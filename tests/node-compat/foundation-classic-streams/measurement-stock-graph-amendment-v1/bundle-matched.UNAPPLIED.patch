@@ -1,0 +1,21 @@
+--- a/bundle-matched.mjs
++++ b/bundle-matched.mjs
+@@ -4,6 +4,7 @@
+ import {createHash} from 'node:crypto';
+ import {dirname,join,isAbsolute} from 'node:path';
+ import {fileURLToPath,pathToFileURL} from 'node:url';
++import {priorStockModules} from './stock-graph.mjs';
+ const here=dirname(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex');
+ export async function bundleMatched(toolchain,admission,arm){
+  assert(['native-on','canonical-on','canonical-off','stock-on'].includes(arm));await admission.recheck();
+@@ -20,8 +21,8 @@
+  const own=['guest.mjs','capture-before.mjs','workload.mjs','control-workload.mjs','protocol.mjs',stockArm?'stock-provider.mjs':canonical?'canonical-provider.mjs':'native-provider.mjs'].map(name=>join(here,name));
+  if(stockArm){
+   assert.deepEqual(chunk.imports,[]);
+-  const previous=JSON.parse(await readFile(join(here,'stock-source-graph.json'))),oldOwn=['entry.mjs','workload.mjs','stock-provider.mjs'];
+-  const prior=previous.modules.filter(id=>!oldOwn.some(name=>id===join(dirname(previous.provider),name)));
++  const previous=JSON.parse(await readFile(join(here,'stock-source-graph.json')));
++  const prior=priorStockModules(previous);
+   assert.equal(prior.length,99);assert.deepEqual([...modules].sort(),[...prior,...own].sort());
+   assert.deepEqual(virtual.sort((a,b)=>a.id.localeCompare(b.id)),[...previous.virtualSources].sort((a,b)=>a.id.localeCompare(b.id)));
+   const processEdges=resolutions.filter(row=>row.request==='process/'&&row.importer?.includes('/readable-stream/lib/'));

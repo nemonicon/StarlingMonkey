@@ -1,0 +1,1 @@
+import{nextTick}from'starling:test-internal-ticks';nextTick(null);export function run(){return ''}

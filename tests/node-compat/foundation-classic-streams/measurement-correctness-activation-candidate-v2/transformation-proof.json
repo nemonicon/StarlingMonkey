@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "parentIndexSha256": "ce2f254f2cf27d44df5f0d23915ca4e09c98ac15b2f88f762d41f57fb8e6048e",
+  "mandatoryPersistenceIndexSha256": "60a8687e9b6bfff4c68df2a36e9dd47ad0f5cd327441f8cf32d63caa67518ba8",
+  "beforeSha256": "a5a73d36cb1a55be220af7415d13d9f6670bbffe34305f67f4031d0e636963ac",
+  "afterSha256": "258c3d0873aeb9a60a5dab530036e628895d02de8333296ce2371aefda2158cb",
+  "edits": [
+    {
+      "old": "OUTPUT=HERE.parent/'measurement-correctness-activated-v1'",
+      "new": "PREVIOUS=HERE.parent/'measurement-correctness-activation-candidate-v1'\nPREVIOUS_INDEX='ce2f254f2cf27d44df5f0d23915ca4e09c98ac15b2f88f762d41f57fb8e6048e'\nPERSIST=HERE.parent/'measurement-correctness-persistence-amendment-v1'\nPERSIST_INDEX='60a8687e9b6bfff4c68df2a36e9dd47ad0f5cd327441f8cf32d63caa67518ba8'\nOUTPUT=HERE.parent/'measurement-correctness-activated-v2'",
+      "count": 1,
+      "afterOffsets": [
+        667
+      ]
+    },
+    {
+      "old": "own_rows=indexed(HERE,own_sha);base_rows=indexed(BASE,BASE_INDEX);amend_rows=indexed(AMEND,AMEND_INDEX)",
+      "new": "own_rows=indexed(HERE,own_sha);base_rows=indexed(BASE,BASE_INDEX);amend_rows=indexed(AMEND,AMEND_INDEX)\n    previous_rows=indexed(PREVIOUS,PREVIOUS_INDEX);persist_rows=indexed(PERSIST,PERSIST_INDEX)",
+      "count": 1,
+      "afterOffsets": [
+        3800
+      ]
+    },
+    {
+      "old": "payload['component-driver.mjs']=regular(AMEND/'proposed/component-driver.mjs');payload['bounded-comparison.mjs']=regular(AMEND/'bounded-comparison.mjs')",
+      "new": "payload['component-driver.mjs']=regular(PERSIST/'proposed/component-driver.mjs');payload['bounded-comparison.mjs']=regular(AMEND/'bounded-comparison.mjs')\n    payload['durable-host.mjs']=regular(PERSIST/'durable-host.mjs')",
+      "count": 1,
+      "afterOffsets": [
+        6110
+      ]
+    },
+    {
+      "old": "payload['README.md']=b'Root-reviewed diagnostic correctness source family only;20/14 actual guest gates remain unexecuted. No timing authority.\\n'",
+      "new": "payload['README.md']=b'Fresh correctness-v2 source family with mandatory per-case persistence and finite600s Wasmtime cap; full20/14 guest gates unexecuted. No resume or timing authority.\\n'",
+      "count": 1,
+      "afterOffsets": [
+        7261
+      ]
+    },
+    {
+      "old": "(AMEND,amend_rows,AMEND_INDEX),(PRODUCER,producer_rows,PRODUCER_INDEX)",
+      "new": "(AMEND,amend_rows,AMEND_INDEX),(PREVIOUS,previous_rows,PREVIOUS_INDEX),(PERSIST,persist_rows,PERSIST_INDEX),(PRODUCER,producer_rows,PRODUCER_INDEX)",
+      "count": 1,
+      "afterOffsets": [
+        7983
+      ]
+    },
+    {
+      "old": "'parentCorrectnessIndexSha256':BASE_INDEX,'mandatoryReportingIndexSha256':AMEND_INDEX,'activationProducerIndexSha256':own_sha,",
+      "new": "'parentCorrectnessIndexSha256':BASE_INDEX,'mandatoryReportingIndexSha256':AMEND_INDEX,'mandatoryPersistenceIndexSha256':PERSIST_INDEX,'previousActivationProducerIndexSha256':PREVIOUS_INDEX,'activationProducerIndexSha256':own_sha,\n      'perCaseWasmtimeDeadlineMs':600000,'fullCorpusGuestProviderOracleBundleInputsChanged':False,'resumeSupported':False,'reusedResults':0,",
+      "count": 1,
+      "afterOffsets": [
+        10548
+      ]
+    }
+  ],
+  "reverseExact": true,
+  "nativeAuthorityOrVerifierOrTupleSchemaChanged": false
+}

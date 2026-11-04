@@ -1,0 +1,22 @@
+--- a/builtins/web/crypto/subtle-crypto.cpp
++++ b/builtins/web/crypto/subtle-crypto.cpp
+@@ -185,7 +185,8 @@
+   // respectively.
+   auto algorithm = args.get(0);
+   auto key_arg = args.get(1);
+-  if (!CryptoKey::is_instance(key_arg)) {
++  if (!CryptoKey::is_instance(key_arg) ||
++      &key_arg.toObject() == CryptoKey::proto_obj.get()) {
+     api::throw_error(cx, api::Errors::TypeError, "crypto.subtle.sign", "key",
+       "be a CryptoKey object");
+     return ReturnPromiseRejectedWithPendingError(cx, args);
+@@ -276,7 +277,8 @@
+   // respectively.
+   auto algorithm = args.get(0);
+   auto key_arg = args.get(1);
+-  if (!CryptoKey::is_instance(key_arg)) {
++  if (!CryptoKey::is_instance(key_arg) ||
++      &key_arg.toObject() == CryptoKey::proto_obj.get()) {
+     api::throw_error(cx, api::Errors::TypeError, "crypto.subtle.verify", "key",
+       "be a CryptoKey object");
+     return ReturnPromiseRejectedWithPendingError(cx, args);

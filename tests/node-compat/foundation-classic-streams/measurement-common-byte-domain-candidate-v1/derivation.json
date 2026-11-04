@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "state": "NEW_FINITE_BYTE_COMMON_DOMAIN_NOT_AN_OLD_WORKLOAD_REWRITE",
+  "parentIndexSha256": "39774bbadae98f70e777edb8801ed0ea70d50430f7193f0f4a7fce3630cca41c",
+  "beforeSha256": "ffbab39fb8c898eee8c22025a1ca20c71798815285b0791774437cfa349613f7",
+  "afterSha256": "925d5c109a84e7528d91ed8c61385339008f59982a91fd1a73dfdb43b49e3276",
+  "edits": [
+    {
+      "old": "export const scenarioIds=Object.freeze(['pipeline-view-64','pipeline-copy-64','pipeline-view-524288','pipeline-copy-524288','fragmented-utf8','object-backpressure','handled-cancellation','checksum-input-only','byte-input-and-copy-construction-only','stream-construction-and-clean-close-only']);",
+      "new": "export const scenarioIds=Object.freeze([\"pipeline-view-64-hwm-plus1\",\"pipeline-copy-64-hwm-plus1\",\"pipeline-view-524288-hwm-plus1\",\"pipeline-copy-524288-hwm-plus1\"]);",
+      "count": 1
+    },
+    {
+      "old": "highWaterMark:fragmented?8:input.size,read()",
+      "new": "highWaterMark:fragmented?8:input.size+1,read()",
+      "count": 1
+    },
+    {
+      "old": "new stream.PassThrough({highWaterMark:input.size});",
+      "new": "new stream.PassThrough({highWaterMark:input.size+1});",
+      "count": 1
+    },
+    {
+      "old": "highWaterMark:fragmented?2:input.size,write}",
+      "new": "highWaterMark:fragmented?2:input.size+1,write}",
+      "count": 1
+    }
+  ],
+  "originalWorkloadChanged": false,
+  "parameter": "source/pass/sink highWaterMark =chunkBytes+1; synchronous sink callback unchanged",
+  "newIds": [
+    "pipeline-view-64-hwm-plus1",
+    "pipeline-copy-64-hwm-plus1",
+    "pipeline-view-524288-hwm-plus1",
+    "pipeline-copy-524288-hwm-plus1"
+  ]
+}

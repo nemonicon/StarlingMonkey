@@ -1,0 +1,453 @@
+#!/usr/bin/env python3
+"""Independent completed-result reader. Never starts guest/Node/build/host.
+
+Default mode records preparation/partial observations only. --finish requires
+Root's explicit terminal receipt; only then may it produce a pass result.
+Static wasm-tools WIT reads are the only child processes in finish mode.
+"""
+import sys
+sys.dont_write_bytecode=True
+from pathlib import Path
+import argparse
+import datetime
+import hashlib
+import json
+import os
+import re
+import stat
+import subprocess
+HERE=Path(__file__).resolve().parent
+FAMILY=HERE.parent
+SOURCE=Path('/private/tmp/starling-node-compat/classic-trace-source-v1/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1')
+RUNTIME=FAMILY/'production-trace-runtime-activated-v1'
+OUTPUT=Path('/tmp/starling-node-compat/production-classic-corrected-regression-v1/off-release')
+SOURCE_SHA='a08aec2d8a28f6bb91251841b617be20820c23ab085e526d0dc107439b061c6e'
+SOURCE_REVIEW_SHA='85296020f2f792c01107e10d9602de5f586881c3cde3628e1c1b30226f6dbf1d'
+RUNTIME_SHA='e1f87cd6a2fd09ff34055187bfb938c2b094c3fd333ef9f57b6a1eea4c175b78'
+PINS_SHA='182e8b724d94ebf73450c0ffcea81fb19b902028e2839bd2a9d1452ab7fab5eb'
+ROOT_SHA='ce88ac3495afdf97718a34f7bf2c2360613f95a91f5c193e556c87269b4a8be0'
+ROOT_TERMINAL_SHA='6dfeda3127cd869d0fe886a5e0899a6f1544b9c1a34461689b66c17ccefa1946'
+ENGINE_SHA='d54446dcd4071fe2c2b1db4984ead78d2fe61ceb0a0396822df8416a26921a92'
+TOOL=Path('/tmp/starling-node-compat/improved-build/cache/wasm-tools/1448/wasm-tools')
+TOOL_SHA='b332dd79057dafdcc8a36ca933d0d499acea506b56b1ea28e28fbb036c9e713d'
+JOBS=[
+ ('core','common/run-core.mjs','results.json','production-admission-complete.json'),
+ ('allocator','common/run-allocator.mjs','results.json','production-admission-complete.json'),
+ ('stream-web','off/run-stream-web.mjs','results.json','followon-admission-complete.json'),
+ ('optional','release/run-optional.mjs','results.json','release-admission-complete.json'),
+ ('strict-sync','off/run-sync.mjs','private-ticks-sync-results.json','followon-admission-complete.json'),
+ ('strict-runtime','off/run-runtime.mjs','private-ticks-runtime-results.json','followon-admission-complete.json'),
+ ('strict-late','off/run-late.mjs','private-ticks-late-results.json','followon-admission-complete.json'),
+ ('strict-callbacks','off/run-callbacks.mjs','private-ticks-callback-results.json','followon-admission-complete.json')]
+MODULES=['path','events','string-decoder','assert','querystring','util']
+checks={}
+
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def absolute(path):
+    return Path(os.path.abspath(path))
+
+
+def regular(path, expected=None, size=None):
+    path = absolute(path)
+    before = path.lstat()
+    assert stat.S_ISREG(before.st_mode), str(path)
+    if size is not None:
+        assert before.st_size == size, str(path)
+    h = hashlib.sha256()
+    with path.open('rb') as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+            h.update(chunk)
+    after = path.lstat()
+    assert (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) == (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns), str(path)
+    row = {'path': str(path), 'sha256': h.hexdigest(), 'bytes': before.st_size}
+    assert expected is None or expected == row['sha256'], str(path)
+    if str(path) in checks:
+        assert checks[str(path)] == row
+    checks[str(path)] = row
+    return row
+
+
+def document(path, expected=None, size=None):
+    row = regular(path, expected, size)
+    data = Path(path).read_bytes()
+    assert digest(data) == row['sha256']
+    return json.loads(data)
+
+
+def below(root, path):
+    root, path = absolute(root), absolute(path)
+    assert path != root and path.is_relative_to(root), (str(root), str(path))
+    assert root.is_dir() and not root.is_symlink(), str(root)
+    cursor = path
+    while cursor != root:
+        assert not cursor.is_symlink(), str(cursor)
+        cursor = cursor.parent
+
+
+def membership(root):
+    assert root.is_dir() and not root.is_symlink(), str(root)
+    rows = []
+    for directory, dirs, files in os.walk(root, followlinks=False):
+        for name in sorted(dirs + files):
+            path = Path(directory) / name
+            mode = path.lstat().st_mode
+            kind = ('symlink' if stat.S_ISLNK(mode) else 'directory' if stat.S_ISDIR(mode) else 'file' if stat.S_ISREG(mode) else None)
+            assert kind, str(path)
+            rows.append({'path': str(path.relative_to(root)), 'kind': kind})
+        dirs[:] = [name for name in dirs if not (Path(directory) / name).is_symlink()]
+    return sorted(rows, key=lambda row: row['path'])
+
+
+
+def indexed(root, expected, count):
+    value=document(root/'index.json',expected)
+    rows={r['path']:r for r in value['files']};assert len(rows)==len(value['files'])==count
+    for name,row in rows.items():
+        assert not Path(name).is_absolute() and '..'not in Path(name).parts
+        below(root,root/name);regular(root/name,row['sha256'],row['bytes'])
+    return value
+
+
+def source_closure():
+    indexed(SOURCE,SOURCE_SHA,83)
+    indexed(FAMILY/'independent-trace-replay-family-review-v1',SOURCE_REVIEW_SHA,7)
+    indexed(RUNTIME,RUNTIME_SHA,26)
+    receipt=document(SOURCE/'source-receipt.json')
+    assert receipt['runtimeIndexSha256']==RUNTIME_SHA
+    assert receipt['reviewedPinsSha256']==PINS_SHA and receipt['rootReviewReceiptSha256']==ROOT_SHA
+    assert receipt['currentV3BodiesByteIdentical']==62 and receipt['newChangedHostBodies']==2
+    assert receipt['guestSemanticOrOracleBodiesChanged'] is receipt['engineMetadataRewritten'] is False
+    consumed={}
+    for name,field,count in [('input-freeze.json','inputFreezeSha256',2293),('capability/input-freeze.json','capabilityFreezeSha256',2292)]:
+        freeze=document(SOURCE/name,receipt[field]);rows={}
+        for row in freeze['inputs']:
+            path=absolute(SOURCE/Path(name).parent/row['path']);assert path not in rows
+            regular(path,row['sha256'],row['bytes']);rows[path]=row
+        assert len(rows)==count;consumed[name]=rows
+    native=document(HERE/'native-results.json')
+    assert native['state']=='CORRECTED_CLASSIC_CURRENT_SOURCE_NATIVE_REHASH_PASSED'
+    assert native['consumedFilesRehashed']==6414 and native['activatedFilesRehashed']==26
+    assert native['toolTreesMembershipChecked']==2 and native['toolLinksRechecked']==22
+    for row in document(HERE/native['verifiedFiles']['path'],native['verifiedFiles']['sha256'])['files']:
+        regular(row['path'],row['sha256'],row['bytes'])
+    pins=document(SOURCE/'runtime-pins.json',PINS_SHA);authority=document(SOURCE/'root-review-receipt.json',ROOT_SHA)
+    pin=pins['variants']['normal-off'];assert pin['engineSha256']==ENGINE_SHA
+    for field in ['engineSha256','engineBytes','receiptSha256','freezeReceiptSha256']:
+        assert pin[field]==authority['variants']['normal-off'][field]
+    regular(pin['enginePath'],ENGINE_SHA,pin['engineBytes'])
+    metadata=document(pin['enginePath']+'.build.json',pin['receiptSha256'])
+    assert len(metadata['sourceManifest'])==342 and len(pin['frozenFiles'])==474
+    assert metadata['classicTraceSourcePolicy']==pin['classicTraceSourcePolicy']
+    assert metadata['gcStress'] is metadata['oomTesting'] is metadata['debuggerEnabled'] is False
+    return pin,metadata,consumed
+
+
+def walk(value, trail=(), owner=None):
+    if isinstance(value,list):
+        for i,item in enumerate(value):yield from walk(item,trail+(i,),owner)
+    elif isinstance(value,dict):
+        owner=value.get('engineSha256',owner)
+        yield trail,value,owner
+        for name,item in value.items():
+            if name in ['engineMetadata','engineReceipt','metadata','receipt','pin','componentizerProvenance','componentizer']:continue
+            yield from walk(item,trail+(name,),owner)
+
+
+def audit_rows(report):
+    return [(trail,item['interfaceAudit'],owner)for trail,item,owner in walk(report)if isinstance(item.get('interfaceAudit'),dict)]
+
+
+def component_refs(report):
+    rows=[]
+    for trail,item,owner in walk(report,owner=ENGINE_SHA):
+        sha=item.get('componentSha256')
+        if isinstance(sha,str):rows.append({'jsonPath':list(trail),'sha256':sha,'ownerEngineSha256':owner})
+        if str(item.get('path','')).endswith('.component.wasm')and isinstance(item.get('sha256'),str):
+            rows.append({'jsonPath':list(trail),'sha256':item['sha256'],'ownerEngineSha256':owner})
+        if item.get('componentPath')and sha:
+            path=Path(item['componentPath']);assert path.resolve().is_relative_to(OUTPUT.resolve())
+            regular(path,sha,item.get('componentBytes'))
+        if isinstance(item.get('source'),str)and item.get('sourceSha256'):
+            assert digest(item['source'].encode())==item['sourceSha256']
+        if item.get('sourcePath')and item.get('sourceSha256'):regular(item['sourcePath'],item['sourceSha256'])
+        if Path(str(item.get('path',''))).is_absolute()and isinstance(item.get('sha256'),str):
+            regular(item['path'],item['sha256'],item.get('bytes'))
+    return rows
+
+
+def production_admission(value,pin):
+    production=value.get('production',value)
+    assert production['engineSha256']==ENGINE_SHA
+    assert production['sourceFilesVerified']==342 and production['entropyPolicy']=='off'and production['gcStress']is False
+    assert production['variant']=='normal-off'and production['freezeReceiptSha256']==pin['freezeReceiptSha256']
+    assert production['recipeSha256']==pin['recipeSha256']
+    closure=production['inputClosure']
+    assert closure=={'path':str(SOURCE/'input-freeze.json'),'sha256':document(SOURCE/'source-receipt.json')['inputFreezeSha256'],'files':2293}
+
+
+def historical(control,label,expected=None):
+    if expected:
+        for field in ['engine','sourceRoot','engineSha256','receiptSha256']:
+            assert control[field]==expected[field]
+    engine=control['engine'];sha=control['engineSha256'];receipt_sha=control['receiptSha256']
+    regular(engine,sha);metadata=document(engine+'.build.json',receipt_sha)
+    assert metadata['engineSha256']==sha and sha!=ENGINE_SHA
+    assert metadata['observedCMakeOptions']['CMAKE_BUILD_TYPE']=='Release'
+    assert metadata['gcStress']is metadata['oomTesting']is False
+    count=control.get('sourceFilesVerified',control.get('sourceFiles'))
+    assert len(metadata['sourceManifest'])==count
+    for row in metadata['sourceManifest']:regular(Path(control['sourceRoot'])/row['path'],row['sha256'])
+    if 'receipt'in control:assert control['receipt']==metadata
+    return {'label':label,'engine':regular(engine,sha),'receipt':regular(engine+'.build.json',receipt_sha),
+        'sourceRoot':control['sourceRoot'],'sourceRowsRehashed':count,'purpose':'Fresh historical control, not current342 production result'}
+
+
+def entry(row,name,runner,report_name,completion_name,pin):
+    assert row['name']==name and row['code']==0 and row['signal']is None and 'spawnError'not in row
+    assert row['runner']==str(SOURCE/runner);regular(row['runner'],row['runnerSha256'])
+    output=OUTPUT/name;assert row['output']==str(output)
+    assert row['logPath']==str(OUTPUT/(name+'.log'));regular(row['logPath'],row['logSha256'])
+    assert row['prelaunchFreeBytes']>=800*1024*1024 and row['startedAtUtc']<=row['finishedAtUtc']
+    assert row['reportPath']==str(output/report_name)and row['completionPath']==str(output/completion_name)
+    report=document(row['reportPath'],row['reportSha256']);completion=document(row['completionPath'],row['completionSha256'])
+    assert report['engineSha256']==ENGINE_SHA and completion['consumedInputsRecheckedAfterRun']is True
+    production_admission(completion,pin)
+    if 'reportSha256'in completion:assert completion['reportSha256']==row['reportSha256']
+    for trail,audit,owner in audit_rows(report):
+        assert audit['state']=='verified-final-component'and audit['emittedImports']==audit['selectedInterfaces']==[]
+    return report,completion
+
+
+def main_calls(report,count):
+    calls=report['calls'];assert len(calls)==count
+    for i,value in enumerate(calls,1):
+        assert value['calls']==i
+        if 'passed'in value:assert value['passed']is True
+    if 'wasmtimeReport'in report:assert report['wasmtimeReport']==calls[0]
+    elif isinstance(report.get('wasmtime'),dict)and 'observed'in report['wasmtime']:
+        assert report['wasmtime']['observed']==calls[0]
+    return calls
+
+
+def fatal(record):
+    child=record['jcoChild'];host=record['wasmtime']
+    assert child['status']==0 and 'EXPECTED_FATAL_EXPORT'in child['stdout']and 'UNEXPECTED_SUCCESS'not in child['stdout']
+    assert host['status']!=0
+    return {'name':record['name'],'jcoStatus':child['status'],'wasmtimeStatus':host['status'],
+        'meaning':'Jco child caught expected terminal failure; host failure is not proof of error origin; failed instances discarded'}
+
+
+from evidence_helpers import review_core_glue, raw_host_inventory
+
+def review_observable_oracles(reports,metadata):
+    from oracle_reader import review
+    return review(reports,metadata,document,regular,FAMILY,SOURCE,OUTPUT)
+
+def finish(terminal_path):
+    assert terminal_path,'Root terminal receipt must be provided explicitly'
+    terminal=document(terminal_path,ROOT_TERMINAL_SHA)
+    assert terminal['state']=='ROOT_CORRECTED_FRESH_EIGHT_STAGE_REPLAY_VERIFIED'
+    assert terminal['toolSession']==23947 and terminal['rawTerminalExitCode']==0
+    assert terminal['sourceIndexSha256']==SOURCE_SHA and terminal['engineSha256']==ENGINE_SHA
+    root_evidence={row['path']:row for row in terminal['evidence']}
+    assert len(root_evidence)==len(terminal['evidence'])
+    for row in root_evidence.values():regular(row['path'],row['sha256'],row['bytes'])
+    pin,metadata,consumed=source_closure()
+    top=document(OUTPUT/'results.json');assert top['state']=='passed'and top['reusedResults']==0 and top['resumeSupported']is False
+    assert top['engineSha256']==ENGINE_SHA and top['sourceFiles']==342
+    production_admission(top['admission'],pin)
+    top_seal=document(OUTPUT/'release-admission-complete.json')
+    production_admission(top_seal,pin);assert top_seal['consumedInputsRecheckedAfterRun']is True and top_seal['jobs']==8
+    assert top_seal['reportSha256']==regular(OUTPUT/'results.json')['sha256']
+    assert [row['name']for row in top['jobs']]==[row[0]for row in JOBS]
+    reports={};entries=[];previous=None
+    for row,spec in zip(top['jobs'],JOBS):
+        if previous is not None:assert previous<=row['startedAtUtc']
+        previous=row['finishedAtUtc']
+        report,seal=entry(row,*spec,pin);reports[spec[0]]=report;entries.append({'name':spec[0],'report':regular(row['reportPath']),'completion':regular(row['completionPath']),'log':regular(row['logPath']),'reportedAuditCount':len(audit_rows(report))})
+    optional=reports['optional'];assert optional['state']=='passed'and [r['name']for r in optional['modules']]==MODULES
+    optional_reports={};historicals=[]
+    controls=document(SOURCE/'release/historical-controls.json')['modules']
+    previous=None
+    for row,name in zip(optional['modules'],MODULES):
+        assert row['name']==name and row['code']==0 and row['signal']is None and 'spawnError'not in row
+        assert row['runner']==str(SOURCE/'release'/('run-'+name+'.mjs'))
+        assert row['output']==str(OUTPUT/'optional'/name)
+        regular(row['runner'],row['runnerSha256']);regular(row['logPath'],row['logSha256'])
+        assert row['logPath']==str(OUTPUT/'optional'/(name+'.log'))
+        if previous is not None:assert previous<=row['startedAtUtc']
+        previous=row['finishedAtUtc']
+        report_path=OUTPUT/'optional'/name/'results.json';seal_path=report_path.parent/'release-module-admission-complete.json'
+        assert row['reportPath']==str(report_path)and row['completionPath']==str(seal_path)
+        report=document(report_path,row['reportSha256']);seal=document(seal_path,row['completionSha256'])
+        assert report['engineSha256']==ENGINE_SHA and seal['module']==name and seal['reportSha256']==row['reportSha256']
+        production_admission(seal,pin);assert seal['consumedInputsRecheckedAfterRun']is True
+        audits=audit_rows(report);assert len(audits)==row['finalComponentAudits']==seal['checked']['finalComponentAudits']and len(audits)>0
+        assert seal['checked']['selectedInterfaces']==seal['checked']['emittedImports']==[]
+        for trail,audit,owner in audits:assert audit['selectedInterfaces']==audit['emittedImports']==[]
+        control=seal['control']
+        if name in ['assert','querystring','util']:
+            historicals.append(historical(control,'optional-'+name,controls[name]))
+            assert report['offAdmission']['engineSha256']==control['engineSha256']
+        else:assert control is None and (name!='events'or report['offAdmission']is None)
+        optional_reports[name]=report
+        entries.append({'name':'optional/'+name,'report':regular(report_path),'completion':regular(seal_path),'log':regular(row['logPath']),'reportedAuditCount':len(audits)})
+    main_calls(reports['core'],2);assert len(reports['core']['initializationFailures'])==4
+    allocator=reports['allocator'];calls=main_calls(allocator,2)
+    oracle=document(FAMILY.parent/'foundation-alloc-unsafe/node-results.json',allocator['oracleSha256'])
+    for call in calls:
+        assert call['cases']==oracle['cases']and call['actualNativeModule']is True and call['allocatorReplaced']is False
+        assert len(call['numericHooks'])==6 and all(h['hookCalls']==0 for h in call['numericHooks'])
+        assert call['refusals']['operations']==240 and call['refusals']['counts']=={'globalError':0,'publicDefineProperty':0,'inheritedGets':0,'inheritedSets':0}
+    assert len(allocator['initialization'])==11 and len(allocator['oldControl']['initialization'])==2
+    historicals.append(historical(allocator['oldControl'],'allocator-old-core'))
+    historicals.append(historical(allocator['delegatedControl'],'allocator-m08-delegated'))
+    assert allocator['oldControl']['engine']=='/tmp/starling-node-compat/foundations-v7/native-freeze/off-foundations.engine.wasm'
+    assert allocator['oldControl']['engineSha256']=='ee92d5d451c16eb7ce83e0306e8dab6920f4aacd9f2c4bb9d6e5e4af2c20ea09'
+    assert allocator['oldControl']['sourceFilesVerified']==293 and allocator['oldControl']['coreExpectations']['coreVersion']=='sm-node-22.14.0-m0.1'
+    delegated=allocator['delegatedControl'];assert delegated['sourceFilesVerified']==304
+    assert delegated['engine']=='/tmp/starling-node-compat/foundations-v10/native-freeze/off-foundations.engine.wasm'
+    assert delegated['engineSha256']=='1098e7531004a4ca1b47f2ca80527a01e64cd3392d28d760da37326c08a85154'
+    assert delegated['coreExpectations']['coreVersion']=='sm-node-22.14.0-m0.8'
+    for i,value in enumerate(delegated['calls'],1):assert value=={'calls':i,'integerCalls':1,'finiteCalls':1,'length':3,'brand':True,'zero':True}
+    assert delegated['wasmtime']['observed']==delegated['calls'][0]
+    main_calls(reports['stream-web'],3)
+    for name,count in [('path',3),('events',2),('string-decoder',3),('assert',2),('querystring',2),('util',2)]:main_calls(optional_reports[name],count)
+    path=optional_reports['path'];assert len(path['aliases']['calls'])==2 and len(path['topLevelFailures'])==2 and path['globReport']['differences']==[]
+    assert path['calls'][0]['lexical']==15696 and path['calls'][0]['globs']==4046
+    oracle_output=OUTPUT/'optional/path/node-oracles'
+    assert path['hostSemanticResults']==document(oracle_output/'semantic-results.json')
+    assert path['globReport']==document(oracle_output/'glob-results.json')
+    assert len(document(oracle_output/'lexical-vectors.json'))==15696
+    assert len(document(oracle_output/'glob-vectors.json'))==4046
+    for name,expected in [('semantic.mjs','23fe6d8eed334a3eae580655d9a859a048f0097bcd957259cf4218a230701cbf'),('glob.mjs','befc3e984b1b82e33ad008943e85a2461dca424e9f1d27561edfdeda455df619')]:
+        regular(FAMILY.parent/'foundation-scheduler/production-release-runner-v3/oracles'/name,expected)
+    assert len(optional_reports['events']['initialization'])==7
+    decoder=optional_reports['string-decoder'];assert len(decoder['topLevelFailures'])==3 and len(decoder['preservedOrderingDeviations'])==2
+    assert optional_reports['assert']['primitiveEqualityComparisons']==784 and len(optional_reports['assert']['initialization'])==9
+    assert optional_reports['querystring']['customSeparatorVectors']==210 and optional_reports['querystring']['byteFallbackVectors']==1536 and len(optional_reports['querystring']['initialization'])==8
+    assert len(optional_reports['util']['initialization'])==8
+    sync=reports['strict-sync'];assert len(sync['initialization'])==16 and len(sync['deployed'])==3
+    for case in sync['initialization']:
+        if case['rejected']:assert case.get('error')
+        else:assert case['calls'][0]==case['calls'][1]==case['wasmtime']['observed']
+    for i,value in enumerate(sync['successfulReuse']['calls'],1):assert value=={'calls':i,'seen':1,'caught':True}
+    fatals=[fatal(x)for x in sync['deployed']]
+    runtime=reports['strict-runtime'];assert len(runtime['controls'])==4
+    previous=document(FAMILY.parent/'foundation-add-abort/runtime-async-observation-results.json',runtime['previousObservationSha256'])
+    assert len(runtime['fatal'])==len(previous['results'])+3
+    for old,new in zip(previous['results'],runtime['fatal']):assert old['source']==new['source']and old['sourceSha256']==new['unchangedV1SourceSha256']
+    fatals.extend(fatal(x)for x in runtime['fatal'])
+    for control in runtime['controls']:
+        assert len(control['calls'])==3 and control['wasmtime']['observed']==control['calls'][0]
+        for i,value in enumerate(control['calls'],1):assert value['calls']==i
+    late=reports['strict-late'];assert len(late['cases'])==6
+    assert [x['rejected']for x in late['cases']]==[True,True,True,False,False,False]
+    for case in late['cases'][3:]:assert case['jco'][0]==case['jco'][1]==case['wasmtime']['observed']and case['jco'][0]['getters']==1
+    callbacks=reports['strict-callbacks'];assert len(callbacks['initialization'])==8 and all(x['rejected']for x in callbacks['initialization'])
+    assert len(callbacks['controls'])==5
+    registration=next(x for x in callbacks['controls']if x['name']=='registration-deferred')
+    assert registration['deviation']and registration['calls'][0]=={'calls':1,'reads':0,'caught':False,'registered':True}
+    for control in callbacks['controls']:
+        assert len(control['calls'])==3 and control['wasmtime']['observed']==control['calls'][0]
+        for i,value in enumerate(control['calls'],1):assert value['calls']==i
+    # Derive the complete final-component set from actual physical outputs and
+    # report hash declarations; never assume a historical fixed component count.
+    all_reports={k:v for k,v in reports.items()if k!='optional'}
+    all_reports.update({'optional/'+k:v for k,v in optional_reports.items()})
+    refs=[]
+    for label,report in all_reports.items():
+        for key in ['engineMetadata','engineReceipt','metadata']:
+            if isinstance(report.get(key),dict):assert report[key]==metadata
+        if 'sourceRoot'in report:assert report['sourceRoot']==pin['sourceRoot']
+        for row in report.get('sourceManifest',[]):
+            if isinstance(row,dict)and row.get('actualPath'):regular(row['actualPath'],row['sha256'])
+        for ref in component_refs(report):refs.append({'report':label,**ref})
+    by_sha={}
+    for ref in refs:by_sha.setdefault(ref['sha256'],[]).append(ref)
+    inventory=[];components=[];symlinks=[]
+    for directory,dirs,files in os.walk(OUTPUT,followlinks=False):
+        for name in dirs+files:
+            p=Path(directory)/name
+            if p.is_symlink():symlinks.append({'path':str(p),'target':os.readlink(p),'resolved':str(p.resolve(strict=True))})
+        dirs[:]=[name for name in dirs if not(Path(directory)/name).is_symlink()]
+        for name in files:
+            p=Path(directory)/name
+            if p.is_symlink():continue
+            item=regular(p);inventory.append(item)
+            if name.endswith('.component.wasm'):components.append(item)
+    assert components
+    for link in symlinks:
+        assert Path(link['path']).name=='node_modules'
+        assert Path(link['resolved'])==Path('/tmp/starling-node-compat/native-toolchain-lock/node_modules').resolve()
+    regular(TOOL,TOOL_SHA);wits=[]
+    for component in components:
+        assert component['sha256']in by_sha,(component['path'],'No actual report declaration')
+        argv=[str(TOOL),'component','wit',component['path']]
+        result=subprocess.run(argv,capture_output=True,timeout=55)
+        assert result.returncode==0 and result.stderr==b''
+        wit=result.stdout.decode();imports=re.findall(r'^\s*import\s+([^;]+);',wit,re.MULTILINE)
+        assert imports==[]
+        rel=Path(component['path']).relative_to(OUTPUT);destination=HERE/'wit'/Path(str(rel)+'.wit')
+        destination.parent.mkdir(parents=True,exist_ok=True);destination.write_bytes(result.stdout)
+        root_component=next(r for r in terminal['components'] if Path(r['path']).resolve()==Path(component['path']).resolve())
+        assert root_component['sha256']==component['sha256']
+        wits.append({'component':component,'reportDeclarations':by_sha[component['sha256']],
+            'argv':argv,'exitCode':0,'imports':imports,'witSha256':digest(result.stdout)})
+    logs=[]
+    for p in [Path('/tmp/starling-node-compat/classic-corrected-release-replay-v1.stdout.log'),Path('/tmp/starling-node-compat/classic-corrected-release-replay-v1.stderr.log')]:logs.append(regular(p))
+    expected_root_refs={str(OUTPUT/'results.json'),str(OUTPUT/'release-admission-complete.json')}|{r['path']for r in logs}
+    for row in entries:
+        expected_root_refs|={row[key]['path']for key in ['report','completion','log']}
+    assert set(root_evidence)==expected_root_refs
+    owner_counts={}
+    for component in components:
+        owners={r['ownerEngineSha256']for r in by_sha[component['sha256']]}
+        assert len(owners)==1 and None not in owners
+        owner=next(iter(owners));owner_counts[owner]=owner_counts.get(owner,0)+1
+    supplement_audits=review_observable_oracles(all_reports,metadata)
+    # Native and sealed source inputs must remain identical after static reads.
+    regular(SOURCE/'index.json',SOURCE_SHA);regular(pin['enginePath'],ENGINE_SHA,pin['engineBytes'])
+    final_top=regular(OUTPUT/'results.json');assert final_top['sha256']==top_seal['reportSha256']
+    result={'schemaVersion':1,'state':'INDEPENDENT_CORRECTED_EIGHT_STAGE_REPLAY_COMPLETED_RESULTS_REVIEW_PASSED',
+        'reviewedAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'rootTerminalEvidence':regular(terminal_path),
+        'rootTerminalObservedByThisReader':False,'sourceIndex':regular(SOURCE/'index.json',SOURCE_SHA),
+        'rootEvidenceReferencesIndependentlyRehashed':len(root_evidence),
+        'sourceIndexedFilesRehashed':83,'rootConsumedRowsRehashed':2293,'capabilityConsumedRowsRehashed':2292,'runtimeConsumedRowsRehashed':6414,'runtimeToolLinks':22,
+        'actualEngineSha256':ENGINE_SHA,'actualNativeSourceRows':342,'actualNativeFrozenRows':474,
+        'topReport':final_top,'topCompletion':regular(OUTPUT/'release-admission-complete.json'),'outerLogs':logs,
+        'freshStageCount':8,'freshOptionalModuleCount':6,'stageAndModuleEvidence':entries,
+        'physicalFinalComponentCount':len(components),'uniqueFinalComponentHashes':len({c['sha256']for c in components}),
+        'componentCountsByDeclaredActualEngine':owner_counts,
+        'componentCountsDerivedFromActualReportsAndFiles':True,'componentWitAudits':wits,
+        'observableOracleReview':supplement_audits, 'coreGlueReview':review_core_glue(OUTPUT,components,wasmtime_only={str(OUTPUT/'core/native-aliases.component.wasm')}),
+        'rawHostEvidence':raw_host_inventory(all_reports), 'currentNativeClosureReview':regular(HERE/'native-results.json'),
+        'outputRegularFilesRehashed':len(inventory),'outputLinks':symlinks,'historicalControls':historicals,
+        'retainedCounterexamples':{'allocatorM08MutableNumberHooks':delegated['calls'],
+            'stringDecoderOrdering':decoder['preservedOrderingDeviations'],
+            'streamWebGuardDeviations':reports['stream-web']['calls'][0]['guardDeviations'],
+            'streamWebDataDeviations':reports['stream-web']['calls'][0]['dataDeviations'],
+            'streamWebOrdinaryNativeBrandProof':reports['stream-web']['calls'][0]['policies']['ordinaryNativeBrandProof'],
+            'pathHostSemantics':path['hostSemanticResults']['deviations'],
+            'callbackRegistrationGetterTiming':registration['deviation']},
+        'fatalDiscardCases':fatals,'reusedResults':0,'resumeSupported':False,
+        'limitations':['No guest, Node, JavaScript preflight, native producer, build, componentizer, transpiler or target host was invoked by this reader; static wasm-tools reads only.',
+            'Root supplied the raw terminal outcome. Reported decoded host observations are compared; absent raw stdout streams are not independently decoded.',
+            'Freshness is supported by the sealed fresh-only orchestration, child report/log/completion chains and one new output root; it is not attestation of a past process.',
+            'Historical controls are explicit old engines and sources; their fresh observations are not current342 production behavior.',
+            'Generic fatal host traps do not identify the originating guest error. Failed instances are discarded.',
+            'Preserved guard/data/ordering/getter and mutable-hook counterexamples prevent broader Node/Web equivalence claims.',
+            'No performance, complete streams/process, ALS, isolated GC-root, reset/teardown or safe failed-instance reuse claim.'],
+        'guestHostBuildOrReplayRerun':False,'completeNodeCompatibilityClaim':False,'performanceClaim':False,'overallRoadmapComplete':False}
+    (HERE/'results.json').write_text(json.dumps(result,indent=2)+'\n')
+    (HERE/'output-files.json').write_text(json.dumps({'schemaVersion':1,'files':inventory},indent=2)+'\n')
+    (HERE/'verified-files.json').write_text(json.dumps({'schemaVersion':1,'files':sorted(checks.values(),key=lambda r:r['path'])},indent=2)+'\n')
+    print(json.dumps({'state':result['state'],'freshStages':8,'optionalModules':6,'components':len(components),'files':len(inventory)}))
+
+
+if __name__=='__main__':
+    finish(FAMILY/'production-adoption-v1/corrected-release-replay-root-results.json')

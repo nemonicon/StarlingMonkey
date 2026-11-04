@@ -1,0 +1,606 @@
+{
+  "schema": 1,
+  "state": "unapplied-private-source-host-semantics-passed",
+  "atUtc": "2026-11-03T11:23:11.052Z",
+  "node": "v22.14.0",
+  "profileVersion": "sm-node-22.14.0-m0.11",
+  "ancestryEngineSha256": "e16c19fc567753517d7b61b65372dd7dc86de8f839e7acab959b5cf5eaf294c9",
+  "sourceReceiptSha256": "97bd998c559f853a14c37e439dad5179866f397b2a796323d65f33f576cf667c",
+  "testSha256": "fbab8ff46d004fc7fce28aa219cc818ce0fa10e7ed7b11aca7cbe28c59d2a599",
+  "sharedCorpusSha256": {
+    "allocation": "01eb4e9a1b7d7731a1eabbadf4902fee6fe0c3a149b79cbc617b6a81e60e561f",
+    "installedPolicyAndPoison": "162ab1ef45630082704f288eabe164c3059da8a7789c21a60c56769798ae4583"
+  },
+  "variants": [
+    {
+      "variant": "baseline",
+      "form": "actual-private-esm",
+      "differentialGroups": 10,
+      "profile": [
+        {
+          "name": "fresh zeroed no-pool backing",
+          "result": [
+            {
+              "size": 0,
+              "length": 0,
+              "offset": 0,
+              "backingBytes": 0
+            },
+            {
+              "size": 0.5,
+              "length": 0,
+              "offset": 0,
+              "backingBytes": 0
+            },
+            {
+              "size": 1,
+              "length": 1,
+              "offset": 0,
+              "backingBytes": 1
+            },
+            {
+              "size": 17,
+              "length": 17,
+              "offset": 0,
+              "backingBytes": 17
+            },
+            {
+              "size": 1024,
+              "length": 1024,
+              "offset": 0,
+              "backingBytes": 1024
+            }
+          ]
+        },
+        {
+          "name": "maximum and raw fractional cap",
+          "result": {
+            "maximum": 16777216,
+            "zeroSamples": [
+              0,
+              0,
+              0
+            ],
+            "rejected": 3
+          }
+        },
+        {
+          "name": "captured original producer and normalization",
+          "result": {
+            "length": 3,
+            "publicCalls": 0
+          }
+        },
+        {
+          "name": "captured validation constructors and own fields",
+          "result": {
+            "hookCalls": 0,
+            "codes": [
+              "ERR_INVALID_ARG_TYPE",
+              "ERR_OUT_OF_RANGE"
+            ]
+          }
+        },
+        {
+          "name": "public pool setting has no effect",
+          "result": {
+            "offset": 0,
+            "backingBytes": 3
+          }
+        }
+      ],
+      "refusals": {
+        "operations": 240,
+        "prototypeFunctions": 91,
+        "counts": {
+          "globalError": 0,
+          "publicDefineProperty": 0,
+          "inheritedGets": 0,
+          "inheritedSets": 0
+        },
+        "ownFields": [
+          "code",
+          "module",
+          "operation",
+          "profile"
+        ],
+        "restored": true,
+        "pureJsOnly": true
+      },
+      "species": {
+        "arity": 0,
+        "writable": false,
+        "configurable": false,
+        "positiveBrand": true,
+        "mappedBrand": true
+      },
+      "mutationCases": [
+        {
+          "name": "isInteger",
+          "behavior": "throw-sentinel",
+          "hookCalls": 1,
+          "result": "same-sentinel"
+        },
+        {
+          "name": "isInteger",
+          "behavior": "return-false",
+          "hookCalls": 1,
+          "result": {
+            "name": "Error",
+            "code": "ERR_SM_NODE_UNSUPPORTED",
+            "operation": "fractional size",
+            "profile": "sm-node-22.14.0-m0.11"
+          }
+        },
+        {
+          "name": "isInteger",
+          "behavior": "return-true",
+          "hookCalls": 1,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isFinite",
+          "behavior": "throw-sentinel",
+          "hookCalls": 1,
+          "result": "same-sentinel"
+        },
+        {
+          "name": "isFinite",
+          "behavior": "return-false",
+          "hookCalls": 1,
+          "result": {
+            "name": "RangeError",
+            "code": "ERR_OUT_OF_RANGE",
+            "operation": null,
+            "profile": null
+          }
+        },
+        {
+          "name": "isFinite",
+          "behavior": "return-true",
+          "hookCalls": 1,
+          "result": "zeroed-length-3"
+        }
+      ],
+      "defaultGraphAndDescriptorOrderPreserved": true
+    },
+    {
+      "variant": "candidate",
+      "form": "actual-private-esm",
+      "differentialGroups": 10,
+      "profile": [
+        {
+          "name": "fresh zeroed no-pool backing",
+          "result": [
+            {
+              "size": 0,
+              "length": 0,
+              "offset": 0,
+              "backingBytes": 0
+            },
+            {
+              "size": 0.5,
+              "length": 0,
+              "offset": 0,
+              "backingBytes": 0
+            },
+            {
+              "size": 1,
+              "length": 1,
+              "offset": 0,
+              "backingBytes": 1
+            },
+            {
+              "size": 17,
+              "length": 17,
+              "offset": 0,
+              "backingBytes": 17
+            },
+            {
+              "size": 1024,
+              "length": 1024,
+              "offset": 0,
+              "backingBytes": 1024
+            }
+          ]
+        },
+        {
+          "name": "maximum and raw fractional cap",
+          "result": {
+            "maximum": 16777216,
+            "zeroSamples": [
+              0,
+              0,
+              0
+            ],
+            "rejected": 3
+          }
+        },
+        {
+          "name": "captured original producer and normalization",
+          "result": {
+            "length": 3,
+            "publicCalls": 0
+          }
+        },
+        {
+          "name": "captured validation constructors and own fields",
+          "result": {
+            "hookCalls": 0,
+            "codes": [
+              "ERR_INVALID_ARG_TYPE",
+              "ERR_OUT_OF_RANGE"
+            ]
+          }
+        },
+        {
+          "name": "public pool setting has no effect",
+          "result": {
+            "offset": 0,
+            "backingBytes": 3
+          }
+        }
+      ],
+      "refusals": {
+        "operations": 240,
+        "prototypeFunctions": 91,
+        "counts": {
+          "globalError": 0,
+          "publicDefineProperty": 0,
+          "inheritedGets": 0,
+          "inheritedSets": 0
+        },
+        "ownFields": [
+          "code",
+          "module",
+          "operation",
+          "profile"
+        ],
+        "restored": true,
+        "pureJsOnly": true
+      },
+      "species": {
+        "arity": 0,
+        "writable": false,
+        "configurable": false,
+        "positiveBrand": true,
+        "mappedBrand": true
+      },
+      "mutationCases": [
+        {
+          "name": "isInteger",
+          "behavior": "throw-sentinel",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isInteger",
+          "behavior": "return-false",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isInteger",
+          "behavior": "return-true",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isFinite",
+          "behavior": "throw-sentinel",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isFinite",
+          "behavior": "return-false",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isFinite",
+          "behavior": "return-true",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        }
+      ],
+      "defaultGraphAndDescriptorOrderPreserved": true
+    },
+    {
+      "variant": "baseline",
+      "form": "exact-generated-strict-factories",
+      "differentialGroups": 10,
+      "profile": [
+        {
+          "name": "fresh zeroed no-pool backing",
+          "result": [
+            {
+              "size": 0,
+              "length": 0,
+              "offset": 0,
+              "backingBytes": 0
+            },
+            {
+              "size": 0.5,
+              "length": 0,
+              "offset": 0,
+              "backingBytes": 0
+            },
+            {
+              "size": 1,
+              "length": 1,
+              "offset": 0,
+              "backingBytes": 1
+            },
+            {
+              "size": 17,
+              "length": 17,
+              "offset": 0,
+              "backingBytes": 17
+            },
+            {
+              "size": 1024,
+              "length": 1024,
+              "offset": 0,
+              "backingBytes": 1024
+            }
+          ]
+        },
+        {
+          "name": "maximum and raw fractional cap",
+          "result": {
+            "maximum": 16777216,
+            "zeroSamples": [
+              0,
+              0,
+              0
+            ],
+            "rejected": 3
+          }
+        },
+        {
+          "name": "captured original producer and normalization",
+          "result": {
+            "length": 3,
+            "publicCalls": 0
+          }
+        },
+        {
+          "name": "captured validation constructors and own fields",
+          "result": {
+            "hookCalls": 0,
+            "codes": [
+              "ERR_INVALID_ARG_TYPE",
+              "ERR_OUT_OF_RANGE"
+            ]
+          }
+        },
+        {
+          "name": "public pool setting has no effect",
+          "result": {
+            "offset": 0,
+            "backingBytes": 3
+          }
+        }
+      ],
+      "refusals": {
+        "operations": 240,
+        "prototypeFunctions": 91,
+        "counts": {
+          "globalError": 0,
+          "publicDefineProperty": 0,
+          "inheritedGets": 0,
+          "inheritedSets": 0
+        },
+        "ownFields": [
+          "code",
+          "module",
+          "operation",
+          "profile"
+        ],
+        "restored": true,
+        "pureJsOnly": true
+      },
+      "species": {
+        "arity": 0,
+        "writable": false,
+        "configurable": false,
+        "positiveBrand": true,
+        "mappedBrand": true
+      },
+      "mutationCases": [
+        {
+          "name": "isInteger",
+          "behavior": "throw-sentinel",
+          "hookCalls": 1,
+          "result": "same-sentinel"
+        },
+        {
+          "name": "isInteger",
+          "behavior": "return-false",
+          "hookCalls": 1,
+          "result": {
+            "name": "Error",
+            "code": "ERR_SM_NODE_UNSUPPORTED",
+            "operation": "fractional size",
+            "profile": "sm-node-22.14.0-m0.11"
+          }
+        },
+        {
+          "name": "isInteger",
+          "behavior": "return-true",
+          "hookCalls": 1,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isFinite",
+          "behavior": "throw-sentinel",
+          "hookCalls": 1,
+          "result": "same-sentinel"
+        },
+        {
+          "name": "isFinite",
+          "behavior": "return-false",
+          "hookCalls": 1,
+          "result": {
+            "name": "RangeError",
+            "code": "ERR_OUT_OF_RANGE",
+            "operation": null,
+            "profile": null
+          }
+        },
+        {
+          "name": "isFinite",
+          "behavior": "return-true",
+          "hookCalls": 1,
+          "result": "zeroed-length-3"
+        }
+      ],
+      "defaultGraphAndDescriptorOrderPreserved": true
+    },
+    {
+      "variant": "candidate",
+      "form": "exact-generated-strict-factories",
+      "differentialGroups": 10,
+      "profile": [
+        {
+          "name": "fresh zeroed no-pool backing",
+          "result": [
+            {
+              "size": 0,
+              "length": 0,
+              "offset": 0,
+              "backingBytes": 0
+            },
+            {
+              "size": 0.5,
+              "length": 0,
+              "offset": 0,
+              "backingBytes": 0
+            },
+            {
+              "size": 1,
+              "length": 1,
+              "offset": 0,
+              "backingBytes": 1
+            },
+            {
+              "size": 17,
+              "length": 17,
+              "offset": 0,
+              "backingBytes": 17
+            },
+            {
+              "size": 1024,
+              "length": 1024,
+              "offset": 0,
+              "backingBytes": 1024
+            }
+          ]
+        },
+        {
+          "name": "maximum and raw fractional cap",
+          "result": {
+            "maximum": 16777216,
+            "zeroSamples": [
+              0,
+              0,
+              0
+            ],
+            "rejected": 3
+          }
+        },
+        {
+          "name": "captured original producer and normalization",
+          "result": {
+            "length": 3,
+            "publicCalls": 0
+          }
+        },
+        {
+          "name": "captured validation constructors and own fields",
+          "result": {
+            "hookCalls": 0,
+            "codes": [
+              "ERR_INVALID_ARG_TYPE",
+              "ERR_OUT_OF_RANGE"
+            ]
+          }
+        },
+        {
+          "name": "public pool setting has no effect",
+          "result": {
+            "offset": 0,
+            "backingBytes": 3
+          }
+        }
+      ],
+      "refusals": {
+        "operations": 240,
+        "prototypeFunctions": 91,
+        "counts": {
+          "globalError": 0,
+          "publicDefineProperty": 0,
+          "inheritedGets": 0,
+          "inheritedSets": 0
+        },
+        "ownFields": [
+          "code",
+          "module",
+          "operation",
+          "profile"
+        ],
+        "restored": true,
+        "pureJsOnly": true
+      },
+      "species": {
+        "arity": 0,
+        "writable": false,
+        "configurable": false,
+        "positiveBrand": true,
+        "mappedBrand": true
+      },
+      "mutationCases": [
+        {
+          "name": "isInteger",
+          "behavior": "throw-sentinel",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isInteger",
+          "behavior": "return-false",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isInteger",
+          "behavior": "return-true",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isFinite",
+          "behavior": "throw-sentinel",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isFinite",
+          "behavior": "return-false",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isFinite",
+          "behavior": "return-true",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        }
+      ],
+      "defaultGraphAndDescriptorOrderPreserved": true
+    }
+  ],
+  "kernel": "Explicit host-only reference-kernel test double; allocator uses real host Uint8Array, kernel crypto/hex not involved",
+  "scope": "Four host forms: baseline/candidate ESM and exact generated strict script. No native engine/component, timing, OOM/fault/DEBUG or production edit."
+}

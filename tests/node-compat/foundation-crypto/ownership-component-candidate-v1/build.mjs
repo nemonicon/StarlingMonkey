@@ -1,0 +1,29 @@
+// Future construction parent. Genuine crypto bootstrap runs only after new Root authority.
+import {readFile,lstat,mkdir,statfs} from 'node:fs/promises';
+import {dirname,join,relative,resolve,isAbsolute} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {componentPreflight} from './guard.mjs';
+import {descriptor,regular,need,hash} from './authority.mjs';
+import {DurableOutput} from './durable.mjs';
+import {runOwnedCommand} from './durable-host.mjs';
+import {checkOwnedTerminal} from './abi.mjs';
+const HERE=dirname(fileURLToPath(import.meta.url));
+export function child(root,path){const name=relative(root,path);need(name&&!isAbsolute(name)&&!name.startsWith('../')&&!name.includes('\\')&&name.split('/').every(v=>v&&v!=='.'&&v!=='..'),'Exact owned descendant');return name;}
+async function rowAt(path){const raw=await readFile(path);return descriptor({path,sha256:hash(raw),bytes:raw.length});}
+async function headroom(path,minimum){const v=await statfs(path);need(v.bavail*v.bsize>=minimum,'Operational free space guard; no space guarantee');}
+export async function buildComponent(options){
+ const frame=await componentPreflight(options);await headroom(dirname(frame.outputRoot),2*1024*1024*1024);await frame.recheck();const output=await DurableOutput.create(frame.outputRoot),registered=new Set();
+ try{
+  const d={schemaVersion:1,state:'PARENT_AUDITED_CRYPTO_OWNER355_COMPONENT_WORKER_V1',componentSourceIndexSha256:frame.componentSourceIndexSha256,rootAction:frame.rootAction,ownIndex:frame.ownIndex,criticalSourceFiles:frame.criticalSourceFiles,mapRow:frame.mapRow,node:frame.node,engine:frame.engine,metadata:frame.metadata,code:frame.code,wit:frame.wit,outputRoot:output.root+'/worker'};
+  const row=await output.write('worker-descriptor.json',d,{json:true});need(row.bytes<=65536,'Small private descriptor; full proof stays in parent');await mkdir(join(output.root,'processes'),{mode:0o700});await headroom(output.root,800*1024*1024);
+  const status=await runOwnedCommand({output:output.root,name:'componentize',executable:frame.node.path,args:[join(HERE,'build-worker.mjs'),JSON.stringify({path:join(output.root,row.path),sha256:row.sha256,bytes:row.bytes})],write:async(path,data)=>output.write(child(output.root,path),typeof data==='string'?Buffer.from(data):data),register:path=>registered.add(path),timeoutMs:frame.workerTimeoutMs,maxOutputBytes:16*1024*1024,onProgress:event=>process.stdout.write(JSON.stringify({event:'crypto-component-operational-heartbeat',...event})+'\n')});
+  for(const path of registered){const r=await rowAt(path);output.rows.set(child(output.root,path),{path:child(output.root,path),sha256:r.sha256,bytes:r.bytes});}checkOwnedTerminal(status); // raw streams/terminal persisted first
+  const root=join(output.root,'worker'),completionRow=await rowAt(join(root,'completion.json')),completion=JSON.parse(await regular(completionRow));need(completion.state==='CRYPTO_COMPONENT_WORKER_COMPLETE_EXTERNAL_EXIT_ZERO_REQUIRED_V1','Worker completion scope');
+  const ix=descriptor({path:join(root,'index.json'),sha256:completion.index.sha256,bytes:completion.index.bytes}),index=JSON.parse(await regular(ix));need(index.schemaVersion===1&&Array.isArray(index.files)&&index.files.length<=128,'Finite worker inventory');const seen=new Set();
+  for(const item of index.files){const path=join(root,item.path),name=child(root,path);need(item.path===name&&!seen.has(name),'Exact unique worker index paths');seen.add(name);await regular({path,sha256:item.sha256,bytes:item.bytes},{maxBytes:64*1024*1024});output.rows.set('worker/'+name,{path:'worker/'+name,sha256:item.sha256,bytes:item.bytes});}
+  for(const path of [ix.path,completionRow.path]){const r=await rowAt(path);output.rows.set(child(output.root,path),{path:child(output.root,path),sha256:r.sha256,bytes:r.bytes});}
+  await frame.recheck();await output.recheck();const result=await output.write('results.json',{schemaVersion:1,state:'CRYPTO_OWNER355_COMPONENT_BUILD_COMPLETE_UNREVIEWED_V1',sourceIndexSha256:frame.componentSourceIndexSha256,rootAction:frame.rootAction,nativeEngine:frame.engine,metadata:frame.metadata,sourceRoot:frame.sourceRoot,configuredSourceRoot:frame.configuredSourceRoot,nativePins:frame.nativePins,nativeRootReview:frame.nativeRootReview,workerCompletion:completionRow,ownedWorkerTerminal:await rowAt(status.terminalPath),rawWorkerExitCode:0,ownedGroupGone:true,guestInitializationExecutedByComponentization:true,ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false,operationalAdmission:false,runtimeAcceptanceClaim:false},{json:true});
+  const indexRow=await output.write('index.json',{schemaVersion:1,state:'UNREVIEWED_CRYPTO_COMPONENT_BUILD_OUTPUT',files:[...output.rows.values()]},{json:true});const completed=await output.write('completion.json',{schemaVersion:1,state:'CRYPTO_COMPONENT_BUILD_COMPLETE_EXTERNAL_PARENT_ZERO_AND_INDEPENDENT_REVIEW_REQUIRED_V1',sourceIndexSha256:frame.componentSourceIndexSha256,index:indexRow,result,ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false},{json:true});await output.recheck();return{root:output.root,index:indexRow,completion:completed};
+ }catch(error){try{await output.write('failure.json',{schemaVersion:1,state:'FAILED_CRYPTO_COMPONENT_BUILD_NO_ACCEPTANCE',thrownType:typeof error,partialOwnedOutputsRetained:true},{json:true});}catch{}throw error;}finally{await output.close();}
+}
+if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){need(process.argv.length===3,'One exact Root config descriptor JSON');process.stdout.write(JSON.stringify(await buildComponent({configDescriptor:descriptor(JSON.parse(process.argv[2]))}))+'\n');}

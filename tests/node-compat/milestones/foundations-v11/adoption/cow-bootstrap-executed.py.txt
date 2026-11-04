@@ -1,0 +1,62 @@
+# Historical execution transcript with fixed output names; do not rerun.
+import sys,os,json,datetime,hashlib,shutil,subprocess,importlib.util
+from pathlib import Path
+sys.dont_write_bytecode=True
+repo=Path.cwd()
+spec=importlib.util.spec_from_file_location('audit',repo/'tests/node-compat/storage-compaction-v11-pass2/compact.py')
+audit=importlib.util.module_from_spec(spec);spec.loader.exec_module(audit)
+base=Path('/tmp/starling-node-compat/foundations-v11/native-freeze')
+expected={'off-foundations':'1eb2b55a391e2bc83478fefee124a6f282cfed148cc0623754125f6c5e9b0458','runtime-foundations':'2e3731ce248be1d8ede0f5672dd87b48fb1731dfddb045bfaabaeea02534a36d','gc-foundations':'b79fd7dba35288e233ec07134e490ddd2ae51f212a2be506ecd70a728f5e6bc4'}
+rows=[]
+for label,digest in expected.items():
+    frozen=base/(label+'.engine.wasm')
+    proof=json.loads((base/(label+'-freeze-receipt.json')).read_text())
+    original=Path(proof['originalEngine'])
+    assert original.parent==Path('/private/tmp/starling-node-compat/improved-build/artifacts')
+    assert original.name.endswith('.m011-production-'+{'off-foundations':'off','runtime-foundations':'runtime','gc-foundations':'gc'}[label]+'.wasm')
+    before=audit.file_stat(original);frozen_before=audit.file_stat(frozen)
+    assert before['regular'] and not before['symlink'] and before['nlink']==1 and before['flags']==0
+    assert before['mode']==0o755 and before['uid']==501 and before['gid']==0
+    assert before['inode']!=frozen_before['inode'] and before['device']==frozen_before['device']
+    assert audit.sha256(original)==audit.sha256(frozen)==digest
+    metadata=audit.preserved_metadata(original)
+    assert metadata['xattrDigests']==audit.xattrs(frozen) and metadata['acl']==audit.acl(frozen)==[]
+    rows.append({'label':label,'original':str(original),'frozen':str(frozen),'sha256':digest,'before':before,'frozenBefore':frozen_before,'metadata':metadata})
+receipt={'schema':1,'state':'verified-duplicate-only-bootstrap-preimages','atUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'freeBefore':shutil.disk_usage(base).free,'rows':rows,'method':'Canonical frozen backups stay present. Remove only three verified redundant NEW m11 raw artifacts, then restore original paths using cp -c -p plus exact metadata. Tool history records these preimages before unlink. No unique payload, accepted old artifact or frozen file is removed.','inodeCtimeBirthtimePreserved':False}
+print(json.dumps(receipt),flush=True)
+journal=None
+try:
+    for row in rows:
+        original=Path(row['original'])
+        assert audit.sha256(Path(row['frozen']))==audit.sha256(original)==row['sha256']
+        original.unlink()
+    receipt['freeAfterDuplicateRemoval']=shutil.disk_usage(base).free
+    path=repo/'tests/node-compat/foundation-alloc-unsafe/production-adoption-m0.11/cow-bootstrap.jsonl'
+    journal=open(path,'x')
+    journal.write(json.dumps({'event':'canonical-backups-verified-raw-duplicates-removed',**receipt})+'\n');journal.flush();os.fsync(journal.fileno())
+    for row in rows:
+        frozen=Path(row['frozen']);original=Path(row['original'])
+        result=subprocess.run(['/bin/cp','-c','-p',str(frozen),str(original)],capture_output=True,text=True)
+        row['clone']={'code':result.returncode,'stdout':result.stdout,'stderr':result.stderr}
+        assert result.returncode==0,result.stderr
+        os.chmod(original,row['before']['mode'])
+        os.utime(original,ns=(row['before']['atimeNs'],row['before']['mtimeNs']))
+        assert audit.sha256(original)==audit.sha256(frozen)==row['sha256']
+        assert audit.preserved_metadata(original)==row['metadata']
+        after=audit.file_stat(original);row['after']=after
+        assert after['nlink']==1 and after['regular'] and not after['symlink'] and after['flags']==0
+        assert after['inode']!=audit.file_stat(frozen)['inode']
+        assert audit.stable_identity(audit.file_stat(frozen))==audit.stable_identity(row['frozenBefore'])
+        journal.write(json.dumps({'event':'raw-original-restored-and-verified','row':row})+'\n');journal.flush();os.fsync(journal.fileno())
+    receipt['freeAfter']=shutil.disk_usage(base).free
+    receipt['observedFreeDelta']=receipt['freeAfter']-receipt['freeBefore']
+    receipt['state']='three-new-raw-artifact-paths-restored-byte-and-metadata-exact'
+    receipt['scope']='Copy-on-write was requested; cp may fall back. Free-space change is an observation, not an extent-ownership proof or guest performance measurement.'
+    journal.write(json.dumps({'event':'complete',**receipt})+'\n');journal.flush();os.fsync(journal.fileno())
+    out=repo/'tests/node-compat/foundation-alloc-unsafe/production-adoption-m0.11/cow-bootstrap-results.json'
+    with open(out,'x') as stream:json.dump(receipt,stream,indent=2);stream.write('\n');stream.flush();os.fsync(stream.fileno())
+    print(json.dumps({'state':receipt['state'],'freeBefore':receipt['freeBefore'],'freeAfter':receipt['freeAfter'],'observedFreeDelta':receipt['observedFreeDelta'],'receipt':str(out)}),flush=True)
+finally:
+    if journal:journal.close()
+    missing=[r['original'] for r in rows if not Path(r['original']).exists()]
+    if missing:print(json.dumps({'unrestoredRawPaths':missing,'canonicalFrozenPayloadsRemain':[r['frozen'] for r in rows],'state':'requires-recovery-no-unique-payload-lost'}),flush=True)

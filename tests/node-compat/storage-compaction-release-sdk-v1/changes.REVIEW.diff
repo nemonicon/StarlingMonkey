@@ -1,0 +1,168 @@
+--- tests/node-compat/storage-compaction-earlier-v1/compact.py
++++ tests/node-compat/storage-compaction-release-sdk-v1/compact.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Lossless, journalled macOS filesystem compression of 92 explicitly whitelisted earlier accepted public component/core outputs.
++"""Lossless, journalled macOS filesystem compression of the one archive-authenticated current Release guest SDK static library.
+ 
+ This changes filesystem representation only. It never edits WebAssembly bytes.
+ Run without --apply to inventory the deliberately narrow allowlist.
+@@ -18,24 +18,33 @@
+ import subprocess
+ import sys
+ import tempfile
++import tarfile
+ import uuid
+ 
+ 
+ BASE = Path('/tmp/starling-node-compat')
+ REPO = Path(__file__).resolve().parents[3]
+-AUDIT_PATH = REPO / 'tests/node-compat/storage-candidate-audit-earlier-v1/results.json'
+-AUDIT_SHA256 = '6a3664ff4ebe283910672090ed4481123ab3d634146781ff7a9321a1302378a8'
+-AUDIT_INDEX_PATH = AUDIT_PATH.with_name('index.json')
+-AUDIT_INDEX_SHA256 = 'e1dcf6ce4608741ab2becd39bf19f9bf81a40aae3371be60ffc8f8dde7dcaa54'
++AUDIT_PATH = REPO / 'tests/node-compat/storage-candidate-audit-sdk-release-v1/results.json'
++AUDIT_SHA256 = '96c952bc3f58353cae079286512f39da402f74411cd1b0670025424b6dc77ff3'
++PEER_PATH = REPO / 'tests/node-compat/storage-candidate-audit-release-sdk-v1/results.json'
++PEER_SHA256 = 'e8cdad568c0faa3f83150181699269c6950d1862ddf40009876417cf18146d85'
+ assert hashlib.sha256(AUDIT_PATH.read_bytes()).hexdigest() == AUDIT_SHA256
+-assert hashlib.sha256(AUDIT_INDEX_PATH.read_bytes()).hexdigest() == AUDIT_INDEX_SHA256
+-AUDIT = json.loads(AUDIT_PATH.read_text())
+-assert AUDIT['eligibleCount'] == len(AUDIT['files']) == 92
+-assert len({row['path'] for row in AUDIT['files']}) == 92
+-ROOTS = {f'accepted-{i:02d}': Path(row['root']) for i,row in enumerate(AUDIT['roots'])}
+-AUDITED = {row['path']:row for row in AUDIT['files']}
+-RECEIPTS = BASE / 'storage-compaction-earlier-v1'
+-EXPECTED_ELIGIBLE_COUNT = 92
++assert hashlib.sha256(PEER_PATH.read_bytes()).hexdigest() == PEER_SHA256
++SOURCE_AUDIT = json.loads(AUDIT_PATH.read_text())
++PEER_AUDIT = json.loads(PEER_PATH.read_text())
++LIBRARY = BASE / 'improved-build/spidermonkey-dist-release/libspidermonkey.a'
++assert SOURCE_AUDIT['file'] == str(LIBRARY)
++assert PEER_AUDIT['candidate']['path'] == str(LIBRARY)
++assert SOURCE_AUDIT['sha256'] == PEER_AUDIT['candidate']['sha256'] == '298b85501657189dc66139242abf5aeb4e981b8db7c37cc5a69d1151ec40aacc'
++row = {**SOURCE_AUDIT['before'], **SOURCE_AUDIT['metadata'],
++       'path': str(LIBRARY), 'root': str(LIBRARY.parent), 'sha256': SOURCE_AUDIT['sha256']}
++for key in ['sha256','device','inode','logicalBytes','allocatedBytes','mode','uid','gid','mtimeNs','flags','nlink','xattrDigests','acl']:
++    assert row[key] == PEER_AUDIT['candidate'][key], key
++AUDIT = {'eligibleCount': 1, 'files': [row]}
++AUDITED = {str(LIBRARY): row}
++ROOTS = {'current-release-library': LIBRARY.parent}
++RECEIPTS = BASE / 'storage-compaction-release-sdk-v1'
++EXPECTED_ELIGIBLE_COUNT = 1
+ HEADROOM_RESERVE = 64 * 1024 * 1024
+ NAME = re.compile(r'.+\.(?:component|core\d*)\.wasm\Z')
+ EXCLUDED_DIRS = {'native-freeze', 'source', 'sources', 'componentize-source', 'harness',
+@@ -98,53 +107,55 @@
+ 
+ 
+ def verify_report_closure():
+-    # Audit/index authenticate the finite accepted file list and its provenance.
+-    # Re-read every consumed report/JS witness; no component is executed.
+-    index = json.loads(AUDIT_INDEX_PATH.read_text())
+-    for row in index['files']:
+-        path = AUDIT_PATH.parent / row['path']
+-        assert path.is_file() and not path.is_symlink()
+-        assert sha256(path) == row['sha256'], path
+-    checked = set()
+-    for row in AUDIT['files']:
+-        proof = row['completionProof']
+-        pairs = [(REPO/proof['milestoneSummary'], proof['milestoneSummarySha256']),
+-                 (REPO/proof['archivedReport'], proof['reportSha256']),
+-                 (Path(proof['currentOriginalReport']), proof['reportSha256'])]
+-        pairs += [(Path(w['path']),w['sha256']) for w in row.get('generatedJsReferences',[])]
+-        for path,digest in pairs:
+-            key = (str(path),digest)
+-            if key in checked: continue
+-            assert path.is_file() and not path.is_symlink(), path
+-            assert sha256(path) == digest, path
+-            checked.add(key)
+-    return len(checked)
++    # This is a separate data class, never a broad SDK/tree admission. Stream
++    # the pinned archive member; extraction and compiler execution are absent.
++    assert sha256(AUDIT_PATH) == AUDIT_SHA256
++    assert sha256(PEER_PATH) == PEER_SHA256
++    archive = SOURCE_AUDIT['archive']
++    peer = PEER_AUDIT['archive']
++    path = Path(archive['path'])
++    assert path == BASE / 'improved-build/spidermonkey-release.tar.gz'
++    assert archive['sha256'] == peer['sha256'] == 'c57dc83d93dc04198882b44fea49cd3cb01e0b267bf99fae3b058cb158da684b'
++    assert path.is_file() and not path.is_symlink()
++    assert sha256(path) == archive['sha256']
++    assert archive['member'] == peer['member']['name'] == 'spidermonkey-dist-release/libspidermonkey.a'
++    found = 0
++    with tarfile.open(path, 'r|gz') as stream:
++        for info in stream:
++            if info.name != archive['member']:
++                continue
++            found += 1
++            assert info.isfile() and not info.islnk() and not info.issym()
++            assert info.size == row['logicalBytes'] == peer['member']['bytes']
++            member = stream.extractfile(info)
++            assert member is not None
++            digest = hashlib.sha256()
++            with member:
++                for chunk in iter(lambda: member.read(1024 * 1024), b''):
++                    digest.update(chunk)
++            assert digest.hexdigest() == row['sha256'] == archive['memberSha256'] == peer['member']['sha256']
++    assert found == 1
++    return 3  # Two fixed audits and the archive, plus streamed member equality.
+ 
+ 
+ def candidates(roots):
+-    # EXACT WHITELIST ONLY: no os.walk, glob or broad root rediscovery.
+-    assert set(roots) == set(ROOTS.values())
+-    for row in sorted(AUDIT['files'], key=lambda row:row['path']):
+-        path = Path(row['path'])
+-        assert path.is_absolute() and path.is_relative_to(BASE)
+-        assert Path(row['root']) in roots and path.is_relative_to(Path(row['root']))
+-        value = file_stat(path)
+-        reason = None
+-        if not NAME.fullmatch(path.name) or 'engine' in path.name.lower():
+-            reason = 'not-an-explicit-generated-component-or-core-name'
+-        elif any(part in EXCLUDED_DIRS for part in path.parts):
+-            reason = 'excluded-source-build-or-input-path'
+-        elif any(token in str(path).lower() for token in ('debug','oom','private','candidate','probe')):
+-            reason = 'excluded-debug-oom-private-candidate-or-probe-path'
+-        elif value['symlink'] or not value['regular']:
+-            reason = 'not-a-regular-nonsymlink-file'
+-        elif value['nlink'] != 1:
+-            reason = 'multiple-hardlinks'
+-        elif value['flags'] & COMPRESSED:
+-            reason = 'already-compressed'
+-        elif value['flags'] != 0:
+-            reason = 'other-file-flags-not-modified'
+-        yield path, reason
++    assert roots == [LIBRARY.parent]
++    assert LIBRARY.is_relative_to(BASE)
++    cursor = LIBRARY.parent
++    while cursor != BASE:
++        assert cursor.is_dir() and not cursor.is_symlink(), cursor
++        cursor = cursor.parent
++    value = file_stat(LIBRARY)
++    reason = None
++    if value['symlink'] or not value['regular']:
++        reason = 'not-a-regular-nonsymlink-file'
++    elif value['nlink'] != 1:
++        reason = 'multiple-hardlinks'
++    elif value['flags'] & COMPRESSED:
++        reason = 'already-compressed'
++    elif value['flags'] != 0:
++        reason = 'other-file-flags-not-modified'
++    yield LIBRARY, reason
+ 
+ 
+ def match_audited_preimage(path, value):
+@@ -189,8 +200,10 @@
+         'command': ['/usr/bin/ditto', '--hfsCompression', '--noclone', 'SOURCE', 'FRESH_SAME_DIRECTORY_TEMP'],
+         'platform': platform.platform(), 'python': sys.version,
+         'journal': str(journal_path), 'diskFreeBeforeBytes': shutil.disk_usage(BASE).free,
+-        'acceptedAudit':str(AUDIT_PATH), 'acceptedAuditSha256':AUDIT_SHA256,
+-        'acceptedAuditIndexSha256':AUDIT_INDEX_SHA256, 'reportClosureWitnessesVerified':closure_count,
++        'sdkMemberAudit':str(AUDIT_PATH), 'sdkMemberAuditSha256':AUDIT_SHA256,
++        'independentAuditSha256':PEER_SHA256, 'archiveClosureWitnessesVerified':closure_count,
++        'dataClass':'one current pinned Release guest SDK static archive',
++        'libraryContentOrHostRuntimeChange':False,
+         'headroomPolicy':'Before each copy: free >= 2*logicalBytes + 64MiB; not a hidden-allocation guarantee',
+         'compressedFiles': 0, 'eligibleFiles': 0, 'skippedEntries': 0,
+         'logicalBytes': 0, 'oldAllocatedBytes': 0, 'newAllocatedBytes': 0,

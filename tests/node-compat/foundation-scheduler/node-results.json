@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "node": "v22.14.0",
+  "nodeBinary": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+  "nodeBinarySha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+  "boundaryCases": [
+    {
+      "boundary": "cjs-initial",
+      "trace": [
+        "tick-first",
+        "nested-tick",
+        "promise-first",
+        "microtask",
+        "promise-from-tick",
+        "nested-promise",
+        "tick-from-promise"
+      ],
+      "expected": [
+        "tick-first",
+        "nested-tick",
+        "promise-first",
+        "microtask",
+        "promise-from-tick",
+        "nested-promise",
+        "tick-from-promise"
+      ],
+      "passed": true
+    },
+    {
+      "boundary": "task",
+      "trace": [
+        "tick-first",
+        "nested-tick",
+        "promise-first",
+        "microtask",
+        "promise-from-tick",
+        "nested-promise",
+        "tick-from-promise"
+      ],
+      "expected": [
+        "tick-first",
+        "nested-tick",
+        "promise-first",
+        "microtask",
+        "promise-from-tick",
+        "nested-promise",
+        "tick-from-promise"
+      ],
+      "passed": true
+    },
+    {
+      "boundary": "promise-job",
+      "trace": [
+        "promise-first",
+        "microtask",
+        "nested-promise",
+        "tick-first",
+        "tick-from-promise",
+        "nested-tick",
+        "promise-from-tick"
+      ],
+      "expected": [
+        "promise-first",
+        "microtask",
+        "nested-promise",
+        "tick-first",
+        "tick-from-promise",
+        "nested-tick",
+        "promise-from-tick"
+      ],
+      "passed": true
+    },
+    {
+      "boundary": "esm-initial",
+      "trace": [
+        "promise-first",
+        "microtask",
+        "nested-promise",
+        "tick-first",
+        "tick-from-promise",
+        "nested-tick",
+        "promise-from-tick"
+      ],
+      "expected": [
+        "promise-first",
+        "microtask",
+        "nested-promise",
+        "tick-first",
+        "tick-from-promise",
+        "nested-tick",
+        "promise-from-tick"
+      ],
+      "passed": true
+    }
+  ],
+  "contracts": {
+    "invalidCallbacks": [
+      {
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      },
+      {
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      },
+      {
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      },
+      {
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      },
+      {
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      },
+      {
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      }
+    ],
+    "callbacks": [
+      {
+        "receiverUndefined": true,
+        "argumentCount": 3,
+        "objectIdentity": true,
+        "symbolIdentity": true,
+        "primitive": 17
+      }
+    ],
+    "returnIsUndefined": true,
+    "publicNodeNextTickConstructible": true,
+    "constructedCallbackRan": true
+  },
+  "fatal": {
+    "status": 1,
+    "stdout": "first\n",
+    "expectedMessagePresent": true,
+    "stderrSha256": "cd1395ef3fe13e9411cebb8a89509c9748ef45173668333572a89b50a359849e",
+    "source": "process.nextTick(()=>{process.stdout.write('first\\n');throw new Error('SCHEDULER_NODE_FATAL_ORACLE')});process.nextTick(()=>process.stdout.write('second\\n'));"
+  },
+  "sources": [
+    {
+      "path": "scenario.cjs",
+      "sha256": "a38d8ab63b1708de26de65100f9cbf9946924478a12e8ac33fdc00a85fc49e6c",
+      "bytes": 863
+    },
+    {
+      "path": "oracle.cjs",
+      "sha256": "2e9b44881c379ec924015c35cba33f3ae310f434885ef657999f2f360fa39eea",
+      "bytes": 84
+    },
+    {
+      "path": "oracle.mjs",
+      "sha256": "15fa2ab39c0f6c7bef1df0ba4f768af5cd3d7c8838eaf771009bfa9902ec0fea",
+      "bytes": 73
+    },
+    {
+      "path": "contracts.cjs",
+      "sha256": "4946e7acca415d18f3cd9dff32bcaafc1ced74df9ba84c19c20fa308429e63b1",
+      "bytes": 954
+    },
+    {
+      "path": "run-node-oracles.mjs",
+      "sha256": "4b32fc6122f577febe22d78635264d5f49959b3f0fd7e9384d4e2df97eb89053",
+      "bytes": 4124
+    },
+    {
+      "path": "node-source/task_queues.node-v22.14.0.js",
+      "sha256": "a6b2b4a8e3818c68d06cd778c40e2b1dc83d59e92dff6da929d7d65df198b7b7",
+      "bytes": 4623
+    }
+  ],
+  "existingSchedulerDriftEvidence": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream/reference-results.json",
+    "sha256": "ede184eaf390d96965ff136bbe4a4bbf1d3d75af1c2d27739aa312a606ae713c",
+    "scope": "Prior task/Promise-job Node-versus-Jco traces reused unchanged, not re-executed."
+  },
+  "guestExecuted": false,
+  "productionSourceChanged": false,
+  "scope": "Pinned Node host source/oracles only. No guest queue, embedding ordering, snapshot, or ALS integration pass is claimed."
+}

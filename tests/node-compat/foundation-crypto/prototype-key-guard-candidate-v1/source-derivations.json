@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "state": "UNAPPLIED_TWO_PUBLIC_ADMISSION_GUARDS",
+  "path": "builtins/web/crypto/subtle-crypto.cpp",
+  "beforeSha256": "f58d225c0374cc91522a427c7921f06c04afb73a458836c743da246318b29f99",
+  "afterSha256": "1caf414e2e7d8d9ec9a0fb6eaf53e73b4fbe9649749f33fc12b116a5357ec639",
+  "preimage": "preimages/builtins/web/crypto/subtle-crypto.cpp",
+  "afterimage": "afterimages/builtins/web/crypto/subtle-crypto.cpp",
+  "edits": [
+    {
+      "operation": "sign",
+      "old": "  if (!CryptoKey::is_instance(key_arg)) {\n    api::throw_error(cx, api::Errors::TypeError, \"crypto.subtle.sign\", \"key\",\n",
+      "new": "  if (!CryptoKey::is_instance(key_arg) ||\n      &key_arg.toObject() == CryptoKey::proto_obj.get()) {\n    api::throw_error(cx, api::Errors::TypeError, \"crypto.subtle.sign\", \"key\",\n",
+      "count": 1
+    },
+    {
+      "operation": "verify",
+      "old": "  if (!CryptoKey::is_instance(key_arg)) {\n    api::throw_error(cx, api::Errors::TypeError, \"crypto.subtle.verify\", \"key\",\n",
+      "new": "  if (!CryptoKey::is_instance(key_arg) ||\n      &key_arg.toObject() == CryptoKey::proto_obj.get()) {\n    api::throw_error(cx, api::Errors::TypeError, \"crypto.subtle.verify\", \"key\",\n",
+      "count": 1
+    }
+  ],
+  "liveAndConfiguredPreimagesEqual": true,
+  "nativeWorktreeChanged": false
+}

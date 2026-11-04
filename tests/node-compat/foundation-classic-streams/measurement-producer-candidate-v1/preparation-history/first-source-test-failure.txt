@@ -1,0 +1,3 @@
+The first source/data test stopped during AST parsing at a missing space in `assert __debug__ and` in the new launcher. The preceding cases had only interpreted data/read source hashes. No launcher/configure/compiler/engine/guest/host action was invoked. Corrected the whitespace before a fresh full test.
+
+The second source test stopped at an incorrect assumption that this production parent has five embedded Python blocks. The actual recipe has four (PY, PYINPUT, PYEMBED, PY), all of which parsed. The test now asserts that exact observed marker list. No build recipe behavior changed.

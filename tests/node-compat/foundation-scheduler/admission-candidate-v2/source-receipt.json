@@ -1,0 +1,138 @@
+{
+  "schema": 2,
+  "state": "UNAPPLIED_SOURCE_ONLY_STREAM_WEB_OPTIONAL_TU_AMENDMENT_READY_FOR_REVIEW",
+  "parentV1": {
+    "indexPath": "../admission-candidate-v1/index.json",
+    "indexSha256": "d92524a460cf7748ac1a3ad6153b256e29590fc824a574144363aafcb3c9184c",
+    "receiptSha256": "257bb0408641a7d43ed5ea2b26a99d327c5a0d3e64f9d698570c40b6eb8fcb32",
+    "testResultSha256": "a3bd91b066da6ac2579bee88b65e2594223b70a9d66a4f3c55f9160c2a4e2bc2",
+    "preservedTests": 82,
+    "indexedFilesRehashed": 32,
+    "allUnchanged": true
+  },
+  "fullPatch": {
+    "path": "selector.UNAPPLIED.patch",
+    "sha256": "be58d1236746d8ebfb6aa8cdcfec12f72df4f1195be0e35317ee1825b9b2052d",
+    "files": [
+      {
+        "path": "tests/node-compat/module-selection.mjs",
+        "beforeSha256": "7e336b6b009e48badd2da3587173c85eea42f584d07f3802ae084e6e472102aa",
+        "afterSha256": "ef46951437138aab4e7759b0a733495c5ef2259c23ed6187438b20611a1e5991"
+      },
+      {
+        "path": "tests/node-compat/private-ticks-admission.mjs",
+        "beforeSha256": null,
+        "afterSha256": "7680fa6b39bd9784c58bfb3d8af452e3b75beb6a23a3a841661d6777fdccd6f8"
+      }
+    ]
+  },
+  "amendmentPatch": {
+    "path": "amendment-against-v1.UNAPPLIED.patch",
+    "sha256": "67c0104bb41866c99d787fb3b840c74a65e87b4c423e34da792eaf03b7a5e3ee",
+    "files": [
+      {
+        "path": "tests/node-compat/private-ticks-admission.mjs",
+        "beforeSha256": "99f818df3868cac6117de8c416719e0c2d82654704da6f77aef4b31a926ca825",
+        "afterSha256": "7680fa6b39bd9784c58bfb3d8af452e3b75beb6a23a3a841661d6777fdccd6f8"
+      }
+    ],
+    "applicationContract": "Alternative to the full patch: apply only against the v1 staged source, never together."
+  },
+  "checks": {
+    "path": "checks.json",
+    "sha256": "c17f1bff1ee35cdaad018c8c5590f09a25b4e5aeff102606dc6e3b58c3944f31"
+  },
+  "runner": {
+    "path": "test-admission.mjs",
+    "sha256": "161384378b0b84ae74612b3d2c1e4117461cbab2af0726b8321da8591aa5344c",
+    "freshOutputOption": "NODE_COMPAT_ADMISSION_TEST_OUTPUT; exclusive creation, no frozen result overwrite"
+  },
+  "unchangedProductionContract": {
+    "recipeSha256": "869d188de3843b5d527d236a9e5c9af6ba1193f118dc9ad786df6266e1606173",
+    "policySha256": "98e80d36b8eb9b7ac99de54832288bd8eec148fa1b9fe0b27b3bada4d12b2cd0",
+    "helperSha256": "78521feeefe299360228e5db76bfde0b11e6eeee93bd2374cd39b2fe695b610c",
+    "parentRecipeSha256": "354cbc8c5317bf14f022fd14a9687e382b99c2141135629b56bb541ef6308754",
+    "sourceInputs": 306,
+    "parentSourceInputs": 304
+  },
+  "cmakeOwnershipProof": {
+    "sourcePath": "cmake/builtins.cmake",
+    "sourceSha256": "1ad350b7ff41a29d9104b9962e1532f25c31f9815e175dbc7d6387ae081e182d",
+    "kernelSourceConditional": "target_sources(builtin_node_compat PRIVATE builtins/node-compat/stream-web-kernel.cpp), only inside NODE_COMPAT_STREAM_WEB condition",
+    "privateMacroScope": "target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_STREAM_WEB=1)",
+    "targetTranslationUnitsWhenOn": [
+      "builtins/node-compat/buffer.cpp",
+      "builtins/node-compat/entropy-bridge.cpp",
+      "builtins/node-compat/entropy-policy.cpp",
+      "builtins/node-compat/register.cpp",
+      "builtins/node-compat/stream-web-kernel.cpp"
+    ],
+    "embeddingAndOtherNativeTranslationUnits": "Macro absent for both StreamWeb selections"
+  },
+  "expectedCoverage": [
+    {
+      "ticks": false,
+      "streamWeb": false,
+      "allNative": 59,
+      "strictNative": 3,
+      "embedding": 1,
+      "kernel": 0
+    },
+    {
+      "ticks": false,
+      "streamWeb": true,
+      "allNative": 60,
+      "strictNative": 3,
+      "embedding": 1,
+      "kernel": 1
+    },
+    {
+      "ticks": true,
+      "streamWeb": false,
+      "allNative": 60,
+      "strictNative": 4,
+      "embedding": 1,
+      "kernel": 0
+    },
+    {
+      "ticks": true,
+      "streamWeb": true,
+      "allNative": 61,
+      "strictNative": 4,
+      "embedding": 1,
+      "kernel": 1
+    }
+  ],
+  "coverageRelations": {
+    "tickAndProtectedActualLayoutLists": "Same exact active TU set with optional queue/kernel filtered",
+    "strictActualNativeList": "Unchanged EventTarget/Engine/EventLoop subset plus queue only when ticks enabled",
+    "kernelReceipt": "Exactly the active layout kernel command when enabled; [] when disabled"
+  },
+  "dataDependencies": [
+    {
+      "path": "tests/node-compat/foundation-scheduler/admission-candidate-v1/pins.json",
+      "sha256": "c285a99fab9c9319d1311ed3b762ce255e73809bdabfa59ea3932ccd8d8ea4ef"
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/integration-candidate-v1/policy.json",
+      "sha256": "98e80d36b8eb9b7ac99de54832288bd8eec148fa1b9fe0b27b3bada4d12b2cd0"
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/integration-candidate-v1/layer-policy.py",
+      "sha256": "78521feeefe299360228e5db76bfde0b11e6eeee93bd2374cd39b2fe695b610c"
+    }
+  ],
+  "limitations": {
+    "syntheticMetadataOnly": true,
+    "engineBuilt": false,
+    "guestExecuted": false,
+    "receiverNegativesExecuted": false,
+    "actualFutureEngineByteAndConfigPreflightRequired": true,
+    "runtimeOrderingVerified": false,
+    "resetSafeReuse": "OPEN",
+    "privateIdsOrPublicProcessAdmitted": false,
+    "newHostCapabilities": false,
+    "legacyFlagsFabricated": false,
+    "liveSelectorChanged": false
+  }
+}

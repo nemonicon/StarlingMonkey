@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "beforePath": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-preparation-context-amendment-v1/activate.py",
+  "beforeSha256": "6a16098b7f0f06bec3c5aa3cfe8f41b2c2d10c69fd2bfdefb9cd2cb9e5332996",
+  "afterSha256": "a606f98c8fa2a91df62d34414e694c523a1d9d4bce3d4305322f02778709acf0",
+  "edits": [
+    {
+      "old": "component-validation-activated-v5",
+      "new": "component-validation-activated-v6",
+      "count": 1
+    },
+    {
+      "old": " spec=importlib.util.spec_from_file_location('actual_zlib350_validation_bootstrap'",
+      "new": " inventory_spec=importlib.util.spec_from_file_location('explicit_validation_inventory',HERE/'inventory.py');inventory=importlib.util.module_from_spec(inventory_spec);inventory_spec.loader.exec_module(inventory)\n spec=importlib.util.spec_from_file_location('actual_zlib350_validation_bootstrap'",
+      "count": 1
+    },
+    {
+      "old": " for root,rows,digest in[(HERE,own,own_sha),(BASE,base_rows,BASE_INDEX),(CONTROL,control_rows,CONTROL_INDEX),(COVERAGE,coverage_rows,COVERAGE_INDEX),(PEER,peer_rows,PEER_INDEX),(bootstrap,boot_rows,bootstrap_sha)]:\n  add(root/'index.json',digest)\n  for row in rows:add(root/row['path'],row['sha256'],row['bytes'])\n  preparation_root=ORIGINAL_BOOTSTRAP if root==bootstrap else root\n  if root==bootstrap:\n   add(ORIGINAL_BOOTSTRAP/'index.json',bootstrap_sha)\n   for row in original_boot_rows:add(ORIGINAL_BOOTSTRAP/row['path'],row['sha256'],row['bytes'])\n  for row in json.loads(regular(preparation_root/'input-freeze.json'))['inputs']:add(preparation_root/row['path'],row['sha256'],row['bytes'])\n",
+      "new": " inventory_families=inventory.collect_validation_inventory(HERE,own_sha,bootstrap,bootstrap_sha,add)\n",
+      "count": 1
+    },
+    {
+      "old": "'mandatoryPreparationContextAmendmentIndexSha256':own_sha,",
+      "new": "'mandatoryPreparationContextAmendmentIndexSha256':'f6f0e1916d02445a0c7e2fc60b0b31b26ef19aef210d59a9964ba77dfcefdee9','mandatoryIndexedPeerInventoryAmendmentIndexSha256':own_sha,'inventoryFamilies':inventory_families,",
+      "count": 1
+    }
+  ],
+  "reverseExact": true,
+  "guestOrDriverOrNativeChanged": false
+}

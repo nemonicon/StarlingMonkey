@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "state": "public-node22-callback-counterexample-oracle-passed",
+  "recordedAtUtc": "2026-11-03T10:00:53.736Z",
+  "nodeVersion": "v22.14.0",
+  "nodeExecutable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+  "nodeExecutableSha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+  "runnerSha256": "83dde3a8ffbd883a47e8ac91ee7bc7ee5058bf9f91d7d55e2c520779451846d8",
+  "nodeOptionsPresent": false,
+  "cases": [
+    {
+      "name": "registration-getter",
+      "source": "const errors=[];process.on('uncaughtException',error=>{errors.push(error.message)});let result;let reads=0,caught=false,registered=false;const t=new EventTarget();try{t.addEventListener('test',{get handleEvent(){reads++;throw new Error('GETTER_REGISTRATION')}});registered=true}catch(error){caught=error.message==='GETTER_REGISTRATION'}await new Promise(resolve=>setImmediate(resolve));result={reads,caught,registered};console.log(JSON.stringify({result,errors}));",
+      "sourceSha256": "09763490dd8740226a4b6154e359e1e7335fc3bd3c1fe8d03b195045f56f76f8",
+      "observed": {
+        "result": {
+          "reads": 1,
+          "caught": true,
+          "registered": false
+        },
+        "errors": []
+      },
+      "childArguments": [
+        "--expose-gc",
+        "--input-type=module",
+        "-e",
+        "<source>"
+      ],
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "name": "dispatch-getter",
+      "source": "const errors=[];process.on('uncaughtException',error=>{errors.push(error.message)});let result;let reads=0,armed=false,dispatchCaught=false,second=0;const t=new EventTarget();t.addEventListener('test',{get handleEvent(){reads++;if(armed)throw new Error('GETTER_DISPATCH');return()=>{}}});t.addEventListener('test',()=>second++);armed=true;try{t.dispatchEvent(new Event('test'))}catch{dispatchCaught=true}await new Promise(resolve=>setImmediate(resolve));result={reads,dispatchCaught,second};console.log(JSON.stringify({result,errors}));",
+      "sourceSha256": "8314bd7c2c073fb037852442b67cd16d25ec9b493bbfeaf86eda737f18e07329",
+      "observed": {
+        "result": {
+          "reads": 2,
+          "dispatchCaught": false,
+          "second": 1
+        },
+        "errors": [
+          "GETTER_DISPATCH"
+        ]
+      },
+      "childArguments": [
+        "--expose-gc",
+        "--input-type=module",
+        "-e",
+        "<source>"
+      ],
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "name": "direct-finalizer",
+      "source": "const errors=[];process.on('uncaughtException',error=>{errors.push(error.message)});let result;let seen=0;const registry=new FinalizationRegistry(()=>{seen++;throw new Error('DIRECT_FINALIZER')});function register(){registry.register({},0)}register();for(let i=0;i<30&&seen===0;i++){globalThis.gc();await new Promise(resolve=>setImmediate(resolve));}result={seen};console.log(JSON.stringify({result,errors}));",
+      "sourceSha256": "2945019b0a8eecd38f75817be1618923c90701251769ca8d279fb00d45e8c3e9",
+      "observed": {
+        "result": {
+          "seen": 1
+        },
+        "errors": [
+          "DIRECT_FINALIZER"
+        ]
+      },
+      "childArguments": [
+        "--expose-gc",
+        "--input-type=module",
+        "-e",
+        "<source>"
+      ],
+      "status": 0,
+      "stderr": ""
+    }
+  ],
+  "limits": [
+    "Node oracle only; public uncaughtException handler captures errors in isolated fresh processes.",
+    "--expose-gc triggers ordinary Node collection solely to schedule FinalizationRegistry; no DEBUG/fault/private memory introspection.",
+    "Finalizer timing is bounded by explicit attempts; no universal GC scheduling/order guarantee is inferred."
+  ]
+}

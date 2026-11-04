@@ -1,0 +1,1 @@
+import {spawn} from 'node:child_process';new spawn();export function run(){return '';}

@@ -1,0 +1,7 @@
+# Foundations v12 — PENDING ROOT ACCEPTANCE
+
+This complete evidence archive is UNACCEPTED. Root must independently rehash its index and record any acceptance. Three production306 engines and two private diagnostic306+2 engines remain distinct. Fresh production/control applications total61 (60 current+1 historical), with20 diagnostic applications separate. Public module versions remain corem0.11/Eventsm0.10; private ticks defaultOFF and no public process.nextTick/ALS API is provided.
+
+Known getter parity remains FALSE (Node1/1/0 vsnative0/0/0); disposal-symbol registry identity differs. GC/queue ownership, reset, failure-discard and lifecycle limits remain explicit in results.json and the copied verification packets. Same HTTP component ccc87ae3... passed3requests perstockhost; counters1/1/1 do not establish reuse. Six standard0.2.10 dependencies include a type-only clock and selected random. No performance claim is transferred.
+
+All306 current native inputs, separate embedding3, exact configurations/licenses/dependency receipts, tested harness/input closures, raw source/log/report/host configuration evidence and immutable packet references are copied with hashes. Engines/components/cores/libraries remain external; only five exact versioned host-API binary SOURCE assets are included. The v11 archive is rehashed as parent and unchanged. This preparation executes no application or host.

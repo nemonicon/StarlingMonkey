@@ -1,0 +1,1 @@
+import {inspect} from 'node:util';inspect({});export function run(){return ''}

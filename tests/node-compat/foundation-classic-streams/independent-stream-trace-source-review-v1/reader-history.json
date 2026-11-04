@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "readerFailures": [
+    {
+      "attempt": 1,
+      "exitCode": 1,
+      "message": "AssertionError at expected == observed_inputs (line100)",
+      "firstSource": {
+        "path": "reader-first-attempt.py.txt",
+        "sha256": "9050f1ce5ba97bf091d190d06099f1587c7dfaf9662f2eeed038118da4c1f909"
+      },
+      "cause": "Expected reconstruction used lexical /tmp paths; producer canonically resolves /private/tmp on macOS. Hashes/sizes were not in conflict.",
+      "correction": "Resolve every expected union row before comparing; retain exact failed first reader."
+    },
+    {
+      "attempt": 2,
+      "exitCode": 1,
+      "message": "KeyError: ENABLE_BUILTIN_WEB_QUEUE_MICROTASK at metadata observedCMakeOptions lookup (line137)",
+      "firstSource": {
+        "path": "reader-second-attempt.py.txt",
+        "sha256": "4405af950ac3f8e3bd6032505d34981291c0c2d88eff4a6d08a9fba02b32d43c"
+      },
+      "cause": "Metadata records a selected observed option subset; the pinned CMakeCache is the direct authority for this existing web prerequisite.",
+      "correction": "Require exact ENABLE_BUILTIN_WEB_QUEUE_MICROTASK:BOOL=ON in hash-verified captured cache and retain native source manifest check."
+    }
+  ],
+  "readOnlyPreparationNotes": [
+    "One broad static source search returned excessive paths and was narrowed to the pinned invocation module.",
+    "An initial Jco src-path lookup returned absent directory; actual sealed package uses dist/api.js and dist/cmd/transpile.js, which were read.",
+    "One ad-hoc union diagnostic printed too many lexical/real path differences; no project mutation or action occurred.",
+    "An ad-hoc diagnostic assumed internalTickPolicy.prerequisiteCMakeOptions, also absent. The pinned CMakeCache directly showed the exact ON setting; no reviewed project code ran."
+  ],
+  "runtimeCanonicalInputCount": 6000,
+  "traceCanonicalInputCount": 6015,
+  "componentGuestHostBuildOrNodeExecuted": false
+}

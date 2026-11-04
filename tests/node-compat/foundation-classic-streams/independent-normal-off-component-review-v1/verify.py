@@ -1,0 +1,312 @@
+#!/usr/bin/env python3
+"""Read completed normal-OFF evidence only; never instantiate or run a guest."""
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import stat
+import subprocess
+
+HERE = Path(__file__).resolve().parent
+BASE = HERE.parent
+RUNTIME = BASE / 'production-runtime-activated-v2'
+OUTPUT = Path('/tmp/starling-node-compat/production-classic-runtime-v2/normal-off')
+COLLECTOR = BASE / 'production-adoption-v1/normal-off-component-root-results.json'
+TOOL = Path('/tmp/starling-node-compat/improved-build/cache/wasm-tools/1448/wasm-tools')
+INDEX_SHA = '8a1b91e73475bfb007220704e08fbe68aa0b584851f70afad5607fd6c3a10d5a'
+PINS_SHA = 'c998dce40ff66a1764ad8c44f8a492b830d40bb6dce958aab711ecf3c5bcbf3e'
+AUTHORITY_SHA = '1df0d5bcbb4792efa9fe7329b164aede3a2da7bc4dec6c90d011972cfb6d7f56'
+ENGINE_SHA = 'b8279ee1fedc4e26b7319b6777f6a413242cee0c36169a14195f5c24c44511e4'
+RESULT_SHA = '915fbe05dc80a6143f39be92955f4a098543f89ef67b79bbf5fd625dec0c1541'
+COMPLETION_SHA = '2ca472eca2f44a5549579d994a7b4745939164b4e3c4d19eadadf770a0a57170'
+TOOL_SHA = 'b332dd79057dafdcc8a36ca933d0d499acea506b56b1ea28e28fbb036c9e713d'
+WIT = b'package root:component;\n\nworld root {\n  export run: func() -> string;\n}\n'
+checked = {}
+
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def file(path, expected=None, size=None):
+    path = Path(path)
+    before = path.lstat()
+    assert stat.S_ISREG(before.st_mode), str(path)
+    h = hashlib.sha256()
+    with path.open('rb') as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+            h.update(chunk)
+    after = path.lstat()
+    assert (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) == (
+        after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns), str(path)
+    row = {'path': str(path), 'sha256': h.hexdigest(), 'bytes': before.st_size}
+    assert expected is None or row['sha256'] == expected, str(path)
+    assert size is None or row['bytes'] == size, str(path)
+    if str(path) in checked:
+        assert checked[str(path)] == row
+    checked[str(path)] = row
+    return row
+
+
+def load(path, expected=None):
+    row = file(path, expected)
+    data = Path(path).read_bytes()
+    assert digest(data) == row['sha256']
+    return json.loads(data)
+
+
+def local(root, name):
+    relative = Path(name)
+    assert not relative.is_absolute() and '..' not in relative.parts
+    path = root / relative
+    parent = path.parent
+    while parent != root:
+        assert parent != parent.parent and not parent.is_symlink()
+        parent = parent.parent
+    assert not root.is_symlink()
+    return path
+
+
+def initializer_vectors():
+    prefix = "import * as stream from 'node:stream';\nimport * as promises from 'node:stream/promises';\n"
+    expressions = [('compose', 'stream.compose'), ('duplexPair', 'stream.duplexPair')]
+    expressions += [(name+'.'+method, 'stream.'+name+'.'+method) for name in ['Readable', 'Writable', 'Duplex'] for method in ['fromWeb', 'toWeb']]
+    expressions += [('Duplex.from', 'stream.Duplex.from')]
+    expressions += [('Readable.prototype.'+name, 'stream.Readable.prototype.'+name) for name in ['compose', 'map', 'filter', 'forEach', 'toArray', 'some', 'find', 'every', 'flatMap', 'drop', 'take', 'reduce', 'iterator']]
+    expressions += [(name+'.prototype[Symbol.asyncDispose]', 'stream.'+name+'.prototype[Symbol.asyncDispose]') for name in ['Readable', 'Writable']]
+    rows = []
+    for operation, expression in expressions:
+        for construct in [False, True]:
+            name = re.sub('[^a-zA-Z0-9]+', '-', operation) + ('-new' if construct else '-call')
+            source = prefix+'const unavailable='+expression+';\n'+('new unavailable();' if construct else 'unavailable();')+'\nexport function run(){return "unreachable";}\n'
+            rows.append((name, operation, construct, operation, source))
+    sink = 'new stream.Writable({write(value,encoding,callback){callback();}})'
+    overloads = []
+    for shape, value in [('readable', '{getReader(){}}'), ('writable', '{getWriter(){}}'), ('transform-pair', '{readable:{},writable:{}}')]:
+        invocations = [
+            ('callback-pipeline', 'stream.pipeline(value,'+sink+',()=>{})', 'pipeline(Web stream)'),
+            ('promise-pipeline', 'promises.pipeline(value,'+sink+')', 'pipeline(Web stream)'),
+            ('callback-finished', 'stream.finished(value,()=>{})', 'finished(Web stream)'),
+            ('promise-finished', 'promises.finished(value)', 'finished(Web stream)'),
+            ('addAbortSignal', 'stream.addAbortSignal(new AbortController().signal,value)', 'addAbortSignal(Web stream)')]
+        for op, invocation, factory_op in invocations:
+            name = shape+'-'+op
+            source = prefix+'const value='+value+';\n'+invocation+';\nexport function run(){return "unreachable";}\n'
+            rows.append((name, op, False, factory_op, source))
+            overloads.append({'name': name, 'code': 'ERR_SM_NODE_UNSUPPORTED', 'operation': factory_op})
+    for op, invocation in [('callback-function-stage', 'stream.pipeline(function stage(){},'+sink+',()=>{})'), ('promise-function-stage', 'promises.pipeline(function stage(){},'+sink+')')]:
+        source = prefix+invocation+';\nexport function run(){return "unreachable";}\n'
+        rows.append((op, op, False, 'pipeline(function stage)', source))
+        overloads.append({'name': op, 'code': 'ERR_SM_NODE_UNSUPPORTED', 'operation': 'pipeline(function stage)'})
+    return rows, expressions, overloads
+
+
+def embedded_cores(data):
+    assert data[:8] == b'\0asm\x0d\0\x01\0'
+    offset = 8
+    cores = []
+    while offset < len(data):
+        section = data[offset]
+        offset += 1
+        length = shift = 0
+        while True:
+            value = data[offset]
+            offset += 1
+            length |= (value & 127) << shift
+            if value < 128:
+                break
+            shift += 7
+            assert shift <= 35
+        assert offset + length <= len(data)
+        payload = data[offset:offset+length]
+        offset += length
+        if section == 1:
+            assert payload[:8] == b'\0asm\x01\0\0\0'
+            cores.append({'sha256': digest(payload), 'bytes': len(payload)})
+    assert offset == len(data)
+    return cores
+
+
+def main():
+    root = load(COLLECTOR)
+    assert root['state'] == 'ROOT_CLASSIC_COMPONENT_SUITE_VERIFIED'
+    assert root['rawTerminalExitCodeObservedByRoot'] == 0 and root['toolSession'] == 26148
+    index = load(RUNTIME/'index.json', INDEX_SHA)
+    assert len(index['files']) == 19
+    for row in index['files']:
+        file(local(RUNTIME, row['path']), row['sha256'], row['bytes'])
+    pins = load(RUNTIME/'runtime-pins.json', PINS_SHA)
+    load(RUNTIME/'root-review-receipt.json', AUTHORITY_SHA)
+    source = load(RUNTIME/'source-receipt.json')
+    inputs = load(RUNTIME/'input-freeze.json', source['inputFreezeSha256'])
+    assert len(inputs['inputs']) == 5978 and len(inputs['toolLinks']) == 22
+    for row in inputs['inputs']:
+        path = Path(row['path'])
+        file(path if path.is_absolute() else local(RUNTIME, row['path']), row['sha256'], row['bytes'])
+    for row in inputs['toolLinks']:
+        path = Path(row['path'])
+        assert path.is_symlink() and os.readlink(path) == row['linkText']
+        assert str(path.resolve()) == row['resolvedTarget']
+        if row['targetKind'] == 'file':
+            file(path.resolve(), row['targetSha256'], row['targetBytes'])
+    completion = load(OUTPUT/'completion.json', COMPLETION_SHA)
+    report = load(OUTPUT/'results.json', RESULT_SHA)
+    assert len(completion['files']) == len({r['path'] for r in completion['files']}) == 90
+    for row in completion['files']:
+        file(local(OUTPUT, row['path']), row['sha256'], row['bytes'])
+    assert completion['state'] == 'CLASSIC_GATE_OUTPUTS_COMPLETE_REQUIRES_EXTERNAL_EXIT_ZERO'
+    assert completion['finalAdmissionRecheckCompletedBeforeReportPublication'] is True
+    assert completion['requiresIndependentTerminalExitCodeZero'] is True
+    assert completion['terminalExitCodeObservedByThisHelper'] is None
+    assert completion['runtimeAcceptanceClaim'] is False
+    assert completion['results'] == {'path': 'results.json', 'sha256': RESULT_SHA, 'bytes': 584785}
+    assert report['status'] == completion['reportStatus'] == 'FUTURE_CLASSIC_REAL_COMPONENT_GATES_PASSED'
+    assert report['variant'] == completion['variant'] == 'normal-off'
+    assert report['engineSha256'] == completion['engineSha256'] == ENGINE_SHA
+    pin = pins['variants']['normal-off']
+    assert report['pin'] == pin and pin['engineSha256'] == ENGINE_SHA
+    file(pin['enginePath'], ENGINE_SHA, pin['engineBytes'])
+    assert report['engineReceipt'] == load(pin['enginePath']+'.build.json', pin['receiptSha256'])
+    for row in pin['frozenFiles']:
+        file(row['path'], row['sha256'], row['bytes'])
+    assert len(pin['frozenFiles']) == 405
+    assert report['gcStressConfigured'] is False
+    assert report['engineReceipt']['oomTesting'] is False and report['engineReceipt']['debuggerEnabled'] is False
+    assert report['engineReceipt']['entropyPolicy'] == 'off'
+    assert report['capabilityPolicy']['selectedInterfaces'] == []
+    assert report['componentizerProvenance']['selection'] == 'patched-import-i32-clock-v2'
+    file(OUTPUT/'classic.bundle.mjs', report['bundle']['sha256'])
+    native_imports = ['node:buffer', 'node:events', 'node:stream', 'node:stream/promises', 'node:util']
+    assert sorted(report['bundle']['imports']) == native_imports
+    bundle_text = (OUTPUT/'classic.bundle.mjs').read_text()
+    assert sorted(re.findall(r'^import .*? from "([^"]+)";', bundle_text, re.MULTILINE)) == native_imports
+    assert set(report['bundle']['moduleIds']) == {
+        str(RUNTIME/'harness/checks.mjs'), str(RUNTIME/'harness/guest.mjs'),
+        str(RUNTIME/'harness/cjs-bindings.cjs')+'.native-profile.mjs'}
+    assert 'builtinFactory' not in bundle_text
+    for row in report['selectedManifests']:
+        file(Path(report['sourceRoot'])/row['path'], row['sha256'])
+    oracle = load(RUNTIME/'harness/node-oracle-results.json', report['oracleReceiptSha256'])
+    expected = load(BASE/'implementation-candidate-v1/node-final-acceptance-results.json', report['expectedReceiptSha256'])['expected']
+    assert oracle['node'] == 'v22.14.0' and oracle['groupCount'] == len(expected) == report['ordinaryGroups'] == 19
+    assert oracle['status'] == 'NODE22_ONLY_EXACT_SINGLE_WAIT_TRANSFORM_PASSED'
+    assert oracle['transform']['occurrenceCount'] == 1
+    assert oracle['transform']['from'] == 'await new Promise(resolve=>process.nextTick(resolve));'
+    assert oracle['transform']['to'] == 'await promises.finished(source).catch(()=>{});'
+    assert oracle['transform']['byteExactReplacementVerified'] is True
+    assert oracle['transformedObserved'] == expected
+    manifest = load(BASE/'implementation-candidate-v1/export-manifest.classic-streams.node-v22.14.0.json')
+    vectors, expressions, overloads = initializer_vectors()
+    deferred = [{'operation': op, 'construct': construct, 'code': 'ERR_SM_NODE_UNSUPPORTED'} for op, _ in expressions for construct in [False, True]]
+    limits = [{'name': name, 'boundary': boundary, 'code': 'ERR_SM_NODE_STREAM_LIMIT', 'operation': op} for name, boundary, op in [('writable object units', 4096, 'write'), ('readable byte chunks', 4096, 'push'), ('readable byte units', 16777216, 'push')]]
+    def observed(value, call):
+        assert value['call'] == call and value['retainedDefaultBefore'] == (65536 if call == 1 else 777)
+        assert value['snapshotDefaults'] == [65536, 16]
+        assert value['snapshotIdentity'] is (True if call == 1 else None)
+        assert value['ordinary'] == expected and value['deferred'] == deferred and value['overloads'] == overloads
+        assert value['limits'] == limits and value['nativeHex'] == '00cafeff'
+        assert value['rooting'] == {'hexRounds': 8, 'streamIdentity': True, 'callbackCalls': 1, 'abortCalls': 1, 'disposedCalls': 0}
+        graph = value['graph']
+        assert graph['rootKeys'] == manifest['modules']['node:stream']['exports']
+        assert graph['promiseKeys'] == manifest['modules']['node:stream/promises']['exports']
+        assert all(graph[key] is True for key in ['aliases', 'staticCommonJS', 'globalBufferIdentity', 'namedBindingSnapshots'])
+        assert graph['customPromisify'] == ['pipeline', 'finished']
+    retained = report['snapshotAndRetained']['retained']
+    assert len(retained) == 3
+    for call, value in enumerate(retained, 1):
+        observed(value, call)
+    observed(report['snapshotAndRetained']['fresh'], 1)
+    observed(report['wasmtime']['observed'], 1)
+    assert report['wasmtime']['stderr'] == ''
+    file(report['wasmtime']['path'], report['wasmtime']['sha256'])
+    assert report['wasmtime']['version'].startswith('wasmtime 42.0.1 ')
+    failures = report['initializationFailures']
+    assert len(vectors) == len(failures) == 65
+    for number, (row, vector) in enumerate(zip(failures, vectors)):
+        name, operation, construct, factory_op, text = vector
+        assert (row['name'], row['operation'], row['construct'], row['expectedFactoryOperation']) == (name, operation, construct, factory_op)
+        expected_message = 'node:stream.'+factory_op+' is unavailable in sm-node-22.14.0-m0.12'
+        assert row['expectedFactoryMessage'] == expected_message and expected_message in row['error']
+        assert row['error'].startswith('Failed to initialize component (wizer (')
+        assert set(row['imports']) <= {'node:stream', 'node:stream/promises'}
+        assert digest(text.encode()) == row['sourceSha256']
+        file(OUTPUT/('initializer-'+str(number)+'.mjs'), row['sourceSha256'])
+    fatal = report['deployedFailures']
+    assert fatal['jco'] == {'status': 0, 'stdout': 'EXPECTED_FATAL_DISCARD\n', 'stderr': ''}
+    assert fatal['wasmtime']['status'] == 134 and 'unreachable' in fatal['wasmtime']['stderr']
+    assert 'UNEXPECTED_FATAL_RETURN' not in fatal['wasmtime']['stdout']
+    assert fatal['policy'] == 'One invocation per fresh instance; terminal failure; discard, never reuse'
+    file(OUTPUT/'deployed_fatal.source.mjs', fatal['fixture']['sourceSha256'])
+    assert len(report['deployedControls']) == 2
+    for control in report['deployedControls']:
+        kind = control['kind']
+        file(OUTPUT/('deployed_'+kind.replace('-', '_')+'.source.mjs'), control['fixture']['sourceSha256'])
+        assert kind in ['caught', 'handled-later'] and len(control['retainedJcoCalls']) == 3
+        for call, value in enumerate(control['retainedJcoCalls'], 1):
+            assert value['kind'] == kind and value['calls'] == call and value['completed'] is True
+            assert value['error'] == {'code': 'ERR_SM_NODE_UNSUPPORTED', 'module': 'node:stream', 'operation': 'compose', 'profile': 'sm-node-22.14.0-m0.12'}
+            if kind == 'handled-later':
+                assert value['handledAfterReaction'] is True
+        assert control['freshWasmtime']['status'] == 0 and control['freshWasmtime']['stderr'] == ''
+        assert control['freshWasmtime']['observed'] == control['retainedJcoCalls'][0]
+    file(OUTPUT/'initializer-caught-control.mjs', report['caughtInitializerControl']['sourceSha256'])
+    assert len(completion['componentFiles']) == 5 and len(completion['generatedWasmFiles']) == len(completion['generatedJavaScriptFiles']) == 4
+    records = [report['component'], fatal['fixture']] + [x['fixture'] for x in report['deployedControls']] + [report['caughtInitializerControl']]
+    by_path = {Path(x.get('path', x.get('componentPath'))).name: x for x in records}
+    assert set(by_path) == set(completion['componentFiles'])
+    file(TOOL, TOOL_SHA)
+    wit_audits = []
+    for name in completion['componentFiles']:
+        fixture = by_path[name]
+        component_path = OUTPUT/name
+        artifact = file(component_path, fixture.get('sha256', fixture.get('componentSha256')))
+        assert fixture['interfaceAudit']['emittedImports'] == fixture['interfaceAudit']['selectedInterfaces'] == []
+        assert fixture['interfaceAudit']['componentSha256'] == artifact['sha256']
+        result = subprocess.run([str(TOOL), 'component', 'wit', str(component_path)], capture_output=True, timeout=55)
+        assert result.returncode == 0 and result.stderr == b'' and result.stdout == WIT
+        (HERE/(name+'.wit')).write_bytes(result.stdout)
+        wit_audits.append({'component': artifact, 'argv': [str(TOOL), 'component', 'wit', str(component_path)], 'exitCode': result.returncode, 'witSha256': digest(result.stdout), 'imports': [], 'export': 'run: func() -> string'})
+    pairs = []
+    for name in completion['generatedWasmFiles']:
+        core = file(OUTPUT/name)
+        base = name[:-len('.core.wasm')]
+        embedded = embedded_cores((OUTPUT/(base+'.component.wasm')).read_bytes())
+        assert embedded == [{'sha256': core['sha256'], 'bytes': core['bytes']}]
+        glue = OUTPUT/(base+'.js')
+        assert "new URL('./"+name+"', import.meta.url)" in glue.read_text()
+        pairs.append({'core': core, 'component': base+'.component.wasm', 'exactEmbeddedCoreBytes': True, 'glue': str(glue), 'glueNamesThisCore': True})
+    # Recheck the immutable boundaries after all static structural tool reads.
+    file(OUTPUT/'results.json', RESULT_SHA)
+    file(OUTPUT/'completion.json', COMPLETION_SHA)
+    file(RUNTIME/'index.json', INDEX_SHA)
+    result = {'schemaVersion': 1, 'state': 'INDEPENDENT_NORMAL_OFF_COMPLETED_COMPONENT_EVIDENCE_REVIEW_PASSED',
+        'reviewedAtUtc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        'variant': 'normal-off', 'collector': file(COLLECTOR),
+        'terminalExitEvidence': {'source': str(COLLECTOR), 'observedByRoot': 0, 'session': 26148, 'observedByThisReader': False},
+        'report': file(OUTPUT/'results.json'), 'completion': file(OUTPUT/'completion.json'),
+        'completionFilesRehashed': 90, 'activatedIndex': file(RUNTIME/'index.json'), 'activatedFilesRehashed': 19,
+        'consumedFilesRehashed': 5978, 'toolLinksRechecked': 22, 'normalOffFrozenCopiesRehashed': 405,
+        'pinsSha256': PINS_SHA, 'rootAuthoritySha256': AUTHORITY_SHA, 'engineSha256': ENGINE_SHA,
+        'ordinaryNodeGroups': 19, 'deferredCallAndConstructCases': 48, 'overloadRefusals': 17, 'logicalLimits': 3,
+        'nodeOracleWaitTransform': oracle['transform'], 'mainNativeImports': native_imports,
+        'exactInitializerSourcesAndFactoryMessages': 65, 'retainedJcoCalls': 3, 'freshJcoCalls': 1, 'freshWasmtimeCalls': 1,
+        'deployedCaughtOrHandledControls': 2, 'deployedFatalFreshDiscardCases': 1, 'caughtInitializerComponentPreserved': True,
+        'snapshotIdentity': {'firstAndFresh': True, 'retainedSecondAndThird': None, 'retainedDefaultBeforeSecondAndThird': 777},
+        'wasmTools': file(TOOL), 'structuralWitAudits': wit_audits, 'exactCoreComponentGluePairs': pairs,
+        'limits': ['No guest, componentization, native build, JavaScript admission, or host invocation was performed by this reader.',
+            'External raw exit zero is Root-observed evidence, not a terminal observation made by this reader.',
+            'The fatal Jco child catches the expected failure and exits zero. Wasmtime status 134 is a generic trap; its error origin is not identified.',
+            'The two successful paired controls validate own unsupported-error fields and are reused. The failed instance is discarded.',
+            'Normal Release has GC stress disabled. Eight byte round trips retain combined JavaScript owners; this is not moving-GC, isolated queue-root, or prototype-key proof.',
+            'Limits cover buffered stream units/chunks, not total heap; affected streams are discarded.',
+            'This bounded component suite does not establish full Node streams parity, performance, ALS, scheduler reset/teardown, or safe failed-instance reuse.'],
+        'completeNodeStreamsClaim': False, 'performanceClaim': False, 'overallRoadmapComplete': False}
+    (HERE/'results.json').write_text(json.dumps(result, indent=2)+'\n')
+    (HERE/'verified-files.json').write_text(json.dumps({'schemaVersion': 1, 'files': sorted(checked.values(), key=lambda row: row['path'])}, indent=2)+'\n')
+    print(json.dumps({key: result[key] for key in ['state', 'completionFilesRehashed', 'consumedFilesRehashed', 'exactInitializerSourcesAndFactoryMessages']}))
+
+
+if __name__ == '__main__':
+    main()

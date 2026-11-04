@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "beforePath": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/measurement-execution-activated-v2/measure.mjs",
+  "beforeSha256": "378158fd48fabbe505bbc1b45f288a522c1648b1fc700acd7abb077f51c1e64c",
+  "afterSha256": "a090f0cf996e6c024a04ef4210f14d3c2c071f7e195a128b3891250f3c4abb4b",
+  "edits": [
+    {
+      "old": "from './protocol.mjs'",
+      "new": "from '../measurement-execution-activated-v2/protocol.mjs'",
+      "count": 1
+    },
+    {
+      "old": "from './instantiate.mjs'",
+      "new": "from '../measurement-execution-activated-v2/instantiate.mjs'",
+      "count": 1
+    },
+    {
+      "old": "from './compact-oracle.mjs'",
+      "new": "from '../measurement-execution-activated-v2/compact-oracle.mjs'",
+      "count": 1
+    },
+    {
+      "old": "from './collect-worker.mjs'",
+      "new": "from '../measurement-execution-activated-v2/collect-worker.mjs'",
+      "count": 1
+    },
+    {
+      "old": "from './deadline-policy.mjs'",
+      "new": "from '../measurement-execution-activated-v2/deadline-policy.mjs'",
+      "count": 1
+    },
+    {
+      "old": "from './runtime-preflight.mjs'",
+      "new": "from '../measurement-execution-activated-v2/runtime-preflight.mjs'",
+      "count": 1
+    },
+    {
+      "old": "const here=dirname(fileURLToPath(import.meta.url)),hash=",
+      "new": "import {parentRoot,parentIndexSha256,verifyTimingSources,auditComposedCorrectness} from './admission.mjs';\nconst admissionHere=dirname(fileURLToPath(import.meta.url)),here=parentRoot,hash=",
+      "count": 1
+    },
+    {
+      "old": "assert.equal(hash(sourceIndexRaw),ownSha)",
+      "new": "assert.equal(hash(sourceIndexRaw),parentIndexSha256)",
+      "count": 1
+    },
+    {
+      "old": "assert.equal(phase.sourceFamilyIndexSha256,ownSha)",
+      "new": "assert.equal(phase.sourceFamilyIndexSha256,parentIndexSha256);assert.equal(phase.timingAdmissionSourceIndexSha256,ownSha)",
+      "count": 1
+    },
+    {
+      "old": "async function auditPhase(){assert.equal",
+      "new": "async function auditPhase(){await verifyTimingSources(admissionHere,ownSha);await auditComposedCorrectness(phase,ownSha);assert.equal",
+      "count": 1
+    },
+    {
+      "old": "hash(await readFile(join(here,'index.json'))),ownSha",
+      "new": "hash(await readFile(join(here,'index.json'))),parentIndexSha256",
+      "count": 1
+    },
+    {
+      "old": "const correctness=JSON.parse(await readFile(phase.actualCorrectness.reportPath));assert.equal(correctness.state,'ACTUAL_COMMON_BYTE_FOUR_ARM_CORRECTNESS_PASSED');assert.equal(correctness.sourceFamilyIndexSha256,ownSha);assert.equal(correctness.pairPinsSha256,phase.pairPinsSha256);assert.equal(correctness.records.length,4);\n",
+      "new": "const correctness=await auditComposedCorrectness(phase,ownSha);\n",
+      "count": 1
+    },
+    {
+      "old": "for(const record of correctness.records)",
+      "new": "for(const {record} of correctness.records)",
+      "count": 1
+    },
+    {
+      "old": "collectWorker(fileURLToPath(import.meta.url)",
+      "new": "collectWorker(join(admissionHere,'measure.mjs')",
+      "count": 1
+    },
+    {
+      "old": "collectWorker(join(here,'audit-inputs.mjs')",
+      "new": "collectWorker(join(admissionHere,'audit-inputs.mjs')",
+      "count": 1
+    },
+    {
+      "old": "sourceIndexSha256:ownSha",
+      "new": "sourceIndexSha256:parentIndexSha256,timingAdmissionSourceIndexSha256:ownSha,collectorSourceIndexSha256:phase.collectorSourceIndexSha256",
+      "count": 3
+    }
+  ],
+  "reverseExact": true
+}

@@ -18,6 +18,17 @@
 
 
 namespace builtins::web::streams {
+bool TransformStreamDefaultController::check_receiver(JSContext *cx, JS::HandleValue receiver,
+                                                       const char *method_name) {
+  // METHOD_HEADER_WITH_NAME expands inside each derived static method, so its
+  // unqualified check_receiver call resolves to this guard before Slot reads.
+  if (!is_instance(receiver) ||
+      !JS::GetReservedSlot(&receiver.toObject(), std::to_underlying(Slots::Stream)).isObject()) {
+    return api::throw_error(cx, api::Errors::WrongReceiver, method_name, class_name);
+  }
+  return true;
+}
+
 JSObject *TransformStreamDefaultController::stream(JSObject *controller) {
   MOZ_ASSERT(is_instance(controller));
   return &JS::GetReservedSlot(controller, std::to_underlying(Slots::Stream)).toObject();

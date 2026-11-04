@@ -1,0 +1,30 @@
+--- a/tests/node-compat/foundation-classic-streams/integration-candidate-v1/artifact-tools/freeze-engine.py
++++ b/artifact-tools/freeze-engine.py
+@@ -187,10 +187,11 @@
+     tool_dependencies(source_root)
+     validate_plan(plan, receipt_path)  # ALL inputs/destinations checked before any copy.
+     execute_plan(plan)
+-    receipt = {'schema': 1, 'state': 'immutable-release-engine-frozen', 'label': label,
++    receipt = {'schema': 1, 'state': 'immutable-trace-release-engine-frozen', 'label': label,
+         'engine': str(OUTPUT / (label + '.engine.wasm')), 'engineSha256': metadata['engineSha256'],
+         'engineBytes': metadata['engineBytes'], 'receiptSha256': digest(metadata_bytes),
+         'sourceRoot': str(OUTPUT / 'source'), 'componentizeSourceRoot': str(OUTPUT / 'componentize-source'),
++        'classicTraceSourcePolicy': metadata['classicTraceSourcePolicy'],
+         'nativeInputsVerified': 342, 'externalEmbeddingInputsVerified': 3, 'recipeSha256': RECIPE,
+         'actualLayoutCompileCommands': 61, 'actualStrictCompileCommands': 4, 'actualEmbeddingCompileCommands': 1,
+         'entropyPolicy': entropy, 'gcStress': gc, 'coreVersion': admission['coreExpectations']['coreVersion'],
+@@ -209,6 +210,14 @@
+             'additionalNativeInput': False, 'doesNotReplaceLiveRuntimeSeal': True}],
+         'toolDependencyClosure': [{'sourcePath': row['path'], 'path': str(OUTPUT / 'tooling/repository' / row['path']),
+                                  'sha256': row['sha256'], 'bytes': row['bytes']} for row in dependency_rows],
++        'semanticSourceProvenance': {
++            'fixSourceIndexSha256': metadata['classicTraceSourcePolicy']['fixSourceIndexSha256'],
++            'correctedReceiptAnnotationBase': str(OUTPUT / 'tooling/repository/tests/node-compat/foundation-classic-streams/trace-semantics-candidate-v1'),
++            'primaryPinsPath': str(OUTPUT / 'tooling/repository/tests/node-compat/foundation-classic-streams/trace-semantics-candidate-v1/primary-source-pins.json'),
++            'primaryPinsSha256': next(row['sha256'] for row in dependency_rows if row['path'] == 'tests/node-compat/foundation-classic-streams/trace-semantics-candidate-v1/primary-source-pins.json'),
++            'nodeMitNoticePath': str(OUTPUT / 'tooling/repository/tests/node-compat/foundation-classic-streams/trace-semantics-candidate-v1/LICENSE.node'),
++            'nodeMitNoticeSha256': next(row['sha256'] for row in dependency_rows if row['path'] == 'tests/node-compat/foundation-classic-streams/trace-semantics-candidate-v1/LICENSE.node'),
++            'annotationInterpretation': 'primaryPins in the unchanged corrected receipt is relative to the reviewed fix proposal, preserved at correctedReceiptAnnotationBase; not relative to the native canonical source directory.'},
+         'copies': [{'path': str(row['target']), 'original': str(row['original']) if row['original'] else None,
+                     'sha256': row['sha256'], 'bytes': row['target'].stat().st_size, 'shared': row['shared']} for row in plan],
+         'dependencyReferences': [{'kind': 'linked-libcrypto-frozen-copy', **library,

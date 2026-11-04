@@ -1,0 +1,10 @@
+// UNCOMPILED public module entry template. Keep internal module external while
+// bundling, or pass its exports directly to the generated registration factory.
+import { hexEncode, hexDecode } from 'starling:node-buffer-kernel@0.1.0';
+import { createBufferModule } from './buffer-facade.mjs';
+const namespace = createBufferModule({ hexEncode, hexDecode });
+export const {
+  Blob, Buffer, File, INSPECT_MAX_BYTES, SlowBuffer, atob, btoa, constants,
+  isAscii, isUtf8, kMaxLength, kStringMaxLength, resolveObjectURL, transcode,
+} = namespace;
+export default namespace.default;

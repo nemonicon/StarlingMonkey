@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "state": "REVERSIBLE_ACTIVATION_V2_CJS_AND_NAMESPACE_WIRING_ONLY",
+  "parentIndexSha256": "2d57efcdbc98dd29c9d4b159fa53992af24c2e18e760e6cacd9fd05131df53b2",
+  "beforeProducerSha256": "798a165e74a349f421293c3f990d9cf43efc6e743c42ace41c0bc9f04e4a1733",
+  "afterProducerSha256": "7fab9f41b37b919fe439b4d63dd2a6bc10b74e7ab0379ad0e1d9f66519dbc712",
+  "cjsAmendmentIndexSha256": "5a15ceca10c8037440eb08fc6d47b26e204a0d9b5be752f6866e8dd2ce0169f1",
+  "edits": [
+    {
+      "old": "AMENDMENT = HERE.parent / 'harness-completion-amendment-v1'",
+      "new": "AMENDMENT = HERE.parent / 'harness-completion-amendment-v1'\nCJS_AMENDMENT = HERE.parent / 'harness-cjs-contract-amendment-v1'\nACTIVATION_PARENT = HERE.parent / 'runtime-activation-candidate-v1'"
+    },
+    {
+      "old": "OUTPUT = HERE.parent / 'production-runtime-activated-v1'",
+      "new": "OUTPUT = HERE.parent / 'production-runtime-activated-v2'"
+    },
+    {
+      "old": "    assert verified_index(AMENDMENT, AMENDMENT_INDEX) == 12",
+      "new": "    assert verified_index(AMENDMENT, AMENDMENT_INDEX) == 12\n    assert verified_index(CJS_AMENDMENT, '5a15ceca10c8037440eb08fc6d47b26e204a0d9b5be752f6866e8dd2ce0169f1') == 14\n    assert verified_index(ACTIVATION_PARENT, '2d57efcdbc98dd29c9d4b159fa53992af24c2e18e760e6cacd9fd05131df53b2') == 15"
+    },
+    {
+      "old": "    payload.update({'runtime-contract.mjs': regular(PARENT / 'runtime-contract.mjs'),",
+      "new": "    payload['harness/guest.mjs'] = regular(CJS_AMENDMENT / 'proposed/harness/guest.mjs')\n    payload['harness/cjs-bindings.cjs'] = regular(CJS_AMENDMENT / 'proposed/harness/cjs-bindings.cjs')\n    payload.update({'runtime-contract.mjs': regular(PARENT / 'runtime-contract.mjs'),"
+    },
+    {
+      "old": "for root in (HERE, PARENT, AMENDMENT):",
+      "new": "for root in (HERE, ACTIVATION_PARENT, PARENT, AMENDMENT, CJS_AMENDMENT):"
+    },
+    {
+      "old": "'completionAmendmentIndexSha256': AMENDMENT_INDEX,",
+      "new": "'completionAmendmentIndexSha256': AMENDMENT_INDEX,\n        'cjsContractAmendmentIndexSha256': '5a15ceca10c8037440eb08fc6d47b26e204a0d9b5be752f6866e8dd2ce0169f1',\n        'activationParentIndexSha256': '2d57efcdbc98dd29c9d4b159fa53992af24c2e18e760e6cacd9fd05131df53b2',"
+    },
+    {
+      "old": "'All inherited guest/oracle bytes are unchanged; only the reviewed completion driver/helper differ.\\n'",
+      "new": "'Inherited checks/oracles and guest identity assertions are unchanged; reviewed completion and CJS placement amendments apply.\\n'"
+    }
+  ],
+  "exactReverseProof": true,
+  "unchangedBackendFiles": [
+    {
+      "path": "authority.py",
+      "sha256": "936c3779210dac902c6f3245a57bb75f1774dda315282e324ebfb3cf7c99ef3d"
+    },
+    {
+      "path": "consumed.mjs",
+      "sha256": "1f894407f95db58f16711e12c15a089b9fd09ccc866eba843d021cd9bd3ccf49"
+    },
+    {
+      "path": "runtime-preflight.template.mjs",
+      "sha256": "63a414d7a4ce8a27c94ea636094f8c198f25047771d5c241a820a92b5657a6e1"
+    },
+    {
+      "path": "backend-transformations.json",
+      "sha256": "f33ef9508db830853910bcc7dca79671257d90c08c03e924c9a6be5ba5757ca7"
+    }
+  ],
+  "nativePinsChanged": false,
+  "completionAmendmentStillMandatory": true,
+  "producerInvoked": false
+}

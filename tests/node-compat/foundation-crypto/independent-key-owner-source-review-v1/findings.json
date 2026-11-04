@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "state": "BOUNDED_SOURCE_DELTA_PASS_WITH_REQUIRED_FOLLOWONS_OPEN",
+  "blockingDeltaFindings": [],
+  "requiredExistingFollowons": [
+    {
+      "id": "CRYPTO-OWNER-FOLLOWON-BIGNUM",
+      "required": true,
+      "scope": "Multiple EC/RSA EVP_PKEY_get_bn_param calls write raw BIGNUM outputs before constructing BignumPtr owners. Short-circuit failures can leave earlier successful allocations unowned; RSA optional CRT extraction also returns before adoption. Move each produced output into RAII immediately in a separately reviewed cut.",
+      "closedByThisReview": false
+    },
+    {
+      "id": "CRYPTO-OWNER-FOLLOWON-COPIES",
+      "required": true,
+      "scope": "Decoded HMAC JWK std::string and JS strings; RSA/EC private component strings; BIGNUM and OpenSSL internal copies; vector intermediate construction/storage beyond logical size are not covered by SecretByteVectorDeleter. No all-copies erasure claim.",
+      "closedByThisReview": false
+    },
+    {
+      "id": "CRYPTO-OWNER-FOLLOWON-BOUNDS",
+      "required": true,
+      "scope": "Existing data->size()*8 can overflow and EVP_PKEY_new_mac_key accepts int length while keyData.size() is size_t. Existing vector/new under -fno-exceptions has no new recoverable allocation-failure guarantee; no new cap or error parity is asserted.",
+      "closedByThisReview": false
+    }
+  ],
+  "additionalPreExistingSourceLimitations": [
+    {
+      "id": "CRYPTO-PROTOTYPE-AS-KEY-SOURCE-AUDIT-OPEN",
+      "introducedByCandidate": false,
+      "blocksBoundedOwnerDelta": false,
+      "mustAuditBeforeCorrespondingNegativeRuntimeCase": true,
+      "evidence": [
+        "CryptoKey public getters reject self==proto_obj; those4 guards remain unchanged.",
+        "BuiltinImpl::is_instance recognizes any object whose JSClass equals CryptoKey::class_, including the class prototype installed by JS_InitClass.",
+        "SubtleCrypto sign/verify use the class predicate, then CryptoKey::is_algorithm reads Algorithm assuming an initialized key."
+      ],
+      "scope": "Rooting conclusion is limited to valid factory-created keys. No prototype-as-key/invalid-slot runtime probe ran; this packet claims no complete public-API safety."
+    }
+  ],
+  "nonClaims": [
+    "allCopyErasure",
+    "exactFinalizerCount",
+    "isolatedNativeRooting",
+    "cryptographicRuntimeCorrectness",
+    "boundedAllocation",
+    "linkage",
+    "performance",
+    "oldNativeProofTransfer"
+  ],
+  "futureAuthority": null
+}

@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "sourceOnly": true,
+  "newGuestComponentNativeOrProviderPayloads": false,
+  "ownedSessions": 3,
+  "arms": [
+    "native-on",
+    "fflate-on",
+    "fflate-off"
+  ],
+  "primarySetupsPerArm": 30,
+  "controlRanges": [
+    [
+      30,
+      59
+    ],
+    [
+      60,
+      89
+    ],
+    [
+      90,
+      119
+    ]
+  ],
+  "controlNames": [
+    "consumeInput",
+    "copyInputAndConsume",
+    "harnessNoCodec"
+  ],
+  "operationsPerBatch": 1,
+  "adjacentRepetitions": 2,
+  "perArmRawReturns": 242,
+  "perArmCounters": {
+    "publicFunctionEntries": 242,
+    "perExportEntries": {
+      "identity": 2,
+      "setup": 30,
+      "observe": 0,
+      "batch": 180,
+      "checkpoint": 30,
+      "stage": 0,
+      "validate": 0
+    },
+    "codecCalls": 0,
+    "controlOperations": 180
+  },
+  "totalRawReturns": 726,
+  "totalControlOperations": 540,
+  "totalDistinctArmControlCases": 270,
+  "actualControlsExecutedByPreparation": 0,
+  "controlRootAuthority": null,
+  "controlSourcePeer": null,
+  "budget": {
+    "ownedDeadlineMs": 600000,
+    "maxPipeBytes": 16777216,
+    "startDiskBytes": 2147483648,
+    "perWorkerDiskBytes": 838860800
+  },
+  "evidenceLimits": [
+    "No independent guest-heap full-input read. Public checkpoints give FNV/matchesSetupFNV/sentinels and source-coupled state.",
+    "Copy count is reported/source-coupled; copied backing is not exposed or independently inspected.",
+    "Empty input has no addressable isolation claim. Empty logical decoder fixtures may have nonempty encoded input.",
+    "Guest codecCalls0 plus unchanged branch/source exclude its invoke path; no hidden native-global call instrumentation.",
+    "No throughput/control subtraction/pilot/WT/GC/reset/request reuse/operational acceptance claim."
+  ],
+  "currentPriorMatrixControls": 0,
+  "prior228PassNotReusedAsControlExecution": true
+}

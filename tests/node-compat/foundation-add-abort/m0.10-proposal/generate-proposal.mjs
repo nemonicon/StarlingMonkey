@@ -1,0 +1,25 @@
+// Generates only this UNAPPLIED proposal header; never writes live builtins.
+import assert from 'node:assert/strict';
+import {readFile,writeFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {dirname,join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {validateManifest} from '../../../../builtins/node-compat/validate-manifest.mjs';
+const here=dirname(fileURLToPath(import.meta.url));
+assert.equal(process.version,'v22.14.0');
+const names=['add-abort.mjs','events-facade.mjs','export-manifest.events.node-v22.14.0.json'];
+const sources=Object.fromEntries(await Promise.all(names.map(async n=>[n,await readFile(join(here,n),'utf8')])));
+const manifest=JSON.parse(sources[names[2]]);validateManifest(manifest,JSON.parse(await readFile(join(here,'../../../../builtins/node-compat/manifest.schema.json'),'utf8')));
+const bindings=manifest.modules['node:events'].exports;
+assert.deepEqual([...bindings].sort(),Object.keys(await import('node:events')).sort());
+assert.deepEqual(manifest.modules['node:events'].aliases,['events']);assert.equal(manifest.profileVersion,'sm-node-22.14.0-m0.10');
+let add=sources['add-abort.mjs'].replace(/^export function /gm,'function ');
+let events=sources['events-facade.mjs'].replace(/^import \{createAddAbortListener\} from '\.\/add-abort.mjs';\n/m,'').replace(/^export function /gm,'function ');
+assert(!/^\s*(?:import|export)\b/m.test(add+events));
+const factory=`(function(resistStopSymbol){\n${add}\n${events}\nreturn createEventsFacade(resistStopSymbol);\n})`;
+assert(!factory.includes(')SM_EVT_M010"'));
+const digest=createHash('sha256');for(const name of names)digest.update(name+'\0'+sources[name]+'\0');
+const output='// UNAPPLIED proposal. Generated locally; no live builtin/header changed.\n// Canonical proposal SHA-256: '+digest.digest('hex')+'\nstatic constexpr const char kEventsFactorySource[] = R"SM_EVT_M010('+factory+')SM_EVT_M010";\n';
+const path=join(here,'events-factories.generated.h');
+if(process.argv.includes('--check'))assert.equal(await readFile(path,'utf8'),output);else await writeFile(path,output);
+console.log('PASS proposal schema/pinned16 Node22 exports/header generation; no runtime semantics executed');

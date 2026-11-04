@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "parentSources": 350,
+  "afterSources": 355,
+  "unchangedParentSources": 348,
+  "changes": [
+    {
+      "path": "builtins/node-compat/register.cpp",
+      "beforeSha256": "ace206308be53e2709a629e1e530ccd1cc0d6d7f86ec6035e0ffc5f4c676c796",
+      "afterSha256": "879b74c797eac19f07e86fa4e93bfa29578e11d0250fc3fb00439167580af9f6",
+      "edits": [
+        {
+          "old": "#ifdef NODE_COMPAT_ZLIB\n#include \"zlib/factories.generated.h\"\n#endif",
+          "new": "#ifdef NODE_COMPAT_ZLIB\n#include \"zlib/factories.generated.h\"\n#endif\n#ifdef NODE_COMPAT_STREAM_CONSUMERS\n#include \"stream-consumers/factories.generated.h\"\n#endif",
+          "count": 1
+        },
+        {
+          "old": "bool install(api::Engine *engine) {",
+          "new": "#ifdef NODE_COMPAT_STREAM_CONSUMERS\nstatic bool install_stream_consumers(api::Engine *engine) {\n  auto *cx = engine->cx(); // install() already entered CONTENT before user code.\n  JS::RootedObject argument(cx, JS_NewPlainObject(cx));\n  if (!argument) return false;\n  JS::RootedValue value(cx);\n  for (const char *name : {\"TextDecoder\", \"ArrayBuffer\", \"Uint8Array\", \"DataView\"}) {\n    if (!JS_GetProperty(cx, engine->global(), name, &value)) return false;\n    if (!value.isObject()) {\n      JS_ReportErrorASCII(cx, \"ERR_SM_NODE_PROFILE_INITIALIZATION: stream consumers native dependency unavailable\");\n      return false;\n    }\n    if (!JS_DefineProperty(cx, argument, name, value, 0)) return false;\n  }\n  JS::RootedValue argument_value(cx, JS::ObjectValue(*argument)), module(cx);\n  if (!evaluate_factory(cx, kStreamConsumersFactorySource, argument_value, &module)) return false;\n  return engine->define_builtin_module(\"node:stream/consumers\", module) &&\n         engine->define_builtin_module(\"stream/consumers\", module);\n}\n#endif\n\nbool install(api::Engine *engine) {",
+          "count": 1
+        },
+        {
+          "old": "  return JS_DefineProperty(cx, engine->global(), \"Buffer\", buffer_constructor, 0);",
+          "new": "#ifdef NODE_COMPAT_STREAM_CONSUMERS\n  if (!install_stream_consumers(engine)) return false;\n#endif\n  return JS_DefineProperty(cx, engine->global(), \"Buffer\", buffer_constructor, 0);",
+          "count": 1
+        }
+      ],
+      "reverseExact": true
+    },
+    {
+      "path": "cmake/builtins.cmake",
+      "beforeSha256": "6900930c538704853dc339a0840eea7d9df81d2a48fc13077fad9186641cb7fb",
+      "afterSha256": "09b4d73d6a2f0f3d83dff0c3bec98304632a712e1217493cd7deb6a080d4dfc0",
+      "edits": [
+        {
+          "old": "",
+          "new": "\n# Independent optional consumers: existing native decoder, no new C++ kernel.\noption(NODE_COMPAT_STREAM_CONSUMERS \"Enable bounded node:stream/consumers text/json\" OFF)\nif(NODE_COMPAT_STREAM_CONSUMERS AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat OR NOT TARGET builtin_web_text_codec)\n        message(FATAL_ERROR \"NODE_COMPAT_STREAM_CONSUMERS requires existing Node and native TextCodec builtins\")\n    endif()\n    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_STREAM_CONSUMERS=1)\n    add_dependencies(builtin_node_compat builtin_web_text_codec)\n    target_link_libraries(builtin_node_compat PRIVATE builtin_web_text_codec)\nendif()\n",
+          "count": 1,
+          "kind": "append"
+        }
+      ],
+      "reverseExact": true
+    }
+  ],
+  "addedSources": [
+    "builtins/node-compat/stream-consumers/facade.mjs",
+    "builtins/node-compat/stream-consumers/factories.generated.h",
+    "builtins/node-compat/stream-consumers/generate-factory.mjs",
+    "builtins/node-compat/stream-consumers/LICENSE.node",
+    "builtins/node-compat/export-manifest.stream-consumers.node-v22.14.0.json"
+  ],
+  "newCppTranslationUnits": 0,
+  "actualNativeCompileCountUnchangedUntilFutureBuild": true
+}

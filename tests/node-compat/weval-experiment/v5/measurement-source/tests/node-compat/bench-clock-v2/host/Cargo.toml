@@ -1,0 +1,15 @@
+[package]
+name = "node-profile-bench-host"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+wasmtime = { version = "=42.0.1", default-features = false, features = ["anyhow", "component-model", "cranelift", "runtime", "std"] }
+anyhow = "=1.0.104"
+serde_json = "=1.0.151"
+libc = "=0.2.189"
+
+[profile.release]
+debug = false
+strip = true

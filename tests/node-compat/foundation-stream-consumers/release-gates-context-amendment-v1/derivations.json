@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "state": "UNAPPLIED_SOURCE_CONTEXT_CORRECTION",
+  "parentIndexSha256": "a74dc603f7e42384892c9f4b69a2ba131a87a80daa38da19e91bbc2c099e5372",
+  "templateBeforeSha256": "d5b4d6c217f39863a059e99d5bca9ab76f17f190b24db390ddeb82a87fed25e6",
+  "templateAfterSha256": "b19d86291030386d7157ab45297398f2f9328893db902f57accabd88bda636ab",
+  "exactReverse": true,
+  "edits": [
+    {
+      "name": "explicit context helper",
+      "before": "import {assertFourPins",
+      "after": "import {sourceContexts,verifyNativeContexts,assertCoreContext} from './source-contexts.mjs';\nimport {assertFourPins"
+    },
+    {
+      "name": "genuine configured admit after both native contexts",
+      "before": " const sourceAdmission=await admit(native.metadata,variant,native.sourceRoot);assert.equal(sourceAdmission.sourceFiles,355);assert.equal(sourceAdmission.operationalAdmission,false);",
+      "after": " const roots=sourceContexts(config,native,pins.variants[variant]);await verifyNativeContexts(native.metadata,roots);\n const sourceAdmission=await admit(native.metadata,variant,roots.admissionSourceRoot);assert.equal(sourceAdmission.sourceRoot,roots.admissionSourceRoot);assert.equal(sourceAdmission.sourceFiles,355);assert.equal(sourceAdmission.operationalAdmission,false);\n assertCoreContext(sourceAdmission.coreExpectations,native.metadata);await verifyNativeContexts(native.metadata,roots);"
+    },
+    {
+      "name": "separate frame roles",
+      "before": "const frame=frozen({...native,metadata:",
+      "after": "const frame=frozen({...native,admissionSourceRoot:roots.admissionSourceRoot,runtimeSourceRoot:roots.runtimeSourceRoot,metadata:"
+    },
+    {
+      "name": "genuine recheck keeps configured admission and frozen runtime",
+      "before": "async function recheck(){await verifyFamily();await native.recheck();await admit(frame.metadata,variant,frame.sourceRoot);assertFrame(native.metadata,native.sourceRoot,frame);}",
+      "after": "async function recheck(){await verifyFamily();await native.recheck();await verifyNativeContexts(frame.metadata,roots);const checked=await admit(frame.metadata,variant,roots.admissionSourceRoot);assert.equal(checked.sourceRoot,roots.admissionSourceRoot);assert.deepEqual(assertCoreContext(checked.coreExpectations,frame.metadata),frame.core);await verifyNativeContexts(frame.metadata,roots);assertFrame(native.metadata,roots.runtimeSourceRoot,frame);}"
+    },
+    {
+      "name": "public role names, sourceRoot remains frozen",
+      "before": "return Object.freeze({...native,selectedManifests:",
+      "after": "return Object.freeze({...native,admissionSourceRoot:roots.admissionSourceRoot,runtimeSourceRoot:roots.runtimeSourceRoot,selectedManifests:"
+    }
+  ],
+  "newHelper": "source-contexts.mjs",
+  "runnerNamespaceBeforeSha256": "a57ad0eb37a44cea5d7fe1c5f272304fe952111896233df9dfcb721d279f06d1",
+  "runnerNamespaceAfterSha256": "735ed586e3a3a36ea6806dd946489a3cdde7ae9c8fa3b202e4c47f104aabdc1a",
+  "guestOracleCaseOrNativeBytesChanged": false,
+  "configuredOrFrozenArtifactsEdited": false,
+  "actionsInvoked": false
+}

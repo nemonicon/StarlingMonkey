@@ -1,0 +1,29 @@
+# UNCOMPILED, opt-in integration template. Include AFTER cmake/builtins.cmake.
+# No additions are made to the production CMakeLists.txt by this audit.
+# Set NODE_PROFILE_NODE and NODE_PROFILE_ROLLDOWN_MODULE to the audited toolchain.
+set(NODE_PROFILE_TEMPLATES "${CMAKE_CURRENT_LIST_DIR}")
+set(NODE_PROFILE_GENERATED "${CMAKE_CURRENT_BINARY_DIR}/node-profile-generated")
+file(MAKE_DIRECTORY "${NODE_PROFILE_GENERATED}")
+configure_file("${NODE_PROFILE_TEMPLATES}/native-buffer.cpp.in"
+               "${NODE_PROFILE_GENERATED}/native-buffer.cpp" COPYONLY)
+configure_file("${NODE_PROFILE_TEMPLATES}/register-profile.cpp.in"
+               "${NODE_PROFILE_GENERATED}/register-profile.cpp" COPYONLY)
+add_custom_command(
+  OUTPUT "${NODE_PROFILE_GENERATED}/node-profile-factories.generated.h"
+  COMMAND "${NODE_PROFILE_NODE}" "${NODE_PROFILE_TEMPLATES}/generate-factories.mjs"
+          "${NODE_PROFILE_ROLLDOWN_MODULE}" "${NODE_PROFILE_GENERATED}"
+  DEPENDS "${NODE_PROFILE_TEMPLATES}/generate-factories.mjs"
+          "${NODE_PROFILE_TEMPLATES}/buffer-facade.mjs"
+          "${NODE_PROFILE_TEMPLATES}/child-process.mjs"
+          "${NODE_PROFILE_TEMPLATES}/unsupported.mjs"
+  VERBATIM)
+add_custom_target(node-profile-factories
+  DEPENDS "${NODE_PROFILE_GENERATED}/node-profile-factories.generated.h")
+add_builtin(builtins::node_compat DISABLED_BY_DEFAULT
+  SRC "${NODE_PROFILE_GENERATED}/native-buffer.cpp"
+      "${NODE_PROFILE_GENERATED}/register-profile.cpp"
+  INCLUDE_DIRS "${NODE_PROFILE_GENERATED}"
+  DEPENDENCIES node-profile-factories)
+# Existing add_builtin() generates ENABLE_BUILTIN_NODE_COMPAT, links extension_api
+# and spidermonkey, and appends this namespace to builtins.incl. The option must
+# be enabled deliberately AFTER the C++ and component gates pass.

@@ -1,0 +1,350 @@
+{
+  "schema": 1,
+  "kind": "Rejected initial depth proposal",
+  "proposedNestedEmitLimit": 256,
+  "observed": {
+    "stage": 4,
+    "result": {
+      "depth": 173,
+      "failure": {
+        "name": "InternalError",
+        "message": "too much recursion"
+      }
+    }
+  },
+  "initialPrototypeSha256": "5a4d6058751d542d245b273f4199407c1c3b432d1d78e416e6ff5dfb5229221d",
+  "prototypeSource": "// Isolated proposal, not an installed node:events builtin.\n// Core listener algorithms follow Node.js22.14.0 lib/events.js and events3.3.0.\n// Copyright Joyent, Inc. and other Node contributors. MIT; see LICENSE.events.\nconst apply = Reflect.apply, keys = Reflect.ownKeys, create = Object.create;\nconst getPrototypeOf = Object.getPrototypeOf, define = Object.defineProperty;\nconst slice = Function.call.bind(Array.prototype.slice);\nconst push = Function.call.bind(Array.prototype.push), unshift = Function.call.bind(Array.prototype.unshift);\nconst splice = Function.call.bind(Array.prototype.splice);\nconst depths = new WeakMap();\nconst ErrorCtor = Error, TypeErrorCtor = TypeError, RangeErrorCtor = RangeError;\nconst numberIsNaN = Number.isNaN, bind = Function.call.bind(Function.prototype.bind);\nconst depthGet = Function.call.bind(WeakMap.prototype.get), depthSet = Function.call.bind(WeakMap.prototype.set);\nconst MAX_NAMES = 4096, MAX_LISTENERS = 65536, MAX_DEPTH = 256;\nlet maxDefault = 10;\nexport const defaultMaxListeners = 10; // Node ESM snapshot; constructor property is mutable.\nexport const captureRejections = false;\nexport const usingDomains = false;\nexport const captureRejectionSymbol = Symbol.for('nodejs.rejection');\nexport const errorMonitor = Symbol('events.errorMonitor');\nfunction failure(code, operation, message, ErrorType = ErrorCtor) {\n  const error = new ErrorType(`${code}: ${message}`); error.code = code; error.module = 'node:events'; error.operation = operation;\n  error.profile = 'sm-node-22.14.0-m0.3'; return error;\n}\nfunction deferred(operation) { throw failure('ERR_SM_NODE_UNSUPPORTED', operation, `node:events.${operation} is deferred by this profile`); }\nfunction limit(operation) { throw failure('ERR_SM_NODE_LIMIT', operation, `node:events.${operation} exceeds the bounded profile limit`, RangeErrorCtor); }\nfunction eventKey(type) {\n  if (typeof type !== 'string' && typeof type !== 'symbol') deferred('eventNameCoercion');\n  return type;\n}\nfunction checkListener(listener) {\n  if (typeof listener !== 'function') throw failure('ERR_INVALID_ARG_TYPE', 'listener', 'The listener argument must be a function', TypeErrorCtor);\n}\nfunction checkNumber(value, operation) {\n  if (typeof value !== 'number') throw failure('ERR_INVALID_ARG_TYPE', operation, 'The argument must be a number', TypeErrorCtor);\n  if (numberIsNaN(value) || value < 0) throw failure('ERR_OUT_OF_RANGE', operation, 'The argument must be >= 0', RangeErrorCtor);\n}\nexport function init(options) {\n  if (this._events === undefined || this._events === getPrototypeOf(this)?._events) {\n    this._events = create(null); this._eventsCount = 0;\n  }\n  this._maxListeners = this._maxListeners || undefined;\n  const capture = options?.captureRejections;\n  if (capture) {\n    if (typeof capture !== 'boolean') throw failure('ERR_INVALID_ARG_TYPE', 'captureRejections', 'captureRejections must be boolean', TypeErrorCtor);\n    deferred('captureRejections');\n  }\n}\nexport function EventEmitter(options) { apply(init, this, [options]); }\nEventEmitter.prototype._events = undefined;\nEventEmitter.prototype._eventsCount = 0;\nEventEmitter.prototype._maxListeners = undefined;\nfunction add(target, type, listener, prepend) {\n  checkListener(listener); eventKey(type);\n  let events = target._events;\n  if (events === undefined) { events = target._events = create(null); target._eventsCount = 0; }\n  else if (events.newListener !== undefined) {\n    target.emit('newListener', type, listener.listener || listener);\n    events = target._events;\n  }\n  const existing = events[type];\n  if (existing === undefined) {\n    if (target._eventsCount >= MAX_NAMES) limit('eventNames');\n    events[type] = listener; target._eventsCount++;\n  } else {\n    const count = typeof existing === 'function' ? 1 : existing.length;\n    if (count >= MAX_LISTENERS) limit('addListener');\n    if (typeof existing === 'function') events[type] = prepend ? [listener, existing] : [existing, listener];\n    else if (prepend) unshift(existing, listener); else push(existing, listener);\n    const list = events[type], maximum = target.getMaxListeners();\n    // Node's threshold is advisory, not an insertion cap. Preserve state and\n    // warned marker, but process.emitWarning delivery is deliberately deferred.\n    if (maximum > 0 && list.length > maximum && !list.warned) list.warned = true;\n  }\n  return target;\n}\nEventEmitter.prototype.setMaxListeners = function setMaxListeners(n) { checkNumber(n, 'setMaxListeners'); this._maxListeners = n; return this; };\nEventEmitter.prototype.getMaxListeners = function getMaxListeners() { return this._maxListeners === undefined ? maxDefault : this._maxListeners; };\nEventEmitter.prototype.emit = function emit(type, ...args) {\n  eventKey(type);\n  const depth = depthGet(depths, this) ?? 0;\n  if (depth >= MAX_DEPTH) limit('emit');\n  depthSet(depths, this, depth + 1);\n  try {\n    const events = this._events;\n    let unhandled = type === 'error';\n    if (events !== undefined) {\n      if (unhandled && events[errorMonitor] !== undefined) this.emit(errorMonitor, ...args);\n      unhandled = unhandled && events.error === undefined;\n    } else if (!unhandled) return false;\n    if (unhandled) {\n      if (args[0] instanceof ErrorCtor) throw args[0];\n      const error = failure('ERR_UNHANDLED_ERROR', 'emit', 'Unhandled error event'); error.context = args[0]; throw error;\n    }\n    const listener = events[type];\n    if (listener === undefined) return false;\n    if (typeof listener === 'function') apply(listener, this, args);\n    else for (const callback of slice(listener)) apply(callback, this, args);\n    return true;\n  } finally { depthSet(depths, this, depth); }\n};\nEventEmitter.prototype.addListener = function addListener(type, listener) { return add(this, type, listener, false); };\nEventEmitter.prototype.on = EventEmitter.prototype.addListener;\nEventEmitter.prototype.prependListener = function prependListener(type, listener) { return add(this, type, listener, true); };\nfunction onceWrapper(...args) {\n  if (!this.fired) {\n    this.target.removeListener(this.type, this.wrapFn); this.fired = true;\n    return apply(this.listener, this.target, args);\n  }\n}\nfunction wrapOnce(target, type, listener) {\n  const state = { fired: false, target, type, listener, wrapFn: undefined };\n  state.wrapFn = bind(onceWrapper, state); state.wrapFn.listener = listener; return state.wrapFn;\n}\nEventEmitter.prototype.once = function once(type, listener) { checkListener(listener); eventKey(type); return this.on(type, wrapOnce(this, type, listener)); };\nEventEmitter.prototype.prependOnceListener = function prependOnceListener(type, listener) { checkListener(listener); eventKey(type); return this.prependListener(type, wrapOnce(this, type, listener)); };\nEventEmitter.prototype.removeListener = function removeListener(type, listener) {\n  checkListener(listener); eventKey(type);\n  const events = this._events, list = events?.[type];\n  if (list === undefined) return this;\n  if (list === listener || list.listener === listener) {\n    this._eventsCount--;\n    if (this._eventsCount === 0) this._events = create(null);\n    else { delete events[type]; if (events.removeListener) this.emit('removeListener', type, list.listener || listener); }\n  } else if (typeof list !== 'function') {\n    let position = -1;\n    for (let i = list.length - 1; i >= 0; --i) if (list[i] === listener || list[i].listener === listener) { position = i; break; }\n    if (position < 0) return this;\n    splice(list, position, 1);\n    if (list.length === 1) events[type] = list[0];\n    if (events.removeListener !== undefined) this.emit('removeListener', type, listener);\n  }\n  return this;\n};\nEventEmitter.prototype.off = EventEmitter.prototype.removeListener;\nEventEmitter.prototype.removeAllListeners = function removeAllListeners(type) {\n  const events = this._events;\n  if (events === undefined) return this;\n  if (arguments.length) eventKey(type);\n  if (events.removeListener === undefined) {\n    if (!arguments.length) { this._events = create(null); this._eventsCount = 0; }\n    else if (events[type] !== undefined) { if (--this._eventsCount === 0) this._events = create(null); else delete events[type]; }\n    return this;\n  }\n  if (!arguments.length) {\n    for (const key of keys(events)) if (key !== 'removeListener') this.removeAllListeners(key);\n    this.removeAllListeners('removeListener'); this._events = create(null); this._eventsCount = 0; return this;\n  }\n  const list = events[type];\n  if (typeof list === 'function') this.removeListener(type, list);\n  else if (list !== undefined) for (let i = list.length - 1; i >= 0; --i) this.removeListener(type, list[i]);\n  return this;\n};\nfunction listenerArray(target, type, unwrap) {\n  eventKey(type); const entry = target._events?.[type];\n  const result = entry === undefined ? [] : typeof entry === 'function' ? [entry] : slice(entry);\n  if (unwrap) for (let i = 0; i < result.length; i++) result[i] = result[i].listener || result[i];\n  return result;\n}\nEventEmitter.prototype.listeners = function listeners(type) { return listenerArray(this, type, true); };\nEventEmitter.prototype.rawListeners = function rawListeners(type) { return listenerArray(this, type, false); };\nEventEmitter.prototype.listenerCount = function listenerCount(type, listener) {\n  eventKey(type); const entry = this._events?.[type];\n  if (entry === undefined) return 0;\n  if (listener == null) return typeof entry === 'function' ? 1 : entry.length;\n  const list = typeof entry === 'function' ? [entry] : entry; let count = 0;\n  for (const callback of list) if (callback === listener || callback.listener === listener) count++;\n  return count;\n};\nEventEmitter.prototype.eventNames = function eventNames() { return this._eventsCount > 0 ? keys(this._events) : []; };\nexport function listenerCount(emitter, type) { return typeof emitter.listenerCount === 'function' ? emitter.listenerCount(type) : apply(EventEmitter.prototype.listenerCount, emitter, [type]); }\nexport function getEventListeners(emitter, type) { if (typeof emitter?.listeners === 'function') return emitter.listeners(type); deferred('getEventListeners.EventTarget'); }\nexport function getMaxListeners(emitter) { if (typeof emitter?.getMaxListeners === 'function') return emitter.getMaxListeners(); deferred('getMaxListeners.EventTarget'); }\nexport function setMaxListeners(n = maxDefault, ...targets) {\n  checkNumber(n, 'setMaxListeners');\n  if (!targets.length) { maxDefault = n; return; }\n  for (const target of targets) { if (typeof target?.setMaxListeners !== 'function') deferred('setMaxListeners.EventTarget'); target.setMaxListeners(n); }\n}\nexport function once(emitter, name, options = undefined) { deferred('once'); }\nexport function on(emitter, event, options = undefined) { deferred('on'); }\nexport function addAbortListener(signal, listener) { deferred('addAbortListener'); }\nexport function EventEmitterAsyncResource(options = undefined) { deferred('EventEmitterAsyncResource'); }\ndefine(init, 'name', { value: '', configurable: true });\nObject.assign(EventEmitter, { EventEmitter, init, listenerCount, getEventListeners, getMaxListeners, setMaxListeners,\n  once, on, addAbortListener, EventEmitterAsyncResource, captureRejectionSymbol, errorMonitor, usingDomains });\ndefine(EventEmitter, 'defaultMaxListeners', { enumerable: true, configurable: true, get() { return maxDefault; }, set(n) { checkNumber(n, 'defaultMaxListeners'); maxDefault = n; } });\ndefine(EventEmitter, 'captureRejections', { enumerable: true, configurable: true, get() { return false; }, set(value) {\n  if (typeof value !== 'boolean') throw failure('ERR_INVALID_ARG_TYPE', 'captureRejections', 'captureRejections must be boolean', TypeErrorCtor);\n  if (value) deferred('captureRejections');\n} });\nexport default EventEmitter;\n",
+  "probeResults": [
+    {
+      "stage": 0,
+      "result": [
+        {
+          "name": "namespace",
+          "result": {
+            "names": [
+              "EventEmitter",
+              "EventEmitterAsyncResource",
+              "addAbortListener",
+              "captureRejectionSymbol",
+              "captureRejections",
+              "default",
+              "defaultMaxListeners",
+              "errorMonitor",
+              "getEventListeners",
+              "getMaxListeners",
+              "init",
+              "listenerCount",
+              "on",
+              "once",
+              "setMaxListeners",
+              "usingDomains"
+            ],
+            "defaultIdentity": true,
+            "staticIdentity": true,
+            "types": [
+              "symbol",
+              "symbol",
+              "number",
+              "boolean",
+              "boolean"
+            ],
+            "errorMonitorKey": null,
+            "rejectionKey": "nodejs.rejection",
+            "defaultThen": null,
+            "namespaceThen": null
+          }
+        },
+        {
+          "name": "listener-aliases",
+          "result": {
+            "on": true,
+            "off": true
+          }
+        },
+        {
+          "name": "emit-receiver-arguments-return",
+          "result": [
+            false,
+            true,
+            [
+              true,
+              true,
+              2,
+              3,
+              4,
+              5,
+              6
+            ]
+          ]
+        },
+        {
+          "name": "prepend-once-order",
+          "result": [
+            "c",
+            "b",
+            "a",
+            "b",
+            "a"
+          ]
+        },
+        {
+          "name": "mutation-during-emit",
+          "result": [
+            "a",
+            "b",
+            "a",
+            "c"
+          ]
+        },
+        {
+          "name": "new-listener-before-insert",
+          "result": [
+            "new:true",
+            "new:false",
+            "nested",
+            "original"
+          ]
+        },
+        {
+          "name": "remove-latest-duplicate",
+          "result": [
+            "f",
+            "g"
+          ]
+        },
+        {
+          "name": "remove-once-original-and-wrapper",
+          "result": {
+            "identities": [
+              true,
+              true
+            ],
+            "trace": [
+              [
+                "x",
+                true
+              ],
+              [
+                "x",
+                true
+              ]
+            ],
+            "count": 0
+          }
+        },
+        {
+          "name": "once-wrapper-manual-call",
+          "result": {
+            "trace": [
+              [
+                true,
+                "manual"
+              ]
+            ],
+            "first": 42,
+            "second": null,
+            "count": 0
+          }
+        },
+        {
+          "name": "once-reentrant-emit",
+          "result": [
+            "once",
+            "regular",
+            "regular"
+          ]
+        },
+        {
+          "name": "remove-all-lifo-and-symbols",
+          "result": {
+            "trace": [
+              [
+                "x",
+                "b"
+              ],
+              [
+                "x",
+                "a"
+              ],
+              [
+                "s",
+                "a"
+              ]
+            ],
+            "names": [],
+            "count": 0
+          }
+        },
+        {
+          "name": "event-key-order-special-names",
+          "result": {
+            "names": [
+              "2",
+              "10",
+              "__proto__",
+              "constructor",
+              "z",
+              "symbol:a",
+              "symbol:b"
+            ],
+            "nullPrototype": true,
+            "count": 7
+          }
+        },
+        {
+          "name": "error-monitor-is-not-handler",
+          "result": {
+            "same": true,
+            "trace": [
+              true,
+              true,
+              [
+                "handled",
+                true
+              ]
+            ]
+          }
+        },
+        {
+          "name": "unhandled-non-error-context",
+          "result": {
+            "name": "Error",
+            "code": "ERR_UNHANDLED_ERROR",
+            "context": true
+          }
+        },
+        {
+          "name": "listener-throw-stops-dispatch",
+          "result": {
+            "trace": [
+              1
+            ],
+            "same": true
+          }
+        },
+        {
+          "name": "listener-inspection-copies-and-filter",
+          "result": [
+            3,
+            2,
+            1,
+            3,
+            0,
+            3
+          ]
+        },
+        {
+          "name": "numeric-listener-thresholds",
+          "result": [
+            7,
+            7,
+            0,
+            "Infinity"
+          ]
+        },
+        {
+          "name": "default-threshold-esm-snapshot",
+          "result": [
+            25,
+            25,
+            10
+          ]
+        },
+        {
+          "name": "mutable-default-static-named-snapshot",
+          "result": [
+            77,
+            10,
+            true,
+            false
+          ]
+        },
+        {
+          "name": "legacy-subclass-mixin",
+          "result": [
+            true,
+            false,
+            1,
+            true
+          ]
+        },
+        {
+          "name": "modern-subclass",
+          "result": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "name": "invalid-listener-and-limits",
+          "result": [
+            {
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "name": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "name": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            }
+          ]
+        },
+        {
+          "name": "capture-disabled-normal-listener-return",
+          "result": [
+            true,
+            0,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "stage": 1,
+      "result": {
+        "code": "ERR_SM_NODE_UNSUPPORTED"
+      }
+    },
+    {
+      "stage": 2,
+      "result": {
+        "count": 65536,
+        "code": "ERR_SM_NODE_LIMIT"
+      }
+    },
+    {
+      "stage": 3,
+      "result": {
+        "count": 4096,
+        "code": "ERR_SM_NODE_LIMIT"
+      }
+    },
+    {
+      "stage": 4,
+      "result": {
+        "depth": 173,
+        "failure": {
+          "name": "InternalError",
+          "message": "too much recursion"
+        }
+      }
+    }
+  ],
+  "scope": "Valid guest JS only. SM guard occurs before256 simple nested emits; no native patch, raw pointer observer or malformed ABI call. The first aggregate harness trap was not symbolized; this diagnostic isolates the original JS recursion error."
+}

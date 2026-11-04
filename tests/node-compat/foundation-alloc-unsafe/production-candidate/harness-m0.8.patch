@@ -1,0 +1,305 @@
+--- a/tests/node-compat/fixtures/component.mjs
++++ b/tests/node-compat/fixtures/component.mjs
+@@ -4,6 +4,7 @@
+ import bareChildDefault from 'child_process';
+ import commonjs from './static-require.cjs';
+ import corpus from 'node-compat:oracle-vectors';
++import coreExpectations from 'node-compat:core-expectations';
+ 
+ const { Buffer } = bufferNamespace;
+ const snapshotBacking = new ArrayBuffer(12);
+@@ -22,7 +23,7 @@
+ function error(call, code, module, operation) {
+   try { call(); } catch (value) {
+     equal(value.code, code, 'error code');
+-    if (code === 'ERR_SM_NODE_UNSUPPORTED') equal(value.profile, 'sm-node-22.14.0-m0.1', 'unsupported profile version');
++    if (code === 'ERR_SM_NODE_UNSUPPORTED') equal(value.profile, coreExpectations.coreVersion, 'unsupported profile version');
+     if (module) equal(value.module, module, 'error module');
+     if (operation) equal(value.operation, operation, 'error operation');
+     return;
+@@ -155,7 +156,25 @@
+   error(() => Buffer.from(backing, 1, 12), 'ERR_BUFFER_OUT_OF_BOUNDS');
+   error(() => Buffer.from('x', 'unknown'), 'ERR_UNKNOWN_ENCODING');
+   error(() => Buffer.from('x'.repeat(1048577)), 'ERR_OUT_OF_RANGE');
+-  for (const name of ['copyBytesFrom', 'of', 'allocUnsafe', 'allocUnsafeSlow', 'compare', 'concat']) unsupported(() => Buffer[name]());
++  for (const name of coreExpectations.unsupportedStatic) {
++    unsupported(() => Buffer[name]());
++    unsupported(() => new Buffer[name]());
++  }
++  // Build-time receipt policy is mandatory; never probe a truthy deferred function.
++  if (coreExpectations.allocUnsafePolicy === 'zeroed-no-pool-v1') {
++    for (const size of [0, 0.5, 1.9, 17, 1024]) {
++      const a = Buffer.allocUnsafe(size), b = new Buffer.allocUnsafe(size);
++      equal(a.length, Math.trunc(size), 'allocUnsafe truncated size');
++      equal(a.byteOffset, 0, 'allocUnsafe zero offset');
++      equal(a.buffer.byteLength, a.length, 'allocUnsafe exact backing');
++      check(a.buffer !== b.buffer && Buffer.isBuffer(a) && Buffer.isBuffer(b), 'allocUnsafe fresh owned brand');
++      for (const byte of a) equal(byte, 0, 'allocUnsafe zero initialization');
++    }
++    for (const value of [-1, -0.5, NaN, Infinity, 16777216.25, 16777217]) error(() => Buffer.allocUnsafe(value), 'ERR_OUT_OF_RANGE');
++    for (const value of [undefined, null, '1', 1n]) error(() => Buffer.allocUnsafe(value), 'ERR_INVALID_ARG_TYPE');
++  } else if (coreExpectations.allocUnsafePolicy !== 'deferred') {
++    throw new Error('Unrecognized allocUnsafe test policy');
++  }
+   // All excluded own callable properties have identifiable refusals, including
+   // methods that otherwise could silently inherit incompatible U8 overloads.
+   const supported = new Set(['constructor', 'toString', 'slice', 'subarray']);
+@@ -192,7 +211,8 @@
+     unsupported(() => Buffer.from(detachedView));
+     backingCases.push('detached-rejected');
+   }
+-  return JSON.stringify({ calls: ++calls, snapshot: 'native Buffer/brand/codecs survive', strings: stringChecks,
++  equal(unavailableMethods, coreExpectations.prototypeRefusals, 'own prototype refusal count');
++  return JSON.stringify({ coreVersion: coreExpectations.coreVersion, allocUnsafePolicy: coreExpectations.allocUnsafePolicy, calls: ++calls, snapshot: 'native Buffer/brand/codecs survive', strings: stringChecks,
+     bytes: byteChecks, seed: corpus.seed, unavailableMethods, backingCases, nativeImports: ['node:buffer', 'node:child_process'],
+     staticCommonJS: true, globalBufferIdentity: true, stubCalls: childExports.length, stubConstructors: childExports.length });
+ }
+--- a/tests/node-compat/optimization/intrinsics-checks.mjs
++++ b/tests/node-compat/optimization/intrinsics-checks.mjs
+@@ -1,3 +1,4 @@
++import coreExpectations from 'node-compat:core-expectations';
+ // Guest-safe checks against the ACTUAL registered native module. No facade
+ // factory, reference kernel, Node assert shim or replacement Buffer is loaded.
+ export function checkCapturedIntrinsics(module) {
+@@ -15,7 +16,7 @@
+     try { call(); } catch (error) {
+       equal(error.code, 'ERR_SM_NODE_UNSUPPORTED', 'unsupported code');
+       equal(error.module, 'node:buffer', 'unsupported module');
+-      equal(error.profile, 'sm-node-22.14.0-m0.1', 'unsupported profile');
++      equal(error.profile, coreExpectations.coreVersion, 'unsupported profile');
+       if (operation) equal(error.operation, operation, 'unsupported operation');
+       return;
+     }
+--- a/tests/node-compat/run.mjs
++++ b/tests/node-compat/run.mjs
+@@ -9,6 +9,7 @@
+ import { loadComponentizer } from './componentizer.mjs';
+ import { bundleProfile } from './profile-bundler.mjs';
+ import { selectedManifestsForEngine } from './module-selection.mjs';
++import { selectCoreExpectations } from './core-expectations.mjs';
+ import { makeOracleCorpus } from './oracle.mjs';
+ 
+ const here = dirname(fileURLToPath(import.meta.url));
+@@ -57,8 +58,10 @@
+ try { await symlink(join(toolchain, 'node_modules'), join(output, 'node_modules'), 'dir'); }
+ catch (error) { if (error.code !== 'EEXIST') throw error; }
+ const builtinManifests = selectedManifestsForEngine(engineMetadata, { sourceRoot });
++const coreExpectations = selectCoreExpectations(engineMetadata, { sourceRoot });
+ const corpus = makeOracleCorpus();
+-const virtualModules = { 'node-compat:oracle-vectors': `export default ${JSON.stringify(corpus)};` };
++const virtualModules = { 'node-compat:oracle-vectors': `export default ${JSON.stringify(corpus)};`,
++  'node-compat:core-expectations': `export default ${JSON.stringify(coreExpectations)};` };
+ const semanticEntry = resolve(process.env.NODE_COMPAT_SEMANTIC_ENTRY ?? join(here, 'fixtures/component.mjs'));
+ const bundle = await bundleProfile({ rolldown, parseAst, input: semanticEntry, virtualModules, builtinManifests });
+ assert.deepEqual(bundle.imports.sort(), ['node:buffer', 'node:child_process']);
+@@ -130,7 +133,7 @@
+   engineMetadataPath: metadataPath, engineMetadata, componentizerProvenance,
+   wasmtime: hostVersion.stdout.trim(), componentBytes: component.length, componentSha256: hash(component),
+   bundleImports: bundle.imports, bundledModules: bundle.moduleIds, globalBufferPolicy: bundle.globalBufferPolicy,
+-  semanticEntry, sourceRoot,
++  semanticEntry, sourceRoot, coreExpectations,
+   emittedImports: imports, emittedWit: wit, interfaceAudit, calls: [first, second], wasmtimeReport: decodeWaveReport(host.stdout),
+   rawAliasFixture: { componentBytes: aliasBuild.component.length, componentSha256: hash(aliasBuild.component), emittedWit: aliasWit, wasmtimeStdout: aliasHost.stdout.trim() },
+   initializationFailures,
+--- a/tests/node-compat/wasmcloud/build-http.mjs
++++ b/tests/node-compat/wasmcloud/build-http.mjs
+@@ -8,6 +8,7 @@
+ import { loadComponentizer } from '../componentizer.mjs';
+ import { createProfilePlugin } from '../profile-bundler.mjs';
+ import { selectedManifestsForEngine } from '../module-selection.mjs';
++import { selectCoreExpectations } from '../core-expectations.mjs';
+ import { RANDOM } from '../entropy/selection-policy.mjs';
+ import { makeOracleCorpus } from '../oracle.mjs';
+ import { componentizeSelectedHTTP } from './http-stubbing.mjs';
+@@ -61,13 +62,14 @@
+ const worldFilename = runtimeEntropy ? 'profile-runtime-entropy.wit' : 'profile.wit';
+ const worldSource = await readFile(join(here, worldFilename), 'utf8');
+ await writeFile(join(witDirectory, 'profile.wit'), worldSource);
++const coreExpectations = selectCoreExpectations(engineMetadata, { sourceRoot: engineSourceRoot });
+ const corpus = makeOracleCorpus();
+ const httpEntry = resolve(process.env.NODE_COMPAT_HTTP_ENTRY ?? join(here, 'http.mjs'));
+ const utilFoundationsFixture = httpEntry === resolve(here, '../foundations/http-v7.mjs');
+ const expandedFoundationsFixture = utilFoundationsFixture || httpEntry === resolve(here, '../foundations/http-v6.mjs');
+ const foundationsIntegrationFixture = expandedFoundationsFixture || httpEntry === resolve(here, '../foundations/http.mjs');
+ let foundationOracles = null;
+-const virtualModules = { 'node-compat:oracle-vectors': `export default ${JSON.stringify(corpus)};`, 'node-compat:entropy-policy': `export default ${JSON.stringify(entropyPolicy)};` };
++const virtualModules = { 'node-compat:core-expectations': `export default ${JSON.stringify(coreExpectations)};`, 'node-compat:oracle-vectors': `export default ${JSON.stringify(corpus)};`, 'node-compat:entropy-policy': `export default ${JSON.stringify(entropyPolicy)};` };
+ if (foundationsIntegrationFixture) {
+   assert.equal(engineMetadata.pathEnabled, true); assert.equal(engineMetadata.eventsEnabled, true);
+   const pathDirectory = resolve(here, '../foundation-path');
+@@ -198,6 +200,7 @@
+     versionPolicy: 'Repository standard 0.2.0 adapter selected during ComponentizeJS; final no-Preview1 core is wrapped without an adapter and must emit exact 0.2.10',
+     usedInFinalWrapping: false },
+   componentPath, componentBytes: component.length, componentSha256: hash(component),
++  coreExpectations,
+   world: 'starling:node-compat-http-test/profile@0.1.0', worldSource, worldFilename, entropyPolicy, selectedInterfaces, builtinManifests: engineMetadata.selectedModuleManifests ?? null,
+   bundleImports: bundle.imports, bundledModules: Object.keys(bundle.modules),
+   httpEntry, entropyIntegrationFixture: foundationsIntegrationFixture || httpEntry === resolve(here, '../entropy/http.mjs'), foundationsIntegrationFixture, expandedFoundationsFixture, utilFoundationsFixture, foundationOracles,
+--- a/tests/node-compat/wasmcloud/test-wasmtime-http.mjs
++++ b/tests/node-compat/wasmcloud/test-wasmtime-http.mjs
+@@ -1,5 +1,6 @@
+ import { checkFoundationsHTTPReport } from '../foundations/assert-http-report.mjs';
+ import assert from 'node:assert/strict';
++import { validateCoreExpectations } from '../core-expectations.mjs';
+ import { createHash } from 'node:crypto';
+ import { spawn, spawnSync } from 'node:child_process';
+ import { mkdir, open, readFile, writeFile } from 'node:fs/promises';
+@@ -12,6 +13,7 @@
+ const output = resolve(process.env.NODE_COMPAT_HTTP_OUTPUT ?? '/tmp/starling-node-compat/wasmcloud-http');
+ const auditPath = resolve(process.env.NODE_COMPAT_HTTP_AUDIT ?? join(output, 'component-audit.json'));
+ const audit = JSON.parse(await readFile(auditPath));
++const coreExpectations = validateCoreExpectations(audit.coreExpectations);
+ const component = await readFile(audit.componentPath);
+ assert.equal(createHash('sha256').update(component).digest('hex'), audit.componentSha256);
+ for (const id of audit.emittedImports) assert(audit.allowedImports.includes(id), `Unselected host interface: ${id}`);
+@@ -50,6 +52,8 @@
+     assert.equal(body.schema, 1);
+     assert.equal(body.requestTag, requestTag);
+     assert(body.componentInstanceRequestCount >= 1);
++    assert.equal(body.native.coreVersion, coreExpectations.coreVersion);
++    assert.equal(body.native.allocUnsafePolicy, coreExpectations.allocUnsafePolicy);
+     assert.equal(body.native.strings, 381);
+     assert.equal(body.native.bytes, 250);
+     assert.equal(body.native.stubCalls, 9);
+@@ -68,7 +72,7 @@
+       assert.equal(body[field].code, 'ERR_SM_NODE_UNSUPPORTED');
+       assert.equal(body[field].module, 'node:child_process');
+       assert.equal(body[field].operation, operation);
+-      assert.equal(body[field].profile, 'sm-node-22.14.0-m0.1');
++      assert.equal(body[field].profile, coreExpectations.coreVersion);
+     }
+     checkEntropyHTTPReport(body, audit);
+     checkFoundationsHTTPReport(body, audit);
+--- a/tests/node-compat/wasmcloud/run-host.mjs
++++ b/tests/node-compat/wasmcloud/run-host.mjs
+@@ -3,6 +3,7 @@
+ // Run the native profile through the released, unmodified wasmCloud 2.11 CLI.
+ // Uses its supported `wash dev` deployment workflow, bound to loopback only.
+ import assert from 'node:assert/strict';
++import { validateCoreExpectations } from '../core-expectations.mjs';
+ import { createHash } from 'node:crypto';
+ import { spawn, spawnSync } from 'node:child_process';
+ import { open, readFile, writeFile, mkdir, mkdtemp, chmod } from 'node:fs/promises';
+@@ -44,6 +45,7 @@
+ const componentBytes = await readFile(componentPath);
+ const componentHash = digest(componentBytes);
+ const audit = JSON.parse(await readFile(auditPath, 'utf8'));
++const coreExpectations = validateCoreExpectations(audit.coreExpectations);
+ // The independent component builder audits WIT and the native engine provenance.
+ // Check the artifact hash again here before the host receives those same bytes.
+ assert.equal(audit.componentSha256, componentHash, 'HTTP component must match its audit');
+@@ -157,6 +159,8 @@
+     checkEntropyHTTPReport(body, audit);
+     checkFoundationsHTTPReport(body, audit);
+     assert.equal(body.requestTag, tag);
++    assert.equal(body.native.coreVersion, coreExpectations.coreVersion);
++    assert.equal(body.native.allocUnsafePolicy, coreExpectations.allocUnsafePolicy);
+     assert.equal(body.native.strings, 381);
+     assert.equal(body.native.bytes, 250);
+     assert.equal(body.native.stubCalls, 9);
+@@ -169,7 +173,7 @@
+       assert.equal(body[field].code, 'ERR_SM_NODE_UNSUPPORTED');
+       assert.equal(body[field].module, 'node:child_process');
+       assert.equal(body[field].operation, operation);
+-      assert.equal(body[field].profile, 'sm-node-22.14.0-m0.1');
++      assert.equal(body[field].profile, coreExpectations.coreVersion);
+     }
+     responses.push({ request: tag, status: response.status, headers: { contentType: response.headers.get('content-type'), cacheControl: response.headers.get('cache-control') }, body });
+   }
+--- a/tests/node-compat/optimized-profile-tests.mjs
++++ b/tests/node-compat/optimized-profile-tests.mjs
+@@ -4,6 +4,7 @@
+ import assert from 'node:assert/strict';
+ import { Buffer as NodeBuffer } from 'node:buffer';
+ import { createBufferModule, MAX_LENGTH } from '../../builtins/node-compat/buffer-facade.mjs';
++import { PROFILE_VERSION } from '../../builtins/node-compat/unsupported.mjs';
+ import * as kernel from '../../docs/node-compat/templates/reference-kernel.mjs';
+ 
+ assert.equal(process.version, 'v22.14.0');
+@@ -12,7 +13,7 @@
+ function unavailable(call, operation) {
+   assert.throws(call, {
+     code: 'ERR_SM_NODE_UNSUPPORTED', module: 'node:buffer',
+-    profile: 'sm-node-22.14.0-m0.1', ...(operation ? { operation } : {}),
++    profile: PROFILE_VERSION, ...(operation ? { operation } : {}),
+   });
+ }
+ 
+--- /dev/null
++++ b/tests/node-compat/core-expectations.mjs
+@@ -0,0 +1,75 @@
++// TEST EXPECTATIONS ONLY. No guest API or runtime feature toggle.
++// Select solely from an exact recognized core source receipt, after engine-byte verification.
++import assert from 'node:assert/strict';
++import { createHash } from 'node:crypto';
++import { readFileSync } from 'node:fs';
++import { resolve } from 'node:path';
++import { CORE_MANIFEST, selectedManifestsForEngine } from './module-selection.mjs';
++const known = {
++  "sm-node-22.14.0-m0.1": {
++    "allocUnsafePolicy": "deferred",
++    "unsupportedStatic": [
++      "copyBytesFrom",
++      "of",
++      "allocUnsafe",
++      "allocUnsafeSlow",
++      "compare",
++      "concat"
++    ],
++    "hashes": {
++      "builtins/node-compat/buffer-facade.mjs": "b1a8b671e4ebf71ed300b56afb1d60986ef37be1716f55bf00b35151a4a00f16",
++      "builtins/node-compat/export-manifest.node-v22.14.0.json": "fbc2f85596eab0cd9614fcd12281212fce55a3c925da731650a4cfa2927809e3",
++      "builtins/node-compat/factories.generated.h": "7de6c1e35dec100894bb7fe6f904b491ef5497df5ae8fe3ce6494742bc91b84e",
++      "builtins/node-compat/unsupported.mjs": "412b869a321421f3930e25ba2c0d4bac4dac9effbbb1e4d84eaf636599d38ea8",
++      "builtins/node-compat/buffer.cpp": "7f73ce790e6b23195a9bfa583bacdbf45dfb9fa9aed00489f66952d93ca37cf8"
++    }
++  },
++  "sm-node-22.14.0-m0.8": {
++    "allocUnsafePolicy": "zeroed-no-pool-v1",
++    "unsupportedStatic": [
++      "copyBytesFrom",
++      "of",
++      "allocUnsafeSlow",
++      "compare",
++      "concat"
++    ],
++    "hashes": {
++      "builtins/node-compat/buffer-facade.mjs": "4af877ca8ebb0273c71d5289fc2e60084623ef57ff10b0a6735181e65af8452d",
++      "builtins/node-compat/export-manifest.node-v22.14.0.json": "0e482334c46240f1cc4a20e97530a2339e14339f29dc14c27e025f1e6d218439",
++      "builtins/node-compat/factories.generated.h": "e6463dbf6c5f741b0b41c952add2ee4ea1129c8950a614b49c4f2f806f51309c",
++      "builtins/node-compat/unsupported.mjs": "aaac55f7e67a5861624ddb38e8ca83fc8b5ef8216789fff18ded772ebbf12f67",
++      "builtins/node-compat/buffer.cpp": "7f73ce790e6b23195a9bfa583bacdbf45dfb9fa9aed00489f66952d93ca37cf8"
++    }
++  }
++};
++const hash = value => createHash('sha256').update(value).digest('hex');
++function expected(version) {
++  const core = known[version]; assert(core && Object.hasOwn(known, version), 'Unrecognized core compatibility version');
++  return { schema: 1, coreVersion: version, allocUnsafePolicy: core.allocUnsafePolicy,
++    unsupportedStatic: [...core.unsupportedStatic], prototypeRefusals: 91,
++    manifestSha256: core.hashes[CORE_MANIFEST], sourceHashes: { ...core.hashes } };
++}
++export function validateCoreExpectations(value) {
++  assert(value && typeof value === 'object' && !Array.isArray(value), 'Missing core expectations');
++  assert.deepEqual(value, expected(value.coreVersion), 'Core expectation fields disagree with the recognized source contract');
++  return value;
++}
++export function selectCoreExpectations(metadata, { sourceRoot }) {
++  assert(typeof sourceRoot === 'string' && sourceRoot.length, 'Core policy requires explicit sourceRoot');
++  const root = resolve(sourceRoot);
++  const manifests = selectedManifestsForEngine(metadata, { sourceRoot: root });
++  const manifest = manifests.find(item => Object.hasOwn(item.modules, 'node:buffer'));
++  assert(manifest, 'Core manifest must contain Buffer'); const version = manifest.profileVersion;
++  const value = expected(version), sources = new Map();
++  for (const entry of metadata.sourceManifest) {
++    assert(entry && typeof entry.path === 'string' && typeof entry.sha256 === 'string' && /^[0-9a-f]{64}$/.test(entry.sha256), 'Malformed source receipt');
++    assert(!sources.has(entry.path), 'Duplicate compiled input path'); sources.set(entry.path, entry.sha256);
++  }
++  for (const [path, digest] of Object.entries(value.sourceHashes)) {
++    assert.equal(sources.get(path), digest, 'Core source receipt does not match selected profile: '+path);
++    const absolute = resolve(root, path); assert(absolute.startsWith(root+'/'), 'Core source escapes selected root');
++    assert.equal(hash(readFileSync(absolute)), digest, 'Core source bytes do not match selected profile: '+path);
++  }
++  assert.deepEqual(manifest.modules['node:buffer'].unsupportedStatic, value.unsupportedStatic);
++  return Object.freeze({ ...value, unsupportedStatic: Object.freeze(value.unsupportedStatic), sourceHashes: Object.freeze(value.sourceHashes) });
++}

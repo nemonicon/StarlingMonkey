@@ -1,0 +1,1 @@
+import{run}from"/tmp/starling-node-compat/foundations-v11/add-abort-off/abort_m11_fatal_queued_sync.js";try{await run();console.log('UNEXPECTED_RETURN');process.exitCode=2;}catch(error){console.log('EXPECTED_FATAL_DISCARD');}

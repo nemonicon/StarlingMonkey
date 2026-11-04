@@ -1,0 +1,360 @@
+--- a/builtins/node-compat/classic-streams/classic-core.generated.mjs
++++ b/builtins/node-compat/classic-streams/classic-core.generated.mjs
+@@ -4822,17 +4822,12 @@
+ }
+ function _write(stream, chunk, encoding, cb) {
+   const state = stream._writableState
+-  if (typeof encoding === 'function') {
+-    cb = encoding
+-    encoding = state.defaultEncoding
+-  } else {
+-    if (!encoding) encoding = state.defaultEncoding
+-    else if (encoding !== 'buffer' && !bufferIsEncoding(encoding)) throw new ERR_UNKNOWN_ENCODING(encoding)
+-    if (typeof cb !== 'function') cb = nop
+-  }
++  if (typeof cb !== 'function') cb = nop
+   if (chunk === null) {
+     throw new ERR_STREAM_NULL_VALUES()
+   } else if (!state.objectMode) {
++    if (!encoding) encoding = state.defaultEncoding
++    else if (encoding !== 'buffer' && !bufferIsEncoding(encoding)) throw new ERR_UNKNOWN_ENCODING(encoding)
+     if (typeof chunk === 'string') {
+       if (state.decodeStrings !== false) {
+         chunk = bufferFrom(chunk, encoding)
+@@ -4863,6 +4858,10 @@
+   return writeOrBuffer(stream, state, chunk, encoding, cb)
+ }
+ Writable.prototype.write = function (chunk, encoding, cb) {
++  if (encoding != null && typeof encoding === 'function') {
++    cb = encoding
++    encoding = null
++  }
+   return _write(this, chunk, encoding, cb) === true
+ }
+ Writable.prototype.cork = function () {
+@@ -4890,10 +4889,6 @@
+   const len = state.objectMode ? 1 : chunk.length
+   state.length += len
+ 
+-  // stream._write resets state.length
+-  const ret = state.length < state.highWaterMark
+-  // We must ensure that previous needDrain will not be reset to false.
+-  if (!ret) state.needDrain = true
+   if (state.writing || state.corked || state.errored || !state.constructed) {
+     state.buffered.push({
+       chunk,
+@@ -4914,6 +4909,10 @@
+     stream._write(chunk, encoding, state.onwrite)
+     state.sync = false
+   }
++
++  // Node22 checks the remaining queue after a synchronous _write callback.
++  const ret = state.length < state.highWaterMark || state.length === 0
++  if (!ret) state.needDrain = true
+ 
+   // Return false if errored or destroyed in order to break
+   // any synchronous while(stream.write(data)) loops.
+--- a/builtins/node-compat/classic-streams/transformation-receipt.json
++++ b/builtins/node-compat/classic-streams/transformation-receipt.json
+@@ -338,7 +338,7 @@
+     {
+       "path": "readable-stream/lib/internal/streams/writable.js",
+       "beforeSha256": "28b0cfad8e4d3528d72f6354cbf17b520c56023407cb6d92c1a3a9890af95647",
+-      "afterSha256": "c219a49afb5c6b5d5c4126d796c8847a6b44d01de520b0589b970ad97ff17c69",
++      "afterSha256": "18faa9f92e430e4aabb4b6349ea7bc481f20ecac61d9141c3db045e75f6f9ef4",
+       "edits": [
+         {
+           "old": "const process = require('process/')",
+@@ -369,6 +369,31 @@
+           "old": "Buffer.isEncoding",
+           "new": "bufferIsEncoding",
+           "count": 2
++        },
++        {
++          "old": "  if (typeof encoding === 'function') {\n    cb = encoding\n    encoding = state.defaultEncoding\n  } else {\n    if (!encoding) encoding = state.defaultEncoding\n    else if (encoding !== 'buffer' && !bufferIsEncoding(encoding)) throw new ERR_UNKNOWN_ENCODING(encoding)\n    if (typeof cb !== 'function') cb = nop\n  }",
++          "new": "  if (typeof cb !== 'function') cb = nop",
++          "count": 1
++        },
++        {
++          "old": "  } else if (!state.objectMode) {\n    if (typeof chunk === 'string') {",
++          "new": "  } else if (!state.objectMode) {\n    if (!encoding) encoding = state.defaultEncoding\n    else if (encoding !== 'buffer' && !bufferIsEncoding(encoding)) throw new ERR_UNKNOWN_ENCODING(encoding)\n    if (typeof chunk === 'string') {",
++          "count": 1
++        },
++        {
++          "old": "Writable.prototype.write = function (chunk, encoding, cb) {\n  return _write(this, chunk, encoding, cb) === true\n}",
++          "new": "Writable.prototype.write = function (chunk, encoding, cb) {\n  if (encoding != null && typeof encoding === 'function') {\n    cb = encoding\n    encoding = null\n  }\n  return _write(this, chunk, encoding, cb) === true\n}",
++          "count": 1
++        },
++        {
++          "old": "  // stream._write resets state.length\n  const ret = state.length < state.highWaterMark\n  // We must ensure that previous needDrain will not be reset to false.\n  if (!ret) state.needDrain = true\n",
++          "new": "",
++          "count": 1
++        },
++        {
++          "old": "  // Return false if errored or destroyed in order to break\n  // any synchronous while(stream.write(data)) loops.\n  return ret && !state.errored && !state.destroyed",
++          "new": "  // Node22 checks the remaining queue after a synchronous _write callback.\n  const ret = state.length < state.highWaterMark || state.length === 0\n  if (!ret) state.needDrain = true\n\n  // Return false if errored or destroyed in order to break\n  // any synchronous while(stream.write(data)) loops.\n  return ret && !state.errored && !state.destroyed",
++          "count": 1
+         }
+       ]
+     },
+@@ -456,8 +481,18 @@
+     }
+   ],
+   "licenseSha256": "ec62dc96da0099b87f4511736c87309335527fb7031639493e06c95728dc8c54",
+-  "generatedSha256": "ba39701153094c6481464fa3f45a7afd87e6d41d673026e8008e12f2693802bf",
++  "generatedSha256": "5c0241a73f4cdffc61d7c962bd4d1a1d2015f8fbadef59a4631b7551f9a767b9",
+   "sourceGraphFiles": 24,
+   "noPublicProcess": true,
+-  "componentOrNativeBuildExecuted": false
++  "componentOrNativeBuildExecuted": false,
++  "node22WritableSemanticDelta": {
++    "sourceOnly": true,
++    "primaryRelease": "v22.14.0",
++    "primaryPins": "primary-source-pins.json",
++    "changes": [
++      "post-_write highWaterMark result",
++      "object-mode encoding passthrough"
++    ],
++    "uncompiled": true
++  }
+ }
+--- a/builtins/node-compat/classic-streams/factories.generated.h
++++ b/builtins/node-compat/classic-streams/factories.generated.h
+@@ -1,5 +1,5 @@
+ // Generated source-only classic candidate; do not edit.
+-// Canonical-source SHA-256: ae1fca15a1f6f5076649f1194738065730e9f5e0b37dc34519710bb43dbba1b8
++// Canonical-source SHA-256: e7a22b558e5ed3559a001e8e0a272e6d23ecdfce05c28c245cfca15439252f3b
+ static constexpr const char kClassicStreamsFactorySource[] = R"SM_NODE_PROFILE((function(dependencies){
+ 'use strict';
+ // UNAPPLIED pure guest JS state machines. No public runtime require/process API.
+@@ -4826,17 +4826,12 @@
+ }
+ function _write(stream, chunk, encoding, cb) {
+   const state = stream._writableState
+-  if (typeof encoding === 'function') {
+-    cb = encoding
+-    encoding = state.defaultEncoding
+-  } else {
+-    if (!encoding) encoding = state.defaultEncoding
+-    else if (encoding !== 'buffer' && !bufferIsEncoding(encoding)) throw new ERR_UNKNOWN_ENCODING(encoding)
+-    if (typeof cb !== 'function') cb = nop
+-  }
++  if (typeof cb !== 'function') cb = nop
+   if (chunk === null) {
+     throw new ERR_STREAM_NULL_VALUES()
+   } else if (!state.objectMode) {
++    if (!encoding) encoding = state.defaultEncoding
++    else if (encoding !== 'buffer' && !bufferIsEncoding(encoding)) throw new ERR_UNKNOWN_ENCODING(encoding)
+     if (typeof chunk === 'string') {
+       if (state.decodeStrings !== false) {
+         chunk = bufferFrom(chunk, encoding)
+@@ -4867,6 +4862,10 @@
+   return writeOrBuffer(stream, state, chunk, encoding, cb)
+ }
+ Writable.prototype.write = function (chunk, encoding, cb) {
++  if (encoding != null && typeof encoding === 'function') {
++    cb = encoding
++    encoding = null
++  }
+   return _write(this, chunk, encoding, cb) === true
+ }
+ Writable.prototype.cork = function () {
+@@ -4894,10 +4893,6 @@
+   const len = state.objectMode ? 1 : chunk.length
+   state.length += len
+ 
+-  // stream._write resets state.length
+-  const ret = state.length < state.highWaterMark
+-  // We must ensure that previous needDrain will not be reset to false.
+-  if (!ret) state.needDrain = true
+   if (state.writing || state.corked || state.errored || !state.constructed) {
+     state.buffered.push({
+       chunk,
+@@ -4918,6 +4913,10 @@
+     stream._write(chunk, encoding, state.onwrite)
+     state.sync = false
+   }
++
++  // Node22 checks the remaining queue after a synchronous _write callback.
++  const ret = state.length < state.highWaterMark || state.length === 0
++  if (!ret) state.needDrain = true
+ 
+   // Return false if errored or destroyed in order to break
+   // any synchronous while(stream.write(data)) loops.
+--- a/tests/node-compat/build-engine.sh
++++ b/tests/node-compat/build-engine.sh
+@@ -5,9 +5,9 @@
+ set -euo pipefail
+ 
+ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
+-work_root="${NODE_COMPAT_BUILD_ROOT:-/tmp/starling-node-compat/improved-build}"
++work_root="${NODE_COMPAT_BUILD_ROOT:-/tmp/starling-node-compat/classic-trace-v1-build}"
+ node_bin="${NODE_COMPAT_NODE:-node}"
+-build_jobs="${NODE_COMPAT_JOBS:-8}"
++build_jobs="${NODE_COMPAT_JOBS:-1}"
+ stress="${NODE_COMPAT_GC_STRESS:-0}"
+ abi_fix="${NODE_COMPAT_ABI_FIX:-1}"
+ bigint_fix="${NODE_COMPAT_BIGINT_FIX:-$abi_fix}"
+@@ -39,7 +39,7 @@
+ if [[ "$entropy_mode" == RUNTIME_ONLY && "$stress" == 1 ]]; then
+   echo 'RuntimeOnly+GC is not a selected classic producer variant' >&2; exit 1
+ fi
+-layer_root="$repo_root/tests/node-compat/foundation-classic-streams/integration-candidate-v1"
++layer_root="$repo_root/tests/node-compat/foundation-classic-streams/trace-integration-candidate-v1"
+ tick_patch="$repo_root/tests/node-compat/foundation-scheduler/taskqueue-owner-v2/componentize-taskqueue-ticks.UNAPPLIED.patch"
+ 
+ abi_patch="$repo_root/tests/node-compat/abi-fix/componentize-u32-result.patch"
+@@ -121,18 +121,17 @@
+ fi
+ # Preserve every pre-policy source tree, build directory and artifact. Each
+ # selected configuration gets its own embedding output directory as well.
+-policy_suffix="entropy-entry-v1-strict-callback-v3-protected-abort-v2.$entropy_mode.path-$path_enabled.events-$events_enabled.string-decoder-$string_decoder_enabled.assert-$assert_enabled.querystring-$querystring_enabled.util-$util_enabled.stream-web-$stream_web_enabled"
+-policy_suffix="$policy_suffix.private-ticks-v1-$ticks_enabled.classic-v1-$classic_enabled"
++policy_suffix="trace-v1.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled"
+ source_dir="$source_dir-$policy_suffix"
+ build_dir="$build_dir-$policy_suffix"
+ artifact_name=starlingmonkey_embedding.abi-i32-i64-v1
+ if [[ "$stress" == 1 ]]; then artifact_name="$artifact_name.gc-stress"; fi
+ if [[ "$oom" == 1 ]]; then artifact_name="$artifact_name.oom-testing"; fi
+ if [[ "$build_type" == Debug ]]; then artifact_name="$artifact_name.debug"; fi
+-artifact_name="$artifact_name.classic-v1.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled"
++artifact_name="$artifact_name.trace-v1.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled"
+ if [[ -n "$artifact_tag" ]]; then artifact_name="$artifact_name.$artifact_tag"; fi
+ artifact="$work_root/artifacts/$artifact_name.wasm"
+-for generated_name in "$artifact_name.wasm.build.json" "componentize-native-inputs-$artifact_name.json" "source-inputs-$artifact_name.json" "openssl-source-$artifact_name.before.json" "configure-$artifact_name.log" "build-$artifact_name.log"; do
++for generated_name in "${source_dir##*/}" "${build_dir##*/}" "$artifact_name.wasm" "$artifact_name.wasm.build.json" "$artifact_name.raw.wasm" "$artifact_name.raw.wasm.build.json" "componentize-native-inputs-$artifact_name.json" "source-inputs-$artifact_name.json" "recipe-$artifact_name.sha256" "openssl-source-$artifact_name.before.json" "configure-$artifact_name.log" "build-$artifact_name.log"; do
+   if [[ ${#generated_name} -gt 255 ]]; then
+     echo 'Generated artifact basename exceeds255bytes; use a shorter tag' >&2; exit 1
+   fi
+@@ -161,6 +160,10 @@
+     mv "$destination.part" "$destination"
+   fi
+ }
++# Authenticate actual corrected342 sources before any archive fetch.
++[[ "$(sha256_file "$layer_root/layer-policy.py")" == 43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9 ]] || exit 1
++[[ "$(sha256_file "$layer_root/policy.json")" == 891a4c53dd4a7b7d776c21003acdd12c7944c6a3eca019a1d9b2be620ed8b11c ]] || exit 1
++python3 "$layer_root/layer-policy.py" "$repo_root"
+ fetch_checked "https://codeload.github.com/bytecodealliance/ComponentizeJS/tar.gz/$componentize_revision" \
+   "$work_root/componentize-source.tar.gz" "$componentize_archive_sha"
+ if [[ ! -f "$source_dir/.source-archive-sha256" ]] || [[ "$(cat "$source_dir/.source-archive-sha256")" != "$componentize_archive_sha" ]]; then
+@@ -168,8 +171,8 @@
+   printf '%s\n' "$componentize_archive_sha" > "$source_dir/.source-archive-sha256"
+ fi
+ # New named source layer; original ABI/entry/strict guards below remain exact.
+-[[ "$(sha256_file "$layer_root/layer-policy.py")" == f4a303250ac979206f0c2b358f4dd16d2a5e3a3e3007200901dedba8576b9a1e ]] || exit 1
+-[[ "$(sha256_file "$layer_root/policy.json")" == 137a35959131d5cb5125bb5fc97324dfa4ba2ce18441818dd95cf83d19c88d6f ]] || exit 1
++[[ "$(sha256_file "$layer_root/layer-policy.py")" == 43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9 ]] || exit 1
++[[ "$(sha256_file "$layer_root/policy.json")" == 891a4c53dd4a7b7d776c21003acdd12c7944c6a3eca019a1d9b2be620ed8b11c ]] || exit 1
+ [[ "$(sha256_file "$tick_patch")" == a6c3a34e06bc98ebc5a2f9ff943ceeb127e337d5b0bb349fc92d21cc123b576f ]] || exit 1
+ python3 "$layer_root/layer-policy.py" "$repo_root"
+ # Restore ONLY an exact previously layered embedding before replaying every
+@@ -268,7 +271,7 @@
+ import importlib.util,json,pathlib,sys
+ sys.dont_write_bytecode=True
+ repo=pathlib.Path(sys.argv[1])
+-helper=repo/'tests/node-compat/foundation-classic-streams/integration-candidate-v1/layer-policy.py'
++helper=repo/'tests/node-compat/foundation-classic-streams/trace-integration-candidate-v1/layer-policy.py'
+ spec=importlib.util.spec_from_file_location('classic_source_capture',helper)
+ layer=importlib.util.module_from_spec(spec);spec.loader.exec_module(layer)
+ json.dump(layer.source_manifest(repo),open(sys.argv[2],'w'),indent=2)
+@@ -276,7 +279,10 @@
+ python3 - "$source_dir" "$componentize_input_manifest" <<'PYEMBED'
+ import hashlib,json,pathlib,sys
+ root=pathlib.Path(sys.argv[1]);paths=sorted(p for p in (root/'embedding').rglob('*') if p.is_file() and p.suffix in ['.cpp','.h'])+[root/'CMakeLists.txt']
+-json.dump([{'path':str(p.relative_to(root)),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in paths],open(sys.argv[2],'w'),indent=2)
++rows=[{'path':str(p.relative_to(root)),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in paths]
++expected=[{'path':'embedding/embedding.cpp','sha256':'9dcb63beaf55ff6af9ca4d2019316d4a167657c02ed76a1bf246012da0bcd205'},{'path':'embedding/embedding.h','sha256':'de2c1ae6c7f881902675d79e4bedaeece6953e70e1eac8291165ad0d5cd0eb0e'},{'path':'CMakeLists.txt','sha256':'4bd9bb94f5b79a2c9eb8ef7d98bc4b712e7b9cc2702467436a87e1845240c5e8'}]
++assert rows==expected,'Exact unchanged external3 sources required before configure'
++json.dump(rows,open(sys.argv[2],'w'),indent=2)
+ PYEMBED
+ string_decoder_flag=OFF; assert_flag=OFF; querystring_flag=OFF; util_flag=OFF; stream_web_flag=OFF
+ if [[ "$string_decoder_enabled" == 1 ]]; then string_decoder_flag=ON; fi
+@@ -328,8 +334,8 @@
+     return subprocess.check_output(args, cwd=repo, text=True).strip()
+ import importlib.util
+ sys.dont_write_bytecode = True
+-layer_file = pathlib.Path(repo) / 'tests/node-compat/foundation-classic-streams/integration-candidate-v1/layer-policy.py'
+-assert digest(layer_file) == 'f4a303250ac979206f0c2b358f4dd16d2a5e3a3e3007200901dedba8576b9a1e'
++layer_file = pathlib.Path(repo) / 'tests/node-compat/foundation-classic-streams/trace-integration-candidate-v1/layer-policy.py'
++assert digest(layer_file) == '43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9'
+ layer_spec = importlib.util.spec_from_file_location('reviewed_classic_layer',layer_file)
+ layer = importlib.util.module_from_spec(layer_spec); layer_spec.loader.exec_module(layer)
+ manifest = layer.source_manifest(repo)
+@@ -398,7 +404,7 @@
+ # Preserve the accepted v3 attestation verbatim. This is a separately named
+ # source extension; the old policy must never claim the new EventTarget bytes.
+ protected_abort_sources = {'builtins/web/event/event-target.h': '516f9c609d78576cf72897c4c5bbe1106a3d04ab4a197c50cedee3fa0c8fb96d', 'builtins/web/event/event-target.cpp': '1c0263f958d0f6221accf04ffa2ac12c6406e11914e1b2fab3c41c66c3038a1e', 'builtins/node-compat/register.cpp': '19eef9879c94e5232238f6df738d57057d384fa025849ee319fcf51eb06eda2b', 'builtins/node-compat/events.mjs': 'b58b0e0891145748e71139b8d08abb4187fe52e1aa12f9705beee3f6380b68f6', 'builtins/node-compat/events-add-abort-listener.mjs': '106be45fe33b0e35d97aad6ece3fb368210cb954bb652ea7bcdfa478b9c7083e', 'builtins/node-compat/events-factories.generated.h': '41b4c286e24089e0c223d0e80d4d0f587322afee8816811f2e754217f8103437', 'builtins/node-compat/generate-events-factory.mjs': '90a7ae6b887fce3bf92dc167090ea44c0bb8755400be2ff577658539f4a84354', 'builtins/node-compat/generate-factories.mjs': '46b0e0a40d3a50dae58e0d833c4861d1344df045eaf490f74060bbccc1a4561e', 'builtins/node-compat/export-manifest.events.node-v22.14.0.json': '90f7dc152b990dc8955c0801eab11b9410a10dc96a8019c1b7a81b69981eb561', 'cmake/builtins.cmake': '0155eae9e45f2d059663f1bcc54315e58e4f2cb0d8e5a9dfcb76cfa9a7f5f9ea'}
+-assert digest(layer_file) == 'f4a303250ac979206f0c2b358f4dd16d2a5e3a3e3007200901dedba8576b9a1e', 'Classic source helper changed during compilation'
++assert digest(layer_file) == '43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9', 'Classic source helper changed during compilation'
+ layer.validate_sources(repo,manifest)
+ strict_callback_sources = dict(strict_callback_v3_sources)
+ strict_callback_sources['builtins/web/event/event-target.cpp'] = protected_abort_sources['builtins/web/event/event-target.cpp']
+@@ -556,7 +562,7 @@
+ }
+ 
+ metadata = layer.decorate(metadata,repo,source_dir,json.loads(compile_commands),embedding_commands,ticks_enabled == '1')
+-assert digest(layer_file) == 'f4a303250ac979206f0c2b358f4dd16d2a5e3a3e3007200901dedba8576b9a1e'
++assert digest(layer_file) == '43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9'
+ assert digest(layer_file.parent / 'policy.json') == layer.POLICY_SHA256
+ 
+ with open(artifact + '.build.json', 'w') as output:
+--- a/tests/node-compat/classic-streams-admission.mjs
++++ b/tests/node-compat/classic-streams-admission.mjs
+@@ -4,8 +4,8 @@
+ import {readFileSync,lstatSync} from 'node:fs';
+ import {resolve,join} from 'node:path';
+ const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+-const PINS_SHA='9c8e3c209c97372b09cff55cd2d05d3491c143799a0820659c62ec94ba193248';
+-const RECIPE_SHA='71b48d2e70c5e003fcbcce7620366744c089dd55036036e52926224dfa2614f7';
++const PINS_SHA='275033a645ed9dd3f3f8770baa6d2a5ddb5702fa0d34ff115d912ddcf9b077d8';
++const RECIPE_SHA='3694c88b7d000f27e11ffcac835fe0b205b2075f5b1d8d29c61f5b0038ba1cf3';
+ function entries(value) {
+   assert(Array.isArray(value), 'Need an explicit source inventory');
+   const seen = new Set();
+@@ -47,6 +47,13 @@
+   assert.deepEqual(definitions,enabled?['-D'+name+'=1']:[], 'Unexpected macro '+name);
+   assert(!tokens.includes('-U'+name),'Unexpected macro undefinition '+name);
+ }
++function release(tokens) {
++  assert.deepEqual(tokens.filter(word=>word.startsWith('-O')),['-O3']);
++  assert.deepEqual(tokens.filter(word=>word==='-DNDEBUG'||word.startsWith('-DNDEBUG=')),['-DNDEBUG']);
++  assert(!tokens.includes('-UNDEBUG')&&!tokens.includes('-UDEBUG')&&!tokens.some(word=>word.startsWith('-DDEBUG')));
++  assert(!tokens.some(word=>word==='-DNODE_COMPAT_OOM_TESTING'||word.startsWith('-DNODE_COMPAT_OOM_TESTING=')));
++  assert(!tokens.includes('-UNODE_COMPAT_OOM_TESTING'));
++}
+ function compiled(command, candidates, enabled, events, streamWeb) {
+   const tokens=words(command), input=tokens[tokens.indexOf('-c')+1];
+   assert(input && !input.startsWith('-'));
+@@ -74,12 +81,12 @@
+ 
+ // Full source/metadata contract. This alone is never engine/runtime proof.
+ function loadContract(){
+- const pinsBytes=readFileSync(new URL('./foundation-classic-streams/integration-candidate-v1/admission-pins.json',import.meta.url));
++ const pinsBytes=readFileSync(new URL('./foundation-classic-streams/trace-integration-candidate-v1/admission-pins.json',import.meta.url));
+  assert.equal(hash(pinsBytes),PINS_SHA,'Unreviewed classic admission contract');
+  const pins=JSON.parse(pinsBytes);
+- const policyBytes=readFileSync(new URL('./foundation-classic-streams/integration-candidate-v1/policy.json',import.meta.url));
++ const policyBytes=readFileSync(new URL('./foundation-classic-streams/trace-integration-candidate-v1/policy.json',import.meta.url));
+  assert.equal(hash(policyBytes),pins.policySha256);
+- assert.equal(hash(readFileSync(new URL('./foundation-classic-streams/integration-candidate-v1/layer-policy.py',import.meta.url))),pins.helperSha256);
++ assert.equal(hash(readFileSync(new URL('./foundation-classic-streams/trace-integration-candidate-v1/layer-policy.py',import.meta.url))),pins.helperSha256);
+  const policy=JSON.parse(policyBytes);
+  const parentPinsBytes=readFileSync(new URL('./foundation-scheduler/admission-candidate-v1/pins.json',import.meta.url));
+  assert.equal(hash(parentPinsBytes),pins.parentAdmissionPinsSha256);
+@@ -118,6 +125,7 @@
+  assert(!(metadata.gcStress&&metadata.entropyPolicy==='runtime-only'),'RuntimeOnly+GC is outside this finite producer');
+  assert.equal(metadata.hostApi,'wasi-0.2.10');assert.equal(metadata.generatedRustProject?.cargoBuildLocked,true);assert.equal(metadata.generatedRustProject?.manifestAndLockCheckedBeforeAndAfterBuild,true);
+  for(const field of['sourceInputsCapturedBeforeBuild','componentizeSourcesCapturedBeforeBuild','buildRecipeCheckedBeforeAndAfterBuild'])assert.equal(metadata[field],true);
++ assert.deepEqual(metadata.classicTraceSourcePolicy,policy.classicTraceSourcePolicy,'Exact corrected source provenance required');
+  const current=entries(metadata.sourceManifest);assert.equal(current.length,342);assert.deepEqual(current,entries(policy.expectedNativeSourceManifest));
+  const immediate=current.filter(row=>!policy.addedSourcePaths.includes(row.path)).map(row=>({path:row.path,sha256:policy.sourceLayer[row.path]?.beforeSha256??row.sha256}));
+  assert.equal(immediate.length,306);assert.deepEqual(immediate,entries(parent.expectedNativeSourceManifest));
+@@ -156,7 +164,7 @@
+  const active=cpp.filter(path=>(ticksEnabled||path!=='runtime/node_tick_queue.cpp')&&(metadata.streamWebEnabled||path!=='builtins/node-compat/stream-web-kernel.cpp'));
+  const layout=new Map();assert(Array.isArray(ticks.actualLayoutCompileCommands));
+  function command(source,candidates){const path=compiled(source,candidates,ticksEnabled,metadata.eventsEnabled,metadata.streamWebEnabled);const tokens=words(source);
+-  assert(tokens.includes('-O3')&&tokens.includes('-DNDEBUG')&&!tokens.includes('-UNDEBUG')&&!tokens.some(x=>x.startsWith('-DDEBUG')));
++  release(tokens);
+   macro(tokens,'NODE_COMPAT_CLASSIC_STREAMS',enabled&&policy.privateTargetCpp.includes(path));macro(tokens,'NODE_COMPAT_ENTROPY_RUNTIME_ONLY',metadata.entropyPolicy==='runtime-only');
+   macro(tokens,'NODE_COMPAT_ENTROPY_POLICY',true);macro(tokens,'NODE_COMPAT_GC_STRESS',metadata.gcStress&&policy.privateTargetCpp.includes(path));return path;}
+  for(const row of ticks.actualLayoutCompileCommands){const path=command(row,cpp);assert(!layout.has(path));layout.set(path,row);}

@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "state": "INDEPENDENT_CRYPTO_NATIVE_SOURCE_NOTES_REVIEW_PASS_OWNERSHIP_BLOCKER_CONFIRMED",
+  "reviewedIndexSha256": "570d84e05d89ed70e1fbee6b039fc3608a422257c2cc7cb8742c95a6f844303c",
+  "indexedMembers": 2,
+  "sourcePins": 11,
+  "allBytesHashExact": true,
+  "sourceClaims": {
+    "digestValidateNormalizeCopyPromiseOrderConfirmed": true,
+    "ownedNativeCopyAndSuccessfulResultTransferMechanismsConfirmed": true,
+    "HmacVectorOwnerDiscardedByReleaseThenData": true,
+    "EcdsaEd25519RsaPkeyOwnersReleasedToPrivateSlots": true,
+    "CryptoKeyClassOpsHaveNoRegisteredFinalizer": true,
+    "hmacSignatureTemporaryRaiiDoesNotOwnCryptoKeySlots": true,
+    "SensitiveWipeLimitedToCopiedBufferSourceNativeStaging": true
+  },
+  "futureKeyReuseDisposition": "HOLD_UNTIL_REAL_OWNERSHIP_AND_FINALIZER_DESIGN",
+  "precision": {
+    "CryptoKeyOverridesInitClass": true,
+    "actualInstallCall": "BuiltinImpl<CryptoKey>::init_class_impl",
+    "mustNotAssumeBuiltinNoConstructorDeletesCryptoKeyGlobal": true,
+    "futureWrapperPolicySecondTemplateParameterWouldNotMatchCurrentDeclaration": true,
+    "backgroundFinalizerThreadPolicyAndPartialInitializationRequireDesign": true
+  },
+  "limits": [
+    "No runtime leak, reclaimed-byte count, native crash, crypto vector, key import, GC, OOM or allocator stress result.",
+    "No Node crypto surface, sync hash implementation, compile/link/ABI correctness or operational admission follows.",
+    "Digest source uses a Promise-returning public method; current synchronous execution internally does not change its public return contract.",
+    "Copy/getter order is verified from source only; Node/WebCrypto parity is not established by this review.",
+    "The inspection establishes the missing registered cleanup owner in these pinned definitions; no proposed fix is implemented or certified.",
+    "No claim that every secret copy or OpenSSL/caller buffer is wiped."
+  ],
+  "execution": {
+    "sourceReadHashAndPythonAssertionsOnly": true,
+    "cryptoKeyImportOrCodecOrNativeOrGuestOrGcExecuted": false,
+    "nativeSourceEdited": false
+  },
+  "operationalAdmission": false,
+  "performanceClaim": false,
+  "citations": {
+    "hmacOwnerLost": {
+      "path": "/Users/dan/dev/StarlingMonkey/builtins/web/crypto/crypto-key.cpp",
+      "sha256": "4ceb7cd64049e23db83bdd4e7c71900cb70a114f68fa85a093cf94666c661a11",
+      "line": 654,
+      "text": "JS::PrivateValue(data.release()->data())"
+    },
+    "ecdsaOwnerReleased": {
+      "path": "/Users/dan/dev/StarlingMonkey/builtins/web/crypto/crypto-key.cpp",
+      "sha256": "4ceb7cd64049e23db83bdd4e7c71900cb70a114f68fa85a093cf94666c661a11",
+      "line": 714,
+      "text": "JS::PrivateValue(pkey.release())"
+    },
+    "keyAccessorsBorrowOnly": {
+      "path": "/Users/dan/dev/StarlingMonkey/builtins/web/crypto/crypto-key.cpp",
+      "sha256": "4ceb7cd64049e23db83bdd4e7c71900cb70a114f68fa85a093cf94666c661a11",
+      "line": 882,
+      "text": "EVP_PKEY *CryptoKey::key(JSObject *self)"
+    },
+    "classInheritance": {
+      "path": "/Users/dan/dev/StarlingMonkey/builtins/web/crypto/crypto-key.h",
+      "sha256": "a46acec82fbf3adbe5fc2599caf422a1ef699c2d7679eb5692ab1cb7e835580d",
+      "line": 80,
+      "text": "class CryptoKey : public BuiltinNoConstructor<CryptoKey>"
+    },
+    "defaultEmptyOps": {
+      "path": "/Users/dan/dev/StarlingMonkey/include/builtin.h",
+      "sha256": "19b759137fe14d8b7bca33c40ec50108e4501277b01a921427b4b64c836bf072",
+      "line": 178,
+      "text": "template <typename Impl> static constexpr JSClassOps class_ops() { return {}; }"
+    },
+    "oneParameterWrapper": {
+      "path": "/Users/dan/dev/StarlingMonkey/include/builtin.h",
+      "sha256": "19b759137fe14d8b7bca33c40ec50108e4501277b01a921427b4b64c836bf072",
+      "line": 297,
+      "text": "template <typename Impl> class BuiltinNoConstructor : public BuiltinImpl<Impl>"
+    },
+    "backgroundFinalizerPolicy": {
+      "path": "/Users/dan/dev/StarlingMonkey/include/builtin.h",
+      "sha256": "19b759137fe14d8b7bca33c40ec50108e4501277b01a921427b4b64c836bf072",
+      "line": 190,
+      "text": "return JSCLASS_BACKGROUND_FINALIZE;"
+    },
+    "actualCryptoKeyInstall": {
+      "path": "/Users/dan/dev/StarlingMonkey/builtins/web/crypto/crypto-key.cpp",
+      "sha256": "4ceb7cd64049e23db83bdd4e7c71900cb70a114f68fa85a093cf94666c661a11",
+      "line": 350,
+      "text": "return BuiltinImpl<CryptoKey>::init_class_impl(cx, global);"
+    },
+    "digestCopyAfterNormalize": {
+      "path": "/Users/dan/dev/StarlingMonkey/builtins/web/crypto/subtle-crypto.cpp",
+      "sha256": "f58d225c0374cc91522a427c7921f06c04afb73a458836c743da246318b29f99",
+      "line": 41,
+      "text": "auto data = copy_crypto_buffer_source"
+    },
+    "digestPromise": {
+      "path": "/Users/dan/dev/StarlingMonkey/builtins/web/crypto/subtle-crypto.cpp",
+      "sha256": "f58d225c0374cc91522a427c7921f06c04afb73a458836c743da246318b29f99",
+      "line": 45,
+      "text": "JS::NewPromiseObject"
+    },
+    "digestNativeResultTransfer": {
+      "path": "/Users/dan/dev/StarlingMonkey/builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 152,
+      "text": "static_cast<void>(buf.release())"
+    },
+    "ownedCopyNoGc": {
+      "path": "/Users/dan/dev/StarlingMonkey/builtins/web/crypto/buffer-source.h",
+      "sha256": "c4e74035c3b4df036081f410a1857fc14ea29ca6b671aa70bce4f89a0c2f9585",
+      "line": 97,
+      "text": "JS::AutoCheckCannotGC no_gc(cx)"
+    },
+    "sensitiveWipeOnlyOwnedStaging": {
+      "path": "/Users/dan/dev/StarlingMonkey/builtins/web/crypto/buffer-source.h",
+      "sha256": "c4e74035c3b4df036081f410a1857fc14ea29ca6b671aa70bce4f89a0c2f9585",
+      "line": 21,
+      "text": "if (sensitive_ && storage_)"
+    },
+    "hmacTemporaryRaii": {
+      "path": "/Users/dan/dev/StarlingMonkey/builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 762,
+      "text": "EvpPkeyPtr hkey(EVP_PKEY_new_mac_key"
+    }
+  }
+}

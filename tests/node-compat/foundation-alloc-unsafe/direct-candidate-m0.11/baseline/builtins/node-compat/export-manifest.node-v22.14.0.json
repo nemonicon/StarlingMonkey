@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "profileVersion": "sm-node-22.14.0-m0.11",
+  "nodeVersion": "v22.14.0",
+  "status": "experimental-opt-in; bounded native byte-kernel implementation",
+  "moduleContract": "ESM with explicit named exports and default data-property object; no dynamic CommonJS require or syncBuiltinESMExports",
+  "modules": {
+    "node:child_process": {
+      "aliases": [
+        "child_process"
+      ],
+      "status": "import-only",
+      "exports": [
+        "ChildProcess",
+        "_forkChild",
+        "default",
+        "exec",
+        "execFile",
+        "execFileSync",
+        "execSync",
+        "fork",
+        "spawn",
+        "spawnSync"
+      ],
+      "callablePolicy": "Every non-default export is a function that immediately throws ERR_SM_NODE_UNSUPPORTED on invocation or construction, including during snapshot initialization"
+    },
+    "node:buffer": {
+      "aliases": [
+        "buffer"
+      ],
+      "globals": [
+        "Buffer (only if profile selected)"
+      ],
+      "status": "partial",
+      "exports": [
+        "Blob",
+        "Buffer",
+        "File",
+        "INSPECT_MAX_BYTES",
+        "SlowBuffer",
+        "atob",
+        "btoa",
+        "constants",
+        "default",
+        "isAscii",
+        "isUtf8",
+        "kMaxLength",
+        "kStringMaxLength",
+        "resolveObjectURL",
+        "transcode"
+      ],
+      "supportedStatic": [
+        "alloc(size:number-integer, fill?:number)",
+        "from(string, utf8|utf-8|hex)",
+        "from(Uint8Array): copy",
+        "from(ArrayBuffer, integerOffset?, integerLength?): shared view",
+        "isBuffer",
+        "isEncoding: profile encodings only",
+        "byteLength(string|Uint8Array|ArrayBuffer, encoding?)",
+        "allocUnsafe(finite nonnegative number <=16777216): truncate length; fresh zeroed owned Buffer; no pool"
+      ],
+      "supportedPrototype": [
+        "toString(utf8|utf-8|hex, integerStart?, integerEnd?)",
+        "subarray",
+        "slice: shared view",
+        "parent",
+        "offset"
+      ],
+      "encodingNames": [
+        "utf8",
+        "utf-8",
+        "hex"
+      ],
+      "limits": {
+        "MAX_LENGTH": 16777216,
+        "MAX_STRING_LENGTH": 33554432,
+        "MAX_SOURCE_CODE_UNITS": 1048576,
+        "poolSize": 0
+      },
+      "numericExports": {
+        "INSPECT_MAX_BYTES": 50,
+        "kMaxLength": 16777216,
+        "kStringMaxLength": 33554432
+      },
+      "importOnlyExports": [
+        "Blob",
+        "File",
+        "SlowBuffer",
+        "atob",
+        "btoa",
+        "isAscii",
+        "isUtf8",
+        "resolveObjectURL",
+        "transcode"
+      ],
+      "unsupportedStatic": [
+        "copyBytesFrom",
+        "of",
+        "allocUnsafeSlow",
+        "compare",
+        "concat"
+      ],
+      "unsupportedPrototypePolicy": "Every other own Node Buffer prototype function is explicitly installed as a throwing function; inventory checked against pinned Node at test time",
+      "deviations": [
+        "No deprecated Buffer or SlowBuffer constructor",
+        "No slab allocator or uninitialized storage; allocUnsafe guarantees fresh zeroed exact backing at offset 0 and ignores poolSize",
+        "No arrays, array-like inputs, DataView, non-Uint8 typed arrays, SharedArrayBuffer or resizable backing stores",
+        "No copying slice: Buffer.slice shares storage",
+        "Source strings limited to 1048576 UTF-16 code units",
+        "Only allocUnsafe truncates finite nonnegative fractional sizes; other fractional sizes/index coercions remain outside the declared overloads",
+        "Default object and constants frozen; CJS mutation synchronization unsupported",
+        "Detached/shared/resizable ArrayBuffers and views fail ERR_SM_NODE_UNSUPPORTED; inherited Uint8Array APIs keep engine behavior",
+        "allocUnsafe validates the raw requested size before truncation; requests above 16777216 reject even if their truncated length would fit",
+        "allocUnsafe uses captured constructors and own data code/module/operation fields for validation; detailed Node error text and pooled backing semantics differ",
+        "allocUnsafeSlow remains explicitly deferred; no legacy Buffer constructor or other method support follows"
+      ]
+    }
+  },
+  "requiredHostInterfaces": []
+}

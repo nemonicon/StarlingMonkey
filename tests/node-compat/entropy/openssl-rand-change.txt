@@ -1,0 +1,28 @@
+UNAPPLIED change to the existing WASI branches in deps/patches/rand.patch.
+Keep the upstream OpenSSL functions' signed wrappers and num<0 validation.
+Add a guarded declaration near existing includes in crypto/rand/rand_lib.c:
+
+  #if defined(__wasi__) && defined(STARLING_NODE_ENTROPY_PROFILE)
+  extern int sm_node_secure_random_fill(unsigned char *, size_t);
+  #endif
+
+In BOTH RAND_priv_bytes_ex and RAND_bytes_ex, use:
+
+  #ifdef __wasi__
+  # ifdef STARLING_NODE_ENTROPY_PROFILE
+      if (sm_node_secure_random_fill(buf, num) != 1) {
+          ERR_raise_data(ERR_LIB_RAND, RAND_R_ERROR_RETRIEVING_ENTROPY,
+                         "ERR_SM_ENTROPY_UNAVAILABLE: selected guest entropy policy denied or failed the request");
+          return 0;
+      }
+      return 1;
+  # else
+      arc4random_buf(buf, num);
+      return 1;
+  # endif
+  #endif
+
+This is a reviewed text template, NOT an applied/compiled OpenSSL patch.
+The unchanged non-profile branch is retained for the existing unselected
+Starling build. A future patch must use OpenSSL3.0.17 contexts, be tested with
+git apply --check against an unpatched archive, and be hashed in the receipt.

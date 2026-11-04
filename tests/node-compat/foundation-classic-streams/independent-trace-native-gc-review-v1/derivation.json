@@ -1,0 +1,82 @@
+{
+  "parent": "tests/node-compat/foundation-classic-streams/independent-trace-native-normal-off-review-v1/verify.py",
+  "parentSha256": "8c0446497f9923854a053e8acc19358675780d6fc49f7f625233734a1940d728",
+  "replacements": [
+    {
+      "before": "normal-off",
+      "after": "gc-off",
+      "count": 12
+    },
+    {
+      "before": "LABELS = ('gc-off', 'normal-runtime', 'gc-off', 'disabled-off')",
+      "after": "LABELS = ('gc-off',)",
+      "count": 1
+    },
+    {
+      "before": "INDEPENDENT_CORRECTED_TRACE_NORMAL_OFF_NATIVE_FREEZE_VERIFIED_NO_GUEST",
+      "after": "INDEPENDENT_CORRECTED_TRACE_GC_OFF_NATIVE_FREEZE_VERIFIED_NO_GUEST",
+      "count": 1
+    },
+    {
+      "before": "d54446dcd4071fe2c2b1db4984ead78d2fe61ceb0a0396822df8416a26921a92",
+      "after": "d8f2f84496854a8732648eb8a2527145b92469c13fce2bb37200468f8c23af79",
+      "count": 1
+    },
+    {
+      "before": "9973355",
+      "after": "9974904",
+      "count": 1
+    },
+    {
+      "before": "bfaec95ee0058edf587ebbf1cb020d7871759e896aa0d809e1af788a300531d6",
+      "after": "afdfb948c7179e6b54667040ab3d81f95215815514e16e2d7da03a848630c872",
+      "count": 1
+    },
+    {
+      "before": "1f2a49ac91978a7ef9565066bf8aaf0175c7a4fdefe50b1a2efb070bc7b756e3",
+      "after": "9dd10435677d298563a4aaf96079dd8ed794448600023f924f68105a8add9e24",
+      "count": 1
+    },
+    {
+      "before": "2bd362d52715d1596cf5ff10a0798e09911ed9416253395394afa91875746186",
+      "after": "f8e1e4145f264fb73dd57a638c801eda2d8b578a5c470733cf1e94740c1e4dbb",
+      "count": 1
+    },
+    {
+      "before": "[107/107]",
+      "after": "[16/16]",
+      "count": 1
+    },
+    {
+      "before": "normal-OFF",
+      "after": "GC-OFF",
+      "count": 4
+    },
+    {
+      "before": "Normal OFF",
+      "after": "GC-OFF",
+      "count": 1
+    },
+    {
+      "before": "no RuntimeOnly, GC, disabled variant or performance acceptance transfers.",
+      "after": "no normal-OFF, RuntimeOnly, disabled variant or performance acceptance transfers.",
+      "count": 1
+    },
+    {
+      "restoreBeforeToAfter": "Exact original frozen-normal-OFF predecessor validation block",
+      "parentStart": 25633,
+      "parentEnd": 26564
+    },
+    {
+      "before": "result = verify(reader, 'gc-off', ANCHORS)",
+      "after": "result = verify(reader, 'gc-off', ANCHORS, PRIOR_OFF_ANCHORS)",
+      "count": 1
+    },
+    {
+      "before": "    reader.finish()\n    return {'schemaVersion': 1,",
+      "after": "    gc_checks(reader, metadata, freeze, mapped, embedding_words)\n    reader.finish()\n    return {'schemaVersion': 1,",
+      "count": 1
+    }
+  ],
+  "scope": "GC-OFF only; preceding normal-OFF frozen engine/metadata/receipt are separate fixed anchors; old normal-OFF cache is never authenticated against its pre-GC hash. Actual GC original cache is authenticated only with new GC metadata."
+}

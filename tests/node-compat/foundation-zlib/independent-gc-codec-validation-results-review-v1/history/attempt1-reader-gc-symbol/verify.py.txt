@@ -1,0 +1,174 @@
+"""Independent data/byte reader only. No owner imports, subprocess or guest APIs."""
+from pathlib import Path
+import hashlib,json,os,re,shlex,stat,struct,zlib
+HERE=Path(__file__).resolve().parent
+REPO=HERE.parents[3]
+ROOT=REPO/'tests/node-compat/foundation-zlib/gc-codec-validation-v1-root-results.json'
+FAMILY=REPO/'tests/node-compat/foundation-zlib/component-validation-activated-v8'
+OUTPUT=Path('/tmp/starling-node-compat/production-zlib-v4-gc-off-codec-validation-v1')
+FROZEN=Path('/tmp/starling-node-compat/production-zlib-v4/native-freeze')
+FAMILYSHA='8af9a2137b93802ae2f09e30219ad416675a9b10fdac1cdbcc18e48e937a9e56'
+ROOTSHA='1e8f04df6537cf7329dcb4cf08bfc7502c6b4bb1a0abb13a5402ef46d485767f'
+ENGINE='cd4df58c9c7cd13d93f42e4a3435ee17429d6b52445e02476aae0208ae9141df'
+COMPONENT='6fc8d9ca798769c40acb618f684b16be396f3b44221a9e349b5525636763ddc7'
+NODE=Path('/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node')
+NODE_SHA='e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0'
+WT_SHA='a85dec9fcbbad23d0e038e5a99604114dbe9aa77bc784e4bce0f33013eb33c1c'
+verified={};aliases={};checks=[]
+def check(name,condition):
+ assert condition,name
+ checks.append(name)
+def sha(raw):return hashlib.sha256(raw).hexdigest()
+def file_sha(path):
+ value=hashlib.sha256()
+ with Path(path).open('rb')as stream:
+  for chunk in iter(lambda:stream.read(4*1024*1024),b''):value.update(chunk)
+ return value.hexdigest()
+def pinned(path,digest=None,size=None):
+ p=Path(path);info=p.lstat();assert stat.S_ISREG(info.st_mode)and not p.is_symlink(),p
+ key=str(p.resolve(strict=True));aliases[str(p)]=key
+ if key not in verified:
+  value=file_sha(p)
+  verified[key]={'path':key,'sha256':value,'bytes':info.st_size}
+ row=verified[key];assert digest is None or row['sha256']==digest,(p,'SHA mismatch');assert size is None or row['bytes']==size,(p,'size mismatch')
+ return row
+def data(path,digest=None,size=None):
+ row=pinned(path,digest,size);raw=Path(path).read_bytes();assert sha(raw)==row['sha256']and len(raw)==row['bytes'];return raw
+def document(path,digest=None,size=None):return json.loads(data(path,digest,size))
+def indexed(root,digest):
+ index=document(root/'index.json',digest);seen=set()
+ for row in index['files']:
+  path=root/row['path'];assert path.is_relative_to(root)and '..'not in Path(row['path']).parts and row['path']not in seen;seen.add(row['path']);pinned(path,row['sha256'],row['bytes'])
+ return index
+def inventory(root):
+ rows=[]
+ for current,dirs,files in os.walk(root,followlinks=False):
+  for name in dirs+files:
+   p=Path(current)/name;s=p.lstat();kind='symlink'if stat.S_ISLNK(s.st_mode)else'directory'if stat.S_ISDIR(s.st_mode)else'file'if stat.S_ISREG(s.st_mode)else None
+   assert kind,p;rows.append({'path':str(p.relative_to(root)),'kind':kind})
+  for name in list(dirs):
+   if(Path(current)/name).is_symlink():dirs.remove(name)
+ return sorted(rows,key=lambda row:row['path'])
+def sealed_inputs(root):
+ manifest=document(root/'input-freeze.json')
+ for row in manifest['inputs']:pinned(root/row['path'],row['sha256'],row['bytes'])
+ for row in manifest.get('toolTrees',[]):
+  assert str(Path(row['path']).resolve())==row['realPath'];assert inventory(Path(row['path']))==row['entries']
+ for row in manifest.get('toolLinks',[]):
+  p=Path(row['path']);assert p.is_symlink()and os.readlink(p)==row['linkText']and str(p.resolve())==row['resolvedTarget']
+  if row['targetKind']=='file':pinned(row['resolvedTarget'],row['targetSha256'],row['targetBytes'])
+ return manifest
+def uleb(raw,offset):
+ value=0
+ for shift in range(0,35,7):
+  byte=raw[offset];offset+=1;value|=(byte&127)<<shift
+  if not byte&128:return value,offset
+ raise AssertionError('Invalid bounded ULEB')
+def sections(raw,version):
+ assert raw[:8]==b'\0asm'+version
+ cursor=8;rows=[]
+ while cursor<len(raw):
+  tag=raw[cursor];cursor+=1;size,cursor=uleb(raw,cursor);end=cursor+size;assert end<=len(raw);rows.append((tag,raw[cursor:end]));cursor=end
+ assert cursor==len(raw);return rows
+def source_of(command):
+ words=shlex.split(command);assert words.count('-c')==1;return words[words.index('-c')+1]
+def seed_bytes(length,seed):
+ out=[];state=seed
+ for _ in range(length):
+  state^=(state<<13)&0xffffffff;state^=state>>17;state^=(state<<5)&0xffffffff;state&=0xffffffff;out.append(state>>24)
+ return bytes(out)
+def main():
+ root=document(ROOT,ROOTSHA);check('genuine Root terminal0/GC tuple/family',root['rawExitCode']==0 and root['variant']=='gc-off'and root['engineSha256']==ENGINE and root['validationFamilyIndexSha256']==FAMILYSHA)
+ for row in root['references']:pinned(row['path'],row['sha256'],row['bytes'])
+ family=indexed(FAMILY,FAMILYSHA);peer=indexed(REPO/'tests/node-compat/foundation-zlib/independent-component-validation-v8-family-review-v1','1e966afe47bc56ed01cf311b42abc908eb3d9b90ddb63ab57c19eed05debd396');inputs=sealed_inputs(FAMILY)
+ check('exact reviewed family21/11107 source inputs/two trees22links',len(family['files'])==21 and len(inputs['inputs'])==11107 and len(inputs['toolTrees'])==2 and len(inputs['toolLinks'])==22)
+ config=document(FAMILY/'activation.json');pins=document(FAMILY/'reviewed-pins.json',config['pinsSha256']);authority=document(FAMILY/'root-review.json',config['rootReviewSha256']);pin=pins['variants']['gc-off']
+ check('real reviewed validation-only350 authority, no operational promotion',pins['state']=='ROOT_REVIEWED_ZLIB350_VALIDATION_BOOTSTRAP_V1'and authority['validationBootstrapOnly']is True and authority['operationalAdmission']is False and config['operationalAdmission']is False)
+ check('distinct authenticated native/tool contexts',config['nativeConfiguredSourceRoot']=='/private/tmp/starling-node-compat/zlib-source-v4'and config['componentToolRoot']==str(REPO)and config['nativeConfiguredSourceRoot']!=config['componentToolRoot'])
+ for key in ['engineSha256','engineBytes','receiptSha256','freezeReceiptSha256']:assert pin[key]==config['actual']['gc-off'][key]
+ for row in pin['frozenFiles']:pinned(row['path'],row['sha256'],row['bytes'])
+ frozen=document(pin['freezeReceiptPath'],pin['freezeReceiptSha256']);metadata=document(str(FROZEN/'gc-off.engine.wasm')+'.build.json',pin['receiptSha256']);pinned(pin['enginePath'],ENGINE,pin['engineBytes'])
+ for row in frozen['copies']:pinned(row['path'],row['sha256'],row['bytes'])
+ for row in metadata['sourceManifest']:pinned(Path(frozen['sourceRoot'])/row['path'],row['sha256'])
+ for row in metadata['componentizeSourceManifest']:pinned(Path(frozen['componentizeSourceRoot'])/row['path'],row['sha256'])
+ check('actual frozen1024/native350/external3 preserved',len(frozen['copies'])==1024 and len(metadata['sourceManifest'])==350 and len(metadata['componentizeSourceManifest'])==3 and frozen['nativeInputsVerified']==350 and frozen['externalEmbeddingInputsVerified']==3)
+ check('genuine ordinary Release GC-on/zlib-on/OFFentropy/noOOM flags',metadata['gcStress']is True and metadata['zlibEnabled']is True and metadata['entropyPolicy']=='off'and metadata['oomTesting']is False and metadata['observedCMakeOptions']['CMAKE_BUILD_TYPE']=='Release')
+ cache=data(pin['cachePath'],pin['cmakeCacheSha256']).decode();database=document(pin['commandsPath'],pin['compileCommandsSha256']);commands=[row['command']for row in database]
+ for key,value in {'NODE_COMPAT_ZLIB':'ON','NODE_COMPAT_GC_STRESS':'ON','NODE_COMPAT_OOM_TESTING':'OFF','NODE_COMPAT_ENTROPY_MODE':'OFF','CMAKE_BUILD_TYPE':'Release'}.items():assert re.search(r'^'+key+r':[^=]+='+value+r'$',cache,re.M)
+ actual=metadata['internalTickPolicy']['actualLayoutCompileCommands'];strict=metadata['strictEventExceptionPolicy']['actualNativeCompileCommands'];private=metadata['classicStreamsPolicy']['actualPrivateTargetCompileCommands'];embedding=metadata['actualEmbeddingCompileCommands'];kernel_commands=metadata['zlibPolicy']['actualKernelCompileCommands']
+ check('actual native62/strict4/private6/kernel1 and embedding1',len(actual)==62 and len(strict)==4 and len(private)==6 and len(kernel_commands)==1 and len(embedding)==1 and all(command in commands for command in actual+strict+private+kernel_commands))
+ selected_prefix='/private/tmp/starling-node-compat/zlib-source-v4/'
+ expected_private={selected_prefix+'builtins/node-compat/'+name for name in ['buffer.cpp','register.cpp','entropy-policy.cpp','entropy-bridge.cpp','stream-web-kernel.cpp','zlib/kernel.cpp']}
+ # Source operands in captured commands retain the configured /tmp spelling.
+ canon=lambda path:str(Path(path).resolve())
+ macro_sources={macro:set()for macro in ['NODE_COMPAT_GC_STRESS','NODE_COMPAT_ZLIB']}
+ for command in commands+embedding:
+  words=shlex.split(command)
+  for macro in macro_sources:
+   occurrences=[word for word in words if word.startswith(('-D'+macro,'-U'+macro))]
+   if occurrences:assert occurrences==['-D'+macro+'=1'];macro_sources[macro].add(canon(source_of(command)))
+ check('both GC andZLIB macros exactly six private target sources, absent embedding/others',all(paths==expected_private for paths in macro_sources.values()))
+ native_core=Path(frozen['sourceRoot'])/'builtins/node-compat/buffer.cpp';core_text=data(native_core).decode();check('ordinary hex calls reach existing GC-instrumented Buffer source', '#ifdef NODE_COMPAT_GC_STRESS'in core_text and 'JS_GC'in core_text)
+ kernel=Path(frozen['sourceRoot'])/'builtins/node-compat/zlib/kernel.cpp';kernel_text=data(kernel,'33c116ead36b7890c9e83915fd053a8cda3cdb9641381a6ca8157617e1b2f9e3').decode();check('pinned kernel guards linked/runtime header agreement in source only','zlibVersion()'in kernel_text and 'ZLIB_VERSION'in kernel_text and 'ZLIB_VERNUM'in kernel_text)
+ expected_header=config['headers']['gc-off'];check('header interpretation remains inference-only4880',expected_header['versionText']=='1.3.1'and expected_header['vernum']==4880 and expected_header['inferenceOnly']is True and expected_header['privateBackendInfoObserved']is False)
+ report=document(OUTPUT/'results.json','fd35a6447b07c29f7153c9a375ce9daf7d988c21bad4ced97902570f5b44d174',230351);complete=document(OUTPUT/'completion.json')
+ check('actual report source350/GC tuple/raw0/completion binding',report['variant']=='gc-off'and report['engineSha256']==ENGINE and report['sourceFiles']==350 and complete['reportSha256']==sha(data(OUTPUT/'results.json'))and report['requiresIndependentTerminalExitZero']is True and complete['requiresIndependentExitZero']is True)
+ artifacts=complete['artifacts'];seen=set()
+ for row in artifacts:assert row['path']not in seen;seen.add(row['path']);assert Path(row['path']).is_relative_to(OUTPUT);pinned(row['path'],row['sha256'],row['bytes'])
+ regular=[];links=[]
+ for current,dirs,files in os.walk(OUTPUT,followlinks=False):
+  for name in list(dirs):
+   if(Path(current)/name).is_symlink():links.append(str(Path(current)/name));dirs.remove(name)
+  regular.extend(str(Path(current)/name)for name in files)
+ check('exact49 artifact files plus completion, no unknown output',len(artifacts)==49 and set(regular)==seen|{str(OUTPUT/'completion.json')})
+ check('one exact output node_modules link',links==[str(OUTPUT/'node_modules')]and len(complete['outputLinks'])==1 and complete['outputLinks']==root['outputLinks'])
+ for row in complete['outputLinks']:assert os.readlink(row['path'])==row['linkText']and str(Path(row['path']).resolve())==row['resolvedTarget']
+ terminal=document('/tmp/starling-node-compat/zlib-v4-gc-off-codec-validation-v1.terminal.json');pinned(terminal['argv'][0],NODE_SHA);check('actual pinned Node22 entry/GC args and rawExit0',Path(terminal['argv'][0]).resolve()==NODE.resolve()and terminal['argv'][1:]==[str(FAMILY/'run-validation.mjs'),FAMILYSHA,'gc-off']and terminal['rawExitCode']==0)
+ stdout=data('/tmp/starling-node-compat/zlib-v4-gc-off-codec-validation-v1.stdout.log').decode();assert data('/tmp/starling-node-compat/zlib-v4-gc-off-codec-validation-v1.stderr.log')==b'';progress=[json.loads(line)for line in stdout.splitlines()]
+ check('20 durable progress records then final success stdout',len(progress)==21 and [row['sequence']for row in progress[:20]]==list(range(1,21))and progress[-1]['state']==report['state'])
+ component=data(report['componentPath'],COMPONENT,13802552);component_sections=sections(component,b'\x0d\x00\x01\x00');imports=sum(uleb(value,0)[0]for tag,value in component_sections if tag==10);exports=sum(uleb(value,0)[0]for tag,value in component_sections if tag==11)
+ check('actual outer component imports0 and five public scalar exports',imports==0 and exports==5)
+ wit=data(OUTPUT/'emitted.wit').decode();expected_exports=['run: func(index: u32) -> string','module-contract: func() -> string','refusals: func() -> string','ownership: func() -> string','ordinary-gc: func() -> string'];check('actual WIT exact five scalar signatures',wit==report['emittedWit']and not re.search(r'\bimport\b',wit)and re.findall(r'export\s+([^;]+);',wit)==expected_exports)
+ check('actual interface audit binds hash and emptyimports',report['componentSha256']==COMPONENT and report['componentBytes']==13802552 and report['interfaceAudit']['componentSha256']==COMPONENT and report['interfaceAudit']['emittedImports']==[])
+ core=data(OUTPUT/'zlib_validation.core.wasm');sections(core,b'\x01\x00\x00\x00');glue=data(OUTPUT/'zlib_validation.js').decode();check('actual extracted core bytes embedded and glue references same file',core in component and 'zlib_validation.core.wasm'in glue)
+ check('actual bundle only two native Node imports/no JS codec or private probe',sorted(report['bundle']['imports'])==['node:buffer','node:zlib']and sha(report['bundle']['code'].encode())==report['bundle']['sha256']and not re.search(r'node_modules/(?:unenv|@bytecodealliance/jco-std)|createZlibModule|kernel\.backendInfo',report['bundle']['code']))
+ node=document(FAMILY/'node-results.json');contract=document(FAMILY/'profile-contract.json');check('pinned Node61 oracle and exact m0.13/public40/refusal31 domain',node['node']=='v22.14.0'and node['nodeExecutableSha256']==NODE_SHA and len(node['cases'])==61 and len(contract['exports'])==40 and len(contract['deferred'])==31 and len(contract['sync'])==6 and contract['profileVersion']=='sm-node-22.14.0-m0.13')
+ raw_calls=sorted((OUTPUT/'calls').glob('*.raw.txt'));check('all nine raw calls retained',len(raw_calls)==9)
+ values={p.name:json.loads(data(p))for p in raw_calls}
+ before=values['0001-module.raw.txt'];after=values['0007-ordinary-GC-module-after.raw.txt'];check('module lifecycle counters0 then3, no other module field mutation',before['calls']==0 and after['calls']==3 and {k:v for k,v in before.items()if k!='calls'}=={k:v for k,v in after.items()if k!='calls'})
+ expected_constants=dict(node['inventory']['constants']);expected_constants['ZLIB_VERNUM']={'type':'number','value':4880}
+ def refusal_records(rows):
+  expected=[(name,mode)for name in contract['deferred']for mode in ['call','new']]+[(name,'new-sync')for name in contract['sync']];assert len(rows)==68 and [(row['name'],row['mode'])for row in rows]==expected
+  for row in rows:
+   wanted={'code':'ERR_SM_NODE_UNSUPPORTED','module':'node:zlib','operation':('new '+row['name'])if row['mode']=='new-sync'else row['name'],'profile':contract['profileVersion']}
+   assert row['error']['name']=='Error'
+   assert row['error']['fields']=={**{key:{'own':True,'type':'string','value':value}for key,value in wanted.items()},'errno':{'own':False,'type':'undefined','value':None}}
+ for module in [before,after]:
+  assert module['namespace']==sorted(contract['exports'])and module['aliasNamespace']==module['namespace']
+  for key in ['aliasNamespaceCached','canonicalNamespaceCached','canonicalStaticNamespace','sameAliases','defaultNamed','cjsDefault','globalBuffer','sameConstantObjects','frozenDefault','frozenConstants','frozenCodes','constantPrototypeNull','codePrototypeNull']:assert module[key]is True,key
+  for key in ['thenType','defaultThenType','publicBackendInfoType','publicKernelType']:assert module[key]=='undefined'
+  assert module['constants']==expected_constants and len(module['constants'])==107 and module['codes']==node['inventory']['codes'];assert module['publicVernum']==module['legacyVernum']=={'type':'number','value':4880};refusal_records(module['initializationRefusals'])
+  snapshot=module['snapshot'];assert bytes.fromhex(snapshot['inputHex'])==bytes.fromhex(snapshot['plainHex'])==bytes([0,1,2,3,254,255]);assert zlib.decompress(bytes.fromhex(snapshot['compressedHex']),31)==bytes([0,1,2,3,254,255])
+ check('all40 namespace/alias/cache/CJS/global identities and107 typed constants/18 codes exact',True)
+ check('publicVERNUM4880 and pure initialization snapshot bytes independently decoded',True)
+ refused=values['0002-refusals.raw.txt'];refusal_records(refused['records']);refusal_records(refused['initializationRefusals']);check('complete68 deployed and initialization own-field refusals match exact source contract',refused['initializationRefusals']==before['initializationRefusals'])
+ gc_expected={'bytes':4096,'outputHex':(b'A'*4096).hex(),'operations':[f'{i:02x}'for i in range(8)],'applicationStrongOwnerRetained':True,'vmTemporaryRootsIsolated':False,'privateGcHookUsed':False}
+ check('Jco4096-byte retained output and eight valid Bufferhex operations exact',values['0003-ordinary-GC.raw.txt']==gc_expected)
+ check('freshWT ordinaryGC raw result matches all4096 bytes/8ops/ownerlimits',values['0008-fresh-Wasmtime-ordinary-GC.raw.txt']==gc_expected)
+ seed=seed_bytes(256,0x12345678);indices=[4,21,38];ids=['gzip-decode-binary','zlib-decode-binary','raw-decode-binary'];check('exact three GC codec records/counters1..3',[(row['index'],row['id'],row['guestCalls'],row['expectedCalls'])for row in report['records']]==[(index,identity,i+1,i+1)for i,(index,identity)in enumerate(zip(indices,ids))])
+ for count,(index,identity)in enumerate(zip(indices,ids),1):
+  filename=f'{count+3:04d}-ordinary-GC-{index}.raw.txt';value=values[filename];oracle=node['cases'][index];assert oracle['id']==identity and oracle['node']['kind']=='ok';plain=data(oracle['node']['result']['path'],oracle['node']['result']['sha256'],oracle['node']['result']['bytes']);assert plain==seed
+  expected={'calls':count,'index':index,'id':identity,'outcome':'ok','outputHex':plain.hex(),'outputLength':256,'inputImmutable':True,'isBuffer':True,'globalBuffer':True,'byteOffset':0,'backingLength':256,'roundtrip':None};assert value==expected
+  record=report['records'][count-1];assert record['rawFile']['sha256']==sha(data(OUTPUT/'calls'/filename));assert record['semantic']=={'outcome':'ok','compressedBytes':None,'decodedBytes':256,'fullBytesEqual':True,'outputSha256':sha(plain),'decodedSha256':sha(plain),'compressedByteIdentityRequired':False}
+ check('full three256-byte gzip/zlib/raw results equal pinned Node oracle and seed, no checksum substitute',True)
+ owner=values['0009-ownership.raw.txt'];assert {k:v for k,v in owner.items()if k!='firstHex'}=={'independentBacking':True,'inputSharedWithOutput':False,'inputByteOffset':8,'inputByteLength':256,'globalBuffer':True};assert zlib.decompress(bytes.fromhex(owner['firstHex']))==bytes((i*17+3)&255 for i in range(256));check('independent successful ownership output fully data-decoded; offset/input mutation contract retained',True)
+ wt=document(OUTPUT/'processes/fresh-wasmtime-ordinary-gc.terminal.json');pinned(wt['executable'],WT_SHA);assert wt['args']==['run','--invoke','ordinary-gc()',report['componentPath']];check('actual freshWT terminal0/no timeout/group retained afterclose',wt['status']==0 and wt['signal']is None and wt['spawnError']is None and wt['timedOut']is False and wt['outputLimitExceeded']is False and wt['closed']is True and wt['ownedGroupGone']is True and wt['terminalExitZeroObserved']is True)
+ rawwt=data(wt['stdout']['path'],wt['stdout']['sha256'],wt['stdout']['bytes']).decode();assert data(wt['stderr']['path'],wt['stderr']['sha256'],wt['stderr']['bytes'])==b'';inner=json.loads(rawwt);check('whole raw WT nested string doubledecodes to exact retainedraw and4096byte output',isinstance(inner,str)and inner==data(OUTPUT/'calls/0008-fresh-Wasmtime-ordinary-GC.raw.txt').decode()and json.loads(inner)==gc_expected)
+ check('retained strong owners/VM limits/nonoperational/backend metadata unchanged',report['operationalAdmission']is False and report['scope']['noHeapIsolation']is True and report['scope']['noTiming']is True and root['ordinaryGcApplicationStrongOwnerRetained']is True and root['vmTemporaryRootsIsolated']is False and root['runtimeBackendProof']==metadata['zlibPolicy']['runtimeBackendProof']=={'verified':False,'version':None,'vernum':None})
+ # Complete current-path rehash, without executing native/source validators.
+ for row in verified.values():assert file_sha(row['path'])==row['sha256'],row['path']
+ result={'schemaVersion':1,'state':'INDEPENDENT_ZLIB350_GC_CODEC_ACTUAL_RESULT_REVIEW_PASSED','rootReceiptSha256':ROOTSHA,'validationFamilyIndexSha256':FAMILYSHA,'rawOuterExit':0,'engineSha256':ENGINE,'componentSha256':COMPONENT,'componentBytes':13802552,'outerComponentImports':[],'publicScalarExports':expected_exports,'rawCallsDecoded':9,'codecCases':ids,'codecCounters':[1,2,3],'codecFullBytes':256,'moduleCounters':[0,3],'constants':107,'codes':18,'refusalRecordsPerSet':68,'ordinaryGcBytes':4096,'ordinaryGcBufferHexOperations':8,'freshWasmtimeNestedRawDecoded':True,'completionArtifacts':49,'outputLinks':1,'nativeSourcePaths':350,'externalEmbeddingSources':3,'frozenCopiesRehashed':1024,'nativeCommands':62,'strictCommands':4,'privateGcZlibCommands':6,'embeddingCommands':1,'inputRows':len(inputs['inputs']),'toolTrees':2,'toolLinks':22,'verifiedUniquePaths':len(verified),'checks':checks,'passed':len(checks),'publicVernum':4880,'sourceCoupledRuntimeHeaderInferenceOnly':True,'privateBackendInfoObserved':False,'runtimeBackendProof':{'verified':False,'version':None,'vernum':None},'operationalAdmission':False,'applicationStrongOwnerRetained':True,'vmTemporaryRootsIsolated':False,'collectionInsideCodecProven':False,'requestReuseOrResetProven':False,'performanceClaim':False,'normal283CodecGateReused':False,'ownerHelpersOrActionsOrPreflightOrNodeOrCompilerOrGuestOrHostsExecutedByReviewer':False,'reviewerActivity':'Read/streaming-hash/exact JSON and bounded public Wasm decoding; Python stdlib decompress transforms only already-recorded stream bytes, not the guest or selected backend.'}
+ for name,value in [('results.json',result),('verified-paths.json',sorted(verified.values(),key=lambda row:row['path'])),('path-aliases.json',aliases)]:
+  with(HERE/name).open('x')as f:json.dump(value,f,indent=2);f.write('\n')
+ print(json.dumps({'state':result['state'],'checks':len(checks),'verifiedUniquePaths':len(verified)}))
+if __name__=='__main__':main()

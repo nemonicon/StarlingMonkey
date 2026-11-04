@@ -1,0 +1,36 @@
+--- a/embedding/embedding.cpp
++++ b/embedding/embedding.cpp
+@@ -2,6 +2,9 @@
+ #include "debugger.h"
+ #include "builtins/web/performance.h"
+ #include "js/Conversions.h"
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++#include "event_loop.h"
++#endif
+ #ifdef NODE_COMPAT_ENTROPY_POLICY
+ #include "node-compat-entropy.h"
+ #endif
+@@ -193,6 +196,11 @@
+   if (Runtime.cur_fn_idx != -1) {
+     Runtime.engine->abort("(call) unexpected call state, post_call was not called after last call");
+   }
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++  // BEFORE a fresh export: never silently discard stale callbacks/arguments.
++  if (!core::EventLoop::require_internal_ticks_quiescent(Runtime.cx))
++    Runtime.engine->abort("entering an export with a nonempty internal tick FIFO");
++#endif
+   Runtime.cur_fn_idx = fn_idx;
+   if (argptr) {
+     Runtime.free_list.push_back(argptr);
+@@ -510,6 +518,11 @@
+     Runtime.engine->abort("finalizing export bindings with an unhandled rejection");
+   }
+ #endif
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++  // ACTUAL final snapshot boundary, after bindExports/getters/jobs.
++  if (!core::EventLoop::require_internal_ticks_quiescent(Runtime.cx))
++    Runtime.engine->abort("finalizing export bindings with pending internal ticks");
++#endif
+ }
+ }
+ 

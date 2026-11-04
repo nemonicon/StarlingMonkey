@@ -1,0 +1,901 @@
+{
+  "schemaVersion": 1,
+  "parentProducerIndexSha256": "35ed348529d3b8c1bfa5d57343b784b3c0b5ee442603e570d72a696e45134ebc",
+  "files": [
+    {
+      "path": "benchmark_common.py",
+      "beforeSha256": "cf3776e49d600461e7fd6cbfafd2d6f4cb0ecc3ee5fab77bd142751c15c8b5d8",
+      "afterSha256": "871da88cf468a7b6415da627300458a95403bec637cffae9db19184deb58c059",
+      "edits": [
+        {
+          "beforeOffset": 1024,
+          "afterOffset": 1024,
+          "old": "",
+          "new": "\n\ndef require_source_root(value):\n    root=Path(value).absolute()\n    assert not root.is_symlink() and root.resolve(strict=True)==REPO,'Explicit SOURCE_ROOT must be the containing corrected checkout'\n    layer().validate_sources(root)\n    capture_addons();tool_dependencies(root);adapter()\n    return root"
+        },
+        {
+          "beforeOffset": 2731,
+          "afterOffset": 3036,
+          "old": "",
+          "new": "assert metadata.get('classicTraceSourcePolicy')==CONTRACT['classicTraceSourcePolicy'],'Corrected trace-source policy required; old342 cannot be relabelled'\n    "
+        },
+        {
+          "beforeOffset": 4114,
+          "afterOffset": 4579,
+          "old": "",
+          "new": "trace-"
+        },
+        {
+          "beforeOffset": 10509,
+          "afterOffset": 10980,
+          "old": "",
+          "new": "trace-"
+        },
+        {
+          "beforeOffset": 11096,
+          "afterOffset": 11573,
+          "old": "",
+          "new": "\n    assert receipt['sourceContractVersion']==CONTRACT['sourceContractVersion']\n    assert receipt['classicTraceSourcePolicy']==CONTRACT['classicTraceSourcePolicy']"
+        },
+        {
+          "beforeOffset": 13048,
+          "afterOffset": 13689,
+          "old": "",
+          "new": "']\n    semantic=receipt['semanticSourceProvenance']\n    base=root/'tooling/repository/tests/node-compat/foundation-classic-streams/trace-semantics-candidate-v1'\n    assert semantic['fixSourceIndexSha256']==CONTRACT['classicTraceSourcePolicy']['fixSourceIndexSha256']\n    assert semantic['correctedReceiptAnnotationBase']==str(base)\n    assert semantic['primaryPinsPath']==str(base/'primary-source-pins.json') and semantic['nodeMitNoticePath']==str(base/'LICENSE.node')\n    assert own(str((base/'primary-source-pins.json').relative_to(root)),semantic['primaryPinsSha256'])\n    own(str((base/'LICENSE.node').relative_to(root)),semantic['nodeMitNoticeSha256'])\n    primary=json.loads(own(str((base/'primary-source-pins.json').relative_to(root))))\n    for row in primary['sources']:\n        assert len(own(str((base/row['path']).relative_to(root)),row['sha256']))==row['bytes"
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "path": "benchmark-policy.py",
+      "beforeSha256": "aeb57200821faa259bc1091b981efc080612e95204a058ca09d6f30fe671ff3c",
+      "afterSha256": "c4943d0ad45ef8e6b4b92c25505197de77b37a9c910e359b4a1e80e71929af66",
+      "edits": [
+        {
+          "beforeOffset": 372,
+          "afterOffset": 372,
+          "old": "",
+          "new": ",require_source_root"
+        },
+        {
+          "beforeOffset": 5957,
+          "afterOffset": 5977,
+          "old": "",
+          "new": "require_source_root(REPO)\n    "
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "path": "build-one.py",
+      "beforeSha256": "b7dec0c5d2436ed92107e7a00897dc1329c94f6fa27f48fcc67f1e302942c1d7",
+      "afterSha256": "2fb654b28fad68db36a3b3c89bff6dab228eda431aa9de6e66fccbb2a72815aa",
+      "edits": [
+        {
+          "beforeOffset": 295,
+          "afterOffset": 295,
+          "old": "",
+          "new": ",require_source_root,verify_frozen"
+        },
+        {
+          "beforeOffset": 745,
+          "afterOffset": 779,
+          "old": "3",
+          "new": "4"
+        },
+        {
+          "beforeOffset": 782,
+          "afterOffset": 816,
+          "old": "",
+          "new": " EXPLICIT_SOURCE_ROOT"
+        },
+        {
+          "beforeOffset": 803,
+          "afterOffset": 858,
+          "old": "",
+          "new": ",source_root"
+        },
+        {
+          "beforeOffset": 1157,
+          "afterOffset": 1224,
+          "old": "",
+          "new": "require_source_root(source_root)\n    "
+        },
+        {
+          "beforeOffset": 1233,
+          "afterOffset": 1337,
+          "old": "",
+          "new": "if label=='benchmark-classic-off':verify_frozen('benchmark-classic-on') # Freeze the first variant before reconfiguration.\n    "
+        },
+        {
+          "beforeOffset": 1270,
+          "afterOffset": 1501,
+          "old": "",
+          "new": "class"
+        },
+        {
+          "beforeOffset": 1271,
+          "afterOffset": 1507,
+          "old": "",
+          "new": "c-bench"
+        },
+        {
+          "beforeOffset": 1272,
+          "afterOffset": 1515,
+          "old": "p",
+          "new": "a"
+        },
+        {
+          "beforeOffset": 1274,
+          "afterOffset": 1517,
+          "old": "o",
+          "new": "k-trace-"
+        },
+        {
+          "beforeOffset": 1276,
+          "afterOffset": 1526,
+          "old": "ed",
+          "new": "2"
+        },
+        {
+          "beforeOffset": 2054,
+          "afterOffset": 2303,
+          "old": "",
+          "new": " if work.exists()else work.parent"
+        },
+        {
+          "beforeOffset": 2080,
+          "afterOffset": 2362,
+          "old": "",
+          "new": " if work.exists()else work.parent"
+        },
+        {
+          "beforeOffset": 2411,
+          "afterOffset": 2726,
+          "old": "",
+          "new": ",str(REPO)"
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "path": "freeze-engine.py",
+      "beforeSha256": "3f8d9ca5d06aae5dc19989ac30e1ad0c67549c98c379db49b49bf70488a87a3a",
+      "afterSha256": "88e67b75a667ef079d0d06ba3d3e085e643eb78c51f136313d0e177593c415be",
+      "edits": [
+        {
+          "beforeOffset": 256,
+          "afterOffset": 256,
+          "old": "4",
+          "new": "5"
+        },
+        {
+          "beforeOffset": 297,
+          "afterOffset": 297,
+          "old": "",
+          "new": " EXPLICIT_SOURCE_ROOT"
+        },
+        {
+          "beforeOffset": 329,
+          "afterOffset": 350,
+          "old": "",
+          "new": ",source_root"
+        },
+        {
+          "beforeOffset": 580,
+          "afterOffset": 613,
+          "old": "",
+          "new": ")\n    require_source_root(source_root"
+        },
+        {
+          "beforeOffset": 7768,
+          "afterOffset": 7838,
+          "old": "",
+          "new": "trace-"
+        },
+        {
+          "beforeOffset": 8321,
+          "afterOffset": 8397,
+          "old": "",
+          "new": ",\n      'sourceContractVersion':CONTRACT['sourceContractVersion'],'classicTraceSourcePolicy':CONTRACT['classicTraceSourcePolicy'],\n      'semanticSourceProvenance':{\n        'fixSourceIndexSha256':CONTRACT['classicTraceSourcePolicy']['fixSourceIndexSha256'],\n        'correctedReceiptAnnotationBase':str(OUTPUT/'tooling/repository/tests/node-compat/foundation-classic-streams/trace-semantics-candidate-v1'),\n        'primaryPinsPath':str(OUTPUT/'tooling/repository/tests/node-compat/foundation-classic-streams/trace-semantics-candidate-v1/primary-source-pins.json'),\n        'primaryPinsSha256':next(row['sha256']for row in dependencies if row['path']=='tests/node-compat/foundation-classic-streams/trace-semantics-candidate-v1/primary-source-pins.json'),\n        'nodeMitNoticePath':str(OUTPUT/'tooling/repository/tests/node-compat/foundation-classic-streams/trace-semantics-candidate-v1/LICENSE.node'),\n        'nodeMitNoticeSha256':next(row['sha256']for row in dependencies if row['path']=='tests/node-compat/foundation-classic-streams/trace-semantics-candidate-v1/LICENSE.node')}"
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "path": "verify-frozen.py",
+      "beforeSha256": "693e7091dfdab86dfd0f253eb2b23cfe00620183661567fe6401cf1a8679cf50",
+      "afterSha256": "caf0b472debf6576a18baec63eaf06cca297824eaff77957f3fd683de3ca97d9",
+      "edits": [
+        {
+          "beforeOffset": 200,
+          "afterOffset": 200,
+          "old": "",
+          "new": ",require_source_root"
+        },
+        {
+          "beforeOffset": 239,
+          "afterOffset": 259,
+          "old": "4",
+          "new": "5"
+        },
+        {
+          "beforeOffset": 301,
+          "afterOffset": 321,
+          "old": "",
+          "new": " EXPLICIT_SOURCE_ROOT"
+        },
+        {
+          "beforeOffset": 334,
+          "afterOffset": 375,
+          "old": "",
+          "new": ",source_root"
+        },
+        {
+          "beforeOffset": 347,
+          "afterOffset": 400,
+          "old": "",
+          "new": "\n    require_source_root(source_root)"
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "path": "verify-packet.py",
+      "beforeSha256": "1e3c4a580f3126ce3281c37dfc067edc9a22a23600485e2115573f7f66284b97",
+      "afterSha256": "6b29beb714e31f5b04215fbe4745e1854599a19aa0b72b3232f60f4713670f50",
+      "edits": [
+        {
+          "beforeOffset": 212,
+          "afterOffset": 212,
+          "old": "",
+          "new": ",source_root=None"
+        },
+        {
+          "beforeOffset": 1248,
+          "afterOffset": 1265,
+          "old": "",
+          "new": "assert seal['preparationContext']['pathResolution']=='absolute-original-preparation-context-not-relocated'\n    if source_root is not None:\n        # The copied packet authenticates its own rows at the new location;\n        # historical preparation rows remain explicit absolute provenance.\n        # Actual mutable build inputs are independently checked in this root.\n        from benchmark_common import require_source_root\n        require_source_root(source_root)\n    "
+        },
+        {
+          "beforeOffset": 1311,
+          "afterOffset": 1798,
+          "old": "2",
+          "new": "3"
+        },
+        {
+          "beforeOffset": 1371,
+          "afterOffset": 1858,
+          "old": "",
+          "new": ",sys.argv[2]"
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "path": "export-pin-candidate.py",
+      "beforeSha256": "dae2a76f313c1f1ede1c2cdb8bc4bfc8d42de03c499c07702de9f1df1c0dc749",
+      "afterSha256": "8632d90e23eddd3a609eac52033532755a0f3290f10219f81aba742cbecbb285",
+      "edits": [
+        {
+          "beforeOffset": 218,
+          "afterOffset": 218,
+          "old": "",
+          "new": ",CONTRACT,require_source_root"
+        },
+        {
+          "beforeOffset": 257,
+          "afterOffset": 286,
+          "old": "3",
+          "new": "4"
+        },
+        {
+          "beforeOffset": 260,
+          "afterOffset": 289,
+          "old": "",
+          "new": "EXPLICIT_SOURCE_ROOT "
+        },
+        {
+          "beforeOffset": 323,
+          "afterOffset": 373,
+          "old": "",
+          "new": "require_source_root(sys.argv[1])\n    "
+        },
+        {
+          "beforeOffset": 344,
+          "afterOffset": 431,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeOffset": 433,
+          "afterOffset": 520,
+          "old": "2",
+          "new": "3"
+        },
+        {
+          "beforeOffset": 699,
+          "afterOffset": 786,
+          "old": "",
+          "new": "-trace"
+        },
+        {
+          "beforeOffset": 1086,
+          "afterOffset": 1179,
+          "old": "",
+          "new": "sourceContractVersion':CONTRACT['sourceContractVersion'],\n          '"
+        },
+        {
+          "beforeOffset": 1255,
+          "afterOffset": 1417,
+          "old": "",
+          "new": "TRACE_"
+        },
+        {
+          "beforeOffset": 1292,
+          "afterOffset": 1460,
+          "old": "1",
+          "new": "2"
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "path": "runtime-preflight.mjs",
+      "beforeSha256": "f616f7ded7ec959486060133e1c9b6bf48556dd186b96d50bc9908405067ce46",
+      "afterSha256": "a8515aabef06fd5bb75bce1c75c1c5724c9e6fdcff0f0880c0bd0a8d71799ab3",
+      "edits": [
+        {
+          "beforeOffset": 688,
+          "afterOffset": 688,
+          "old": "",
+          "new": "TRACE_"
+        },
+        {
+          "beforeOffset": 718,
+          "afterOffset": 724,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeOffset": 981,
+          "afterOffset": 987,
+          "old": "",
+          "new": "trace-"
+        },
+        {
+          "beforeOffset": 1154,
+          "afterOffset": 1166,
+          "old": "",
+          "new": ");\n assert.equal(pin.sourceContractVersion,'sm-classic-trace-source-v1'"
+        },
+        {
+          "beforeOffset": 1724,
+          "afterOffset": 1807,
+          "old": "",
+          "new": ",sourceRoot"
+        },
+        {
+          "beforeOffset": 2191,
+          "afterOffset": 2285,
+          "old": "",
+          "new": "typeof sourceRoot,'string','Explicit containing corrected sourceRoot required');\n const containingRoot=resolve(here,'../../../..');assert.equal(resolve(sourceRoot),containingRoot);\n assert.equal("
+        },
+        {
+          "beforeOffset": 2349,
+          "afterOffset": 2638,
+          "old": "",
+          "new": "trace-v2-"
+        },
+        {
+          "beforeOffset": 2358,
+          "afterOffset": 2656,
+          "old": "-v1",
+          "new": ""
+        },
+        {
+          "beforeOffset": 2784,
+          "afterOffset": 3079,
+          "old": "",
+          "new": ",containingRoot"
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "path": "metadata-admission.mjs",
+      "beforeSha256": "ebd1845dfb3298a13b81f630abd40674b0cd43da4003f4559dced67f446732b4",
+      "afterSha256": "79e2477da07a2e2c5943e0268d721b8d642c50235c918260bcdbc57847ca3c58",
+      "edits": [
+        {
+          "beforeOffset": 881,
+          "afterOffset": 881,
+          "old": "",
+          "new": ");\n assert.deepEqual(metadata.classicTraceSourcePolicy,contract.classicTraceSourcePolicy,'Corrected trace-source policy required'"
+        },
+        {
+          "beforeOffset": 3032,
+          "afterOffset": 3161,
+          "old": "",
+          "new": "policyRaw=await readFile(join(here,'policy.json'));assert.equal(hash(policyRaw),contract.sourcePolicySha256);\n const policy=JSON.parse(policyRaw);assert.deepEqual(metadata.sourceManifest,policy.expectedNativeSourceManifest,'Exact corrected342 manifest required');\n for(const row of metadata.sourceManifest){const path=join(sourceRoot,row.path),stat=await lstat(path);assert(stat.isFile()&&!stat.isSymbolicLink());assert.equal(hash(await readFile(path)),row.sha256,path);}\n const "
+        },
+        {
+          "beforeOffset": 4137,
+          "afterOffset": 4745,
+          "old": "re",
+          "new": "join("
+        },
+        {
+          "beforeOffset": 4141,
+          "afterOffset": 4752,
+          "old": "lv",
+          "new": "urc"
+        },
+        {
+          "beforeOffset": 4144,
+          "afterOffset": 4756,
+          "old": "(here",
+          "new": "Root"
+        },
+        {
+          "beforeOffset": 4151,
+          "afterOffset": 4762,
+          "old": "../../../../",
+          "new": ""
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "path": "reviewed-pins.json",
+      "beforeSha256": "d98b446ba08c692b159aaeb64f042c4581bef69bfaf4ecb8442058eb64b1d9a3",
+      "afterSha256": "99d1cf044547aacb02b99852df853a660f2d79e739dd4bbc938105a9b064ded8",
+      "edits": [
+        {
+          "beforeOffset": 57,
+          "afterOffset": 57,
+          "old": "",
+          "new": "TRACE_"
+        },
+        {
+          "beforeOffset": 85,
+          "afterOffset": 91,
+          "old": "",
+          "new": "_V2"
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "path": "test-source.py",
+      "beforeSha256": "024ee121a28c8a208c109e8892834aba4515efec68f4f39b2c4ac0c2723f6e2a",
+      "afterSha256": "4ee0aa3a3598e3845ee8b26fc70774514734453874e7fe7e62af9d2ecc246a0b",
+      "edits": [
+        {
+          "beforeOffset": 231,
+          "afterOffset": 231,
+          "old": "",
+          "new": "assert len(sys.argv)==3,'READ_ONLY_CORRECTED_SOURCE_ROOT FRESH_TEST_OUTPUT'\nSOURCE_ROOT=Path(sys.argv[1]).resolve(strict=True)\n"
+        },
+        {
+          "beforeOffset": 240,
+          "afterOffset": 367,
+          "old": "",
+          "new": "sys.argv[2]).absolu"
+        },
+        {
+          "beforeOffset": 242,
+          "afterOffset": 388,
+          "old": "mpfile.mkdtemp",
+          "new": ""
+        },
+        {
+          "beforeOffset": 257,
+          "afterOffset": 389,
+          "old": "prefix='cl",
+          "new": ");"
+        },
+        {
+          "beforeOffset": 270,
+          "afterOffset": 394,
+          "old": "ic-b",
+          "new": ""
+        },
+        {
+          "beforeOffset": 275,
+          "afterOffset": 395,
+          "old": "nchm",
+          "new": "rt str(OUT).st"
+        },
+        {
+          "beforeOffset": 281,
+          "afterOffset": 411,
+          "old": "k-producer-",
+          "new": "t"
+        },
+        {
+          "beforeOffset": 293,
+          "afterOffset": 413,
+          "old": "ource-',d",
+          "new": "w"
+        },
+        {
+          "beforeOffset": 303,
+          "afterOffset": 415,
+          "old": "r=",
+          "new": "th("
+        },
+        {
+          "beforeOffset": 331,
+          "afterOffset": 444,
+          "old": "",
+          "new": "/"
+        },
+        {
+          "beforeOffset": 333,
+          "afterOffset": 447,
+          "old": "",
+          "new": "\nassert not OUT.exists()and not OUT.is_symlink();OUT.mkdir(parents=True"
+        },
+        {
+          "beforeOffset": 1277,
+          "afterOffset": 1462,
+          "old": "",
+          "new": "TraceSourcePolicy']=copy.deepcopy(CONTRACT['classicTraceSourcePolicy'])\n    value['classic"
+        },
+        {
+          "beforeOffset": 2036,
+          "afterOffset": 2311,
+          "old": "",
+          "new": "d,'benchmark-classic-on')))\nchanged=model();changed.pop('classicTraceSourcePolicy')\ncheck('old342 diagnostic shape missing trace contract rejected',lambda:rejected(lambda:classify(changed,'benchmark-classic-on')))\nchanged=model();changed['classicTraceSourcePolicy']['schedulerChanged']=True\ncheck('trace policy substitution rejected before artifacts',lambda:rejected(lambda:classify(change"
+        },
+        {
+          "beforeOffset": 6580,
+          "afterOffset": 7244,
+          "old": "5",
+          "new": "6"
+        },
+        {
+          "beforeOffset": 6614,
+          "afterOffset": 7278,
+          "old": "",
+          "new": "corrected "
+        },
+        {
+          "beforeOffset": 6624,
+          "afterOffset": 7298,
+          "old": "71b",
+          "new": "369"
+        },
+        {
+          "beforeOffset": 6628,
+          "afterOffset": 7302,
+          "old": "8",
+          "new": ""
+        },
+        {
+          "beforeOffset": 6679,
+          "afterOffset": 7352,
+          "old": "",
+          "new": " len(proof['edits'])!=16 or"
+        },
+        {
+          "beforeOffset": 6820,
+          "afterOffset": 7520,
+          "old": "",
+          "new": "explicit "
+        },
+        {
+          "beforeOffset": 6826,
+          "afterOffset": 7535,
+          "old": "",
+          "new": " corrected"
+        },
+        {
+          "beforeOffset": 6830,
+          "afterOffset": 7549,
+          "old": "",
+          "new": "stage matches new policy read-only',lambda:layer().validate_"
+        },
+        {
+          "beforeOffset": 6837,
+          "afterOffset": 7616,
+          "old": " mat",
+          "new": "(SOURCE_ROOT))\n"
+        },
+        {
+          "beforeOffset": 6843,
+          "afterOffset": 7633,
+          "old": " ",
+          "new": "eck('orig"
+        },
+        {
+          "beforeOffset": 6846,
+          "afterOffset": 7644,
+          "old": "h",
+          "new": "al old342 byt"
+        },
+        {
+          "beforeOffset": 6848,
+          "afterOffset": 7658,
+          "old": "",
+          "new": "s "
+        },
+        {
+          "beforeOffset": 6849,
+          "afterOffset": 7661,
+          "old": "i",
+          "new": "ejected by correc"
+        },
+        {
+          "beforeOffset": 6862,
+          "afterOffset": 7690,
+          "old": "",
+          "new": "lambda:rejected("
+        },
+        {
+          "beforeOffset": 6898,
+          "afterOffset": 7742,
+          "old": "",
+          "new": ")))\ncheck('original containing old checkout refused before actions',lambda:rejected(lambda:require_source_root(REPO)))\ncheck('foreign corrected checkout cannot stand in for containing packet checkout',lambda:rejected(lambda:require_source_root(SOURCE_ROOT)"
+        },
+        {
+          "beforeOffset": 6977,
+          "afterOffset": 8077,
+          "old": "",
+          "new": "corrected "
+        },
+        {
+          "beforeOffset": 7008,
+          "afterOffset": 8118,
+          "old": "still ",
+          "new": ""
+        },
+        {
+          "beforeOffset": 7020,
+          "afterOffset": 8124,
+          "old": "",
+          "new": " read-only"
+        },
+        {
+          "beforeOffset": 7047,
+          "afterOffset": 8161,
+          "old": "",
+          "new": "SOU"
+        },
+        {
+          "beforeOffset": 7048,
+          "afterOffset": 8165,
+          "old": "",
+          "new": "C"
+        },
+        {
+          "beforeOffset": 7049,
+          "afterOffset": 8167,
+          "old": "P",
+          "new": "_R"
+        },
+        {
+          "beforeOffset": 7051,
+          "afterOffset": 8170,
+          "old": "",
+          "new": "OT"
+        },
+        {
+          "beforeOffset": 7148,
+          "afterOffset": 8269,
+          "old": "",
+          "new": "corrected "
+        },
+        {
+          "beforeOffset": 7227,
+          "afterOffset": 8358,
+          "old": "",
+          "new": "trace-"
+        },
+        {
+          "beforeOffset": 9525,
+          "afterOffset": 10662,
+          "old": "",
+          "new": "preparationContext':{'pathResolution':'absolute-original-preparation-context-not-relocated'},'"
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "path": "test-host.mjs",
+      "beforeSha256": "4e1567a8b48780e884ca2c2ced6bfb62a89ff60fee10437b575f64750b98f32b",
+      "afterSha256": "4012b37f33b1bbc230e3abbc0cd59ec5d4efdea92ae47b7d2644790d524e1853",
+      "edits": [
+        {
+          "beforeOffset": 474,
+          "afterOffset": 474,
+          "old": "se",
+          "new": "pathToFi"
+        },
+        {
+          "beforeOffset": 478,
+          "afterOffset": 484,
+          "old": "ctedManifestsForEngine",
+          "new": "URL"
+        },
+        {
+          "beforeOffset": 508,
+          "afterOffset": 495,
+          "old": "../../m",
+          "new": "n"
+        },
+        {
+          "beforeOffset": 517,
+          "afterOffset": 498,
+          "old": "",
+          "new": "e:"
+        },
+        {
+          "beforeOffset": 518,
+          "afterOffset": 501,
+          "old": "",
+          "new": "r"
+        },
+        {
+          "beforeOffset": 519,
+          "afterOffset": 503,
+          "old": "e-selection.mjs",
+          "new": ""
+        },
+        {
+          "beforeOffset": 631,
+          "afterOffset": 600,
+          "old": "",
+          "new": "assert.equal(process.argv.length,4,'READ_ONLY_CORRECTED_SOURCE_ROOT FRESH_TEST_OUTPUT');\n"
+        },
+        {
+          "beforeOffset": 637,
+          "afterOffset": 695,
+          "old": "",
+          "new": "sourceRoot=resolve(process.argv[2]),"
+        },
+        {
+          "beforeOffset": 644,
+          "afterOffset": 738,
+          "old": "",
+          "new": "resolve(process."
+        },
+        {
+          "beforeOffset": 645,
+          "afterOffset": 755,
+          "old": "w",
+          "new": "rgv[3]);"
+        },
+        {
+          "beforeOffset": 647,
+          "afterOffset": 764,
+          "old": "",
+          "new": "ssert(output.startsW"
+        },
+        {
+          "beforeOffset": 649,
+          "afterOffset": 786,
+          "old": " mkdtemp",
+          "new": "h"
+        },
+        {
+          "beforeOffset": 685,
+          "afterOffset": 815,
+          "old": "",
+          "new": "'));\nawait (await import('node:fs/promises')).mkdir(output,{recursive:false});\nconst selectorPath=join(sourceRoot,'tests/node-compat/module-selection.mjs'),admissionPath=join(sourceRoot,'tests/node-compat/"
+        },
+        {
+          "beforeOffset": 693,
+          "afterOffset": 1028,
+          "old": "b",
+          "new": "str"
+        },
+        {
+          "beforeOffset": 695,
+          "afterOffset": 1032,
+          "old": "nch",
+          "new": "a"
+        },
+        {
+          "beforeOffset": 699,
+          "afterOffset": 1034,
+          "old": "ark",
+          "new": "s"
+        },
+        {
+          "beforeOffset": 712,
+          "afterOffset": 1045,
+          "old": "-",
+          "new": ".mjs"
+        },
+        {
+          "beforeOffset": 714,
+          "afterOffset": 1050,
+          "old": "",
+          "new": ");\nassert.equal(createHash('sha256').update(await readFile(selectorPath)).digest('hex'),'57968dc834e9f9efa90e8e26eb1ace60dff182b816f33e36fea15e1fee22ef85');\nassert.equal(createHash('sha256').update(await readFile(admissionPath)).digest('hex'),'46acb447c5e2acc6f33d94d3d21e90c1495a8da2d593e08b0f3c21e84e738d24');\nconst {selectedManifestsForEngine}=await import(pathToFileURL(selectorPath)"
+        },
+        {
+          "beforeOffset": 1151,
+          "afterOffset": 1874,
+          "old": "",
+          "new": "TRACE_"
+        },
+        {
+          "beforeOffset": 1179,
+          "afterOffset": 1908,
+          "old": "",
+          "new": "_V2"
+        },
+        {
+          "beforeOffset": 1251,
+          "afterOffset": 1983,
+          "old": "",
+          "new": "TRACE_"
+        },
+        {
+          "beforeOffset": 1288,
+          "afterOffset": 2026,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeOffset": 1377,
+          "afterOffset": 2115,
+          "old": "",
+          "new": "TRACE_"
+        },
+        {
+          "beforeOffset": 1407,
+          "afterOffset": 2151,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeOffset": 3711,
+          "afterOffset": 4455,
+          "old": "",
+          "new": "classicTraceSourcePolicy:structuredClone(contract.classicTraceSourcePolicy),"
+        },
+        {
+          "beforeOffset": 3804,
+          "afterOffset": 4624,
+          "old": "",
+          "new": "JSON.p"
+        },
+        {
+          "beforeOffset": 3805,
+          "afterOffset": 4631,
+          "old": "",
+          "new": "rse(await readFile(join(here,'policy.json'))).expe"
+        },
+        {
+          "beforeOffset": 3807,
+          "afterOffset": 4683,
+          "old": "u",
+          "new": "edN"
+        },
+        {
+          "beforeOffset": 3809,
+          "afterOffset": 4687,
+          "old": "l.s",
+          "new": "tiveS"
+        },
+        {
+          "beforeOffset": 4138,
+          "afterOffset": 5018,
+          "old": ");\nconst sourceRoot=resolve(here,'../../../..'",
+          "new": ""
+        },
+        {
+          "beforeOffset": 5907,
+          "afterOffset": 6741,
+          "old": "",
+          "new": "await check('original old342 source checkout refused as corrected declarations',async()=>assert.rejects(rawBuiltinManifests(model,'benchmark-classic-on',resolve(here,'../../../..'))));\nawait check('old source manifest cannot be projected behind new trace policy',async()=>{const value=structuredClone(model);value.sourceManifest=actual.sourceManifest;await assert.rejects(rawBuiltinManifests(value,'benchmark-classic-on',sourceRoot));});\nawait check('trace provenance missing in declaration shape refused',async()=>{const value=structuredClone(model);delete value.classicTraceSourcePolicy;assert.throws(()=>classify(value,'benchmark-classic-on'));});\n"
+        }
+      ],
+      "forwardAndReverseExact": true
+    }
+  ],
+  "actionsInvoked": false
+}

@@ -1,0 +1,1 @@
+import{run}from"/tmp/starling-node-compat/production-scheduler-runtime-v1/focused-off/abort_m11_fatal_fresh_async.js";try{await run();console.log('UNEXPECTED_RETURN');process.exitCode=2;}catch(error){console.log('EXPECTED_FATAL_DISCARD');}

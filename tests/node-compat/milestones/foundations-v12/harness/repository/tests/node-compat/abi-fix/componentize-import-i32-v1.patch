@@ -1,0 +1,29 @@
+--- a/crates/spidermonkey-embedding-splicer/src/splice.rs
++++ b/crates/spidermonkey-embedding-splicer/src/splice.rs
+@@ -603,7 +603,26 @@
+                             offset: 0,
+                             memory,
+                         });
++                        // Use the same Int32 tag check as the floating-point
++                        // argument paths below. Canonical i32 arguments may be
++                        // boxed Doubles (notably u32 values above INT32_MAX).
++                        func.local_tee(tmp_local);
++                        func.i64_const(32);
++                        func.i64_shr_u();
++                        func.i64_const(0xFFFFFF81);
++                        func.i64_eq();
++                        func.if_stmt(BlockType::Type(DataType::I32));
++                        func.local_get(tmp_local);
+                         func.i32_wrap_i64();
++                        func.else_stmt();
++                        func.local_get(tmp_local);
++                        func.f64_reinterpret_i64();
++                        // Every canonical s32/u32 integer fits exactly in i64.
++                        // Signed truncation also accepts negative Doubles; wrap
++                        // preserves the shared core-i32 bit representation.
++                        func.i64_trunc_f64_s();
++                        func.i32_wrap_i64();
++                        func.end();
+                     }
+                     CoreTy::I64 => {
+                         func.call(get_export_fid(module, &coreabi_from_bigint64));

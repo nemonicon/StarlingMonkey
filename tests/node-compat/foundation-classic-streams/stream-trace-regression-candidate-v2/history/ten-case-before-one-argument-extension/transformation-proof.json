@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "state": "FINITE_PUBLIC_OBJECT_ENCODING_SOURCE_EXTENSION",
+  "parentIndexSha256": "636dfc0561891ff23f028b19289693aa77452fc25e8c5b415f1bf4a191afe7ac",
+  "originalEightCaseSourceUnchanged": true,
+  "newCases": 2,
+  "records": [
+    {
+      "path": "cases.mjs",
+      "beforeSha256": "69c08a737d2e7150367ce2154b440f7c2fb6f371fd8ca023d38b6799d3fba0e6",
+      "afterSha256": "85c5c658ca6cf37078e62d442fb1066c365ec92b39b331c74746743e4a9633b9",
+      "edits": [
+        {
+          "old": " return results;\n",
+          "new": " for(const explicitUtf8 of [false,true]){\n  const trace=boundedTrace(),payload={id:1};let writeCalls=0,callbackCalls=0,finish=0,close=0,accepted,samePayload=false,valueId,encoding;\n  let resolveClosed,rejectClosed;const closed=new Promise((resolve,reject)=>{resolveClosed=resolve;rejectClosed=reject;});\n  const sink=new stream.Writable({objectMode:true,write(value,suppliedEncoding,callback){writeCalls++;samePayload=value===payload;valueId=value.id;\n   encoding=suppliedEncoding===undefined?{type:'undefined'}:{type:typeof suppliedEncoding,value:suppliedEncoding};\n   trace.push('object-write',samePayload,typeof suppliedEncoding);callback();}});\n  sink.on('error',rejectClosed);sink.on('finish',()=>{finish++;trace.push('finish');});sink.on('close',()=>{close++;trace.push('close');resolveClosed();});\n  const callback=error=>{if(error){rejectClosed(error);return;}callbackCalls++;trace.push('user-write-callback');};trace.push('before-write');\n  accepted=explicitUtf8?sink.write(payload,'utf8',callback):sink.write(payload,callback);trace.push('write-return',accepted);sink.end();trace.push('after-end');await closed;\n  check(writeCalls===1&&callbackCalls===1&&samePayload&&valueId===1&&finish===1&&close===1,'Object-mode valid-operation invariants failed');\n  check(encoding.type==='undefined'||encoding.type==='string'||(encoding.type==='object'&&encoding.value===null),'Finite encoding carrier expected');\n  results.push({id:'object-'+(explicitUtf8?'explicit-utf8':'default-encoding'),kind:'object-writable',explicitUtf8,accepted,writeCalls,callbackCalls,samePayload,valueId,payloadKeys:Object.keys(payload),encoding,finish,close,events:trace.events});\n }\n return results;\n",
+          "occurrences": 1
+        }
+      ],
+      "reverseExact": true
+    },
+    {
+      "path": "component-driver.mjs",
+      "beforeSha256": "229b408fab9d495a53bb0767bc8761232451834794c1393156fb4cf719b4c6c0",
+      "afterSha256": "69d55b0665028f33dc3cfc58962de327302e62a2d4f5cfdf8e8f85b1d30d886b",
+      "edits": [
+        {
+          "old": "assert.equal(oracle.groups,8);",
+          "new": "assert.equal(oracle.groups,10);",
+          "occurrences": 1
+        },
+        {
+          "old": "assert.equal(value.observed.length,8);",
+          "new": "assert.equal(value.observed.length,10);",
+          "occurrences": 1
+        },
+        {
+          "old": "  for(let i=0;i<8;i++){const row=value.observed[i],expected=oracle.nodeObserved[i];assert.equal(row.id,expected.id);assert.equal(row.bytes,64);assert.equal(row.checksum,expected.checksum);assert.equal(row.writeCalls,1);assert.equal(row.callbackCalls,1);assert(row.events.length<128);}",
+          "new": "  for(let i=0;i<10;i++){const row=value.observed[i],expected=oracle.nodeObserved[i];assert.equal(row.id,expected.id);assert.equal(row.kind,expected.kind);assert.equal(row.writeCalls,1);assert.equal(row.callbackCalls,1);assert(row.events.length<128);\n   if(row.kind==='object-writable'){assert.equal(row.samePayload,true);assert.equal(row.valueId,1);assert.deepEqual(row.payloadKeys,['id']);assert.equal(row.finish,1);assert.equal(row.close,1);assert(['undefined','string','object'].includes(row.encoding.type));\n    if(row.encoding.type==='undefined')assert.deepEqual(row.encoding,{type:'undefined'});else if(row.encoding.type==='object')assert.deepEqual(row.encoding,{type:'object',value:null});else assert.equal(typeof row.encoding.value,'string');\n   }else{assert.equal(row.bytes,64);assert.equal(row.checksum,expected.checksum);}}",
+          "occurrences": 1
+        },
+        {
+          "old": "const differences=[];for(let i=0;i<8;i++)",
+          "new": "const differences=[];for(let i=0;i<10;i++)",
+          "occurrences": 1
+        },
+        {
+          "old": "const report={schemaVersion:1,status:",
+          "new": "const report={schemaVersion:1,caseCount:10,status:",
+          "occurrences": 1
+        },
+        {
+          "old": "Observation gate: valid64byte operations",
+          "new": "Observation gate: eight valid64byte cases plus two ordinary object-mode encoding cases",
+          "occurrences": 1
+        }
+      ],
+      "reverseExact": true
+    },
+    {
+      "path": "node-oracle.mjs",
+      "beforeSha256": "0216c41a5e937fa15857c5ad14970affb4470bc193fd85371793619c74cd6b4e",
+      "afterSha256": "d0a0171e83b0990f29c761e3e0c4c47b4537cf6dc6884c525add6bb64b6d6d94",
+      "edits": [
+        {
+          "old": "assert.equal(native.length,8);assert.equal(model.length,8);",
+          "new": "assert.equal(native.length,10);assert.equal(model.length,10);",
+          "occurrences": 1
+        },
+        {
+          "old": "groups:8",
+          "new": "groups:10",
+          "occurrences": 2
+        },
+        {
+          "old": "Bounded64byte writable HWM65/64/63 plus PassThrough pipeline sync/microtask callback traces; public state only.",
+          "new": "Original eight bounded64byte cases plus ordinary object-mode default/explicit-utf8 encoding probes; public state only.",
+          "occurrences": 1
+        }
+      ],
+      "reverseExact": true
+    }
+  ],
+  "unchanged": [
+    {
+      "path": "guest.mjs",
+      "sha256": "3e8f7ef3c45f39f91a5a50ae6eb7edb31f2678ddae14d2edbc1cbc76b7449191",
+      "byteIdentical": true
+    },
+    {
+      "path": "preflight.template.mjs",
+      "sha256": "ab31c77ce74c7600814ceb14e21873567c6eee24edbd1534a197193c56900701",
+      "byteIdentical": true
+    },
+    {
+      "path": "run-component.UNEXECUTED.mjs",
+      "sha256": "25f40d0375083a5da5272b77269f4f695893cf8a68ddefb381469ca21f78d4df",
+      "byteIdentical": true
+    }
+  ],
+  "nativeOrGuestOrHostOrComponentizerExecuted": false
+}

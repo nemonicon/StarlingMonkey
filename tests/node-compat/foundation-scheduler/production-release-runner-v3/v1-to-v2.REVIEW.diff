@@ -1,0 +1,242 @@
+--- v1/preflight.mjs
++++ v2/preflight.mjs
+@@ -3,7 +3,7 @@
+ import {readFile,writeFile} from 'node:fs/promises';
+ import {dirname,join,resolve} from 'node:path';
+ import {fileURLToPath} from 'node:url';
+-import {verifyProductionTicks,verifyInputClosure,requireFreshOutput,hash} from '../production-regression-candidate-v3/preflight.mjs';
++import {verifyProductionTicks,verifyInputClosure,requireFreshOutput,hash} from '../production-regression-candidate-v4/preflight.mjs';
+ export {requireFreshOutput,hash};
+ export const here=dirname(fileURLToPath(import.meta.url));
+ export const repository=resolve(here,'../../../..');
+@@ -13,10 +13,10 @@
+ export async function verifyReleaseOff(){
+   // FIRST gate: no own manifest, old control, loader or output is read first.
+   const production=await verifyProductionTicks({gcStress:false});
+-  assert.equal(hash(await readFile(join(here,'../production-regression-candidate-v3/index.json'))),
+-    '3064605fbf043c26e3d1bc85378b91d68c98be4034f4b6c5cf0f30f964ac61a2');
+-  assert.equal(hash(await readFile(join(here,'../production-followon-off-v1/index.json'))),
+-    'a4812fe2e5429562b11f3e7ce1dbaf8cb7cb498726998ad5b473b16f05c61bbe');
++  assert.equal(hash(await readFile(join(here,'../production-regression-candidate-v4/index.json'))),
++    'd0411aafee83a0ab238d456a722cf753ba850a4aaf9f55bc820827d0746491a9');
++  assert.equal(hash(await readFile(join(here,'../production-followon-off-v2/index.json'))),
++    '48117ef405f4861ead8c8d6abfd3623efa67596d20f8db755a50082111794376');
+   const inputClosure=await verifyInputClosure({manifestPath:join(here,'input-freeze.json')});
+   const manifestPath=inputClosure.path,expectedSha256=inputClosure.sha256;
+   async function recheck(){
+--- v1/job-plan.mjs
++++ v2/job-plan.mjs
+@@ -1,11 +1,11 @@
+ import {join} from 'node:path';
+ export function releaseJobs(here,output){
+   return[
+-    {name:'core',runner:join(here,'../production-regression-candidate-v3/run-core.mjs'),variable:'NODE_COMPAT_OUTPUT',report:'results.json',completion:'production-admission-complete.json'},
+-    {name:'allocator',runner:join(here,'../production-regression-candidate-v3/run-allocator.mjs'),variable:'NODE_COMPAT_INSTALLED_ALLOCATOR_OUTPUT',report:'results.json',completion:'production-admission-complete.json'},
+-    {name:'stream-web',runner:join(here,'../production-followon-off-v1/run-stream-web.mjs'),variable:'NODE_COMPAT_STREAM_WEB_OUTPUT',report:'results.json',completion:'followon-admission-complete.json'},
++    {name:'core',runner:join(here,'../production-regression-candidate-v4/run-core.mjs'),variable:'NODE_COMPAT_OUTPUT',report:'results.json',completion:'production-admission-complete.json'},
++    {name:'allocator',runner:join(here,'../production-regression-candidate-v4/run-allocator.mjs'),variable:'NODE_COMPAT_INSTALLED_ALLOCATOR_OUTPUT',report:'results.json',completion:'production-admission-complete.json'},
++    {name:'stream-web',runner:join(here,'../production-followon-off-v2/run-stream-web.mjs'),variable:'NODE_COMPAT_STREAM_WEB_OUTPUT',report:'results.json',completion:'followon-admission-complete.json'},
+     {name:'optional',runner:join(here,'run-optional.mjs'),variable:'NODE_COMPAT_OPTIONAL_OUTPUT',report:'results.json',completion:'release-admission-complete.json'},
+-    ...['sync','runtime','late','callbacks'].map(name=>({name:'strict-'+name,runner:join(here,'../production-followon-off-v1/run-'+name+'.mjs'),
++    ...['sync','runtime','late','callbacks'].map(name=>({name:'strict-'+name,runner:join(here,'../production-followon-off-v2/run-'+name+'.mjs'),
+       variable:'NODE_COMPAT_STRICT_EVENT_OUTPUT',report:'private-ticks-'+(name==='callbacks'?'callback':name)+'-results.json',completion:'followon-admission-complete.json'})),
+   ].map(job=>({...job,output:join(output,job.name)}));
+ }
+--- v1/freeze-inputs.py
++++ v2/freeze-inputs.py
+@@ -18,8 +18,8 @@
+     paths.add(path)
+ 
+ 
+-for sibling, expected in [('production-regression-candidate-v3','3064605fbf043c26e3d1bc85378b91d68c98be4034f4b6c5cf0f30f964ac61a2'),
+-                          ('production-followon-off-v1','a4812fe2e5429562b11f3e7ce1dbaf8cb7cb498726998ad5b473b16f05c61bbe')]:
++for sibling, expected in [('production-regression-candidate-v4','d0411aafee83a0ab238d456a722cf753ba850a4aaf9f55bc820827d0746491a9'),
++                          ('production-followon-off-v2','48117ef405f4861ead8c8d6abfd3623efa67596d20f8db755a50082111794376')]:
+     base=HERE.parent/sibling
+     assert digest(base/'index.json')==expected
+     add(base/'index.json');add(base/'input-freeze.json')
+@@ -33,6 +33,9 @@
+         add(path)
+ for name in ['historical-controls.json','runner-transformations.json']:
+     add(HERE/name)
++live_adapter=REPO/'host-apis/wasi-0.2.0/preview1-adapter-release/wasi_snapshot_preview1.wasm'
++assert digest(live_adapter)=='988224282d03fe0bd3c25b62344aef265b1a8e1f5804bdbc34d6442507fabcc0'
++add(live_adapter)
+ names={
+  'path':['component.mjs','static-require.cjs','raw-aliases.mjs','profile.wit','top-level-budget.mjs','top-level-invalid.mjs','semantic.mjs','glob.mjs'],
+  'events':['native-component.mjs','native-checks.mjs','native-require.cjs','checks.mjs','prototype-checks.mjs','native-node-results.json'],
+--- v1/test-host.mjs
++++ v2/test-host.mjs
+@@ -8,7 +8,7 @@
+ import {runSerial,rejectResume} from './serial.mjs';
+ import {releaseJobs} from './job-plan.mjs';
+ import {controlEnvironment,validateModuleReport} from './preflight.mjs';
+-import {verifyInputClosure} from '../production-regression-candidate-v3/preflight.mjs';
++import {verifyInputClosure} from '../production-regression-candidate-v4/preflight.mjs';
+ assert.equal(process.version,'v22.14.0');assert.deepEqual(process.execArgv,[]);assert(!process.env.NODE_OPTIONS);
+ assert(process.env.NODE_COMPAT_RELEASE_HOST_TEST_OUTPUT,'Explicit fresh report output required');
+ const here=dirname(fileURLToPath(import.meta.url)),repository=resolve(here,'../../../..');
+@@ -69,6 +69,8 @@
+ }
+ 
+ const preserved=JSON.parse(await readFile(join(here,'input-freeze.json'))).preservedOldOutputs;
++const activeRows=JSON.parse(await readFile(join(here,'input-freeze.json'))).inputs;
++test('LIVE adapter physical path is sealed exactly once',()=>{const rows=activeRows.filter(row=>resolve(here,row.path)===join(repository,'host-apis/wasi-0.2.0/preview1-adapter-release/wasi_snapshot_preview1.wasm'));assert.equal(rows.length,1);assert.equal(rows[0].sha256,'988224282d03fe0bd3c25b62344aef265b1a8e1f5804bdbc34d6442507fabcc0');});
+ for(const row of preserved)assert.equal(hash(await readFile(join(repository,row.path))),row.sha256);
+ const oracleOutput=join(output,'path-oracles');await mkdir(oracleOutput);
+ const oracleRuns=[];
+--- v1/README.md
++++ v2/README.md
+@@ -1,106 +1,53 @@
+-# Fresh OFF release replay: source preparation
++This is a **source-only activation correction** to the preserved
++[release runner v1](../production-release-runner-v1/README.md). It binds the
++same six-foundation and serial eight-job OFF replay to exact common-v4
++indexd0411aaf and OFF-follow-on-v2 index48117ef4. All actual production pins
++remain null. No native compiler, driver, packager, component, guest or Wasmtime
++was run; fixed-artifact success remains unexecuted.
+ 
+-This is a new **source-only runner packet**, not a release or runtime pass.
+-Actual production pins remain null in the unchanged common
+-`production-regression-candidate-v3`. Every public entry rejects before reading
+-an engine, loading a toolchain/packager, following old controls or creating its
+-output. No native build, componentization, Wasmtime or guest ran here. Accepted
+-compatibility remains foundations-v11.
++The new1409-input manifest explicitly includes the physical live repository
++adapter `98822428…`, the complete common-v4/OFF-v2 closures, exact historical
++controls and all actual local inputs. This closes the previously recorded live
++adapter gap for this sibling. It does not change the old1405-input packet or
++any accepted evidence. Native306/external3 and real frozen artifacts remain
++separately authenticated; unreviewed artifact exports cannot activate entries.
+ 
+-The packet supplies the remaining six-foundation replay and an all-fresh serial
+-eight-gate OFF batch. `run-release.mjs` runs, in order: core, allocator, stream/web,
+-six foundations, strict sync, strict runtime, strict late binding, strict
+-callbacks. It consumes the exact common-v3 and Buffer-owned followon-OFF entries;
+-the callback report name is singular `private-ticks-callback-results.json`.
+-All jobs use the same future fixed normal Release/OFF engine and fresh outputs.
+-There is no resume, copied success, accepted-v11 pass reuse or native build step.
++All nine runner/helper/oracle sibling bodies, their reverse transformations,
++historical control table, serial lifecycle and entry bodies are byte-identical
++to v1. Code changes are limited to common/follow-on import/index wiring and
++explicit adapter source membership. The common guard still runs first before
++own sources, old controls, loaders or output. Primitive initial pin/manifest
++digests, digest-before-parse/rows, fresh outputs, no resume/pass reuse,
++stop-on-failure, capacity floor and exclusive completion seals remain.
+ 
+-## Preserved module semantics and writes
++Validation passed54 host-only checks and24 source/syntax checks. The original
++53 checks remain with one new physical-adapter membership check. Eight child
++entries stop at null pins before impossible engine/source/toolchain/host paths.
++Full original bounded Node Path oracles run only with redirected fresh outputs;
++their lexical/glob results match the preserved old bytes. All11 old latest and
++oracle outputs remain unchanged. The nine reverse transformations restore every
++original source byte; current306 native-policy hashes are unchanged.
+ 
+-`run-optional.mjs` serially invokes `run-{path,events,string-decoder,assert,
+-querystring,util}.mjs`. Nine isolated copies—six runners, the shared scalar
+-harness and two Path oracles—are recorded in `runner-transformations.json`.
+-Every import/path/report/guard edit reverses exactly to the original bytes.
+-Fixtures and source oracles stay at their real original paths. Events' inner
+-strict-version guard names the actual private-ticks policy; no old metadata is
+-projected into the new policy.
++The serial plan remains exactly core, allocator, installed stream/web, six
++optional foundations, then strict sync/runtime/late/callbacks. Each child must
++exit0 and supply its full semantic report and completion seal. The optional
++batch similarly requires all six complete module bodies and their exact
++historical OFF controls. Report basenames and all case/positive/fatal controls
++are unchanged. No prior v11 report is used as a new runtime pass. HTTP, focused
++Events, RuntimeOnly, GC, private scheduler acceptance and real production builds
++remain separate gates.
+ 
+-The cloned scalar harness writes its report mirror into the fresh output.
+-Standalone Path, Events and StringDecoder mirrors are redirected likewise.
+-Path executes its copied `semantic.mjs` and `glob.mjs` with an explicit fresh
+-`node-oracles/` directory, reads those generated vectors/results, and records
+-actual vector paths. All five oracle writes are redirected, including
+-`glob-differences.json`. Original Node checks, budgets, ordinary-pattern policy,
+-VM shims, source pins and skipped virtual-cwd probe remain unchanged. The actual
+-guest bundle still imports installed native modules, with all no-facade checks.
++To repeat the host-only checks, use a fresh report directory:
+ 
+-Existing OFF controls are preserved: Assert and Querystring select the actual
+-v5 OFF engine, Util the actual v6 OFF engine. The old six-module orchestration
+-cleared Events-OFF; that default remains. The existing Events optional branch
+-is retained for an explicitly selected, exact historical v10 Events-OFF control.
+-Path and StringDecoder acquire no invented OFF flags. These controls prove only
+-their historical admission behavior, never a new scheduler engine pass.
++```sh
++NODE_COMPAT_RELEASE_HOST_TEST_OUTPUT=/tmp/starling-node-compat/release-v2-host-NEW/results.json \
++  /tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node \
++  tests/node-compat/foundation-scheduler/production-release-runner-v2/test-host.mjs
++```
+ 
+-The full original module bodies retain Node comparisons, aliases/cache/static
+-CJS, snapshots and repeated/fresh execution, deferred call/new/initializer
+-failures, namespace inspection, limits and real OFF admission. Additional report
+-checks preserve Path's three calls/two rejected initializers, Events' two calls/
+-seven rejected initializers, StringDecoder's three calls/three rejected
+-initializers, Assert's 784 comparisons/nine rejected initializers, Querystring's
+-210 separator and1,536 byte vectors/eight rejected initializers, and Util's eight
+-rejected initializers. Exact remaining assertions stay in the unchanged bodies.
+-
+-## Fixed admission and evidence
+-
+-`verifyReleaseOff()` first calls actual common fixed-production admission. It
+-then authenticates the common-v3 and followon-OFF indexes and captures the local
+-manifest's primitive digest. Final checks call the common pins-first recheck,
+-then compare the exact local manifest bytes to the captured digest before
+-parsing or following rows. No mutable returned report object supplies the
+-expected digest. Each module needs exit0, its full semantic report and
+-`release-module-admission-complete.json`; optional and eight-job scopes also
+-need `release-admission-complete.json`. A partial report alone is insufficient.
+-
+-The 1,405-file seal covers both existing runner closures, finite original
+-fixtures/oracles, generated siblings and helpers, Path's primary upstream inputs,
+-old output guards and actual historical control engines/sidecars/sources. The
+-306 future native and three external embedding inputs remain a separate fixed
+-artifact partition. The18 unresolved relative references are pinned Node
+-upstream `../common`/`../common/fixtures` data handled by the preserved VM shims.
+-Archived/host-test sources remain hashed witnesses rather than runtime imports.
+-Npm provenance remains the existing checked toolchain/componentizer contract;
+-this is not a byte archive of all dependencies or future generated outputs.
+-
+-## Executed host checks and remaining gates
+-
+-`test-results.json` records **53 host-only checks**; `source-checks.json` records
+-**24 syntax/source checks**. Eight fresh negative entry children reject the null
+-pins before engine/toolchain/output access. Pure checks cover serial execution,
+-failure stop, no resume, report validation, exact old controls, reversible
+-transforms and local digest rejection before parsing/following changed rows.
+-
+-The two copied Path Node oracles execute in a fresh owned output. They pass
+-**15,696 lexical vectors**, **220 invalid cases**, **934 upstream assertions in
+-16 files**, and **4,046 glob comparisons with zero differences**. All five fresh
+-output files equal their original bytes; all eleven old report/oracle outputs
+-remain unchanged. Raw stdout/stderr and output digests are retained in the host
+-report. Initial50-check evidence predates three added local-seal controls and is
+-preserved separately; neither stage ran a guest.
+-
+-Actual future pin/freeze compatibility, positive fixed-artifact admission and
+-all eight guest results remain unexecuted. GC, focused protected29/getter gates,
+-RuntimeOnly, HTTP/both-host checks and milestone acceptance are separate. Buffer
+-GC does not prove tick queue ownership; no ALS, reset/reuse, performance or full
+-Node/module support follows. Host children are serial; this packet adds no
+-process-tree cancellation or in-flight disk-allocation guarantee. The host
+-prelaunch check stops new guest jobs below800MiB but does not lower the separate
+-2GiB native-build guard or prove enough space for an entire batch.
+-
+-Future entry variables are `NODE_COMPAT_PRODUCTION_RELEASE_OUTPUT` for all eight,
+-`NODE_COMPAT_OPTIONAL_OUTPUT` for the six replay, or the original module output
+-variables for individual entries. All require nonexistent fresh directories.
+-Host-only reproduction uses the pinned Node22 binary and a fresh
+-`NODE_COMPAT_RELEASE_HOST_TEST_OUTPUT`; source checks use a fresh
+-`NODE_COMPAT_RELEASE_SOURCE_CHECK_OUTPUT`. Actual execution must wait for real
+-reviewed production pins and capacity. The packet index is the source-review
+-boundary; it is not an engine receipt or runtime acceptance record.
++The copied wrappers require a reviewed actual-pin activation revision before
++runtime use. Source preparation does not prove process-tree cancellation,
++in-flight disk capacity, safe Engine reset/reuse, ALS/public process, new API
++compatibility, memory or performance benefits. The getter/Symbol/combined-GC
++qualifications remain unchanged. [source-receipt.json](source-receipt.json) and
++[index.json](index.json) seal this finite correction; no binary was copied.

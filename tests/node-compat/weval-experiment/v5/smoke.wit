@@ -1,0 +1,16 @@
+package starling:weval-smoke@0.1.0;
+world profile {
+  record payload { unsigned: u32, signed: s32, large: u64, negative: s64, text: string, bytes: list<u8> }
+  export run: func() -> string;
+  export direct-u32: func(value: u32) -> u32;
+  export constant-max: func() -> u32;
+  export direct-s32: func(value: s32) -> s32;
+  export direct-f32: func(value: f32) -> f32;
+  export direct-f64: func(value: f64) -> f64;
+  export direct-u64: func(value: u64) -> u64;
+  export direct-s64: func(value: s64) -> s64;
+  export echo-string: func(value: string) -> string;
+  export echo-bytes: func(value: list<u8>) -> list<u8>;
+  export echo-record: func(value: payload) -> payload;
+  export result-u32: func(ok: bool, value: u32) -> result<u32, u32>;
+}

@@ -1,0 +1,1 @@
+import * as a from "node:assert"; a.deepStrictEqual({}, {}); export function run(){return '';}

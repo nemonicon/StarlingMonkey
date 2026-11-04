@@ -1,0 +1,158 @@
+"""Independent data/byte reader only. No owner imports, subprocess or guest APIs."""
+from pathlib import Path
+import hashlib,json,os,re,shlex,stat,struct
+HERE=Path(__file__).resolve().parent
+REPO=HERE.parents[3]
+FAMILY=REPO/'tests/node-compat/foundation-zlib/component-validation-activated-v7'
+SOURCE=REPO/'tests/node-compat/foundation-zlib/disabled-validation-candidate-v1'
+OUTPUT=Path('/tmp/starling-node-compat/production-zlib-v4-disabled-selection-validation-v1')
+FROZEN=Path('/tmp/starling-node-compat/production-zlib-v4/native-freeze')
+ROOT=REPO/'tests/node-compat/foundation-zlib/disabled-selection-validation-root-results-v1.json'
+SOURCESHA='89a38793670ce6066970a6cca288abf841ba194ddd4b6eb04a56edec363f4dd2'
+FAMILYSHA='d67971d0fbf2e116c646a0411bf3ffc4d3209475033c2d2209c443deb9802c9e'
+ROOTSHA='d0dc2ef2685cef2ef72f62e5ab00d0615056a6f5dc6b74b895a75a066cf80722'
+ENGINE='3d19535f0bbe910066b6c00aea2cdd9bbee933705429d28f3e23714c93bc2a44'
+COMPONENT='154b43e4bc677f5495760d8875e26dc14d353f61732101998e869a86e1fdb02e'
+NODE=Path('/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node')
+NODE_SHA='e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0'
+WT_SHA='a85dec9fcbbad23d0e038e5a99604114dbe9aa77bc784e4bce0f33013eb33c1c'
+verified={};aliases={};checks=[]
+def check(name,condition):
+ assert condition,name
+ checks.append(name)
+def sha(raw):return hashlib.sha256(raw).hexdigest()
+def file_sha(path):
+ value=hashlib.sha256()
+ with Path(path).open('rb')as stream:
+  for chunk in iter(lambda:stream.read(4*1024*1024),b''):value.update(chunk)
+ return value.hexdigest()
+def pinned(path,digest=None,size=None):
+ p=Path(path);info=p.lstat();assert stat.S_ISREG(info.st_mode)and not p.is_symlink(),p
+ key=str(p.resolve(strict=True));aliases[str(p)]=key
+ if key not in verified:
+  value=file_sha(p)
+  verified[key]={'path':key,'sha256':value,'bytes':info.st_size}
+ row=verified[key];assert digest is None or row['sha256']==digest,(p,'SHA mismatch');assert size is None or row['bytes']==size,(p,'size mismatch')
+ return row
+def data(path,digest=None,size=None):
+ row=pinned(path,digest,size);raw=Path(path).read_bytes();assert sha(raw)==row['sha256']and len(raw)==row['bytes'];return raw
+def document(path,digest=None,size=None):return json.loads(data(path,digest,size))
+def indexed(root,digest):
+ index=document(root/'index.json',digest);seen=set()
+ for row in index['files']:
+  path=root/row['path'];assert path.is_relative_to(root)and '..'not in Path(row['path']).parts and row['path']not in seen;seen.add(row['path']);pinned(path,row['sha256'],row['bytes'])
+ return index
+def inventory(root):
+ rows=[]
+ for current,dirs,files in os.walk(root,followlinks=False):
+  for name in dirs+files:
+   p=Path(current)/name;s=p.lstat();kind='symlink'if stat.S_ISLNK(s.st_mode)else'directory'if stat.S_ISDIR(s.st_mode)else'file'if stat.S_ISREG(s.st_mode)else None
+   assert kind,p;rows.append({'path':str(p.relative_to(root)),'kind':kind})
+  for name in list(dirs):
+   if(Path(current)/name).is_symlink():dirs.remove(name)
+ return sorted(rows,key=lambda row:row['path'])
+def sealed_inputs(root):
+ manifest=document(root/'input-freeze.json')
+ for row in manifest['inputs']:pinned(root/row['path'],row['sha256'],row['bytes'])
+ for row in manifest.get('toolTrees',[]):
+  assert str(Path(row['path']).resolve())==row['realPath'];assert inventory(Path(row['path']))==row['entries']
+ for row in manifest.get('toolLinks',[]):
+  p=Path(row['path']);assert p.is_symlink()and os.readlink(p)==row['linkText']and str(p.resolve())==row['resolvedTarget']
+  if row['targetKind']=='file':pinned(row['resolvedTarget'],row['targetSha256'],row['targetBytes'])
+ return manifest
+def uleb(raw,offset):
+ value=0
+ for shift in range(0,35,7):
+  byte=raw[offset];offset+=1;value|=(byte&127)<<shift
+  if not byte&128:return value,offset
+ raise AssertionError('Invalid bounded ULEB')
+def sections(raw,version):
+ assert raw[:8]==b'\0asm'+version
+ cursor=8;rows=[]
+ while cursor<len(raw):
+  tag=raw[cursor];cursor+=1;size,cursor=uleb(raw,cursor);end=cursor+size;assert end<=len(raw);rows.append((tag,raw[cursor:end]));cursor=end
+ assert cursor==len(raw);return rows
+def source_of(command):
+ words=shlex.split(command);assert words.count('-c')==1;return words[words.index('-c')+1]
+def main():
+ root=document(ROOT,ROOTSHA);check('Root actual outer exit0 and exact source/family',root['rawExitCode']==0 and root['sourceIndexSha256']==SOURCESHA and root['validationFamilyIndexSha256']==FAMILYSHA)
+ for row in root['references']:pinned(row['path'],row['sha256'],row['bytes'])
+ own=indexed(SOURCE,SOURCESHA);family=indexed(FAMILY,FAMILYSHA)
+ source_peer=indexed(REPO/'tests/node-compat/foundation-zlib/independent-disabled-validation-source-review-v1','7ccc3c42e41961df7cb7f32faedd80ba9497c0c1ddf8b17d26f7d997d100a62e')
+ family_peer=indexed(REPO/'tests/node-compat/foundation-zlib/independent-component-validation-v7-family-review-v1','178ab2d0abbdc6c0ce825938de615db27aebed50dd0f93c19a8583b275193ec4')
+ source_inputs=sealed_inputs(SOURCE);family_inputs=sealed_inputs(FAMILY)
+ check('source10/family21 and pure preparation/full consumed seals',len(own['files'])==10 and len(family['files'])==21 and len(source_inputs['inputs'])==11059 and len(family_inputs['inputs'])==11036)
+ check('exact two tool trees and22 pinned links',len(family_inputs['toolTrees'])==2 and len(family_inputs['toolLinks'])==22)
+ config=document(FAMILY/'activation.json');pin_document=document(FAMILY/'reviewed-pins.json',config['pinsSha256']);authority=document(FAMILY/'root-review.json',config['rootReviewSha256']);pin=pin_document['variants']['disabled-off']
+ check('genuine reviewed validation-only authority remains nonoperational',pin_document['state']=='ROOT_REVIEWED_ZLIB350_VALIDATION_BOOTSTRAP_V1'and authority['validationBootstrapOnly']is True and authority['operationalAdmission']is False and config['operationalAdmission']is False)
+ check('source and component tools have distinct genuine roots',config['nativeConfiguredSourceRoot']=='/private/tmp/starling-node-compat/zlib-source-v4'and config['componentToolRoot']==str(REPO)and config['nativeConfiguredSourceRoot']!=config['componentToolRoot'])
+ for key in ['engineSha256','engineBytes','receiptSha256','freezeReceiptSha256']:assert pin[key]==config['actual']['disabled-off'][key]
+ for row in pin['frozenFiles']:pinned(row['path'],row['sha256'],row['bytes'])
+ frozen=document(pin['freezeReceiptPath'],pin['freezeReceiptSha256']);metadata=document(str(FROZEN/'disabled-off.engine.wasm')+'.build.json',pin['receiptSha256']);pinned(pin['enginePath'],ENGINE,pin['engineBytes'])
+ check('disabled metadata exact350/native flags/no backend proof',len(metadata['sourceManifest'])==350 and len(metadata['componentizeSourceManifest'])==3 and metadata['zlibEnabled']is False and metadata['gcStress']is False and metadata['entropyPolicy']=='off'and metadata['oomTesting']is False and metadata['zlibPolicy']['runtimeBackendProof']=={'verified':False,'version':None,'vernum':None})
+ for row in frozen['copies']:pinned(row['path'],row['sha256'],row['bytes'])
+ for row in metadata['sourceManifest']:pinned(Path(frozen['sourceRoot'])/row['path'],row['sha256'])
+ for row in metadata['componentizeSourceManifest']:pinned(Path(frozen['componentizeSourceRoot'])/row['path'],row['sha256'])
+ check('1024 current frozen copies and original metadata preserved',len(frozen['copies'])==1024 and frozen['nativeInputsVerified']==350 and frozen['externalEmbeddingInputsVerified']==3)
+ cache=data(pin['cachePath'],pin['cmakeCacheSha256']).decode();database=document(pin['commandsPath'],pin['compileCommandsSha256']);commands=[row['command']for row in database]
+ for key,value in {'NODE_COMPAT_ZLIB':'OFF','NODE_COMPAT_GC_STRESS':'OFF','NODE_COMPAT_OOM_TESTING':'OFF','NODE_COMPAT_ENTROPY_MODE':'OFF','CMAKE_BUILD_TYPE':'Release'}.items():assert re.search(r'^'+key+r':[^=]+='+value+r'$',cache,re.M)
+ actual=metadata['internalTickPolicy']['actualLayoutCompileCommands'];strict=metadata['strictEventExceptionPolicy']['actualNativeCompileCommands'];private=metadata['classicStreamsPolicy']['actualPrivateTargetCompileCommands'];embedding=metadata['actualEmbeddingCompileCommands']
+ check('actual native61/strict4/private5 and separate embedding1',len(actual)==61 and len(strict)==4 and len(private)==5 and len(embedding)==1 and all(command in commands for command in actual+strict+private))
+ check('zlib kernel not compiled and no ZLIB macro anywhere',not metadata['zlibPolicy']['actualKernelCompileCommands']and not any(source_of(command).endswith('/zlib/kernel.cpp')for command in actual)and all(not any(word.startswith(('-DNODE_COMPAT_ZLIB','-UNODE_COMPAT_ZLIB'))for word in shlex.split(command))for command in commands+embedding))
+ installed=data(next(row['path']for row in frozen['copies']if row['path'].endswith('-builtins.incl'))).decode();check('normal native Node profile still installed',bool(re.search(r'NS_DEF\(.*node',installed)))
+ manifests=[]
+ for row in metadata['selectedModuleManifests']:
+  m=document(Path(frozen['sourceRoot'])/row['path'],row['sha256']);manifests.append(m)
+ check('genuine raw350 selected manifests exclude both zlib IDs',all(name not in ('node:zlib','zlib')and 'zlib'not in module['aliases']for manifest in manifests for name,module in manifest['modules'].items()))
+ core=next(m for m in manifests if'node:child_process'in m['modules']);assert core['profileVersion']=='sm-node-22.14.0-m0.11'
+ report=document(OUTPUT/'results.json');complete=document(OUTPUT/'completion.json');check('report/completion bind original Root hashes and require external zero',complete['reportSha256']==sha(data(OUTPUT/'results.json'))and complete['requiresIndependentExitZero']is True and report['requiresIndependentOuterExitZero']is True)
+ artifacts=complete['artifacts'];seen=set()
+ for row in artifacts:assert row['path']not in seen;seen.add(row['path']);assert Path(row['path']).is_relative_to(OUTPUT);pinned(row['path'],row['sha256'],row['bytes'])
+ regular=[];links=[]
+ for current,dirs,files in os.walk(OUTPUT,followlinks=False):
+  for name in list(dirs):
+   path=Path(current)/name
+   if path.is_symlink():links.append(str(path));dirs.remove(name)
+  regular.extend(str(Path(current)/name)for name in files)
+ check('exact50 completion artifacts plus completion, no unknown outputs',len(artifacts)==50 and set(regular)==seen|{str(OUTPUT/'completion.json')})
+ check('one exact output node_modules link',len(complete['outputLinks'])==1 and links==[str(OUTPUT/'node_modules')]and complete['outputLinks']==root['outputLinks'])
+ for row in complete['outputLinks']:assert os.readlink(row['path'])==row['linkText']and str(Path(row['path']).resolve())==row['resolvedTarget']
+ terminal=document('/tmp/starling-node-compat/zlib-v4-disabled-selection-validation-v1.terminal.json');pinned(terminal['argv'][0],NODE_SHA);pinned(NODE,NODE_SHA)
+ check('actual Root launcher is pinned Node22/raw0/expected exact entry',Path(terminal['argv'][0]).resolve()==NODE.resolve()and terminal['argv'][1:]==[str(SOURCE/'run-disabled.mjs'),SOURCESHA,FAMILYSHA]and terminal['rawExitCode']==0)
+ stdout=data('/tmp/starling-node-compat/zlib-v4-disabled-selection-validation-v1.stdout.log').decode();assert data('/tmp/starling-node-compat/zlib-v4-disabled-selection-validation-v1.stderr.log')==b''
+ stdout_rows=[json.loads(line)for line in stdout.splitlines()];check('six progress records precede final successful stdout',len(stdout_rows)==7 and [r['sequence']for r in stdout_rows[:6]]==list(range(1,7))and stdout_rows[-1]['state']==report['state'])
+ raw_component=data(report['componentPath'],COMPONENT,12913583);component_sections=sections(raw_component,b'\x0d\x00\x01\x00');imports=sum(uleb(payload,0)[0]for tag,payload in component_sections if tag==10);exports=sum(uleb(payload,0)[0]for tag,payload in component_sections if tag==11)
+ check('actual outer component imports0/exports1, not nested core imports',imports==0 and exports==1)
+ wit=data(OUTPUT/'emitted.wit').decode();check('public WIT exactly sole run()->string',wit==report['emittedWit']and not re.search(r'\bimport\b',wit)and re.findall(r'export\s+([^;]+);',wit)==['run: func() -> string'])
+ check('actual report interface audit component hash/imports match',report['componentSha256']==COMPONENT and report['componentBytes']==12913583 and report['interfaceAudit']['componentSha256']==COMPONENT and report['interfaceAudit']['emittedImports']==[])
+ core_raw=data(OUTPUT/'disabled_smoke.core.wasm');sections(core_raw,b'\x01\x00\x00\x00');glue=data(OUTPUT/'disabled_smoke.js').decode();check('actual generated core byte-exact embedded and glue references core',core_raw in raw_component and 'disabled_smoke.core.wasm'in glue)
+ fixture=data(SOURCE/'fixtures.mjs').decode();smoke=re.search(r'export const smokeSource=`(.*?)`;\s*$',fixture,re.S).group(1);check('actual smoke source is exact held AB/U8 fixture, no Buffer.from(Array)',data(OUTPUT/'smoke.mjs').decode()==smoke and 'Buffer.from(backing,2,3)'in smoke and 'Buffer.from(shared)'in smoke and 'Buffer.from(['not in smoke)
+ bundle=data(OUTPUT/'smoke.bundle.mjs').decode();check('actual bundle only native buffer/child_process imports, no JS codec/Buffer adapter',set(re.findall(r'from [\"\']([^\"\']+)[\"\']',bundle))=={'node:buffer','node:child_process'}and'node_modules'not in bundle and'readable-stream'not in bundle)
+ expected_bytes={'sharedHex':'090203','copyHex':'010203','viewHex':'0203','sharedBacking':True,'sharedOffset':2,'viewBacking':True,'viewOffset':3,'copyIndependent':True,'globalBuffer':True}
+ refusal={key:{'own':True,'type':'string','value':value}for key,value in {'code':'ERR_SM_NODE_UNSUPPORTED','module':'node:child_process','operation':'exec','profile':core['profileVersion']}.items()}
+ def expected(calls):return {'calls':calls,'snapshot':{'bytes':expected_bytes,'call':refusal,'construction':refusal},'bytes':expected_bytes,'call':refusal,'construction':refusal,'namespace':sorted(core['modules']['node:child_process']['exports']),'defaultNamed':True,'allCallable':True,'thenType':'undefined','defaultThenType':'undefined'}
+ observations=report['observations'];check('five exact labels/counters',[(r['label'],r['calls'])for r in observations]==[('retained-1',1),('retained-2',2),('retained-3',3),('fresh-Jco',1),('fresh-Wasmtime',1)])
+ for row in observations:
+  value=expected(row['calls']);raw=data(row['rawFile']['path'],row['rawFile']['sha256'],row['rawFile']['bytes']).decode();assert raw==json.dumps(value,separators=(',',':'));assert row['value']==value and document(OUTPUT/'calls'/f"{row['label']}.observed.json")==value
+ check('all five complete raw/parsed results exactly validate bytes/identity/snapshot/stub fields',True)
+ wt=document(OUTPUT/'processes/disabled-smoke-wasmtime.terminal.json');pinned(wt['executable'],WT_SHA);check('fresh Wasmtime owned child terminal0/no timeout/output limit/retained group',wt['status']==0 and wt['signal']is None and wt['spawnError']is None and wt['timedOut']is False and wt['outputLimitExceeded']is False and wt['closed']is True and wt['ownedGroupGone']is True and wt['terminalExitZeroObserved']is True)
+ raw_wt=data(wt['stdout']['path'],wt['stdout']['sha256'],wt['stdout']['bytes']).decode();assert data(wt['stderr']['path'],wt['stderr']['sha256'],wt['stderr']['bytes'])==b'';inner=json.loads(raw_wt);check('full raw Wasmtime nested string independently double-decodes exactly',isinstance(inner,str)and inner==data(OUTPUT/'calls/fresh-Wasmtime.raw.txt').decode()and json.loads(inner)==expected(1))
+ denials=document(OUTPUT/'bundler-denials.json');check('eight exact canonical/bare ESM/CJS denials with zero componentizer calls',denials['componentizeCalls']==0 and denials['allBeforeComponentization']is True and len(denials['denials'])==8 and denials['denials']==report['denials'])
+ for i,row in enumerate(denials['denials']):
+  wanted_id=['node:zlib','zlib'][i//4];kind=['default-esm','named-esm','namespace-esm','literal-cjs'][i%4];assert row['id']==wanted_id and row['kind']==kind and row['rejected']is True and row['componentizeCallsAtEnd']==0 and row['preComponentizationOnly']is True and document(OUTPUT/'denials'/str(i)/'result.json')==row
+  expected_files={'entry.mjs':f'import z from {json.dumps(wanted_id)}; export function run(){{return typeof z;}}'}if kind=='default-esm'else {'entry.mjs':f'import {{gzipSync}} from {json.dumps(wanted_id)}; export function run(){{return typeof gzipSync;}}'}if kind=='named-esm'else {'entry.mjs':f'import * as z from {json.dumps(wanted_id)}; export function run(){{return typeof z;}}'}if kind=='namespace-esm'else {'entry.mjs':"import z from './literal.cjs'; export function run(){return typeof z;}",'literal.cjs':f'module.exports=require({json.dumps(wanted_id)});'}
+  for name,value in expected_files.items():assert data(OUTPUT/'denials'/str(i)/name).decode()==value
+  assert ('CommonJS require is not admitted: '+wanted_id if kind=='literal-cjs'else'Node builtin is not admitted by this profile: '+wanted_id)in row['error']['message']
+ check('all denial source texts and saved error records match exact ordinary import fixtures',True)
+ direct=document(OUTPUT/'direct-native-zlib-result.json');check('direct native generic rejection paired only with genuine successful smoke',direct['rejected']is True and direct['pairedValidSmoke']is True and direct['genericAbiErrorOnly']is True and direct['uniqueFailureCauseProven']is False and report['directNativeRejected']is True and report['directNativeCauseUniquelyIdentified']is False and report['componentizeCalls']==2)
+ assert data(OUTPUT/'direct-native-zlib.mjs').decode()=="import * as z from 'node:zlib'; export function run(){return typeof z;}\n"
+ check('no operational/backend/complete-zlib/reuse promotion',report['operationalAdmission']is False and report['noCompleteZlibSupport']is True and report['noInstanceReuseClaim']is True and root['runtimeBackendProof']=={'verified':False,'version':None,'vernum':None})
+ # Rehash every already inspected byte path after decoding, before this reader publishes.
+ for row in verified.values():
+  p=Path(row['path']);assert p.is_file()and not p.is_symlink()
+  assert file_sha(p)==row['sha256'],p
+ result={'schemaVersion':1,'state':'INDEPENDENT_ZLIB350_DISABLED_SELECTION_ACTUAL_RESULT_REVIEW_PASSED','sourceIndexSha256':SOURCESHA,'validationFamilyIndexSha256':FAMILYSHA,'rootReceiptSha256':ROOTSHA,'rawOuterExit':0,'engineSha256':ENGINE,'componentSha256':COMPONENT,'componentBytes':12913583,'outerComponentImports':[],'publicExports':['run: func() -> string'],'bundlerDenialsBeforeComponentization':8,'fullRawObservationsDecoded':5,'retainedCounters':[1,2,3],'freshJcoCounter':1,'freshWasmtimeCounter':1,'completionArtifactFiles':50,'outputLinks':1,'nativeSourcePaths':350,'externalEmbeddingSources':3,'frozenCopiesRehashed':1024,'nativeLayoutCompileCommands':61,'strictCompileCommands':4,'privateTargetCompileCommands':5,'embeddingCompileCommands':1,'inputPathRows':{'source':len(source_inputs['inputs']),'family':len(family_inputs['inputs'])},'toolTrees':2,'toolLinks':22,'verifiedUniquePaths':len(verified),'checks':checks,'passed':len(checks),'operationalAdmission':False,'runtimeBackendProof':{'verified':False,'version':None,'vernum':None},'uniqueDirectAbiFailureCauseProven':False,'requestReuseOrIsolationProven':False,'gcStressProof':False,'ownerHelpersOrActionsOrPreflightOrBundlerOrCompilerOrGuestOrHostsExecutedByReviewer':False,'reviewerActivity':'Read/streaming-hash, exact JSON and bounded public Wasm section decoding only.'}
+ for name,value in [('results.json',result),('verified-paths.json',sorted(verified.values(),key=lambda r:r['path'])),('path-aliases.json',aliases)]:
+  with(HERE/name).open('x')as stream:json.dump(value,stream,indent=2);stream.write('\n')
+ print(json.dumps({'state':result['state'],'checks':len(checks),'verifiedUniquePaths':len(verified)}))
+if __name__=='__main__':main()

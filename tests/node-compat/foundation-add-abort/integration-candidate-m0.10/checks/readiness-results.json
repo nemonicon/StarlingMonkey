@@ -1,0 +1,47 @@
+{
+  "scope": "Final exact-source host admission/differential facade/parser replay; no guest or native build",
+  "cases": [
+    {
+      "name": "selection",
+      "command": [
+        "env",
+        "NODE_COMPAT_TOOLCHAIN=/tmp/starling-node-compat/native-toolchain-lock",
+        "/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-add-abort/integration-candidate-m0.10/source/tests/node-compat/module-selection-test.mjs"
+      ],
+      "exitCode": 0,
+      "stdout": "{\n  \"node\": \"v22.14.0\",\n  \"tests\": 328,\n  \"passed\": 328,\n  \"failures\": [],\n  \"scope\": \"build-time manifest, engine receipt and bundle selection; no engine execution claimed\"\n}\n",
+      "stderr": "(node:45358) [DEP0025] DeprecationWarning: sys is deprecated. Use util instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n"
+    },
+    {
+      "name": "events-node",
+      "command": [
+        "/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-add-abort/integration-candidate-m0.10/source/tests/node-compat/foundation-events/run-native-node.mjs"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"differentialCases\":27,\"profile\":{\"deferred\":11,\"limits\":3,\"eventNameCoercionDeferred\":true}}\n",
+      "stderr": ""
+    },
+    {
+      "name": "facade",
+      "command": [
+        "/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-add-abort/integration-candidate-m0.10/checks/source-facade.mjs"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"passed\":4,\"state\":\"HOST_SOURCE_ONLY_NO_NATIVE_PROTECTION_OR_GUEST_PROOF\"}\n",
+      "stderr": ""
+    }
+  ],
+  "shellSyntax": true,
+  "embeddedPythonParsed": [
+    "PY",
+    "PYINPUT",
+    "PYEMBED",
+    "PY"
+  ],
+  "recipeSha256": "354cbc8c5317bf14f022fd14a9687e382b99c2141135629b56bb541ef6308754",
+  "admissionSourceSha256": "7e336b6b009e48badd2da3587173c85eea42f584d07f3802ae084e6e472102aa",
+  "admissionTestSha256": "a52c7fad368636ac74afc687375d27b59aee642efed1d2da7eebf88466155447"
+}

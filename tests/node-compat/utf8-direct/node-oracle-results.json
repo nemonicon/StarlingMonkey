@@ -1,0 +1,1359 @@
+{
+  "schemaVersion": 1,
+  "verifiedAtUtc": "2026-11-03T04:41:59.670Z",
+  "node": "v22.14.0",
+  "versions": {
+    "node": "22.14.0",
+    "acorn": "8.14.0",
+    "ada": "2.9.2",
+    "amaro": "0.3.0",
+    "ares": "1.34.4",
+    "brotli": "1.1.0",
+    "cjs_module_lexer": "1.4.1",
+    "cldr": "46.0",
+    "icu": "76.1",
+    "llhttp": "9.2.1",
+    "modules": "127",
+    "napi": "10",
+    "nbytes": "0.1.1",
+    "ncrypto": "0.0.1",
+    "nghttp2": "1.64.0",
+    "nghttp3": "1.6.0",
+    "ngtcp2": "1.10.0",
+    "openssl": "3.0.15+quic",
+    "simdjson": "3.10.1",
+    "simdutf": "6.0.3",
+    "sqlite": "3.47.2",
+    "tz": "2024b",
+    "undici": "6.21.1",
+    "unicode": "16.0",
+    "uv": "1.49.2",
+    "uvwasi": "0.0.21",
+    "v8": "12.4.254.21-node.22",
+    "zlib": "1.3.0.1-motley-82a5fec"
+  },
+  "executable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+  "executableSha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+  "execArgv": [],
+  "nodeOptionsPresent": false,
+  "sharedCasesSha256": "35efb79478c5d8c1452245cc9a173ef48540e17c9f7481f3427a2974803019fb",
+  "runnerSha256": "e0af87854f66ec4dcc75647791358e8a8d32cbe8d422660264b35fd6b333048c",
+  "injectedImplementations": {
+    "TextEncoder": "actual Node global",
+    "Buffer": "actual node:buffer",
+    "gc": "not injected"
+  },
+  "cases": [
+    {
+      "name": "default and primitive input conversion",
+      "passed": true,
+      "assertionCount": 277,
+      "observations": [
+        {
+          "label": "omitted",
+          "byteLength": 0
+        },
+        {
+          "label": "undefined",
+          "byteLength": 0
+        },
+        {
+          "label": "null",
+          "byteLength": 4
+        },
+        {
+          "label": "false",
+          "byteLength": 5
+        },
+        {
+          "label": "true",
+          "byteLength": 4
+        },
+        {
+          "label": "zero",
+          "byteLength": 1
+        },
+        {
+          "label": "negative zero",
+          "byteLength": 1
+        },
+        {
+          "label": "negative integer",
+          "byteLength": 4
+        },
+        {
+          "label": "fraction",
+          "byteLength": 4
+        },
+        {
+          "label": "NaN",
+          "byteLength": 3
+        },
+        {
+          "label": "positive infinity",
+          "byteLength": 8
+        },
+        {
+          "label": "negative infinity",
+          "byteLength": 9
+        },
+        {
+          "label": "BigInt",
+          "byteLength": 30
+        },
+        {
+          "label": "Symbol",
+          "errorName": "TypeError"
+        }
+      ]
+    },
+    {
+      "name": "ToString hook order, hint and original exceptions",
+      "passed": true,
+      "assertionCount": 27,
+      "observations": [
+        {
+          "primitiveHookOrder": [
+            "get @@toPrimitive",
+            "call @@toPrimitive:string"
+          ],
+          "fallbackHookOrder": [
+            "get @@toPrimitive",
+            "get toString",
+            "call toString",
+            "get valueOf",
+            "call valueOf"
+          ],
+          "sentinelStages": 6
+        }
+      ]
+    },
+    {
+      "name": "hand-written UTF-16 scalar and replacement byte vectors",
+      "passed": true,
+      "assertionCount": 214,
+      "observations": [
+        {
+          "label": "empty",
+          "codeUnits": 0,
+          "expectedBytes": []
+        },
+        {
+          "label": "ASCII",
+          "codeUnits": 6,
+          "expectedBytes": [
+            65,
+            122,
+            48,
+            57,
+            32,
+            126
+          ]
+        },
+        {
+          "label": "embedded NUL",
+          "codeUnits": 3,
+          "expectedBytes": [
+            0,
+            65,
+            0
+          ]
+        },
+        {
+          "label": "leading BOM",
+          "codeUnits": 2,
+          "expectedBytes": [
+            239,
+            187,
+            191,
+            88
+          ]
+        },
+        {
+          "label": "Latin1 boundaries",
+          "codeUnits": 3,
+          "expectedBytes": [
+            127,
+            194,
+            128,
+            195,
+            191
+          ]
+        },
+        {
+          "label": "BMP width boundaries",
+          "codeUnits": 2,
+          "expectedBytes": [
+            223,
+            191,
+            224,
+            160,
+            128
+          ]
+        },
+        {
+          "label": "BMP around surrogate range",
+          "codeUnits": 3,
+          "expectedBytes": [
+            237,
+            159,
+            191,
+            238,
+            128,
+            128,
+            239,
+            191,
+            191
+          ]
+        },
+        {
+          "label": "supplementary pairs",
+          "codeUnits": 4,
+          "expectedBytes": [
+            240,
+            159,
+            152,
+            128,
+            240,
+            157,
+            132,
+            158
+          ]
+        },
+        {
+          "label": "largest scalar",
+          "codeUnits": 2,
+          "expectedBytes": [
+            244,
+            143,
+            191,
+            191
+          ]
+        },
+        {
+          "label": "lone high surrogate",
+          "codeUnits": 1,
+          "expectedBytes": [
+            239,
+            191,
+            189
+          ]
+        },
+        {
+          "label": "lone low surrogate",
+          "codeUnits": 1,
+          "expectedBytes": [
+            239,
+            191,
+            189
+          ]
+        },
+        {
+          "label": "separated surrogates",
+          "codeUnits": 3,
+          "expectedBytes": [
+            239,
+            191,
+            189,
+            65,
+            239,
+            191,
+            189
+          ]
+        },
+        {
+          "label": "high-high-low-low",
+          "codeUnits": 4,
+          "expectedBytes": [
+            239,
+            191,
+            189,
+            240,
+            144,
+            128,
+            128,
+            239,
+            191,
+            189
+          ]
+        },
+        {
+          "label": "low-high pair",
+          "codeUnits": 3,
+          "expectedBytes": [
+            239,
+            191,
+            189,
+            240,
+            159,
+            152,
+            128
+          ]
+        }
+      ]
+    },
+    {
+      "name": "fresh exact-length outputs around small allocation boundaries",
+      "passed": true,
+      "assertionCount": 69541,
+      "observations": [
+        {
+          "byteLength": 0,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 1,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 7,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 8,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 15,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 16,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 31,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 32,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 47,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 48,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 63,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 64,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 65,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 95,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 96,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 97,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 127,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 128,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 129,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 255,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 256,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 257,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 1023,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 1024,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 1025,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 4095,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 4096,
+          "freshObject": true,
+          "independentBacking": true
+        },
+        {
+          "byteLength": 4097,
+          "freshObject": true,
+          "independentBacking": true
+        }
+      ]
+    },
+    {
+      "name": "concatenation, sliced strings and surrogate pairs across concatenations",
+      "passed": true,
+      "assertionCount": 5675,
+      "observations": [
+        {
+          "repetitions": 257,
+          "codeUnits": 1542,
+          "byteLength": 2827,
+          "representationScope": "Logical concatenation/slice inputs; no assertion of engine-private rope layout."
+        }
+      ]
+    },
+    {
+      "name": "encodeInto complete scalar boundaries, offsets and untouched sentinels",
+      "passed": true,
+      "assertionCount": 1554,
+      "observations": [
+        {
+          "sourceCodeUnits": 0,
+          "columns": [
+            "offset",
+            "capacity",
+            "read",
+            "written"
+          ],
+          "matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              2,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              2,
+              0,
+              0
+            ],
+            [
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              1,
+              0,
+              0
+            ],
+            [
+              3,
+              2,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "sourceCodeUnits": 3,
+          "columns": [
+            "offset",
+            "capacity",
+            "read",
+            "written"
+          ],
+          "matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              0,
+              2,
+              2,
+              2
+            ],
+            [
+              0,
+              3,
+              3,
+              3
+            ],
+            [
+              0,
+              4,
+              3,
+              3
+            ],
+            [
+              0,
+              5,
+              3,
+              3
+            ],
+            [
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              2,
+              2,
+              2
+            ],
+            [
+              1,
+              3,
+              3,
+              3
+            ],
+            [
+              1,
+              4,
+              3,
+              3
+            ],
+            [
+              1,
+              5,
+              3,
+              3
+            ],
+            [
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              1,
+              1,
+              1
+            ],
+            [
+              3,
+              2,
+              2,
+              2
+            ],
+            [
+              3,
+              3,
+              3,
+              3
+            ],
+            [
+              3,
+              4,
+              3,
+              3
+            ],
+            [
+              3,
+              5,
+              3,
+              3
+            ]
+          ]
+        },
+        {
+          "sourceCodeUnits": 5,
+          "columns": [
+            "offset",
+            "capacity",
+            "read",
+            "written"
+          ],
+          "matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              0,
+              2,
+              1,
+              1
+            ],
+            [
+              0,
+              3,
+              2,
+              3
+            ],
+            [
+              0,
+              4,
+              2,
+              3
+            ],
+            [
+              0,
+              5,
+              2,
+              3
+            ],
+            [
+              0,
+              6,
+              2,
+              3
+            ],
+            [
+              0,
+              7,
+              4,
+              7
+            ],
+            [
+              0,
+              8,
+              5,
+              8
+            ],
+            [
+              0,
+              9,
+              5,
+              8
+            ],
+            [
+              0,
+              10,
+              5,
+              8
+            ],
+            [
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              2,
+              1,
+              1
+            ],
+            [
+              1,
+              3,
+              2,
+              3
+            ],
+            [
+              1,
+              4,
+              2,
+              3
+            ],
+            [
+              1,
+              5,
+              2,
+              3
+            ],
+            [
+              1,
+              6,
+              2,
+              3
+            ],
+            [
+              1,
+              7,
+              4,
+              7
+            ],
+            [
+              1,
+              8,
+              5,
+              8
+            ],
+            [
+              1,
+              9,
+              5,
+              8
+            ],
+            [
+              1,
+              10,
+              5,
+              8
+            ],
+            [
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              1,
+              1,
+              1
+            ],
+            [
+              3,
+              2,
+              1,
+              1
+            ],
+            [
+              3,
+              3,
+              2,
+              3
+            ],
+            [
+              3,
+              4,
+              2,
+              3
+            ],
+            [
+              3,
+              5,
+              2,
+              3
+            ],
+            [
+              3,
+              6,
+              2,
+              3
+            ],
+            [
+              3,
+              7,
+              4,
+              7
+            ],
+            [
+              3,
+              8,
+              5,
+              8
+            ],
+            [
+              3,
+              9,
+              5,
+              8
+            ],
+            [
+              3,
+              10,
+              5,
+              8
+            ]
+          ]
+        },
+        {
+          "sourceCodeUnits": 3,
+          "columns": [
+            "offset",
+            "capacity",
+            "read",
+            "written"
+          ],
+          "matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              2,
+              0,
+              0
+            ],
+            [
+              0,
+              3,
+              1,
+              3
+            ],
+            [
+              0,
+              4,
+              2,
+              4
+            ],
+            [
+              0,
+              5,
+              2,
+              4
+            ],
+            [
+              0,
+              6,
+              2,
+              4
+            ],
+            [
+              0,
+              7,
+              3,
+              7
+            ],
+            [
+              0,
+              8,
+              3,
+              7
+            ],
+            [
+              0,
+              9,
+              3,
+              7
+            ],
+            [
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              2,
+              0,
+              0
+            ],
+            [
+              1,
+              3,
+              1,
+              3
+            ],
+            [
+              1,
+              4,
+              2,
+              4
+            ],
+            [
+              1,
+              5,
+              2,
+              4
+            ],
+            [
+              1,
+              6,
+              2,
+              4
+            ],
+            [
+              1,
+              7,
+              3,
+              7
+            ],
+            [
+              1,
+              8,
+              3,
+              7
+            ],
+            [
+              1,
+              9,
+              3,
+              7
+            ],
+            [
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              1,
+              0,
+              0
+            ],
+            [
+              3,
+              2,
+              0,
+              0
+            ],
+            [
+              3,
+              3,
+              1,
+              3
+            ],
+            [
+              3,
+              4,
+              2,
+              4
+            ],
+            [
+              3,
+              5,
+              2,
+              4
+            ],
+            [
+              3,
+              6,
+              2,
+              4
+            ],
+            [
+              3,
+              7,
+              3,
+              7
+            ],
+            [
+              3,
+              8,
+              3,
+              7
+            ],
+            [
+              3,
+              9,
+              3,
+              7
+            ]
+          ]
+        },
+        {
+          "sourceCodeUnits": 2,
+          "columns": [
+            "offset",
+            "capacity",
+            "read",
+            "written"
+          ],
+          "matrix": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              2,
+              0,
+              0
+            ],
+            [
+              0,
+              3,
+              1,
+              3
+            ],
+            [
+              0,
+              4,
+              1,
+              3
+            ],
+            [
+              0,
+              5,
+              1,
+              3
+            ],
+            [
+              0,
+              6,
+              2,
+              6
+            ],
+            [
+              0,
+              7,
+              2,
+              6
+            ],
+            [
+              0,
+              8,
+              2,
+              6
+            ],
+            [
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              2,
+              0,
+              0
+            ],
+            [
+              1,
+              3,
+              1,
+              3
+            ],
+            [
+              1,
+              4,
+              1,
+              3
+            ],
+            [
+              1,
+              5,
+              1,
+              3
+            ],
+            [
+              1,
+              6,
+              2,
+              6
+            ],
+            [
+              1,
+              7,
+              2,
+              6
+            ],
+            [
+              1,
+              8,
+              2,
+              6
+            ],
+            [
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              1,
+              0,
+              0
+            ],
+            [
+              3,
+              2,
+              0,
+              0
+            ],
+            [
+              3,
+              3,
+              1,
+              3
+            ],
+            [
+              3,
+              4,
+              1,
+              3
+            ],
+            [
+              3,
+              5,
+              1,
+              3
+            ],
+            [
+              3,
+              6,
+              2,
+              6
+            ],
+            [
+              3,
+              7,
+              2,
+              6
+            ],
+            [
+              3,
+              8,
+              2,
+              6
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "captured encoder methods survive public prototype replacement",
+      "passed": true,
+      "assertionCount": 19,
+      "observations": [
+        {
+          "replacedCalls": 0,
+          "bufferCaptureChecked": true
+        }
+      ]
+    },
+    {
+      "name": "bounded Buffer UTF-8 bytes, lengths and backing relationships",
+      "passed": true,
+      "assertionCount": 462,
+      "observations": [
+        {
+          "label": "empty",
+          "byteLength": 0,
+          "visibleBytesIndependent": true,
+          "backingScope": "Offsets/pooling intentionally unrestricted; backing view must cover the visible bytes."
+        },
+        {
+          "label": "ASCII",
+          "byteLength": 6,
+          "visibleBytesIndependent": true,
+          "backingScope": "Offsets/pooling intentionally unrestricted; backing view must cover the visible bytes."
+        },
+        {
+          "label": "embedded NUL",
+          "byteLength": 3,
+          "visibleBytesIndependent": true,
+          "backingScope": "Offsets/pooling intentionally unrestricted; backing view must cover the visible bytes."
+        },
+        {
+          "label": "leading BOM",
+          "byteLength": 4,
+          "visibleBytesIndependent": true,
+          "backingScope": "Offsets/pooling intentionally unrestricted; backing view must cover the visible bytes."
+        },
+        {
+          "label": "Latin1 boundaries",
+          "byteLength": 5,
+          "visibleBytesIndependent": true,
+          "backingScope": "Offsets/pooling intentionally unrestricted; backing view must cover the visible bytes."
+        },
+        {
+          "label": "BMP width boundaries",
+          "byteLength": 5,
+          "visibleBytesIndependent": true,
+          "backingScope": "Offsets/pooling intentionally unrestricted; backing view must cover the visible bytes."
+        },
+        {
+          "label": "BMP around surrogate range",
+          "byteLength": 9,
+          "visibleBytesIndependent": true,
+          "backingScope": "Offsets/pooling intentionally unrestricted; backing view must cover the visible bytes."
+        },
+        {
+          "label": "supplementary pairs",
+          "byteLength": 8,
+          "visibleBytesIndependent": true,
+          "backingScope": "Offsets/pooling intentionally unrestricted; backing view must cover the visible bytes."
+        },
+        {
+          "label": "largest scalar",
+          "byteLength": 4,
+          "visibleBytesIndependent": true,
+          "backingScope": "Offsets/pooling intentionally unrestricted; backing view must cover the visible bytes."
+        },
+        {
+          "label": "lone high surrogate",
+          "byteLength": 3,
+          "visibleBytesIndependent": true,
+          "backingScope": "Offsets/pooling intentionally unrestricted; backing view must cover the visible bytes."
+        },
+        {
+          "label": "lone low surrogate",
+          "byteLength": 3,
+          "visibleBytesIndependent": true,
+          "backingScope": "Offsets/pooling intentionally unrestricted; backing view must cover the visible bytes."
+        },
+        {
+          "label": "separated surrogates",
+          "byteLength": 7,
+          "visibleBytesIndependent": true,
+          "backingScope": "Offsets/pooling intentionally unrestricted; backing view must cover the visible bytes."
+        },
+        {
+          "label": "high-high-low-low",
+          "byteLength": 10,
+          "visibleBytesIndependent": true,
+          "backingScope": "Offsets/pooling intentionally unrestricted; backing view must cover the visible bytes."
+        },
+        {
+          "label": "low-high pair",
+          "byteLength": 7,
+          "visibleBytesIndependent": true,
+          "backingScope": "Offsets/pooling intentionally unrestricted; backing view must cover the visible bytes."
+        }
+      ]
+    }
+  ],
+  "caseCount": 8,
+  "assertionCount": 77769,
+  "observationCount": 78,
+  "bufferChecked": true,
+  "gcBoundaryCalls": 0,
+  "scope": "Bounded UTF-8 TextEncoder and optional Buffer tests; not complete Web API or Buffer conformance.",
+  "allocationSizes": [
+    0,
+    1,
+    7,
+    8,
+    15,
+    16,
+    31,
+    32,
+    47,
+    48,
+    63,
+    64,
+    65,
+    95,
+    96,
+    97,
+    127,
+    128,
+    129,
+    255,
+    256,
+    257,
+    1023,
+    1024,
+    1025,
+    4095,
+    4096,
+    4097
+  ],
+  "unicodeVectorCount": 14
+}

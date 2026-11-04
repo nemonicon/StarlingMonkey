@@ -1,0 +1,1 @@
+import{addAbortListener}from'node:events';import{spawn}from'node:child_process';const c=new AbortController();c.abort();addAbortListener(c.signal,()=>spawn());export function run(){return'must-not-return'}

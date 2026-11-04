@@ -1,0 +1,215 @@
+"""Independent source/data-only reconstruction. Imports no owner code."""
+from pathlib import Path
+import hashlib,json,os,stat,difflib,ast
+HERE=Path(__file__).resolve().parent;FAMILY=HERE.parent
+ACTUAL=FAMILY/'measurement-execution-activated-v2'
+BASE=FAMILY/'measurement-execution-candidate-v1'
+AMEND=FAMILY/'measurement-execution-deadline-amendment-v1'
+SOURCE=Path('/private/tmp/starling-node-compat/classic-benchmark-trace-v2-source')
+DECLARED=Path('/tmp/starling-node-compat/classic-benchmark-trace-v2-source')
+PRODUCER=SOURCE/'tests/node-compat/foundation-classic-streams/measurement-producer-candidate-v3'
+FREEZE=Path('/tmp/starling-node-compat/classic-benchmark-trace-v3-artifacts/native-freeze')
+INDEX='1b801439258792c19b9cbc2527d04940c35fb0750f4c26b82a30df6802407612'
+PARENT='4b6fdfa51d41120865114b0e8558dbc6e97fdd63007e108a35c264d20bc0280d'
+MANDATORY='b0975b544506df8000e21de1bfdc8c4fc07c38d01a850fd56f7be422bee339a9'
+PAIR='f36268516df72ac5b0d5b5ae8fd808d1ce94d40ca364dc533c522fe399b2681e'
+REVIEW='2bfa334981d1fc63ae05280fcb0c2afb9d8ea22e5e1451ae796d7c756479950e'
+PRODUCER_SHA='46c031d36c1691c3980c51d44102e1a7cc651ff4bf8b9470c9e746697eece8bc'
+RECIPE='d98d1129db0a55abe18c2b96e7fe314ab27d6bc9a2ef481abed3f07d996fbba6'
+ROOT_SHA='0a600573f83019ef33d566eac08b9f027bda00cb130c68be65091ee5843a4e37'
+seen={};expected={};checks=[]
+def sha(raw):return hashlib.sha256(raw).hexdigest()
+def read(path,h=None,size=None):
+ p=Path(path);a=p.lstat();assert stat.S_ISREG(a.st_mode)and not p.is_symlink(),p;raw=p.read_bytes();b=p.lstat()
+ assert(a.st_dev,a.st_ino,a.st_size,a.st_mtime_ns)==(b.st_dev,b.st_ino,b.st_size,b.st_mtime_ns),p
+ digest=sha(raw);assert h is None or digest==h,p;assert size is None or len(raw)==size,p
+ key=str(p.resolve(strict=True));row={'path':key,'sha256':digest,'bytes':len(raw)};assert key not in seen or seen[key]==row,p;seen[key]=row;return raw
+def doc(path,h=None):return json.loads(read(path,h))
+def add(path,h=None,size=None):
+ raw=read(path,h,size);key=str(Path(path).resolve(strict=True));row={'path':key,'sha256':sha(raw),'bytes':len(raw)}
+ assert key not in expected or expected[key]==row,key;expected[key]=row
+def indexed(root,h,consume=False):
+ j=doc(root/'index.json',h);names=set()
+ if consume:add(root/'index.json',h)
+ for row in j['files']:
+  name=row['path'];assert name not in names and not Path(name).is_absolute()and all(x not in('','.','..')for x in name.split('/'));names.add(name)
+  p=root
+  for x in name.split('/'):p/=x;assert not p.is_symlink(),p
+  (add if consume else read)(p,row['sha256'],row['bytes'])
+ return j
+def check(s):checks.append(s)
+assert not(HERE/'results.json').exists()
+actual=indexed(ACTUAL,INDEX);assert len(actual['files'])==35
+root=doc(FAMILY/'production-adoption-v1/common-byte-v2-source-and-preflights-root-results.json',ROOT_SHA)
+assert root['activationRootSession']==69131 and root['activationRawOuterExit']==0 and root['preflightRootSession']==24691 and root['preflightRawOuterExit']==0
+assert root['sourceIndexSha256']==INDEX and root['fourArmComponentCorrectness']=='not executed' and root['timingAllowed']is False
+for row in root['files']:read(row['path'],row['sha256'],row['bytes'])
+check('actual35 generated files and all Root activation/preflight evidence authenticated; raw0 events remain Root-reported only')
+parents=[(AMEND,MANDATORY),(BASE,PARENT),(PRODUCER,PRODUCER_SHA)]
+parents += [(FAMILY/name,h)for name,h in [
+ ('measurement-common-byte-domain-candidate-v1','fbf4790df0beed34511a13553d07fd9bf57a5919bcf9338db2844f5826ebbdae'),
+ ('measurement-workload-candidate-v1','39774bbadae98f70e777edb8801ed0ea70d50430f7193f0f4a7fce3630cca41c'),
+ ('independent-common-byte-domain-source-review-v1','dac15efbe770ccdd8108ff768428c3ddf4a7b835b00c991763884b892412bc24'),
+ ('measurement-correctness-candidate-v1','138a4e0bcfe22ef3b48375257a50958f595dcebb607fc9267a30080948d612da'),
+ ('measurement-correctness-reporting-amendment-v1','0558b50589680f9e1b812c8a62210233a768385bfabeae2f07be47c2e1fe5350'),
+ ('measurement-correctness-persistence-amendment-v1','60a8687e9b6bfff4c68df2a36e9dd47ad0f5cd327441f8cf32d63caa67518ba8'),
+ ('independent-measurement-execution-source-review-v1','96bc44a3c926b3ef4c1f99ba009629b88118162ff54d6358ef0ce29e4e0bd4e0')]]
+for path,h in parents:
+ indexed(path,h,True)
+ if(path/'input-freeze.json').exists():
+  for row in doc(path/'input-freeze.json')['inputs']:add(path/row['path'],row['sha256'],row['bytes'])
+peer=indexed(FAMILY/'independent-measurement-execution-deadline-source-review-v1','9e602ec9ec05d21e83c26d7d3cc01b36bd401e050929ad7028e41e0ddab632d5')
+check('all source ancestry and mandatory amendment/old M1 review bytes authenticated without running helpers')
+pin_path=FAMILY/'production-adoption-v1/reviewed-diagnostic-v3-pair-pins.json';review_path=FAMILY/'production-adoption-v1/diagnostic-v3-pair-root-review-receipt.json'
+add(pin_path,PAIR);add(review_path,REVIEW)
+pin_raw=read(ACTUAL/'reviewed-pair.json',PAIR);review_raw=read(ACTUAL/'root-pair-review.json',REVIEW)
+assert pin_raw==read(pin_path,PAIR)and review_raw==read(review_path,REVIEW)
+pins=json.loads(pin_raw);review=json.loads(review_raw)
+assert pins['state']=='ROOT_REVIEWED_CLASSIC_TRACE_BENCHMARK_DIAGNOSTIC_FREEZES_V3'and review['state']=='ROOT_REVIEWED_COMMON_BYTE_DIAGNOSTIC_PAIR_V1'
+assert review['reviewedPinsSha256']==PAIR and review['timingAllowed']is review['performanceClaim']is review['runtimeAcceptanceClaim']is False
+assert pins['requiresIndependentReviewAndSeparateRootAuthority']is False and pins['consumerPinsModified']is False
+assert DECLARED.resolve(strict=True)==SOURCE and not DECLARED.is_symlink()and not SOURCE.is_symlink()
+actual_tuples={};receipts={}
+for label,engine,native_peer,proof_sha in [
+ ('benchmark-classic-on','12a8f7dc79e12e8bc3519b3fe72e898b226bbabde6930e63d3a6c30706b88274','independent-measurement-producer-v3-on-native-review-v1','c05afb8d47edfec5e024578583c9b166d44f94edc44093b9a828352d8abbd019'),
+ ('benchmark-classic-off','4e1f62ea9ee192e1f288e4f5f6bc1e8ea5f3b259e8ae56527930cf90c1a72d94','independent-measurement-producer-v3-off-native-review-v1','ca2debb8964c7722503c1e398a0f69c04bfa008c1b9560ce842dfca7896e777e')]:
+ pin=pins['variants'][label];assert pin['engineSha256']==engine and pin['sourceIndexSha256']==PRODUCER_SHA and pin['recipeSha256']==RECIPE
+ assert pin['reviewRequired']is False and pin['classicStreamsEnabled']is(label=='benchmark-classic-on')
+ for k in ['engineSha256','engineBytes','metadataSha256','freezeReceiptSha256']:assert pin[k]==review['variants'][label][k]
+ assert review['variants'][label]['independentProofIndexSha256']==proof_sha
+ indexed(FAMILY/native_peer,proof_sha)
+ read(FAMILY/native_peer/'results.json',review['variants'][label]['independentProofResultSha256'])
+ receipt=doc(FREEZE/(label+'-freeze-receipt.json'),pin['freezeReceiptSha256']);add(FREEZE/(label+'-freeze-receipt.json'),pin['freezeReceiptSha256'])
+ metadata=doc(FREEZE/(label+'.engine.wasm.build.json'),pin['metadataSha256']);receipts[label]=(receipt,metadata)
+ assert len(receipt['copies'])==525 and metadata['diagnosticOnly']is True and metadata['gcStress']is False
+ originals=0
+ for row in receipt['copies']:
+  add(row['path'],row['sha256'],row['bytes'])
+  if row['original']is not None:read(row['original'],row['sha256'],row['bytes']);originals+=1
+ assert originals==521
+ assert len(metadata['sourceManifest'])==342
+ for row in metadata['sourceManifest']:add(SOURCE/row['path'],row['sha256'])
+ actual_tuples[label]={k:pin[k]for k in ['engineSha256','engineBytes','metadataSha256','freezeReceiptSha256']}
+ assert review['freshRootRechecks'][label]=={'copies':525,'originalReferences':521,'metadataSourceRows':342,'proofFiles':6}
+contract=doc(PRODUCER/'contract.json');assert len(contract['addonSources'])==2
+for row in contract['addonSources']:add(SOURCE/row['path'],row['sha256'])
+tooling=receipts['benchmark-classic-on'][0]['toolDependencyClosure'];assert len(tooling)==92
+for row in tooling:add(SOURCE/row['sourcePath'],row['sha256'],row['bytes'])
+old=doc(FAMILY/'production-adoption-v1/reviewed-diagnostic-v3-on-pins.json','2e9811a54b03733d7d4dde0b42f66831a9b97da2c2f26313f078443dc329165c')
+read(FAMILY/'production-adoption-v1/diagnostic-v3-on-root-review-receipt.json','9681578ea64c826f72baa1e1bff1533af276ff27d6dda52c5bf1dbe064697001')
+assert old['variants']['benchmark-classic-off']is None and old['variants']['benchmark-classic-on']['engineSha256']==actual_tuples['benchmark-classic-on']['engineSha256']
+export=review['originalUnreviewedExport'];doc(export['path'],export['sha256'])
+check('new pair genuine ON/OFF tuples/proofs/525 copies and521 originals each agree; original ON-only authority unchanged')
+original=doc(FAMILY/'measurement-correctness-candidate-v1/input-freeze.json')
+assert len(original['toolTrees'])==2 and len(original['toolLinks'])==22
+for row in original['toolTrees']:
+ path=Path(row['path']);assert path.is_dir()and not path.is_symlink()and str(path.resolve(strict=True))==row['realPath'];members=[]
+ for directory,dirs,files in os.walk(path,followlinks=False):
+  for name in sorted(dirs+files):
+   p=Path(directory)/name;mode=p.lstat().st_mode;kind='symlink'if stat.S_ISLNK(mode)else'directory'if stat.S_ISDIR(mode)else'file'if stat.S_ISREG(mode)else None;assert kind;members.append({'path':str(p.relative_to(path)),'kind':kind})
+   if kind=='file':add(p)
+  dirs[:]=[name for name in dirs if not(Path(directory)/name).is_symlink()]
+ assert sorted(members,key=lambda r:r['path'])==row['entries']
+for row in original['toolLinks']:
+ p=Path(row['path']);target=p.resolve(strict=True);assert p.is_symlink()and os.readlink(p)==row['linkText']and str(target)==row['resolvedTarget']
+ assert any(target.is_relative_to(Path(x['realPath']))for x in original['toolTrees'])
+ assert ('directory'if target.is_dir()else'file')==row['targetKind']
+ if row['targetKind']=='file':add(target,row['targetSha256'],row['targetBytes'])
+names=['protocol.mjs','compact-oracle.mjs','capture-before.mjs','native-provider.mjs','canonical-provider.mjs','stock-provider.mjs','guest.mjs','workload.mjs','control-workload.mjs','classic-streams.mjs','classic-core.generated.mjs','stock-source-graph.json','node-common-oracle.json','node-control-oracle.json','provider-notices.json','bundle-matched.mjs','prepare-correctness.mjs','instantiate.mjs','bounded-comparison.mjs','phase.mjs','collect-worker.mjs','measure.mjs','consumed.mjs','runtime-preflight.template.mjs','future-pair-authority.json','future-measurement-phase.json']
+payload={name:read(BASE/name)for name in names}
+for name in ['prepare-correctness.mjs','collect-worker.mjs','measure.mjs']:payload[name]=read(AMEND/'proposed'/name)
+for name in ['deadline-policy.mjs','owned-host.mjs','audit-inputs.mjs']:payload[name]=read(AMEND/name)
+payload['reviewed-pair.json']=pin_raw;payload['root-pair-review.json']=review_raw
+config={'schemaVersion':1,'state':'ROOT_REVIEWED_COMMON_BYTE_SOURCE_ACTIVATION_V1','producerRoot':str(PRODUCER),'sourceRoot':str(SOURCE),'declaredConfiguredSourceRoot':str(DECLARED),'producerIndexSha256':PRODUCER_SHA,'recipeSha256':RECIPE,'pairSha256':PAIR,'rootReviewSha256':REVIEW,'actual':actual_tuples,'timingAllowed':False}
+payload['activation.json']=(json.dumps(config,indent=2)+'\n').encode()
+for name,raw in payload.items():
+ assert read(ACTUAL/name)==raw,name
+ expected[name]={'path':name,'sha256':sha(raw),'bytes':len(raw),'boundary':'.'}
+manifest={'schemaVersion':1,'state':'ACTUAL_COMMON_BYTE_PAIR_SOURCE_AND_TOOLS_SEALED','inputs':sorted(expected.values(),key=lambda r:r['path']),'toolTrees':original['toolTrees'],'toolLinks':original['toolLinks'],'invocation':original['invocation'],'sourceContext':{'declaredRoot':str(DECLARED),'canonicalRoot':str(SOURCE),'preparationRowsRelocated':False,'metadataRewritten':False}}
+assert len(expected)==7709 and read(ACTUAL/'input-freeze.json')==(json.dumps(manifest,indent=2)+'\n').encode()
+compiled=payload['runtime-preflight.template.mjs'].decode()
+for key,h in {'CONFIG_SHA':sha(payload['activation.json']),'INPUTS_SHA':sha(read(ACTUAL/'input-freeze.json'))}.items():
+ assert compiled.count('@'+key+'@')==1;compiled=compiled.replace('@'+key+'@',h)
+assert read(ACTUAL/'runtime-preflight.mjs')==compiled.encode()
+receipt=doc(ACTUAL/'source-receipt.json');assert receipt['actual']==actual_tuples and receipt['activationIndexSha256']==receipt['mandatoryDeadlineAmendmentIndexSha256']==MANDATORY
+assert receipt['parentSourceIndexSha256']==PARENT and receipt['consumedInputs']==7709 and receipt['pairPinsSha256']==PAIR and receipt['rootReviewSha256']==REVIEW
+assert receipt['metadataRewritten']is receipt['guestExecuted']is receipt['timingAllowed']is False
+assert not ACTUAL.with_name(ACTUAL.name+'.staging').exists()
+check('all32 copied/rendered consumed payloads and full7709 input manifest independently reconstructed byte exact; two complete tool trees/22links retained')
+deriv=doc(AMEND/'host-derivations.json');assert len(deriv['files'])==3
+for row in deriv['files']:
+ name=row['path'];before=read(BASE/name,row['beforeSha256']).decode();after=read(ACTUAL/name,row['afterSha256']).decode();a=before.splitlines(True);b=after.splitlines(True)
+ op=difflib.SequenceMatcher(None,a,b).get_opcodes();assert [list(x)for x in op]==row['opcodes']
+ assert ''.join(a[i:j]if tag=='equal'else b[k:l]for tag,i,j,k,l in op)==after
+ assert ''.join(b[k:l]if tag=='equal'else a[i:j]for tag,i,j,k,l in op)==before
+ assert ''.join(difflib.unified_diff(a,b,fromfile='a/'+name,tofile='b/'+name))==read(AMEND/row['patch']).decode()
+helper=read(FAMILY/'measurement-correctness-persistence-amendment-v1/durable-host.mjs').decode()
+assert helper.replace('timeoutMs<=600000','timeoutMs<=7200000')==payload['owned-host.mjs'].decode()and helper.count('timeoutMs<=600000')==1
+assert read(AMEND/'authority.py')==read(BASE/'authority.py')
+actproof=doc(AMEND/'activation-derivation.json');before=read(BASE/'activate.py',actproof['beforeSha256']).decode();value=before;positions=[]
+for e in actproof['edits']:
+ assert e['count']==1 and value.count(e['old'])==1;at=value.index(e['old']);positions.append(at);value=value[:at]+e['new']+value[at+len(e['old']):]
+assert len(positions)==5 and value==read(AMEND/'activate.py',actproof['afterSha256']).decode()
+for at,e in reversed(list(zip(positions,actproof['edits']))):assert value[at:at+len(e['new'])]==e['new'];value=value[:at]+e['old']+value[at+len(e['new']):]
+assert value==before
+check('three exact host afterimages/patches, five reversible publisher edits and sole owned-helper ceiling change authenticated')
+common=json.loads(payload['node-common-oracle.json']);controls=json.loads(payload['node-control-oracle.json']);oracle=doc(FAMILY/'measurement-correctness-candidate-v1/node-workload-oracle.json',controls['sourceOracleSha256'])
+assert len(common['cases'])==8 and len(controls['cases'])==6
+project=[{'id':x['id'],'iterations':x['iterations'],'setup':x['setup'],'expected':x['oracle']}for x in oracle['expected']if x['id']in ['checksum-input-only','byte-input-and-copy-construction-only','stream-construction-and-clean-close-only']]
+assert project==controls['cases']
+for row in common['cases']:assert row['proposedExact']is True and row['proposed']==row['expected']and row['iterations']in [1,16]
+for name in ['classic-core.generated.mjs','classic-streams.mjs']:assert payload[name]==read(SOURCE/'builtins/node-compat/classic-streams'/name)
+graph=json.loads(payload['stock-source-graph.json']);assert len(graph['modules'])==102 and graph['providerOptions']=={}and graph['schedulerOverride']is False
+for row in graph['physicalSources']:read(row['path'],row['sha256'],row['bytes'])
+resolutions=[x for x in graph['resolutions']if x['request']=='process/'];assert len(resolutions)==7 and all(x['result']==graph['scheduler']for x in resolutions)
+scheduler=read(graph['scheduler']).decode();assert 'queueMicrotask' in scheduler
+notices=json.loads(payload['provider-notices.json']);assert len(notices['packages'])==6
+for row in notices['packages']:
+ read(row['metadataPath'],row['metadataSha256'])
+ for n in row['notices']:read(n['path'],n['sha256'],n['bytes'])
+check('full14 min/max oracle rows and exact6 original controls preserved; canonical5c bytes, stock102-source graph/seven scheduler resolutions and six-package notices authenticated')
+prepare=payload['prepare-correctness.mjs'].decode();measure=payload['measure.mjs'].decode();preflight=compiled;guest=payload['guest.mjs'].decode();bundle=payload['bundle-matched.mjs'].decode();phase=payload['phase.mjs'].decode();policy=payload['deadline-policy.mjs'].decode();owned=payload['owned-host.mjs'].decode()
+assert 'await verifyConsumedSeal' in preflight and preflight.index('await verifyConsumedSeal')<preflight.index('await import(pathToFileURL(join(producer')
+assert 'const nativeRecheck=native.recheck' in preflight and 'await nativeRecheck()' in preflight
+assert "nodeBuiltinPlugin({imports:[],exports:[]},{})"in bundle and 'inject:nodeGlobals()'in bundle
+assert "Buffer===bufferBeforeProvider"in guest and "globalThis.Buffer!==bufferBeforeProvider"in guest
+assert "bufferSameAsBefore:arm!=='stock-on'"in prepare and "globalChangedDuringProvider:arm==='stock-on'"in prepare
+assert "import {bufferBeforeProvider} from './capture-before.mjs'"in guest and payload['capture-before.mjs'].decode().count('import ')==0
+assert 'queueDepthObserved:false,terminalQueueEmptyObserved:false'in guest
+assert "assert.equal(records[1].bundleSha256,records[2].bundleSha256"in prepare
+assert "for(let i=0;i<14;i++)"in prepare and 'round<3'in prepare and 'for(let i=-2;i<14;i++)'in prepare
+assert owned.index('await persistFile({output,write,path:terminalPath')<owned.index('return{...outcome,terminalPath,stdout:')
+assert prepare.index("await progress(arm,'fresh-Wasmtime-collected'")<prepare.index('assert.equal(actual.terminalExitZeroObserved,true')
+assert prepare.index("'failure-before-source-audit.json'")<prepare.index('finally{try{postAudit=await runOwnedCommand(')
+assert 'if(!operationFailure)operationFailure=auditError'in prepare and 'if(operationFailure)throw operationFailure'in prepare
+assert '2*1024**3'in prepare and '800*1024**2'in prepare
+assert 'publicCaseMs:600000'in policy and 'sourceAuditMs:180000'in policy and 'workerHardMaxMs:7200000'in policy
+assert 'Math.ceil(2*sampleAndWarmupMs+firstBatchAllowanceMs+startupAllowanceMs)'in policy and 'admitted:requestedMs<=7200000'in policy
+assert measure.index("'.budget-plan.json'")<measure.index('assert(Object.values(budgets).every(row=>row.admitted)')<measure.index('for(let repetition=0;repetition<3;repetition++)')
+assert 'assert.equal(samples.length,126)'in measure and 'assert.equal(calibrations.length,21)'in measure
+assert 'NODE_COMPAT_COMMON_BYTE_TIMING_APPROVED'in measure and "ROOT_REVIEWED_COMMON_BYTE_PREREQUISITE_V1"in measure
+assert all(x in phase for x in ['actualCorrectness','freshFull20And14','freshReplay','freshHttpBothHosts','ROOT_EXPLICIT_SINGLE_MEASUREMENT_WINDOW'])
+future=json.loads(payload['future-measurement-phase.json']);assert future['timingAllowed']is False and all(future[k]is None for k in ['pairPinsSha256','actualCorrectness','freshFull20And14','freshReplay','freshHttpBothHosts','components','coordinatedWindow'])
+check('actual activated guards preserve primitive rechecks, four-arm identity/probe semantics, durable owned terminal capture, finite deadlines,42+126 protocol and NULL future timing phase')
+for row in list(seen.values()):read(row['path'],row['sha256'],row['bytes'])
+result={'schemaVersion':1,'state':'INDEPENDENT_ACTUAL_COMMON_BYTE_V2_SOURCE_FAMILY_REVIEW_PASSED_NO_GUEST',
+ 'actualIndexSha256':INDEX,'generatedFiles':35,'consumedInputs':7709,'toolTrees':2,'toolLinks':22,
+ 'pairPinsSha256':PAIR,'rootPairReviewSha256':REVIEW,'nativeVariants':2,'frozenCopiesPerVariant':525,'originalReferencesPerVariant':521,
+ 'nativeSources':342,'addonSources':2,'externalEmbeddingSources':3,'correctedToolDependencies':92,
+ 'copiedPayloads':32,'reversibleHostAfterimages':3,'reversiblePublisherEdits':5,'ownedHelperCeilingChanges':1,
+ 'passed':len(checks),'checks':checks,'fullCommonCases':8,'fullControlCases':6,'fourArms':4,'publicScalarExportsPlanned':5,
+ 'timingProtocol':{'calibrationWorkers':42,'timedWorkers':126,'totalWorkers':168,'warmups':3,'correlatedSamplesPerWorker':7,'freshTimedWorkersPerArmFamilyComparison':3,'sharedN':[1,16],'order':'AB/BA/AB'},
+ 'pairAuthorityPresent':True,'futureTimingPhaseAllNull':True,'timingAllowed':False,'fourArmGuestCorrectnessExecutedOrPassedByThisReview':False,
+ 'rootReportedTerminals':{'activationSession':69131,'activationRawExit':0,'preflightSession':24691,'preflightRawExit':0,'observedByThisReader':False},
+ 'ownerHelpersOrActionsOrNativeVerifiersOrNodeOrBundlingOrGuestOrHostOrTimingExecutedByReviewer':False,
+ 'runtimeAcceptanceClaim':False,'performanceClaim':False,'concreteBlockers':[],
+ 'limitations':['Source-family and frozen/input authentication only. All four-arm components, exact outputs/identities/probes and actual bundle graphs remain unexecuted future gates.',
+ 'Common14 comprises8 narrowed HWM+1 byte rows and6 original raw controls; full20/14 evidence is a separate prerequisite.',
+ 'Actual pair authority is distinct from NULL future phase and unchanged ON-only authority; no timing authorization is inferred.',
+ 'Finite600s cases/pilots,180s source audit and pilot-derived2h-capped worker estimates do not guarantee adequacy. In-process Jco calls remain externally interruptible only.',
+ 'Probe and scheduledCallbacks are provider/workload observations; no native queue-empty/work count, VM root isolation, capacity/grow, GC/ALS/reset/reuse or native C++ stream state-machine inference.',
+ 'Stock Buffer replacement and queueMicrotask FIFO intentionally differ from native/canonical; no provider normalization or ambient Web independence claim.'],
+ 'verifiedPathStrings':len(seen)}
+for name,value in [('results.json',result),('evidence.json',{'schemaVersion':1,'files':sorted(seen.values(),key=lambda r:r['path'])})]:
+ with(HERE/name).open('x')as f:json.dump(value,f,indent=2);f.write('\n')
+print(json.dumps({'state':result['state'],'checks':len(checks),'generated':35,'inputs':7709,'paths':len(seen)}))

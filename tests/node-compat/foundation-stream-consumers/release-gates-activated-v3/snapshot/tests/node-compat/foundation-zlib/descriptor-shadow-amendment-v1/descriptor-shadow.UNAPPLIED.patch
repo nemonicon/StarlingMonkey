@@ -1,0 +1,19 @@
+--- a/codec-evidence.py
++++ b/codec-evidence.py
+@@ -163,14 +163,14 @@
+  command=[str(nm),'--defined-only','--extern-only','--format=posix','--print-file-name',current['archive']['path']]
+  child=subprocess.run(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=55,check=True)
+  (evidence_root/'nm.stdout.txt').write_bytes(child.stdout);(evidence_root/'nm.stderr.txt').write_bytes(child.stderr)
+- selected=symbols(child.stdout)
++ selected_symbols=symbols(child.stdout)
+  assert distribution(dist)==current and cache_install(build)==before_value['install']
+  witnesses=[row(before_path),row(evidence_root/'link.after.commands.txt'),row(evidence_root/'nm.stdout.txt'),row(evidence_root/'nm.stderr.txt'),before_value['install'],*current['headers'],*linked['responseFiles']]
+  return{'version':'sm-selected-moz-z-codec-source-link-witness-v1','selectedDistribution':str(Path(dist).absolute()),'selectedCompileInput':selected,'beforeManifestPath':str(Path(before_path).absolute()),'beforeManifestSha256':expected_before_sha,
+   'archive':current['archive'],'archiveStorage':'External hash reference, rechecked; no duplicate archive copy or extent claim',
+   'headers':current['headers'],'actualKernelCompileCommands':kernels,'actualHeaderSearchDirectories':search,
+   'postBuildLinkEvidence':{**linked,'command':['ninja','-C',str(build),'-t','commands','starlingmonkey_embedding'],'path':str(evidence_root/'link.after.commands.txt'),'sha256':row(evidence_root/'link.after.commands.txt')['sha256'],'beforeBuildCaptureExists':False},
+-  'archiveSymbolEvidence':{'command':command,'nm':row(nm,NM_SHA),'selectedDefinitions':selected,'exitCode':child.returncode},
++  'archiveSymbolEvidence':{'command':command,'nm':row(nm,NM_SHA),'selectedDefinitions':selected_symbols,'exitCode':child.returncode},
+   'sourceInputsCheckedBeforeAndAfterBuild':True,'install':before_value['install'],'witnessFiles':witnesses,
+   'runtimeBackendProof':{'verified':False,'version':None,'vernum':None},'guestExecuted':False}
+ 

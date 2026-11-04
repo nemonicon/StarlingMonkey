@@ -1,0 +1,32 @@
+// Future fixed authority before backend/toolchain/packager or output access.
+import assert from 'node:assert/strict';
+import {readFile,lstat} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {dirname,join,resolve} from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import {selectActivation,PRODUCER_INDEX,RECIPE} from './activation-contract.mjs';
+import {verifyConsumedSeal} from './consumed.mjs';
+const here=dirname(fileURLToPath(import.meta.url)),CONFIG_SHA='61321fa025c674355b70f8713b8bb3460cdb0becf08dbbfa3af170c7d990c294',INPUTS_SHA='aca69e5256350f3c301bb689d8042d7510e2b7358550cb382d556b9c0e4d862e';
+const hash=data=>createHash('sha256').update(data).digest('hex');
+async function regular(path,expected,bytes){const stat=await lstat(path);assert(stat.isFile()&&!stat.isSymbolicLink(),path);const raw=await readFile(path);assert.equal(hash(raw),expected,path);if(bytes!==undefined)assert.equal(raw.length,bytes);return raw;}
+export async function correctnessPreflight(){
+ const configPath=join(here,'activation-template.json'),raw=await regular(configPath,CONFIG_SHA);
+ const config=selectActivation(JSON.parse(raw)); // Current NULL authority fails here, before any external loader/output.
+ assert.equal(process.version,'v22.14.0');assert.deepEqual(process.execArgv,[]);assert(!process.env.NODE_OPTIONS&&!process.env.NODE_PATH);
+ const root=config.sourceRoot,producer=config.producerRoot;assert.equal(resolve(producer,'../../../..'),root);assert.equal(producer,join(root,'tests/node-compat/foundation-classic-streams/measurement-producer-candidate-v3'));
+ async function seal(){return verifyConsumedSeal(here,INPUTS_SHA,{CONFIG_SHA,INPUTS_SHA});}
+ await seal();
+ const index=JSON.parse(await regular(join(producer,'index.json'),PRODUCER_INDEX));
+ const frozenRows=index.files.map(row=>({...row}));for(const row of frozenRows)await regular(join(producer,row.path),row.sha256,row.bytes);
+ const pinsPath=config.reviewedPinsPath,pinsSha=config.reviewedPinsSha256;
+ const authority=JSON.parse(await regular(pinsPath,pinsSha));assert.equal(authority.state,'ROOT_REVIEWED_CLASSIC_TRACE_BENCHMARK_DIAGNOSTIC_FREEZES_V3');
+ const {diagnosticPreflight}=await import(pathToFileURL(join(producer,'runtime-preflight.mjs')));
+ const native=await diagnosticPreflight({variant:'benchmark-classic-on',reviewedPinsPath:pinsPath,reviewedPinsSha256:pinsSha,sourceRoot:root});
+ assert.equal(native.pin.recipeSha256,RECIPE);assert.equal(native.metadata.diagnosticOnly,true);assert.equal(native.metadata.classicStreamsEnabled,true);assert.equal(native.metadata.gcStress,false);
+ assert.deepEqual(native.diagnosticExternalIds,['starling:test-classic-benchmark']);
+ for(const key of ['engineSha256','metadataSha256','freezeReceiptSha256','engineBytes','sourceFiles','addonFiles'])assert.equal(native.pin[key],config.reviewedActualEngine[key],key);
+ const nativeRecheck=native.recheck;
+ async function recheck(){await regular(configPath,CONFIG_SHA);await seal();await regular(pinsPath,pinsSha);await regular(join(producer,'index.json'),PRODUCER_INDEX);for(const row of frozenRows)await regular(join(producer,row.path),row.sha256,row.bytes);await nativeRecheck();}
+ await recheck();return Object.freeze({...native,recheck,toolSourceRoot:root,
+  correctnessScope:'20 original full-trace workloads and14 original valid boundaries; no timing or queue-counter observability.'});
+}

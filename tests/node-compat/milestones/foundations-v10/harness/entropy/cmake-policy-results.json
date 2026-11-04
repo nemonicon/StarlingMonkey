@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "verifiedAtUtc": "2026-11-03T03:15:01.327726+00:00",
+  "kind": "CMake policy module only; no build/configure of dependencies",
+  "sourceSha256": "c2eecc2559f02ecf1008d6ff48d13be488fdcae2b9db98a9a86e951c35fb1245",
+  "cases": [
+    {
+      "name": "default",
+      "arguments": [],
+      "expectedAccepted": true,
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "off-profile",
+      "arguments": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_ENTROPY_MODE=OFF"
+      ],
+      "expectedAccepted": true,
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "runtime-profile",
+      "arguments": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_ENTROPY_MODE=RUNTIME_ONLY"
+      ],
+      "expectedAccepted": true,
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "runtime-without-profile",
+      "arguments": [
+        "-DNODE_COMPAT_ENTROPY_MODE=RUNTIME_ONLY"
+      ],
+      "expectedAccepted": false,
+      "exitCode": 1,
+      "output": "CMake Error at cmake/node-compat-policy.cmake:9 (message):\n  RUNTIME_ONLY entropy requires ENABLE_BUILTIN_NODE_COMPAT=ON\n\n\n"
+    },
+    {
+      "name": "unknown-mode",
+      "arguments": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_ENTROPY_MODE=INSECURE"
+      ],
+      "expectedAccepted": false,
+      "exitCode": 1,
+      "output": "CMake Error at cmake/node-compat-policy.cmake:6 (message):\n  NODE_COMPAT_ENTROPY_MODE must be OFF or RUNTIME_ONLY\n\n\n"
+    }
+  ]
+}

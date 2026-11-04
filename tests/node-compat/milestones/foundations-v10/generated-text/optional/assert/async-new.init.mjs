@@ -1,0 +1,1 @@
+import * as a from "node:assert"; new a.rejects(); export function run(){return '';}

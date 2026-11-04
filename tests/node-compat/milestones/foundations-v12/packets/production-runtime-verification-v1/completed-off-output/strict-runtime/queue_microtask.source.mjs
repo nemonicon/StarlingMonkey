@@ -1,0 +1,1 @@
+export async function run(){let calls=0;queueMicrotask(()=>{calls++;throw new Error('MICROTASK_UNCAUGHT')});await Promise.resolve();return JSON.stringify({calls,returnedDespiteUnhandledAsyncError:true})}

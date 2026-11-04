@@ -1,0 +1,70 @@
+{
+  "state": "NODE_ORACLE_ONLY_NO_GUEST_EXECUTED",
+  "nodeRelease": "v22.14.0",
+  "nodeExecutable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+  "nodeExecutableSha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+  "sourceSha256": "96bc67f89348ff506a6e72d83e4a092b80bb58187749a61b3fbc7a9fc2da7907",
+  "cases": [
+    {
+      "mode": "ordinary-once",
+      "log": [
+        "earlier:outer",
+        "earlier:nested",
+        "later:nested",
+        "later:readded",
+        "earlier:after-nested",
+        "earlier:second",
+        "later:second",
+        "earlier:third"
+      ],
+      "laterInvocations": 2,
+      "laterRanInOuter": false,
+      "syntheticDispatchOnly": true,
+      "actualControllerAbortCalled": false
+    },
+    {
+      "mode": "protected-once",
+      "log": [
+        "earlier:outer",
+        "earlier:nested",
+        "later:nested",
+        "later:readded",
+        "earlier:after-nested",
+        "earlier:second",
+        "later:second",
+        "earlier:third"
+      ],
+      "laterInvocations": 2,
+      "laterRanInOuter": false,
+      "syntheticDispatchOnly": true,
+      "actualControllerAbortCalled": false
+    },
+    {
+      "mode": "protected-after-stop",
+      "log": [
+        "earlier:outer",
+        "earlier:nested",
+        "later:nested",
+        "later:readded",
+        "earlier:after-nested",
+        "earlier:second",
+        "later:second",
+        "earlier:third"
+      ],
+      "laterInvocations": 2,
+      "laterRanInOuter": false,
+      "syntheticDispatchOnly": true,
+      "actualControllerAbortCalled": false
+    },
+    {
+      "mode": "ordinary-remove-and-readd-control",
+      "log": [
+        "earlier",
+        "earlier",
+        "later"
+      ]
+    }
+  ],
+  "passed": 4,
+  "conclusion": "A once record removed by a nested dispatch remains removed in the outer traversal; readding the callback creates a new record for a later dispatch."
+}

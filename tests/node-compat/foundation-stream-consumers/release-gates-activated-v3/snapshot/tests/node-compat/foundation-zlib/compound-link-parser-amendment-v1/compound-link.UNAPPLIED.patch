@@ -1,0 +1,71 @@
+--- a/codec-evidence.py
++++ b/codec-evidence.py
+@@ -113,8 +113,35 @@
+  return[str(path)for path in includes]
+ 
+ def link_commands(raw,build,archive,resolve_path=lambda path:path):
+- """Capture response files rather than inventing a flattened Ninja database."""
++ """Parse finite captured direct-link or compiler/cd/optimizer forms; never run."""
+  build=Path(build).absolute();archive=Path(archive).absolute();responses={};selected=[]
++ def ordinary_path(word,base):
++  path=Path(word);assert '..'not in path.parts
++  path=path if path.is_absolute()else base/path
++  assert path.is_relative_to(build),'Link output/cd must stay in its actual build'
++  return path
++ def no_shell_words(words):
++  for word in words:assert not any(char in word for char in ['&',';','|','<','>','$','`','#','(',')','\n','\r']),word
++ def shell_form(line):
++  # Split the shell grammar before response expansion. Response tokens are only
++  # compiler arguments and can never become a synthetic shell stage.
++  assert not any(char in line for char in [';','|','<','>','$','`','#','(',')',"'",'"','\\','\n','\r'])
++  words=shlex.split(line);groups=[[]]
++  for word in words:
++   if word=='&&':groups.append([])
++   else:groups[-1].append(word)
++  assert all(groups)
++  for group in groups:no_shell_words(group)
++  if len(groups)==1:
++   assert Path(groups[0][0]).name in ['clang++','clang','cxx-wrapper'],'Direct shape must be a compiler command'
++   return 'direct-compiler-link-v1',groups[0],None,None
++  assert len(groups)==4 and groups[0]==[':'],'Only observed leading-colon compiler/cd/optimizer chain is allowed'
++  compiler,cd,optimizer=groups[1:]
++  assert compiler[0]==str(build/'cxx-wrapper')
++  assert len(cd)==2 and cd[0]=='cd'and Path(cd[1]).is_absolute()
++  assert len(optimizer)==6 and optimizer[0]==str(build.parent/'cache/binaryen/1b13/bin/wasm-opt')
++  assert optimizer[1:4]==['--strip-debug','-O3','-o']
++  return 'compiler-cd-inplace-wasm-opt-v1',compiler,cd,optimizer
+  def expand(words,depth=0):
+   assert depth<=4;result=[]
+   for word in words:
+@@ -130,17 +157,28 @@
+       if cursor==build:break
+       cursor=cursor.parent
+     data=captured.read_bytes();assert len(data)<=4*1024*1024
+-    responses[str(path)]={**row(captured),'path':str(path)};result.extend(expand(shlex.split(data.decode()),depth+1))
++    tokens=shlex.split(data.decode());no_shell_words(tokens)
++    responses[str(path)]={**row(captured),'path':str(path)};result.extend(expand(tokens,depth+1))
+    else:result.append(word)
+   return result
+  for line in raw.decode().splitlines():
+   if ' -c 'in line:continue
+-  words=shlex.split(line);expanded=expand(words);no_second_codec(expanded)
++  words=shlex.split(line);no_second_codec(words)
++  if 'libspidermonkey.a'not in line and not any(word.startswith('@')for word in words):continue
++  kind,compiler,cd,optimizer=shell_form(line);expanded=expand(compiler);no_shell_words(expanded);no_second_codec(expanded)
+   names=[Path(x)if Path(x).is_absolute()else build/x for x in expanded if x.endswith('/libspidermonkey.a')or x=='libspidermonkey.a']
+   if any(x.resolve()==archive.resolve()for x in names):
+    assert expanded.count('-o')==1
+    at=expanded.index('-o');assert at+1<len(expanded)and expanded[at+1].endswith('.wasm'),'Selected archive must occur in an actual output-Wasm link command'
+-   selected.append({'rawCommand':line,'expandedArguments':expanded})
++   output=ordinary_path(expanded[at+1],build)
++   record={'rawCommand':line,'expandedArguments':expanded,'kind':kind,'compilerArguments':compiler,'compilerExpandedArguments':expanded,'compilerOutputPath':str(output)}
++   if optimizer is not None:
++    cwd=ordinary_path(cd[1],build);assert cwd==output.parent
++    optimized_output=ordinary_path(optimizer[4],cwd);optimized_input=ordinary_path(optimizer[5],cwd)
++    assert optimized_input==optimized_output==output,'Compiler output and optimizer input/output must name exactly the same Wasm'
++    assert optimizer[4]==optimizer[5]==output.name
++    record.update(postOptimizerArguments=optimizer,postOptimizerWorkingDirectory=str(cwd),postOptimizerInputPath=str(optimized_input),postOptimizerOutputPath=str(optimized_output),sameWasmOutputProved=True)
++   selected.append(record)
+  assert len(selected)==1,'Need exactly one actual final link command selecting the authenticated archive; unknown response/link shapes fail closed'
+  return{'commands':selected,'responseFiles':list(responses.values())}
+ 

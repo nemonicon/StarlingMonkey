@@ -1,0 +1,82 @@
+--- a/prepare-correctness.mjs
++++ b/run-stock-only.mjs
+@@ -1,22 +1,25 @@
+ // Future explicit correctness/packaging action. Never run by source tests.
+ import assert from 'node:assert/strict';
+-import {readFile,writeFile,mkdir,lstat,symlink,statfs} from 'node:fs/promises';
++import {readFile,writeFile,mkdir,lstat,symlink,statfs,readlink,realpath} from 'node:fs/promises';
+ import {createHash} from 'node:crypto';
+ import {dirname,join,resolve} from 'node:path';
+ import {fileURLToPath,pathToFileURL} from 'node:url';
+ import {performance} from 'node:perf_hooks';
+-import {executionPreflight} from './runtime-preflight.mjs';
+-import {bundleMatched} from './bundle-matched.mjs';
+-import {cases,arms} from './protocol.mjs';
+-import {loadCompiled} from './instantiate.mjs';
+-import {requireExactJSON} from './bounded-comparison.mjs';
+-import {runOwnedCommand,persistFile} from './owned-host.mjs';
+-import {deadlinePolicy} from './deadline-policy.mjs';
+-const here=dirname(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex');
+-const indexSha=process.argv[2];assert(/^[0-9a-f]{64}$/.test(indexSha??''));const indexRaw=await readFile(join(here,'index.json'));assert.equal(hash(indexRaw),indexSha);
+-for(const row of JSON.parse(indexRaw).files){const raw=await readFile(join(here,row.path));assert.equal(hash(raw),row.sha256);assert.equal(raw.length,row.bytes);}
++import {executionPreflight} from '../measurement-execution-activated-v2/runtime-preflight.mjs';
++import {bundleMatched} from './bundle-stock.mjs';
++import {parentRoot,parentIndexSha256,verifyCollector,verifyThreeArmAuthority} from './provenance.mjs';
++import {cases,arms} from '../measurement-execution-activated-v2/protocol.mjs';
++import {loadCompiled} from '../measurement-execution-activated-v2/instantiate.mjs';
++import {requireExactJSON} from '../measurement-execution-activated-v2/bounded-comparison.mjs';
++import {runOwnedCommand,persistFile} from '../measurement-execution-activated-v2/owned-host.mjs';
++import {deadlinePolicy} from '../measurement-execution-activated-v2/deadline-policy.mjs';
++const collectorHere=dirname(fileURLToPath(import.meta.url)),here=parentRoot,hash=raw=>createHash('sha256').update(raw).digest('hex');
++const [indexSha,authorityPath,authoritySha]=process.argv.slice(2);assert(/^[0-9a-f]{64}$/.test(indexSha??''));
++await verifyCollector(collectorHere,indexSha);
++const reviewedThree=await verifyThreeArmAuthority(authorityPath,authoritySha);
++const recheckCollector=async()=>{await verifyCollector(collectorHere,indexSha);await verifyThreeArmAuthority(authorityPath,authoritySha);};
+ const on=await executionPreflight({variant:'benchmark-classic-on'}),off=await executionPreflight({variant:'benchmark-classic-off'});
+-const output=resolve(process.env.NODE_COMPAT_COMMON_BYTE_CORRECTNESS_OUTPUT??'');assert(output.startsWith('/tmp/starling-node-compat/'));
++const output=resolve(process.env.NODE_COMPAT_COMMON_BYTE_STOCK_OUTPUT??'');assert(output.startsWith('/tmp/starling-node-compat/'));
+ try{await lstat(output);assert.fail('Fresh output required');}catch(error){if(error.code!=='ENOENT')throw error;}
+ const initialDisk=await statfs(dirname(output));assert(initialDisk.bavail*initialDisk.bsize>=2*1024**3,'2GiB initial storage guard');
+ const {loadToolchain}=await import(pathToFileURL(join(on.toolSourceRoot,'tests/node-compat/toolchain.mjs'))),toolchain=await loadToolchain();
+@@ -35,7 +38,7 @@
+ async function save(path,data){return persistFile({output,write,path,data:typeof data==='string'?data:JSON.stringify(data,null,2)+'\n'});}
+ async function progress(arm,stage,index=null,call=null,detail={}){const disk=await statfs(output);assert(disk.bavail*disk.bsize>=800*1024**2,'Stop writes below800MiB');const event={sequence:++progressSequence,arm,stage,index,call,atUtc:new Date().toISOString(),partialObservationOnly:true,...detail};process.stderr.write(JSON.stringify(event)+'\n');return save(join(output,'progress',String(progressSequence).padStart(5,'0')+'.json'),event);}
+ try{
+-for(const arm of arms){
++for(const arm of ['stock-on']){
+  await progress(arm,'bundle-and-componentize');
+  const admission=arm==='canonical-off'?off:on,directory=join(output,arm);await mkdir(directory);await admission.recheck();
+  const bundle=await bundleMatched(toolchain,admission,arm);await writeFile(join(directory,'application.bundle.mjs'),bundle.code,{flag:'wx'});await writeFile(join(directory,'bundle-graph.json'),JSON.stringify(bundle.graph,null,2)+'\n',{flag:'wx'});
+@@ -47,7 +50,7 @@
+  const componentPath=join(directory,'common-byte.component.wasm');await writeFile(componentPath,component,{flag:'wx'});await writeFile(join(directory,'emitted.wit'),emittedWit,{flag:'wx'});
+  const transpileStart=performance.now(),{files}=await transpile(component,{name:'common_byte',instantiation:'async'}),transpileWallMs=performance.now()-transpileStart,transpiledFiles=[];
+  for(const[name,bytes]of Object.entries(files)){await mkdir(dirname(join(directory,name)),{recursive:true});await writeFile(join(directory,name),bytes,{flag:'wx'});transpiledFiles.push({name,sha256:hash(bytes),bytes:bytes.length});}
+- const record={arm,componentPath,componentSha256:hash(component),componentBytes:component.length,enginePath:admission.enginePath,engineSha256:admission.pin.engineSha256,engineMetadataSha256:admission.pin.metadataSha256,
++ const record={arm,guestSourceFamilyIndexSha256:parentIndexSha256,collectorSourceIndexSha256:indexSha,componentPath,componentSha256:hash(component),componentBytes:component.length,enginePath:admission.enginePath,engineSha256:admission.pin.engineSha256,engineMetadataSha256:admission.pin.metadataSha256,
+   modulePath:join(directory,'common_byte.js'),coreFiles:Object.keys(files).filter(name=>name.endsWith('.wasm')),transpiledFiles,bundleSha256:bundle.graph.bundleSha256,emittedImports:interfaceAudit.emittedImports,interfaceAudit,graph:bundle.graph,packager:selected.provenance,componentizationWallMs,transpileWallMs,buildTimingScope:'Sequential host packaging wall time; cold cache and isolated snapshot time not established'};
+  await save(join(directory,'component-record.before-observations.json'),record);await mkdir(join(directory,'calls'));await mkdir(join(directory,'processes'));
+  const instantiate=await loadCompiled(record);let recorded=false,callSequence=0;
+@@ -77,10 +80,19 @@
+  record.schedulerBudget={override:false,cumulativeWorkloadIterationBounds:[1,16],nativeQueueCountersObserved:false,provider:arm==='stock-on'?'Unmodified queueMicrotask FIFO; its callbacks are not native private-nextTick work-counter observations':'Actual private nextTick callable; success under configured limit, no counter observability'};
+  records.push(record);await save(join(directory,'arm-results.partial.json'),record);await progress(arm,'arm-complete',null,null,{partialObservationOnly:true});await admission.recheck();
+ }
+-assert.equal(records[1].bundleSha256,records[2].bundleSha256,'Canonical ON/OFF application bundle must be byte-identical');
++assert.equal(records.length,1);assert.equal(records[0].arm,'stock-on');await recheckCollector();
+ }catch(error){operationFailure=error;try{await save(join(output,'failure-before-source-audit.json'),{error:{name:error.name,message:error.message},completedArms:records.map(row=>row.arm),partialObservationOnly:true,runtimeAcceptanceClaim:false});}catch(storageError){process.stderr.write(JSON.stringify({event:'failure-record-write-failed',original:{name:error.name,message:error.message},storage:{name:storageError.name,message:storageError.message}})+'\n');}}
+-finally{try{postAudit=await runOwnedCommand({output,name:'post-operation-source-audit',executable:process.execPath,args:[join(here,'audit-inputs.mjs'),indexSha],write,register,timeoutMs:deadlinePolicy.sourceAuditMs,maxOutputBytes:4*1024*1024,graceMs:5000,heartbeatMs:30000,onProgress:detail=>process.stderr.write(JSON.stringify({stage:'post-operation-source-audit-heartbeat',...detail})+'\n')});await save(join(output,'post-operation-source-audit.json'),{status:postAudit.status,signal:postAudit.signal,spawnError:postAudit.spawnError,timedOut:postAudit.timedOut,terminalPath:postAudit.terminalPath,passed:postAudit.terminalExitZeroObserved&&postAudit.ownedGroupGone,originalFailure:operationFailure?{name:operationFailure.name,message:operationFailure.message}:null});assert(postAudit.terminalExitZeroObserved&&postAudit.ownedGroupGone,'Post-operation source audit failed');}catch(auditError){if(!operationFailure)operationFailure=auditError;else process.stderr.write(JSON.stringify({stage:'post-operation-source-audit-failed',original:{name:operationFailure.name,message:operationFailure.message},audit:{name:auditError.name,message:auditError.message}})+'\n');}}
++finally{try{postAudit=await runOwnedCommand({output,name:'post-operation-source-audit',executable:process.execPath,args:[join(here,'audit-inputs.mjs'),parentIndexSha256],write,register,timeoutMs:deadlinePolicy.sourceAuditMs,maxOutputBytes:4*1024*1024,graceMs:5000,heartbeatMs:30000,onProgress:detail=>process.stderr.write(JSON.stringify({stage:'post-operation-source-audit-heartbeat',...detail})+'\n')});await save(join(output,'post-operation-source-audit.json'),{status:postAudit.status,signal:postAudit.signal,spawnError:postAudit.spawnError,timedOut:postAudit.timedOut,terminalPath:postAudit.terminalPath,passed:postAudit.terminalExitZeroObserved&&postAudit.ownedGroupGone,originalFailure:operationFailure?{name:operationFailure.name,message:operationFailure.message}:null});assert(postAudit.terminalExitZeroObserved&&postAudit.ownedGroupGone,'Post-operation source audit failed');}catch(auditError){if(!operationFailure)operationFailure=auditError;else process.stderr.write(JSON.stringify({stage:'post-operation-source-audit-failed',original:{name:operationFailure.name,message:operationFailure.message},audit:{name:auditError.name,message:auditError.message}})+'\n');}}
++try{await recheckCollector();}catch(error){if(!operationFailure)operationFailure=error;}
+ if(operationFailure)throw operationFailure;
+-const report={schemaVersion:1,state:'ACTUAL_COMMON_BYTE_FOUR_ARM_CORRECTNESS_PASSED',sourceFamilyIndexSha256:indexSha,pairPinsSha256:on.pairSha256,records,commonCases:8,controlCases:6,controlsSubtracted:false,original28CounterexamplesPreserved:true,timingAllowed:false,
++const report={schemaVersion:1,state:'ACTUAL_COMMON_BYTE_STOCK_ONLY_CORRECTNESS_PASSED',collectorSourceIndexSha256:indexSha,guestSourceFamilyIndexSha256:parentIndexSha256,pairPinsSha256:on.pairSha256,reviewedThreeArmAuthority:{path:authorityPath,sha256:authoritySha},failedParentRawOuterExit:1,records,commonCases:8,controlCases:6,controlsSubtracted:false,original28CounterexamplesPreserved:true,timingAllowed:false,
+  queueEmptyProof:false,rootIsolationProof:false,cppStateMachineClaim:false,requiresIndependentExitCodeZero:true};
+-await writeFile(join(output,'correctness-results.json'),JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({state:report.state,output,arms:4,commonCases:8,controlCases:6,imports:[]}));
++const reportPath=join(output,'stock-correctness-results.json');await writeFile(reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx'});
++const files=new Set([...capturedPaths,reportPath,join(output,'package.json')]);
++for(const row of records){const directory=dirname(row.componentPath);for(const name of ['application.bundle.mjs','bundle-graph.json','emitted.wit'])files.add(join(directory,name));files.add(row.componentPath);for(const file of row.transpiledFiles)files.add(join(directory,file.name));}
++const outputs=[];for(const path of [...files].sort()){assert(path.startsWith(output+'/'));const info=await lstat(path);assert(info.isFile()&&!info.isSymbolicLink());const raw=await readFile(path);outputs.push({path,sha256:hash(raw),bytes:raw.length});}
++const linkPath=join(output,'node_modules');assert((await lstat(linkPath)).isSymbolicLink());assert.equal(await readlink(linkPath),join(toolchain.directory,'node_modules'));assert.equal(await realpath(linkPath),await realpath(join(toolchain.directory,'node_modules')));
++const links=[{path:linkPath,linkText:await readlink(linkPath),resolvedTarget:await realpath(linkPath)}];
++await recheckCollector();
++await writeFile(join(output,'stock-completion.json'),JSON.stringify({schemaVersion:1,state:'STOCK_ONLY_OUTPUTS_SEALED_EXTERNAL_EXIT_ZERO_REQUIRED',collectorSourceIndexSha256:indexSha,guestSourceFamilyIndexSha256:parentIndexSha256,pairPinsSha256:on.pairSha256,result:{path:reportPath,sha256:hash(await readFile(reportPath)),bytes:(await lstat(reportPath)).size},outputs,links,requiresIndependentRawOuterExitZero:true,wholeOldParentPassed:false,timingAllowed:false,runtimeAcceptanceClaim:false},null,2)+'\n',{flag:'wx'});
++console.log(JSON.stringify({state:report.state,output,arms:1,commonCases:8,controlCases:6,imports:[],completion:'stock-completion.json',requiresIndependentRawOuterExitZero:true}));

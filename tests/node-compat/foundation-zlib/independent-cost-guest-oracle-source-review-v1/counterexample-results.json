@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "state": "PURE_SOURCE_OUTPUT_STABILITY_COUNTEREXAMPLE_CONFIRMED",
+  "sourceSha256": "33456781163dc5a88448a1da5c4f1e0078e1b0525c9e054e86b366887fb6c56e",
+  "extractedValidationBlock": "  const previousComparable=priorOutput!==null&&priorOutput.caseId===caseId;\n  let independentBacking=null,mutationProbe={performed:false,reason:previousComparable?'empty output has no addressable mutation':'no previous comparable output',currentFullBytesUnchanged:null,inputFullBytesUnchanged:null,previousRestored:null};\n  if(previousComparable){\n   independentBacking=nonempty&&priorOutput.output.length>0?output.buffer!==priorOutput.output.buffer:null;\n   if(nonempty&&priorOutput.output.length>0){\n    requireValue(independentBacking,'successive nonempty output backing independence');const currentBefore=new Uint8Array(output),saved=priorOutput.output[0];\n    try{priorOutput.output[0]=saved^255;requireValue(bytesEqual(output,currentBefore)&&unchangedWindow(active.window,inputBefore),'previous mutation must not affect current/input');}\n    finally{priorOutput.output[0]=saved;}\n    mutationProbe={performed:true,reason:null,currentFullBytesUnchanged:true,inputFullBytesUnchanged:true,previousRestored:priorOutput.output[0]===saved};\n   }\n  }\n",
+  "records": [
+    {
+      "changedIndex": 0,
+      "allExistingOwnershipPredicatesPass": true,
+      "firstAndSecondSerializedBytesWouldMatch": true,
+      "heldPriorFullBytesCorrupted": true,
+      "observed": {
+        "previousComparable": true,
+        "independentBacking": true,
+        "mutationProbe": {
+          "performed": true,
+          "reason": null,
+          "currentFullBytesUnchanged": true,
+          "inputFullBytesUnchanged": true,
+          "previousRestored": true
+        }
+      }
+    },
+    {
+      "changedIndex": 1,
+      "allExistingOwnershipPredicatesPass": true,
+      "firstAndSecondSerializedBytesWouldMatch": true,
+      "heldPriorFullBytesCorrupted": true,
+      "observed": {
+        "previousComparable": true,
+        "independentBacking": true,
+        "mutationProbe": {
+          "performed": true,
+          "reason": null,
+          "currentFullBytesUnchanged": true,
+          "inputFullBytesUnchanged": true,
+          "previousRestored": true
+        }
+      }
+    },
+    {
+      "changedIndex": 63,
+      "allExistingOwnershipPredicatesPass": true,
+      "firstAndSecondSerializedBytesWouldMatch": true,
+      "heldPriorFullBytesCorrupted": true,
+      "observed": {
+        "previousComparable": true,
+        "independentBacking": true,
+        "mutationProbe": {
+          "performed": true,
+          "reason": null,
+          "currentFullBytesUnchanged": true,
+          "inputFullBytesUnchanged": true,
+          "previousRestored": true
+        }
+      }
+    }
+  ],
+  "codecOrProviderCalls": 0,
+  "actualCodecDefectObserved": false
+}

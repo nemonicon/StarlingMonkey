@@ -1,0 +1,10 @@
+--- a/build-classic-benchmark-engine.sh
++++ b/build-classic-benchmark-engine.sh
+@@ -580,6 +580,7 @@
+ assert digest(layer_file) == '43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9'
+ assert digest(layer_file.parent / 'policy.json') == layer.POLICY_SHA256
+ 
++sys.path.insert(0, str(pathlib.Path(packet_root)))
+ benchmark_spec = importlib.util.spec_from_file_location('classic_benchmark_build_policy',pathlib.Path(packet_root)/'benchmark-policy.py')
+ benchmark = importlib.util.module_from_spec(benchmark_spec);benchmark_spec.loader.exec_module(benchmark)
+ metadata = benchmark.decorate(metadata, pathlib.Path(artifact))

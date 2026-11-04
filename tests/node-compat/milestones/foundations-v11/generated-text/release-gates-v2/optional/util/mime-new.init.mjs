@@ -1,0 +1,1 @@
+import {MIMEType} from 'util';new MIMEType('text/plain');export function run(){return ''}

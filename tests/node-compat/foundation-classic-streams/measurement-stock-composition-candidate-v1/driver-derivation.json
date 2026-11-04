@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "origin": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/measurement-execution-activated-v2/prepare-correctness.mjs",
+  "beforeSha256": "51d8da23c4360e60733f2647e6b7775f0ccb4ce83ecc628c79abacc6496ca866",
+  "afterSha256": "171f0483d081e74a52bc9185567aae5223d193d40bc221d225a40b0c9ca8564d",
+  "edits": [
+    {
+      "old": "import {readFile,writeFile,mkdir,lstat,symlink,statfs} from 'node:fs/promises';",
+      "new": "import {readFile,writeFile,mkdir,lstat,symlink,statfs,readlink,realpath} from 'node:fs/promises';",
+      "count": 1
+    },
+    {
+      "old": "from './runtime-preflight.mjs'",
+      "new": "from '../measurement-execution-activated-v2/runtime-preflight.mjs'",
+      "count": 1
+    },
+    {
+      "old": "from './protocol.mjs'",
+      "new": "from '../measurement-execution-activated-v2/protocol.mjs'",
+      "count": 1
+    },
+    {
+      "old": "from './instantiate.mjs'",
+      "new": "from '../measurement-execution-activated-v2/instantiate.mjs'",
+      "count": 1
+    },
+    {
+      "old": "from './bounded-comparison.mjs'",
+      "new": "from '../measurement-execution-activated-v2/bounded-comparison.mjs'",
+      "count": 1
+    },
+    {
+      "old": "from './owned-host.mjs'",
+      "new": "from '../measurement-execution-activated-v2/owned-host.mjs'",
+      "count": 1
+    },
+    {
+      "old": "from './deadline-policy.mjs'",
+      "new": "from '../measurement-execution-activated-v2/deadline-policy.mjs'",
+      "count": 1
+    },
+    {
+      "old": "import {bundleMatched} from './bundle-matched.mjs';",
+      "new": "import {bundleMatched} from './bundle-stock.mjs';\nimport {parentRoot,parentIndexSha256,verifyCollector,verifyThreeArmAuthority} from './provenance.mjs';",
+      "count": 1
+    },
+    {
+      "old": "const here=dirname(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex');",
+      "new": "const collectorHere=dirname(fileURLToPath(import.meta.url)),here=parentRoot,hash=raw=>createHash('sha256').update(raw).digest('hex');",
+      "count": 1
+    },
+    {
+      "old": "const indexSha=process.argv[2];assert(/^[0-9a-f]{64}$/.test(indexSha??''));const indexRaw=await readFile(join(here,'index.json'));assert.equal(hash(indexRaw),indexSha);\nfor(const row of JSON.parse(indexRaw).files){const raw=await readFile(join(here,row.path));assert.equal(hash(raw),row.sha256);assert.equal(raw.length,row.bytes);}",
+      "new": "const [indexSha,authorityPath,authoritySha]=process.argv.slice(2);assert(/^[0-9a-f]{64}$/.test(indexSha??''));\nawait verifyCollector(collectorHere,indexSha);\nconst reviewedThree=await verifyThreeArmAuthority(authorityPath,authoritySha);\nconst recheckCollector=async()=>{await verifyCollector(collectorHere,indexSha);await verifyThreeArmAuthority(authorityPath,authoritySha);};",
+      "count": 1
+    },
+    {
+      "old": "NODE_COMPAT_COMMON_BYTE_CORRECTNESS_OUTPUT",
+      "new": "NODE_COMPAT_COMMON_BYTE_STOCK_OUTPUT",
+      "count": 1
+    },
+    {
+      "old": "for(const arm of arms){",
+      "new": "for(const arm of ['stock-on']){",
+      "count": 1
+    },
+    {
+      "old": "const record={arm,componentPath",
+      "new": "const record={arm,guestSourceFamilyIndexSha256:parentIndexSha256,collectorSourceIndexSha256:indexSha,componentPath",
+      "count": 1
+    },
+    {
+      "old": "assert.equal(records[1].bundleSha256,records[2].bundleSha256,'Canonical ON/OFF application bundle must be byte-identical');",
+      "new": "assert.equal(records.length,1);assert.equal(records[0].arm,'stock-on');await recheckCollector();",
+      "count": 1
+    },
+    {
+      "old": "args:[join(here,'audit-inputs.mjs'),indexSha]",
+      "new": "args:[join(here,'audit-inputs.mjs'),parentIndexSha256]",
+      "count": 1
+    },
+    {
+      "old": "if(operationFailure)throw operationFailure;",
+      "new": "try{await recheckCollector();}catch(error){if(!operationFailure)operationFailure=error;}\nif(operationFailure)throw operationFailure;",
+      "count": 1
+    },
+    {
+      "old": "state:'ACTUAL_COMMON_BYTE_FOUR_ARM_CORRECTNESS_PASSED',sourceFamilyIndexSha256:indexSha,pairPinsSha256:on.pairSha256,records",
+      "new": "state:'ACTUAL_COMMON_BYTE_STOCK_ONLY_CORRECTNESS_PASSED',collectorSourceIndexSha256:indexSha,guestSourceFamilyIndexSha256:parentIndexSha256,pairPinsSha256:on.pairSha256,reviewedThreeArmAuthority:{path:authorityPath,sha256:authoritySha},failedParentRawOuterExit:1,records",
+      "count": 1
+    },
+    {
+      "old": "join(output,'correctness-results.json')",
+      "new": "join(output,'stock-correctness-results.json')",
+      "count": 1
+    },
+    {
+      "old": "output,arms:4",
+      "new": "output,arms:1",
+      "count": 1
+    },
+    {
+      "old": "await writeFile(join(output,'stock-correctness-results.json'),JSON.stringify(report,null,2)+'\\n',{flag:'wx'});console.log(JSON.stringify({state:report.state,output,arms:1,commonCases:8,controlCases:6,imports:[]}));\n",
+      "new": "const reportPath=join(output,'stock-correctness-results.json');await writeFile(reportPath,JSON.stringify(report,null,2)+'\\n',{flag:'wx'});\nconst files=new Set([...capturedPaths,reportPath,join(output,'package.json')]);\nfor(const row of records){const directory=dirname(row.componentPath);for(const name of ['application.bundle.mjs','bundle-graph.json','emitted.wit'])files.add(join(directory,name));files.add(row.componentPath);for(const file of row.transpiledFiles)files.add(join(directory,file.name));}\nconst outputs=[];for(const path of [...files].sort()){assert(path.startsWith(output+'/'));const info=await lstat(path);assert(info.isFile()&&!info.isSymbolicLink());const raw=await readFile(path);outputs.push({path,sha256:hash(raw),bytes:raw.length});}\nconst linkPath=join(output,'node_modules');assert((await lstat(linkPath)).isSymbolicLink());assert.equal(await readlink(linkPath),join(toolchain.directory,'node_modules'));assert.equal(await realpath(linkPath),await realpath(join(toolchain.directory,'node_modules')));\nconst links=[{path:linkPath,linkText:await readlink(linkPath),resolvedTarget:await realpath(linkPath)}];\nawait recheckCollector();\nawait writeFile(join(output,'stock-completion.json'),JSON.stringify({schemaVersion:1,state:'STOCK_ONLY_OUTPUTS_SEALED_EXTERNAL_EXIT_ZERO_REQUIRED',collectorSourceIndexSha256:indexSha,guestSourceFamilyIndexSha256:parentIndexSha256,pairPinsSha256:on.pairSha256,result:{path:reportPath,sha256:hash(await readFile(reportPath)),bytes:(await lstat(reportPath)).size},outputs,links,requiresIndependentRawOuterExitZero:true,wholeOldParentPassed:false,timingAllowed:false,runtimeAcceptanceClaim:false},null,2)+'\\n',{flag:'wx'});\nconsole.log(JSON.stringify({state:report.state,output,arms:1,commonCases:8,controlCases:6,imports:[],completion:'stock-completion.json',requiresIndependentRawOuterExitZero:true}));\n",
+      "count": 1
+    }
+  ],
+  "reverseExact": true,
+  "guestAndProviderAndOracleBytesChanged": false,
+  "unaffectedThreeArmsRerun": false
+}

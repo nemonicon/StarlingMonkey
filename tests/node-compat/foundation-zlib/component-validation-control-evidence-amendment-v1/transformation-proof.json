@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "beforeSha256": "5b0d853f5588592f7c8bcf54a942ef10a2e937db313edc70b8112a973fd8698e",
+  "afterSha256": "96012c5643fb880e04165c2dcee06264849926e398db54f79b3d789419999d78",
+  "edits": [
+    {
+      "old": "readFile,writeFile,mkdir,lstat,statfs,symlink",
+      "new": "readFile,writeFile,mkdir,lstat,statfs,symlink,readlink,realpath",
+      "count": 1
+    },
+    {
+      "old": "await progress('validation-started'",
+      "new": "paths.add(join(output,'package.json'));\nconst moduleLink={path:join(output,'node_modules'),linkText:await readlink(join(output,'node_modules')),resolvedTarget:await realpath(join(output,'node_modules'))};\nawait progress('validation-started'",
+      "count": 1
+    },
+    {
+      "old": "const artifacts=[];for(const path of paths)",
+      "new": "assert((await lstat(moduleLink.path)).isSymbolicLink());assert.equal(await readlink(moduleLink.path),moduleLink.linkText);assert.equal(await realpath(moduleLink.path),moduleLink.resolvedTarget);\nawait save('output-controls.json',{packageJson:{path:join(output,'package.json'),sha256:hash(await readFile(join(output,'package.json')))},nodeModulesLink:moduleLink});\nconst artifacts=[];for(const path of paths)",
+      "count": 1
+    },
+    {
+      "old": "{state:'ZLIB_VALIDATION_OUTPUT_COMPLETE',artifacts,reportSha256:",
+      "new": "{state:'ZLIB_VALIDATION_OUTPUT_COMPLETE',artifacts,outputLinks:[moduleLink],reportSha256:",
+      "count": 1
+    }
+  ],
+  "semanticCorpusOrGuestOrNativeChanged": false
+}

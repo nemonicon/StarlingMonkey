@@ -1,0 +1,161 @@
+--- a/node-v22.14.0/lib/path.js
++++ b/path.mjs
+@@ -19,47 +19,51 @@
+ // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+ // USE OR OTHER DEALINGS IN THE SOFTWARE.
+ 
+-'use strict';
+-
+-const {
+-  ArrayPrototypeJoin,
+-  ArrayPrototypeSlice,
+-  FunctionPrototypeBind,
+-  StringPrototypeCharCodeAt,
+-  StringPrototypeIncludes,
+-  StringPrototypeIndexOf,
+-  StringPrototypeLastIndexOf,
+-  StringPrototypeRepeat,
+-  StringPrototypeReplace,
+-  StringPrototypeSlice,
+-  StringPrototypeSplit,
+-  StringPrototypeToLowerCase,
+-} = primordials;
+-
+-const {
+-  CHAR_UPPERCASE_A,
+-  CHAR_LOWERCASE_A,
+-  CHAR_UPPERCASE_Z,
+-  CHAR_LOWERCASE_Z,
+-  CHAR_DOT,
+-  CHAR_FORWARD_SLASH,
+-  CHAR_BACKWARD_SLASH,
+-  CHAR_COLON,
+-  CHAR_QUESTION_MARK,
+-} = require('internal/constants');
+-const {
+-  validateObject,
+-  validateString,
+-} = require('internal/validators');
+-
+-const {
+-  getLazy,
+-  emitExperimentalWarning,
+-  isWindows,
+-  isMacOS,
+-} = require('internal/util');
+-
+-const lazyMinimatch = getLazy(() => require('internal/deps/minimatch/index'));
++// Adapted from the exact Node.js v22.14.0 native lib/path.js source.
++// Virtual profile: POSIX default, cwd '/', no drive environment, no host calls.
++// See export-manifest.path.node-v22.14.0.json for explicit deviations.
++import { createMinimatch } from './path-matcher.mjs';
++
++export function createPathModules() {
++  const uncurry = method => Function.prototype.call.bind(method);
++  const ArrayPrototypeJoin = uncurry(Array.prototype.join);
++  const ArrayPrototypeSlice = uncurry(Array.prototype.slice);
++  const FunctionPrototypeBind = uncurry(Function.prototype.bind);
++  const StringPrototypeCharCodeAt = uncurry(String.prototype.charCodeAt);
++  const StringPrototypeIncludes = uncurry(String.prototype.includes);
++  const StringPrototypeIndexOf = uncurry(String.prototype.indexOf);
++  const StringPrototypeLastIndexOf = uncurry(String.prototype.lastIndexOf);
++  const StringPrototypeRepeat = uncurry(String.prototype.repeat);
++  const StringPrototypeReplace = uncurry(String.prototype.replace);
++  const StringPrototypeSlice = uncurry(String.prototype.slice);
++  const StringPrototypeSplit = uncurry(String.prototype.split);
++  const StringPrototypeToLowerCase = uncurry(String.prototype.toLowerCase);
++  const CHAR_UPPERCASE_A = 65, CHAR_LOWERCASE_A = 97;
++  const CHAR_UPPERCASE_Z = 90, CHAR_LOWERCASE_Z = 122;
++  const CHAR_DOT = 46, CHAR_FORWARD_SLASH = 47, CHAR_BACKWARD_SLASH = 92;
++  const CHAR_COLON = 58, CHAR_QUESTION_MARK = 63;
++  const isWindows = false, isMacOS = false;
++  const virtualCwd = () => '/';
++  const emitExperimentalWarning = () => {};
++  const InvalidArgType = TypeError;
++  const defineProperty = Object.defineProperty;
++  const arrayIsArray = Array.isArray;
++  function invalid(value, name, expected) {
++    const error = new InvalidArgType(`The "${name}" argument must be of type ${expected}. Received ${value === null ? 'null' : typeof value}`);
++    defineProperty(error, 'code', { value: 'ERR_INVALID_ARG_TYPE', writable: true, configurable: true, enumerable: true });
++    throw error;
++  }
++  function validateString(value, name) {
++    if (typeof value !== 'string') invalid(value, name, 'string');
++  }
++  function validateObject(value, name) {
++    if (value === null || typeof value !== 'object' || arrayIsArray(value)) invalid(value, name, 'object');
++  }
++  const getLazy = factory => {
++    let value;
++    return () => value ??= factory();
++  };
++  const lazyMinimatch = getLazy(createMinimatch);
+ 
+ function isPathSeparator(code) {
+   return code === CHAR_FORWARD_SLASH || code === CHAR_BACKWARD_SLASH;
+@@ -203,14 +207,14 @@
+           continue;
+         }
+       } else if (resolvedDevice.length === 0) {
+-        path = process.cwd();
++        path = virtualCwd();
+       } else {
+         // Windows has the concept of drive-specific current working
+         // directories. If we've resolved a drive letter but not yet an
+         // absolute path, get cwd for that drive, or the process cwd if
+         // the drive cwd is not available. We're sure the device is not
+         // a UNC path at this points, because UNC paths are always absolute.
+-        path = process.env[`=${resolvedDevice}`] || process.cwd();
++        path = virtualCwd();
+ 
+         // Verify that a cwd was found and that it actually points
+         // to our drive. If not, default to the drive's root.
+@@ -317,7 +321,7 @@
+     }
+ 
+     // At this point the path should be resolved to a full absolute path,
+-    // but handle relative paths to be safe (might happen when process.cwd()
++    // but handle relative paths to be safe (might happen when virtualCwd()
+     // fails)
+ 
+     // Normalize the tail path
+@@ -1162,13 +1166,13 @@
+     // and truncates any drive indicator
+     const regexp = /\\/g;
+     return () => {
+-      const cwd = StringPrototypeReplace(process.cwd(), regexp, '/');
++      const cwd = StringPrototypeReplace(virtualCwd(), regexp, '/');
+       return StringPrototypeSlice(cwd, StringPrototypeIndexOf(cwd, '/'));
+     };
+   }
+ 
+   // We're already on POSIX, no need for any transformations
+-  return () => process.cwd();
++  return () => virtualCwd();
+ })();
+ 
+ const posix = {
+@@ -1203,7 +1207,7 @@
+     }
+ 
+     // At this point the path should be resolved to a full absolute path, but
+-    // handle relative paths to be safe (might happen when process.cwd() fails)
++    // handle relative paths to be safe (might happen when virtualCwd() fails)
+ 
+     // Normalize the path
+     resolvedPath = normalizeString(resolvedPath, !resolvedAbsolute, '/',
+@@ -1639,4 +1643,13 @@
+ win32._makeLong = win32.toNamespacedPath;
+ posix._makeLong = posix.toNamespacedPath;
+ 
+-module.exports = isWindows ? win32 : posix;
++const names = ['_makeLong', 'basename', 'delimiter', 'dirname', 'extname', 'format', 'isAbsolute', 'join', 'matchesGlob', 'normalize', 'parse', 'posix', 'relative', 'resolve', 'sep', 'toNamespacedPath', 'win32'];
++  const exportsFor = value => {
++    const record = { default: value };
++    for (const name of names) record[name] = value[name];
++    return record;
++  };
++  const root = exportsFor(posix);
++  return { root, posix: root, win32: exportsFor(win32) };
++
++}

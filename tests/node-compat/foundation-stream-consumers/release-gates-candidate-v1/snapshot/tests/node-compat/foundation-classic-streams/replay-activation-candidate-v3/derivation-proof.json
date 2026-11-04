@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "state": "EXACT_FIVE_POLICY_TAG_AND_REAL_GC_SCHEMA_ACTIVATION_WIRING",
+  "parentIndexSha256": "afd5a7148f0a7737e919d84cf8e97d224e4f8e5126b8e46e498444ac3f3cf4f5",
+  "beforeProducerSha256": "b8fff2f6692b4dbd0e6ef9f77100fa17bcbe97e5fc4309a1c14fcbfca99daaff",
+  "afterProducerSha256": "34c726d84ad8fe6447efd1853d2b03b86edf49d5957098561ef427776a65d338",
+  "edits": [
+    {
+      "old": "AMENDMENT_INDEX = '7462f1255f4fd5048e345a96d58908c8e6251158bf36e5ab4450dab97be193b4'",
+      "new": "AMENDMENT_INDEX = '7462f1255f4fd5048e345a96d58908c8e6251158bf36e5ab4450dab97be193b4'\nPOLICY_AMENDMENT = HERE.parent / 'exact-policy-tag-amendment-v1'\nPOLICY_AMENDMENT_INDEX = 'fd0242e16c6d684b91a332ff00005bf2a25b25d133b4d819e8e16341cac6306c'"
+    },
+    {
+      "old": "OUTPUT = HERE.parent / 'production-regression-activated-v2'",
+      "new": "OUTPUT = HERE.parent / 'production-regression-activated-v3'"
+    },
+    {
+      "old": "    return images\n",
+      "new": "    policy=json.loads(regular(POLICY_AMENDMENT/'transformation-proof.json'))\n    expected={'release/runners/events.mjs','common/runners/allocator-gc.mjs','off/runners/sync.mjs','off/runners/runtime.mjs','off/runners/callbacks.mjs'}\n    assert policy['oldBodiesByteIdentical']==57 and policy['totalChangedHostBodies']==7\n    assert policy['guestOrOracleBytesChanged'] is False and policy['engineMetadataRewritten'] is False\n    assert {row['path']for row in policy['records']}==expected and len(policy['records'])==5\n    for row in policy['records']:\n        assert row['path']not in images\n        before=regular(PARENT/row['path'],row['beforeSha256'])\n        after=regular(POLICY_AMENDMENT/'proposed'/row['path'],row['afterSha256'])\n        reverse=after.decode()\n        for edit in reversed(row['edits']):\n            assert reverse.count(edit['new'])==edit.get('occurrences',1)\n            reverse=reverse.replace(edit['new'],edit['old'])\n        assert reverse.encode()==before\n        images[row['path']]=after\n    assert len(images)==7\n    return images\n"
+    },
+    {
+      "old": "    payload['registrar-ancestry-proof.json']=regular(AMENDMENT/'transformation-proof.json')",
+      "new": "    payload['registrar-ancestry-proof.json']=regular(AMENDMENT/'transformation-proof.json')\n    payload['exact-policy-tag-proof.json']=regular(POLICY_AMENDMENT/'transformation-proof.json')"
+    },
+    {
+      "old": "    amendment_index,_=indexed(AMENDMENT,AMENDMENT_INDEX)",
+      "new": "    amendment_index,_=indexed(AMENDMENT,AMENDMENT_INDEX)\n    policy_amendment_index,_=indexed(POLICY_AMENDMENT,POLICY_AMENDMENT_INDEX)"
+    },
+    {
+      "old": "(AMENDMENT, amendment_index)):",
+      "new": "(AMENDMENT, amendment_index), (POLICY_AMENDMENT, policy_amendment_index)):"
+    },
+    {
+      "old": "    amendment_inputs=json.loads(regular(AMENDMENT/'input-freeze.json'))\n    for row in amendment_inputs['inputs']:\n        path=Path(row['path']);assert path.is_absolute()\n        external_file(path,row['sha256'])",
+      "new": "    for amendment in [AMENDMENT,POLICY_AMENDMENT]:\n        amendment_inputs=json.loads(regular(amendment/'input-freeze.json'))\n        for row in amendment_inputs['inputs']:\n            path=Path(row['path']);assert path.is_absolute()\n            external_file(path,row['sha256'])"
+    },
+    {
+      "old": "'62 of64 inherited bodies are byte-identical; only exact registrar ancestry admission and Path Node oracle host orchestration are amended. Guest/facade/oracle semantics unchanged. HTTP pins stay null and sealed.\\n'",
+      "new": "'57 of64 inherited bodies are byte-identical; seven host admission/orchestration bodies have exact mandatory registrar/Path and policy/GC-schema amendments. Guest/facade/oracle semantics unchanged. HTTP pins stay null and sealed.\\n'"
+    },
+    {
+      "old": "'inheritedBodies':len(records),'oldBodiesByteIdentical':62,'changedHostHarnessBodies':2,",
+      "new": "'inheritedBodies':len(records),'oldBodiesByteIdentical':57,'changedHostHarnessBodies':7,"
+    },
+    {
+      "old": "'registrarOracleAmendmentIndexSha256':AMENDMENT_INDEX,'guestSemanticBodiesChanged':False,",
+      "new": "'registrarOracleAmendmentIndexSha256':AMENDMENT_INDEX,'exactPolicyTagAmendmentIndexSha256':POLICY_AMENDMENT_INDEX,'guestSemanticBodiesChanged':False,"
+    },
+    {
+      "old": "'inheritedBodiesByteIdentical': 62, 'changedHostHarnessBodies': 2,",
+      "new": "'inheritedBodiesByteIdentical': 57, 'changedHostHarnessBodies': 7,"
+    }
+  ],
+  "exactReverseProof": true,
+  "unchangedBackendFiles": [
+    {
+      "path": "authority.py",
+      "sha256": "3332bda420e63d0c4313f4c14c0cda74d3d0c6fd44d2b97d51a3855ea8cc5150"
+    },
+    {
+      "path": "native-preflight.template.mjs",
+      "sha256": "1e092675a37d888eaa2ec5f733637adb6691b17ae4558bfee26b331c3e46dcce"
+    }
+  ],
+  "oldBodiesByteIdentical": 57,
+  "changedHostHarnessBodies": 7,
+  "guestSemanticBodiesChanged": false,
+  "activationInvoked": false
+}

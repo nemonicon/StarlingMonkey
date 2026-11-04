@@ -1,0 +1,13 @@
+--- a/embedding/embedding.cpp
++++ b/embedding/embedding.cpp
+@@ -311,7 +311,9 @@
+     Runtime.free_list.push_back(retptr);
+     switch (fn->ret.value()) {
+     case CoreVal::I32:
+-      *((uint32_t *)retptr) = ret.toInt32();
++      // u32 lowering may produce a boxed Double above INT32_MAX. Read the
++      // numeric value and preserve its i32 bits instead of reading its payload.
++      *((uint32_t *)retptr) = static_cast<uint32_t>(JS::ToInt32(ret.toNumber()));
+       break;
+     case CoreVal::I64:
+       if (!JS::detail::BigIntIsUint64(ret.toBigInt(), (uint64_t *)retptr)) {

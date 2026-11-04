@@ -1,0 +1,1 @@
+let reads=0,caught=false,registered=false,calls=0;const t=new EventTarget();try{t.addEventListener('test',{get handleEvent(){reads++;throw new Error('GETTER_REGISTRATION')}});registered=true}catch{caught=true}export function run(){return JSON.stringify({calls:++calls,reads,caught,registered})}

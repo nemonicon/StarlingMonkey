@@ -1,0 +1,1 @@
+let exports=0;export function run(){const t=new EventTarget();let calls=0;function listener(){calls++;if(calls===1)t.addEventListener('test',listener,{once:true})}t.addEventListener('test',listener,{once:true});t.dispatchEvent(new Event('test'));t.dispatchEvent(new Event('test'));t.dispatchEvent(new Event('test'));return JSON.stringify({calls:++exports,listenerCalls:calls})}

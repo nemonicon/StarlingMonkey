@@ -1,0 +1,29 @@
+--- a/harness/guest.mjs
++++ b/harness/guest.mjs
+@@ -8,13 +8,11 @@
+ import { EventEmitter, addAbortListener } from 'node:events';
+ import { promisify } from 'node:util';
+ import { checks } from './checks.mjs';
++import cjsBindings from './cjs-bindings.cjs';
+ 
+-// These four literal calls are the selected bundler's static CJS contract.
++// Literal require calls live in the explicit .cjs fixture module.
+ // No public runtime require() is installed or used after bundling.
+-const cjs = require('node:stream');
+-const cjsAlias = require('stream');
+-const cjsPromises = require('node:stream/promises');
+-const cjsPromisesAlias = require('stream/promises');
++const {cjs, cjsAlias, cjsPromises, cjsPromisesAlias} = cjsBindings;
+ const rootKeys = ['Duplex','PassThrough','Readable','Stream','Transform','Writable',
+   '_isArrayBufferView','_isUint8Array','_uint8ArrayToBuffer','addAbortSignal','compose',
+   'default','destroy','duplexPair','finished','getDefaultHighWaterMark','isDestroyed',
+--- /dev/null
++++ b/harness/cjs-bindings.cjs
+@@ -0,0 +1,7 @@
++// Explicit static CJS fixture; only admitted literal builtin requires.
++module.exports = {
++  cjs: require('node:stream'),
++  cjsAlias: require('stream'),
++  cjsPromises: require('node:stream/promises'),
++  cjsPromisesAlias: require('stream/promises'),
++};

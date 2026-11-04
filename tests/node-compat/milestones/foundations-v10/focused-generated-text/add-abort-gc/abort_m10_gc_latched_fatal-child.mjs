@@ -1,0 +1,1 @@
+import{run}from"/tmp/starling-node-compat/foundations-v10/add-abort-gc/abort_m10_gc_latched_fatal.js";try{await run();console.log('UNEXPECTED_RETURN');process.exitCode=2;}catch(error){console.log('EXPECTED_FATAL_DISCARD');}

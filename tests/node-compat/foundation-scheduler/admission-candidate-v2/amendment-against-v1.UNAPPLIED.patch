@@ -1,0 +1,44 @@
+--- a/tests/node-compat/private-ticks-admission.mjs
++++ b/tests/node-compat/private-ticks-admission.mjs
+@@ -70,7 +70,7 @@
+   assert.deepEqual(definitions,enabled?['-D'+name+'=1']:[], 'Unexpected macro '+name);
+   assert(!tokens.includes('-U'+name),'Unexpected macro undefinition '+name);
+ }
+-function compiled(command, candidates, enabled, events) {
++function compiled(command, candidates, enabled, events, streamWeb) {
+   const tokens=words(command), input=tokens[tokens.indexOf('-c')+1];
+   assert(input && !input.startsWith('-'));
+   const paths=candidates.filter(path=>input.endsWith('/'+path));
+@@ -78,6 +78,8 @@
+   macro(tokens,'NODE_COMPAT_INTERNAL_TICKS',enabled);
+   macro(tokens,'NODE_COMPAT_STRICT_INITIALIZATION',true);
+   macro(tokens,'NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER',events);
++  // CMake selects this PRIVATE definition only on builtin_node_compat.
++  macro(tokens,'NODE_COMPAT_STREAM_WEB',streamWeb&&paths[0].startsWith('builtins/node-compat/'));
+   return paths[0];
+ }
+ function resolveLayer(map,policy) {
+@@ -183,17 +185,20 @@
+   assert.equal(metadata.componentizeJsRevision,pins.componentizeJsRevision);
+   const cpp=current.filter(item=>item.path.endsWith('.cpp')&&/^(builtins|runtime)\//.test(item.path)).map(item=>item.path);
+   assert.equal(cpp.length,61);
+-  const active=cpp.filter(path=>enabled||path!=='runtime/node_tick_queue.cpp');
++  const active=cpp.filter(path=>(enabled||path!=='runtime/node_tick_queue.cpp')&&
++    (metadata.streamWebEnabled||path!=='builtins/node-compat/stream-web-kernel.cpp'));
+   assert(Array.isArray(ticks.actualLayoutCompileCommands));
+   const layout=new Map();
+-  for(const command of ticks.actualLayoutCompileCommands){const path=compiled(command,cpp,enabled,metadata.eventsEnabled);assert(!layout.has(path));layout.set(path,command);}
++  for(const command of ticks.actualLayoutCompileCommands){const path=compiled(command,cpp,enabled,metadata.eventsEnabled,metadata.streamWebEnabled);assert(!layout.has(path));layout.set(path,command);}
+   assert.deepEqual([...layout.keys()].sort(),active.sort());
+   assert.deepEqual(protectedPolicy.actualLayoutCompileCommands,ticks.actualLayoutCompileCommands);
+   const embedding=ticks.actualEmbeddingCompileCommands;
+   assert(Array.isArray(embedding)&&embedding.length===1);
+-  compiled(embedding[0],['embedding/embedding.cpp'],enabled,metadata.eventsEnabled);
++  compiled(embedding[0],['embedding/embedding.cpp'],enabled,metadata.eventsEnabled,metadata.streamWebEnabled);
+   assert.deepEqual(metadata.actualEmbeddingCompileCommands,embedding);assert.deepEqual(protectedPolicy.actualEmbeddingCompileCommands,embedding);
+   assert.deepEqual(ticks.actualQueueCompileCommands,enabled?[layout.get('runtime/node_tick_queue.cpp')]:[]);
++  assert.deepEqual(metadata.actualStreamWebKernelCompileCommands,
++    metadata.streamWebEnabled?[layout.get('builtins/node-compat/stream-web-kernel.cpp')]:[]);
+   const strictCpp=Object.keys(strictSources).filter(path=>path.endsWith('.cpp')&&(enabled||path!=='runtime/node_tick_queue.cpp'));
+   assert.equal(strict.actualNativeCompileCommands.length,strictCpp.length);
+   assert.deepEqual([...strict.actualNativeCompileCommands].sort(),strictCpp.map(path=>layout.get(path)).sort());

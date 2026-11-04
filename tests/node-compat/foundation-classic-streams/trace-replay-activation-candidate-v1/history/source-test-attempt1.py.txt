@@ -1,0 +1,80 @@
+"""Own source/data/path checks, never activation main or native preflight."""
+from pathlib import Path
+import ast
+import hashlib
+import importlib.util
+import json
+import sys
+
+HERE = Path(__file__).resolve().parent
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(HERE))
+spec = importlib.util.spec_from_file_location('trace_replay_pure_data_functions', HERE / 'activate.py')
+model = importlib.util.module_from_spec(spec); spec.loader.exec_module(model)
+checks = []
+
+
+def sha(data): return hashlib.sha256(data).hexdigest()
+
+
+def check(name, condition=True):
+    assert condition, name; checks.append(name)
+
+
+def main():
+    assert len(sys.argv) == 2
+    output = Path(sys.argv[1]).absolute()
+    assert str(output).startswith('/tmp/starling-node-compat/') and not output.exists()
+    output.mkdir(parents=True, exist_ok=False)
+    payload, records = model.source_payload()
+    check('all64 actual current bodies present', len(records) == 64)
+    changed = [r['destinationPath'] for r in records if payload[r['destinationPath']] != (model.BASE / r['destinationPath']).read_bytes()]
+    check('62 bodies exact and only finite guard2 change', len(changed) == 2)
+    proof = json.loads((HERE / 'body-transformations.json').read_bytes())
+    for row in proof['files']:
+        before = Path(row['origin']).read_text(); text = before
+        check('exact old source ' + row['path'], sha(before.encode()) == row['beforeSha256'])
+        for edit in row['edits']:
+            assert text.count(edit['old']) == edit['count']; text = text.replace(edit['old'], edit['new'])
+        check('exact forward ' + row['path'], text == (HERE / row['path']).read_text() and sha(text.encode()) == row['afterSha256'])
+        for edit in reversed(row['edits']):
+            assert text.count(edit['new']) == edit['count']; text = text.replace(edit['new'], edit['old'])
+        check('exact reverse ' + row['path'], text == before)
+    actual_pins = (model.RUNTIME / 'runtime-pins.json').read_bytes()
+    actual_review = (model.RUNTIME / 'root-review-receipt.json').read_bytes()
+    payload.update({'runtime-pins.json': actual_pins, 'root-review-receipt.json': actual_review})
+    for name, expected, count in [
+        ('input-freeze.json', 'a9c41e39e811620a27d71cce21f084a17c7c0f785ae69dd6b9d2c29085e23a97', 2055),
+        ('capability/input-freeze.json', '24ade3ad845315b96190b3977c7f7e256faf1e16ba274f46b86445d1a944475a', 2054)]:
+        old, rows, mappings = model.map_inputs(name, expected, payload)
+        check('all inherited paths map to exact source bytes ' + name, len(old['inputs']) == count)
+        for relative in old['liveComputedInputs']:
+            check('actual staged live input sealed ' + name + '/' + relative, str(model.SOURCE_ROOT / relative) in rows)
+        (output / (name.replace('/', '-') + '.mapping.json')).write_text(json.dumps({'rows': list(rows.values()), 'mappings': mappings}, indent=2) + '\n')
+    template = (HERE / 'native-preflight.template.mjs').read_text()
+    check('absolute actual runtime template token', "RUNTIME='@RUNTIME_ROOT@'" in template)
+    check('index hash precedes runtime import', template.index('await indexedRuntime()') < template.index('await import(pathToFileURL')))
+    check('new Root/source states fixed', 'ROOT_REVIEWED_CLASSIC_TRACE342_REPLAY_AUTHORITY_BOUND_NOT_EXECUTED' in template and 'ACTUAL_REVIEWED_CLASSIC_TRACE_RUNTIME_SOURCE_FAMILY_NOT_EXECUTED' in template)
+    check('captured native recheck retained', 'const nativeRecheck=native.recheck' in template)
+    check('hash manifest before rows retained', "regular(join(HERE,'input-freeze.json'),INPUTS_SHA),document=JSON.parse(raw)" in template)
+    check('all four tokens reconstructed', "replaceAll('@'+'RUNTIME_ROOT'+'@',RUNTIME)" in template)
+    check('HTTP component pin remains null', json.loads(payload['capability/http-component-pins.json'])['component'] is None)
+    guard = payload['release/helpers/native-scalar-harness.mjs'].decode()
+    check('trace provenance mandatory in finite oracle guard', 'assert.deepEqual(metadata.classicTraceSourcePolicy,classic.classicTraceSourcePolicy)' in guard)
+    check('unchanged exact registrar and original oracle identities', '19eef9879c94e5232238f6df738d57057d384fa025849ee319fcf51eb06eda2b' in guard and '2848f059fb5693aa37c54945bff685444c8431007ceaec59d3335d01f7aced4a' in guard)
+    check('exact full strict tags retained', all('sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1-classic-streams-source-v1' in payload[n].decode() for n in ['release/runners/events.mjs', 'off/runners/sync.mjs', 'off/runners/runtime.mjs', 'off/runners/callbacks.mjs']))
+    for path in HERE.rglob('*.py'):
+        ast.parse(path.read_text(), filename=str(path)); check('Python AST ' + str(path.relative_to(HERE)))
+    check('no future activation output exists', not model.OUTPUT.exists())
+    check('no future staging output exists', not model.OUTPUT.with_name(model.OUTPUT.name + '.staging').exists())
+    result = {'schemaVersion': 1, 'state': 'TRACE_REPLAY_SOURCE_PATH_AND_GUARD_CHECKS_PASSED_NO_ACTIONS',
+        'passed': len(checks), 'checks': checks, 'output': str(output), 'inheritedBodies': 64,
+        'currentV3BodiesByteIdentical': 62, 'newChangedHostBodies': 2,
+        'oldInputRowsChecked': [2055, 2054], 'nativePreflightOrActivationMainExecuted': False,
+        'guestNodeOracleComponentizerNativeBuildHostOrTimingExecuted': False,
+        'oldReportsOrStagedFilesModified': False, 'activationOutputCreated': False}
+    (output / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
+    print(json.dumps(result))
+
+
+if __name__ == '__main__': main()

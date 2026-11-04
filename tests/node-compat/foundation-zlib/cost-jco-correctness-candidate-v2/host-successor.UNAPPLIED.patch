@@ -1,0 +1,236 @@
+--- cost-jco-correctness-candidate-v1/admission.mjs
++++ cost-jco-correctness-candidate-v2/admission.mjs
+@@ -1,46 +1,73 @@
+-// New action model only. T3's action enum and ordinary350 admission stay CLOSED.
+-import {readFile,lstat} from 'node:fs/promises';
+-import {join,dirname,isAbsolute} from 'node:path';
+-import {fileURLToPath} from 'node:url';
++// Dedicated untimed correctness action. No T3 action state is forged/projected.
++import {dirname,join} from 'node:path';
++import {lstat} from 'node:fs/promises';
++import {fileURLToPath,pathToFileURL} from 'node:url';
+ import {descriptor,regular,sha} from './authority.mjs';
++import {indexed,deepFreeze,local} from './proofs.mjs';
+ import {need} from './transport.mjs';
++import {PARSER} from './parser-tuple.mjs';
+ const HERE=dirname(fileURLToPath(import.meta.url));
+-export const TOOLING='ff208e72d0b87933aa75cdeb7c1ae16f29aa6ae94c357318a9d6676af04b36b8';
+-export const GUEST='ebe8fa901a3516358539c0458b09cad822308f9a3b0c76db33015ff378a8eae8';
+-export const PUBLICATION='4621f7e72b4fb0555a5df630b1aedd4d2a04743b0db9188fc50099779f07387b';
+-export const ARMS=Object.freeze(['native-on','fflate-on','fflate-off']);
+-export const OUTPUT='/private/tmp/starling-node-compat/zlib-cost-jco-correctness-v1';
+-function proof(value,label){need(value&&typeof value==='object',label+' actual indexed proof required');for(const key of['index','result']){const row=descriptor(value[key]);need(Number.isSafeInteger(row.bytes)&&row.bytes>0&&row.bytes<=32*1024*1024,label+' bounded proof');}}
+-export function authorityModel(value,sourceSha){
+- sha(sourceSha);need(value?.schemaVersion===1&&value.state==='ROOT_REVIEWED_ZLIB_COST_JCO_CORRECTNESS_V1'&&value.action==='untimed-jco-correctness'&&value.actionAllowed===true,'Separate exact Root correctness authority; NULL/unreviewed refuses');
+- need(value.correctnessSourceIndexSha256===sourceSha&&value.toolingSourceIndexSha256===TOOLING&&value.guestSourceIndexSha256===GUEST&&value.sourcePublicationIndexSha256===PUBLICATION,'Exact source/guest/publication ancestry');need(value.componentSourceIndexSha256==='e7252156f464f3a73621c002d01b95fa309ebc8208934539687d54d885257caa','Only corrected WIT source ancestry; actual artifact/ABI proof remains required');
+- need(value.outputRoot===OUTPUT&&value.workerTimeoutMs===600000&&value.retainedRotations===3&&value.primaryCases===30&&value.primaryEncoderStreams===45&&value.primaryCrossdecodeEdges===135,'Finite fresh correctness domain');
+- need(value.ffOffEncodings===15&&value.ffOffNodeEdges===15&&value.ffOffGuestEdges===45,'Separate actual FF-OFF domain');
+- need(value.metadataProjection===false&&value.operationalAdmission===false&&value.nativeInputs===350&&value.sourcePromotionAllowed===false&&value.pilotOrTimingAllowed===false&&value.stockWasmtimeExecutionAllowed===false,'No projection/ordinary admission/timing/Wasmtime authority');
+- for(const name of['sourceIndependentReview','sourcePublicationReview','rootReviewedNativePair','rootReviewedNodeOracleRender','actualGeneratedLoadingProtocolReview','freshNodeMatrixDecoderReview'])proof(value[name],name);
+- for(const kind of['actualComponentReviews','actualBundleReviews']){need(JSON.stringify(Object.keys(value[kind]??{}).sort())===JSON.stringify([...ARMS].sort()),'Exactly three real per-arm '+kind);for(const arm of ARMS)proof(value[kind][arm],arm+' '+kind);}
++export const TOOLING='ff208e72d0b87933aa75cdeb7c1ae16f29aa6ae94c357318a9d6676af04b36b8',GUEST='ebe8fa901a3516358539c0458b09cad822308f9a3b0c76db33015ff378a8eae8',PUBLICATION='4621f7e72b4fb0555a5df630b1aedd4d2a04743b0db9188fc50099779f07387b';
++export const COMPONENT='cf3110b3af503fecd2408781a4dcb53b21670b74cd94e3266c4f0b86f795d794';
++export const ARMS=Object.freeze(['native-on','fflate-on','fflate-off']),OUTPUT='/private/tmp/starling-node-compat/zlib-cost-jco-correctness-v2';
++export const NODE=Object.freeze({path:'/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node',sha256:'e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0',bytes:108619024});
++const PARENTS=Object.freeze({
++ 'cost-component-glue-amendment-v1':COMPONENT,
++ 'cost-component-wit-amendment-v1':'e7252156f464f3a73621c002d01b95fa309ebc8208934539687d54d885257caa',
++ 'cost-component-candidate-v1':'a2fa62b3ab63a6aca044aec9a83c1ff5a09edaa208eb615226a13845bf1522f9',
++ 'cost-tooling-candidate-v3':TOOLING,'cost-guest-oracle-candidate-v2':GUEST,
++ 'cost-jco-correctness-candidate-v1':'610295513e79ffa3a926c466f2b07a05d465694e8ee7de706f3966052f8f305a'});
++function proof(value){need(value?.index&&value?.result,'Actual indexed proof required');for(const name of['index','result']){const r=descriptor(value[name]);need(Number.isSafeInteger(r.bytes)&&r.bytes>0,'Actual bounded proof bytes');}}
++export function authorityModel(v,sourceSha){
++ sha(sourceSha);need(v?.schemaVersion===1&&v.state==='ROOT_REVIEWED_ZLIB_COST_JCO_CORRECTNESS_V2'&&v.action==='untimed-jco-correctness'&&v.actionAllowed===true,'Dedicated actual Root correctness authority; NULL/unreviewed refuses');
++ need(v.correctnessSourceIndexSha256===sourceSha&&v.componentSourceIndexSha256===COMPONENT&&v.toolingSourceIndexSha256===TOOLING&&v.guestSourceIndexSha256===GUEST&&v.sourcePublicationIndexSha256===PUBLICATION,'Exact current source/component/native publication ancestry');
++ need(v.outputRoot===OUTPUT&&v.workerTimeoutMs===600000&&v.retainedRotations===3&&v.primaryCases===30&&v.primaryEncoderStreams===45&&v.primaryCrossdecodeEdges===135&&v.ffOffEncodings===15&&v.ffOffNodeEdges===15&&v.ffOffGuestEdges===45,'Exact finite untimed scope');
++ need(v.nativeInputs===350&&v.metadataProjection===false&&v.operationalAdmission===false&&v.sourcePromotionAllowed===false&&v.pilotOrTimingAllowed===false&&v.stockWasmtimeExecutionAllowed===false&&v.nodeMatrixCodecCallsAllowed===true&&v.ordinaryGuestCallsAllowed===true,'No admission/promotion/WT/timing extension; actual untimed Node/Jco calls need explicit authority');
++ proof(v.sourceIndependentReview);descriptor(v.oracle);
++ for(const kind of['componentBuildAuthorities','actualComponentReviews']){need(JSON.stringify(Object.keys(v[kind]??{}).sort())===JSON.stringify([...ARMS].sort()),'Exactlythree actual per-arm '+kind);for(const arm of ARMS){if(kind==='actualComponentReviews')proof(v[kind][arm]);else descriptor(v[kind][arm]);}}
+  return true;
+ }
+-export function implementationReady(slots){
+- // Do not fill these from a caller's config. They are reviewed SOURCE slots.
+- need(slots?.runtimeActionsEnabled===true&&slots.actualGeneratedLoadingProtocol!==null&&slots.reviewedComponentSourceIndexSha256!==null&&slots.freshNodeMatrixDecoderImplementation!==null,'SOURCE gate closed: real generated loader, ABI and Node matrix decoder are not implemented/reviewed');
+- throw new Error('ERR_COST_JCO_CORRECTNESS: this revision has no activated implementation; a new immutable source cut is required');
++async function sourceIndex(root,expected){const path=join(root,'index.json');const raw=await lstat(path);const ix=descriptor({path,sha256:expected,bytes:raw.size}),value=JSON.parse(await regular(ix));need(value.schemaVersion===1&&Array.isArray(value.files)&&value.files.length<=1024,'Finite immutable source index');const rows=[],seen=new Set();
++ for(const item of value.files){local(item.path);need(!seen.has(item.path),'Unique source row');seen.add(item.path);const r=descriptor({path:join(root,item.path),sha256:item.sha256,bytes:item.bytes});await regular(r,{maxBytes:64*1024*1024});rows.push(r);}
++ return Object.freeze({rows:Object.freeze(rows),recheck:async()=>{await regular(ix);for(const r of rows)await regular(r,{maxBytes:64*1024*1024});}});
+ }
+-function member(value){need(typeof value==='string'&&!isAbsolute(value)&&!value.includes('\\')&&!value.includes('\0')&&value.split('/').every(p=>p&&p!=='.'&&p!=='..'),'Finite indexed source member');return value;}
+-async function ownIndex(expected){
+- const path=join(HERE,'index.json'),size=(await lstat(path)).size,ix=descriptor({path,sha256:sha(expected),bytes:size});
+- const raw=await regular(ix),value=JSON.parse(raw);need(value.schemaVersion===1&&Array.isArray(value.files)&&value.files.length<=128,'Finite own source index');
+- const seen=new Set(),rows=[];for(const item of value.files){const name=member(item.path);need(!seen.has(name),'Unique source member');seen.add(name);const row=descriptor({path:join(HERE,name),sha256:item.sha256,bytes:item.bytes});await regular(row,{maxBytes:64*1024*1024});rows.push(row);}
+- return{rows,recheck:async()=>{await regular(ix);for(const row of rows)await regular(row,{maxBytes:64*1024*1024});}};
++export function artifactModel(r,arm){
++ need(r?.schemaVersion===1&&r.state==='INDEPENDENT_ZLIB_COST_COMPONENT_ARTIFACT_REVIEW_PASSED_V1'&&r.verifiedPassed===true&&r.arm===arm,'Actual independent construction-artifact review, not source review or failed partial');
++ need(r.componentSourceIndexSha256===COMPONENT&&r.toolingSourceIndexSha256===TOOLING&&r.guestSourceIndexSha256===GUEST&&r.sourcePublicationIndexSha256===PUBLICATION,'Actual component source identities');
++ need(r.externalParentExitCode===0&&r.rawWorkerExitCode===0&&r.ownedGroupGone===true&&r.generatedModuleImported===false&&r.ordinaryGuestExportsInvoked===false&&r.operationalAdmission===false&&r.timingAllowed===false,'Actual clean construction/cleanup only; ordinary calls are new authority');
++ need(r.generatedJsGluePolicy==='JCO7_SCALAR_FUNCTIONS_PLUS_EXACT_EMPTY_UTIL_V1'&&Array.isArray(r.emittedImports)&&r.emittedImports.length===0,'Exact scalar/helper/import policy');
++ const abi={identity:'() -> string',setup:'(u32) -> string',observe:'(u32) -> string',batch:'(u32,u32) -> string',checkpoint:'() -> string',stage:'(string) -> string',validate:'(string) -> string'};need(r.emittedAbi&&JSON.stringify(Object.keys(r.emittedAbi).sort())===JSON.stringify(Object.keys(abi).sort())&&Object.entries(abi).every(([name,type])=>r.emittedAbi[name]===type),'Exact actual independently reviewed seven scalar ABI');
++ for(const name of['component','glue','core','dts','wit','transpileMetadata','packageJson','code','nativeEngine','metadata','actualBuildAuthority','externalParentTerminal','ownedWorkerTerminal','workerIndex','workerCompletion','parentResult','workerResult'])descriptor(r[name]);
++ const root='/private/tmp/starling-node-compat/zlib-cost-component-v3-'+arm+'/worker';
++ for(const[name,path]of Object.entries({component:'codec-cost.component.wasm',glue:'transpiled/codec_cost.js',core:'transpiled/codec_cost.core.wasm',dts:'transpiled/codec_cost.d.ts',wit:'emitted.wit',transpileMetadata:'transpile-metadata.json',packageJson:'transpiled/package.json',workerIndex:'index.json',workerCompletion:'completion.json',workerResult:'results.json'}))need(r[name].path===join(root,path),'Only actual successful v3 artifact namespace '+name);
++ return true;
+ }
++const same=(a,b)=>a.path.replace(/^\/tmp(?=\/|$)/,'/private/tmp')===b.path.replace(/^\/tmp(?=\/|$)/,'/private/tmp')&&a.sha256===b.sha256&&a.bytes===b.bytes;
+ export async function correctnessPreflight({correctnessSourceIndexSha256,rootAction}={}){
+- need(correctnessSourceIndexSha256&&rootAction,'NULL authority refuses before artifact/tool/output access');
+- const captured=descriptor(rootAction),raw=await regular(captured),value=JSON.parse(raw);authorityModel(value,correctnessSourceIndexSha256);
+- const source=await ownIndex(correctnessSourceIndexSha256),slotRow=source.rows.find(row=>row.path===join(HERE,'implementation-slots.json'));need(slotRow,'Implementation slots indexed once');
+- const slots=JSON.parse(await regular(slotRow));
+- implementationReady(slots); // Always refuses in this sealed source revision.
+- // No configured helper, generated JS, provider, codec, worker, output or timing
+- // can be reached. A successor must replace this gate using real observed glue,
+- // authenticate ALL proofs before loaders and capture their primitive rechecks.
+- await source.recheck();await regular(captured);throw new Error('Unreachable closed correctness source');
++ need(correctnessSourceIndexSha256&&rootAction,'NULL correctness authority refuses before source/artifact/output access');const expectedSourceSha=sha(correctnessSourceIndexSha256),rootRow=descriptor(rootAction),rootBytes=await regular(rootRow),v=deepFreeze(JSON.parse(rootBytes));authorityModel(v,expectedSourceSha);
++ const own=await sourceIndex(HERE,expectedSourceSha),parents=[];for(const[name,digest]of Object.entries(PARENTS))parents.push(await sourceIndex(join(HERE,'..',name),digest));
++ const peer=await indexed(v.sourceIndependentReview,{state:'INDEPENDENT_ZLIB_COST_JCO_CORRECTNESS_SOURCE_REVIEW_PASSED_V2'});need(peer.data.correctnessSourceIndexSha256===expectedSourceSha&&peer.data.sourceOnly===true&&peer.data.sourceReviewPassed===true&&peer.data.ownerActionsInvoked===false,'Own exact independent source review');
++ const {componentPreflight}=await import('../cost-component-glue-amendment-v1/guard.mjs');const {checkOwnedTerminal,parsePublicWit,parsePublicDts,checkTranspileMetadata}=await import('./glue-policy.mjs');
++ const frames={},reviews=[];
++ for(const arm of ARMS){
++  const authorityRow=descriptor(v.componentBuildAuthorities[arm]),buildAuthority=JSON.parse(await regular(authorityRow));
++  // Reuse the GENUINE prior component-build authority unchanged for its read-only
++  // admission API. Do not change/strip it into a T3 or correctness action state.
++  const frame=await componentPreflight({componentSourceIndexSha256:COMPONENT,arm,rootAction:authorityRow});
++  const proof=await indexed(v.actualComponentReviews[arm],{state:'INDEPENDENT_ZLIB_COST_COMPONENT_ARTIFACT_REVIEW_PASSED_V1'}),r=proof.data;artifactModel(r,arm);need(same(r.actualBuildAuthority,authorityRow),'Actual construction authority crossbinding');
++  need(same(r.code,frame.codeRow)&&same(r.nativeEngine,{path:frame.enginePath,sha256:frame.pin.engineSha256,bytes:frame.pin.engineBytes})&&r.metadata.path.replace(/^\/tmp(?=\/|$)/,'/private/tmp')===(frame.enginePath+'.build.json').replace(/^\/tmp(?=\/|$)/,'/private/tmp')&&r.metadata.sha256===frame.pin.metadataSha256&&r.oracleSha256===v.oracle.sha256,'Actual code/native/oracle tuple equals genuine admission');
++  need(same(v.oracle,buildAuthority.nodeOracleRenderProof.oracle),'Every arm uses the same real reviewed oracle/render');
++  const evidenceRows=Object.freeze(['component','glue','core','dts','wit','transpileMetadata','packageJson','code','nativeEngine','metadata','externalParentTerminal','ownedWorkerTerminal','workerIndex','workerCompletion','parentResult','workerResult'].map(name=>descriptor(r[name])));for(const row of evidenceRows)await regular(row,{maxBytes:64*1024*1024});
++  const parent=JSON.parse(await regular(r.externalParentTerminal)),owned=JSON.parse(await regular(r.ownedWorkerTerminal));need(parent.rawExitCode===0,'Actual external parent raw0');checkOwnedTerminal(owned);
++  const worker=JSON.parse(await regular(r.workerResult)),parentResult=JSON.parse(await regular(r.parentResult));need(worker.state==='ZLIB_COST_COMPONENT_BUILT_UNREVIEWED_V1'&&parentResult.state==='ZLIB_COST_COMPONENT_BUILD_COMPLETE_UNREVIEWED_V1'&&worker.arm===arm&&parentResult.arm===arm,'Preserved genuine unreviewed construction records; independent review is separate');
++  need(parentResult.sourceIndexSha256===COMPONENT&&parentResult.rawWorkerExitCode===0&&parentResult.ownedGroupGone===true&&parentResult.ordinaryGuestExportsInvoked===false,'Actual parent source/terminal/call scope');
++  need(same(parentResult.rootAction,authorityRow)&&same(parentResult.workerCompletion,r.workerCompletion)&&same(worker.nativeEngine,r.nativeEngine)&&same(worker.metadata,r.metadata)&&same(worker.source,r.code)&&worker.component.sha256===r.component.sha256&&worker.component.bytes===r.component.bytes&&worker.generatedModuleImported===false&&worker.ordinaryGuestExportsInvoked===false,'Actual raw construction tuples and unexecuted namespace scope match review');
++  const windex=JSON.parse(await regular(r.workerIndex)),complete=JSON.parse(await regular(r.workerCompletion));need(complete.state==='COMPONENT_WORKER_COMPLETE_EXTERNAL_EXIT_ZERO_REQUIRED'&&complete.index.sha256===r.workerIndex.sha256&&complete.index.bytes===r.workerIndex.bytes&&complete.result.sha256===r.workerResult.sha256&&complete.result.bytes===r.workerResult.bytes&&complete.component.sha256===r.component.sha256&&complete.component.bytes===r.component.bytes,'Actual worker completion/index/result/component binding');const artifacts=[],names=new Set();need(windex.schemaVersion===1&&Array.isArray(windex.files)&&windex.files.length>0&&windex.files.length<=256,'Finite actual worker index');
++  for(const row of windex.files){local(row.path);need(!names.has(row.path),'Unique actual worker inventory row');names.add(row.path);const rr=descriptor({path:join(dirname(r.workerIndex.path),row.path),sha256:row.sha256,bytes:row.bytes});await regular(rr,{maxBytes:64*1024*1024});artifacts.push(rr);}
++  for(const name of['component','glue','core','dts','wit','transpileMetadata','packageJson','workerResult'])need(artifacts.filter(row=>same(row,r[name])).length===1,'Each actual critical artifact worker-indexed exactly once');
++  parsePublicWit(new TextDecoder('utf-8',{fatal:true}).decode(await regular(r.wit)));parsePublicDts(new TextDecoder('utf-8',{fatal:true}).decode(await regular(r.dts)));checkTranspileMetadata(JSON.parse(await regular(r.transpileMetadata)));
++  const artifact=deepFreeze({parentAuditedActualComponent:true,...Object.fromEntries(['component','glue','core','dts','wit','transpileMetadata','packageJson'].map(name=>[name,descriptor(r[name])]))});frames[arm]=Object.freeze({frame,artifact,proofResult:r,authority:authorityRow});reviews.push({proof,artifacts,authorityRow,evidenceRows});
++ }
++ await regular(descriptor(v.oracle));await regular(PARSER);const recheck=async()=>{await regular(rootRow);await own.recheck();for(const p of parents)await p.recheck();await peer.recheck();for(const arm of ARMS)await frames[arm].frame.recheck();for(const r of reviews){await r.proof.recheck();await regular(r.authorityRow);for(const row of r.evidenceRows)await regular(row,{maxBytes:64*1024*1024});for(const row of r.artifacts)await regular(row,{maxBytes:64*1024*1024});}await regular(descriptor(v.oracle));await regular(PARSER);};await recheck();
++ return Object.freeze({rootAction:rootRow,sourceSha:expectedSourceSha,frames:Object.freeze(frames),oracle:descriptor(v.oracle),outputRoot:OUTPUT,workerTimeoutMs:600000,criticalSourceFiles:Object.freeze([...own.rows,...parents.flatMap(p=>p.rows)]),recheck});
+ }
+--- cost-jco-correctness-candidate-v1/run.mjs
++++ cost-jco-correctness-candidate-v2/run.mjs
+@@ -1,16 +1,71 @@
+-// CLOSED source entry. No loader/import/output happens before this gate.
+-import {resolve} from 'node:path';
+-import {fileURLToPath} from 'node:url';
+-import {regular} from './authority.mjs';
+-import {correctnessPreflight} from './admission.mjs';
++// Separate finite untimed correctness action. Import creates no output/process.
++import {dirname,join,relative,resolve,isAbsolute} from 'node:path';
++import {fileURLToPath,pathToFileURL} from 'node:url';
++import {mkdir,lstat,readdir,readFile,statfs} from 'node:fs/promises';
++import {correctnessPreflight,NODE,COMPONENT,TOOLING,GUEST} from './admission.mjs';
++import {descriptor,regular,hash} from './authority.mjs';
+ import {need} from './transport.mjs';
++import {DurableOutput} from './durable.mjs';
++import {runOwnedCommand} from './durable-host.mjs';
++import {primaryJobs,primaryStreams,offJobs} from './plan.mjs';
++import {requireCoverage} from './coverage.mjs';
++import {parseOracleBytes} from './oracle-data.mjs';
++import {assertSameStream} from './scenarios.mjs';
++import {executeFreshNodeEdges} from './node-edges.mjs';
++const HERE=dirname(fileURLToPath(import.meta.url));
++function childName(root,path){const name=relative(root,path);need(name&&!isAbsolute(name)&&!name.startsWith('../')&&!name.includes('\\')&&name.split('/').every(v=>v&&v!=='.'&&v!=='..'),'Bounded owned output name');return name;}
++async function disk(minimum){const s=await statfs('/private/tmp/starling-node-compat');need(s.bavail*s.bsize>=minimum,'Operational disk guard; no space/recovery guarantee');}
++async function collectJob(output,root,job,sourceSha,componentSha){
++ const indexPath=join(root,'index.json'),completePath=join(root,'completion.json'),indexBytes=await readFile(indexPath),complete=JSON.parse(await readFile(completePath));need(complete.state==='JCO_CORRECTNESS_JOB_COMPLETE_EXTERNAL_OWNED_EXIT_ZERO_REQUIRED'&&complete.index.sha256===hash(indexBytes)&&complete.index.bytes===indexBytes.length&&complete.sourceIndexSha256===sourceSha&&complete.componentSha256===componentSha,'Exact actual child completion/index/source/component');
++ const index=JSON.parse(indexBytes);need(index.schemaVersion===1&&Array.isArray(index.files)&&index.files.length>0&&index.files.length<=8192,'Bounded actual child file inventory');const seen=new Set();
++ for(const row of index.files){const path=join(root,row.path),name=childName(root,path);need(!seen.has(name),'Unique child artifact');seen.add(name);await regular({path,sha256:row.sha256,bytes:row.bytes},{maxBytes:64*1024*1024});output.rows.set(childName(output.root,path),{path:childName(output.root,path),sha256:row.sha256,bytes:row.bytes});}
++ for(const path of[indexPath,completePath]){const raw=await readFile(path);output.rows.set(childName(output.root,path),{path:childName(output.root,path),sha256:hash(raw),bytes:raw.length});}
++ const resultsPath=join(root,'results.json'),resultRow=index.files.find(row=>row.path==='results.json');need(resultRow&&resultRow.sha256===complete.results.sha256&&resultRow.bytes===complete.results.bytes,'Exact actual indexed result');const result=JSON.parse(await regular({path:resultsPath,sha256:resultRow.sha256,bytes:resultRow.bytes}));
++ need(result.state==='UNTIMED_ZLIB_COST_JCO_JOB_COMPLETE_UNREVIEWED_V2'&&result.correctnessSourceIndexSha256===sourceSha&&result.componentSourceIndexSha256===COMPONENT&&result.component.sha256===componentSha&&JSON.stringify(result.job)===JSON.stringify(job)&&result.generatedModuleImported===true&&result.initializationCompletedByModuleTLA===true&&JSON.stringify(result.externalWasiImports)==='[]'&&result.timing===false,'Exact actual worker result identity/source/job, not previous partial');
++ return{data:result,row:{path:resultsPath,sha256:resultRow.sha256,bytes:resultRow.bytes},completion:{path:completePath,sha256:hash(await readFile(completePath)),bytes:(await lstat(completePath)).size}};
++}
+ export async function runCorrectness(options){
+- await correctnessPreflight(options);
+- // The existing source cannot reach this point. Real generated loading,
+- // dedicated owned workers, fresh Node matrix decode and artifact reviews must
+- // be implemented in a successor after actual ABI/glue exists. Internal
+- // execution.mjs is prepared, not an unguarded public action alternative.
+- throw new Error('ERR_COST_JCO_CORRECTNESS: unconfigured actual execution');
++ const admitted=await correctnessPreflight(options); // NULL/proofs fail BEFORE output
++ const casesRow=descriptor(admitted.criticalSourceFiles.find(row=>row.path===join(HERE,'cases.json'))),cases=JSON.parse(await regular(casesRow)),oracleBytes=await regular(admitted.oracle),data=parseOracleBytes(oracleBytes,admitted.oracle.sha256,cases);
++ await disk(2*1024**3);await admitted.recheck();const output=await DurableOutput.create(admitted.outputRoot),primary=[],mainEdges=[],offEncodings=[],offNodeEdges=[],offGuestEdges=[],origins=[],streams=new Map();
++ const write=(path,value)=>output.write(path,value,{json:true}),writeBytes=(path,value)=>output.write(path,value);
++ const checkOwned=(await import('./glue-policy.mjs')).checkOwnedTerminal;
++ try{
++  await mkdir(join(output.root,'jobs'),{mode:0o700});await mkdir(join(output.root,'processes'),{mode:0o700});
++  const criticalFiles=[...admitted.criticalSourceFiles,admitted.rootAction];
++  async function run(job,name){
++   await disk(800*1024**2);const artifact=admitted.frames[job.arm].artifact;
++   const value={schemaVersion:1,state:'PARENT_AUDITED_ZLIB_COST_JCO_WORKER_V2',parentAuditedActualComponents:true,correctnessSourceIndexSha256:admitted.sourceSha,componentSourceIndexSha256:COMPONENT,parentOutputRoot:output.root,outputRoot:join(output.root,'jobs',name),jobName:name,job,artifact,oracle:admitted.oracle,cases:casesRow,criticalFiles};
++   const row=await write('descriptors/'+name+'.json',value);need(row.bytes<=4*1024*1024,'Finite worker descriptor file, never a giant CLI argument');const d={path:join(output.root,row.path),sha256:row.sha256,bytes:row.bytes},registered=new Set();
++   const status=await runOwnedCommand({output:output.root,name,executable:NODE.path,args:[join(HERE,'worker.mjs'),JSON.stringify(d)],write:(path,data)=>output.write(childName(output.root,path),data),register:path=>registered.add(path),timeoutMs:600000,maxOutputBytes:16*1024*1024,onProgress:event=>process.stdout.write(JSON.stringify({event:'untimed-correctness-operational-heartbeat',...event})+'\n')});
++   // All raw pipes/terminal are persisted before any success assertion.
++   for(const path of registered){const raw=await readFile(path),name=childName(output.root,path);output.rows.set(name,{path:name,sha256:hash(raw),bytes:raw.length});}
++   checkOwned(status);const collected=await collectJob(output,value.outputRoot,job,admitted.sourceSha,artifact.component.sha256);origins.push({job,workerResults:collected.row,workerCompletion:collected.completion,ownedTerminal:status.terminalPath,ownedRawExitCode:0,component:artifact.component,actualFreshOwnedProcess:true});return collected.data.observed;
++  }
++  for(const job of primaryJobs()){
++   const name=job.kind==='retained-primary'?'retained-'+job.arm:'fresh-'+job.arm+'-'+String(job.caseId).padStart(2,'0'),result=await run(job,name);
++   need(result.arm===job.arm&&result.records.length===(job.kind==='retained-primary'?90:1),'Whole actual primary job count');
++   for(const row of result.records)primary.push({...row,kind:job.kind});
++   for(const stream of result.streams){const old=streams.get(stream.streamId);if(old)await assertSameStream(write,'compare-'+name+'-'+stream.fixture+'-'+stream.format,stream,old);else{need(job.kind==='retained-primary','First actual encoder stream originates in retained full case proof');streams.set(stream.streamId,stream);}}
++  }
++  const primarySet=new Map(data.nodeInputs.map(row=>[row.streamId,row]));for(const stream of streams.values())if(stream.provider!=='fflate-off')primarySet.set(stream.streamId,stream);
++  const expectedStreams=primaryStreams();need(primarySet.size===45&&expectedStreams.every(row=>primarySet.has(row.streamId)),'Actual full45 Node/native/FFON streams captured before matrix');
++  for(const stream of streams.values())if(stream.provider==='fflate-off'){const on=streams.get('fflate-on.'+stream.fixture+'.'+stream.format);need(on,'Actual separate FFON encoding exists');await assertSameStream(write,'off-vs-on-'+stream.fixture+'-'+stream.format,stream,on);offEncodings.push({provider:'fflate-off',fixture:stream.fixture,format:stream.format,streamId:stream.streamId,fullBytesComparedWith:on.streamId});}
++  await write('actual-encoder-streams.json',{primary:[...primarySet.values()],off:[...streams.values()].filter(row=>row.provider==='fflate-off'),origins:origins.map(row=>({job:row.job,workerResults:row.workerResults,component:row.component}))});
++  // Import genuine existing HOST Node audit API only after the full current
++  // authority/source/native/artifact chain passed. This is not a guest fallback.
++  await admitted.recheck();const nativeFrame=admitted.frames['native-on'].frame;for(const name of['node-oracle.mjs','node-transport.mjs','contract.mjs','framing.mjs','fixtures.mjs','cases.generated.mjs'])await nativeFrame.checkGuestFile(join(nativeFrame.guestRoot,name));
++  const {decodeNodeStream}=await import(pathToFileURL(join(nativeFrame.guestRoot,'node-oracle.mjs')).href),nodeZlib=await import('node:zlib'),{Buffer}=await import('node:buffer');
++  const sourceBinding={proposalIndexSha256:'e29c596df3c809bab8fd3851b224a7ec4e84177d791c5d1f909072985f047ef8',protocolDecisionSha256:'0025c7a1083d9291effe0cf51bbfef4e154353db75d433dae07f296d46d61cc6',nodeExecutableSha256:NODE.sha256,guestSourceIndexSha256:GUEST,costToolingIndexSha256:TOOLING,rootActionAuthoritySha256:admitted.rootAction.sha256};
++  const ordered=expectedStreams.map(row=>primarySet.get(row.streamId)),nodeRows=await executeFreshNodeEdges({streams:ordered,decodeNodeStream,Buffer,nodeZlib,sourceBinding,rawFixtures:data.rawFixtures,write,writeBytes,prefix:'node-main'});mainEdges.push(...nodeRows);
++  const offStreams=offJobs().encoding.map(row=>streams.get('fflate-off.'+row.fixture+'.'+row.format));need(offStreams.every(Boolean),'All15 actual off streams');offNodeEdges.push(...await executeFreshNodeEdges({streams:offStreams,decodeNodeStream,Buffer,nodeZlib,sourceBinding,rawFixtures:data.rawFixtures,write,writeBytes,prefix:'node-off'}));
++  for(const arm of['native-on','fflate-on','fflate-off'])for(let index=0;index<ordered.length;index++){
++   const stream=ordered[index],kind=arm==='fflate-off'?'off-guest-crossdecode':'main-crossdecode',result=await run({kind,arm,stream},'edge-'+arm+'-'+String(index).padStart(2,'0'));need(result.decoder===arm&&result.streamId===stream.streamId&&result.provider===stream.provider&&result.fullRawFixtureEqual===true,'Actual guest edge identity');(arm==='fflate-off'?offGuestEdges:mainEdges).push(result);
++  }
++  const coverage=requireCoverage({primary,mainEdges,offEncodings,offNodeEdges,offGuestEdges});await admitted.recheck();await output.recheck();
++  const result=await write('results.json',{schemaVersion:1,state:'UNTIMED_ZLIB_COST_JCO_CORRECTNESS_COMPLETE_PENDING_INDEPENDENT_REVIEW_V2',correctnessSourceIndexSha256:admitted.sourceSha,componentSourceIndexSha256:COMPONENT,toolingSourceIndexSha256:TOOLING,guestSourceIndexSha256:GUEST,rootAction:admitted.rootAction,oracle:admitted.oracle,components:Object.fromEntries(Object.entries(admitted.frames).map(([arm,v])=>[arm,v.artifact.component])),coverage,primary,mainEdges,offEncodings,offNodeEdges,offGuestEdges,origins,allNewOwnedWorkersCompletedZero:true,wasmtimeExecuted:false,pilotOrTimingExecuted:false,metadataProjection:false,operationalAdmission:false,runtimeAcceptanceClaim:false});
++  const index=await write('index.json',{schemaVersion:1,files:[...output.rows.values()]});const completion=await write('completion.json',{schemaVersion:1,state:'UNTIMED_JCO_CORRECTNESS_COMPLETE_EXTERNAL_PARENT_ZERO_AND_REVIEW_REQUIRED_V2',results:result,index,sourceIndexSha256:admitted.sourceSha,timingAllowed:false,operationalAdmission:false});await output.recheck();return{index,completion};
++ }catch(error){let postFailureSourceAuditPassed=false;try{await admitted.recheck();postFailureSourceAuditPassed=true;}catch{}try{await write('failure.json',{schemaVersion:1,state:'UNTIMED_JCO_CORRECTNESS_FAILED_NOT_ACCEPTED_V2',thrownType:typeof error,fullPartialRawOutputsRetained:true,completedJobOrigins:origins,postFailureSourceAuditPassed,timingAllowed:false,operationalAdmission:false});}catch{}throw error;}
++ finally{await output.close();}
+ }
+-async function main(){need(process.argv.length===3,'One exact Root config descriptor JSON');const raw=await regular(JSON.parse(process.argv[2]));await runCorrectness(JSON.parse(raw));}
+-if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url))await main();
++if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){need(process.argv.length===3,'One exact external Root config descriptor');const options=JSON.parse(await regular(JSON.parse(process.argv[2])));process.stdout.write(JSON.stringify(await runCorrectness(options))+'\n');}
+--- cost-jco-correctness-candidate-v1/README.md
++++ cost-jco-correctness-candidate-v2/README.md
+@@ -1,21 +1,23 @@
+-This is an unexecuted, source-only preparation cut for untimed zlib-cost Jco correctness. It implements ordinary JSON/byte collectors, exact counter/state models, raw-before-assert transport, and concrete public-call schedules. It does not load a generated component, invoke a provider/codec, run a worker, enable ordinary350 operational admission, or authorize timing.
++This is a SOURCE-only, unexecuted successor to correctness610. It preserves all thirteen copied collector/case/fixture/oracle/transport/coverage/lifecycle files byte-for-byte and adds the observed Jco loader plus a serial parent and owned workers. Guestebe8, six codec providers/options, all30 primary cases, oracles, seven public signatures and timing protocol remain unchanged. No codec/provider, generated module, positive preflight, worker, guest, pilot or timing action was invoked during preparation.
+ 
+-`run.mjs` uses a dedicated Root authority model and always refuses this revision before output or loaders. `implementation-slots.json` keeps real component artifact reviews, the observed generated loading protocol, and the fresh Node matrix-decoder adapter NULL. Filling a caller JSON cannot activate them. A new immutable source revision is required after genuine emitted glue/d.ts/ABI and all three component reviews exist. The corrected component source e725 is source ancestry; the held a2fa WIT-parser failure and its earlier bounded source review remain historical. Neither is an actual ABI pass.
++The only loading protocol implemented is the actual captured direct ESM/TLA shape: one top-level `await $init`, same-directory `codec_cost.core.wasm` and exact `package.json` type-module classification, seven same-name synchronous function exports and one terminal literal empty `_util`. The source parser and pure ABI policy run BEFORE importing generated JS; they reject exported `then`, extra/aliased/default/star exports, wrong arities/async functions, nonempty/mutated helpers, other JS dependencies/core URLs or a different TLA form. After import the actual namespace must still have those eight names and empty ordinary-object helper. The module namespace remains private behind a synchronous `invoke` wrapper. Raw results are persisted before type/JSON checks without Promise/thenable assimilation or coercion. No instantiate(imports) API, private memory, custom host, reset or Wasmtime CLI syntax is invented.
+ 
+-The prepared schedules preserve all 30 primary cases for native-on, fflate-on and fflate-off. Three retained rotations and one fresh process per case produce 360 primary case observations. Each case explicitly calls setup, two observe calls, untimed batch N1, checkpoint, validate with its adjacent observe pair, and checkpoint. Validate is one outer invocation containing named function entries; its counters are not a host-call count. Full raw strings are retained before type/JSON/equality checks. Unexpected opaque values are carried without properties, getters, coercion or Promise/thenable assimilation. Complete counterexamples precede compact errors; no byte clipping or assertion-formatter dump is used.
++The captured native-on v2 JS/d.ts/WIT/metadata are SOURCE observations from a failed raw1 construction attempt. They are copied as text only; component/core Wasm is not copied. Neither the failed v2 artifacts nor the earlier a2fa WIT failure is admitted. Active source ancestry is corrected componentcf311; the actual three component review slots and new Root action template are NULL/false. Future action requires exact Root state `ROOT_REVIEWED_ZLIB_COST_JCO_CORRECTNESS_V2`, this source index, all three genuine component-build authorities and independent indexed actual artifact reviews. Each review must bind source/native/code/oracle/component/core/glue/d.ts/WIT/same-directory package.json, actual external parent0, owned worker0/cleanup, actual worker index/completion/results, imports[] and seven scalar signatures plus the separate empty helper. Source-review states or declared booleans alone do not pass the real reader. All referenced actual evidence is hashed before use and rechecked before completion.
+ 
+-The main matrix has 45 actual encoder streams (15 each from Node/native-on/fflate-on) and 135 newly executed decoder edges. Earlier Node-own15 decode evidence cannot supply the fresh Node edges. FF-OFF remains separate: 15 actual encodings compared byte-for-byte with actual FF-ON, 15 fresh Node decodes of those OFF streams, and 45 actual FF-OFF decodes of the primary streams. `coverage.mjs` checks exact IDs and rejects missing/duplicate edges; coverage data alone proves no execution. `node-edges.mjs` arranges fresh calls to the existing reviewed `decodeNodeStream` API, including its retained typed returns, full bytes, strict-wrapper/raw-payload consumption and input immutability checks. No codec method was called while preparing it.
++`correctnessPreflight` reuses cf311's real `componentPreflight` read-only admission API with the genuine unchanged construction authorities. It does not forge a T3 action state or project metadata. That authenticates actual350 source/native/SDK/tool/publication/oracle/bundle closure; ordinary350 operational admission stays closed. Own/parent source indices are authenticated before dynamic external helper imports. A separate exact independent SOURCE review for this cut is also required. No execution authority is contained in this packet.
+ 
+-`Collector` checks complete decoded fixture bytes, FNV/full encoded bytes within each provider, complete input-window observations, full-prior-output stability, independent nonempty backing/mutation-restoration reports, exact named-entry/codec counters, setup-clears-stage and checkpoint cleanup. Empty output only records backing relations; it makes no addressable isolation claim. Cross-provider compressed encodings need not be identical except the explicitly required FF-ON/OFF same-provider comparison. The source checks guard observations, not private heap inspection. There is no reset, reuse, forced-GC, minimum-copy or lifetime-proof transfer across processes.
++The parent schedules93 primary jobs: three retained instances times30cases times3rotations, plus90 fresh one-case processes. It then schedules90 fresh native/FFON guest decoder edges and45 separately scoped FF-OFF edges. Every fresh job is a new detached owned Node process using the existing bounded lifecycle helper,600s cap, streamed raw pipes, persisted terminal-before-assert and owned-group cleanup. Before/after critical-file hashing surrounds loading/calls; final full source/native/tool/artifact rechecks and external parent0 remain mandatory. No failed partial job is resumed. Disk guards are2GiB before the new output and800MiB before each job, not a space guarantee.
+ 
+-The original guest ebe8, fixed options/corpus, public seven-scalar ABI and full oracle bytes are unchanged references. The source/data tests read the actual pinned Node capture only as bytes/JSON and generate deterministic fixture bytes without a codec. Synthetic observation records are test fixtures, never guest evidence. The copied `authority.mjs`, `durable.mjs` and `durable-host.mjs` retain the existing exclusive/fsynced output and detached-owned-process lifecycle byte-for-byte; they were not invoked. The existing ff208 action enum remains closed for component/correctness/pilot/timing. Native350 pair facts, actual publication/oracle/bundle proofs and each actual component review must all be authenticated before a successor reaches dynamic code, and rechecked before its final completion plus external terminal zero.
++Each primary/edge case explicitly checks setup, adjacent observe outputs, untimed primary batchN1, checkpoint, the same validate/setup/(stage)/adjacent pair and checkpoint. Setup precedes stage and clears old staging. Seven outer functions remain the ABI; `publicFunctionEntries` counts internal validate calls too and must not be read as outer host calls. Empty outputs make no addressable isolation claim. Complete full bytes, typed raw returns, counters, snapshots, full-prior-output stability and nonempty backing/mutation-restoration observations are retained and checked. No heap/GC/capacity/request-isolation claim follows.
+ 
+-`artifact-review-contract.json` specifies the finite future independent component review data. There is no stock Wasmtime loader/string syntax or argv workaround here. Actual string-parser ABI and exact largest argument plus environment/per-argument feasibility still need proof under a separate source/action cut; a 2 MiB wire cap is not an argv permission. Timing, calibration and operational controls remain outside this packet.
++The main matrix has45 actual encoder streams and135 newly executed decoder edges. Node's old15 encoded streams are genuine reviewed oracle inputs, but its old own-decode results NEVER replace the45 fresh Node decoder calls. The existing guest-v2 `decodeNodeStream` host API performs new complete wrapped/raw-payload consumption, checksum/full-byte and input-immutability checks with durable typed/binary retention. Native/FFON encodings are captured from new guest calls and repeated/fresh bytes compared within each provider. FF-OFF remains separate:15 actual encodings compared byte-for-byte with actual FFON,15 new Node decodes of OFF streams and45 actual OFF guest decodes of main streams. No FFON runtime pass transfers into FFOFF. No cross-provider compressed-byte equality is otherwise claimed.
+ 
+-Pure checks require an explicit fresh output directory:
++This is untimed correctness only. Calibration, controls, pilot, throughput/RSS, stock Wasmtime string-parser/argv feasibility and host services remain excluded. A2MiB scalar wire bound is not an argv permission; worker CLI carries only a small file descriptor, not staged base64 arguments. Stock WT has no implementation or action here. Final outputs stay PENDING independent actual review and external parent0; no runtime or operational acceptance is self-issued.
++
++The guarded future entry accepts one exact external config descriptor JSON whose data is `{correctnessSourceIndexSha256,rootAction:{path,sha256,bytes}}`. The Root authority template remains unissued. Pure/parser checks use a fresh output path:
+ 
+ ```
+-COST_JCO_PURE_OUTPUT=/tmp/fresh-cost-jco-pure /private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node tests/node-compat/foundation-zlib/cost-jco-correctness-candidate-v1/test-pure.mjs
++COST_JCO_LOADING_PURE_OUTPUT=/tmp/fresh-jco-loading-pure /private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node tests/node-compat/foundation-zlib/cost-jco-correctness-candidate-v2/test-loading-pure.mjs
+ ```
+ 
+-The preparation seal references exact immutable source/data inputs in their original contexts; it is not a relocated active tooling/native closure. No source promotion, component correctness, full 45/135 matrix, guest ABI, runtime acceptance or performance claim is made.
++Only the pinned parser evaluates captured JS as syntax data; that source is never imported. Synthetic namespace/authority/artifact shapes are test models, not actual proofs. The preparation manifest retains original contexts and is not a relocated runtime tool/native seal. Known unavailable actual artifact/authority evidence stays NULL until Root independently reviews real outcomes.

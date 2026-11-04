@@ -1,0 +1,412 @@
+--- a/runtime/event_loop.h
++++ b/runtime/event_loop.h
+@@ -3,6 +3,9 @@
+ 
+ #include "extension-api.h"
+ #include "jsapi.h"
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++#include "node_tick_queue.h"
++#endif
+ 
+ namespace core {
+ 
+@@ -34,6 +37,16 @@
+    * See run_event_loop in extension-api.h for the complete description.
+    */
+   static bool run_event_loop(api::Engine *engine, double total_compute);
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++  // Existing two-argument entry remains the TaskOrExport wrapper.
++  static bool run_event_loop(api::Engine *engine, double total_compute, TickCheckpointOrigin origin);
++  // Internal captured factory argument; no public process/module/global API.
++  static JSObject* create_internal_next_tick(JSContext* cx);
++  static bool require_internal_ticks_quiescent(JSContext* cx);
++  static bool internal_tick_checkpoint_active();
++  static bool require_internal_tick_reset_allowed(JSContext* cx);
++  static bool run_internal_tick_checkpoint(JSContext* cx, TickCheckpointOrigin origin);
++#endif
+ 
+   /**
+    * Run the FinalizationRegistry cleanups that collections have queued, and the microtasks they
+--- a/runtime/event_loop.cpp
++++ b/runtime/event_loop.cpp
+@@ -14,11 +14,17 @@
+   std::vector<RefPtr<api::AsyncTask>> tasks;
+   int interest_cnt = 0;
+   bool event_loop_running = false;
+-
+-  void trace(JSTracer *trc) const {
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++  core::InternalTickQueue ticks;
++#endif
++
++  void trace(JSTracer *trc) {
+     for (const auto &task : tasks) {
+       task->trace(trc);
+     }
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++    ticks.trace(trc);
++#endif
+   }
+ };
+ 
+@@ -173,19 +179,61 @@
+ 
+ inline bool interest_complete() { return queue.get().interest_cnt == 0; }
+ 
+-inline void exit_event_loop() { queue.get().event_loop_running = false; }
++inline void exit_event_loop(bool success = false) {
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++  if (!success) queue.get().ticks.discard();
++#endif
++  queue.get().event_loop_running = false;
++}
++
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++static bool enqueue_internal_tick(JSContext* cx, unsigned argc, JS::Value* vp) {
++  return queue.get().ticks.enqueue(cx, JS::CallArgsFromVp(argc, vp));
++}
++JSObject* EventLoop::create_internal_next_tick(JSContext* cx) {
++  JS::RootedFunction function(cx, JS_NewFunction(cx, enqueue_internal_tick, 1, 0, "nextTick"));
++  return function ? JS_GetFunctionObject(function) : nullptr;
++}
++bool EventLoop::internal_tick_checkpoint_active() { return queue.get().ticks.checkpoint_running(); }
++bool EventLoop::require_internal_ticks_quiescent(JSContext* cx) {
++  if (queue.get().event_loop_running || !queue.get().ticks.empty_and_inactive())
++    return InternalTickQueue::fail(cx, JSEXN_ERR, "ERR_SM_NODE_SCHEDULER_STATE", "tick FIFO must be empty and inactive at this boundary");
++  return true;
++}
++bool EventLoop::require_internal_tick_reset_allowed(JSContext* cx) {
++  if (queue.get().event_loop_running || queue.get().ticks.checkpoint_running())
++    return InternalTickQueue::fail(cx, JSEXN_ERR, "ERR_SM_NODE_SCHEDULER_REENTRY", "cannot reset an active tick/task checkpoint");
++  return true;
++}
++bool EventLoop::run_internal_tick_checkpoint(JSContext* cx, TickCheckpointOrigin origin) {
++  return queue.get().ticks.checkpoint(cx, origin);
++}
++#endif
+ 
+ bool EventLoop::run_event_loop(api::Engine *engine, double total_compute) {
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++  return run_event_loop(engine, total_compute, TickCheckpointOrigin::TaskOrExport);
++}
++bool EventLoop::run_event_loop(api::Engine *engine, double total_compute, TickCheckpointOrigin origin) {
++  if (queue.get().event_loop_running || queue.get().ticks.checkpoint_running())
++    return InternalTickQueue::fail(engine->cx(), JSEXN_ERR, "ERR_SM_NODE_SCHEDULER_REENTRY", "event loop is already running");
++#else
+   if (queue.get().event_loop_running) {
+     std::print(stderr, "cannot run event loop as it is already running");
+     return false;
+   }
++#endif
+   queue.get().event_loop_running = true;
+   JSContext *cx = engine->cx();
+ 
+   while (true) {
+-    // Run a microtask checkpoint
++    // Complete existing Promise checkpoint, optionally bracketed by guest ticks.
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++    if (!run_internal_tick_checkpoint(cx, origin)) { exit_event_loop(); return false; }
++    origin = TickCheckpointOrigin::TaskOrExport;
++#else
+     js::RunJobs(cx);
++#endif
+ 
+ #ifdef NODE_COMPAT_STRICT_INITIALIZATION
+     if (!take_pending_event_exception(cx)) {
+@@ -208,12 +256,15 @@
+     }
+ #endif
+     if (ran_cleanups) {
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++      origin = TickCheckpointOrigin::FinalizerBatch;
++#endif
+       continue;
+     }
+ 
+     // if there is no interest in the event loop at all, just run one tick
+     if (interest_complete()) {
+-      exit_event_loop();
++      exit_event_loop(true);
+       return true;
+     }
+ 
+@@ -255,7 +306,12 @@
+     if (!ran_cleanups) {
+       return true;
+     }
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++    // Existing strict cleanup-error check ABOVE remains before dispatch.
++    if (!run_internal_tick_checkpoint(cx, TickCheckpointOrigin::FinalizerBatch)) return false;
++#else
+     js::RunJobs(cx);
++#endif
+ #ifdef NODE_COMPAT_STRICT_INITIALIZATION
+     if (!take_pending_event_exception(cx)) {
+       return false;
+@@ -285,12 +341,21 @@
+ }
+ 
+ void EventLoop::reset(api::Engine *engine) {
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++  if (!require_internal_tick_reset_allowed(engine->cx())) {
++    engine->abort("resetting an active internal tick checkpoint");
++    return;
++  }
++#endif
+   auto &q = queue.get();
+   for (const auto& task : q.tasks) {
+     task->cancel(engine);
+   }
+   q.tasks.clear();
+   q.interest_cnt = 0;
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++  q.ticks.reset_storage();
++#endif
+ #ifdef NODE_COMPAT_STRICT_INITIALIZATION
+   // Assignment keeps the PersistentRooted registered for subsequent entries.
+   first_uncaught_event_exception = JS::UndefinedValue();
+--- a/runtime/engine.cpp
++++ b/runtime/engine.cpp
+@@ -545,6 +545,11 @@
+ 
+ void Engine::finish_pre_initialization() {
+   MOZ_ASSERT(state_ == EngineState::ScriptPreInitializing);
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++  // EARLY boundary only: embedding must also check AFTER bindExports.
++  if (!core::EventLoop::require_internal_ticks_quiescent(cx()))
++    abort("finishing pre-initialization with pending internal ticks");
++#endif
+ #ifdef NODE_COMPAT_STRICT_INITIALIZATION
+   // Initializer-only embeddings may have no content-script eval checkpoint.
+   if (!core::EventLoop::take_pending_event_exception(cx())) {
+@@ -606,7 +611,13 @@
+     return false;
+   }
+   RootedValue result(cx);
+-  return JS_ExecuteScript(cx, script, &result);
++  if (!JS_ExecuteScript(cx, script, &result)) return false;
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++  // Actual initializer is a classic script in INIT_SCRIPT_GLOBAL.
++  return core::EventLoop::run_internal_tick_checkpoint(cx, core::TickCheckpointOrigin::InitializerScript);
++#else
++  return true;
++#endif
+ }
+ 
+ HandleObject Engine::init_script_global() { return INIT_SCRIPT_GLOBAL; }
+@@ -623,7 +634,12 @@
+   }
+ 
+   SCRIPT_VALUE = ns;
+-#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++  // Classify using actual configuration; preserve Engine's public no-arg ABI.
++  if (!core::EventLoop::run_event_loop(this, 0, config_->module_mode
++          ? core::TickCheckpointOrigin::ModuleEvaluation
++          : core::TickCheckpointOrigin::ClassicEvaluation)) return false;
++#elif defined(NODE_COMPAT_STRICT_INITIALIZATION)
+   if (!this->run_event_loop()) {
+     return false;
+   }
+@@ -781,6 +797,13 @@
+   JS::SetClear(CONTEXT, unhandledRejectedPromises);
+ }
+ void Engine::reset() {
++#ifdef NODE_COMPAT_INTERNAL_TICKS
++  // Establish idle state BEFORE changing existing reset-owned state.
++  if (!core::EventLoop::require_internal_tick_reset_allowed(cx())) {
++    abort("resetting an active internal tick checkpoint");
++    return;
++  }
++#endif
+   clear_unhandled_promise_rejections();
+   core::EventLoop::reset(this);
+   builtins::web::timers::reset();
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -77,6 +77,9 @@
+ )
+ 
+ add_executable(starling-raw.wasm ${SOURCES})
++if(NODE_COMPAT_INTERNAL_TICKS)
++    target_sources(starling-raw.wasm PRIVATE runtime/node_tick_queue.cpp)
++endif()
+ 
+ target_link_libraries(starling-raw.wasm PRIVATE host_api extension_api builtins spidermonkey rust-crates)
+ 
+--- a/cmake/builtins.cmake
++++ b/cmake/builtins.cmake
+@@ -220,3 +220,12 @@
+     add_dependencies(builtin_node_compat builtin_web_streams builtin_web_text_codec)
+     target_link_libraries(builtin_node_compat PRIVATE builtin_web_streams builtin_web_text_codec)
+ endif()
++
++# Private scheduler proposal: no public process namespace or host capability.
++option(NODE_COMPAT_INTERNAL_TICKS "Enable private bounded guest nextTick queue" OFF)
++if(NODE_COMPAT_INTERNAL_TICKS AND NOT CMAKE_SCRIPT_MODE_FILE)
++    if(NOT TARGET builtin_node_compat)
++        message(FATAL_ERROR "NODE_COMPAT_INTERNAL_TICKS requires ENABLE_BUILTIN_NODE_COMPAT=ON")
++    endif()
++    target_compile_definitions(extension_api INTERFACE NODE_COMPAT_INTERNAL_TICKS=1)
++endif()
+--- /dev/null
++++ b/runtime/node_tick_queue.h
+@@ -0,0 +1,40 @@
++// UNAPPLIED, UNCOMPILED proposal: owned/traced by the existing TaskQueue root.
++#ifndef STARLING_INTERNAL_NODE_TICK_QUEUE_H
++#define STARLING_INTERNAL_NODE_TICK_QUEUE_H
++#include "js/CallArgs.h"
++#include "js/ErrorReport.h"
++#include "js/GCVector.h"
++#include "js/RootingAPI.h"
++#include "js/TypeDecls.h"
++#include <cstddef>
++#include <cstdint>
++
++namespace core {
++enum class TickCheckpointOrigin { TaskOrExport, ClassicEvaluation, ModuleEvaluation,
++                                  InitializerScript, FinalizerBatch };
++class InternalTickQueue {
++  struct Tick {
++    JS::Heap<JSObject*> callback{nullptr};
++    JS::Heap<JSObject*> arguments{nullptr};
++    uint32_t argc = 0;
++    void trace(JSTracer* trc);
++  };
++  JS::GCVector<Tick, 0, js::SystemAllocPolicy> slots_;
++  size_t head_ = 0, count_ = 0, argument_count_ = 0;
++  bool checkpoint_running_ = false;
++  bool drain_ticks(JSContext* cx, size_t& executed);
++public:
++  static constexpr size_t MaxPending = 4096, MaxArgumentsPerTick = 1024;
++  static constexpr size_t MaxPendingArguments = 65536, MaxCallbacksPerCheckpoint = 65536;
++  void trace(JSTracer* trc) { slots_.trace(trc); }
++  bool enqueue(JSContext* cx, const JS::CallArgs& args);
++  bool checkpoint(JSContext* cx, TickCheckpointOrigin origin);
++  bool empty_and_inactive() const { return count_ == 0 && !checkpoint_running_; }
++  bool checkpoint_running() const { return checkpoint_running_; }
++  void discard();
++  // Caller must establish the TaskQueue is idle BEFORE cancelling tasks/resetting.
++  void reset_storage();
++  static bool fail(JSContext* cx, JSExnType type, const char* code, const char* text);
++};
++} // namespace core
++#endif
+--- /dev/null
++++ b/runtime/node_tick_queue.cpp
+@@ -0,0 +1,115 @@
++// UNAPPLIED, UNCOMPILED proposal. No additional PersistentRooted/static queue.
++#include "node_tick_queue.h"
++#include "event_loop.h"
++#include "js/Array.h"
++#include "js/CallAndConstruct.h"
++#include "js/ColumnNumber.h"
++#include "js/ErrorReport.h"
++#include "js/PropertyAndElement.h"
++#include "js/Realm.h"
++#include "js/ValueArray.h"
++#include "js/TracingAPI.h"
++#include "jsapi.h"
++#include "jsfriendapi.h"
++
++namespace core {
++using namespace JS;
++void InternalTickQueue::Tick::trace(JSTracer* trc) {
++  TraceEdge(trc, &callback, "internal tick callback");
++  TraceEdge(trc, &arguments, "internal tick private argument array");
++}
++
++bool InternalTickQueue::fail(JSContext* cx, JSExnType type, const char* code, const char* text) {
++  RootedString message(cx, JS_NewStringCopyZ(cx, text));
++  if (!message) return false;
++  RootedString file(cx, JS_NewStringCopyZ(cx, "<internal-node-tick>"));
++  if (!file) return false;
++  Rooted<mozilla::Maybe<Value>> cause(cx, mozilla::Nothing());
++  RootedValue error(cx);
++  if (!CreateError(cx, type, nullptr, file, 0, ColumnNumberOneOrigin::fromZeroOrigin(0),
++                   nullptr, message, cause, &error)) return false;
++  RootedObject object(cx, &error.toObject());
++  RootedString code_string(cx, JS_NewStringCopyZ(cx, code));
++  if (!code_string || !JS_DefineProperty(cx, object, "code", code_string, JSPROP_ENUMERATE)) return false;
++  JS_SetPendingException(cx, error, ExceptionStackBehavior::DoNotCapture);
++  return false;
++}
++
++bool InternalTickQueue::enqueue(JSContext* cx, const CallArgs& args) {
++  if (args.length() == 0 || !args[0].isObject() || !IsCallable(&args[0].toObject()))
++    return fail(cx, JSEXN_TYPEERR, "ERR_INVALID_ARG_TYPE", "callback must be callable");
++  RootedObject callback(cx, &args[0].toObject());
++  if (GetObjectRealmOrNull(callback) != GetCurrentRealmOrNull(cx))
++    return fail(cx, JSEXN_TYPEERR, "ERR_SM_NODE_UNSUPPORTED", "cross-realm tick callback is outside the private contract");
++  const size_t argc = args.length() - 1;
++  if (count_ >= MaxPending || argc > MaxArgumentsPerTick ||
++      argc > MaxPendingArguments - argument_count_)
++    return fail(cx, JSEXN_RANGEERR, "ERR_SM_NODE_SCHEDULER_LIMIT", "internal tick queue budget exceeded");
++  if (slots_.empty() && !slots_.resize(MaxPending)) { JS_ReportOutOfMemory(cx); return false; }
++  // CallArgs is rooted. Copy plain argument VALUES, without getter/coercion.
++  // Allocating the private dense Array commits no entry until it succeeds.
++  RootedObject arguments(cx, NewArrayObject(cx, HandleValueArray::subarray(args, 1, argc)));
++  if (!arguments) return false;
++  Tick& tick = slots_[(head_ + count_) % MaxPending];
++  tick.callback = callback; tick.arguments = arguments; tick.argc = argc;
++  ++count_; argument_count_ += argc;
++  args.rval().setUndefined();
++  return true;
++}
++
++void InternalTickQueue::discard() {
++  for (auto& tick : slots_) { tick.callback = nullptr; tick.arguments = nullptr; tick.argc = 0; }
++  head_ = count_ = argument_count_ = 0;
++}
++void InternalTickQueue::reset_storage() {
++  MOZ_RELEASE_ASSERT(!checkpoint_running_);
++  discard();
++  slots_.clearAndFree();
++}
++
++bool InternalTickQueue::drain_ticks(JSContext* cx, size_t& executed) {
++  while (count_) {
++    if (executed == MaxCallbacksPerCheckpoint)
++      return fail(cx, JSEXN_RANGEERR, "ERR_SM_NODE_SCHEDULER_LIMIT", "tick checkpoint work budget exceeded");
++    Tick& tick = slots_[head_];
++    RootedObject callback(cx, tick.callback), arguments(cx, tick.arguments);
++    const uint32_t argc = tick.argc;
++    RootedValueVector argv(cx);
++    if (!argv.resize(argc)) { JS_ReportOutOfMemory(cx); return false; }
++    for (uint32_t i = 0; i < argc; ++i)
++      if (!JS_GetElement(cx, arguments, i, argv[i])) return false;
++    // Everything needed by JS is rooted BEFORE removing the queue entry.
++    argument_count_ -= argc;
++    tick.callback = nullptr; tick.arguments = nullptr; tick.argc = 0;
++    head_ = (head_ + 1) % MaxPending; --count_; ++executed;
++    JSAutoRealm realm(cx, callback);
++    RootedValue ignored(cx);
++    if (!Call(cx, UndefinedHandleValue, callback, argv, &ignored)) return false;
++    // Retained EventTarget errors stay subject to the EXISTING layered policy:
++    // its latch is checked after the full Promise checkpoint, not per tick.
++  }
++  return true;
++}
++
++bool InternalTickQueue::checkpoint(JSContext* cx, TickCheckpointOrigin origin) {
++  if (checkpoint_running_)
++    return fail(cx, JSEXN_ERR, "ERR_SM_NODE_SCHEDULER_REENTRY", "internal checkpoint is already running");
++  if (JS_IsExceptionPending(cx)) { discard(); return false; }
++  checkpoint_running_ = true;
++  struct Exit { bool& running; ~Exit() { running = false; } } exit{checkpoint_running_};
++  size_t executed = 0;
++  bool promise_first = origin == TickCheckpointOrigin::ModuleEvaluation;
++  do {
++    if (!promise_first && !drain_ticks(cx, executed)) { discard(); return false; }
++    promise_first = false;
++    // Preserve the existing COMPLETE job checkpoint, kept-object cleanup,
++    // rejection tracking and job-error reporting. No individual-job interleave.
++    js::RunJobs(cx);
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++    if (!EventLoop::take_pending_event_exception(cx)) { discard(); return false; }
++#endif
++    if (JS_IsExceptionPending(cx)) { discard(); return false; }
++  } while (count_);
++  return true;
++}
++} // namespace core

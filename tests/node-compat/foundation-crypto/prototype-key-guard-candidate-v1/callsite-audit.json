@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_ONLY_PUBLIC_TO_INTERNAL_KEY_ADMISSION_AUDIT",
+  "citations": [
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/builtins/web/crypto/subtle-crypto.cpp",
+      "sha256": "f58d225c0374cc91522a427c7921f06c04afb73a458836c743da246318b29f99",
+      "bytes": 15344,
+      "line": 188,
+      "anchor": "if (!CryptoKey::is_instance(key_arg))",
+      "role": "ORIGINAL_UNAPPLIED_PREIMAGE"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/subtle-crypto.cpp",
+      "sha256": "1caf414e2e7d8d9ec9a0fb6eaf53e73b4fbe9649749f33fc12b116a5357ec639",
+      "bytes": 15462,
+      "line": 189,
+      "anchor": "&key_arg.toObject() == CryptoKey::proto_obj.get()",
+      "role": "NEW_SOURCE_GUARD"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/include/builtin.h",
+      "sha256": "19b759137fe14d8b7bca33c40ec50108e4501277b01a921427b4b64c836bf072",
+      "bytes": 15928,
+      "line": 263,
+      "anchor": "static bool is_instance(const JSObject *obj)",
+      "role": "EXISTING_CLASS_PREDICATE"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/include/builtin.h",
+      "sha256": "19b759137fe14d8b7bca33c40ec50108e4501277b01a921427b4b64c836bf072",
+      "bytes": 15928,
+      "line": 286,
+      "anchor": "proto_obj.init(cx, JS_InitClass(cx, global, &class_",
+      "role": "EXISTING_PROTOTYPE_CLASS_INSTALLATION"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-key.cpp",
+      "sha256": "9e1e93c15cc68702398e2f2a7779efedb9d2a20fd014b003a2acde94a0a29ecc",
+      "bytes": 30704,
+      "line": 917,
+      "anchor": "JS::Result<bool> CryptoKey::is_algorithm(",
+      "role": "PARENT_BYTE_EXACT_INTERNAL_SLOT_ASSUMPTION"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-key.cpp",
+      "sha256": "9e1e93c15cc68702398e2f2a7779efedb9d2a20fd014b003a2acde94a0a29ecc",
+      "bytes": 30704,
+      "line": 154,
+      "anchor": "if (self == proto_obj.get())",
+      "role": "PARENT_BYTE_EXACT_PUBLIC_GETTER_GUARD"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-key.h",
+      "sha256": "74ec1ef5179471be2f8086049e97f349623095d81c183eba7e2f14a9547230be",
+      "bytes": 9178,
+      "line": 148,
+      "anchor": "static bool constructor(",
+      "role": "PARENT_BYTE_EXACT_CONSTRUCTOR"
+    }
+  ],
+  "actualCallsites": [
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/subtle-crypto.cpp",
+      "line": 188,
+      "text": "if (!CryptoKey::is_instance(key_arg) ||",
+      "sourceSha256": "1caf414e2e7d8d9ec9a0fb6eaf53e73b4fbe9649749f33fc12b116a5357ec639"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/subtle-crypto.cpp",
+      "line": 228,
+      "text": "auto match_result = CryptoKey::is_algorithm(cx, key, identifier);",
+      "sourceSha256": "1caf414e2e7d8d9ec9a0fb6eaf53e73b4fbe9649749f33fc12b116a5357ec639"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/subtle-crypto.cpp",
+      "line": 241,
+      "text": "if (!CryptoKey::canSign(key)) {",
+      "sourceSha256": "1caf414e2e7d8d9ec9a0fb6eaf53e73b4fbe9649749f33fc12b116a5357ec639"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/subtle-crypto.cpp",
+      "line": 280,
+      "text": "if (!CryptoKey::is_instance(key_arg) ||",
+      "sourceSha256": "1caf414e2e7d8d9ec9a0fb6eaf53e73b4fbe9649749f33fc12b116a5357ec639"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/subtle-crypto.cpp",
+      "line": 327,
+      "text": "auto match_result = CryptoKey::is_algorithm(cx, key, identifier);",
+      "sourceSha256": "1caf414e2e7d8d9ec9a0fb6eaf53e73b4fbe9649749f33fc12b116a5357ec639"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/subtle-crypto.cpp",
+      "line": 334,
+      "text": "if (!CryptoKey::canVerify(key)) {",
+      "sourceSha256": "1caf414e2e7d8d9ec9a0fb6eaf53e73b4fbe9649749f33fc12b116a5357ec639"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-key.cpp",
+      "line": 893,
+      "text": "CryptoKeyType CryptoKey::type(JSObject *self) {",
+      "sourceSha256": "9e1e93c15cc68702398e2f2a7779efedb9d2a20fd014b003a2acde94a0a29ecc"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-key.cpp",
+      "line": 898,
+      "text": "JSObject *CryptoKey::get_algorithm(JS::HandleObject self) {",
+      "sourceSha256": "9e1e93c15cc68702398e2f2a7779efedb9d2a20fd014b003a2acde94a0a29ecc"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-key.cpp",
+      "line": 904,
+      "text": "EVP_PKEY *CryptoKey::key(JSObject *self) {",
+      "sourceSha256": "9e1e93c15cc68702398e2f2a7779efedb9d2a20fd014b003a2acde94a0a29ecc"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-key.cpp",
+      "line": 909,
+      "text": "std::span<uint8_t> CryptoKey::hmacKeyData(JSObject *self) {",
+      "sourceSha256": "9e1e93c15cc68702398e2f2a7779efedb9d2a20fd014b003a2acde94a0a29ecc"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-key.cpp",
+      "line": 917,
+      "text": "JS::Result<bool> CryptoKey::is_algorithm(JSContext *cx, JS::HandleObject self,",
+      "sourceSha256": "9e1e93c15cc68702398e2f2a7779efedb9d2a20fd014b003a2acde94a0a29ecc"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-key.cpp",
+      "line": 919,
+      "text": "MOZ_ASSERT(CryptoKey::is_instance(self));",
+      "sourceSha256": "9e1e93c15cc68702398e2f2a7779efedb9d2a20fd014b003a2acde94a0a29ecc"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-key.cpp",
+      "line": 942,
+      "text": "bool CryptoKey::canSign(JS::HandleObject self) {",
+      "sourceSha256": "9e1e93c15cc68702398e2f2a7779efedb9d2a20fd014b003a2acde94a0a29ecc"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-key.cpp",
+      "line": 950,
+      "text": "bool CryptoKey::canVerify(JS::HandleObject self) {",
+      "sourceSha256": "9e1e93c15cc68702398e2f2a7779efedb9d2a20fd014b003a2acde94a0a29ecc"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 72,
+      "text": "JS::RootedObject alg(cx, CryptoKey::get_algorithm(key));",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 417,
+      "text": "JS::RootedObject alg(cx, CryptoKey::get_algorithm(key));",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 794,
+      "text": "MOZ_ASSERT(CryptoKey::is_instance(key));",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 803,
+      "text": "std::span<uint8_t> keyData = CryptoKey::hmacKeyData(key);",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 827,
+      "text": "MOZ_ASSERT(CryptoKey::is_instance(key));",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 835,
+      "text": "std::span<uint8_t> keyData = CryptoKey::hmacKeyData(key);",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 854,
+      "text": "MOZ_ASSERT(CryptoKey::is_instance(key));",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 857,
+      "text": "if (CryptoKey::type(key) != CryptoKeyType::Private) {",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 879,
+      "text": "EVP_PKEY *pkey = CryptoKey::key(key);",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 958,
+      "text": "MOZ_ASSERT(CryptoKey::is_instance(key));",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 960,
+      "text": "if (CryptoKey::type(key) != CryptoKeyType::Public) {",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 1030,
+      "text": "EVP_PKEY *pkey = CryptoKey::key(key);",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 1052,
+      "text": "MOZ_ASSERT(CryptoKey::is_instance(key));",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 1055,
+      "text": "if (CryptoKey::type(key) != CryptoKeyType::Private) {",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 1064,
+      "text": "if (!ctx || EVP_DigestSignInit(ctx.get(), nullptr, nullptr, nullptr, CryptoKey::key(key)) != 1) {",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 1103,
+      "text": "MOZ_ASSERT(CryptoKey::is_instance(key));",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 1106,
+      "text": "if (CryptoKey::type(key) != CryptoKeyType::Public) {",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 1121,
+      "text": "if (!ctx || EVP_DigestVerifyInit(ctx.get(), nullptr, nullptr, nullptr, CryptoKey::key(key)) != 1) {",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 1138,
+      "text": "if (CryptoKey::type(key) != CryptoKeyType::Private) {",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 1143,
+      "text": "MOZ_ASSERT(CryptoKey::is_instance(key));",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 1144,
+      "text": "if (CryptoKey::type(key) != CryptoKeyType::Private) {",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 1167,
+      "text": "EvpPkeyCtxPtr ctx(EVP_PKEY_CTX_new(CryptoKey::key(key), nullptr));",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 1222,
+      "text": "MOZ_ASSERT(CryptoKey::is_instance(key));",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 1224,
+      "text": "if (CryptoKey::type(key) != CryptoKeyType::Public) {",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/prototype-key-guard-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "line": 1238,
+      "text": "EvpPkeyCtxPtr ctx(EVP_PKEY_CTX_new(CryptoKey::key(key), nullptr));",
+      "sourceSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755"
+    }
+  ],
+  "publicKeyEntryPoints": [
+    "SubtleCrypto::sign",
+    "SubtleCrypto::verify"
+  ],
+  "guardBefore": [
+    "JS::RootedObject key",
+    "validate_crypto_buffer_source",
+    "CryptoAlgorithmSignVerify::normalize",
+    "copy_crypto_buffer_source",
+    "CryptoKey::is_algorithm",
+    "CryptoKey::canSign/canVerify",
+    "normalizedAlgorithm->sign/verify"
+  ],
+  "validKeyAssumption": "Current public factory-created objects are fresh distinct instances. No CryptoKey native subclass registration is present; trusted future native creators require a separate audit.",
+  "noPropertyReadsOrCallbacksInGuard": true,
+  "noNativePrivateSlotReadsInGuard": true,
+  "nativeRuntimeObserved": false
+}

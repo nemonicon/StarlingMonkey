@@ -1,0 +1,18 @@
+# Async context investigation
+
+This folder contains an architecture audit, exact Node v22.14.0 oracles and two **separate experimental guest engines**. It does not ship `node:async_hooks` or claim complete AsyncLocalStorage support. Production source and host capabilities are unchanged.
+
+The [architecture audit](architecture.md) identifies the actual SpiderMonkey 147 `JS::JobQueue::getHostDefinedData` registration hook, the supported queue preference, Promise-creation metadata, native event-loop capture sites and remaining lifecycle/realm/API requirements. The [source ledger](source-audit.json) records the exact upstream and installed header hashes. Wrapping JavaScript `.then` would miss native reactions and `await`.
+
+| Evidence | Result | Limit |
+| --- | --- | --- |
+| [Node oracle](node-oracle-results.json) | Exact Node 22.14.0: 19 cases, 63 observations. | Oracle evidence; does not test Starling timers or filesystem. |
+| [Public-hook component](probe-public-v1-results.json) | 43 checks per call, three calls to one Jco instance and a fresh stock Wasmtime 42 invocation; zero imports. | Plain-object Promise species produces a documented Node context mismatch. |
+| [Private-record component](probe-private-v2-results.json) | Same checks and hosts, zero imports; the observed species mismatch also matches Node. | Reads the exact pinned `PromiseReactionRecord` layout after representation/class/slot/realm checks. This is private ABI coupling, not a new supported Promise API. |
+| [Mutable-resource prototype](resource-model-results.json) | 19/63 shared store cases, 9/44 shared store-edge observations and 23 targeted checks on each of three Jco calls plus fresh Wasmtime; zero imports. | [Model and policy decisions](resource-model.md): pure guest task completions substitute for real guest timer/FS adapters; fatal metadata OOM, realm/private-ABI/ID/lifecycle/performance limits remain. |
+
+Both components exercise interleaved pending/settled/primitive awaits, native `JS::AddPromiseReactions`, thenable creation context, Promise species, an explicitly captured empty context, moving GC, `queueMicrotask`, pure guest `api::AsyncTask` dispatch/cancellation, and restored context across component calls. Sixteen optimized awaits add no queue entries and retain their context. The immediate task uses the existing event loop; actual HTTP, timer, filesystem and socket completion propagation remains unimplemented.
+
+The native sources are [public v1](probe-public-v1.cpp) and [private v2](probe-private-v2.cpp). The [build script](build-probe.sh) copies an immutable R2 source freeze and adds the diagnostic through existing `add_builtin`/CMake extension mechanisms. It requires that preserved freeze and the pinned external SDK/static-library cache. Each engine sidecar hashes every copied input. The [runner](run-probe.mjs) validates those hashes, packages with the audited v2 componentizer, asserts zero imports, and executes both Jco and Wasmtime. The exact reproduction commands and source pins are in the architecture audit.
+
+The production proposal uses resource-local mutable execution cells, per-ALS restoration, registration-time native task capture, explicit fresh-entry state and separate request/handle ownership. The v3 prototype verifies `run`/`enterWith`/`disable`/`exit` and selected bind/snapshot/resource store behavior with independently copied bindings. Complete facade/AsyncResource semantics, cross-realm handling, actual I/O/cancellation/reuse integration, debugger behavior, metadata-builder coexistence/OOM policy and performance remain open. No generic request global or complete async-hooks lifecycle/ID support is inferred from these probes.

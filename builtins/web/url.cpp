@@ -621,7 +621,7 @@ bool URL::createObjectURL(JSContext *cx, unsigned argc, JS::Value *vp) {
   result.append("/");
 
   // 8. Generate a UUID [RFC4122] as a string and append it to result.
-  auto maybe_uuid = crypto::random_uuid_v4(cx);
+  auto maybe_uuid = crypto::random_uuid_v4(cx, "URL.createObjectURL");
   if (!maybe_uuid.has_value()) {
     return false;
   }

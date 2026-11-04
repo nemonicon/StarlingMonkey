@@ -1,0 +1,117 @@
+--- a/release/helpers/native-scalar-harness.mjs
++++ b/release/helpers/native-scalar-harness.mjs
+@@ -11,6 +11,63 @@
+ import { bundleProfile } from '../../../../profile-bundler.mjs';
+ import { selectedManifestsForEngine } from '../../../../module-selection.mjs';
+ export const hash = value => createHash('sha256').update(value).digest('hex');
++
++// BEGIN FINITE CLASSIC REGISTRAR ORACLE ANCESTRY
++export function verifyClassicRegistrarOracle({kind, oracle, requiredNames, registrar, metadata, proof}) {
++  const path='builtins/node-compat/register.cpp';
++  const before='19eef9879c94e5232238f6df738d57057d384fa025849ee319fcf51eb06eda2b';
++  const after='2848f059fb5693aa37c54945bff685444c8431007ceaec59d3335d01f7aced4a';
++  const documents={
++    assert:{sha:'cbb3bcb3f6bc9e97b12b1a61167483ac0f949de199ae6bd0172926419f4c01a3',required:['assert.mjs','assert-strict.mjs','assert-factories.generated.h','export-manifest.assert.node-v22.14.0.json']},
++    querystring:{sha:'e59e05a7cb470970d9bcce230f359cf74bf62a00b094510a2df16d4ab3f901a4',required:['querystring.mjs','querystring-factories.generated.h','export-manifest.querystring.node-v22.14.0.json']},
++    util:{sha:'489cb9cf4fbe256201f70e385d4326ea32552d2f2a1f187211d9409e73838816',required:['util.mjs','util-types.mjs','util-core.mjs','util-metadata.mjs','util-unsupported.mjs','export-manifest.util.node-v22.14.0.json','generate-util-factories.mjs','util-factories.generated.h']}
++  };
++  assert(Object.hasOwn(documents,kind),'Only three pinned strict-script oracles have this registrar ancestry');
++  const expected=documents[kind];
++  assert.equal(hash(proof.oracleBytes),expected.sha,'Exact unchanged Node oracle document required');
++  assert.deepEqual(oracle,JSON.parse(proof.oracleBytes),'Caller oracle differs from captured bytes');
++  assert.deepEqual([...requiredNames].sort(),[...expected.required].sort(),'Exact facade-source check set required');
++  assert.equal(oracle.registrarSha256,before);
++  // Authenticate both policy documents and both exact native patches BEFORE
++  // parsing policy rows. The Tick patch never changes register.cpp.
++  assert.equal(hash(proof.tickPolicyBytes),'98e80d36b8eb9b7ac99de54832288bd8eec148fa1b9fe0b27b3bada4d12b2cd0');
++  assert.equal(hash(proof.tickPatchBytes),'e286ebeb3f09b438999422dbc2059fed565ef71b98d9f7f62b09291fb5eb5491');
++  assert.equal(hash(proof.classicPolicyBytes),'137a35959131d5cb5125bb5fc97324dfa4ba2ce18441818dd95cf83d19c88d6f');
++  assert.equal(hash(proof.classicPatchBytes),'0574b88e1126e616e4adaac2d7dea4435657c70e2d07a429531218aff24bd73c');
++  const tick=JSON.parse(proof.tickPolicyBytes),classic=JSON.parse(proof.classicPolicyBytes);
++  assert.equal(tick.version,'sm-private-ticks-source-v1');
++  assert.equal(tick.nativePatchSha256,hash(proof.tickPatchBytes));
++  assert(!Object.hasOwn(tick.sourceLayer,path),'Tick registrar must remain unchanged');
++  assert.equal(classic.parentPolicySha256,hash(proof.tickPolicyBytes));
++  assert.equal(classic.parentRecipeSha256,'869d188de3843b5d527d236a9e5c9af6ba1193f118dc9ad786df6266e1606173');
++  assert.deepEqual(classic.parentExpectedNativeSourceManifest,tick.expectedNativeSourceManifest);
++  assert.equal(tick.expectedNativeSourceManifest.length,306);
++  assert.equal(tick.expectedNativeSourceManifest.find(row=>row.path===path)?.sha256,before);
++  assert.deepEqual(classic.sourceLayer[path],{beforeSha256:before,afterSha256:after});
++  assert.equal(classic.nativePatchSha256,hash(proof.classicPatchBytes));
++  assert.equal(classic.expectedNativeSourceManifest.length,342);
++  assert.equal(classic.expectedNativeSourceManifest.find(row=>row.path===path)?.sha256,after);
++  assert.equal(metadata.buildRecipeSha256,'71b48d2e70c5e003fcbcce7620366744c089dd55036036e52926224dfa2614f7');
++  assert.notEqual(metadata.syntheticMetadataOnly,true);assert.notEqual(metadata.diagnosticOnly,true);
++  assert.equal(metadata.classicStreamsEnabled,true);assert.equal(metadata.internalTicksEnabled,true);
++  assert.equal(metadata.observedCMakeOptions.CMAKE_BUILD_TYPE,'Release');
++  assert.equal(metadata.classicStreamsPolicy.policyFileSha256,hash(proof.classicPolicyBytes));
++  assert.equal(metadata.classicStreamsPolicy.nativePatchSha256,hash(proof.classicPatchBytes));
++  assert.equal(metadata.internalTickPolicy.parentPrivateTickPolicyFileSha256,hash(proof.tickPolicyBytes));
++  assert.equal(metadata.internalTickPolicy.policyFileSha256,hash(proof.classicPolicyBytes));
++  assert.equal(metadata.sourceManifest.length,342);
++  const rows=metadata.sourceManifest.map(row=>({path:row.path,sha256:row.sha256}));
++  assert.equal(new Set(rows.map(row=>row.path)).size,342);
++  assert.deepEqual(rows,classic.expectedNativeSourceManifest,'Actual342 source manifest must match the pinned Classic afterimage');
++  assert.equal(hash(registrar),after,'Captured actual registrar must be the exact342 afterimage');
++  assert.match(registrar,/options\.setForceStrictMode\(\)/,'Force-strict compilation must remain');
++  for(const name of requiredNames)
++    assert.equal(rows.find(row=>row.path==='builtins/node-compat/'+name)?.sha256,oracle.sources[name],'Unchanged oracle facade/source '+name);
++  return {version:'exact-classic342-registrar-oracle-ancestry-v1',kind,oracleSha256:expected.sha,
++    oracleRegistrarSha256:before,actualRegistrarSha256:after,tickRegistrarChanged:false,
++    classicPatchSha256:hash(proof.classicPatchBytes),oracleRewritten:false,metadataProjected:false};
++}
++// END FINITE CLASSIC REGISTRAR ORACLE ANCESTRY
+ 
+ export function decodeCliString(source) {
+   let normalized = '';
+@@ -45,6 +102,13 @@
+   const registrar = await readFile(join(sourceRoot, 'builtins/node-compat/register.cpp'), 'utf8');
+   assert.match(registrar, /options\.setForceStrictMode\(\)/, 'Selected native registrar must preserve ESM strictness');
+   const builtinManifests = selectedManifestsForEngine(metadata, { sourceRoot });
++  const registrarProof = {
++    oracleBytes: await readFile(join(here,'native-node-results.json')),
++    tickPolicyBytes: await readFile(join(repository,'tests/node-compat/foundation-scheduler/integration-candidate-v1/policy.json')),
++    tickPatchBytes: await readFile(join(repository,'tests/node-compat/foundation-scheduler/taskqueue-owner-v2/starling-taskqueue-ticks.UNAPPLIED.patch')),
++    classicPolicyBytes: await readFile(join(repository,'tests/node-compat/foundation-classic-streams/integration-candidate-v1/policy.json')),
++    classicPatchBytes: await readFile(join(repository,'tests/node-compat/foundation-classic-streams/implementation-candidate-v1-allocation-order-amendment/native-integration.corrected.UNAPPLIED.patch'))
++  };
+   const output = resolve(process.env[outputVariable] ?? '/tmp/starling-node-compat/native-'+kind);
+   await mkdir(output, { recursive: true }); await writeFile(join(output, 'package.json'), '{"type":"module"}\n');
+   const toolchain = await loadToolchain(), selected = await loadComponentizer(toolchain);
+@@ -101,7 +165,7 @@
+       sourceFilesVerified: offMetadata.sourceManifest.length, error: failure.message, scope: 'Actual optional-OFF engine selection rejects module before packaging; no JS adapter fallback' };
+   }
+   function verifyOracleSources(oracle, requiredNames) {
+-    assert.equal(hash(registrar), oracle.registrarSha256, 'Native registrar must match strict-script oracle receipt');
++    evidence.registrarOracleAncestry = verifyClassicRegistrarOracle({kind,oracle,requiredNames,registrar,metadata,proof:registrarProof});
+     for (const name of requiredNames) {
+       const expected = oracle.sources[name]; assert(expected, 'Missing source oracle '+name);
+       assert.equal(metadata.sourceManifest.find(item => item.path === 'builtins/node-compat/'+name)?.sha256, expected, name+' must match native engine inputs');
+--- a/release/runners/path.mjs
++++ b/release/runners/path.mjs
+@@ -32,11 +32,14 @@
+ const { componentWit, transpile } = await import(pathToFileURL(toolchain.require.resolve('@bytecodealliance/jco')));
+ const hostVersion = spawnSync(wasmtime, ['--version'], { encoding: 'utf8' });
+ assert.equal(hostVersion.status, 0, hostVersion.stderr); assert.match(hostVersion.stdout, /^wasmtime 42\.0\.1\b/);
+-const oracleScripts = resolve(dirname(fileURLToPath(import.meta.url)), '../oracles');
++const oracleScripts = resolve(here, '../foundation-scheduler/production-release-runner-v3/oracles');
++const oracleSourcePins = { 'semantic.mjs': '23fe6d8eed334a3eae580655d9a859a048f0097bcd957259cf4218a230701cbf', 'glob.mjs': 'befc3e984b1b82e33ad008943e85a2461dca424e9f1d27561edfdeda455df619' };
+ const oracleOutput = join(output, 'node-oracles');
+ await mkdir(output, { recursive: true }); await mkdir(oracleOutput, { recursive: false });
+ for (const [file, flags] of [['semantic.mjs', []], ['glob.mjs', ['--expose-internals']]]) {
+-  const result = spawnSync(process.execPath, [...flags, join(oracleScripts, file)], { encoding: 'utf8', timeout: 30000, env: { ...process.env, NODE_COMPAT_PATH_ORACLE_OUTPUT: oracleOutput } });
++  assert.equal(hash(await readFile(join(oracleScripts,file))),oracleSourcePins[file],'Exact inherited Node oracle subprocess source');
++  const result = spawnSync(process.execPath, [...flags, join(oracleScripts, file)], { cwd: repository, encoding: 'utf8', timeout: 30000, env: { ...process.env, NODE_COMPAT_PATH_ORACLE_OUTPUT: oracleOutput } });
++  assert.equal(hash(await readFile(join(oracleScripts,file))),oracleSourcePins[file],'Node oracle source changed during subprocess');
+   assert.equal(result.status, 0, result.stderr || result.stdout);
+ }
+ const lexical = JSON.parse(await readFile(join(oracleOutput, 'lexical-vectors.json')));
+@@ -115,7 +118,7 @@
+   hostSemanticResults: JSON.parse(await readFile(join(oracleOutput, 'semantic-results.json'))), globReport,
+   sourceManifest: await Promise.all(['component.mjs', 'static-require.cjs', 'raw-aliases.mjs', 'profile.wit',
+     'top-level-budget.mjs', 'top-level-invalid.mjs', 'semantic.mjs', 'glob.mjs', 'run.mjs',
+-    'lexical-vectors.json', 'glob-vectors.json'].map(async path => ({ path, actualPath: ['lexical-vectors.json', 'glob-vectors.json'].includes(path) ? join(oracleOutput, path) : join(here, path), sha256: hash(await readFile(['lexical-vectors.json', 'glob-vectors.json'].includes(path) ? join(oracleOutput, path) : join(here, path))) }))),
++    'lexical-vectors.json', 'glob-vectors.json'].map(async path => ({ path, actualPath: ['lexical-vectors.json', 'glob-vectors.json'].includes(path) ? join(oracleOutput, path) : ['semantic.mjs', 'glob.mjs'].includes(path) ? join(oracleScripts, path) : join(here, path), sha256: hash(await readFile(['lexical-vectors.json', 'glob-vectors.json'].includes(path) ? join(oracleOutput, path) : ['semantic.mjs', 'glob.mjs'].includes(path) ? join(oracleScripts, path) : join(here, path))) }))),
+   limitations: ['Virtual cwd and fixed POSIX-host glob case policy are explicit deviations; no host environment, filesystem or drive-state behavior is claimed.',
+     'Matcher resource budgets intentionally exclude unbounded inputs and replace upstream silent truncation with coded RangeError.',
+     'No broad DEBUG indirect Component Model ABI support is claimed. This uses the audited Release engine.'] };

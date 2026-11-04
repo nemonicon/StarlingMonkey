@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "contracts.mjs",
+      "origin": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/measurement-memory-probe-candidate-v1/contracts.mjs",
+      "beforeSha256": "54206d11868804f312064470951c2ae9ba822ac18ab2389ae101ec7d2317df0f",
+      "afterSha256": "0f6db663faa191e9b093c1f7af8e9386b01b5e71bda9071ab7349f4bae28906f",
+      "edits": [
+        {
+          "beforeOffset": 2938,
+          "afterOffset": 2938,
+          "old": " assert.equal(d.schemaVersion,1);assert.equal(d.state,'PARENT_AUTHENTICATED_SMALL_MEMORY_WORKER_INPUT_V1');assert(SHA.test(d.sourceIndexSha256));assert.equal(d.parentPhaseSha256,phaseSha);\n",
+          "new": " assert.equal(d.schemaVersion,1);assert.equal(d.state,'PARENT_AUTHENTICATED_SMALL_MEMORY_WORKER_INPUT_V2');assert(SHA.test(d.sourceIndexSha256));assert.equal(d.parentPhaseSha256,phaseSha);\n"
+        },
+        {
+          "beforeOffset": 4264,
+          "afterOffset": 4264,
+          "old": "  const row=d.expected.cases[i];keys(row,['index','iterations','setupReturn','batchRaw','units']);assert.equal(row.index,index);assert.equal(row.iterations,1);assert.equal(typeof row.setupReturn,'string');assert(Buffer.byteLength(row.setupReturn)<=1024);\n",
+          "new": "  const row=d.expected.cases[i];keys(row,['index','iterations','setupReturn','batchRaw','units']);assert.equal(row.index,index);assert.equal(row.iterations,1);requireS32(row.setupReturn);assert.equal(row.setupReturn,index===1?151852933:-1502831163,'Pinned Node setup result');\n"
+        },
+        {
+          "beforeOffset": 5637,
+          "afterOffset": 5659,
+          "old": " assert.equal(value.schemaVersion,1);assert.equal(value.state,'ROOT_REVIEWED_COMMON_BYTE_PROCESS_RSS_SUPPLEMENT_V1');assert.equal(value.sourceIndexSha256,ownSha);assert(SHA.test(ownSha));assert.equal(value.memorySupplementAllowed,true);\n",
+          "new": " assert.equal(value.schemaVersion,1);assert.equal(value.state,'ROOT_REVIEWED_COMMON_BYTE_PROCESS_RSS_SUPPLEMENT_V2');assert.equal(value.sourceIndexSha256,ownSha);assert(SHA.test(ownSha));assert.equal(value.memorySupplementAllowed,true);\n"
+        },
+        {
+          "beforeOffset": 6388,
+          "afterOffset": 6410,
+          "old": "",
+          "new": "export function requireS32(value){assert.equal(typeof value,'number','setup public ABI is signed32 number');assert(Number.isInteger(value)&&value>=-2147483648&&value<=2147483647,'setup must be finite signed32');return value;}\nexport function requirePublicReturn(name,actual,expected){\n if(name==='setup'){requireS32(actual);requireS32(expected);assert.equal(actual,expected,'Exact signed32 setup result');return;}\n assert(['identity','checkpointProbe','batch'].includes(name),'Unknown public scalar');assert.equal(typeof actual,'string');assert.equal(typeof expected,'string');\n if(JSON.stringify(JSON.parse(actual))!==expected)throw new Error('Public string JSON mismatch: '+name+' (whole raw return retained)');\n}\nexport function buildExpectedCases(oracle,compactExpected){\n return[1,5].map(index=>{const compact=compactExpected(oracle,index,1);return{index,iterations:1,setupReturn:requireS32(oracle[index].setup),batchRaw:JSON.stringify(compact),units:compact.result.totalUnits};});\n}\nexport function buildDescriptor({sourceIndexSha256,row,record,expectedCases,native}){\n const component={path:record.componentPath,sha256:record.componentSha256,bytes:record.componentBytes};\n return validateDescriptor({schemaVersion:1,state:'PARENT_AUTHENTICATED_SMALL_MEMORY_WORKER_INPUT_V2',sourceIndexSha256,parentPhaseSha256:phaseSha,...row,component,modulePath:record.modulePath,coreFiles:record.coreFiles,\n  criticalFiles:[component,...['common_byte.core.wasm','common_byte.js','common_byte.d.ts'].map(name=>{const f=record.transpiledFiles.find(f=>f.name===name);assert(f);return{path:artifactRoot(row.arm)+'/'+name,sha256:f.sha256,bytes:f.bytes};}),packageFile(row.arm)],\n  expected:{identityRaw:JSON.stringify(record.identity),probeRaw:JSON.stringify(record.checkpointProbe),cases:expectedCases},nativeEvidence:{...native,notLoadedByWorker:true}});\n}\n"
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "path": "parent.mjs",
+      "origin": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/measurement-memory-probe-candidate-v1/parent.mjs",
+      "beforeSha256": "b5332cbf9dec59d71c92bd35d5f4fc6059fffeb08cc28a001454ded0382648c5",
+      "afterSha256": "217cdb29781c48afb51fce73b50cf7972525c0b706d462cfa8791fa053d9c31e",
+      "edits": [
+        {
+          "beforeOffset": 2434,
+          "afterOffset": 2434,
+          "old": "const {validateAuthority,validateDescriptor,schedule,artifactRoot,packageFile,timingSourceSha,instantiateSha,phaseSha,timingSha}=await import('./contracts.mjs');\n",
+          "new": "const {validateAuthority,buildDescriptor,buildExpectedCases,requirePublicReturn,schedule,timingSourceSha,instantiateSha,phaseSha,timingSha}=await import('./contracts.mjs');\n"
+        },
+        {
+          "beforeOffset": 7087,
+          "afterOffset": 7098,
+          "old": " const expectedCases=[1,5].map(index=>({index,iterations:1,setupReturn:oracle[index].setup,batchRaw:JSON.stringify(compactExpected(oracle,index,1)),units:compactExpected(oracle,index,1).result.totalUnits}));\n",
+          "new": " const expectedCases=buildExpectedCases(oracle,compactExpected);\n"
+        },
+        {
+          "beforeOffset": 7774,
+          "afterOffset": 7642,
+          "old": "",
+          "new": "assert.equal(output,'/tmp/starling-node-compat/production-common-byte-process-rss-supplement-v2');\n"
+        },
+        {
+          "beforeOffset": 9189,
+          "afterOffset": 9156,
+          "old": " const component={path:r.componentPath,sha256:r.componentSha256,bytes:r.componentBytes};\n const descriptor=validateDescriptor({schemaVersion:1,state:'PARENT_AUTHENTICATED_SMALL_MEMORY_WORKER_INPUT_V1',sourceIndexSha256:ownSha,parentPhaseSha256:phaseSha,...row,component,modulePath:r.modulePath,coreFiles:r.coreFiles,\n  criticalFiles:[component,...['common_byte.core.wasm','common_byte.js','common_byte.d.ts'].map(name=>{const f=r.transpiledFiles.find(f=>f.name===name);assert(f);return{path:join(artifactRoot(row.arm),name),sha256:f.sha256,bytes:f.bytes};}),packageFile(row.arm)],\n  expected:{identityRaw:JSON.stringify(r.identity),probeRaw:JSON.stringify(r.checkpointProbe),cases:before.expectedCases},nativeEvidence:{...native,notLoadedByWorker:true}});\n",
+          "new": " const descriptor=buildDescriptor({sourceIndexSha256:ownSha,row,record:r,expectedCases:before.expectedCases,native});\n"
+        },
+        {
+          "beforeOffset": 12402,
+          "afterOffset": 11731,
+          "old": "  for(const [i,value] of actual.rawReturns.entries()){const literal=i===2||i===4;const serialized=literal?value.rawReturn:JSON.stringify(JSON.parse(value.rawReturn));assert.equal(serialized,expected[i],'Parent independently checks retained public raw returns');}\n",
+          "new": "  const names=['identity','checkpointProbe','setup','batch','setup','batch','checkpointProbe'];\n  for(const [i,value] of actual.rawReturns.entries()){assert.equal(value.publicExport,names[i]);assert.equal(value.rawReturnType,typeof value.rawReturn);requirePublicReturn(names[i],value.rawReturn,expected[i]);}\n"
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "path": "worker.mjs",
+      "origin": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/measurement-memory-probe-candidate-v1/worker.mjs",
+      "beforeSha256": "ee63ee723ad7cb1f10f08dc6ae6a5ff23354303e2b739589492a9893eb026a17",
+      "afterSha256": "1ba1634d8f8df13c48beec3373b5f54c11dbf2495c7bfbc208d57d115822bf47",
+      "edits": [
+        {
+          "beforeOffset": 3108,
+          "afterOffset": 3108,
+          "old": "const {validateDescriptor,artifactRoot,packageFile}=await import('./contracts.mjs');\n",
+          "new": "const {validateDescriptor,requirePublicReturn,artifactRoot,packageFile}=await import('./contracts.mjs');\n"
+        },
+        {
+          "beforeOffset": 4393,
+          "afterOffset": 4413,
+          "old": "async function exactCall(instance,name,args,expectedRaw,label,{literal=false}={}){\n",
+          "new": "async function exactCall(instance,name,args,expectedRaw,label){\n"
+        },
+        {
+          "beforeOffset": 4654,
+          "afterOffset": 4655,
+          "old": " const observed={label,publicExport:name,arguments:args,rawReturn:actual,elapsedMs,rssBytes:rss()};rawReturns.push(observed);await persist('raw-'+label,observed);await progress('returned-'+label);\n assert.equal(typeof actual,'string');const serialized=literal?actual:JSON.stringify(JSON.parse(actual));if(serialized!==expectedRaw)throw new Error('Public scalar mismatch: '+label+' (whole raw return retained)');return elapsedMs;\n",
+          "new": " const observed={label,publicExport:name,arguments:args,rawReturn:actual,rawReturnType:typeof actual,elapsedMs,rssBytes:rss()};rawReturns.push(observed);await persist('raw-'+label,observed);await progress('returned-'+label);\n requirePublicReturn(name,actual,expectedRaw);return elapsedMs;\n"
+        },
+        {
+          "beforeOffset": 6388,
+          "afterOffset": 6249,
+          "old": "  const label=i===0?'small':'large';stages.push({stage:label+'-setup',elapsedMs:await exactCall(instance,'setup',[row.index],row.setupReturn,label+'-setup',{literal:true})});snapshot('after-'+label+'-setup');\n",
+          "new": "  const label=i===0?'small':'large';stages.push({stage:label+'-setup',elapsedMs:await exactCall(instance,'setup',[row.index],row.setupReturn,label+'-setup')});snapshot('after-'+label+'-setup');\n"
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "path": "tests.mjs",
+      "origin": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/measurement-memory-probe-candidate-v1/tests.mjs",
+      "beforeSha256": "e204c6919c28b7d822385286fd607d459aa689857b87d61a608eab674c1d9f2d",
+      "afterSha256": "4a54bec102a25b531a0309803a715a8fc58990678e08c1426642fd401192ab50",
+      "edits": [
+        {
+          "beforeOffset": 166,
+          "afterOffset": 166,
+          "old": "",
+          "new": "import {createHash} from 'node:crypto';\n"
+        },
+        {
+          "beforeOffset": 246,
+          "afterOffset": 286,
+          "old": "import {validateDescriptor,validateAuthority,schedule,artifactRoot,packageFile,tuples,phaseSha,timingSha,timingRootSha,integritySha} from './contracts.mjs';\n",
+          "new": "import {validateDescriptor,validateAuthority,buildDescriptor,buildExpectedCases,requirePublicReturn,requireS32,schedule,packageFile,phaseSha,timingSha,timingRootSha,integritySha} from './contracts.mjs';\nimport {compactExpected} from '../measurement-execution-activated-v2/compact-oracle.mjs';\n"
+        },
+        {
+          "beforeOffset": 508,
+          "afterOffset": 684,
+          "old": "const sha='1'.repeat(64),tuple=tuples['native-on'],root=artifactRoot('native-on');\nconst descriptor={schemaVersion:1,state:'PARENT_AUTHENTICATED_SMALL_MEMORY_WORKER_INPUT_V1',sourceIndexSha256:sha,parentPhaseSha256:phaseSha,arm:'native-on',comparison:'same-engine-binding',repetition:0,runOrder:['native-on','canonical-on'],position:0,\n component:{path:root+'/common-byte.component.wasm',sha256:tuple[0],bytes:tuple[1]},modulePath:root+'/common_byte.js',coreFiles:['common_byte.core.wasm'],criticalFiles:[\n {path:root+'/common-byte.component.wasm',sha256:tuple[0],bytes:tuple[1]},\n {path:root+'/common_byte.core.wasm',sha256:tuple[2],bytes:tuple[3]},\n {path:root+'/common_byte.js',sha256:'747296bc080f83a7a97657224a6aff71cfeaff124a47d4266c5c65124d99a53c',bytes:133860},\n {path:root+'/common_byte.d.ts',sha256:'e6e5d4c3d021092d6a6b662c6235f34987eca59672915aa18ab0e1618f3defe8',bytes:2209},packageFile('native-on')],\n expected:{identityRaw:'{}',probeRaw:'{}',cases:[1,5].map(index=>({index,iterations:1,setupReturn:'setup',batchRaw:JSON.stringify({result:{iterations:1,totalUnits:index===1?8192:4194304,records:[]}}),units:index===1?8192:4194304}))},\n nativeEvidence:{engineSha256:'12a8f7dc79e12e8bc3519b3fe72e898b226bbabde6930e63d3a6c30706b88274',metadataSha256:'f2f67947631136647259b7ba40422d6fb89fe943b1b74d2db4c5754bbfcc2c31',notLoadedByWorker:true}};\n",
+          "new": "const sha='1'.repeat(64),hash=raw=>createHash('sha256').update(raw).digest('hex'),base=dirname(here),old=join(base,'measurement-execution-activated-v2');\nasync function pinned(path,digest){const raw=await readFile(path);assert.equal(hash(raw),digest);return raw;}\nconst oldIndex=JSON.parse(await pinned(join(old,'index.json'),'1b801439258792c19b9cbc2527d04940c35fb0750f4c26b82a30df6802407612'));\nconst oracles=[];for(const name of ['node-common-oracle.json','node-control-oracle.json']){const row=oldIndex.files.find(r=>r.path===name);assert(row);oracles.push(...JSON.parse(await pinned(join(old,name),row.sha256)).cases);}\nconst phase=JSON.parse(await pinned(join(base,'production-adoption-v1/reviewed-composed-timing-phase-v1.json'),phaseSha));\nconst wit=(await pinned('/tmp/starling-node-compat/production-common-byte-correctness-v2/native-on/emitted.wit','53336fc899248b72ca00055a55af04acbdd06e9f03270173b67e9a633407b77d')).toString();\nconst declarations=(await pinned('/tmp/starling-node-compat/production-common-byte-correctness-v2/native-on/common_byte.d.ts','e6e5d4c3d021092d6a6b662c6235f34987eca59672915aa18ab0e1618f3defe8')).toString();\ncheck('actual signed32 ABI from pinned emittedWIT and declarations',()=>{assert(wit.includes('export setup: func(index: u32) -> s32;'));assert(declarations.includes('setup(index: number): number'));for(const name of ['batch','identity','checkpoint-probe'])assert(wit.split('\\n').some(line=>line.includes('export '+name+':')&&line.includes('-> string;')));});\nconst expectedCases=buildExpectedCases(oracles,compactExpected);check('genuine two Node setup values retained as numbers',()=>assert.deepEqual(expectedCases.map(r=>r.setupReturn),[151852933,-1502831163]));\nconst descriptors=schedule().map(row=>{const record=phase.components[row.arm];return buildDescriptor({sourceIndexSha256:sha,row,record,expectedCases,native:{engineSha256:record.engineSha256,metadataSha256:record.engineMetadataSha256}});});\ncheck('actual parent builder validates all18 genuine phase/oracle descriptors',()=>{assert.equal(descriptors.length,18);for(const d of descriptors){assert.deepEqual(validateDescriptor(d),d);assert.deepEqual(d.expected.cases.map(r=>r.setupReturn),[151852933,-1502831163]);}});\nconst descriptor=descriptors[0],root=dirname(descriptor.modulePath);\n"
+        },
+        {
+          "beforeOffset": 3326,
+          "afterOffset": 4445,
+          "old": "const authority={schemaVersion:1,state:'ROOT_REVIEWED_COMMON_BYTE_PROCESS_RSS_SUPPLEMENT_V1',sourceIndexSha256:sha,memorySupplementAllowed:true,throughputReplacement:false,runtimeAcceptanceClaim:false,\n",
+          "new": "for(const [name,value] of [['string','151852933'],['NaN',NaN],['fraction',1.25],['high',2147483648],['low',-2147483649],['infinity',Infinity],['null',null]]){\n check('typed setup '+name+' refused by descriptor and shared public guard',()=>{const d=structuredClone(descriptor);d.expected.cases[0].setupReturn=value;assert.throws(()=>validateDescriptor(d));assert.throws(()=>requirePublicReturn('setup',value,151852933));});\n}\ncheck('signed32 limits accepted without string coercion',()=>{assert.equal(requireS32(-2147483648),-2147483648);assert.equal(requireS32(2147483647),2147483647);});\ncheck('shared typed return guard accepts both genuine setup returns',()=>{for(const row of expectedCases)requirePublicReturn('setup',row.setupReturn,row.setupReturn);});\ncheck('incorrect integer setup result rejected strictly',()=>assert.throws(()=>requirePublicReturn('setup',151852934,151852933)));\ncheck('incorrect numeric expected result rejected in actual descriptor construction',()=>{const bad=structuredClone(expectedCases);bad[0].setupReturn++;const row=schedule()[0],record=phase.components[row.arm];assert.throws(()=>buildDescriptor({sourceIndexSha256:sha,row,record,expectedCases:bad,native:{engineSha256:record.engineSha256,metadataSha256:record.engineMetadataSha256}}));});\ncheck('number expected cannot be string-coerced',()=>assert.throws(()=>requirePublicReturn('setup',151852933,'151852933')));\ncheck('five other public returns remain JSON strings',()=>{for(const d of descriptors){requirePublicReturn('identity',d.expected.identityRaw,d.expected.identityRaw);requirePublicReturn('checkpointProbe',d.expected.probeRaw,d.expected.probeRaw);for(const row of d.expected.cases){requirePublicReturn('batch',row.batchRaw,row.batchRaw);assert.throws(()=>requirePublicReturn('batch',JSON.parse(row.batchRaw),row.batchRaw));}}});\ncheck('actual construction fails on string oracle setup before output',()=>{const bad=structuredClone(oracles);bad[1].setup=String(bad[1].setup);assert.throws(()=>buildExpectedCases(bad,compactExpected));});\nconst authority={schemaVersion:1,state:'ROOT_REVIEWED_COMMON_BYTE_PROCESS_RSS_SUPPLEMENT_V2',sourceIndexSha256:sha,memorySupplementAllowed:true,throughputReplacement:false,runtimeAcceptanceClaim:false,\n"
+        },
+        {
+          "beforeOffset": 3904,
+          "afterOffset": 7059,
+          "old": "",
+          "new": "check('old v1 Root permission cannot activate v2',()=>assert.throws(()=>validateAuthority({...authority,state:'ROOT_REVIEWED_COMMON_BYTE_PROCESS_RSS_SUPPLEMENT_V1'},sha)));\n"
+        },
+        {
+          "beforeOffset": 5584,
+          "afterOffset": 8912,
+          "old": "check('whole raw scalar persistence precedes equality',()=>assert(worker.indexOf(\"await persist('raw-'+label,observed)\")<worker.indexOf('if(serialized!==expectedRaw)')));\n",
+          "new": "check('whole typed raw scalar persistence precedes shared guard',()=>{assert(worker.includes('rawReturn:actual,rawReturnType:typeof actual'));assert(worker.indexOf(\"await persist('raw-'+label,observed)\")<worker.indexOf('requirePublicReturn(name,actual,expectedRaw)'));});\n"
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    }
+  ],
+  "runtimeProtocolUnchanged": true,
+  "guestOrProviderBytesChanged": false
+}

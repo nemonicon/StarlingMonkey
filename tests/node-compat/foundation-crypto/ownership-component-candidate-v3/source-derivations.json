@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "guard": {
+    "origin": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-component-candidate-v2/guard.mjs",
+      "sha256": "a232ebd6eb93516f19a6f071a1de5c4905197bcd6de78054a0542aa3221a6809",
+      "bytes": 8626
+    },
+    "afterimage": "guard.mjs",
+    "afterSha256": "2a1bf83e46c72ae9074f6ed49d6a21469a70cea3b91a19abdd0c715181c04ab0",
+    "edits": [
+      {
+        "old": "import {loadPackaging,streamHash,packagingEnvironment} from '../ownership-component-candidate-v1/packaging.mjs';",
+        "new": "import {loadPackaging,streamHash,packagingEnvironment} from '../ownership-component-candidate-v1/packaging.mjs';\nimport {captureConfiguredBootstrap} from './bootstrap-context.mjs';",
+        "afterOffsetAtEdit": 414,
+        "count": 1
+      },
+      {
+        "old": "/crypto-owner355-component-v2'",
+        "new": "/crypto-owner355-component-v3'",
+        "afterOffsetAtEdit": 701,
+        "count": 1
+      },
+      {
+        "old": "ROOT_REVIEWED_CRYPTO_OWNER355_COMPONENT_BUILD_V2",
+        "new": "ROOT_REVIEWED_CRYPTO_OWNER355_COMPONENT_BUILD_V3",
+        "afterOffsetAtEdit": 1638,
+        "count": 1
+      },
+      {
+        "old": "INDEPENDENT_CRYPTO_OWNER355_COMPONENT_SOURCE_REVIEW_PASSED_V2",
+        "new": "INDEPENDENT_CRYPTO_OWNER355_COMPONENT_SOURCE_REVIEW_PASSED_V3",
+        "afterOffsetAtEdit": 3705,
+        "count": 1
+      },
+      {
+        "old": "const prereqBytes=await regular(donor.rows.find",
+        "new": "const parent=await sourceIndex({path:join(HERE,'../ownership-component-candidate-v2/index.json'),sha256:'b03d1edb70c77eefb3effad27046189d23ff2baa91bb154e05b5eac56d234bc7',bytes:3264});\n const prereqBytes=await regular(donor.rows.find",
+        "afterOffsetAtEdit": 3467,
+        "count": 1
+      },
+      {
+        "old": "await regular(p.bootstrapEntry);const {cryptoOwnerBootstrapPreflight}=await import(pathToFileURL(p.bootstrapEntry.path));",
+        "new": "await regular(p.bootstrapEntry); // original preparation entry is provenance DATA only\n const contextRow=own.rows.find(r=>r.path===join(HERE,'bootstrap-context.json'));need(contextRow,'Indexed actual configured bootstrap context');const configured=await captureConfiguredBootstrap(contextRow,p,root);\n await configured.recheck();const {cryptoOwnerBootstrapPreflight}=await import(pathToFileURL(configured.entry.path));",
+        "afterOffsetAtEdit": 6437,
+        "count": 1
+      },
+      {
+        "old": "const engine=descriptor({path:frame.enginePath",
+        "new": "configured.assertReturned(frame);\n const engine=descriptor({path:frame.enginePath",
+        "afterOffsetAtEdit": 7576,
+        "count": 1
+      },
+      {
+        "old": "await own.recheck();await donor.recheck();",
+        "new": "await own.recheck();await donor.recheck();await parent.recheck();await configured.recheck();",
+        "afterOffsetAtEdit": 8217,
+        "count": 1
+      },
+      {
+        "old": "await frame.recheck();await packaging.recheck();",
+        "new": "await frame.recheck();configured.assertReturned(frame);await packaging.recheck();",
+        "afterOffsetAtEdit": 8542,
+        "count": 1
+      },
+      {
+        "old": "[...own.rows,...donor.rows]",
+        "new": "[...own.rows,...donor.rows,...parent.rows]",
+        "afterOffsetAtEdit": 9126,
+        "count": 1
+      }
+    ],
+    "forwardAndOffsetReverseExact": true
+  },
+  "unchangedCopies": [
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-component-candidate-v2/build.mjs",
+        "sha256": "cbfa8e6577f0277d31c05b9019e4f50a5cce74549be78b540dfa894b0b8d5403",
+        "bytes": 5792
+      },
+      "afterimage": "build.mjs",
+      "sha256": "cbfa8e6577f0277d31c05b9019e4f50a5cce74549be78b540dfa894b0b8d5403"
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-component-candidate-v2/build-worker.mjs",
+        "sha256": "65fdc964240b18488f8dfdfd6fc4455a62bce8963c3a7b3b313f2b641cb89621",
+        "bytes": 8175
+      },
+      "afterimage": "build-worker.mjs",
+      "sha256": "65fdc964240b18488f8dfdfd6fc4455a62bce8963c3a7b3b313f2b641cb89621"
+    }
+  ],
+  "originalGuestNativeWitToolOrAdapterPayloadChanged": false
+}

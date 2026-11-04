@@ -1,0 +1,21 @@
+--- a/cmake/builtins.cmake
++++ b/cmake/builtins.cmake
+@@ -151,7 +151,18 @@
+     endif()
+     option(NODE_COMPAT_EVENTS "Enable optional bounded synchronous node:events module" OFF)
+     if(NODE_COMPAT_EVENTS)
++        # UNAPPLIED m0.10: guest implementation prerequisites, never host services.
++        foreach(NODE_COMPAT_EVENT_PREREQUISITE builtin_web_event builtin_web_abort builtin_web_queue_microtask)
++            if(NOT TARGET ${NODE_COMPAT_EVENT_PREREQUISITE})
++                message(FATAL_ERROR "NODE_COMPAT_EVENTS m0.10 requires ${NODE_COMPAT_EVENT_PREREQUISITE}")
++            endif()
++        endforeach()
+         target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_EVENTS=1)
++        # EventListener has a selected field: every TU seeing its header must
++        # agree. Keep this derived flag out of user-selectable cache options.
++        target_compile_definitions(extension_api INTERFACE NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER=1)
++        add_dependencies(builtin_node_compat builtin_web_event builtin_web_abort builtin_web_queue_microtask)
++        target_link_libraries(builtin_node_compat PRIVATE builtin_web_event builtin_web_abort builtin_web_queue_microtask)
+     endif()
+     option(NODE_COMPAT_STRING_DECODER "Enable optional bounded node:string_decoder module" OFF)
+     option(NODE_COMPAT_ASSERT "Enable optional bounded node:assert/strict modules" OFF)

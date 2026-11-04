@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_READY_HOST_LIFECYCLE_VALIDATED_NATIVE_LAUNCH_UNEXECUTED",
+  "timestampUtc": "2026-11-03T17:46:02.791527+00:00",
+  "launcherSha256": "19de49b11f7fcef3d971f5264033dc5318a93294c92eb42a24ee26471a982d40",
+  "checkSourceSha256": "3c5df64b4e71da570eaac139bf4e1de4978a6e0b80acca6bdc5b00b4e519486f",
+  "hostResultsSha256": "a22732e79122acc81f6fbc8d943de3401dbe84d9c4bff70ab13d92a7be04d6c6",
+  "oldLaunchersPreserved": [
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-adoption-v1/build-one-diagnostic.py",
+      "sha256": "74292ab70c501ce69deeed6710e963817d7eb13860d059cff7ca4b4e1dae6feb"
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-adoption-v1/build-one-diagnostic-v2.py",
+      "sha256": "9e65676fce58f9047e94fef24d302333d435a8bb8cc3b1b621d137445cb8798c"
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-adoption-v1/build-one-diagnostic-v3.py",
+      "sha256": "f618fc37e9112f54777e80a939ea9436ba80cc4e38e2b300263682bdb1bc7d68"
+    }
+  ],
+  "reviewedProducerSha256": "1e2f15d1aac2f86c3363390cc3c6261721a20c07fea8ca0825c68027154c0e19",
+  "futureOutputRoot": "/tmp/starling-node-compat/foundation-scheduler-v4/builds",
+  "futureLabels": [
+    "diagnostic-release",
+    "diagnostic-gc"
+  ],
+  "futureNormalArtifactTag": "r4",
+  "futureGCArtifactTag": "",
+  "initialCapacityRequiredBytes": 2147483648,
+  "stopBelowFreeBytes": 838860800,
+  "parallelBuilds": 1,
+  "nestedWorkerLimits": [
+    "NODE_COMPAT_JOBS=1",
+    "BINARYEN_CORES=1",
+    "RAYON_NUM_THREADS=1",
+    "CARGO_BUILD_JOBS=1"
+  ],
+  "signalPolicy": "Only the Popen child created with start_new_session=True supplies the process-group id. Never substitute a queried or caller-supplied group. ESRCH closes that id permanently. TERM then bounded group observation/KILL independent of shell-leader status; only own leader reaped before probes. Temporary SIGTERM handler records during spawn/cleanup, raises on first active-monitor cancellation, ignores no signals silently and restores previous handler. Default SIGINT remains caught as KeyboardInterrupt.",
+  "statusPolicy": "Raw child code is separate from launcher status. Monitor/cleanup/external cancellation/errors are finalized; missing final observation or result storage makes evidence incomplete/nonzero; stdout retains full result even on simulated ENOSPC.",
+  "checks": [
+    "capacity-and-output-collision",
+    "leader-exits-grandchild-survives-term",
+    "already-exited-group-esrch",
+    "monitor-error-and-simulated-enospc-finalization",
+    "external-and-repeated-sigterm-finalization",
+    "final-observation-error-classification"
+  ],
+  "hostProcessChecksOnly": true,
+  "nativeProducerMainInvoked": false,
+  "compilerGuestNetworkExecuted": false,
+  "actualDiskFill": false,
+  "retainedCounterexamples": [
+    "launcher-v4-history/before-sigterm-review preserves original source4checks before Root cancellation review",
+    "launcher-v4-history/before-reap-observation-review preserves6checks with recorded EPERM after KILL; source now reaps own leader before group probe; new6checks require cleanup.errors empty"
+  ],
+  "limits": [
+    "Source review and benign lifecycle checks are not native build/runtime acceptance",
+    "Capacity precondition/1s sampling do not guarantee no transient ENOSPC",
+    "Cleanup is bounded; any unconfirmed group exit or reap is reported incomplete and fails launcher",
+    "Known group identities are used only in their immediate owned lifecycle; not a general hostile process/PID-churn service",
+    "Future repeatedGC retry needs a fresh approved namespace because the fixed GC no-tag identity cannot be reused",
+    "Partial new launch/result/log files are preserved, never overwritten"
+  ]
+}

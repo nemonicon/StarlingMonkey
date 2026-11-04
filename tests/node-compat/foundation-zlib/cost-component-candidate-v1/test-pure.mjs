@@ -1,0 +1,31 @@
+// Pure source/carrier models only. No child, codec, library, Wasm or tool call.
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {dirname,join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {authorityModel,componentPreflight,TOOLING_SHA,GUEST_SHA,PUBLICATION,OUTPUTS} from './guard.mjs';
+import {componentOptions} from './build-worker.mjs';
+import {parsePublicWit,checkTranspileMetadata,checkOwnedTerminal,NAMES,wasmArgumentFeasibility,publicJSExports} from './abi.mjs';
+import {plainJSON} from './durable.mjs';
+let checks=0;function yes(name,fn){fn();checks++;}function no(name,fn){assert.throws(fn);checks++;}
+const H='a'.repeat(64),row={path:'/private/tmp/unconfigured-proof.json',sha256:H,bytes:100},proof={index:row,result:row};
+const value={schemaVersion:1,state:'ROOT_REVIEWED_ZLIB_COST_COMPONENT_BUILD_V1',action:'component-build',actionAllowed:true,componentSourceIndexSha256:H,toolingCandidateIndexSha256:TOOLING_SHA,guestSourceIndexSha256:GUEST_SHA,arm:'native-on',outputRoot:OUTPUTS['native-on'],nativeInputs:350,metadataProjection:false,operationalAdmission:false,sourcePromotionAllowed:false,workerTimeoutMs:600000,maxComponentBytes:67108864,ordinaryGuestExportCallsAllowed:false,pilotOrTimingAllowed:false,publicationIndex:PUBLICATION,sourcePublicationCompletion:row,sourcePublicationProof:proof,nodeOracleRenderProof:proof,rootReviewedPair:proof,actualBundleReview:proof,componentSourceReview:proof};
+yes('future synthetic shape, never actual authority',()=>authorityModel(value,{componentSourceIndexSha256:H,arm:'native-on'}));
+for(const [key,bad]of Object.entries({state:'ROOT_REVIEWED_FRESH_ZLIB350_COST_ACTION_V1',action:'bundle-source',actionAllowed:false,componentSourceIndexSha256:'b'.repeat(64),toolingCandidateIndexSha256:'b'.repeat(64),guestSourceIndexSha256:'b'.repeat(64),outputRoot:'/private/tmp/old',nativeInputs:355,metadataProjection:true,operationalAdmission:true,sourcePromotionAllowed:true,workerTimeoutMs:7200000,maxComponentBytes:999999999,ordinaryGuestExportCallsAllowed:true,pilotOrTimingAllowed:true}))no('finite action '+key,()=>authorityModel({...value,[key]:bad},{componentSourceIndexSha256:H,arm:'native-on'}));
+for(const key of['actualBundleReview','componentSourceReview','rootReviewedPair','sourcePublicationProof','nodeOracleRenderProof'])no('missing actual proof '+key,()=>authorityModel({...value,[key]:null},{componentSourceIndexSha256:H,arm:'native-on'}));
+no('wrong published source',()=>authorityModel({...value,publicationIndex:{...PUBLICATION,sha256:H}},{componentSourceIndexSha256:H,arm:'native-on'}));
+await assert.rejects(()=>componentPreflight());checks++;
+const here=dirname(fileURLToPath(import.meta.url)),wit=await readFile(join(here,'public-abi.wit'),'utf8');
+const emitted=wit.replace('package starling:codec-cost-proposal;','package root:component;').replace('world codec-cost-proposal','world root');
+yes('seven scalar source-model ABI, not actual emitted proof',()=>assert.equal(Object.keys(parsePublicWit(emitted)).length,7));
+for(const [name,text]of Object.entries({missing:emitted.replace('export validate: func(record: string) -> string;',''),signed:emitted.replace('case-id: u32','case-id: s32'),import:emitted.replace('world root {','world root { import a: func();'),extra:emitted.replace('world root {','world root { export extra: func() -> string;'),resource:emitted.replace('world root {','world root { export resource: interface { f: func(); }'),returnNumber:emitted.replace('identity: func() -> string','identity: func() -> u32')}))no('bad actual-ABI model '+name,()=>parsePublicWit(text));
+const transpile={imports:[],exports:NAMES.map(name=>[name,'function'])};yes('actual inspected Jco metadata shape',()=>checkTranspileMetadata(transpile));
+no('Jco instance',()=>checkTranspileMetadata({...transpile,exports:transpile.exports.map((v,i)=>i===0?[v[0],'instance']:v)}));no('Jco unexpected imports',()=>checkTranspileMetadata({...transpile,imports:['wasi:random/random@0.2.10']}));
+const ast={type:'Program',body:[{type:'ExportNamedDeclaration',source:null,specifiers:NAMES.map(name=>({type:'ExportSpecifier',exported:{type:'Identifier',name}}))}]};yes('pure ESTree public-name model',()=>publicJSExports(ast));
+no('extra actual glue export',()=>publicJSExports({...ast,body:[...ast.body,{type:'ExportDefaultDeclaration'}]}));no('re-export dependency',()=>publicJSExports({...ast,body:[{...ast.body[0],source:{value:'outside'}}]}));no('missing actual public name',()=>publicJSExports({...ast,body:[{...ast.body[0],specifiers:ast.body[0].specifiers.slice(1)}]}));
+const opts=componentOptions({engine:{path:'/private/tmp/data.engine'},adapter:{path:'/private/tmp/adapter'}},wit);
+yes('genuine options seam serializes no undefined values',()=>plainJSON({...opts,optionsScope:'public-options-model'}));yes('empty guest env/no AOT',()=>{assert.deepEqual(opts.env,{});assert.equal(opts.enableAot,false);assert.deepEqual(opts.selectedInterfaces,[]);});
+const terminal={closed:true,status:0,signal:null,ownedGroupGone:true,terminalExitZeroObserved:true,spawnError:null,timedOut:false,externalSignal:null,outputLimitExceeded:false,errors:[]};yes('clean owned terminal shape',()=>checkOwnedTerminal(terminal));
+for(const [key,bad]of Object.entries({closed:false,status:1,signal:'SIGTERM',ownedGroupGone:false,terminalExitZeroObserved:false,spawnError:{code:'EIO'},timedOut:true,externalSignal:'SIGINT',outputLimitExceeded:true,errors:[{stage:'stream'}]}))no('incomplete terminal '+key,()=>checkOwnedTerminal({...terminal,[key]:bad}));
+no('string wire cap not argv proof',()=>wasmArgumentFeasibility({argv:['/tmp/wt','validate("x")'],environment:{},argMax:1048576,transportProof:null}));
+process.stdout.write(JSON.stringify({schemaVersion:1,state:'PURE_COMPONENT_SOURCE_MODELS_PASSED',checks,syntheticAuthorityAndABIModelsOnly:true,nullAuthorityDenialCalls:1,positivePreflightsInvoked:0,ownedCommandsInvoked:0,componentizerOrTranspilerOrWasmOrGuestOrCodecInvoked:false})+'\n');

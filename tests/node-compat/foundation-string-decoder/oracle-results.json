@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "node": "v22.14.0",
+  "scope": "Host-only unintegrated UTF8/hex prototype; no generic native TextDecoder safety or registered builtin claim",
+  "stats": {
+    "sequences": 137520,
+    "writes": 283984,
+    "bytePairs": 131072,
+    "errorCases": 60,
+    "mutationCases": 8
+  },
+  "variants": [
+    {
+      "label": "NodeBuffer native host",
+      "constructor": "StringDecoder",
+      "stateBytes": 7,
+      "lastCharViewBytes": 4,
+      "viewsShareOneUnsharedBuffer": true
+    },
+    {
+      "label": "M0 facade with explicit JS reference kernel",
+      "constructor": "StringDecoder",
+      "stateBytes": 7,
+      "lastCharViewBytes": 4,
+      "viewsShareOneUnsharedBuffer": true
+    }
+  ],
+  "exclusions": [
+    "Shared/resizable/detached backing stores are not exercised on old native TextDecoder.",
+    "Other known encodings are explicit deferred constructor errors.",
+    "Detailed received-value messages, internal-state corruption and forged receivers are outside this prototype contract."
+  ],
+  "sourceManifest": [
+    {
+      "path": "prototype.mjs",
+      "sha256": "eee26aae4538637211f097072ed0698a9c9f2fd950e0d49c940e88e9ec0e583a"
+    },
+    {
+      "path": "oracle.mjs",
+      "sha256": "a8132ea62778c78891748ca99e1cb6aec0667fa3bfe0434929ae82d02edc6b33"
+    },
+    {
+      "path": "../../../builtins/node-compat/buffer-facade.mjs",
+      "sha256": "b1a8b671e4ebf71ed300b56afb1d60986ef37be1716f55bf00b35151a4a00f16"
+    },
+    {
+      "path": "../../../docs/node-compat/templates/reference-kernel.mjs",
+      "sha256": "ed04116feed90ae3827cbee6c45022a7c12ec5acdabb7cc5f850bfd04e8dd627"
+    }
+  ]
+}

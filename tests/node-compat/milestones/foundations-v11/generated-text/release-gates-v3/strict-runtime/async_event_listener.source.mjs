@@ -1,0 +1,1 @@
+export async function run(){let calls=0;const t=new EventTarget();t.addEventListener('test',async()=>{calls++;throw new Error('ASYNC_EVENT_UNCAUGHT')});t.dispatchEvent(new Event('test'));await Promise.resolve();return JSON.stringify({calls,returnedDespiteUnhandledAsyncError:true})}

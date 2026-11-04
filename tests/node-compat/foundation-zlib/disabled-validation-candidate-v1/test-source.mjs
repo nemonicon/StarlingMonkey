@@ -1,0 +1,23 @@
+// Optional future pure synthetic/source test only; no native/tool action imports.
+import assert from 'node:assert/strict';
+import {readFile,mkdir,writeFile} from 'node:fs/promises';
+import {dirname,join,resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {deniedSources,smokeSource,directNativeSource} from './fixtures.mjs';
+import {assertDisabledManifests,assertSmoke} from './checks.mjs';
+const here=dirname(fileURLToPath(import.meta.url)),output=resolve(process.env.NODE_COMPAT_ZLIB_DISABLED_SOURCE_OUTPUT??'');assert(output.startsWith('/tmp/starling-node-compat/'));await mkdir(output);const checks=[],ok=(name,fn)=>{fn();checks.push(name);};
+const core={profileVersion:'synthetic-profile-only',modules:{'node:buffer':{aliases:['buffer'],exports:['Buffer']},'node:child_process':{aliases:['child_process'],exports:['default','exec']}}};
+ok('finite eight source cases',()=>{assert.equal(deniedSources.length,8);assert.equal(new Set(deniedSources.map(row=>row.id+'/'+row.kind)).size,8);assert.equal(deniedSources.filter(row=>row.kind==='literal-cjs').length,2);});
+ok('synthetic disabled manifests only',()=>assert.deepEqual(assertDisabledManifests([core]),{profileVersion:'synthetic-profile-only',exports:['default','exec']}));
+for(const canonical of ['node:zlib','zlib'])ok('reject canonical selection '+canonical,()=>assert.throws(()=>assertDisabledManifests([{...core,modules:{...core.modules,[canonical]:{aliases:['zlib']}}}])));
+ok('reject bare alias in selected manifest',()=>assert.throws(()=>assertDisabledManifests([{...core,modules:{...core.modules,'node:other':{aliases:['zlib']}}}])));
+ok('reject missing core',()=>assert.throws(()=>assertDisabledManifests([{modules:{}}])));
+const bytes={sharedHex:'090203',copyHex:'010203',viewHex:'0203',sharedBacking:true,sharedOffset:2,viewBacking:true,viewOffset:3,copyIndependent:true,globalBuffer:true},fields=Object.fromEntries(Object.entries({code:'ERR_SM_NODE_UNSUPPORTED',module:'node:child_process',operation:'exec',profile:core.profileVersion}).map(([key,value])=>[key,{own:true,type:'string',value}])),value={calls:1,bytes,snapshot:{bytes,call:fields,construction:fields},call:fields,construction:fields,namespace:['default','exec'],defaultNamed:true,allCallable:true,thenType:'undefined',defaultThenType:'undefined'};
+ok('synthetic smoke carrier only',()=>assertSmoke(value,1,{profileVersion:core.profileVersion,exports:['default','exec']}));
+for(const key of ['calls','bytes','namespace','call'])ok('reject smoke mismatch '+key,()=>{const copy=structuredClone(value);if(key==='calls')copy.calls=2;else if(key==='bytes')copy.bytes.sharedOffset=0;else if(key==='namespace')copy.namespace.push('zlib');else copy.call.code.own=false;assert.throws(()=>assertSmoke(copy,1,{profileVersion:core.profileVersion,exports:['default','exec']}));});
+const driver=await readFile(join(here,'run-disabled.mjs'),'utf8');
+ok('both index checks precede actual preflight import',()=>assert(driver.indexOf('await indexed(family,familySha)')<driver.indexOf('const{validationPreflight}')));
+ok('eight denials strictly before first componentize call',()=>assert(driver.indexOf("assert.equal(denials.length,8)")<driver.indexOf('componentizeCalls++;const{component')));
+ok('absence control generic and paired',()=>{assert(driver.includes('uniqueFailureCauseProven:false'));assert(driver.includes('pairedValidSmoke:true'));assert(directNativeSource.includes("from 'node:zlib'"));});
+ok('only supported ordinary smoke APIs',()=>{assert(smokeSource.includes('Buffer.from(backing,2,3)'));assert(smokeSource.includes('shared.subarray(1)'));assert(smokeSource.includes("refusal('new')"));assert(!smokeSource.includes('reset('));});
+await writeFile(join(output,'results.json'),JSON.stringify({state:'PURE_DISABLED_PROFILE_SOURCE_CHECKS_PASSED',passed:checks.length,checks,syntheticOnly:true,bootstrapOrComponentizerOrGuestOrHostExecuted:false},null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({passed:checks.length,output}));

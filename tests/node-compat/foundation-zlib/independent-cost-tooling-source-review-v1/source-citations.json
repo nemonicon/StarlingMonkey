@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "findingsBoundToActualSealedSourceAndPinnedLoader": true,
+  "files": [
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-tooling-candidate-v1/environment.mjs",
+      "sha256": "2b17b196c0065d86dcd19626e799a5b2e88b3bf26e0f31f6c688643b735676df",
+      "bytes": 774,
+      "needle": "['NODE_OPTIONS','NODE_PATH']",
+      "occurrences": [
+        {
+          "line": 10,
+          "text": "for(const key of['NODE_OPTIONS','NODE_PATH'])need(!environment[key],'Inherited module injection refuses: '+key);"
+        }
+      ]
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-tooling-candidate-v1/bundle.mjs",
+      "sha256": "a508e143ae4a118615b19b2f5e93366fbb4b3187e8872a10245a6514188f5f2e",
+      "bytes": 5069,
+      "needle": "assertPackagingEnvironment(admitted)",
+      "occurrences": [
+        {
+          "line": 11,
+          "text": "assertPackagingEnvironment(admitted);"
+        }
+      ]
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-tooling-candidate-v1/bundle.mjs",
+      "sha256": "a508e143ae4a118615b19b2f5e93366fbb4b3187e8872a10245a6514188f5f2e",
+      "bytes": 5069,
+      "needle": "const {loadToolchain}=await import",
+      "occurrences": [
+        {
+          "line": 22,
+          "text": "const {loadToolchain}=await import(pathToFileURL(join(admitted.packagingRoot,'tests/node-compat/toolchain.mjs')));"
+        }
+      ]
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-tooling-candidate-v1/context.mjs",
+      "sha256": "7f2ca5dbba3f057b0958a8d2e42adfc94b8b4283fbe091b539503c0b35489760",
+      "bytes": 10697,
+      "needle": "export async function loadPublication(indexDescriptor,authority)",
+      "occurrences": [
+        {
+          "line": 21,
+          "text": "export async function loadPublication(indexDescriptor,authority){"
+        }
+      ]
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-tooling-candidate-v1/context.mjs",
+      "sha256": "7f2ca5dbba3f057b0958a8d2e42adfc94b8b4283fbe091b539503c0b35489760",
+      "bytes": 10697,
+      "needle": "await regular(indexDescriptor)",
+      "occurrences": [
+        {
+          "line": 23,
+          "text": "const raw=await regular(indexDescriptor),index=JSON.parse(raw),root=await realpath(dirname(indexDescriptor.path));"
+        },
+        {
+          "line": 52,
+          "text": "await authority.recheck();await actualProof.recheck();await regular(indexDescriptor);await regular(completionRow);const now=await lstat(root);need(now.dev===initial.dev&&now.ino===initial.ino&&(now.mode&0o777)===0o700,'Fresh source root changed');"
+        }
+      ]
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-tooling-candidate-v1/context.mjs",
+      "sha256": "7f2ca5dbba3f057b0958a8d2e42adfc94b8b4283fbe091b539503c0b35489760",
+      "bytes": 10697,
+      "needle": "publicationIndexSha256:indexDescriptor.sha256",
+      "occurrences": [
+        {
+          "line": 59,
+          "text": "const publicContext={publicationRoot:root,publicationIndexSha256:indexDescriptor.sha256,guestSourceIndexSha256:sha(context.guestSourceIndexSha256),packagingRoot:join(root,context.packagingRoot),toolchainRoot:join(root,context.toolchainRoot),packagerRoot:join(root,context.packagerRoot),guestRoot:join(root,context.guestRoot),fflateBrowserPath:join(root,context.fflateBrowser),existingNativeFacts:facts,"
+        }
+      ]
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-tooling-candidate-v1/preflight.mjs",
+      "sha256": "2939655374915744331f43dfb3b9d1c837095ef33c1f5f0782e6027e9dcafccb",
+      "bytes": 1369,
+      "needle": "rootActionSha256:rootAction.sha256",
+      "occurrences": [
+        {
+          "line": 17,
+          "text": "rootActionSha256:rootAction.sha256,toolingSourceIndexSha256,publicationIndexSha256:publicationIndex.sha256,rootAction:authority.authority,recheck});"
+        }
+      ]
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/native-toolchain-lock/node_modules/rolldown/dist/shared/binding-BXYS21Tf.mjs",
+      "sha256": "87ce0808ad14e6d75ce2a7a38caa766da88f31569572b6966d19185e4df46cec",
+      "bytes": 35162,
+      "needle": "if (process.env.NAPI_RS_NATIVE_LIBRARY_PATH)",
+      "occurrences": [
+        {
+          "line": 69,
+          "text": "if (process.env.NAPI_RS_NATIVE_LIBRARY_PATH) try {"
+        }
+      ]
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/native-toolchain-lock/node_modules/rolldown/dist/shared/binding-BXYS21Tf.mjs",
+      "sha256": "87ce0808ad14e6d75ce2a7a38caa766da88f31569572b6966d19185e4df46cec",
+      "bytes": 35162,
+      "needle": "__require(process.env.NAPI_RS_NATIVE_LIBRARY_PATH)",
+      "occurrences": [
+        {
+          "line": 70,
+          "text": "const overrideBinding = __require(process.env.NAPI_RS_NATIVE_LIBRARY_PATH);"
+        }
+      ]
+    }
+  ],
+  "ownerCodeOrLoaderInvoked": false
+}

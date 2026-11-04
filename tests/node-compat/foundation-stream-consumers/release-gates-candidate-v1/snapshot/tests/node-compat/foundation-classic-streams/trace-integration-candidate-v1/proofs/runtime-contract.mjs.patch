@@ -1,0 +1,18 @@
+--- a/tests/node-compat/foundation-classic-streams/production-runtime-activated-v3/runtime-contract.mjs
++++ b/runtime-contract.mjs
+@@ -6,11 +6,13 @@
+ export function selectClassicPin(document,{variant='normal-off',recipeSha256}={}){
+   assert(variants.includes(variant),'Unknown classic engine variant');
+   assert.equal(document.schemaVersion,1);
+-  assert.equal(document.state,'REVIEWED_REAL_CLASSIC_PRODUCTION_FREEZES_V1','Classic engine pins remain unconfigured');
++  assert.equal(document.state,'REVIEWED_REAL_CLASSIC_TRACE_PRODUCTION_FREEZES_V1','Classic engine pins remain unconfigured');
+   assert.deepEqual(Object.keys(document.variants).sort(),[...variants].sort());
+   const pin=document.variants[variant];assert(pin&&typeof pin==='object','No reviewed actual classic engine artifact');
+-  assert.equal(pin.state,'reviewed-real-classic-production-freeze');
++  assert.equal(pin.state,'reviewed-real-classic-trace-production-freeze');
+   assert.equal(pin.variant,variant);assert.equal(pin.sourceFiles,342);assert.equal(pin.recipeSha256,recipeSha256);
++  assert.equal(pin.sourceContractVersion,'sm-classic-trace-source-v1');
++  assert.equal(pin.classicTraceSourcePolicy?.fixSourceIndexSha256,'59c9233c5dd1c9f07c4da16a79abdb58abc9775b37c714f6af179e85f23f0631');
+   assert.equal(pin.gcStress,variant==='gc-off');assert.equal(pin.entropyPolicy,variant==='normal-runtime'?'runtime-only':'off');
+   assert.equal(pin.classicStreamsEnabled,variant!=='disabled-off');
+   for(const name of ['engineSha256','receiptSha256','cmakeCacheSha256','compileCommandsSha256','freezeReceiptSha256','parentEmbeddingCommandSha256'])assert(SHA.test(pin[name]),name);

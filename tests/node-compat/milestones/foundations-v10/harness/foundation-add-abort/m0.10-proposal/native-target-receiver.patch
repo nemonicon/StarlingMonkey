@@ -1,0 +1,27 @@
+--- a/builtins/web/event/event-target.cpp
++++ b/builtins/web/event/event-target.cpp
+@@ -10,6 +10,7 @@
+ #ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+ #include "js/Id.h"
+ #include "js/Symbol.h"
++#include "global-event-target.h"
+ #endif
+ #ifdef NODE_COMPAT_STRICT_INITIALIZATION
+ #include "event_loop.h"
+@@ -618,8 +619,16 @@
+ 
+     bool callback_ok;
+     if (JS::IsCallable(callback_obj)) {
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++      // Preserve the global API's hidden-target convention; ordinary native
++      // EventTarget/AbortSignal function listeners receive their actual target.
++      RootedObject receiver(cx, Event::current_target(event));
++      if (receiver == global_event_target()) receiver = engine->global();
++      callback_ok = JS::Call(cx, receiver, callback_val, args, &rval);
++#else
+       auto global = engine->global();
+       callback_ok = JS::Call(cx, global, callback_val, args, &rval);
++#endif
+     } else {
+       RootedValue handle_fn(cx);
+       if (!JS_GetProperty(cx, callback_obj, "handleEvent", &handle_fn)) {

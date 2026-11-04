@@ -1,0 +1,734 @@
+{
+  "node": "v22.14.0",
+  "cases": [
+    {
+      "name": "from-array",
+      "value": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "name": "from-string-unicode",
+      "value": [
+        "A",
+        "🌍",
+        "é"
+      ]
+    },
+    {
+      "name": "from-sync-generator",
+      "value": [
+        1,
+        2
+      ]
+    },
+    {
+      "name": "from-async-generator",
+      "value": [
+        1,
+        2
+      ]
+    },
+    {
+      "name": "from-sync-promised-value",
+      "value": [
+        7
+      ]
+    },
+    {
+      "name": "from-async-promised-value",
+      "value": {
+        "promised": true,
+        "value": 8
+      }
+    },
+    {
+      "name": "from-invalid-null",
+      "error": {
+        "name": "TypeError"
+      }
+    },
+    {
+      "name": "from-invalid-undefined",
+      "error": {
+        "name": "TypeError"
+      }
+    },
+    {
+      "name": "from-invalid-plain",
+      "error": {
+        "name": "TypeError",
+        "code": "ERR_ARG_NOT_ITERABLE"
+      }
+    },
+    {
+      "name": "from-invalid-number",
+      "error": {
+        "name": "TypeError",
+        "code": "ERR_ARG_NOT_ITERABLE"
+      }
+    },
+    {
+      "name": "from-invalid-sync-null",
+      "error": {
+        "name": "TypeError"
+      }
+    },
+    {
+      "name": "from-invalid-async-number",
+      "error": {
+        "name": "TypeError"
+      }
+    },
+    {
+      "name": "from-invalid-iterator-number",
+      "error": {
+        "name": "TypeError",
+        "code": "ERR_INVALID_STATE"
+      }
+    },
+    {
+      "name": "from-invalid-iterator-function",
+      "error": {
+        "name": "TypeError",
+        "code": "ERR_INVALID_STATE"
+      }
+    },
+    {
+      "name": "from-async-next-number",
+      "error": {
+        "name": "TypeError",
+        "code": "ERR_INVALID_STATE"
+      }
+    },
+    {
+      "name": "from-async-next-promised-number",
+      "error": {
+        "name": "TypeError",
+        "code": "ERR_INVALID_STATE"
+      }
+    },
+    {
+      "name": "from-sync-next-number",
+      "error": {
+        "name": "TypeError"
+      }
+    },
+    {
+      "name": "from-throwing-next",
+      "value": {
+        "same": true,
+        "locked": false
+      }
+    },
+    {
+      "name": "from-no-eager-pull",
+      "value": {
+        "before": [
+          "iterator"
+        ],
+        "first": {
+          "value": 3,
+          "done": false
+        },
+        "after": [
+          "iterator",
+          "next"
+        ],
+        "trace": [
+          "iterator",
+          "next",
+          "return:stop"
+        ]
+      }
+    },
+    {
+      "name": "from-next-captured",
+      "value": {
+        "values": [
+          9
+        ],
+        "gets": 1
+      }
+    },
+    {
+      "name": "from-sync-next-get-order",
+      "value": {
+        "before": [
+          "iterator",
+          "next-get"
+        ],
+        "trace": [
+          "iterator",
+          "next-get",
+          "next-get"
+        ],
+        "gets": 2,
+        "values": [
+          9
+        ]
+      }
+    },
+    {
+      "name": "from-cancel-return-number",
+      "value": {
+        "same": true,
+        "cancelled": {
+          "error": {
+            "name": "TypeError",
+            "code": "ERR_INVALID_STATE"
+          }
+        },
+        "locked": false
+      }
+    },
+    {
+      "name": "from-cancel-return-null",
+      "value": {
+        "same": true,
+        "cancelled": {
+          "error": {
+            "name": "TypeError",
+            "code": "ERR_INVALID_STATE"
+          }
+        },
+        "locked": false
+      }
+    },
+    {
+      "name": "from-cancel-return-undefined",
+      "value": {
+        "same": true,
+        "cancelled": {
+          "error": {
+            "name": "TypeError",
+            "code": "ERR_INVALID_STATE"
+          }
+        },
+        "locked": false
+      }
+    },
+    {
+      "name": "from-cancel-return-object",
+      "value": {
+        "same": true,
+        "cancelled": {},
+        "locked": false
+      }
+    },
+    {
+      "name": "from-cancel-return-promise-object",
+      "value": {
+        "same": true,
+        "cancelled": {},
+        "locked": false
+      }
+    },
+    {
+      "name": "from-cancel-return-rejection",
+      "value": {
+        "same": true,
+        "locked": false
+      }
+    },
+    {
+      "name": "from-static-this-ignored",
+      "value": [
+        4
+      ]
+    },
+    {
+      "name": "from-async-method-precedence",
+      "value": {
+        "trace": [
+          "async"
+        ],
+        "values": [
+          5
+        ]
+      }
+    },
+    {
+      "name": "from-null-async-fallback",
+      "value": [
+        6
+      ]
+    },
+    {
+      "name": "from-sync-generator-cancel-finally",
+      "value": {
+        "first": {
+          "value": 1,
+          "done": false
+        },
+        "trace": [
+          "finally"
+        ]
+      }
+    },
+    {
+      "name": "from-serial-pulls",
+      "value": {
+        "before": [
+          "next:0"
+        ],
+        "trace": [
+          "next:0",
+          "next:1"
+        ],
+        "results": [
+          {
+            "value": 1,
+            "done": false
+          },
+          {
+            "done": true
+          }
+        ],
+        "maxActive": 1
+      }
+    },
+    {
+      "name": "from-throwing-result-done",
+      "value": {
+        "same": true,
+        "locked": false
+      }
+    },
+    {
+      "name": "from-throwing-result-value",
+      "value": {
+        "same": true,
+        "locked": false
+      }
+    },
+    {
+      "name": "from-throwing-return-getter",
+      "value": {
+        "same": true
+      }
+    },
+    {
+      "name": "from-new-rejected",
+      "error": {
+        "name": "TypeError"
+      }
+    },
+    {
+      "name": "values-options-undefined",
+      "value": {
+        "first": {
+          "done": true
+        },
+        "locked": false
+      }
+    },
+    {
+      "name": "values-options-null",
+      "value": {
+        "first": {
+          "done": true
+        },
+        "locked": false
+      }
+    },
+    {
+      "name": "values-options-false",
+      "error": {
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      }
+    },
+    {
+      "name": "values-options-zero",
+      "error": {
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      }
+    },
+    {
+      "name": "values-options-string",
+      "error": {
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      }
+    },
+    {
+      "name": "values-options-array",
+      "value": {
+        "first": {
+          "done": true
+        },
+        "locked": false
+      }
+    },
+    {
+      "name": "values-options-function",
+      "value": {
+        "first": {
+          "done": true
+        },
+        "locked": false
+      }
+    },
+    {
+      "name": "values-invalid-receiver-before-options",
+      "value": {
+        "error": {
+          "name": "TypeError",
+          "code": "ERR_INVALID_THIS"
+        },
+        "reads": 0
+      }
+    },
+    {
+      "name": "values-prototype-rejected",
+      "error": {
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "name": "values-locked-after-getter",
+      "value": {
+        "result": {
+          "error": {
+            "name": "TypeError",
+            "code": "ERR_INVALID_STATE"
+          }
+        },
+        "trace": [
+          "get"
+        ]
+      }
+    },
+    {
+      "name": "values-throwing-options-unlocked",
+      "value": {
+        "same": true,
+        "locked": false
+      }
+    },
+    {
+      "name": "values-close-and-next",
+      "value": {
+        "lockedBefore": true,
+        "one": {
+          "value": 1,
+          "done": false
+        },
+        "two": {
+          "done": true
+        },
+        "three": {
+          "done": true
+        },
+        "closedKeys": [
+          "done",
+          "value"
+        ],
+        "lockedAfter": false,
+        "returned": {
+          "done": true,
+          "value": "after"
+        }
+      }
+    },
+    {
+      "name": "values-three-concurrent-next",
+      "value": {
+        "results": [
+          {
+            "value": 1,
+            "done": false
+          },
+          {
+            "value": 2,
+            "done": false
+          },
+          {
+            "done": true
+          }
+        ],
+        "locked": false
+      }
+    },
+    {
+      "name": "values-pending-next-return-serialized",
+      "value": {
+        "before": [],
+        "results": [
+          {
+            "value": 7,
+            "done": false
+          },
+          {
+            "done": true,
+            "value": "stop"
+          }
+        ],
+        "trace": [
+          "next",
+          "cancel:stop",
+          "return"
+        ],
+        "locked": false
+      }
+    },
+    {
+      "name": "values-return-prevent-false",
+      "value": {
+        "first": {
+          "value": 1,
+          "done": false
+        },
+        "returned": {
+          "done": true,
+          "value": "stop"
+        },
+        "again": {
+          "done": true
+        },
+        "reasons": [
+          "stop"
+        ],
+        "locked": false,
+        "remaining": null
+      }
+    },
+    {
+      "name": "values-return-prevent-true",
+      "value": {
+        "first": {
+          "value": 1,
+          "done": false
+        },
+        "returned": {
+          "done": true,
+          "value": "stop"
+        },
+        "again": {
+          "done": true
+        },
+        "reasons": [],
+        "locked": false,
+        "remaining": 2
+      }
+    },
+    {
+      "name": "values-return-prevent-yes",
+      "value": {
+        "first": {
+          "value": 1,
+          "done": false
+        },
+        "returned": {
+          "done": true,
+          "value": "stop"
+        },
+        "again": {
+          "done": true
+        },
+        "reasons": [],
+        "locked": false,
+        "remaining": 2
+      }
+    },
+    {
+      "name": "values-return-prevent-0",
+      "value": {
+        "first": {
+          "value": 1,
+          "done": false
+        },
+        "returned": {
+          "done": true,
+          "value": "stop"
+        },
+        "again": {
+          "done": true
+        },
+        "reasons": [
+          "stop"
+        ],
+        "locked": false,
+        "remaining": null
+      }
+    },
+    {
+      "name": "values-return-cancel-reject-unlocks",
+      "value": {
+        "same": true,
+        "locked": false,
+        "next": {
+          "done": true
+        },
+        "again": {
+          "done": true,
+          "value": "again"
+        }
+      }
+    },
+    {
+      "name": "values-error-unlocks-and-recovers-queue",
+      "value": {
+        "same": true,
+        "locked": false,
+        "next": {
+          "done": true
+        },
+        "returned": {
+          "done": true,
+          "value": "after"
+        }
+      }
+    },
+    {
+      "name": "values-concurrent-rejection-next",
+      "value": {
+        "first": true,
+        "second": {
+          "done": true
+        },
+        "locked": false
+      }
+    },
+    {
+      "name": "values-return-before-read",
+      "value": {
+        "returned": {
+          "done": true,
+          "value": "early"
+        },
+        "next": {
+          "done": true
+        },
+        "trace": [
+          "early"
+        ],
+        "locked": false
+      }
+    },
+    {
+      "name": "values-concurrent-returns",
+      "value": {
+        "returned": [
+          {
+            "done": true,
+            "value": "first"
+          },
+          {
+            "done": true,
+            "value": "second"
+          },
+          {
+            "done": true
+          }
+        ],
+        "reasons": [
+          "first"
+        ],
+        "locked": false
+      }
+    },
+    {
+      "name": "values-return-unlocks-before-cancel-fulfilled",
+      "value": {
+        "before": {
+          "locked": false,
+          "fulfilled": false
+        },
+        "returned": {
+          "done": true,
+          "value": "stop"
+        },
+        "after": true
+      }
+    },
+    {
+      "name": "values-option-read-once",
+      "value": {
+        "gets": 1,
+        "locked": false
+      }
+    },
+    {
+      "name": "values-for-await-break",
+      "value": {
+        "values": [
+          1
+        ],
+        "trace": [
+          "undefined"
+        ],
+        "locked": false
+      }
+    },
+    {
+      "name": "values-for-await-prevent-cancel",
+      "value": {
+        "values": [
+          1
+        ],
+        "rest": [
+          2
+        ],
+        "cancels": 0,
+        "locked": false
+      }
+    },
+    {
+      "name": "values-borrowed-next-return",
+      "value": {
+        "first": {
+          "value": 3,
+          "done": false
+        },
+        "last": {
+          "done": true,
+          "value": "stop"
+        },
+        "locked": false
+      }
+    },
+    {
+      "name": "values-descriptors-and-protocol",
+      "value": {
+        "same": true,
+        "valuesLength": 0,
+        "fromLength": 1,
+        "nextLength": 0,
+        "returnLength": 1,
+        "self": true,
+        "throwType": "undefined",
+        "protoNext": true,
+        "protoReturn": true,
+        "ownKeys": [
+          "next",
+          "return"
+        ],
+        "tag": "[object Object]"
+      }
+    },
+    {
+      "name": "values-new-rejected",
+      "error": {
+        "name": "TypeError"
+      }
+    },
+    {
+      "name": "own-error-codes-ignore-inherited-setter",
+      "value": {
+        "gets": 0,
+        "sets": 0,
+        "codes": [
+          "ERR_ARG_NOT_ITERABLE",
+          "ERR_INVALID_THIS",
+          "ERR_INVALID_STATE"
+        ]
+      }
+    }
+  ]
+}

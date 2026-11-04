@@ -1,0 +1,105 @@
+--- a/tests/node-compat/build-engine.sh
++++ b/source/tests/node-compat/build-engine.sh
+@@ -5,9 +5,9 @@
+ set -euo pipefail
+ 
+ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
+-work_root="${NODE_COMPAT_BUILD_ROOT:-/tmp/starling-node-compat/improved-build}"
++work_root="${NODE_COMPAT_BUILD_ROOT:-/tmp/starling-node-compat/classic-trace-v1-build}"
+ node_bin="${NODE_COMPAT_NODE:-node}"
+-build_jobs="${NODE_COMPAT_JOBS:-8}"
++build_jobs="${NODE_COMPAT_JOBS:-1}"
+ stress="${NODE_COMPAT_GC_STRESS:-0}"
+ abi_fix="${NODE_COMPAT_ABI_FIX:-1}"
+ bigint_fix="${NODE_COMPAT_BIGINT_FIX:-$abi_fix}"
+@@ -39,7 +39,7 @@
+ if [[ "$entropy_mode" == RUNTIME_ONLY && "$stress" == 1 ]]; then
+   echo 'RuntimeOnly+GC is not a selected classic producer variant' >&2; exit 1
+ fi
+-layer_root="$repo_root/tests/node-compat/foundation-classic-streams/integration-candidate-v1"
++layer_root="$repo_root/tests/node-compat/foundation-classic-streams/trace-integration-candidate-v1"
+ tick_patch="$repo_root/tests/node-compat/foundation-scheduler/taskqueue-owner-v2/componentize-taskqueue-ticks.UNAPPLIED.patch"
+ 
+ abi_patch="$repo_root/tests/node-compat/abi-fix/componentize-u32-result.patch"
+@@ -121,18 +121,17 @@
+ fi
+ # Preserve every pre-policy source tree, build directory and artifact. Each
+ # selected configuration gets its own embedding output directory as well.
+-policy_suffix="entropy-entry-v1-strict-callback-v3-protected-abort-v2.$entropy_mode.path-$path_enabled.events-$events_enabled.string-decoder-$string_decoder_enabled.assert-$assert_enabled.querystring-$querystring_enabled.util-$util_enabled.stream-web-$stream_web_enabled"
+-policy_suffix="$policy_suffix.private-ticks-v1-$ticks_enabled.classic-v1-$classic_enabled"
++policy_suffix="trace-v1.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled"
+ source_dir="$source_dir-$policy_suffix"
+ build_dir="$build_dir-$policy_suffix"
+ artifact_name=starlingmonkey_embedding.abi-i32-i64-v1
+ if [[ "$stress" == 1 ]]; then artifact_name="$artifact_name.gc-stress"; fi
+ if [[ "$oom" == 1 ]]; then artifact_name="$artifact_name.oom-testing"; fi
+ if [[ "$build_type" == Debug ]]; then artifact_name="$artifact_name.debug"; fi
+-artifact_name="$artifact_name.classic-v1.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled"
++artifact_name="$artifact_name.trace-v1.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled"
+ if [[ -n "$artifact_tag" ]]; then artifact_name="$artifact_name.$artifact_tag"; fi
+ artifact="$work_root/artifacts/$artifact_name.wasm"
+-for generated_name in "$artifact_name.wasm.build.json" "componentize-native-inputs-$artifact_name.json" "source-inputs-$artifact_name.json" "openssl-source-$artifact_name.before.json" "configure-$artifact_name.log" "build-$artifact_name.log"; do
++for generated_name in "${source_dir##*/}" "${build_dir##*/}" "$artifact_name.wasm" "$artifact_name.wasm.build.json" "$artifact_name.raw.wasm" "$artifact_name.raw.wasm.build.json" "componentize-native-inputs-$artifact_name.json" "source-inputs-$artifact_name.json" "recipe-$artifact_name.sha256" "openssl-source-$artifact_name.before.json" "configure-$artifact_name.log" "build-$artifact_name.log"; do
+   if [[ ${#generated_name} -gt 255 ]]; then
+     echo 'Generated artifact basename exceeds255bytes; use a shorter tag' >&2; exit 1
+   fi
+@@ -161,6 +160,10 @@
+     mv "$destination.part" "$destination"
+   fi
+ }
++# Authenticate actual corrected342 sources before any archive fetch.
++[[ "$(sha256_file "$layer_root/layer-policy.py")" == 43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9 ]] || exit 1
++[[ "$(sha256_file "$layer_root/policy.json")" == 891a4c53dd4a7b7d776c21003acdd12c7944c6a3eca019a1d9b2be620ed8b11c ]] || exit 1
++python3 "$layer_root/layer-policy.py" "$repo_root"
+ fetch_checked "https://codeload.github.com/bytecodealliance/ComponentizeJS/tar.gz/$componentize_revision" \
+   "$work_root/componentize-source.tar.gz" "$componentize_archive_sha"
+ if [[ ! -f "$source_dir/.source-archive-sha256" ]] || [[ "$(cat "$source_dir/.source-archive-sha256")" != "$componentize_archive_sha" ]]; then
+@@ -168,8 +171,8 @@
+   printf '%s\n' "$componentize_archive_sha" > "$source_dir/.source-archive-sha256"
+ fi
+ # New named source layer; original ABI/entry/strict guards below remain exact.
+-[[ "$(sha256_file "$layer_root/layer-policy.py")" == f4a303250ac979206f0c2b358f4dd16d2a5e3a3e3007200901dedba8576b9a1e ]] || exit 1
+-[[ "$(sha256_file "$layer_root/policy.json")" == 137a35959131d5cb5125bb5fc97324dfa4ba2ce18441818dd95cf83d19c88d6f ]] || exit 1
++[[ "$(sha256_file "$layer_root/layer-policy.py")" == 43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9 ]] || exit 1
++[[ "$(sha256_file "$layer_root/policy.json")" == 891a4c53dd4a7b7d776c21003acdd12c7944c6a3eca019a1d9b2be620ed8b11c ]] || exit 1
+ [[ "$(sha256_file "$tick_patch")" == a6c3a34e06bc98ebc5a2f9ff943ceeb127e337d5b0bb349fc92d21cc123b576f ]] || exit 1
+ python3 "$layer_root/layer-policy.py" "$repo_root"
+ # Restore ONLY an exact previously layered embedding before replaying every
+@@ -268,7 +271,7 @@
+ import importlib.util,json,pathlib,sys
+ sys.dont_write_bytecode=True
+ repo=pathlib.Path(sys.argv[1])
+-helper=repo/'tests/node-compat/foundation-classic-streams/integration-candidate-v1/layer-policy.py'
++helper=repo/'tests/node-compat/foundation-classic-streams/trace-integration-candidate-v1/layer-policy.py'
+ spec=importlib.util.spec_from_file_location('classic_source_capture',helper)
+ layer=importlib.util.module_from_spec(spec);spec.loader.exec_module(layer)
+ json.dump(layer.source_manifest(repo),open(sys.argv[2],'w'),indent=2)
+@@ -328,8 +331,8 @@
+     return subprocess.check_output(args, cwd=repo, text=True).strip()
+ import importlib.util
+ sys.dont_write_bytecode = True
+-layer_file = pathlib.Path(repo) / 'tests/node-compat/foundation-classic-streams/integration-candidate-v1/layer-policy.py'
+-assert digest(layer_file) == 'f4a303250ac979206f0c2b358f4dd16d2a5e3a3e3007200901dedba8576b9a1e'
++layer_file = pathlib.Path(repo) / 'tests/node-compat/foundation-classic-streams/trace-integration-candidate-v1/layer-policy.py'
++assert digest(layer_file) == '43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9'
+ layer_spec = importlib.util.spec_from_file_location('reviewed_classic_layer',layer_file)
+ layer = importlib.util.module_from_spec(layer_spec); layer_spec.loader.exec_module(layer)
+ manifest = layer.source_manifest(repo)
+@@ -398,7 +401,7 @@
+ # Preserve the accepted v3 attestation verbatim. This is a separately named
+ # source extension; the old policy must never claim the new EventTarget bytes.
+ protected_abort_sources = {'builtins/web/event/event-target.h': '516f9c609d78576cf72897c4c5bbe1106a3d04ab4a197c50cedee3fa0c8fb96d', 'builtins/web/event/event-target.cpp': '1c0263f958d0f6221accf04ffa2ac12c6406e11914e1b2fab3c41c66c3038a1e', 'builtins/node-compat/register.cpp': '19eef9879c94e5232238f6df738d57057d384fa025849ee319fcf51eb06eda2b', 'builtins/node-compat/events.mjs': 'b58b0e0891145748e71139b8d08abb4187fe52e1aa12f9705beee3f6380b68f6', 'builtins/node-compat/events-add-abort-listener.mjs': '106be45fe33b0e35d97aad6ece3fb368210cb954bb652ea7bcdfa478b9c7083e', 'builtins/node-compat/events-factories.generated.h': '41b4c286e24089e0c223d0e80d4d0f587322afee8816811f2e754217f8103437', 'builtins/node-compat/generate-events-factory.mjs': '90a7ae6b887fce3bf92dc167090ea44c0bb8755400be2ff577658539f4a84354', 'builtins/node-compat/generate-factories.mjs': '46b0e0a40d3a50dae58e0d833c4861d1344df045eaf490f74060bbccc1a4561e', 'builtins/node-compat/export-manifest.events.node-v22.14.0.json': '90f7dc152b990dc8955c0801eab11b9410a10dc96a8019c1b7a81b69981eb561', 'cmake/builtins.cmake': '0155eae9e45f2d059663f1bcc54315e58e4f2cb0d8e5a9dfcb76cfa9a7f5f9ea'}
+-assert digest(layer_file) == 'f4a303250ac979206f0c2b358f4dd16d2a5e3a3e3007200901dedba8576b9a1e', 'Classic source helper changed during compilation'
++assert digest(layer_file) == '43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9', 'Classic source helper changed during compilation'
+ layer.validate_sources(repo,manifest)
+ strict_callback_sources = dict(strict_callback_v3_sources)
+ strict_callback_sources['builtins/web/event/event-target.cpp'] = protected_abort_sources['builtins/web/event/event-target.cpp']
+@@ -556,7 +559,7 @@
+ }
+ 
+ metadata = layer.decorate(metadata,repo,source_dir,json.loads(compile_commands),embedding_commands,ticks_enabled == '1')
+-assert digest(layer_file) == 'f4a303250ac979206f0c2b358f4dd16d2a5e3a3e3007200901dedba8576b9a1e'
++assert digest(layer_file) == '43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9'
+ assert digest(layer_file.parent / 'policy.json') == layer.POLICY_SHA256
+ 
+ with open(artifact + '.build.json', 'w') as output:

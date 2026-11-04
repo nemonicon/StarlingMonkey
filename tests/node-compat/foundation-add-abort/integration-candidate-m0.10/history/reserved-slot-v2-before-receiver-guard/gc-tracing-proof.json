@@ -1,0 +1,44 @@
+{
+  "state": "PINNED_SOURCE_PROOF_NOT_RUNTIME_GC_PROOF",
+  "spiderMonkeyRevision": "9dab3d6f643e926a340c391ea30968e940390dec",
+  "source": [
+    {
+      "file": "/tmp/starling-node-compat/add-abort-m0.10-reentrant-v1/JSObject.cpp",
+      "sha256": "1c4b374e285d2582988d5b560dd296234a03ce9c917f196b3522f15f63c04232",
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/js/src/vm/JSObject.cpp",
+      "symbol": "JSObject::traceChildren",
+      "lines": [
+        3322,
+        3374
+      ],
+      "finding": "Native fixed/dynamic value slots are traced before the custom class trace hook; a hook early return on undefined Listeners does not omit the Symbol slot."
+    },
+    {
+      "file": "/tmp/starling-node-compat/add-abort-m0.10-reentrant-v1/PropMap.h",
+      "sha256": "6447bbb2f1a87412114d971e36795ff33441cbc1e112189db7947558a6d9ce98",
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/js/src/vm/PropMap.h",
+      "symbol": "SharedPropMap::slotSpan",
+      "lines": [
+        675,
+        691
+      ],
+      "finding": "Slot span is at least JSCLASS_RESERVED_SLOTS, including a property-less native prototype."
+    },
+    {
+      "file": "/tmp/starling-node-compat/improved-build/spidermonkey-dist-release/include/js/Object.h",
+      "sha256": "f94f174a00a3fd30aa8ec90dc79386da0ee1d204201489f22b294e5c0c38e57f",
+      "symbol": "JS::GetReservedSlot / JS::SetReservedSlot",
+      "lines": [
+        63,
+        95
+      ],
+      "finding": "Public slot APIs validate class slot range in debug and SetReservedSlot applies GC barriers for GC-valued writes."
+    }
+  ],
+  "owner": "The existing EventTarget::proto_obj object owns the new SymbolValue slot; the selected JS factory also holds normal traced closure references. No additional static/PersistentRootedSymbol is introduced.",
+  "initialization": "Initialize actual prototype first; only then allocate rooted description/Symbol and store with barrier. Failure returns false and no key is published to registration.",
+  "lookup": "Check prototype root initialized/non-null and slot isSymbol; getter makes no allocating call; caller immediately initializes RootedSymbol before any property lookup/JS evaluation.",
+  "layout": "Selected EventTarget::Slots::Count becomes2; AbortSignal::ParentSlots and Reason compute2. All repository C++ TUs plus real external embedding must share derived macro, not only EventTarget/register.",
+  "teardown": "Current Engine has no explicit destructor/context shutdown protocol; singleton intent does not prove a general native embedding teardown contract. This proposal adds no independent native root and makes no broader teardown fix claim.",
+  "runtimeProofPending": true
+}

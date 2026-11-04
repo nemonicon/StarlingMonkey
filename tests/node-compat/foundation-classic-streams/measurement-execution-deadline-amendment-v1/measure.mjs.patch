@@ -1,0 +1,50 @@
+--- a/measure.mjs
++++ b/measure.mjs
+@@ -11,6 +11,7 @@
+ import {loadCompiled} from './instantiate.mjs';
+ import {compactExpected} from './compact-oracle.mjs';
+ import {collectWorker} from './collect-worker.mjs';
++import {deadlinePolicy,workerBudget} from './deadline-policy.mjs';
+ import {executionPreflight} from './runtime-preflight.mjs';
+ const here=dirname(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex');
+ assert.equal(process.version,'v22.14.0');assert.deepEqual(process.execArgv,[]);assert(!process.env.NODE_OPTIONS&&!process.env.NODE_PATH);
+@@ -57,25 +58,30 @@
+  const disk=await statfs(dirname(output));assert(disk.bavail*disk.bsize>=2*1024**3,'2GiB initial guard retained');await mkdir(output,{recursive:false});
+  await writeFile(join(output,'started.json'),JSON.stringify({atUtc:new Date().toISOString(),phaseSha256:phaseSha,sourceIndexSha256:ownSha,protocol})+'\n',{flag:'wx'});
+  const samples=[],calibrations=[];let failure=null;
+- async function child(mode,comparison,index,arm,iterations,label){
++ async function child(mode,comparison,index,arm,iterations,label,deadlineMs,budget){
+   const available=await statfs(output);assert(available.bavail*available.bsize>=800*1024**2,'Stop creating artifacts below800MiB');
+   process.stderr.write(JSON.stringify({comparison:comparison.id,index,arm,iterations,stage:mode,label})+'\n');
+-  const result=await collectWorker(fileURLToPath(import.meta.url),[mode,ownSha,phasePath,phaseSha,arm,String(index),String(iterations)],join(output,label));
+-   assert.equal(result.status,0,result.error??result.signal);assert.equal(result.error,null,'Worker capture evidence incomplete');const row=JSON.parse(result.stdout);assert.equal(row.arm,arm);assert.equal(row.index,index);return{...row,wholeProcessElapsedMs:result.wholeProcessElapsedMs};
++   const result=await collectWorker(fileURLToPath(import.meta.url),[mode,ownSha,phasePath,phaseSha,arm,String(index),String(iterations)],join(output,label),{deadlineMs,budget});
++   assert.equal(result.terminalExitZeroObserved,true,result.error??result.signal);assert.equal(result.ownedGroupGone,true);assert.equal(result.status,0);assert.equal(result.error,null,'Worker capture evidence incomplete');
++   const row=JSON.parse(result.stdout);await writeFile(join(output,label+'.observed.json'),JSON.stringify(row,null,2)+'\n',{flag:'wx'});assert.equal(row.arm,arm);assert.equal(row.index,index);return{...row,wholeProcessElapsedMs:result.wholeProcessElapsedMs,collection:{terminalPath:result.terminalPath,deadlineMs,budget,status:result.status,signal:result.signal,spawnError:result.spawnError}};
+  }
+  try{
+   for(const comparison of comparisons)for(const index of measurementCaseIndices){
+-   const pilots=[];for(const arm of comparison.arms){const row=await child('--calibrate',comparison,index-1,arm,1,comparison.id+'.case-'+index+'.calibration.'+arm);assert.equal(row.batchMs.length,0);pilots.push(row);}
+-   const iterations=chooseBatch(pilots[0].firstBatchMs,pilots[1].firstBatchMs);calibrations.push({comparison:comparison.id,caseIndex:index,requestedMaximum:16,chosenIterations:iterations,targetBatchMs:25,pilots});
++   const pilots=[];for(const arm of comparison.arms){const row=await child('--calibrate',comparison,index-1,arm,1,comparison.id+'.case-'+index+'.calibration.'+arm,deadlinePolicy.pilotMs,{scope:'public-one-iteration-pilot',caseCapMs:deadlinePolicy.pilotMs,allCaseAdequacyClaim:false});assert.equal(row.batchMs.length,0);pilots.push(row);}
++   const iterations=chooseBatch(pilots[0].firstBatchMs,pilots[1].firstBatchMs),budgets=Object.fromEntries(pilots.map(row=>[row.arm,workerBudget(row,iterations)]));
++   const calibrationRecord={comparison:comparison.id,caseIndex:index,requestedMaximum:16,chosenIterations:iterations,targetBatchMs:25,pilots,budgets};calibrations.push(calibrationRecord);
++   await writeFile(join(output,comparison.id+'.case-'+index+'.budget-plan.json'),JSON.stringify(calibrationRecord,null,2)+'\n',{flag:'wx'});
++   assert(Object.values(budgets).every(row=>row.admitted),'Whole arm/family worker budget exceeds fixed hard cap; no clipping or N change');
+    for(let repetition=0;repetition<3;repetition++)for(const arm of orderFor(repetition,comparison.arms)){
+     const label=comparison.id+'.case-'+index+'.rep-'+repetition+'.'+arm;
+-    const row=await child('--worker',comparison,index,arm,iterations,label);assert.equal(row.batchMs.length,7);assert.equal(row.iterations,iterations);
++    const row=await child('--worker',comparison,index,arm,iterations,label,budgets[arm].requestedMs,budgets[arm]);assert.equal(row.batchMs.length,7);assert.equal(row.iterations,iterations);
+     samples.push({comparison:comparison.id,repetition,caseIndex:index,runOrder:orderFor(repetition,comparison.arms),...row});
+    }
+   }
+- }catch(error){failure=error;}finally{
+-  try{await auditPhase();await on.recheck();await off.recheck();}catch(error){failure??=error;}
+-  await writeFile(join(output,'terminal-source-audit.json'),JSON.stringify({phaseSha256:phaseSha,sourceIndexSha256:ownSha,successfulTimedWorkers:samples.length,expectedTimedWorkers:126,completedCalibrationPairs:calibrations.length,expectedCalibrationWorkers:42,passed:failure===null,error:failure?{name:failure.name,message:failure.message}:null},null,2)+'\n',{flag:'wx'});
++ }catch(error){failure=error;try{await writeFile(join(output,'failure-before-source-audit.json'),JSON.stringify({originalFailure:{name:error.name,message:error.message},successfulTimedWorkers:samples.length,partialObservationOnly:true},null,2)+'\n',{flag:'wx'});}catch(storageError){process.stderr.write(JSON.stringify({stage:'failure-record-write-failed',original:{name:error.name,message:error.message},storage:{name:storageError.name,message:storageError.message}})+'\n');}}finally{
++  const originalFailure=failure?{name:failure.name,message:failure.message}:null;let sourceAuditFailure=null,auditTerminalPath=null;
++  try{const audit=await collectWorker(join(here,'audit-inputs.mjs'),[ownSha,phasePath,phaseSha],join(output,'post-operation-source-audit'),{deadlineMs:deadlinePolicy.sourceAuditMs,budget:{scope:'read-only-source-audit',hardCapMs:deadlinePolicy.sourceAuditMs}});auditTerminalPath=audit.terminalPath;assert(audit.terminalExitZeroObserved&&audit.ownedGroupGone,'Bounded post-operation source audit failed');}catch(error){sourceAuditFailure={name:error.name,message:error.message};failure??=error;}
++  await writeFile(join(output,'terminal-source-audit.json'),JSON.stringify({phaseSha256:phaseSha,sourceIndexSha256:ownSha,successfulTimedWorkers:samples.length,expectedTimedWorkers:126,completedCalibrationPairs:calibrations.length,expectedCalibrationWorkers:42,passed:failure===null,originalFailure,sourceAuditFailure,auditTerminalPath,error:failure?{name:failure.name,message:failure.message}:null},null,2)+'\n',{flag:'wx'});
+  }
+  if(failure)throw failure;assert.equal(samples.length,126);assert.equal(calibrations.length,21);
+  const median=values=>[...values].sort((a,b)=>a-b)[Math.floor(values.length/2)];

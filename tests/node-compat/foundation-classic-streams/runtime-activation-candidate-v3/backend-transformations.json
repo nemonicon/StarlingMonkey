@@ -1,0 +1,16 @@
+{
+  "state": "INTEGRITY_WIRING_ONLY_342_BACKEND_UNCHANGED",
+  "beforeSha256": "77185b16f76ad45c9918500e68c7519d2f617a65a41167a4b96ed8cf9aabff1a",
+  "afterSha256": "63a414d7a4ce8a27c94ea636094f8c198f25047771d5c241a820a92b5657a6e1",
+  "edits": [
+    {
+      "old": "import {selectClassicPin} from './runtime-contract.mjs';",
+      "new": "import {selectClassicPin} from './runtime-contract.mjs';\nimport {verifyConsumedSeal} from './consumed.mjs';"
+    },
+    {
+      "old": " async function seal(){const document=JSON.parse(await regular(join(HERE,'input-freeze.json'),INPUTS_SHA));assert.equal(document.schemaVersion,1);const seen=new Set();\n  for(const row of document.inputs){assert(typeof row.path==='string'&&!row.path.includes('\\0')&&!seen.has(row.path));seen.add(row.path);await regular(resolve(HERE,row.path),row.sha256,row.bytes);}return document.inputs.length;}",
+      "new": " async function seal(){return verifyConsumedSeal(HERE,INPUTS_SHA,{PINS_SHA,INPUTS_SHA,RECIPE_SHA,SELECTOR_SHA,ADMISSION_SHA});}"
+    }
+  ],
+  "reverseByteExact": true
+}

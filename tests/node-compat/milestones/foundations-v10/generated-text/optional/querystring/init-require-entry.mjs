@@ -1,0 +1,1 @@
+import "/tmp/starling-node-compat/foundations-v10/release-gates-v1/optional/querystring/init-require.cjs"; export function run(){return '';}

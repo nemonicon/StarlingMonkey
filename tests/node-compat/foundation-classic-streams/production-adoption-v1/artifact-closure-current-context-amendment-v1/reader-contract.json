@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "state": "DATA_ONLY_ARCHIVE_CONTEXT_READER_CONTRACT_NOT_RUNTIME_MIGRATION",
+  "mapState": "EXPLICIT_ARCHIVE_CONTEXT_MAP_V1",
+  "mapAuthority": "Exact caller-supplied SHA256 checked before JSON parsing; no environment override, original-path fallback or inferred mapping",
+  "lookupTuple": ["contextId", "literalOriginalPath", "expectedSha256"],
+  "target": "Explicit normalized archive-relative archivePath; every ancestor and final file opened beneath the canonical archive root with O_NOFOLLOW",
+  "contextManifest": ["originalPath-as-data-only", "archivePath", "sha256", "bytes"],
+  "mappingRow": ["manifestRows", "originalPath", "expectedSha256", "bytes", "archivePath"],
+  "supportedFormats": {
+    "input-freeze-v1": {"list": "inputs", "identity": "path"},
+    "v11-copied-evidence-v1": {"list": "copiedEvidence", "identity": "original"},
+    "sealed-files-v1": {"list": "files", "identity": "path"}
+  },
+  "rowBinding": "Hash and parse the copied original manifest; each explicitly indexed row must exactly match originalPath, expected SHA and byte count. Multiple identical original descriptors may be coalesced only through explicit manifestRows indices.",
+  "coverage": {
+    "selected-rows": "Only declared rows verified; no full archive/manifest preservation claim",
+    "all-rows": "Every original manifest row index must be covered exactly once"
+  },
+  "limits": {"mapAndContextJsonMaxBytesEach": 67108864, "targetPayload": "Stream SHA/size only; no payload execution or JSON conversion"},
+  "rejects": ["unknown context/original/hash tuple", "unequal target bytes", "unknown schema/format/fields", "duplicate JSON keys or contexts", "forged original descriptor", "incomplete all-row coverage", "bool byte counts", "archive path traversal/absolute/noncanonical/backslash", "archive/map/member/ancestor symlinks", "changed file during read"],
+  "originalRelativePaths": "Historical ../ strings may exist as literal descriptor identities. They never become filesystem access paths.",
+  "mutableReadmeRule": "No entry for unavailable24e4 old bytes. The3e5992 exclusive snapshot is a separately identified observation, never a replacement for old24e4.",
+  "notProvided": ["old preflight rerunnability", "source-family activation", "native metadata projection", "guest execution", "Root promotion authority", "archive acceptance"]
+}

@@ -1,0 +1,36 @@
+// Evaluate only the extracted finite metadata/oracle guard with ordinary JSON.
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir,lstat} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import {dirname,join,resolve} from 'node:path';
+assert.equal(process.version,'v22.14.0');assert.deepEqual(process.execArgv,[]);assert(!process.env.NODE_OPTIONS&&!process.env.NODE_PATH);
+const here=dirname(fileURLToPath(import.meta.url)),source='/tmp/starling-node-compat/classic-trace-source-v1';
+const output=resolve(process.env.NODE_COMPAT_TRACE_REPLAY_TEST_OUTPUT??'');assert(process.env.NODE_COMPAT_TRACE_REPLAY_TEST_OUTPUT&&output.startsWith('/tmp/starling-node-compat/'));
+try{await lstat(output);assert.fail('Fresh output required');}catch(error){if(error.code!=='ENOENT')throw error;}await mkdir(output,{recursive:false});
+const text=await readFile(join(here,'payload/release/helpers/native-scalar-harness.mjs'),'utf8');
+const marker='// BEGIN FINITE CLASSIC REGISTRAR ORACLE ANCESTRY',end='// END FINITE CLASSIC REGISTRAR ORACLE ANCESTRY';
+const guard=text.slice(text.indexOf(marker),text.indexOf(end)+end.length);
+const moduleText="import assert from 'node:assert/strict';import {createHash}from'node:crypto';const hash=b=>createHash('sha256').update(b).digest('hex');\n"+guard+'\n';
+const modulePath=join(output,'guard.mjs');await writeFile(modulePath,moduleText,{flag:'wx'});
+const {verifyClassicRegistrarOracle}=await import(pathToFileURL(modulePath));
+const pinData=JSON.parse(await readFile(join(here,'../production-trace-runtime-activated-v1/runtime-pins.json'))),pin=pinData.variants['normal-off'];
+const metadata=JSON.parse(await readFile(pin.enginePath+'.build.json'));
+const registrar=await readFile(join(pin.sourceRoot,'builtins/node-compat/register.cpp'),'utf8');
+const policy=await readFile(join(source,'tests/node-compat/foundation-classic-streams/trace-integration-candidate-v1/policy.json'));
+const shared={tickPolicyBytes:await readFile(join(source,'tests/node-compat/foundation-scheduler/integration-candidate-v1/policy.json')),
+ tickPatchBytes:await readFile(join(source,'tests/node-compat/foundation-scheduler/taskqueue-owner-v2/starling-taskqueue-ticks.UNAPPLIED.patch')),
+ classicPolicyBytes:policy,classicPatchBytes:await readFile(join(source,'tests/node-compat/foundation-classic-streams/implementation-candidate-v1-allocation-order-amendment/native-integration.corrected.UNAPPLIED.patch'))};
+const checks=[];let first;
+for(const[kind,folder]of [['assert','foundation-assert'],['querystring','foundation-querystring'],['util','foundation-util']]){
+ const oracleBytes=await readFile(join(source,'tests/node-compat',folder,'native-node-results.json')),oracle=JSON.parse(oracleBytes);
+ const requiredNames=Object.keys(oracle.sources);const args={kind,oracle,requiredNames,registrar,metadata,proof:{...shared,oracleBytes}};
+ verifyClassicRegistrarOracle(args);checks.push('actual corrected metadata + exact unchanged '+kind+' oracle accepted as data');if(!first)first=args;
+}
+for(const[name,change]of [['missing trace',m=>delete m.classicTraceSourcePolicy],['wrong trace',m=>m.classicTraceSourcePolicy.version='old'],['synthetic',m=>m.syntheticMetadataOnly=true],['diagnostic',m=>m.diagnosticOnly=true]]){
+ const changed=structuredClone(metadata);change(changed);assert.throws(()=>verifyClassicRegistrarOracle({...first,metadata:changed}));checks.push(name+' metadata rejected');
+}
+const result={schemaVersion:1,state:'FINITE_CORRECTED_REGISTRAR_ORACLE_SOURCE_DATA_GUARD_CHECKS_PASSED',passed:checks.length,checks,output,
+ extractedGuardSha256:createHash('sha256').update(guard).digest('hex'),engineBytesRead:false,nativePreflightOrGuestOrActivationExecuted:false,
+ oracleBytesRewritten:false,onlyJSONMetadataAndSourceTextUsed:true};
+await writeFile(join(output,'results.json'),JSON.stringify(result,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(result));

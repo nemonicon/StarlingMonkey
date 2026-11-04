@@ -12,6 +12,7 @@
 #include "../dom-exception.h"
 
 #include "crypto-algorithm.h"
+#include "buffer-source.h"
 #include "crypto-key-ec-components.h"
 #include "crypto-key-rsa-components.h"
 #include "crypto-raii.h"
@@ -1365,7 +1366,7 @@ JSObject *CryptoAlgorithmHMAC_Import::importKey(JSContext *cx, CryptoKeyFormat f
   // 5. If format is "raw":
   case CryptoKeyFormat::Raw: {
     // 5.1 Let data be the octet string contained in keyData.
-    // keyData is a view of the caller's buffer, which can change after import, so copy it.
+    // The caller owns this temporary native input. Copy it into the key's lifetime.
     auto key_bytes = std::get<std::span<uint8_t>>(key_data);
     data = std::make_unique<std::vector<uint8_t>>(key_bytes.begin(), key_bytes.end());
     if (!data) {
@@ -1528,22 +1529,22 @@ JSObject *CryptoAlgorithmHMAC_Import::importKey(JSContext *cx, CryptoKeyFormat f
     return nullptr;
   }
 
+  std::unique_ptr<JsonWebKey> jwk;
+  std::optional<CopiedBufferSource> owned_bytes;
   KeyData data;
   if (format == CryptoKeyFormat::Jwk) {
     // This handles step 6.4: If the kty field of jwk is not a case-sensitive string match to "oct", then throw a DataError.
-    auto jwk = JsonWebKey::parse(cx, key_data, "oct");
+    jwk = JsonWebKey::parse(cx, key_data, "oct");
     if (!jwk) {
       return nullptr;
     }
-    data = jwk.release();
+    data = jwk.get();
   } else {
-    std::optional<std::span<uint8_t>> buffer = value_to_buffer(cx, key_data, "");
-    if (!buffer.has_value()) {
-      // value_to_buffer would have already created a JS exception so we don't need to create one
-      // ourselves.
+    owned_bytes = copy_crypto_buffer_source(cx, key_data, "SubtleCrypto.importKey: keyData", true);
+    if (!owned_bytes) {
       return nullptr;
     }
-    data = buffer.value();
+    data = owned_bytes->bytes();
   }
   return this->importKey(cx, format, data, extractable, usages);
 }
@@ -1939,24 +1940,26 @@ JSObject *CryptoAlgorithmECDSA_Import::importKey(JSContext *cx, CryptoKeyFormat 
                       CryptoKeyUsages usages) {
   MOZ_ASSERT(cx);
 
+  std::unique_ptr<JsonWebKey> jwk;
+  std::optional<CopiedBufferSource> owned_bytes;
   KeyData data;
   switch (format) {
     case CryptoKeyFormat::Jwk: {
       // This handles step 2.3: If the "kty" field of jwk is not "EC", then throw a DataError.
-      auto jwk = JsonWebKey::parse(cx, key_data, "EC");
+      jwk = JsonWebKey::parse(cx, key_data, "EC");
       if (!jwk) {
         return nullptr;
       }
-      data = jwk.release();
+      data = jwk.get();
       break;
     }
     case CryptoKeyFormat::Pkcs8:
     case CryptoKeyFormat::Spki: {
-      std::optional<std::span<uint8_t>> buffer = value_to_buffer(cx, key_data, "");
-      if (!buffer.has_value()) {
+      owned_bytes = copy_crypto_buffer_source(cx, key_data, "SubtleCrypto.importKey: keyData", true);
+      if (!owned_bytes) {
         return nullptr;
       }
-      data = buffer.value();
+      data = owned_bytes->bytes();
       break;
     }
     case CryptoKeyFormat::Raw: {
@@ -2315,6 +2318,7 @@ JSObject *CryptoAlgorithmEd25519_Import::importKey(JSContext *cx, CryptoKeyForma
   MOZ_ASSERT(cx);
 
   std::unique_ptr<JsonWebKey> jwk;
+  std::optional<CopiedBufferSource> owned_bytes;
   KeyData data;
   switch (format) {
     case CryptoKeyFormat::Jwk: {
@@ -2329,11 +2333,11 @@ JSObject *CryptoAlgorithmEd25519_Import::importKey(JSContext *cx, CryptoKeyForma
     case CryptoKeyFormat::Pkcs8:
     case CryptoKeyFormat::Spki:
     case CryptoKeyFormat::Raw: {
-      std::optional<std::span<uint8_t>> buffer = value_to_buffer(cx, key_data, "");
-      if (!buffer.has_value()) {
+      owned_bytes = copy_crypto_buffer_source(cx, key_data, "SubtleCrypto.importKey: keyData", true);
+      if (!owned_bytes) {
         return nullptr;
       }
-      data = buffer.value();
+      data = owned_bytes->bytes();
       break;
     }
   }
@@ -2703,22 +2707,22 @@ JSObject *CryptoAlgorithmRSASSA_PKCS1_v1_5_Import::importKey(JSContext *cx,
     return nullptr;
   }
 
+  std::unique_ptr<JsonWebKey> jwk;
+  std::optional<CopiedBufferSource> owned_bytes;
   KeyData data;
   if (format == CryptoKeyFormat::Jwk) {
     // This handles set 2.3: If the kty field of jwk is not a case-sensitive string match to "RSA", then throw a DataError.
-    auto jwk = JsonWebKey::parse(cx, key_data, "RSA");
+    jwk = JsonWebKey::parse(cx, key_data, "RSA");
     if (!jwk) {
       return nullptr;
     }
-    data = jwk.release();
+    data = jwk.get();
   } else {
-    std::optional<std::span<uint8_t>> buffer = value_to_buffer(cx, key_data, "");
-    if (!buffer.has_value()) {
-      // value_to_buffer would have already created a JS exception so we don't need to create one
-      // ourselves.
+    owned_bytes = copy_crypto_buffer_source(cx, key_data, "SubtleCrypto.importKey: keyData", true);
+    if (!owned_bytes) {
       return nullptr;
     }
-    data = buffer.value();
+    data = owned_bytes->bytes();
   }
   return this->importKey(cx, format, data, extractable, usages);
 }

@@ -1,0 +1,195 @@
+{
+  "schema": 1,
+  "atUtc": "2026-11-03T08:18:56.848186+00:00",
+  "kind": "Real cmake/builtins.cmake guards with unrelated target creation mocked; configure only. Real recipe sentinel rejection; no engine compilation.",
+  "sourceSha256": "6b78a1063a38517987f9b71b91a599843ec2f5e38439c38044ab2960279b87c4",
+  "recipeSha256": "c9df086a7cfe736fe6dfa63389da95a18c41f3e8f627c4af0e8cec35c9bde287",
+  "cases": [
+    {
+      "name": "default-core-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON"
+      ],
+      "accepted": true,
+      "definitions": [
+        "defs-NOTFOUND"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "all-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_PATH=ON",
+        "-DNODE_COMPAT_EVENTS=ON",
+        "-DNODE_COMPAT_STRING_DECODER=ON",
+        "-DNODE_COMPAT_ASSERT=ON",
+        "-DNODE_COMPAT_QUERYSTRING=ON",
+        "-DNODE_COMPAT_UTIL=ON"
+      ],
+      "accepted": true,
+      "definitions": [
+        "NODE_COMPAT_PATH=1",
+        "NODE_COMPAT_EVENTS=1",
+        "NODE_COMPAT_STRING_DECODER=1",
+        "NODE_COMPAT_ASSERT=1",
+        "NODE_COMPAT_QUERYSTRING=1",
+        "NODE_COMPAT_UTIL=1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "all-off-without-core",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=OFF"
+      ],
+      "accepted": true,
+      "definitions": [],
+      "exitCode": 0
+    },
+    {
+      "name": "path-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_PATH=ON"
+      ],
+      "accepted": true,
+      "definitions": [
+        "NODE_COMPAT_PATH=1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "path-without-core",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=OFF",
+        "-DNODE_COMPAT_PATH=ON"
+      ],
+      "accepted": false,
+      "definitions": [],
+      "exitCode": 1
+    },
+    {
+      "name": "events-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_EVENTS=ON"
+      ],
+      "accepted": true,
+      "definitions": [
+        "NODE_COMPAT_EVENTS=1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "events-without-core",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=OFF",
+        "-DNODE_COMPAT_EVENTS=ON"
+      ],
+      "accepted": false,
+      "definitions": [],
+      "exitCode": 1
+    },
+    {
+      "name": "string_decoder-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_STRING_DECODER=ON"
+      ],
+      "accepted": true,
+      "definitions": [
+        "NODE_COMPAT_STRING_DECODER=1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "string_decoder-without-core",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=OFF",
+        "-DNODE_COMPAT_STRING_DECODER=ON"
+      ],
+      "accepted": false,
+      "definitions": [],
+      "exitCode": 1
+    },
+    {
+      "name": "assert-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_ASSERT=ON"
+      ],
+      "accepted": true,
+      "definitions": [
+        "NODE_COMPAT_ASSERT=1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "assert-without-core",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=OFF",
+        "-DNODE_COMPAT_ASSERT=ON"
+      ],
+      "accepted": false,
+      "definitions": [],
+      "exitCode": 1
+    },
+    {
+      "name": "querystring-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_QUERYSTRING=ON"
+      ],
+      "accepted": true,
+      "definitions": [
+        "NODE_COMPAT_QUERYSTRING=1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "querystring-without-core",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=OFF",
+        "-DNODE_COMPAT_QUERYSTRING=ON"
+      ],
+      "accepted": false,
+      "definitions": [],
+      "exitCode": 1
+    },
+    {
+      "name": "util-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_UTIL=ON"
+      ],
+      "accepted": true,
+      "definitions": [
+        "NODE_COMPAT_UTIL=1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "util-without-core",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=OFF",
+        "-DNODE_COMPAT_UTIL=ON"
+      ],
+      "accepted": false,
+      "definitions": [],
+      "exitCode": 1
+    },
+    {
+      "name": "existing-engine-rejected",
+      "exitCode": 1,
+      "sentinelPreserved": true,
+      "rejectedBeforeSourcePreparation": true
+    },
+    {
+      "name": "existing-receipt-rejected",
+      "exitCode": 1,
+      "sentinelPreserved": true,
+      "rejectedBeforeSourcePreparation": true
+    }
+  ]
+}

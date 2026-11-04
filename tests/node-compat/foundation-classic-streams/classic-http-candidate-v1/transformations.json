@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_ONLY_COMBINED_HTTP_WRAPPER_TRANSFORMATIONS",
+  "replayIndexSha256": "81c55887dc5e767db27477ba28f0e7a26a948435c7ddc61c70da329d4bd7f029",
+  "proofs": [
+    {
+      "original": "tests/node-compat/foundation-classic-streams/production-regression-candidate-v1/capability/runners/http-build.mjs",
+      "target": "capability/runners/http-build.mjs",
+      "beforeSha256": "1048b61d661291997c1ceb8f302fb4c01fe30bddfe0570cf11e78dfe8bc13927",
+      "afterSha256": "5348045fba3689da40a7feae0180ff9e348315b3b34e609e370b2c61b7036c33",
+      "edits": [
+        {
+          "old": "import { createProfilePlugin } from '../../../../profile-bundler.mjs';",
+          "new": "import { createProfilePlugin } from '../../../../profile-bundler.mjs';\nimport {createClassicHTTPPlugin,BASELINE_ENTRY,CLASSIC_ORDINARY,CLASSIC_CHECKS,COMPOSER_SOURCE} from '../composer-plugin.mjs';"
+        },
+        {
+          "old": "  plugins: [\n",
+          "new": "  plugins: [\n    createClassicHTTPPlugin(),\n"
+        },
+        {
+          "old": "const expectedBundleImports = ['node:buffer', 'node:child_process',",
+          "new": "const expectedBundleImports = ['node:stream', 'node:stream/promises', 'node:buffer', 'node:child_process',"
+        },
+        {
+          "old": "audit.currentProductionAdmission=productionAdmission.report;",
+          "new": "audit.currentProductionAdmission=productionAdmission.report;\naudit.classicCombinedHTTP={schema:1,ordinaryGroups:19,nodeOracleSha256:'88bd20781a396e6fd178d3b014a98495fec848eb28adb81c80e7dc838f4686ce',baselineEntry:BASELINE_ENTRY,baselineSha256:hash(await readFile(BASELINE_ENTRY)),ordinarySourceSha256:hash(await readFile(CLASSIC_ORDINARY)),checksSourceSha256:hash(await readFile(CLASSIC_CHECKS)),composerSha256:hash(COMPOSER_SOURCE),scope:'Ordinary19 only; no classic fatal/init/limit/GC or Web bridge cases'};"
+        }
+      ],
+      "reverseExact": true
+    },
+    {
+      "original": "tests/node-compat/wasmcloud/test-wasmtime-http.mjs",
+      "target": "capability/hosts/test-wasmtime-http.mjs",
+      "beforeSha256": "c7a821f9ca0d68bcfedacd354c00782818796119b5cf1a8a1136fed84fab272d",
+      "afterSha256": "cb6b58aa2dedeee6862cd7c799bb24961419c5db908c10a7ba71611d5f79ec6e",
+      "edits": [
+        {
+          "old": "from '../foundations/assert-http-report.mjs'",
+          "new": "from '../../../../foundations/assert-http-report.mjs'"
+        },
+        {
+          "old": "from '../core-expectations.mjs'",
+          "new": "from '../../../../core-expectations.mjs'"
+        },
+        {
+          "old": "from '../entropy/assert-http-report.mjs'",
+          "new": "from '../../../../entropy/assert-http-report.mjs'"
+        },
+        {
+          "old": "import { checkEntropyHTTPReport, checkEntropyHTTPSamples }",
+          "new": "import { checkEntropyHTTPReport }"
+        },
+        {
+          "old": "const body = JSON.parse(text);",
+          "new": "const combinedBody = JSON.parse(text);\n    const body = projectCombinedHTTPBody(combinedBody,audit);"
+        },
+        {
+          "old": ", body });",
+          "new": ", body: combinedBody });"
+        },
+        {
+          "old": "import assert from 'node:assert/strict';",
+          "new": "import assert from 'node:assert/strict';\nimport {projectCombinedHTTPBody,checkCombinedHTTPSamples as checkEntropyHTTPSamples} from '../validate-combined.mjs';"
+        }
+      ],
+      "reverseExact": true
+    },
+    {
+      "original": "tests/node-compat/wasmcloud/run-host.mjs",
+      "target": "capability/hosts/run-host.mjs",
+      "beforeSha256": "bbb5e4c4dfa87d3f90a426f41902653f6338c9003a54e40b329fdb27d6ab4bac",
+      "afterSha256": "c4ef22a7ac0d0eaa36fb7cdffe35ddfb1431919fbdfb88580a49ae6bde8486a0",
+      "edits": [
+        {
+          "old": "from '../foundations/assert-http-report.mjs'",
+          "new": "from '../../../../foundations/assert-http-report.mjs'"
+        },
+        {
+          "old": "from '../entropy/assert-http-report.mjs'",
+          "new": "from '../../../../entropy/assert-http-report.mjs'"
+        },
+        {
+          "old": "from '../core-expectations.mjs'",
+          "new": "from '../../../../core-expectations.mjs'"
+        },
+        {
+          "old": "import { checkEntropyHTTPReport, checkEntropyHTTPSamples }",
+          "new": "import { checkEntropyHTTPReport }"
+        },
+        {
+          "old": "const body = JSON.parse(text);",
+          "new": "const combinedBody = JSON.parse(text);\n    const body = projectCombinedHTTPBody(combinedBody,audit);"
+        },
+        {
+          "old": ", body });",
+          "new": ", body: combinedBody });"
+        },
+        {
+          "old": "const here = dirname(fileURLToPath(import.meta.url));",
+          "new": "const here = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../wasmcloud');"
+        },
+        {
+          "old": "import assert from 'node:assert/strict';",
+          "new": "import assert from 'node:assert/strict';\nimport {projectCombinedHTTPBody,checkCombinedHTTPSamples as checkEntropyHTTPSamples} from '../validate-combined.mjs';"
+        }
+      ],
+      "reverseExact": true
+    }
+  ],
+  "oracleBlockSha256": "c81fcc254fcebcb894ac411670f87980a940a2a627bd85f95bf8cb602cb70663",
+  "oracleBlockByteExact": true,
+  "baselineBodyModified": false,
+  "replayBodiesModified": false,
+  "packagingOrGuestExecuted": false
+}

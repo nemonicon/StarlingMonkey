@@ -1,0 +1,67 @@
+{
+  "schema": "consumer-api-audit-v1",
+  "contractVersion": "stream-consumers-prototype-v1",
+  "nodeVersion": "v22.14.0",
+  "module": "node:stream/consumers",
+  "aliases": ["stream/consumers"],
+  "productionModuleInstalled": false,
+  "requiredHostInterfaces": [],
+  "apis": [
+    {
+      "export": "default",
+      "productionStatus": "deferred",
+      "prototypeStatus": "host-verified real finite ESM default object",
+      "strategy": "Small mutable ordinary object whose initial five properties equal the named functions; retain lexical function relationships.",
+      "requiredCapability": "none",
+      "deviations": "No production namespace/CJS registration or syncBuiltinESMExports behavior claimed.",
+      "validation": "Node export/order/identity oracle and host ESM inspection pass; actual native namespace/alias/static CJS/optional-OFF component gate pending."
+    },
+    {
+      "export": "text",
+      "productionStatus": "deferred",
+      "prototypeStatus": "partial; Node host differential only",
+      "strategy": "Captured native streaming TextDecoder with literal string concatenation and one final flush; built-in for-await for sync/async iterables.",
+      "requiredCapability": "none for finite pure iterables; any resource source must select its own standard WASI interfaces",
+      "deviations": "Fixed unshared backing and explicit byte/string/output/chunk caps; no Web reader adapter, deadline, Node scheduling or complete error text contract.",
+      "validation": "18 ordinary text/JSON groups and shared 12 profile groups pass on Node; actual guest decoder/iteration/cancellation/snapshot/zero-import gates pending."
+    },
+    {
+      "export": "json",
+      "productionStatus": "deferred",
+      "prototypeStatus": "partial; Node host differential only",
+      "strategy": "Await the private text function, then call captured native JSON.parse without a reviver.",
+      "requiredCapability": "none",
+      "deviations": "Inherits text limits; decoded-string cap does not impose an exact parser heap/object/nesting or genuine OOM bound.",
+      "validation": "BOM, malformed syntax, source completion, error precedence and capture/default-mutation host cases pass; component gates pending."
+    },
+    {
+      "export": "blob",
+      "productionStatus": "deferred",
+      "prototypeStatus": "explicit call/new refusal",
+      "strategy": "Future collection must retain traced JS part references until source completion and construct one audited native Blob then; no early byte copies.",
+      "requiredCapability": "none for memory-backed parts",
+      "deviations": "Current native Blob allocator/error/backing/lifetime and Buffer.Blob identity gates remain open. Deferred ordinary function differs from Node async shape.",
+      "validation": "12 ordinary Node Blob/reference groups available; prototype ERR_SM_NODE_UNSUPPORTED call/new tested; no native Blob/consumer run."
+    },
+    {
+      "export": "arrayBuffer",
+      "productionStatus": "deferred",
+      "prototypeStatus": "explicit call/new refusal",
+      "strategy": "Future audited owned Blob read into a fresh exact ArrayBuffer, preserving collection/conversion timing and independent output ownership.",
+      "requiredCapability": "none",
+      "deviations": "Depends on explicit JS_free-compatible/fallible allocation and coherent promise failures. No early-copy JS concat substitute.",
+      "validation": "Node mutable-part/offset/fresh-output vectors available; coded prototype call/new tests pass; actual component ownership gate pending."
+    },
+    {
+      "export": "buffer",
+      "productionStatus": "deferred",
+      "prototypeStatus": "explicit call/new refusal",
+      "strategy": "Future existing privately branded Buffer.from over the fresh owned ArrayBuffer, retaining offsets and sharing that result without another Buffer copy.",
+      "requiredCapability": "none",
+      "deviations": "Blob path must pass first; existing Buffer cap/backing contract still applies; no allocUnsafeSlow, concat or classic Stream support follows.",
+      "validation": "Node real Buffer/exact backing reference recorded; coded prototype call/new tests pass; native identity/ownership/component gate pending."
+    }
+  ],
+  "excluded": ["bytes (Node24 adapter extension)","stream/iter","classic Stream constructors/lifecycle","Node nextTick/ALS claims","Web reader duck-typing fallback"],
+  "scope": "Source/Node-only proposal. No selected production manifest/version or host capability was added."
+}

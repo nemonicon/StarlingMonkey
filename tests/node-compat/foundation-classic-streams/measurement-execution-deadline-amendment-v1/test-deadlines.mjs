@@ -1,0 +1,20 @@
+// Pure operational-budget data tests; no command, verifier, component or timing.
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {dirname,join,resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {deadlinePolicy,workerBudget} from './deadline-policy.mjs';
+const here=dirname(fileURLToPath(import.meta.url)),output=resolve(process.env.NODE_COMPAT_DEADLINE_SOURCE_OUTPUT??'');assert(output.startsWith('/tmp/starling-node-compat/'));await mkdir(output,{recursive:false});
+const checks=[],check=(name,run)=>{run();checks.push(name);};
+check('per public case and pilot caps600s',()=>{assert.equal(deadlinePolicy.publicCaseMs,600000);assert.equal(deadlinePolicy.pilotMs,600000);});
+check('cleanup5s source audit180s wholeworker hardmax2h',()=>{assert.equal(deadlinePolicy.cleanupGraceMs,5000);assert.equal(deadlinePolicy.sourceAuditMs,180000);assert.equal(deadlinePolicy.workerHardMaxMs,7200000);});
+check('budget preserves3warmups7samples',()=>{assert.equal(deadlinePolicy.warmups,3);assert.equal(deadlinePolicy.samples,7);});
+check('derived finite budget exact formula',()=>{const r=workerBudget({firstBatchMs:10,wholeProcessElapsedMs:1000},16);assert.equal(r.sampleAndWarmupMs,1600);assert.equal(r.firstBatchAllowanceMs,160);assert.equal(r.observedStartupAndEvidenceMs,990);assert.equal(r.startupAllowanceMs,121980);assert.equal(r.requestedMs,125340);assert.equal(r.admitted,true);});
+check('first batch accounted separately from3+7',()=>{const r=workerBudget({firstBatchMs:100,wholeProcessElapsedMs:500},2);assert.equal(r.sampleAndWarmupMs,2000);assert.equal(r.firstBatchAllowanceMs,200);});
+check('over-hardmax refuses rather than clamps',()=>{const r=workerBudget({firstBatchMs:500000,wholeProcessElapsedMs:510000},1);assert.equal(r.requestedMs,10640000);assert.equal(r.hardMaxMs,7200000);assert.equal(r.admitted,false);assert.equal(r.iterations,1);assert(r.requestedMs>r.hardMaxMs);});
+check('chosen16 unchanged on refusal',()=>{const r=workerBudget({firstBatchMs:100000,wholeProcessElapsedMs:100100},16);assert.equal(r.iterations,16);assert.equal(r.admitted,false);});
+for(const cost of[0,-1,NaN,Infinity,undefined])check('invalid public cost '+String(cost),()=>assert.throws(()=>workerBudget({firstBatchMs:cost,wholeProcessElapsedMs:1000},1)));
+for(const count of[0,17,NaN,1.5,'1'])check('invalid chosen count '+String(count),()=>assert.throws(()=>workerBudget({firstBatchMs:1,wholeProcessElapsedMs:1000},count)));
+const witness=JSON.parse(await readFile(join(here,'public-case5-deadline-witness.json')));
+check('single public witness scope preserved no adequacy or fullpass claim',()=>{assert.equal(witness.caseIndex,5);assert.equal(witness.iterations,16);assert.equal(witness.timeoutSeconds,600);assert.equal(witness.wholeTraceAndChecksumEqualNode,true);assert.equal(witness.originalFailedRunCaseStillUnknown,true);assert.equal(witness.fullTwentyPlusFourteenPassed,false);assert.equal(witness.deadlineAdequateForAllCasesClaim,false);assert.equal(witness.performanceClaim,false);});
+await writeFile(join(output,'results.json'),JSON.stringify({schemaVersion:1,state:'PURE_OPERATIONAL_DEADLINE_DATA_CHECKS_PASSED',passed:checks.length,checks,syntheticPilotCostsOnly:true,commandsOrProbesOrActualTimingOrGuestExecuted:false},null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({passed:checks.length,output}));

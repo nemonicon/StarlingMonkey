@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "state": "INDEPENDENT_READER_ASSUMPTION_CORRECTED_BEFORE_RECEIPT",
+  "firstAttemptReaderSha256": "d96051b2d3f993183b180ee5739a21d0f4709804cfcd10e441d44316d6619ebc",
+  "firstAttemptExitCode": 1,
+  "failure": "KeyError for runtime-activation-candidate-v1/index.json after all activated payloads, consumed input rows and tool membership/link checks passed.",
+  "cause": "The reader incorrectly required v1/index.json as a direct v3 consumed input. The reviewed v3 producer seals its direct v2 parent source files, not every historical parent index.",
+  "correction": "Retain direct sealed authority partitions only; do not infer an extra consumed input requirement. No activated source, input manifest, pin, native artifact or existing review was changed."
+}

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "sourceContractProposal": "sm-cryptokey-prototype-key-admission-source-v1",
+  "ownerSourceContractComposition": "EXPLICIT_DISJOINT_SOURCE_COMPOSITION_ONLY",
+  "sourcePathCountRemains": 355,
+  "newSourcePathsAdded": 0,
+  "changedPathsWithOwner": 5,
+  "moduleExportSurfaceChanged": false,
+  "constructorOrGetterBehaviorChanged": false,
+  "prototypeKeyAdmissionChangedOnlyByProposedSource": true,
+  "originalUnsafePrototypeRuntimeExecuted": false,
+  "proposedPrototypeRejectionRuntimeValidated": false,
+  "fullCryptoOwnershipCompleted": false,
+  "requiredOwnerFollowons": [
+    {
+      "id": "CRYPTO-OWNER-FOLLOWON-BIGNUM",
+      "required": true,
+      "scope": "Multiple EC/RSA EVP_PKEY_get_bn_param calls write raw BIGNUM outputs before constructing BignumPtr owners. Short-circuit failures can leave earlier successful allocations unowned; RSA optional CRT extraction also returns before adoption. Move each produced output into RAII immediately in a separately reviewed cut.",
+      "nativeSourceUnchangedHere": true
+    },
+    {
+      "id": "CRYPTO-OWNER-FOLLOWON-COPIES",
+      "required": true,
+      "scope": "Decoded HMAC JWK std::string and JS strings; RSA/EC private component strings; BIGNUM and OpenSSL internal copies; vector intermediate construction/storage beyond logical size are not covered by SecretByteVectorDeleter. No all-copies erasure claim.",
+      "nativeSourceUnchangedHere": true
+    },
+    {
+      "id": "CRYPTO-OWNER-FOLLOWON-BOUNDS",
+      "required": true,
+      "scope": "Existing data->size()*8 can overflow and EVP_PKEY_new_mac_key accepts int length while keyData.size() is size_t. Existing vector/new under -fno-exceptions has no new recoverable allocation-failure guarantee; no new cap or error parity is asserted.",
+      "nativeSourceUnchangedHere": true
+    }
+  ],
+  "newNativePolicyHelperRecipeOrPinsIssued": false,
+  "oldNativeOrRuntimeProofTransferred": false,
+  "futureAuthority": null
+}

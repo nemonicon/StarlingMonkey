@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "beforePath": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-candidate-v1/component.mjs",
+  "beforeSha256": "7e9c3be25cc4353f1165e0db90777cffffa25d20d368bc22ab41ba3bf0f976ca",
+  "afterSha256": "c357709ae163ef31bd4bb6da72e61b92db4dfebdc6db25b8bc70b48443a02b0c",
+  "edits": [
+    {
+      "old": "const aliasId='z'+'lib',alias=await import(aliasId);const names=Object.keys(namespace).sort();",
+      "new": "const aliasId='z'+'lib',canonicalId='node:'+'zlib',alias=await import(aliasId),aliasAgain=await import(aliasId),canonical=await import(canonicalId),canonicalAgain=await import(canonicalId);const names=Object.keys(namespace).sort();",
+      "count": 1
+    },
+    {
+      "old": "const result={calls,namespace:names,aliasNamespace:",
+      "new": "const result={calls,aliasNamespaceCached:alias===aliasAgain,canonicalNamespaceCached:canonical===canonicalAgain,canonicalStaticNamespace:canonical===namespace,namespace:names,aliasNamespace:",
+      "count": 1
+    }
+  ],
+  "reverseExact": true
+}

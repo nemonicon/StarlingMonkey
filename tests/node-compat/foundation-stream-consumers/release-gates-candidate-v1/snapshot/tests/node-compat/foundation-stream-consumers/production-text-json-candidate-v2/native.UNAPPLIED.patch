@@ -1,0 +1,378 @@
+--- /dev/null
++++ b/builtins/node-compat/stream-consumers/facade.mjs
+@@ -0,0 +1,101 @@
++// UNAPPLIED optional production text/JSON source. Fresh355 native/registration/guest gates pending.
++// The text/json algorithm follows Node v22.14.0 stream/consumers (LICENSE.node).
++// Blob-dependent operations deliberately do not call the existing native Blob.
++export const CONTRACT_VERSION = 'sm-node-22.14.0-m0.14';
++export const MAX_BYTE_INPUT = 1048576;
++export const MAX_STRING_INPUT_CODE_UNITS = 1048576;
++export const MAX_OUTPUT_CODE_UNITS = 1048576;
++export const MAX_CHUNKS = 4096;
++
++export function createConsumersModule(web) {
++  const Apply = Reflect.apply, Define = Object.defineProperty, Freeze = Object.freeze;
++  const Descriptor = Object.getOwnPropertyDescriptor;
++  const TypeErrorCtor = TypeError, RangeErrorCtor = RangeError, ErrorCtor = Error;
++  const Parse = JSON.parse, IsView = web.ArrayBuffer.isView;
++  const Decoder = web.TextDecoder, Decode = Decoder.prototype.decode;
++  const U8 = web.Uint8Array;
++  const ABLength = Object.getOwnPropertyDescriptor(web.ArrayBuffer.prototype, 'byteLength').get;
++  const ABResizable = Object.getOwnPropertyDescriptor(web.ArrayBuffer.prototype, 'resizable')?.get;
++  const ABDetached = Object.getOwnPropertyDescriptor(web.ArrayBuffer.prototype, 'detached')?.get;
++  const typed = Object.getPrototypeOf(U8.prototype);
++  const TypedBuffer = Object.getOwnPropertyDescriptor(typed, 'buffer').get;
++  const TypedLength = Object.getOwnPropertyDescriptor(typed, 'byteLength').get;
++  const ViewBuffer = Object.getOwnPropertyDescriptor(web.DataView.prototype, 'buffer').get;
++  const ViewLength = Object.getOwnPropertyDescriptor(web.DataView.prototype, 'byteLength').get;
++  const streamOptions = Freeze({ __proto__: null, stream: true });
++  const finalOptions = Freeze({ __proto__: null, stream: false });
++  function failure(Ctor, code, operation, message) {
++    const error = new Ctor(code+': node:stream/consumers.'+operation+' '+message);
++    Define(error, 'code', { __proto__: null, value: code, writable: true, enumerable: true, configurable: true });
++    Define(error, 'module', { __proto__: null, value: 'node:stream/consumers', writable: true, enumerable: true, configurable: true });
++    Define(error, 'operation', { __proto__: null, value: operation, writable: true, enumerable: true, configurable: true });
++    Define(error, 'profile', { __proto__: null, value: CONTRACT_VERSION, writable: true, enumerable: true, configurable: true });
++    throw error;
++  }
++  function deferred(operation) { failure(ErrorCtor, 'ERR_SM_NODE_UNSUPPORTED', operation, 'requires the separate Blob ownership/identity gate'); }
++  function invalid() { failure(TypeErrorCtor, 'ERR_INVALID_ARG_TYPE', 'text', 'chunk must be a string or supported BufferSource'); }
++  function limit(name) { failure(RangeErrorCtor, 'ERR_SM_NODE_LIMIT', 'text', 'exceeds '+name); }
++  function inputLength(value) {
++    if (value === undefined) return 0; // Node passes undefined to TextDecoder.
++    let buffer, length;
++    if (IsView(value)) {
++      try { buffer = Apply(TypedBuffer, value, []); length = Apply(TypedLength, value, []); }
++      catch {
++        try { buffer = Apply(ViewBuffer, value, []); length = Apply(ViewLength, value, []); }
++        catch { return invalid(); }
++      }
++    } else {
++      buffer = value;
++      try { length = Apply(ABLength, buffer, []); }
++      catch { return invalid(); }
++    }
++    // Validate backing with captured internal-slot getters only. No byte is
++    // copied early and no native borrowed pointer survives this JS operation.
++    try { Apply(ABLength, buffer, []); }
++    catch { failure(ErrorCtor, 'ERR_SM_NODE_UNSUPPORTED', 'text', 'shared backing is outside this prototype'); }
++    if (ABResizable && Apply(ABResizable, buffer, [])) failure(ErrorCtor, 'ERR_SM_NODE_UNSUPPORTED', 'text', 'resizable backing is outside this prototype');
++    if (ABDetached && Apply(ABDetached, buffer, [])) failure(ErrorCtor, 'ERR_SM_NODE_UNSUPPORTED', 'text', 'detached backing is outside this prototype');
++    if (!ABDetached) {
++      try { new U8(buffer, 0, 0); }
++      catch { failure(ErrorCtor, 'ERR_SM_NODE_UNSUPPORTED', 'text', 'detached backing is outside this prototype'); }
++    }
++    return length;
++  }
++  async function text(stream) {
++    const decoder = new Decoder();
++    let result = '', bytes = 0, stringUnits = 0, chunks = 0;
++    // Built-in for-await preserves Sync/Async iterator distinctions and body
++    // failure close precedence; a failed next() is not manually closed again.
++    for await (const chunk of stream) {
++      if (++chunks > MAX_CHUNKS) limit('MAX_CHUNKS');
++      let part;
++      if (typeof chunk === 'string') {
++        stringUnits += chunk.length;
++        if (stringUnits > MAX_STRING_INPUT_CODE_UNITS) limit('MAX_STRING_INPUT_CODE_UNITS');
++        part = chunk; // A string does not flush pending decoder bytes.
++      } else {
++        bytes += inputLength(chunk);
++        if (bytes > MAX_BYTE_INPUT) limit('MAX_BYTE_INPUT');
++        part = Apply(Decode, decoder, [chunk, streamOptions]);
++      }
++      if (part.length > MAX_OUTPUT_CODE_UNITS - result.length) limit('MAX_OUTPUT_CODE_UNITS');
++      result += part;
++    }
++    const final = Apply(Decode, decoder, [undefined, finalOptions]);
++    if (final.length > MAX_OUTPUT_CODE_UNITS - result.length) limit('MAX_OUTPUT_CODE_UNITS');
++    return result + final;
++  }
++  async function json(stream) { return Parse(await text(stream)); }
++  function arrayBuffer(stream) { deferred('arrayBuffer'); }
++  function blob(stream) { deferred('blob'); }
++  function buffer(stream) { deferred('buffer'); }
++  // Resolve SpiderMonkey lazy function properties before application reads.
++  // The captured descriptors retain native values/attributes; no new property
++  // is defined. Node creates length then name for these async functions.
++  Descriptor(text, 'length'); Descriptor(text, 'name');
++  Descriptor(json, 'length'); Descriptor(json, 'name');
++  const defaultObject = { arrayBuffer, blob, buffer, text, json };
++  // The future embedding would declare real module bindings from this finite
++  // record. This factory itself does not install a native module or a global.
++  return Freeze({ arrayBuffer, blob, buffer, text, json, default: defaultObject });
++}
+--- /dev/null
++++ b/builtins/node-compat/stream-consumers/factories.generated.h
+@@ -0,0 +1,108 @@
++// Generated UNAPPLIED stream-consumers factory.
++// Canonical-source SHA-256: aa8a4a5b9199e1fa5eccdc582ecb806ec55e9a5ac231d5c7879da96b2850b3d1
++static constexpr const char kStreamConsumersFactorySource[] = R"SM_NODE_PROFILE((function(argument){
++'use strict';
++// UNAPPLIED optional production text/JSON source. Fresh355 native/registration/guest gates pending.
++// The text/json algorithm follows Node v22.14.0 stream/consumers (LICENSE.node).
++// Blob-dependent operations deliberately do not call the existing native Blob.
++const CONTRACT_VERSION = 'sm-node-22.14.0-m0.14';
++const MAX_BYTE_INPUT = 1048576;
++const MAX_STRING_INPUT_CODE_UNITS = 1048576;
++const MAX_OUTPUT_CODE_UNITS = 1048576;
++const MAX_CHUNKS = 4096;
++
++function createConsumersModule(web) {
++  const Apply = Reflect.apply, Define = Object.defineProperty, Freeze = Object.freeze;
++  const Descriptor = Object.getOwnPropertyDescriptor;
++  const TypeErrorCtor = TypeError, RangeErrorCtor = RangeError, ErrorCtor = Error;
++  const Parse = JSON.parse, IsView = web.ArrayBuffer.isView;
++  const Decoder = web.TextDecoder, Decode = Decoder.prototype.decode;
++  const U8 = web.Uint8Array;
++  const ABLength = Object.getOwnPropertyDescriptor(web.ArrayBuffer.prototype, 'byteLength').get;
++  const ABResizable = Object.getOwnPropertyDescriptor(web.ArrayBuffer.prototype, 'resizable')?.get;
++  const ABDetached = Object.getOwnPropertyDescriptor(web.ArrayBuffer.prototype, 'detached')?.get;
++  const typed = Object.getPrototypeOf(U8.prototype);
++  const TypedBuffer = Object.getOwnPropertyDescriptor(typed, 'buffer').get;
++  const TypedLength = Object.getOwnPropertyDescriptor(typed, 'byteLength').get;
++  const ViewBuffer = Object.getOwnPropertyDescriptor(web.DataView.prototype, 'buffer').get;
++  const ViewLength = Object.getOwnPropertyDescriptor(web.DataView.prototype, 'byteLength').get;
++  const streamOptions = Freeze({ __proto__: null, stream: true });
++  const finalOptions = Freeze({ __proto__: null, stream: false });
++  function failure(Ctor, code, operation, message) {
++    const error = new Ctor(code+': node:stream/consumers.'+operation+' '+message);
++    Define(error, 'code', { __proto__: null, value: code, writable: true, enumerable: true, configurable: true });
++    Define(error, 'module', { __proto__: null, value: 'node:stream/consumers', writable: true, enumerable: true, configurable: true });
++    Define(error, 'operation', { __proto__: null, value: operation, writable: true, enumerable: true, configurable: true });
++    Define(error, 'profile', { __proto__: null, value: CONTRACT_VERSION, writable: true, enumerable: true, configurable: true });
++    throw error;
++  }
++  function deferred(operation) { failure(ErrorCtor, 'ERR_SM_NODE_UNSUPPORTED', operation, 'requires the separate Blob ownership/identity gate'); }
++  function invalid() { failure(TypeErrorCtor, 'ERR_INVALID_ARG_TYPE', 'text', 'chunk must be a string or supported BufferSource'); }
++  function limit(name) { failure(RangeErrorCtor, 'ERR_SM_NODE_LIMIT', 'text', 'exceeds '+name); }
++  function inputLength(value) {
++    if (value === undefined) return 0; // Node passes undefined to TextDecoder.
++    let buffer, length;
++    if (IsView(value)) {
++      try { buffer = Apply(TypedBuffer, value, []); length = Apply(TypedLength, value, []); }
++      catch {
++        try { buffer = Apply(ViewBuffer, value, []); length = Apply(ViewLength, value, []); }
++        catch { return invalid(); }
++      }
++    } else {
++      buffer = value;
++      try { length = Apply(ABLength, buffer, []); }
++      catch { return invalid(); }
++    }
++    // Validate backing with captured internal-slot getters only. No byte is
++    // copied early and no native borrowed pointer survives this JS operation.
++    try { Apply(ABLength, buffer, []); }
++    catch { failure(ErrorCtor, 'ERR_SM_NODE_UNSUPPORTED', 'text', 'shared backing is outside this prototype'); }
++    if (ABResizable && Apply(ABResizable, buffer, [])) failure(ErrorCtor, 'ERR_SM_NODE_UNSUPPORTED', 'text', 'resizable backing is outside this prototype');
++    if (ABDetached && Apply(ABDetached, buffer, [])) failure(ErrorCtor, 'ERR_SM_NODE_UNSUPPORTED', 'text', 'detached backing is outside this prototype');
++    if (!ABDetached) {
++      try { new U8(buffer, 0, 0); }
++      catch { failure(ErrorCtor, 'ERR_SM_NODE_UNSUPPORTED', 'text', 'detached backing is outside this prototype'); }
++    }
++    return length;
++  }
++  async function text(stream) {
++    const decoder = new Decoder();
++    let result = '', bytes = 0, stringUnits = 0, chunks = 0;
++    // Built-in for-await preserves Sync/Async iterator distinctions and body
++    // failure close precedence; a failed next() is not manually closed again.
++    for await (const chunk of stream) {
++      if (++chunks > MAX_CHUNKS) limit('MAX_CHUNKS');
++      let part;
++      if (typeof chunk === 'string') {
++        stringUnits += chunk.length;
++        if (stringUnits > MAX_STRING_INPUT_CODE_UNITS) limit('MAX_STRING_INPUT_CODE_UNITS');
++        part = chunk; // A string does not flush pending decoder bytes.
++      } else {
++        bytes += inputLength(chunk);
++        if (bytes > MAX_BYTE_INPUT) limit('MAX_BYTE_INPUT');
++        part = Apply(Decode, decoder, [chunk, streamOptions]);
++      }
++      if (part.length > MAX_OUTPUT_CODE_UNITS - result.length) limit('MAX_OUTPUT_CODE_UNITS');
++      result += part;
++    }
++    const final = Apply(Decode, decoder, [undefined, finalOptions]);
++    if (final.length > MAX_OUTPUT_CODE_UNITS - result.length) limit('MAX_OUTPUT_CODE_UNITS');
++    return result + final;
++  }
++  async function json(stream) { return Parse(await text(stream)); }
++  function arrayBuffer(stream) { deferred('arrayBuffer'); }
++  function blob(stream) { deferred('blob'); }
++  function buffer(stream) { deferred('buffer'); }
++  // Resolve SpiderMonkey lazy function properties before application reads.
++  // The captured descriptors retain native values/attributes; no new property
++  // is defined. Node creates length then name for these async functions.
++  Descriptor(text, 'length'); Descriptor(text, 'name');
++  Descriptor(json, 'length'); Descriptor(json, 'name');
++  const defaultObject = { arrayBuffer, blob, buffer, text, json };
++  // The future embedding would declare real module bindings from this finite
++  // record. This factory itself does not install a native module or a global.
++  return Freeze({ arrayBuffer, blob, buffer, text, json, default: defaultObject });
++}
++
++return createConsumersModule(argument);
++}))SM_NODE_PROFILE";
+--- /dev/null
++++ b/builtins/node-compat/stream-consumers/generate-factory.mjs
+@@ -0,0 +1,19 @@
++// Source/schema/parse checks only; never invoke the consumer factory.
++import assert from 'node:assert/strict';
++import {readFile,writeFile} from 'node:fs/promises';
++import {createHash} from 'node:crypto';
++import {dirname,join,resolve} from 'node:path';
++import {fileURLToPath,pathToFileURL} from 'node:url';
++import vm from 'node:vm';
++assert.equal(process.version,'v22.14.0');
++const here=dirname(fileURLToPath(import.meta.url)),at=process.argv.indexOf('--repository');assert(at>=0);const repository=resolve(process.argv[at+1]);
++const {validateManifest}=await import(pathToFileURL(join(repository,'builtins/node-compat/validate-manifest.mjs')));
++const name='export-manifest.stream-consumers.node-v22.14.0.json',manifestSource=await readFile(join(here,'../'+name),'utf8'),manifest=JSON.parse(manifestSource);
++validateManifest(manifest,JSON.parse(await readFile(join(repository,'builtins/node-compat/manifest.schema.json'),'utf8')));
++assert.equal(manifest.profileVersion,'sm-node-22.14.0-m0.14');assert.deepEqual(Object.keys(manifest.modules),['node:stream/consumers']);assert.deepEqual(manifest.modules['node:stream/consumers'].exports,['arrayBuffer','blob','buffer','default','json','text']);
++const facade=await readFile(join(here,'facade.mjs'),'utf8');assert(!facade.includes('globalThis'));const script=facade.replace(/^export const /gm,'const ').replace(/^export function /gm,'function ');assert(!/^\s*(?:import|export)\b/m.test(script));
++const factory="(function(argument){\n'use strict';\n"+script+'\nreturn createConsumersModule(argument);\n})';assert(!factory.includes(')SM_NODE_PROFILE"'));new vm.Script(factory,{filename:'<unapplied-stream-consumers-factory>'});
++const digest=createHash('sha256');for(const[n,s]of[['facade.mjs',facade],[name,manifestSource]])digest.update(n+'\0'+s+'\0');
++const output='// Generated UNAPPLIED stream-consumers factory.\n// Canonical-source SHA-256: '+digest.digest('hex')+'\nstatic constexpr const char kStreamConsumersFactorySource[] = R"SM_NODE_PROFILE('+factory+')SM_NODE_PROFILE";\n';
++const target=join(here,'factories.generated.h');if(process.argv.includes('--check'))assert.equal(await readFile(target,'utf8'),output);else await writeFile(target,output,{flag:'wx'});
++console.log(JSON.stringify({state:'STREAM_CONSUMERS_SCHEMA_SOURCE_PARSE_ONLY_PASSED',bindings:6,factoryInvoked:false,guestExecuted:false}));
+--- /dev/null
++++ b/builtins/node-compat/stream-consumers/LICENSE.node
+@@ -0,0 +1,20 @@
++Copyright Joyent, Inc. and other Node contributors.
++
++Permission is hereby granted, free of charge, to any person obtaining a
++copy of this software and associated documentation files (the
++"Software"), to deal in the Software without restriction, including
++without limitation the rights to use, copy, modify, merge, publish,
++distribute, sublicense, and/or sell copies of the Software, and to permit
++persons to whom the Software is furnished to do so, subject to the
++following conditions:
++
++The above copyright notice and this permission notice shall be included
++in all copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
++OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
++NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
++DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
++OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
++USE OR OTHER DEALINGS IN THE SOFTWARE.
+--- /dev/null
++++ b/builtins/node-compat/export-manifest.stream-consumers.node-v22.14.0.json
+@@ -0,0 +1,48 @@
++{
++  "schemaVersion": 1,
++  "profileVersion": "sm-node-22.14.0-m0.14",
++  "nodeVersion": "v22.14.0",
++  "status": "UNAPPLIED optional bounded native-TextDecoder consumer factory; no installed355 or runtime proof.",
++  "moduleContract": "Real six-binding record, same functions/default object under canonical and bare IDs. Mutable ordinary default object; mutation does not rewrite named bindings. Literal static CJS lowering returns that default object.",
++  "modules": {
++    "node:stream/consumers": {
++      "aliases": [
++        "stream/consumers"
++      ],
++      "status": "partial",
++      "exports": [
++        "arrayBuffer",
++        "blob",
++        "buffer",
++        "default",
++        "json",
++        "text"
++      ],
++      "supportedStatic": [
++        "text",
++        "json"
++      ],
++      "importOnlyExports": [
++        "arrayBuffer",
++        "blob",
++        "buffer"
++      ],
++      "callablePolicy": "text/json are async arity1/nonconstructible; three ordinary arity1 Blob-dependent functions synchronously refuse call/new with own identifiable fields.",
++      "limits": {
++        "byteInput": 1048576,
++        "stringInputCodeUnits": 1048576,
++        "outputCodeUnits": 1048576,
++        "chunks": 4096
++      },
++      "deviations": [
++        "No Blob, Buffer-output, arrayBuffer-output, Node24 bytes, Web reader adapter, public process or ALS.",
++        "Fixed attached unshared BufferSource/string/undefined chunks and ordinary finite sync/async iterables only; arbitrary Proxy/coercion/cross-realm domains are not claimed.",
++        "Selected classic and node:stream/web wrapper inputs need separate fresh355 gates. Raw native-global ReadableStream lacks async iteration and is not implicitly adapted.",
++        "Profile cap errors close through standard for-await; a pending next/return Promise has no facade timeout. No external resource ownership/reuse/reset guarantee.",
++        "Output code-unit cap is not a JSON parser heap/object-count or total peak-memory bound.",
++        "Default object deliberately remains mutable with Node order arrayBuffer,blob,buffer,text,json; frozen binding record does not freeze default."
++      ]
++    }
++  },
++  "requiredHostInterfaces": []
++}
+--- a/builtins/node-compat/register.cpp
++++ b/builtins/node-compat/register.cpp
+@@ -6,6 +6,9 @@
+ #include "factories.generated.h"
+ #ifdef NODE_COMPAT_ZLIB
+ #include "zlib/factories.generated.h"
++#endif
++#ifdef NODE_COMPAT_STREAM_CONSUMERS
++#include "stream-consumers/factories.generated.h"
+ #endif
+ #ifdef NODE_COMPAT_CLASSIC_STREAMS
+ #include "classic-streams/factories.generated.h"
+@@ -223,6 +226,27 @@
+ }
+ #endif
+ 
++#ifdef NODE_COMPAT_STREAM_CONSUMERS
++static bool install_stream_consumers(api::Engine *engine) {
++  auto *cx = engine->cx(); // install() already entered CONTENT before user code.
++  JS::RootedObject argument(cx, JS_NewPlainObject(cx));
++  if (!argument) return false;
++  JS::RootedValue value(cx);
++  for (const char *name : {"TextDecoder", "ArrayBuffer", "Uint8Array", "DataView"}) {
++    if (!JS_GetProperty(cx, engine->global(), name, &value)) return false;
++    if (!value.isObject()) {
++      JS_ReportErrorASCII(cx, "ERR_SM_NODE_PROFILE_INITIALIZATION: stream consumers native dependency unavailable");
++      return false;
++    }
++    if (!JS_DefineProperty(cx, argument, name, value, 0)) return false;
++  }
++  JS::RootedValue argument_value(cx, JS::ObjectValue(*argument)), module(cx);
++  if (!evaluate_factory(cx, kStreamConsumersFactorySource, argument_value, &module)) return false;
++  return engine->define_builtin_module("node:stream/consumers", module) &&
++         engine->define_builtin_module("stream/consumers", module);
++}
++#endif
++
+ bool install(api::Engine *engine) {
+   auto *cx = engine->cx();
+   // Existing install_builtins() executes in the CONTENT realm before user code.
+@@ -275,6 +299,9 @@
+ #ifdef NODE_COMPAT_ZLIB
+   if (!install_zlib(engine, buffer_constructor)) return false;
+ #endif
++#ifdef NODE_COMPAT_STREAM_CONSUMERS
++  if (!install_stream_consumers(engine)) return false;
++#endif
+   return JS_DefineProperty(cx, engine->global(), "Buffer", buffer_constructor, 0);
+ }
+ } // namespace builtins::node_compat
+--- a/cmake/builtins.cmake
++++ b/cmake/builtins.cmake
+@@ -270,3 +270,14 @@
+     target_sources(builtin_node_compat PRIVATE builtins/node-compat/zlib/kernel.cpp)
+     target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_ZLIB=1)
+ endif()
++
++# Independent optional consumers: existing native decoder, no new C++ kernel.
++option(NODE_COMPAT_STREAM_CONSUMERS "Enable bounded node:stream/consumers text/json" OFF)
++if(NODE_COMPAT_STREAM_CONSUMERS AND NOT CMAKE_SCRIPT_MODE_FILE)
++    if(NOT TARGET builtin_node_compat OR NOT TARGET builtin_web_text_codec)
++        message(FATAL_ERROR "NODE_COMPAT_STREAM_CONSUMERS requires existing Node and native TextCodec builtins")
++    endif()
++    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_STREAM_CONSUMERS=1)
++    add_dependencies(builtin_node_compat builtin_web_text_codec)
++    target_link_libraries(builtin_node_compat PRIVATE builtin_web_text_codec)
++endif()

@@ -1,0 +1,51 @@
+"""Root data-only pair review; no verifier/loader/engine/codec executes."""
+from pathlib import Path
+import hashlib,json
+HERE=Path(__file__).resolve().parent
+BASE=HERE.parent
+FACTS=BASE/'cost-comparison-candidate-v1/existing-native-facts.DATA-ONLY.json'
+RECIPE='4417285083551bb48bdb877de781e31dbac08818081a78e1b28a35b9134aeed2'
+cache={}
+def desc(path):
+    path=Path(path);assert path.is_file()and not path.is_symlink()
+    stat=path.stat();identity=(str(path),stat.st_dev,stat.st_ino,stat.st_size,stat.st_mtime_ns,stat.st_ctime_ns)
+    if identity not in cache:
+        h=hashlib.sha256();n=0
+        with path.open('rb')as f:
+            for chunk in iter(lambda:f.read(1048576),b''):h.update(chunk);n+=len(chunk)
+        after=path.stat();assert(stat.st_dev,stat.st_ino,stat.st_size,stat.st_mtime_ns,stat.st_ctime_ns)==(after.st_dev,after.st_ino,after.st_size,after.st_mtime_ns,after.st_ctime_ns)
+        cache[identity]=dict(path=str(path),sha256=h.hexdigest(),bytes=n)
+    return dict(cache[identity])
+def checked(row):
+    actual=desc(row['path']);assert actual['sha256']==row['sha256']and actual['bytes']==row['bytes'];return actual
+def save(name,value):
+    with(HERE/name).open('x')as f:json.dump(value,f,indent=2);f.write('\n')
+facts=json.loads(FACTS.read_bytes());arms={};source_context=[];sdk=None;proofs=[];source_manifest=None
+for label,name,peer,pin in [('normal-off','nativeOn','independent-native-zlib-v4-normal-off-review-v1','ba0451db576ed7ede8c39c6dadf7b22e37238c9c0ec0028edf019641467aeec0'),('disabled-off','nativeOff','independent-native-zlib-v4-disabled-off-review-v1','ac8d15ac33d7a76aa9b2aceb4d47849bf3f26fc31e6545344171bca9253c1f76')]:
+    root=BASE/peer;assert desc(root/'index.json')['sha256']==pin;index=json.loads((root/'index.json').read_bytes())
+    for row in index['files']:checked(dict(path=str(root/row['path']),sha256=row['sha256'],bytes=row['bytes']))
+    receipt=json.loads((root/'review-receipt.json').read_bytes());assert receipt['concreteBlockers']==[] and receipt['nativeSources']==350
+    proofs.append(dict(index=desc(root/'index.json'),receipt=desc(root/'review-receipt.json'),scope='Existing native build/freeze command/source evidence; no old input manifest followed or helper rerun'))
+    fact=next(v for v in facts['variants']if v['label']==label);metadata_row=checked(fact['metadata']);freeze_row=checked(fact['freezeReceipt']);m=json.loads(Path(metadata_row['path']).read_bytes());f=json.loads(Path(freeze_row['path']).read_bytes())
+    assert m['engineSha256']==fact['engineSha256']==f['engineSha256']and f['engineBytes']==fact['engineBytes']
+    assert len(m['sourceManifest'])==350 and len(m['componentizeSourceManifest'])==3 and m['buildRecipeSha256']==RECIPE
+    assert m['hostApi']=='wasi-0.2.10'and m['entropyPolicy']=='off'and m['gcStress']is False and m['zlibEnabled']==(label=='normal-off')
+    assert m['zlibPolicy']['runtimeBackendProof']==f['runtimeBackendProof']==dict(verified=False,version=None,vernum=None)
+    assert f['nativeInputsVerified']==350 and f['externalEmbeddingInputsVerified']==3 and len(f['copies'])==1024
+    assert f['actualLayoutCompileCommands']==(62 if label=='normal-off'else61)and f['actualStrictCompileCommands']==4 and f['actualEmbeddingCompileCommands']==1
+    for row in f['copies']:source_context.append(checked(row))
+    for row in m['sourceManifest']:
+        actual=desc(Path(f['sourceRoot'])/row['path']);assert actual['sha256']==row['sha256']
+    if source_manifest is None:source_manifest=m['sourceManifest']
+    else:assert source_manifest==m['sourceManifest']
+    selected=[f['sourceRoot']+'/'+r['path']for r in m['selectedModuleManifests']];assert len(selected)==(10 if label=='normal-off'else9)
+    witness=m['zlibPolicy']['codecWitness'];references=[{k:r[k]for k in ['path','sha256','bytes']}for r in [witness['archive']]+witness['headers']]
+    assert len(references)==5
+    if sdk is None:sdk=references
+    else:assert sdk==references
+    for row in references:checked(row)
+    engine=desc(f['engine']);assert engine['sha256']==fact['engineSha256']and engine['bytes']==fact['engineBytes']
+    arms[name]=dict(engine=engine,metadata=metadata_row,freezeReceipt=freeze_row,sourceRoot=f['sourceRoot'],zlibEnabled=m['zlibEnabled'],nativeInputs=350,externalEmbeddingInputs=3,existingNativeReview=proofs[-1])
+save('frozen-byte-context.json',dict(frozenRows=2048,files=source_context,selectedSDKReferences=sdk,originalPathsNotFollowed=True))
+save('results.json',dict(schemaVersion=1,state='ROOT_REVIEWED_GENUINE_ZLIB350_COST_PAIR_V1',nativeInputs=350,recipeSha256=RECIPE,operationalAdmission=False,sourcePromotionAllowed=False,metadataProjection=False,nativeOn=arms['nativeOn'],nativeOff=arms['nativeOff'],selectedSDKReferences=sdk,frozenRowsRehashed=2048,nativeSourceRowsCheckedPerVariant=350,sourceManifestsIdentical=True,existingNativeReviews=proofs,originalMutableNormalCachesReopened=False,metadataBackendProofChanged=False,libraryOrNativeVerifierOrCodecOrGuestExecuted=False,actualComponentImports=None,performanceClaim=False,actionAuthorityIssued=False))
+print(json.dumps(dict(state='ROOT_DATA_ONLY_COST_PAIR_REVIEW_PASSED',frozenRows=2048,selectedSDKReferences=5,uniqueStableFileReads=len(cache),codecCalls=0)))

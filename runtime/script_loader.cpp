@@ -300,6 +300,22 @@ static JSObject *get_builtin_module(JSContext *cx, HandleValue id, HandleObject 
 
   SetModulePrivate(module, ObjectValue(*info));
 
+  // This generated wrapper has no requested modules: import.meta is metadata,
+  // not an import declaration. Complete its empty graph before publishing it.
+  // ContinueDynamicImport expects this phase to have finished before linking;
+  // returning a freshly compiled module leaves it in SpiderMonkey's New state.
+  // The zero-dependency LoadRequestedModules callback completes synchronously.
+  if (!JS::LoadRequestedModules(
+          cx, module, JS::UndefinedHandleValue,
+          [](JSContext *, JS::Handle<JS::Value>) { return true; },
+          [](JSContext *cx, JS::Handle<JS::Value>, JS::Handle<JS::Value> error) {
+            JS_SetPendingException(cx, error);
+            return true;
+          }) ||
+      JS_IsExceptionPending(cx)) {
+    return nullptr;
+  }
+
   if (!MapSet(cx, moduleRegistry, id, module_val)) {
     return nullptr;
   }

@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_ONLY_CAPABILITY_FOLLOWON_V2_READY_FOR_REVIEW_NOT_RUNTIME_ACCEPTANCE",
+  "capturedAtUtc": "2026-11-03T20:49:32.098102+00:00",
+  "parentPacket": {
+    "path": "tests/node-compat/foundation-scheduler/production-regression-candidate-v3",
+    "indexSha256": "3064605fbf043c26e3d1bc85378b91d68c98be4034f4b6c5cf0f30f964ac61a2"
+  },
+  "enginePinDocument": {
+    "path": "pins.json",
+    "sha256": "ce265df8ad60cdcae450013597a2ac1f20d83dbcffcc1114b2a00af927743c74",
+    "state": "UNCONFIGURED_ACTUAL_PRODUCTION_FREEZES_REQUIRED",
+    "variants": {
+      "normal-off": null,
+      "gc-off": null,
+      "normal-runtime": null
+    }
+  },
+  "httpComponentPinDocument": {
+    "path": "http-component-pins.json",
+    "sha256": "a9be39264829706dcc04d322a183423d026ab3fed9d89154162b0f9b5e4cbd19",
+    "state": "UNCONFIGURED_ACTUAL_HTTP_COMPONENT_REQUIRED",
+    "component": null,
+    "phasePinExcludedFromPrepackSeal": true,
+    "afterConfiguredPrimitiveDigestRecheckedBy": "verifyHTTPReady"
+  },
+  "runtimeSourceInputSeal": {
+    "path": "input-freeze.json",
+    "sha256": "b0fc65b4ad5d7121bf0320d57f2eb71c80e27aac39392eee3a2bfec6c0a56d3d",
+    "files": 773,
+    "ancestralLineageInputs": 665,
+    "nativePartition": 306,
+    "externalEmbeddingPartition": 3,
+    "binariesCopied": false,
+    "explicitLiveHTTPInputs": 8
+  },
+  "sourceTransforms": {
+    "path": "transformations.json",
+    "sha256": "b8ce73ba6a6ffc2e5158d1f26bae411862204b111e11f19b3f424ecb8661a16c",
+    "derivedFiles": 15,
+    "reverseEditsRestoreEveryOldByte": true
+  },
+  "reviewDiff": {
+    "path": "derivations.REVIEW.diff",
+    "sha256": "722440d7be24710d885111b34bc118800bccebbdfccbe3ac9bfd12ad43df4dc9",
+    "role": "Review-only; old sources are not to be modified or renamed"
+  },
+  "checks": {
+    "hostOnly": {
+      "path": "test-results.json",
+      "sha256": "633474c30560274b2dac7b750c8e37da762704bbfaa22f6a5424bd0e923cbce6",
+      "passed": 87,
+      "negativeChildEntries": 11,
+      "scratchSealCases": 7,
+      "readonlyLiveComputedInputs": 8
+    },
+    "source": {
+      "path": "source-checks.json",
+      "sha256": "d35625669b17b07006e4faec8db88bb252503840b012a05472c6305ff70f4731",
+      "syntaxChecks": 30,
+      "nativeInputsRehashed": 306,
+      "actualRecursiveCopyInputsSealed": 7
+    }
+  },
+  "capabilityContracts": {
+    "normalOffScalar": [],
+    "gcOffScalar": [],
+    "normalRuntimeScalar": [
+      "wasi:random/random@0.2.10"
+    ],
+    "runtimeHttp": [
+      "wasi:clocks/monotonic-clock@0.2.10",
+      "wasi:http/types@0.2.10",
+      "wasi:io/error@0.2.10",
+      "wasi:io/poll@0.2.10",
+      "wasi:io/streams@0.2.10",
+      "wasi:random/random@0.2.10"
+    ],
+    "httpExports": [
+      "wasi:http/incoming-handler@0.2.10"
+    ],
+    "clock": "nominal-duration-only; no callable/core clock imports",
+    "observedNewComponentImports": false
+  },
+  "preservedFocusedScope": {
+    "public": 16,
+    "nested": 4,
+    "receivers": 9,
+    "total": 29,
+    "namespaceExports": 16,
+    "ownErrors": 7,
+    "initializationFailures": 8,
+    "deployedFatalCases": 5,
+    "ordinarySuccessfulRetainedCalls": 9,
+    "ordinarySuccessfulFreshWasmtime": 3,
+    "gcRoundtripsPerCall": 8,
+    "getterExpectedNode": {
+      "ordinary": 1,
+      "protectedSignal": 1,
+      "alreadyAborted": 0
+    },
+    "getterExpectedNative": {
+      "ordinary": 0,
+      "protectedSignal": 0,
+      "alreadyAborted": 0
+    },
+    "nodeCompatibilityPassed": false
+  },
+  "bothHostContract": {
+    "sameComponentBytes": true,
+    "requestsPerHost": 3,
+    "stockWasmtime": "42.0.1",
+    "officialWash": "2.11.0",
+    "cleanStopAndExit0Required": true,
+    "instanceReuseClaim": false,
+    "currentHostsExecuted": false
+  },
+  "limitations": [
+    "Actual engine/component pins and all artifact-success branches remain absent/unexecuted.",
+    "GC validates combined co-owners only; factory closure also owns the Symbol.",
+    "Fresh getter counterexample remains false parity; Symbol registry/description and request/reset/ALS/process gaps remain.",
+    "Standard HTTP transport is not node:http; no new outgoing/network/filesystem/TLS capability inferred.",
+    "No performance/memory/source-only test is a new runtime compatibility claim."
+  ],
+  "launchGatesUnchanged": {
+    "requiredStartFreeBytes": 2147483648,
+    "stopBelowFreeBytes": 838860800
+  },
+  "nativeBuildComponentGuestHostExecuted": false,
+  "liveNativeCMakeRecipeOrSharedHarnessEdited": false,
+  "oldPacketsEdited": false,
+  "stoppedBranchesResumed": false,
+  "supersededV1": {
+    "path": "tests/node-compat/foundation-scheduler/production-followon-capability-v1",
+    "indexSha256": "6e6116228ee1dfadb987313547903d038bf4992c1003dd3cb5525f07bc2df091",
+    "sourceReceiptSha256": "5ee37f3963ba6b7d96ee4b7e2ef91f769b639297a2d6394bc0593955fbecc219",
+    "all44FilesUnchanged": true,
+    "readiness": "HOLD: eight computed live inputs were absent; old75tests are not readiness approval",
+    "independentFindingPath": "../independent-followon-capability-review-v1/review.json",
+    "independentFindingSha256": "1a140d3d96e82fe0393fcbb4c5eedb5d15f8fc65071f448fa5fe49a9242c2d9a"
+  },
+  "computedIOAudit": {
+    "path": "computed-io-audit.json",
+    "sha256": "899ca343258a5408e00210be22826e49755ef84295f9d05900e2389419d536da",
+    "explicitLiveInputs": 8,
+    "recursiveCpFiles": 7,
+    "otherComputedReads": 17,
+    "actualNativeOrHostExecution": false
+  }
+}

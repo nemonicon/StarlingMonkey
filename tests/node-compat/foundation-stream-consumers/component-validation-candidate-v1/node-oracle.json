@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "node": "v22.14.0",
+  "sourceReportSha256": "6a2571a90f6f272dd4940f3e400914d6a86d0b042751f965836ca63c02a327fd",
+  "oldRuntimeProofTransferred": false,
+  "cases": [
+    {
+      "name": "empty and string chunks",
+      "result": [
+        "",
+        "abcd",
+        "abc"
+      ]
+    },
+    {
+      "name": "split UTF8 BOM and incomplete final sequence",
+      "result": "A\u20ac\ufffd"
+    },
+    {
+      "name": "strings do not flush a pending byte decoder",
+      "result": "X\u20ac"
+    },
+    {
+      "name": "strings do not consume decoder BOM state",
+      "result": "AB\ufeffC"
+    },
+    {
+      "name": "string surrogate halves concatenate without UTF8 conversion",
+      "result": "\ud83d\ude00"
+    },
+    {
+      "name": "typed views decode only visible raw bytes",
+      "result": [
+        "AB",
+        "AB",
+        "AB",
+        "\u0000AB\u0000"
+      ]
+    },
+    {
+      "name": "eager decoding precedes later mutation of reused chunk",
+      "result": "AB"
+    },
+    {
+      "name": "undefined byte chunk is an empty decoder input",
+      "result": "A"
+    },
+    {
+      "name": "invalid byte chunks reject with error type and code",
+      "result": [
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        }
+      ]
+    },
+    {
+      "name": "sync iterator yielded promises are unwrapped",
+      "result": "AB"
+    },
+    {
+      "name": "async iterator yielded promise value is not unwrapped",
+      "result": {
+        "fulfilled": false,
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      }
+    },
+    {
+      "name": "body decoding failure closes the iterator once",
+      "result": {
+        "error": {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        "log": [
+          "iterator",
+          "next",
+          "return"
+        ]
+      }
+    },
+    {
+      "name": "next rejection propagates original error without return",
+      "result": {
+        "same": true,
+        "log": [
+          "next"
+        ]
+      }
+    },
+    {
+      "name": "sync iterator body failure invokes finally",
+      "result": {
+        "error": {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        "log": [
+          "finally"
+        ]
+      }
+    },
+    {
+      "name": "json consumes streaming text before parsing",
+      "result": {
+        "value": {
+          "x": 2
+        },
+        "log": [
+          "complete"
+        ]
+      }
+    },
+    {
+      "name": "json syntax failure occurs after iterator completion",
+      "result": {
+        "error": {
+          "fulfilled": false,
+          "name": "SyntaxError"
+        },
+        "log": [
+          "complete"
+        ]
+      }
+    },
+    {
+      "name": "literal BOM json differs from byte BOM",
+      "result": {
+        "literal": {
+          "fulfilled": false,
+          "name": "SyntaxError"
+        },
+        "bytes": {
+          "x": 1
+        }
+      }
+    },
+    {
+      "name": "native Promise result and supported async non-construction",
+      "result": {
+        "promise": true,
+        "then": "function",
+        "value": "a",
+        "text": {
+          "name": "TypeError"
+        },
+        "json": {
+          "name": "TypeError"
+        }
+      }
+    }
+  ],
+  "selection": {
+    "groups": 18,
+    "invalidKindVectors": 5,
+    "excludedBlobVectors": 1,
+    "reason": "Do not construct native Blob; preserve all remaining Node input/oracle cases."
+  }
+}

@@ -1,0 +1,661 @@
+{
+  "schema": 1,
+  "proposalVersion": "buffer-allocunsafe-zeroed-v1",
+  "node": "v22.14.0",
+  "installed": false,
+  "productionManifestChanged": false,
+  "sources": {
+    "candidate.mjs": "ae3788b0d74fac335ae8dbde7e10fac7b48adc6590e2c9e71ac0fa53f2941905",
+    "checks.mjs": "01eb4e9a1b7d7731a1eabbadf4902fee6fe0c3a149b79cbc617b6a81e60e561f",
+    "demand-source.mjs": "7e1124c3e8b6b87c4b941870285bc2f8caf11e2dda7a0c3105fdae439f7a9fab",
+    "demand-checks.mjs": "3f3f8f82b6850048d28dc8a87610cc759cf2c593a9ad78493cd14a5433500f2b",
+    "run-node.mjs": "6cc99de2297cc6c5c1b8fed9bd3bae573ec50325b2399721d47550a2634f4979"
+  },
+  "nodeEmbeddedSourceSha256": {
+    "buffer": "152c14464ee02be32fa470606105c613dd1e3aff2d9b2c65d8273291227ae1b3",
+    "internal/buffer": "5640599bf73b82806b4936cfe00ce28b12f082c23b9396393c80cbb12574fa69",
+    "internal/validators": "4a630edb64131c6884fe19561d8da85063b5dd7831405e6dee6642e8a283538c"
+  },
+  "differentialGroups": 10,
+  "cases": [
+    {
+      "name": "function name arity and ordinary prototype",
+      "result": {
+        "name": "allocUnsafe",
+        "length": 1,
+        "callable": "function",
+        "prototypeConstructor": true,
+        "prototypeWritable": true,
+        "then": "undefined"
+      }
+    },
+    {
+      "name": "invalid argument type and no implicit numeric coercion",
+      "result": {
+        "result": [
+          {
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE"
+          },
+          {
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE"
+          },
+          {
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE"
+          },
+          {
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE"
+          },
+          {
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE"
+          },
+          {
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE"
+          },
+          {
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE"
+          },
+          {
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE"
+          },
+          {
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE"
+          },
+          {
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE"
+          }
+        ],
+        "coercionCalls": 0
+      }
+    },
+    {
+      "name": "negative NaN and infinity",
+      "result": [
+        {
+          "name": "RangeError",
+          "code": "ERR_OUT_OF_RANGE"
+        },
+        {
+          "name": "RangeError",
+          "code": "ERR_OUT_OF_RANGE"
+        },
+        {
+          "name": "RangeError",
+          "code": "ERR_OUT_OF_RANGE"
+        },
+        {
+          "name": "RangeError",
+          "code": "ERR_OUT_OF_RANGE"
+        },
+        {
+          "name": "RangeError",
+          "code": "ERR_OUT_OF_RANGE"
+        },
+        {
+          "name": "RangeError",
+          "code": "ERR_OUT_OF_RANGE"
+        }
+      ]
+    },
+    {
+      "name": "integer fraction and signed zero lengths",
+      "result": [
+        {
+          "input": "0",
+          "length": 0,
+          "byteLength": 0,
+          "isBuffer": true
+        },
+        {
+          "input": "0",
+          "length": 0,
+          "byteLength": 0,
+          "isBuffer": true
+        },
+        {
+          "input": "5e-324",
+          "length": 0,
+          "byteLength": 0,
+          "isBuffer": true
+        },
+        {
+          "input": "0.5",
+          "length": 0,
+          "byteLength": 0,
+          "isBuffer": true
+        },
+        {
+          "input": "0.999",
+          "length": 0,
+          "byteLength": 0,
+          "isBuffer": true
+        },
+        {
+          "input": "1",
+          "length": 1,
+          "byteLength": 1,
+          "isBuffer": true
+        },
+        {
+          "input": "1.9",
+          "length": 1,
+          "byteLength": 1,
+          "isBuffer": true
+        },
+        {
+          "input": "7.75",
+          "length": 7,
+          "byteLength": 7,
+          "isBuffer": true
+        },
+        {
+          "input": "64",
+          "length": 64,
+          "byteLength": 64,
+          "isBuffer": true
+        }
+      ]
+    },
+    {
+      "name": "written bytes only differential",
+      "result": [
+        3,
+        20,
+        37,
+        54,
+        71,
+        88,
+        105,
+        122,
+        139,
+        156,
+        173,
+        190,
+        207,
+        224,
+        241,
+        2,
+        19,
+        36,
+        53,
+        70,
+        87,
+        104,
+        121,
+        138,
+        155,
+        172,
+        189,
+        206,
+        223,
+        240,
+        1,
+        18,
+        35,
+        52,
+        69,
+        86,
+        103,
+        120,
+        137,
+        154,
+        171,
+        188,
+        205,
+        222,
+        239,
+        0,
+        17,
+        34,
+        51,
+        68,
+        85,
+        102,
+        119,
+        136,
+        153,
+        170,
+        187,
+        204,
+        221,
+        238,
+        255,
+        16,
+        33,
+        50,
+        67,
+        84,
+        101,
+        118,
+        135,
+        152,
+        169,
+        186,
+        203,
+        220,
+        237,
+        254,
+        15,
+        32,
+        49,
+        66,
+        83,
+        100,
+        117,
+        134,
+        151,
+        168,
+        185,
+        202,
+        219,
+        236,
+        253,
+        14,
+        31,
+        48,
+        65,
+        82,
+        99,
+        116,
+        133,
+        150,
+        167,
+        184,
+        201,
+        218,
+        235,
+        252,
+        13,
+        30,
+        47,
+        64,
+        81,
+        98,
+        115,
+        132,
+        149,
+        166,
+        183,
+        200,
+        217,
+        234,
+        251,
+        12,
+        29,
+        46,
+        63,
+        80,
+        97,
+        114,
+        131,
+        148,
+        165,
+        182,
+        199,
+        216,
+        233,
+        250,
+        11,
+        28,
+        45,
+        62,
+        79,
+        96,
+        113,
+        130,
+        147,
+        164,
+        181,
+        198,
+        215,
+        232,
+        249,
+        10,
+        27,
+        44,
+        61,
+        78,
+        95,
+        112,
+        129,
+        146,
+        163,
+        180,
+        197,
+        214,
+        231,
+        248,
+        9,
+        26,
+        43,
+        60,
+        77,
+        94,
+        111,
+        128,
+        145,
+        162,
+        179,
+        196,
+        213,
+        230,
+        247,
+        8,
+        25,
+        42,
+        59,
+        76,
+        93,
+        110,
+        127,
+        144,
+        161,
+        178,
+        195,
+        212,
+        229,
+        246,
+        7,
+        24,
+        41,
+        58,
+        75,
+        92,
+        109,
+        126,
+        143,
+        160,
+        177,
+        194,
+        211,
+        228,
+        245,
+        6,
+        23,
+        40,
+        57,
+        74,
+        91,
+        108,
+        125,
+        142,
+        159,
+        176,
+        193,
+        210,
+        227,
+        244,
+        5,
+        22,
+        39,
+        56,
+        73,
+        90,
+        107,
+        124,
+        141,
+        158,
+        175,
+        192,
+        209,
+        226,
+        243,
+        4,
+        21,
+        38,
+        55,
+        72,
+        89,
+        106,
+        123,
+        140,
+        157,
+        174,
+        191,
+        208,
+        225,
+        242,
+        3
+      ]
+    },
+    {
+      "name": "call this binding and construction",
+      "result": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "name": "construction invalid inputs",
+      "result": [
+        {
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "name": "RangeError",
+          "code": "ERR_OUT_OF_RANGE"
+        }
+      ]
+    },
+    {
+      "name": "bound call extra arguments and derived construction",
+      "result": {
+        "boundLength": 3,
+        "extraLength": 4,
+        "boundConstruct": 5,
+        "derivedBuffer": true,
+        "derivedInstance": false,
+        "returnedPrototype": true
+      }
+    },
+    {
+      "name": "independent visible allocations",
+      "result": {
+        "distinct": true,
+        "a": 11,
+        "b": 22,
+        "prototype": true
+      }
+    },
+    {
+      "name": "shared subarray and backing view",
+      "result": {
+        "bytes": [
+          1,
+          41,
+          42,
+          4,
+          5,
+          43
+        ],
+        "slice": [
+          41,
+          42,
+          4
+        ],
+        "subarray": [
+          42,
+          4,
+          5
+        ],
+        "sliceBrand": true,
+        "subarrayBrand": true,
+        "backing": true,
+        "offsetDeltas": [
+          1,
+          2
+        ]
+      }
+    }
+  ],
+  "candidateCases": [
+    {
+      "name": "zeroed fresh no-pool allocations",
+      "result": [
+        {
+          "size": 0,
+          "length": 0,
+          "offset": 0,
+          "backing": 0,
+          "zero": true
+        },
+        {
+          "size": 0.5,
+          "length": 0,
+          "offset": 0,
+          "backing": 0,
+          "zero": true
+        },
+        {
+          "size": 1,
+          "length": 1,
+          "offset": 0,
+          "backing": 1,
+          "zero": true
+        },
+        {
+          "size": 17,
+          "length": 17,
+          "offset": 0,
+          "backing": 17,
+          "zero": true
+        },
+        {
+          "size": 1024,
+          "length": 1024,
+          "offset": 0,
+          "backing": 1024,
+          "zero": true
+        }
+      ]
+    },
+    {
+      "name": "inclusive maximum and raw-size cap",
+      "result": {
+        "maximum": 16777216,
+        "samples": [
+          0,
+          0,
+          0
+        ],
+        "failures": [
+          {
+            "name": "RangeError",
+            "code": "ERR_OUT_OF_RANGE"
+          },
+          {
+            "name": "RangeError",
+            "code": "ERR_OUT_OF_RANGE"
+          },
+          {
+            "name": "RangeError",
+            "code": "ERR_OUT_OF_RANGE"
+          }
+        ]
+      }
+    },
+    {
+      "name": "captured allocator and intrinsic references",
+      "result": {
+        "length": 3,
+        "zero": true
+      }
+    },
+    {
+      "name": "allocator failure propagates with no fallback",
+      "result": true
+    },
+    {
+      "name": "public pool setting does not create a slab",
+      "result": {
+        "independentOfPoolSize": true,
+        "parentMatchesBacking": true,
+        "offset": 0
+      }
+    }
+  ],
+  "callerDemand": {
+    "concat": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "concatBrand": true,
+    "originalNodes": 2,
+    "consumed": [
+      1,
+      2,
+      3
+    ],
+    "consumedBrand": true,
+    "remainingNodes": 1,
+    "remaining": [
+      4,
+      5
+    ],
+    "outputVisibleRangeDisjoint": true
+  },
+  "demandSource": {
+    "path": "/tmp/starling-node-compat/native-toolchain-lock/node_modules/readable-stream/lib/internal/streams/buffer_list.js",
+    "sha256": "c8a1206970857cf3d1df0b8dfa54be336b93fce9ecafdcc3e630f25b6f4415d7",
+    "excerpts": {
+      "constructor": {
+        "text": "  constructor() {\n    this.head = null\n    this.tail = null\n    this.length = 0\n  }",
+        "sha256": "04eba3e98806a43af7b546ac2b0c353d0ca4e4afef6788d9a1b107837ff2948e"
+      },
+      "push": {
+        "text": "  push(v) {\n    const entry = {\n      data: v,\n      next: null\n    }\n    if (this.length > 0) this.tail.next = entry\n    else this.head = entry\n    this.tail = entry\n    ++this.length\n  }",
+        "sha256": "80401de6fdb8a10965de75fa550e02b651e7ad1c294c7c2c7c1f8941918ccae6"
+      },
+      "concat": {
+        "text": "  concat(n) {\n    if (this.length === 0) return Buffer.alloc(0)\n    const ret = Buffer.allocUnsafe(n >>> 0)\n    let p = this.head\n    let i = 0\n    while (p) {\n      TypedArrayPrototypeSet(ret, p.data, i)\n      i += p.data.length\n      p = p.next\n    }\n    return ret\n  }",
+        "sha256": "5bf1ff0cc9c85b63e9e55ae13bddc5df25c6c510babe891cb226f3ea7d28911c"
+      },
+      "_getBuffer": {
+        "text": "  _getBuffer(n) {\n    const ret = Buffer.allocUnsafe(n)\n    const retLen = n\n    let p = this.head\n    let c = 0\n    do {\n      const buf = p.data\n      if (n > buf.length) {\n        TypedArrayPrototypeSet(ret, buf, retLen - n)\n        n -= buf.length\n      } else {\n        if (n === buf.length) {\n          TypedArrayPrototypeSet(ret, buf, retLen - n)\n          ++c\n          if (p.next) this.head = p.next\n          else this.head = this.tail = null\n        } else {\n          TypedArrayPrototypeSet(ret, new Uint8Array(buf.buffer, buf.byteOffset, n), retLen - n)\n          this.head = p\n          p.data = buf.slice(n)\n        }\n        break\n      }\n      ++c\n    } while ((p = p.next) !== null)\n    this.length -= c\n    return ret\n  }",
+        "sha256": "2c9e93144ea8de49e6971f7b2755e4ac2c36f121ffd969a4a9cc56406b1bddac"
+      }
+    },
+    "injectedModuleSha256": "a37d6da7a4fc583481678552ffeeaed87176b78fcd4deaca62685fb27f0e865e",
+    "slowAllocationDemand": false
+  },
+  "referencePoolMetadata": {
+    "nodePoolSize": 8192,
+    "nodeMaximum": 9007199254740991,
+    "small": {
+      "length": 1,
+      "byteOffset": 592,
+      "backingBytes": 8192
+    },
+    "positiveFractionToZero": {
+      "length": 0,
+      "byteOffset": 600,
+      "backingBytes": 8192
+    },
+    "candidate": {
+      "length": 1,
+      "byteOffset": 0,
+      "backingBytes": 1
+    }
+  },
+  "scope": "Node22 reference versus isolated zeroed captured-alloc candidate and exact readable-stream demand excerpts. No initial Node contents inspected, no genuine OOM injected, no production registration or guest component proof yet."
+}

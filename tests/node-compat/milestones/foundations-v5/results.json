@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "milestone": "foundations-v5",
+  "capturedAtUtc": "2026-11-03T06:27:34.303582+00:00",
+  "goalStatus": "active; full roadmap incomplete",
+  "offEngineSha256": "165b59a1fac4f3bab14547a28063908193c2b98767bd5fa835ca00b9b6d8adfc",
+  "runtimeEngineSha256": "ff770f47dea834da5077fa10f4c1af1e89165519e9d67b664e9b7abf1bfcdb5b",
+  "sourceInputsVerifiedPerEngine": 271,
+  "sourceArchive": "/tmp/starling-node-compat/foundations-v5/native-freeze/source",
+  "change": "Existing native TextEncoder.encode uses exact GC-owned Uint8Array storage, rooted linearization and no-GC deflation; no staging ownership transfer. encodeInto roots source, skips empty destinations and reports documented allocation failure. No private test hooks in production.",
+  "ordinaryCodec": {
+    "baselineAssertionsPerCall": 77769,
+    "sharedExtraAssertionsPerCall": 226,
+    "starlingSourcePolicyCases": 7,
+    "starlingSourcePolicyAssertions": 13,
+    "sameInstanceCallsPerMode": 3,
+    "freshWasmtimePerMode": true,
+    "offImports": [],
+    "runtimeImports": [
+      "wasi:random/random@0.2.10"
+    ],
+    "snapshotOwnership": true,
+    "safeTransferReentrancyAndZeroDetachedOOB": true
+  },
+  "buffer": {
+    "strings": 381,
+    "byteCases": 250,
+    "sameJcoCalls": 2,
+    "wasmtime": true,
+    "imports": []
+  },
+  "jointHTTP": {
+    "componentSha256": "f4aedfd1bb47663cef70bbf985288c2c5807c7d184905b7063419e5ff83851a6",
+    "imports": [
+      "wasi:clocks/monotonic-clock@0.2.10",
+      "wasi:http/types@0.2.10",
+      "wasi:io/error@0.2.10",
+      "wasi:io/poll@0.2.10",
+      "wasi:io/streams@0.2.10",
+      "wasi:random/random@0.2.10"
+    ],
+    "clockFunctions": [],
+    "requestsPerHost": 3,
+    "bufferPathEventsEntropyFullChecks": true,
+    "deployedBareAliases": 6,
+    "hostCounters": [
+      1,
+      1,
+      1
+    ],
+    "sameInstanceReuseClaim": false
+  },
+  "performanceScope": "Same-project private Release pair motivates change; no automatic transfer of exact measured timings/size to these production engines. See utf8-direct release benchmark records.",
+  "OOM": "New private linearization fault diagnostic failed an assertion; automatic review blocked follow-up. No passing new OOM evidence or universal allocation-recovery claim. Historical four Buffer kernel scopes remain separate.",
+  "reports": [
+    {
+      "path": "native.json",
+      "sha256": "6f205cc0480a7f3d70a8cde6897ff97eaf71a05910d65418a612c26236e4283b",
+      "source": "/private/tmp/starling-node-compat/foundations-v5/native/results.json"
+    },
+    {
+      "path": "codec-off.json",
+      "sha256": "a3c14528c6efa9159fde8feae504e0e84cb10ee4701641c07197f4ff3e34ca25",
+      "source": "/private/tmp/starling-node-compat/foundations-v5/codec/results.json"
+    },
+    {
+      "path": "codec-runtime.json",
+      "sha256": "e01e9d07c880db3df2f2e883d19f572e0b1f05bb6044882286dc2b7e943b28ce",
+      "source": "/private/tmp/starling-node-compat/foundations-v5/runtime-codec/results.json"
+    },
+    {
+      "path": "http.json",
+      "sha256": "7c6a31b778fc3957b6d7f78f9baba1494394308530c9d681bf506f6ccb9a1cab",
+      "source": "/private/tmp/starling-node-compat/foundations-v5/http-joint/component-audit.json"
+    },
+    {
+      "path": "wasmtime-http.json",
+      "sha256": "8f24a1f49d33a22cf501274399a7de2e074f53bd62d5bdec455cc3649cffc818",
+      "source": "/private/tmp/starling-node-compat/foundations-v5/http-joint/wasmtime-results.json"
+    },
+    {
+      "path": "wasmcloud-http.json",
+      "sha256": "8b74cab511592df852e963351ec2100f2f91877153a9d08405c0389c292320b3",
+      "source": "/private/tmp/starling-node-compat/foundations-v5/wasmcloud-http-results.json"
+    },
+    {
+      "path": "engines/off.json",
+      "sha256": "60eda31144c0b7005eab4d25c65758978061d08ba91f761f9c820f1db69f0ffb",
+      "source": "/private/tmp/starling-node-compat/foundations-v5/native-freeze/off-path-events.engine.wasm.build.json"
+    },
+    {
+      "path": "engines/runtime.json",
+      "sha256": "7c0460d6ac854eeaafa9f57200c4c814efd2d031d4eccb545306d3d7f6ad0d66",
+      "source": "/private/tmp/starling-node-compat/foundations-v5/native-freeze/runtime-path-events.engine.wasm.build.json"
+    },
+    {
+      "path": "source/build-engine.sh",
+      "sha256": "ef3c91e7b9c20745600a040645e83c41013a44a16184e9ab2f12edda010f84ab",
+      "source": "/private/tmp/starling-node-compat/foundations-v5/native-freeze/build-engine.sh"
+    },
+    {
+      "path": "source/openssl-source-audit.py",
+      "sha256": "02a9517b18b0f72f5ecc40c26b3d2fff0f9a2ed6352b66be03156d799eb23840",
+      "source": "/private/tmp/starling-node-compat/foundations-v5/native-freeze/openssl-source-audit.py"
+    },
+    {
+      "path": "source/text-encoder.cpp",
+      "sha256": "32230064c1ea0bc66ffbc5f9ddd6a97f46a8bc47a7c9e72caaddf5745f8986c7",
+      "source": "/private/tmp/starling-node-compat/foundations-v5/native-freeze/source/builtins/web/text-codec/text-encoder.cpp"
+    }
+  ],
+  "limitations": [
+    "Not complete Node or Buffer support",
+    "encodeInto keeps existing Starling source coercion, unlike Node22 primitive-string-only validation",
+    "Shared/cross-realm/generalDEBUG indirect ABI remain unverified",
+    "StringDecoder/Assert/Querystring prototypes not registered",
+    "Weval experiment and remaining roadmap phases still in progress"
+  ]
+}

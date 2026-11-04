@@ -20,7 +20,7 @@ namespace builtins::web::crypto {
 // 4-bit version number from Section 4.1.3.
 //
 // Set all the other bits to randomly (or pseudo-randomly) chosen values.
-std::optional<std::string> random_uuid_v4(JSContext *cx);
+std::optional<std::string> random_uuid_v4(JSContext *cx, const char *operation = "crypto.randomUUID");
 
 } // namespace builtins::web::crypto
 

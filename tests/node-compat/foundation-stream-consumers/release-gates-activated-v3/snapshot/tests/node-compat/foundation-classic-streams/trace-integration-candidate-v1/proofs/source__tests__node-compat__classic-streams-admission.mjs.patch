@@ -1,0 +1,60 @@
+--- a/tests/node-compat/classic-streams-admission.mjs
++++ b/source/tests/node-compat/classic-streams-admission.mjs
+@@ -4,8 +4,8 @@
+ import {readFileSync,lstatSync} from 'node:fs';
+ import {resolve,join} from 'node:path';
+ const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+-const PINS_SHA='9c8e3c209c97372b09cff55cd2d05d3491c143799a0820659c62ec94ba193248';
+-const RECIPE_SHA='71b48d2e70c5e003fcbcce7620366744c089dd55036036e52926224dfa2614f7';
++const PINS_SHA='275033a645ed9dd3f3f8770baa6d2a5ddb5702fa0d34ff115d912ddcf9b077d8';
++const RECIPE_SHA='3694c88b7d000f27e11ffcac835fe0b205b2075f5b1d8d29c61f5b0038ba1cf3';
+ function entries(value) {
+   assert(Array.isArray(value), 'Need an explicit source inventory');
+   const seen = new Set();
+@@ -47,6 +47,13 @@
+   assert.deepEqual(definitions,enabled?['-D'+name+'=1']:[], 'Unexpected macro '+name);
+   assert(!tokens.includes('-U'+name),'Unexpected macro undefinition '+name);
+ }
++function release(tokens) {
++  assert.deepEqual(tokens.filter(word=>word.startsWith('-O')),['-O3']);
++  assert.deepEqual(tokens.filter(word=>word==='-DNDEBUG'||word.startsWith('-DNDEBUG=')),['-DNDEBUG']);
++  assert(!tokens.includes('-UNDEBUG')&&!tokens.includes('-UDEBUG')&&!tokens.some(word=>word.startsWith('-DDEBUG')));
++  assert(!tokens.some(word=>word==='-DNODE_COMPAT_OOM_TESTING'||word.startsWith('-DNODE_COMPAT_OOM_TESTING=')));
++  assert(!tokens.includes('-UNODE_COMPAT_OOM_TESTING'));
++}
+ function compiled(command, candidates, enabled, events, streamWeb) {
+   const tokens=words(command), input=tokens[tokens.indexOf('-c')+1];
+   assert(input && !input.startsWith('-'));
+@@ -74,12 +81,12 @@
+ 
+ // Full source/metadata contract. This alone is never engine/runtime proof.
+ function loadContract(){
+- const pinsBytes=readFileSync(new URL('./foundation-classic-streams/integration-candidate-v1/admission-pins.json',import.meta.url));
++ const pinsBytes=readFileSync(new URL('./foundation-classic-streams/trace-integration-candidate-v1/admission-pins.json',import.meta.url));
+  assert.equal(hash(pinsBytes),PINS_SHA,'Unreviewed classic admission contract');
+  const pins=JSON.parse(pinsBytes);
+- const policyBytes=readFileSync(new URL('./foundation-classic-streams/integration-candidate-v1/policy.json',import.meta.url));
++ const policyBytes=readFileSync(new URL('./foundation-classic-streams/trace-integration-candidate-v1/policy.json',import.meta.url));
+  assert.equal(hash(policyBytes),pins.policySha256);
+- assert.equal(hash(readFileSync(new URL('./foundation-classic-streams/integration-candidate-v1/layer-policy.py',import.meta.url))),pins.helperSha256);
++ assert.equal(hash(readFileSync(new URL('./foundation-classic-streams/trace-integration-candidate-v1/layer-policy.py',import.meta.url))),pins.helperSha256);
+  const policy=JSON.parse(policyBytes);
+  const parentPinsBytes=readFileSync(new URL('./foundation-scheduler/admission-candidate-v1/pins.json',import.meta.url));
+  assert.equal(hash(parentPinsBytes),pins.parentAdmissionPinsSha256);
+@@ -118,6 +125,7 @@
+  assert(!(metadata.gcStress&&metadata.entropyPolicy==='runtime-only'),'RuntimeOnly+GC is outside this finite producer');
+  assert.equal(metadata.hostApi,'wasi-0.2.10');assert.equal(metadata.generatedRustProject?.cargoBuildLocked,true);assert.equal(metadata.generatedRustProject?.manifestAndLockCheckedBeforeAndAfterBuild,true);
+  for(const field of['sourceInputsCapturedBeforeBuild','componentizeSourcesCapturedBeforeBuild','buildRecipeCheckedBeforeAndAfterBuild'])assert.equal(metadata[field],true);
++ assert.deepEqual(metadata.classicTraceSourcePolicy,policy.classicTraceSourcePolicy,'Exact corrected source provenance required');
+  const current=entries(metadata.sourceManifest);assert.equal(current.length,342);assert.deepEqual(current,entries(policy.expectedNativeSourceManifest));
+  const immediate=current.filter(row=>!policy.addedSourcePaths.includes(row.path)).map(row=>({path:row.path,sha256:policy.sourceLayer[row.path]?.beforeSha256??row.sha256}));
+  assert.equal(immediate.length,306);assert.deepEqual(immediate,entries(parent.expectedNativeSourceManifest));
+@@ -156,7 +164,7 @@
+  const active=cpp.filter(path=>(ticksEnabled||path!=='runtime/node_tick_queue.cpp')&&(metadata.streamWebEnabled||path!=='builtins/node-compat/stream-web-kernel.cpp'));
+  const layout=new Map();assert(Array.isArray(ticks.actualLayoutCompileCommands));
+  function command(source,candidates){const path=compiled(source,candidates,ticksEnabled,metadata.eventsEnabled,metadata.streamWebEnabled);const tokens=words(source);
+-  assert(tokens.includes('-O3')&&tokens.includes('-DNDEBUG')&&!tokens.includes('-UNDEBUG')&&!tokens.some(x=>x.startsWith('-DDEBUG')));
++  release(tokens);
+   macro(tokens,'NODE_COMPAT_CLASSIC_STREAMS',enabled&&policy.privateTargetCpp.includes(path));macro(tokens,'NODE_COMPAT_ENTROPY_RUNTIME_ONLY',metadata.entropyPolicy==='runtime-only');
+   macro(tokens,'NODE_COMPAT_ENTROPY_POLICY',true);macro(tokens,'NODE_COMPAT_GC_STRESS',metadata.gcStress&&policy.privateTargetCpp.includes(path));return path;}
+  for(const row of ticks.actualLayoutCompileCommands){const path=command(row,cpp);assert(!layout.has(path));layout.set(path,row);}

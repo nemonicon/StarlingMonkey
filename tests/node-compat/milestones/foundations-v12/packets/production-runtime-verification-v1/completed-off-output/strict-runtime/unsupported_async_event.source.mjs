@@ -1,0 +1,1 @@
+import{spawn}from'node:child_process';export async function run(){const t=new EventTarget();t.addEventListener('test',async()=>spawn());t.dispatchEvent(new Event('test'));await Promise.resolve();return'unexpected'}

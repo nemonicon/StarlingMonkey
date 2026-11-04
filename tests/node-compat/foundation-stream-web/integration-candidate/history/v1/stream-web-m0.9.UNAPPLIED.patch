@@ -1,0 +1,3121 @@
+--- /dev/null
++++ b/builtins/node-compat/LICENSE.stream-web
+@@ -0,0 +1,20 @@
++Copyright Joyent, Inc. and other Node contributors.
++
++Permission is hereby granted, free of charge, to any person obtaining a
++copy of this software and associated documentation files (the
++"Software"), to deal in the Software without restriction, including
++without limitation the rights to use, copy, modify, merge, publish,
++distribute, sublicense, and/or sell copies of the Software, and to permit
++persons to whom the Software is furnished to do so, subject to the
++following conditions:
++
++The above copyright notice and this permission notice shall be included
++in all copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
++OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
++NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
++DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
++OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
++USE OR OTHER DEALINGS IN THE SOFTWARE.
+--- /dev/null
++++ b/builtins/node-compat/export-manifest.stream-web.node-v22.14.0.json
+@@ -0,0 +1,82 @@
++{
++  "schemaVersion": 1,
++  "profileVersion": "sm-node-22.14.0-m0.9",
++  "nodeVersion": "v22.14.0",
++  "status": "Optional bounded stream/web foundation selected only by NODE_COMPAT_STREAM_WEB=ON; requires the existing native web streams and text-codec builtins. No host interface is selected. Support is limited to the explicit policy below.",
++  "moduleContract": "Exactly the 17 pinned Node22 named exports plus default. The mutable ordinary default object initially maps each name to the same function; ESM bindings capture initial values without syncBuiltinESMExports. Proposed literal CommonJS lowering returns default; runtime require remains excluded. Private record capture is guest implementation detail, never a host service.",
++  "modules": {
++    "node:stream/web": {
++      "aliases": [
++        "stream/web"
++      ],
++      "status": "partial",
++      "exports": [
++        "ByteLengthQueuingStrategy",
++        "CompressionStream",
++        "CountQueuingStrategy",
++        "DecompressionStream",
++        "ReadableByteStreamController",
++        "ReadableStream",
++        "ReadableStreamBYOBReader",
++        "ReadableStreamBYOBRequest",
++        "ReadableStreamDefaultController",
++        "ReadableStreamDefaultReader",
++        "TextDecoderStream",
++        "TextEncoderStream",
++        "TransformStream",
++        "TransformStreamDefaultController",
++        "WritableStream",
++        "WritableStreamDefaultController",
++        "WritableStreamDefaultWriter",
++        "default"
++      ],
++      "callablePolicy": "Reuse thirteen real native stream/strategy constructors, implement native-bulk UTF8 codec stream facades plus serialized ReadableStream.from/values/asyncIterator, and adapt ordinary DataView BYOB requests through same-backing Uint8Array views. Compression/decompression bindings are explicit functions throwing ERR_SM_NODE_UNSUPPORTED when called or constructed. All unsupported and resource-limit errors use own coded properties; no Proxy export substitute.",
++      "supportedStatic": [
++        "ReadableStream.from"
++      ],
++      "supportedPrototype": [
++        "ReadableStream.values",
++        "ReadableStream[Symbol.asyncIterator]",
++        "ReadableStreamBYOBReader.read:ordinary fixed unshared views,min1",
++        "TextEncoderStream.encoding",
++        "TextEncoderStream.readable",
++        "TextEncoderStream.writable",
++        "TextDecoderStream.encoding",
++        "TextDecoderStream.fatal",
++        "TextDecoderStream.ignoreBOM",
++        "TextDecoderStream.readable",
++        "TextDecoderStream.writable"
++      ],
++      "encodingNames": [
++        "utf-8"
++      ],
++      "limits": {
++        "encoderSourceUtf16UnitsPerChunk": 1048576,
++        "decoderInputBytesPerChunk": 16777216,
++        "byobViewBytes": 16777216,
++        "pendingEncoderSurrogateUnits": 1
++      },
++      "importOnlyExports": [
++        "CompressionStream",
++        "DecompressionStream"
++      ],
++      "deviations": [
++        "This optional bounded module does not claim complete node:stream/web or Web Streams conformance. Existing native operations beyond the recorded ordinary corpus retain their existing implementation and unverified overloads.",
++        "TextDecoderStream supports UTF8 only through native label normalization. Other known native labels throw ERR_SM_NODE_UNSUPPORTED after the recorded getter effects; unknown labels use RangeError ERR_ENCODING_NOT_SUPPORTED.",
++        "Decoder inputs are fixed attached unshared BufferSources. Shared, resizable and detached decoder inputs are rejected explicitly; native generic TextDecoder retains its separate broader contract. Buffer-source validation can materialize inline typed-array ArrayBuffers.",
++        "BYOB supports only ordinary local unmodified fixed unshared typed-array/DataView views with default/null/min1. min>1, shared/resizable backing, subclass/cross-realm/modified layout views are rejected. Proxy reader receivers are excluded although Node22 can accept a Proxy of a genuine reader.",
++        "DataView requests use a Uint8Array view over the same backing/offset/length, then a DataView over the moved result. This introduces no explicit byte copy but makes no claim about native transfer copies. The broken old-native DataView branch is never entered.",
++        "WritableStreamDefaultController.signal remains absent and requires native implementation; it is not fabricated from sink.abort. Native retained constructor error codes and Transform controller arity have recorded differences.",
++        "A released native BYOB reader throws TypeError without Node ERR_INVALID_STATE. Source error objects retain identity; this difference is not hidden by message parsing or blanket TypeError relabeling.",
++        "The optional profile replaces eight static/prototype descriptors while preserving native constructor/prototype identities. Installation runs once in the content realm before application initialization; no runtime syncBuiltinESMExports is provided.",
++        "The uninitialized Transform controller prototype is rejected by guarded public operations. Native class/slot validation independently protects web methods. The Node-facing wrapper attaches ERR_INVALID_THIS for that prototype only; other invalid native receiver paths can retain uncoded TypeError. Full receiver error-code parity is not claimed.",
++        "Native classes are captured through public JS_GetClassObject and existing retained prototype roots in the content realm. The private BYOB callback uses public JS::IsReadableStreamBYOBReader and excludes scripted Proxy receivers; no temporary initialization streams or public test hook is used.",
++        "from uses HWM0, async protocol preference and an async-from-sync generator bridge. values serializes pending next/return, releases/cancels on close/error/return, supports preventCancel. Arbitrary protocol mutation, Promise.prototype.then immunity, worker transfer and cross-realm semantics are not claimed.",
++        "Per-operation input caps do not bound application-retained queues, total lifetime stream output or arbitrarily many queued iterator calls. Compression output limits, native allocation failure/fatal Rust allocator behavior and complete scheduler/async-context behavior remain separate gates.",
++        "No new global TextEncoderStream/TextDecoderStream name is installed by this module proposal; existing native global constructor identities are reused where present.",
++        "CompressionStream and DecompressionStream remain explicit import-only/deferred callable bindings until ownership, cleanup, malformed-input and expansion-budget hardening and ordinary tests pass. No native compression transform was invoked by these candidate tests."
++      ]
++    }
++  },
++  "requiredHostInterfaces": []
++}
+--- a/builtins/node-compat/generate-factories.mjs
++++ b/builtins/node-compat/generate-factories.mjs
+@@ -102,4 +102,5 @@
+   import('./generate-assert-factories.mjs'),
+   import('./generate-querystring-factories.mjs'),
+   import('./generate-util-factories.mjs'),
++  import('./generate-stream-web-factory.mjs'),
+ ]);
+--- /dev/null
++++ b/builtins/node-compat/generate-stream-web-factory.mjs
+@@ -0,0 +1,68 @@
++// Dependency-free optional stream/web packaging; no host service or npm build dependency.
++import {readFile,writeFile} from 'node:fs/promises';
++import {createHash} from 'node:crypto';
++import {dirname,join} from 'node:path';
++import {fileURLToPath} from 'node:url';
++import {validateManifest} from './validate-manifest.mjs';
++import * as pinnedNodeWeb from 'node:stream/web';
++import vm from 'node:vm';
++if(process.version!=='v22.14.0')throw Error('Stream/web generation requires exact Node v22.14.0');
++const directory=dirname(fileURLToPath(import.meta.url));
++const names=['stream-web-codecs.mjs','stream-web-readable-iteration.mjs','stream-web-byob.mjs','stream-web.mjs','stream-web-namespace.template.mjs','export-manifest.stream-web.node-v22.14.0.json'];
++const sources=Object.fromEntries(await Promise.all(names.map(async name=>[name,await readFile(join(directory,name),'utf8')])));
++const manifest=JSON.parse(sources[names.at(-1)]);
++validateManifest(manifest,JSON.parse(await readFile(join(directory,'manifest.schema.json'),'utf8')));
++if(manifest.profileVersion!=='sm-node-22.14.0-m0.9'||Object.keys(manifest.modules).join()!=='node:stream/web')throw Error('Unexpected stream/web version/modules');
++const exports=manifest.modules['node:stream/web'].exports;
++if([...exports].sort().join()!==Object.keys(pinnedNodeWeb).sort().join())throw Error('Not the exact pinned Node22 stream/web namespace');
++if(exports.length!==18||!exports.includes('default')||manifest.modules['node:stream/web'].aliases.join()!=='stream/web')throw Error('Unexpected stream/web surface');
++const declarations=[...sources['stream-web-namespace.template.mjs'].matchAll(/^export const ([A-Za-z_$][A-Za-z0-9_$]*)=moduleRecord\.\1;$/gm)].map(match=>match[1]);
++if([...declarations,'default'].sort().join()!==[...exports].sort().join())throw Error('Finite ESM bindings differ from manifest');
++function local(name,factory){
++  let body=sources[name].replace(/^export const /gm,'const ').replace(/^export function /gm,'function ');
++  if(/^\s*(?:import|export)\b/m.test(body))throw Error('Unexpected source syntax: '+name);
++  return`const ${factory}=(() => {\n${body}\nreturn ${factory};\n})();\n`;
++}
++let main=sources['stream-web.mjs'].replace(/^import .*;\n/gm,'').replace(/^export function /gm,'function ');
++if(/^\s*(?:import|export)\b/m.test(main))throw Error('Unexpected composition syntax');
++const factory=`(() => {\n'use strict';\n${local('stream-web-codecs.mjs','createCodecModule')}${local('stream-web-readable-iteration.mjs','installReadableIteration')}${local('stream-web-byob.mjs','installDataViewBYOB')}${main}\nreturn createStreamWebModule;\n})()`;
++if(factory.includes(')SM_NODE_PROFILE"'))throw Error('Raw-string delimiter collision');
++// Build-host reflection validates the emitted strict factory's finite graph.
++// No streams/codecs/host handles are constructed, and no production native
++// brand behavior is inferred from the never-called build-only callback.
++const classNames=['ReadableStream','ReadableStreamDefaultReader','ReadableStreamBYOBReader','ReadableStreamBYOBRequest',
++  'ReadableByteStreamController','ReadableStreamDefaultController','WritableStream','WritableStreamDefaultWriter',
++  'WritableStreamDefaultController','ByteLengthQueuingStrategy','CountQueuingStrategy','TransformStream','TransformStreamDefaultController'];
++let brandCalls=0;
++const record=Object.fromEntries(classNames.map(name=>[name,pinnedNodeWeb[name]]));
++Object.assign(record,{TextEncoder:globalThis.TextEncoder,TextDecoder:globalThis.TextDecoder,isReadableStreamBYOBReader(){brandCalls++;return false;}});
++const targets=[[pinnedNodeWeb.ReadableStreamBYOBReader.prototype,'read'],[pinnedNodeWeb.ReadableStream,'from'],
++  [pinnedNodeWeb.ReadableStream.prototype,'values'],[pinnedNodeWeb.ReadableStream.prototype,Symbol.asyncIterator],
++  ...['desiredSize','enqueue','error','terminate'].map(name=>[pinnedNodeWeb.TransformStreamDefaultController.prototype,name])];
++const originals=targets.map(([object,name])=>Object.getOwnPropertyDescriptor(object,name));
++try{
++  const emitted=new vm.Script('"use strict";\n'+factory,{filename:'<generated-stream-web-factory>'}).runInThisContext();
++  if(typeof emitted!=='function'||emitted.length!==1)throw Error('Need exactly one private native-record argument');
++  const module=emitted(record);
++  if(Object.keys(module).sort().join()!==Object.keys(pinnedNodeWeb).sort().join())throw Error('Emitted runtime namespace differs from Node22');
++  if(Object.keys(module.default).sort().join()!==exports.filter(name=>name!=='default').sort().join())throw Error('Unexpected default graph');
++  if(Object.isFrozen(module.default)||module.then!==undefined)throw Error('Default mutability/namespace inspection contract changed');
++  for(const name of exports)if(name!=='default'&&(typeof module[name]!=='function'||module[name]!==module.default[name]))throw Error('Invalid named/default identity '+name);
++  for(const name of classNames)if(module[name]!==pinnedNodeWeb[name])throw Error('Native class identity changed '+name);
++  for(const name of ['CompressionStream','DecompressionStream'])for(const construct of [false,true]){
++    let error;try{if(construct)new module[name]('gzip');else module[name]('gzip');}catch(caught){error=caught;}
++    if(error?.code!=='ERR_SM_NODE_UNSUPPORTED'||error.profile!=='sm-node-22.14.0-m0.9')throw Error('Deferred callable contract '+name);
++  }
++  if(brandCalls!==0)throw Error('Build-only brand callback must never be executed');
++}finally{
++  for(let index=0;index<targets.length;index++){const[object,name]=targets[index],original=originals[index];
++    if(original)Object.defineProperty(object,name,original);else Reflect.deleteProperty(object,name);
++  }
++}
++
++const digest=createHash('sha256');for(const name of names)digest.update(name+'\0'+sources[name]+'\0');
++const output='// Generated by generate-stream-web-factory.mjs; do not edit.\n'+`// Canonical-source SHA-256: ${digest.digest('hex')}\n`+
++  `static constexpr const char kStreamWebFactorySource[] = R"SM_NODE_PROFILE(${factory})SM_NODE_PROFILE";\n`;
++const path=join(directory,'stream-web-factories.generated.h');
++if(process.argv.includes('--check')){if(await readFile(path,'utf8')!==output)throw Error('Stale candidate header');console.log('PASS optional stream/web exact Node22 inventory, strict factory graph and header');}
++else await writeFile(path,output);
+--- a/builtins/node-compat/register.cpp
++++ b/builtins/node-compat/register.cpp
+@@ -22,9 +22,15 @@
+ #ifdef NODE_COMPAT_UTIL
+ #include "util-factories.generated.h"
+ #endif
++#ifdef NODE_COMPAT_STREAM_WEB
++#include "stream-web-factories.generated.h"
++#endif
+ 
+ namespace builtins::node_compat {
+ JSObject *create_kernel(JSContext *cx);
++#ifdef NODE_COMPAT_STREAM_WEB
++JSObject *create_stream_web_kernel(JSContext *cx);
++#endif
+ 
+ static bool evaluate_factory(JSContext *cx, const char *source_text,
+                              JS::HandleValue argument, JS::MutableHandleValue result) {
+@@ -122,6 +128,21 @@
+ }
+ #endif
+ 
++#ifdef NODE_COMPAT_STREAM_WEB
++static bool install_stream_web(api::Engine *engine) {
++  auto *cx = engine->cx();
++  // install() already entered the content realm; existing web prerequisites
++  // precede this builtin in declaration/install order. Capture no live streams.
++  JS::RootedObject kernel(cx, create_stream_web_kernel(cx));
++  if (!kernel) return false;
++  JS::RootedValue argument(cx, JS::ObjectValue(*kernel));
++  JS::RootedValue module(cx);
++  if (!evaluate_factory(cx, kStreamWebFactorySource, argument, &module)) return false;
++  return engine->define_builtin_module("node:stream/web", module) &&
++         engine->define_builtin_module("stream/web", module);
++}
++#endif
++
+ bool install(api::Engine *engine) {
+   auto *cx = engine->cx();
+   // Existing install_builtins() executes in the CONTENT realm before user code.
+@@ -163,6 +184,9 @@
+ #ifdef NODE_COMPAT_UTIL
+   if (!install_util(engine)) return false;
+ #endif
++#ifdef NODE_COMPAT_STREAM_WEB
++  if (!install_stream_web(engine)) return false;
++#endif
+   return JS_DefineProperty(cx, engine->global(), "Buffer", buffer_constructor, 0);
+ }
+ } // namespace builtins::node_compat
+--- /dev/null
++++ b/builtins/node-compat/stream-web-byob.mjs
+@@ -0,0 +1,52 @@
++// ISOLATED ordinary-view adapter. nativeRead MUST be captured from the real
++// native BYOB prototype before installing the frozen base simulation.
++// No call delegates a DataView to the known unsupported native branch.
++export function installDataViewBYOB(record,nativeRead){
++  const Reader=record.ReadableStreamBYOBReader,brand=record.isReadableStreamBYOBReader;
++  const U8=Uint8Array,DV=DataView,TypeErrorCtor=TypeError,RangeErrorCtor=RangeError,ErrorCtor=Error;
++  const apply=Reflect.apply,define=Object.defineProperty,descriptor=Object.getOwnPropertyDescriptor,getPrototype=Object.getPrototypeOf;
++  const isView=ArrayBuffer.isView,isInteger=Number.isInteger;
++  const call=(fn,self,args=[])=>apply(fn,self,args),getter=(prototype,key)=>descriptor(prototype,key).get;
++  const typed=getPrototype(U8.prototype),typedBytes=getter(typed,'byteLength'),typedLength=getter(typed,'length');
++  const typedBuffer=getter(typed,'buffer'),typedOffset=getter(typed,'byteOffset'),typedName=getter(typed,Symbol.toStringTag);
++  const dataBytes=getter(DV.prototype,'byteLength'),dataBuffer=getter(DV.prototype,'buffer'),dataOffset=getter(DV.prototype,'byteOffset');
++  const bufferBytes=getter(ArrayBuffer.prototype,'byteLength'),resizable=getter(ArrayBuffer.prototype,'resizable');
++  const prototypes=new Set([Int8Array.prototype,U8.prototype,Uint8ClampedArray.prototype,Int16Array.prototype,Uint16Array.prototype,
++    Int32Array.prototype,Uint32Array.prototype,Float32Array.prototype,Float64Array.prototype,BigInt64Array.prototype,BigUint64Array.prototype,DV.prototype]);
++  const ordinary=prototypes.has.bind(prototypes);
++  function coded(Ctor,code,message){const error=new Ctor(message);define(error,'code',{__proto__:null,value:code,writable:true,configurable:true,enumerable:true});throw error;}
++  function unsupported(operation){coded(ErrorCtor,'ERR_SM_NODE_UNSUPPORTED',operation+' unavailable in isolated bounded BYOB adapter');}
++  const previous=descriptor(Reader.prototype,'read');
++  async function read(view,options=undefined){
++    if(!brand(this))coded(TypeErrorCtor,'ERR_INVALID_THIS','Invalid BYOB reader');
++    if(!isView(view))coded(TypeErrorCtor,'ERR_INVALID_ARG_TYPE','view must be an ArrayBufferView');
++    if(options!==undefined&&options!==null&&typeof options!=='object'&&typeof options!=='function')
++      coded(TypeErrorCtor,'ERR_INVALID_ARG_TYPE','options must be an object');
++    if(!ordinary(getPrototype(view)))unsupported('subclass or cross-realm view');
++    for(const key of ['buffer','byteOffset','byteLength','length','constructor'])if(descriptor(view,key))unsupported('modified view layout');
++    const dataView=call(typedName,view)===undefined;
++    const bytes=call(dataView?dataBytes:typedBytes,view),buffer=call(dataView?dataBuffer:typedBuffer,view);
++    let backing;try{backing=call(bufferBytes,buffer);}catch{unsupported('shared view');}
++    if(bytes===0||backing===0)coded(TypeErrorCtor,'ERR_INVALID_STATE','View or backing buffer empty or detached');
++    const min=options?.min??1;
++    if(typeof min!=='number')coded(TypeErrorCtor,'ERR_INVALID_ARG_TYPE','options.min must be a number');
++    if(!isInteger(min)||min<=0)coded(TypeErrorCtor,'ERR_INVALID_ARG_VALUE','options.min must be a positive integer');
++    const elements=dataView?bytes:call(typedLength,view);
++    if(min>elements)coded(RangeErrorCtor,'ERR_OUT_OF_RANGE','options.min exceeds view length');
++    if(bytes>16777216){const error=new RangeErrorCtor('byob-view-bytes');
++      define(error,'code',{__proto__:null,value:'ERR_SM_NODE_LIMIT',writable:true,configurable:true,enumerable:true});
++      define(error,'resource',{__proto__:null,value:'byob-view-bytes',writable:true,configurable:true,enumerable:true});throw error;}
++    if(call(resizable,buffer))unsupported('resizable view');
++    if(min>1)unsupported('minimum greater than one');
++    if(!dataView)return call(nativeRead,this,[view]);
++    // Get fresh offsets/length after the observable min getter. Construction
++    // rejects any standard detachment performed by that getter, before entry.
++    const alias=new U8(buffer,call(dataOffset,view),call(dataBytes,view));
++    const result=await call(nativeRead,this,[alias]);
++    if(result.value===undefined)return{value:undefined,done:result.done};
++    const value=result.value;
++    return{value:new DV(call(typedBuffer,value),call(typedOffset,value),call(typedBytes,value)),done:result.done};
++  }
++  define(Reader.prototype,'read',{...previous,value:read});
++  return read;
++}
+--- /dev/null
++++ b/builtins/node-compat/stream-web-codecs.mjs
+@@ -0,0 +1,157 @@
++// ISOLATED opt-in guest prototype. No production registration/global codecs.
++// Encoder framing follows Node22 internal/webstreams/encoding.js (MIT), but
++// bulk Unicode conversion remains in the captured native encoder.
++export const MAX_SOURCE_UNITS=1024*1024;
++export const MAX_INPUT_BYTES=16*1024*1024;
++export function createCodecModule(record){
++  const ErrorCtor=Error,TypeErrorCtor=TypeError,RangeErrorCtor=RangeError,StringCtor=String;
++  const apply=Reflect.apply,define=Object.defineProperty,defines=Object.defineProperties;
++  const ownKeys=Reflect.ownKeys,descriptor=Object.getOwnPropertyDescriptor;
++  const isView=ArrayBuffer.isView;
++  const call=(fn,self,args=[])=>apply(fn,self,args);
++  const keys=['ReadableStream','ReadableStreamDefaultReader','ReadableStreamBYOBReader','ReadableStreamBYOBRequest',
++    'ReadableByteStreamController','ReadableStreamDefaultController','WritableStream','WritableStreamDefaultWriter',
++    'WritableStreamDefaultController','ByteLengthQueuingStrategy','CountQueuingStrategy','TransformStream',
++    'TransformStreamDefaultController','TextEncoder','TextDecoder','isReadableStreamBYOBReader'];
++  function own(object,key,value){define(object,key,{__proto__:null,value,writable:true,enumerable:true,configurable:true});return object;}
++  function fail(Ctor,code,message){const error=new Ctor(message);if(code!==undefined)own(error,'code',code);throw error;}
++  function unsupported(operation){const error=new ErrorCtor('node:stream/web.'+operation+' is unavailable in the bounded isolated prototype');
++    own(error,'code','ERR_SM_NODE_UNSUPPORTED');own(error,'module','node:stream/web');own(error,'operation',operation);
++    own(error,'profile','sm-node-22.14.0-m0.9');throw error;}
++  function limit(resource){const error=new RangeErrorCtor('node:stream/web exceeds '+resource+' budget');
++    own(error,'code','ERR_SM_NODE_LIMIT');own(error,'resource',resource);throw error;}
++  if(!record||typeof record!=='object'||ownKeys(record).length!==keys.length)fail(TypeErrorCtor,'ERR_SM_NODE_RECORD','Expected exact private native-class record');
++  const nativeValues={__proto__:null};
++  for(const key of keys){const entry=descriptor(record,key);
++    if(!entry||!('value'in entry)||typeof entry.value!=='function')fail(TypeErrorCtor,'ERR_SM_NODE_RECORD','Missing private native class/callback '+key);
++    nativeValues[key]=entry.value;
++  }
++  const {ReadableStream,ReadableStreamDefaultReader,ReadableStreamBYOBReader,ReadableStreamBYOBRequest,
++    ReadableByteStreamController,ReadableStreamDefaultController,WritableStream,WritableStreamDefaultWriter,
++    WritableStreamDefaultController,ByteLengthQueuingStrategy,CountQueuingStrategy,TransformStream,
++    TransformStreamDefaultController,TextEncoder:Encoder,TextDecoder:Decoder}=nativeValues;
++  const getter=(prototype,key)=>descriptor(prototype,key).get;
++  const typed=Object.getPrototypeOf(Uint8Array.prototype);
++  const typedBytes=getter(typed,'byteLength'),typedBuffer=getter(typed,'buffer');
++  const typedName=getter(typed,Symbol.toStringTag);
++  const dataBytes=getter(DataView.prototype,'byteLength'),dataBuffer=getter(DataView.prototype,'buffer');
++  const bufferBytes=getter(ArrayBuffer.prototype,'byteLength'),bufferResizable=descriptor(ArrayBuffer.prototype,'resizable')?.get;
++  const bufferDetached=descriptor(ArrayBuffer.prototype,'detached')?.get;
++  if(!bufferDetached||!bufferResizable)fail(TypeErrorCtor,'ERR_SM_NODE_RECORD','Pinned ArrayBuffer lifecycle getters required');
++  const sharedBytes=globalThis.SharedArrayBuffer&&getter(globalThis.SharedArrayBuffer.prototype,'byteLength');
++  const charCodeAt=String.prototype.charCodeAt,slice=String.prototype.slice;
++  const tsReadable=getter(TransformStream.prototype,'readable'),tsWritable=getter(TransformStream.prototype,'writable');
++  const enqueue=TransformStreamDefaultController.prototype.enqueue,terminate=TransformStreamDefaultController.prototype.terminate;
++  const controllerPrototype=TransformStreamDefaultController.prototype,controllerError=controllerPrototype.error;
++  const desiredDescriptor=descriptor(controllerPrototype,'desiredSize');
++  const encode=Encoder.prototype.encode,decode=Decoder.prototype.decode;
++  const decoderEncoding=getter(Decoder.prototype,'encoding');
++  const encoderEncoding=getter(Encoder.prototype,'encoding');
++  const encoderStates=new WeakMap(),encoderGet=encoderStates.get.bind(encoderStates),encoderSet=encoderStates.set.bind(encoderStates);
++  const decoderStates=new WeakMap(),decoderGet=decoderStates.get.bind(decoderStates),decoderSet=decoderStates.set.bind(decoderStates);
++  function state(get,self,name){const value=get(self);if(!value)fail(TypeErrorCtor,undefined,'Invalid '+name+' receiver');return value;}
++  function sourceBytes(input){
++    if(input===undefined)fail(TypeErrorCtor,'ERR_INVALID_ARG_TYPE','chunk must be a BufferSource');
++    let bytes,buffer,viewKind=null;
++    if(isView(input)){
++      viewKind=call(typedName,input)===undefined?'data':'typed';
++      buffer=viewKind==='data'?call(dataBuffer,input):call(typedBuffer,input);
++    }else{
++      try{bytes=call(bufferBytes,input);buffer=input;}
++      catch{
++        let shared=false;if(sharedBytes)try{call(sharedBytes,input);shared=true;}catch{}
++        if(shared)unsupported('shared decoder input');
++        fail(TypeErrorCtor,'ERR_INVALID_ARG_TYPE','chunk must be an unshared BufferSource');
++      }
++    }
++    // A native AB getter supplies a brand check and rejects shared memory.
++    try{call(bufferBytes,buffer);}catch{unsupported('shared decoder input');}
++    if(call(bufferDetached,buffer))unsupported('detached decoder input');
++    if(call(bufferResizable,buffer))unsupported('resizable decoder input');
++    if(viewKind)bytes=viewKind==='data'?call(dataBytes,input):call(typedBytes,input);
++    if(bytes>MAX_INPUT_BYTES)limit('decoder-input-bytes');
++    return bytes;
++  }
++  class TextEncoderStream{
++    constructor(){
++      const handle=new Encoder(),value={handle,pending:'',transform:null};
++      value.transform=new TransformStream({
++        transform(chunk,controller){
++          // Node22's stream specifically uses String(), including Symbol.
++          let text=StringCtor(chunk);
++          if(text.length>MAX_SOURCE_UNITS)limit('encoder-source-units');
++          if(value.pending)text=value.pending+text;
++          value.pending='';
++          if(text.length){const last=call(charCodeAt,text,[text.length-1]);
++            if(last>=0xd800&&last<=0xdbff){value.pending=call(slice,text,[-1]);text=call(slice,text,[0,-1]);}}
++          if(text.length)call(enqueue,controller,[call(encode,handle,[text])]);
++        },
++        flush(controller){if(value.pending){call(enqueue,controller,[call(encode,handle,[value.pending])]);value.pending='';}},
++      });
++      encoderSet(this,value);
++    }
++    get encoding(){return call(encoderEncoding,state(encoderGet,this,'TextEncoderStream').handle);}
++    get readable(){return call(tsReadable,state(encoderGet,this,'TextEncoderStream').transform);}
++    get writable(){return call(tsWritable,state(encoderGet,this,'TextEncoderStream').transform);}
++  }
++  class TextDecoderStream{
++    constructor(label='utf-8',options=undefined){
++      // Match Node22 label conversion before options validation. Template
++      // conversion deliberately rejects Symbol, unlike encoder String(chunk).
++      const normalizedLabel=`${label}`;
++      if(options!==undefined&&options!==null&&typeof options!=='object'&&typeof options!=='function')
++        fail(TypeErrorCtor,'ERR_INVALID_ARG_TYPE','options must be an object');
++      let flagReadsStarted=false,handle,readFatal=false,readIgnore=false,firstFatal,firstIgnore;
++      // Cache each first flag read: native Node rereads its private options,
++      // whereas Starling reads once. User getters still run exactly in the
++      // pinned fatal,ignoreBOM,ignoreBOM,fatal order on both backends.
++      const nativeOptions={get fatal(){flagReadsStarted=true;if(!readFatal){readFatal=true;firstFatal=options?.fatal;}return firstFatal;},
++        get ignoreBOM(){if(!readIgnore){readIgnore=true;firstIgnore=options?.ignoreBOM;}return firstIgnore;}};
++      try{handle=new Decoder(normalizedLabel,nativeOptions);}
++      catch(error){if(!flagReadsStarted&&error instanceof RangeErrorCtor)own(error,'code','ERR_ENCODING_NOT_SUPPORTED');throw error;}
++      // Node22 rereads these for fast-path bookkeeping; its public getters
++      // still expose the FIRST decode flags. Keep the observable reads without
++      // allocating a second native decoder or changing decode/getter flags.
++      void !!options?.ignoreBOM;void !!options?.fatal;
++      const ignoreBOM=!!firstIgnore,fatal=!!firstFatal;
++      const encoding=call(decoderEncoding,handle);
++      if(encoding!=='utf-8')unsupported('TextDecoderStream encoding '+encoding);
++      const value={handle,encoding,fatal,ignoreBOM,transform:null};
++      const nativeFatal=!!firstFatal;
++      function decoded(args){try{return call(decode,handle,args);}
++        catch(error){if(nativeFatal&&error instanceof TypeErrorCtor&&!descriptor(error,'code'))own(error,'code','ERR_ENCODING_INVALID_ENCODED_DATA');throw error;}}
++      value.transform=new TransformStream({
++        transform(chunk,controller){sourceBytes(chunk);const output=decoded([chunk,{stream:true}]);
++          if(output.length)call(enqueue,controller,[output]);},
++        flush(controller){const output=decoded([]);if(output.length)call(enqueue,controller,[output]);call(terminate,controller);},
++      });
++      decoderSet(this,value);
++    }
++    get encoding(){return state(decoderGet,this,'TextDecoderStream').encoding;}
++    get fatal(){return state(decoderGet,this,'TextDecoderStream').fatal;}
++    get ignoreBOM(){return state(decoderGet,this,'TextDecoderStream').ignoreBOM;}
++    get readable(){return call(tsReadable,state(decoderGet,this,'TextDecoderStream').transform);}
++    get writable(){return call(tsWritable,state(decoderGet,this,'TextDecoderStream').transform);}
++  }
++  for(const name of ['encoding','readable','writable'])defines(TextEncoderStream.prototype,{[name]:{enumerable:true}});
++  for(const name of ['encoding','fatal','ignoreBOM','readable','writable'])defines(TextDecoderStream.prototype,{[name]:{enumerable:true}});
++  function CompressionStream(format){unsupported('CompressionStream');}
++  function DecompressionStream(format){unsupported('DecompressionStream');}
++
++  // Never call the old native implementation with its uninitialized prototype
++  // as receiver. These opt-in guards are isolated until the native fix compiles.
++  function initializedController(self){if(self===controllerPrototype)fail(TypeErrorCtor,'ERR_INVALID_THIS','Invalid TransformStreamDefaultController receiver');}
++  const controllerGuards={
++    enqueue(chunk){initializedController(this);return call(enqueue,this,[chunk]);},
++    error(reason){initializedController(this);return call(controllerError,this,[reason]);},
++    terminate(){initializedController(this);return call(terminate,this);},
++    get desiredSize(){initializedController(this);return call(desiredDescriptor.get,this);},
++  };
++  for(const name of ['enqueue','error','terminate'])define(controllerPrototype,name,{...descriptor(controllerPrototype,name),value:controllerGuards[name]});
++  define(controllerPrototype,'desiredSize',{...desiredDescriptor,get:descriptor(controllerGuards,'desiredSize').get});
++  const module={ReadableStream,ReadableStreamDefaultReader,ReadableStreamBYOBReader,ReadableStreamBYOBRequest,
++    ReadableByteStreamController,ReadableStreamDefaultController,TransformStream,TransformStreamDefaultController,
++    WritableStream,WritableStreamDefaultWriter,WritableStreamDefaultController,ByteLengthQueuingStrategy,
++    CountQueuingStrategy,TextEncoderStream,TextDecoderStream,CompressionStream,DecompressionStream};
++  return{...module,default:module};
++}
+--- /dev/null
++++ b/builtins/node-compat/stream-web-factories.generated.h
+@@ -0,0 +1,356 @@
++// Generated by generate-stream-web-factory.mjs; do not edit.
++// Canonical-source SHA-256: f0a2dd4f1f96d4a59885fe2ed621172be7cc67321218bd481b209be52abcc813
++static constexpr const char kStreamWebFactorySource[] = R"SM_NODE_PROFILE((() => {
++'use strict';
++const createCodecModule=(() => {
++// ISOLATED opt-in guest prototype. No production registration/global codecs.
++// Encoder framing follows Node22 internal/webstreams/encoding.js (MIT), but
++// bulk Unicode conversion remains in the captured native encoder.
++const MAX_SOURCE_UNITS=1024*1024;
++const MAX_INPUT_BYTES=16*1024*1024;
++function createCodecModule(record){
++  const ErrorCtor=Error,TypeErrorCtor=TypeError,RangeErrorCtor=RangeError,StringCtor=String;
++  const apply=Reflect.apply,define=Object.defineProperty,defines=Object.defineProperties;
++  const ownKeys=Reflect.ownKeys,descriptor=Object.getOwnPropertyDescriptor;
++  const isView=ArrayBuffer.isView;
++  const call=(fn,self,args=[])=>apply(fn,self,args);
++  const keys=['ReadableStream','ReadableStreamDefaultReader','ReadableStreamBYOBReader','ReadableStreamBYOBRequest',
++    'ReadableByteStreamController','ReadableStreamDefaultController','WritableStream','WritableStreamDefaultWriter',
++    'WritableStreamDefaultController','ByteLengthQueuingStrategy','CountQueuingStrategy','TransformStream',
++    'TransformStreamDefaultController','TextEncoder','TextDecoder','isReadableStreamBYOBReader'];
++  function own(object,key,value){define(object,key,{__proto__:null,value,writable:true,enumerable:true,configurable:true});return object;}
++  function fail(Ctor,code,message){const error=new Ctor(message);if(code!==undefined)own(error,'code',code);throw error;}
++  function unsupported(operation){const error=new ErrorCtor('node:stream/web.'+operation+' is unavailable in the bounded isolated prototype');
++    own(error,'code','ERR_SM_NODE_UNSUPPORTED');own(error,'module','node:stream/web');own(error,'operation',operation);
++    own(error,'profile','sm-node-22.14.0-m0.9');throw error;}
++  function limit(resource){const error=new RangeErrorCtor('node:stream/web exceeds '+resource+' budget');
++    own(error,'code','ERR_SM_NODE_LIMIT');own(error,'resource',resource);throw error;}
++  if(!record||typeof record!=='object'||ownKeys(record).length!==keys.length)fail(TypeErrorCtor,'ERR_SM_NODE_RECORD','Expected exact private native-class record');
++  const nativeValues={__proto__:null};
++  for(const key of keys){const entry=descriptor(record,key);
++    if(!entry||!('value'in entry)||typeof entry.value!=='function')fail(TypeErrorCtor,'ERR_SM_NODE_RECORD','Missing private native class/callback '+key);
++    nativeValues[key]=entry.value;
++  }
++  const {ReadableStream,ReadableStreamDefaultReader,ReadableStreamBYOBReader,ReadableStreamBYOBRequest,
++    ReadableByteStreamController,ReadableStreamDefaultController,WritableStream,WritableStreamDefaultWriter,
++    WritableStreamDefaultController,ByteLengthQueuingStrategy,CountQueuingStrategy,TransformStream,
++    TransformStreamDefaultController,TextEncoder:Encoder,TextDecoder:Decoder}=nativeValues;
++  const getter=(prototype,key)=>descriptor(prototype,key).get;
++  const typed=Object.getPrototypeOf(Uint8Array.prototype);
++  const typedBytes=getter(typed,'byteLength'),typedBuffer=getter(typed,'buffer');
++  const typedName=getter(typed,Symbol.toStringTag);
++  const dataBytes=getter(DataView.prototype,'byteLength'),dataBuffer=getter(DataView.prototype,'buffer');
++  const bufferBytes=getter(ArrayBuffer.prototype,'byteLength'),bufferResizable=descriptor(ArrayBuffer.prototype,'resizable')?.get;
++  const bufferDetached=descriptor(ArrayBuffer.prototype,'detached')?.get;
++  if(!bufferDetached||!bufferResizable)fail(TypeErrorCtor,'ERR_SM_NODE_RECORD','Pinned ArrayBuffer lifecycle getters required');
++  const sharedBytes=globalThis.SharedArrayBuffer&&getter(globalThis.SharedArrayBuffer.prototype,'byteLength');
++  const charCodeAt=String.prototype.charCodeAt,slice=String.prototype.slice;
++  const tsReadable=getter(TransformStream.prototype,'readable'),tsWritable=getter(TransformStream.prototype,'writable');
++  const enqueue=TransformStreamDefaultController.prototype.enqueue,terminate=TransformStreamDefaultController.prototype.terminate;
++  const controllerPrototype=TransformStreamDefaultController.prototype,controllerError=controllerPrototype.error;
++  const desiredDescriptor=descriptor(controllerPrototype,'desiredSize');
++  const encode=Encoder.prototype.encode,decode=Decoder.prototype.decode;
++  const decoderEncoding=getter(Decoder.prototype,'encoding');
++  const encoderEncoding=getter(Encoder.prototype,'encoding');
++  const encoderStates=new WeakMap(),encoderGet=encoderStates.get.bind(encoderStates),encoderSet=encoderStates.set.bind(encoderStates);
++  const decoderStates=new WeakMap(),decoderGet=decoderStates.get.bind(decoderStates),decoderSet=decoderStates.set.bind(decoderStates);
++  function state(get,self,name){const value=get(self);if(!value)fail(TypeErrorCtor,undefined,'Invalid '+name+' receiver');return value;}
++  function sourceBytes(input){
++    if(input===undefined)fail(TypeErrorCtor,'ERR_INVALID_ARG_TYPE','chunk must be a BufferSource');
++    let bytes,buffer,viewKind=null;
++    if(isView(input)){
++      viewKind=call(typedName,input)===undefined?'data':'typed';
++      buffer=viewKind==='data'?call(dataBuffer,input):call(typedBuffer,input);
++    }else{
++      try{bytes=call(bufferBytes,input);buffer=input;}
++      catch{
++        let shared=false;if(sharedBytes)try{call(sharedBytes,input);shared=true;}catch{}
++        if(shared)unsupported('shared decoder input');
++        fail(TypeErrorCtor,'ERR_INVALID_ARG_TYPE','chunk must be an unshared BufferSource');
++      }
++    }
++    // A native AB getter supplies a brand check and rejects shared memory.
++    try{call(bufferBytes,buffer);}catch{unsupported('shared decoder input');}
++    if(call(bufferDetached,buffer))unsupported('detached decoder input');
++    if(call(bufferResizable,buffer))unsupported('resizable decoder input');
++    if(viewKind)bytes=viewKind==='data'?call(dataBytes,input):call(typedBytes,input);
++    if(bytes>MAX_INPUT_BYTES)limit('decoder-input-bytes');
++    return bytes;
++  }
++  class TextEncoderStream{
++    constructor(){
++      const handle=new Encoder(),value={handle,pending:'',transform:null};
++      value.transform=new TransformStream({
++        transform(chunk,controller){
++          // Node22's stream specifically uses String(), including Symbol.
++          let text=StringCtor(chunk);
++          if(text.length>MAX_SOURCE_UNITS)limit('encoder-source-units');
++          if(value.pending)text=value.pending+text;
++          value.pending='';
++          if(text.length){const last=call(charCodeAt,text,[text.length-1]);
++            if(last>=0xd800&&last<=0xdbff){value.pending=call(slice,text,[-1]);text=call(slice,text,[0,-1]);}}
++          if(text.length)call(enqueue,controller,[call(encode,handle,[text])]);
++        },
++        flush(controller){if(value.pending){call(enqueue,controller,[call(encode,handle,[value.pending])]);value.pending='';}},
++      });
++      encoderSet(this,value);
++    }
++    get encoding(){return call(encoderEncoding,state(encoderGet,this,'TextEncoderStream').handle);}
++    get readable(){return call(tsReadable,state(encoderGet,this,'TextEncoderStream').transform);}
++    get writable(){return call(tsWritable,state(encoderGet,this,'TextEncoderStream').transform);}
++  }
++  class TextDecoderStream{
++    constructor(label='utf-8',options=undefined){
++      // Match Node22 label conversion before options validation. Template
++      // conversion deliberately rejects Symbol, unlike encoder String(chunk).
++      const normalizedLabel=`${label}`;
++      if(options!==undefined&&options!==null&&typeof options!=='object'&&typeof options!=='function')
++        fail(TypeErrorCtor,'ERR_INVALID_ARG_TYPE','options must be an object');
++      let flagReadsStarted=false,handle,readFatal=false,readIgnore=false,firstFatal,firstIgnore;
++      // Cache each first flag read: native Node rereads its private options,
++      // whereas Starling reads once. User getters still run exactly in the
++      // pinned fatal,ignoreBOM,ignoreBOM,fatal order on both backends.
++      const nativeOptions={get fatal(){flagReadsStarted=true;if(!readFatal){readFatal=true;firstFatal=options?.fatal;}return firstFatal;},
++        get ignoreBOM(){if(!readIgnore){readIgnore=true;firstIgnore=options?.ignoreBOM;}return firstIgnore;}};
++      try{handle=new Decoder(normalizedLabel,nativeOptions);}
++      catch(error){if(!flagReadsStarted&&error instanceof RangeErrorCtor)own(error,'code','ERR_ENCODING_NOT_SUPPORTED');throw error;}
++      // Node22 rereads these for fast-path bookkeeping; its public getters
++      // still expose the FIRST decode flags. Keep the observable reads without
++      // allocating a second native decoder or changing decode/getter flags.
++      void !!options?.ignoreBOM;void !!options?.fatal;
++      const ignoreBOM=!!firstIgnore,fatal=!!firstFatal;
++      const encoding=call(decoderEncoding,handle);
++      if(encoding!=='utf-8')unsupported('TextDecoderStream encoding '+encoding);
++      const value={handle,encoding,fatal,ignoreBOM,transform:null};
++      const nativeFatal=!!firstFatal;
++      function decoded(args){try{return call(decode,handle,args);}
++        catch(error){if(nativeFatal&&error instanceof TypeErrorCtor&&!descriptor(error,'code'))own(error,'code','ERR_ENCODING_INVALID_ENCODED_DATA');throw error;}}
++      value.transform=new TransformStream({
++        transform(chunk,controller){sourceBytes(chunk);const output=decoded([chunk,{stream:true}]);
++          if(output.length)call(enqueue,controller,[output]);},
++        flush(controller){const output=decoded([]);if(output.length)call(enqueue,controller,[output]);call(terminate,controller);},
++      });
++      decoderSet(this,value);
++    }
++    get encoding(){return state(decoderGet,this,'TextDecoderStream').encoding;}
++    get fatal(){return state(decoderGet,this,'TextDecoderStream').fatal;}
++    get ignoreBOM(){return state(decoderGet,this,'TextDecoderStream').ignoreBOM;}
++    get readable(){return call(tsReadable,state(decoderGet,this,'TextDecoderStream').transform);}
++    get writable(){return call(tsWritable,state(decoderGet,this,'TextDecoderStream').transform);}
++  }
++  for(const name of ['encoding','readable','writable'])defines(TextEncoderStream.prototype,{[name]:{enumerable:true}});
++  for(const name of ['encoding','fatal','ignoreBOM','readable','writable'])defines(TextDecoderStream.prototype,{[name]:{enumerable:true}});
++  function CompressionStream(format){unsupported('CompressionStream');}
++  function DecompressionStream(format){unsupported('DecompressionStream');}
++
++  // Never call the old native implementation with its uninitialized prototype
++  // as receiver. These opt-in guards are isolated until the native fix compiles.
++  function initializedController(self){if(self===controllerPrototype)fail(TypeErrorCtor,'ERR_INVALID_THIS','Invalid TransformStreamDefaultController receiver');}
++  const controllerGuards={
++    enqueue(chunk){initializedController(this);return call(enqueue,this,[chunk]);},
++    error(reason){initializedController(this);return call(controllerError,this,[reason]);},
++    terminate(){initializedController(this);return call(terminate,this);},
++    get desiredSize(){initializedController(this);return call(desiredDescriptor.get,this);},
++  };
++  for(const name of ['enqueue','error','terminate'])define(controllerPrototype,name,{...descriptor(controllerPrototype,name),value:controllerGuards[name]});
++  define(controllerPrototype,'desiredSize',{...desiredDescriptor,get:descriptor(controllerGuards,'desiredSize').get});
++  const module={ReadableStream,ReadableStreamDefaultReader,ReadableStreamBYOBReader,ReadableStreamBYOBRequest,
++    ReadableByteStreamController,ReadableStreamDefaultController,TransformStream,TransformStreamDefaultController,
++    WritableStream,WritableStreamDefaultWriter,WritableStreamDefaultController,ByteLengthQueuingStrategy,
++    CountQueuingStrategy,TextEncoderStream,TextDecoderStream,CompressionStream,DecompressionStream};
++  return{...module,default:module};
++}
++
++return createCodecModule;
++})();
++const installReadableIteration=(() => {
++// ISOLATED continuation of the frozen codec/guard stage. Node22 stream
++// algorithms and MIT source attribution are pinned in source-pins.json.
++function installReadableIteration(record){
++  const {ReadableStream:Stream,ReadableStreamDefaultReader:Reader,
++    ReadableStreamDefaultController:Controller}=record;
++  const apply=Reflect.apply,define=Object.defineProperty,descriptor=Object.getOwnPropertyDescriptor;
++  const getPrototype=Object.getPrototypeOf,setPrototype=Object.setPrototypeOf;
++  const TypeErrorCtor=TypeError,PromiseCtor=Promise;
++  const then=PromiseCtor.prototype.then,resolve=PromiseCtor.resolve.bind(PromiseCtor);
++  const call=(fn,self,args=[])=>apply(fn,self,args);
++  const chain=(promise,fulfilled,rejected)=>call(then,promise,[fulfilled,rejected]);
++  const locked=descriptor(Stream.prototype,'locked').get;
++  const read=Reader.prototype.read,cancel=Reader.prototype.cancel,release=Reader.prototype.releaseLock;
++  const closed=descriptor(Reader.prototype,'closed').get;
++  const enqueue=Controller.prototype.enqueue,close=Controller.prototype.close;
++  const iteratorSymbol=Symbol.iterator,asyncSymbol=Symbol.asyncIterator;
++  function codeOwn(error,code){define(error,'code',{__proto__:null,value:code,writable:true,enumerable:true,configurable:true});return error;}
++  function invalid(code,message){throw codeOwn(new TypeErrorCtor(message),code);}
++  const asyncPrototype=getPrototype(getPrototype(getPrototype((async function*(){})())));
++  const iteratorBase=setPrototype({next:undefined,return:undefined},asyncPrototype);
++
++  function iteratorRecord(iterable){
++    // Property access and callable errors deliberately remain ordinary errors.
++    let method=iterable[asyncSymbol];
++    if(method==null){
++      method=iterable[iteratorSymbol];
++      if(method===undefined)invalid('ERR_ARG_NOT_ITERABLE','The argument must be iterable');
++      const iterator=call(method,iterable);
++      // Node22 util.getIterator uses typeof object, excluding callable results.
++      if(typeof iterator!=='object'||iterator===null)invalid('ERR_INVALID_STATE','Iterator method must return an object');
++      const next=iterator.next;
++      // Match the pinned async-generator bridge: yielded promises from sync
++      // iterators are awaited and sync return delegation retains its semantics.
++      const adapter=(async function*(){return yield*{[iteratorSymbol](){return iterator;}};})();
++      // Capture the original next once, as Node's GetIterator does before
++      // creating the bridge (the bridge itself reads next again on first use).
++      void next;
++      return{iterator:adapter,next:adapter.next};
++    }
++    const iterator=call(method,iterable);
++    if(typeof iterator!=='object'||iterator===null)invalid('ERR_INVALID_STATE','Iterator method must return an object');
++    return{iterator,next:iterator.next};
++  }
++  const methods={
++    from(iterable){
++      const source=iteratorRecord(iterable);
++      return new Stream({
++        pull(controller){
++          const result=call(source.next,source.iterator);
++          if(typeof result!=='object'||result===null)invalid('ERR_INVALID_STATE','Iterator.next must return an object');
++          return chain(resolve(result),entry=>{
++            if(typeof entry!=='object'||entry===null)invalid('ERR_INVALID_STATE','Iterator.next promise must fulfill with an object');
++            if(entry.done)call(close,controller);else call(enqueue,controller,[entry.value]);
++          });
++        },
++        cancel(reason){
++          const method=source.iterator.return;
++          if(method===undefined)return;
++          return chain(resolve(call(method,source.iterator,[reason])),entry=>{
++            if(typeof entry!=='object'||entry===null)invalid('ERR_INVALID_STATE','Iterator.return promise must fulfill with an object');
++          });
++        },
++      },{highWaterMark:0});
++    },
++    values(options=undefined){
++      // Class prototypes have no initialized stream; never delegate that
++      // receiver. Native getter supplies the ordinary receiver brand check.
++      if(this===Stream.prototype)invalid('ERR_INVALID_THIS','Invalid ReadableStream receiver');
++      try{call(locked,this);}catch{invalid('ERR_INVALID_THIS','Invalid ReadableStream receiver');}
++      if(options!==undefined&&options!==null&&typeof options!=='object'&&typeof options!=='function')
++        invalid('ERR_INVALID_ARG_TYPE','options must be an object');
++      const preventCancel=!!options?.preventCancel;
++      let reader;
++      try{reader=new Reader(this);}catch(error){
++        if(error instanceof TypeErrorCtor&&!descriptor(error,'code'))codeOwn(error,'ERR_INVALID_STATE');throw error;
++      }
++      // Releasing an ordinary reader can reject its closed promise; handle it
++      // privately even if the iterator's caller never inspects that promise.
++      chain(call(closed,reader),()=>{},()=>{});
++      let done=false,current,started=false;
++      const finished=value=>({done:true,value});
++      function nextStep(){
++        if(done)return resolve(finished(undefined));
++        return chain(call(read,reader),entry=>{
++          current=undefined;
++          if(entry.done){done=true;call(release,reader);return finished(undefined);}
++          return{value:entry.value,done:false};
++        },error=>{current=undefined;done=true;call(release,reader);throw error;});
++      }
++      function returnStep(value){
++        if(done)return resolve(finished(value));
++        done=true;
++        if(preventCancel){call(release,reader);return resolve(finished(value));}
++        let cancellation;
++        try{cancellation=call(cancel,reader,[value]);}finally{call(release,reader);}
++        return chain(resolve(cancellation),()=>finished(value));
++      }
++      return setPrototype({
++        next(){
++          if(!started){current=resolve();started=true;}
++          current=current!==undefined?chain(current,nextStep,nextStep):nextStep();
++          return current;
++        },
++        return(value){
++          started=true;
++          current=current!==undefined?chain(current,()=>returnStep(value),()=>returnStep(value)):returnStep(value);
++          return current;
++        },
++        [asyncSymbol](){return this;},
++      },iteratorBase);
++    },
++  };
++  define(Stream,'from',{value:methods.from,writable:true,enumerable:false,configurable:true});
++  define(Stream.prototype,'values',{value:methods.values,writable:true,enumerable:true,configurable:true});
++  define(Stream.prototype,asyncSymbol,{value:methods.values,writable:true,enumerable:false,configurable:true});
++  return{from:methods.from,values:methods.values};
++}
++
++return installReadableIteration;
++})();
++const installDataViewBYOB=(() => {
++// ISOLATED ordinary-view adapter. nativeRead MUST be captured from the real
++// native BYOB prototype before installing the frozen base simulation.
++// No call delegates a DataView to the known unsupported native branch.
++function installDataViewBYOB(record,nativeRead){
++  const Reader=record.ReadableStreamBYOBReader,brand=record.isReadableStreamBYOBReader;
++  const U8=Uint8Array,DV=DataView,TypeErrorCtor=TypeError,RangeErrorCtor=RangeError,ErrorCtor=Error;
++  const apply=Reflect.apply,define=Object.defineProperty,descriptor=Object.getOwnPropertyDescriptor,getPrototype=Object.getPrototypeOf;
++  const isView=ArrayBuffer.isView,isInteger=Number.isInteger;
++  const call=(fn,self,args=[])=>apply(fn,self,args),getter=(prototype,key)=>descriptor(prototype,key).get;
++  const typed=getPrototype(U8.prototype),typedBytes=getter(typed,'byteLength'),typedLength=getter(typed,'length');
++  const typedBuffer=getter(typed,'buffer'),typedOffset=getter(typed,'byteOffset'),typedName=getter(typed,Symbol.toStringTag);
++  const dataBytes=getter(DV.prototype,'byteLength'),dataBuffer=getter(DV.prototype,'buffer'),dataOffset=getter(DV.prototype,'byteOffset');
++  const bufferBytes=getter(ArrayBuffer.prototype,'byteLength'),resizable=getter(ArrayBuffer.prototype,'resizable');
++  const prototypes=new Set([Int8Array.prototype,U8.prototype,Uint8ClampedArray.prototype,Int16Array.prototype,Uint16Array.prototype,
++    Int32Array.prototype,Uint32Array.prototype,Float32Array.prototype,Float64Array.prototype,BigInt64Array.prototype,BigUint64Array.prototype,DV.prototype]);
++  const ordinary=prototypes.has.bind(prototypes);
++  function coded(Ctor,code,message){const error=new Ctor(message);define(error,'code',{__proto__:null,value:code,writable:true,configurable:true,enumerable:true});throw error;}
++  function unsupported(operation){coded(ErrorCtor,'ERR_SM_NODE_UNSUPPORTED',operation+' unavailable in isolated bounded BYOB adapter');}
++  const previous=descriptor(Reader.prototype,'read');
++  async function read(view,options=undefined){
++    if(!brand(this))coded(TypeErrorCtor,'ERR_INVALID_THIS','Invalid BYOB reader');
++    if(!isView(view))coded(TypeErrorCtor,'ERR_INVALID_ARG_TYPE','view must be an ArrayBufferView');
++    if(options!==undefined&&options!==null&&typeof options!=='object'&&typeof options!=='function')
++      coded(TypeErrorCtor,'ERR_INVALID_ARG_TYPE','options must be an object');
++    if(!ordinary(getPrototype(view)))unsupported('subclass or cross-realm view');
++    for(const key of ['buffer','byteOffset','byteLength','length','constructor'])if(descriptor(view,key))unsupported('modified view layout');
++    const dataView=call(typedName,view)===undefined;
++    const bytes=call(dataView?dataBytes:typedBytes,view),buffer=call(dataView?dataBuffer:typedBuffer,view);
++    let backing;try{backing=call(bufferBytes,buffer);}catch{unsupported('shared view');}
++    if(bytes===0||backing===0)coded(TypeErrorCtor,'ERR_INVALID_STATE','View or backing buffer empty or detached');
++    const min=options?.min??1;
++    if(typeof min!=='number')coded(TypeErrorCtor,'ERR_INVALID_ARG_TYPE','options.min must be a number');
++    if(!isInteger(min)||min<=0)coded(TypeErrorCtor,'ERR_INVALID_ARG_VALUE','options.min must be a positive integer');
++    const elements=dataView?bytes:call(typedLength,view);
++    if(min>elements)coded(RangeErrorCtor,'ERR_OUT_OF_RANGE','options.min exceeds view length');
++    if(bytes>16777216){const error=new RangeErrorCtor('byob-view-bytes');
++      define(error,'code',{__proto__:null,value:'ERR_SM_NODE_LIMIT',writable:true,configurable:true,enumerable:true});
++      define(error,'resource',{__proto__:null,value:'byob-view-bytes',writable:true,configurable:true,enumerable:true});throw error;}
++    if(call(resizable,buffer))unsupported('resizable view');
++    if(min>1)unsupported('minimum greater than one');
++    if(!dataView)return call(nativeRead,this,[view]);
++    // Get fresh offsets/length after the observable min getter. Construction
++    // rejects any standard detachment performed by that getter, before entry.
++    const alias=new U8(buffer,call(dataOffset,view),call(dataBytes,view));
++    const result=await call(nativeRead,this,[alias]);
++    if(result.value===undefined)return{value:undefined,done:result.done};
++    const value=result.value;
++    return{value:new DV(call(typedBuffer,value),call(typedOffset,value),call(typedBytes,value)),done:result.done};
++  }
++  define(Reader.prototype,'read',{...previous,value:read});
++  return read;
++}
++
++return installDataViewBYOB;
++})();
++// Uninstalled m0.9 production candidate. Exactly one private native record;
++// capture/registration/CMake remain separately reviewed integration work.
++function createStreamWebModule(record){
++  // Validate every private field before reading any possibly untrusted getter.
++  // createCodecModule performs exact own-data/function record validation first.
++  const module=createCodecModule(record);
++  const nativeRead=record.ReadableStreamBYOBReader.prototype.read;
++  installReadableIteration(record);
++  installDataViewBYOB(record,nativeRead);
++  return module;
++}
++
++return createStreamWebModule;
++})())SM_NODE_PROFILE";
+--- /dev/null
++++ b/builtins/node-compat/stream-web-kernel.cpp
+@@ -0,0 +1,101 @@
++// UNCOMPILED integration template, not installed or runtime-verified.
++// Intended future target includes the StarlingMonkey source root and depends
++// on builtin_web_streams + builtin_web_text_codec through add_builtin().
++// Existing generated install order must install those builtins first. The
++// caller must enter the content realm and immediately root the return value,
++// exactly as register.cpp currently roots create_kernel().
++#include "builtin.h"
++#include "builtins/web/streams/transform-stream.h"
++#include "builtins/web/streams/transform-stream-default-controller.h"
++#include "builtins/web/text-codec/text-encoder.h"
++#include "builtins/web/text-codec/text-decoder.h"
++#include "js/CallAndConstruct.h"
++#include "js/Proxy.h"
++#include "js/Stream.h"
++#include "jsapi.h"
++
++namespace builtins::node_compat {
++namespace {
++
++bool define_standard_constructor(JSContext *cx, JS::HandleObject record,
++                                 const char *name, JSProtoKey key) {
++  JS::RootedObject constructor(cx);
++  // Verified declaration: pinned jsapi.h:204. Its actual returned constructors
++  // still need a compiled-component identity/operation gate for this template.
++  if (!JS_GetClassObject(cx, key, &constructor)) return false;
++  if (!constructor || !JS::IsCallable(constructor)) {
++    JS_ReportErrorASCII(cx, "Node stream/web native constructor unavailable: %s", name);
++    return false;
++  }
++  JS::RootedValue value(cx, JS::ObjectValue(*constructor));
++  return JS_DefineProperty(cx, record, name, value, JSPROP_ENUMERATE);
++}
++
++bool define_prototype_constructor(JSContext *cx, JS::HandleObject record,
++                                  const char *name, JS::HandleObject prototype) {
++  if (!prototype) {
++    JS_ReportErrorASCII(cx, "Node stream/web prerequisite not initialized: %s", name);
++    return false;
++  }
++  JS::RootedValue value(cx);
++  if (!JS_GetProperty(cx, prototype, "constructor", &value)) return false;
++  if (!value.isObject() || !JS::IsCallable(&value.toObject())) {
++    JS_ReportErrorASCII(cx, "Node stream/web retained constructor unavailable: %s", name);
++    return false;
++  }
++  return JS_DefineProperty(cx, record, name, value, JSPROP_ENUMERATE);
++}
++
++bool is_readable_stream_byob_reader(JSContext *cx, unsigned argc, JS::Value *vp) {
++  JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
++  bool matches = false;
++  if (args.get(0).isObject()) {
++    JS::RootedObject object(cx, &args[0].toObject());
++    // Bounded profile policy excludes scripted Proxy receivers. Node22 can
++    // accept a Proxy of a genuine reader through its JS state representation;
++    // this stronger native brand is an explicit deviation, not Node parity.
++    matches = !js::IsScriptedProxy(object) && JS::IsReadableStreamBYOBReader(object);
++  }
++  args.rval().setBoolean(matches);
++  return true;
++}
++
++} // namespace
++
++// Proposed private guest function, not an existing embedding API or host
++// service. Its result is the single argument to the future strict JS factory.
++JSObject *create_stream_web_kernel(JSContext *cx) {
++  JS::RootedObject record(cx, JS_NewPlainObject(cx));
++  if (!record) return nullptr;
++  const struct { const char *name; JSProtoKey key; } classes[] = {
++      {"ReadableStream", JSProto_ReadableStream},
++      {"ReadableStreamDefaultReader", JSProto_ReadableStreamDefaultReader},
++      {"ReadableStreamBYOBReader", JSProto_ReadableStreamBYOBReader},
++      {"ReadableStreamBYOBRequest", JSProto_ReadableStreamBYOBRequest},
++      {"ReadableByteStreamController", JSProto_ReadableByteStreamController},
++      {"ReadableStreamDefaultController", JSProto_ReadableStreamDefaultController},
++      {"WritableStream", JSProto_WritableStream},
++      {"WritableStreamDefaultWriter", JSProto_WritableStreamDefaultWriter},
++      {"WritableStreamDefaultController", JSProto_WritableStreamDefaultController},
++      {"ByteLengthQueuingStrategy", JSProto_ByteLengthQueuingStrategy},
++      {"CountQueuingStrategy", JSProto_CountQueuingStrategy},
++  };
++  for (const auto &entry : classes) {
++    if (!define_standard_constructor(cx, record, entry.name, entry.key)) return nullptr;
++  }
++  JS::RootedObject transform(cx, web::streams::TransformStream::proto_obj);
++  JS::RootedObject controller(cx, web::streams::TransformStreamDefaultController::proto_obj);
++  JS::RootedObject encoder(cx, web::text_codec::TextEncoder::proto_obj);
++  JS::RootedObject decoder(cx, web::text_codec::TextDecoder::proto_obj);
++  if (!define_prototype_constructor(cx, record, "TransformStream", transform) ||
++      !define_prototype_constructor(cx, record, "TransformStreamDefaultController", controller) ||
++      !define_prototype_constructor(cx, record, "TextEncoder", encoder) ||
++      !define_prototype_constructor(cx, record, "TextDecoder", decoder)) return nullptr;
++  if (!JS_DefineFunction(cx, record, "isReadableStreamBYOBReader",
++                         is_readable_stream_byob_reader, 1, JSPROP_ENUMERATE)) return nullptr;
++  // No temporary streams, writer promises, live host resources, byte pointers
++  // or native compression constructors are created/retained here.
++  return record;
++}
++
++} // namespace builtins::node_compat
+--- /dev/null
++++ b/builtins/node-compat/stream-web-namespace.template.mjs
+@@ -0,0 +1,24 @@
++// UNINSTALLED explicit ESM template. The private record import below is an
++// internal guest binding to be supplied by reviewed registration, not a host
++// interface, available embedding API or production module in this repository.
++import record from 'node-compat:stream-web-native-record';
++import {createStreamWebModule} from './stream-web.mjs';
++const moduleRecord=createStreamWebModule(record);
++export const ByteLengthQueuingStrategy=moduleRecord.ByteLengthQueuingStrategy;
++export const CompressionStream=moduleRecord.CompressionStream;
++export const CountQueuingStrategy=moduleRecord.CountQueuingStrategy;
++export const DecompressionStream=moduleRecord.DecompressionStream;
++export const ReadableByteStreamController=moduleRecord.ReadableByteStreamController;
++export const ReadableStream=moduleRecord.ReadableStream;
++export const ReadableStreamBYOBReader=moduleRecord.ReadableStreamBYOBReader;
++export const ReadableStreamBYOBRequest=moduleRecord.ReadableStreamBYOBRequest;
++export const ReadableStreamDefaultController=moduleRecord.ReadableStreamDefaultController;
++export const ReadableStreamDefaultReader=moduleRecord.ReadableStreamDefaultReader;
++export const TextDecoderStream=moduleRecord.TextDecoderStream;
++export const TextEncoderStream=moduleRecord.TextEncoderStream;
++export const TransformStream=moduleRecord.TransformStream;
++export const TransformStreamDefaultController=moduleRecord.TransformStreamDefaultController;
++export const WritableStream=moduleRecord.WritableStream;
++export const WritableStreamDefaultController=moduleRecord.WritableStreamDefaultController;
++export const WritableStreamDefaultWriter=moduleRecord.WritableStreamDefaultWriter;
++export default moduleRecord.default;
+--- /dev/null
++++ b/builtins/node-compat/stream-web-readable-iteration.mjs
+@@ -0,0 +1,117 @@
++// ISOLATED continuation of the frozen codec/guard stage. Node22 stream
++// algorithms and MIT source attribution are pinned in source-pins.json.
++export function installReadableIteration(record){
++  const {ReadableStream:Stream,ReadableStreamDefaultReader:Reader,
++    ReadableStreamDefaultController:Controller}=record;
++  const apply=Reflect.apply,define=Object.defineProperty,descriptor=Object.getOwnPropertyDescriptor;
++  const getPrototype=Object.getPrototypeOf,setPrototype=Object.setPrototypeOf;
++  const TypeErrorCtor=TypeError,PromiseCtor=Promise;
++  const then=PromiseCtor.prototype.then,resolve=PromiseCtor.resolve.bind(PromiseCtor);
++  const call=(fn,self,args=[])=>apply(fn,self,args);
++  const chain=(promise,fulfilled,rejected)=>call(then,promise,[fulfilled,rejected]);
++  const locked=descriptor(Stream.prototype,'locked').get;
++  const read=Reader.prototype.read,cancel=Reader.prototype.cancel,release=Reader.prototype.releaseLock;
++  const closed=descriptor(Reader.prototype,'closed').get;
++  const enqueue=Controller.prototype.enqueue,close=Controller.prototype.close;
++  const iteratorSymbol=Symbol.iterator,asyncSymbol=Symbol.asyncIterator;
++  function codeOwn(error,code){define(error,'code',{__proto__:null,value:code,writable:true,enumerable:true,configurable:true});return error;}
++  function invalid(code,message){throw codeOwn(new TypeErrorCtor(message),code);}
++  const asyncPrototype=getPrototype(getPrototype(getPrototype((async function*(){})())));
++  const iteratorBase=setPrototype({next:undefined,return:undefined},asyncPrototype);
++
++  function iteratorRecord(iterable){
++    // Property access and callable errors deliberately remain ordinary errors.
++    let method=iterable[asyncSymbol];
++    if(method==null){
++      method=iterable[iteratorSymbol];
++      if(method===undefined)invalid('ERR_ARG_NOT_ITERABLE','The argument must be iterable');
++      const iterator=call(method,iterable);
++      // Node22 util.getIterator uses typeof object, excluding callable results.
++      if(typeof iterator!=='object'||iterator===null)invalid('ERR_INVALID_STATE','Iterator method must return an object');
++      const next=iterator.next;
++      // Match the pinned async-generator bridge: yielded promises from sync
++      // iterators are awaited and sync return delegation retains its semantics.
++      const adapter=(async function*(){return yield*{[iteratorSymbol](){return iterator;}};})();
++      // Capture the original next once, as Node's GetIterator does before
++      // creating the bridge (the bridge itself reads next again on first use).
++      void next;
++      return{iterator:adapter,next:adapter.next};
++    }
++    const iterator=call(method,iterable);
++    if(typeof iterator!=='object'||iterator===null)invalid('ERR_INVALID_STATE','Iterator method must return an object');
++    return{iterator,next:iterator.next};
++  }
++  const methods={
++    from(iterable){
++      const source=iteratorRecord(iterable);
++      return new Stream({
++        pull(controller){
++          const result=call(source.next,source.iterator);
++          if(typeof result!=='object'||result===null)invalid('ERR_INVALID_STATE','Iterator.next must return an object');
++          return chain(resolve(result),entry=>{
++            if(typeof entry!=='object'||entry===null)invalid('ERR_INVALID_STATE','Iterator.next promise must fulfill with an object');
++            if(entry.done)call(close,controller);else call(enqueue,controller,[entry.value]);
++          });
++        },
++        cancel(reason){
++          const method=source.iterator.return;
++          if(method===undefined)return;
++          return chain(resolve(call(method,source.iterator,[reason])),entry=>{
++            if(typeof entry!=='object'||entry===null)invalid('ERR_INVALID_STATE','Iterator.return promise must fulfill with an object');
++          });
++        },
++      },{highWaterMark:0});
++    },
++    values(options=undefined){
++      // Class prototypes have no initialized stream; never delegate that
++      // receiver. Native getter supplies the ordinary receiver brand check.
++      if(this===Stream.prototype)invalid('ERR_INVALID_THIS','Invalid ReadableStream receiver');
++      try{call(locked,this);}catch{invalid('ERR_INVALID_THIS','Invalid ReadableStream receiver');}
++      if(options!==undefined&&options!==null&&typeof options!=='object'&&typeof options!=='function')
++        invalid('ERR_INVALID_ARG_TYPE','options must be an object');
++      const preventCancel=!!options?.preventCancel;
++      let reader;
++      try{reader=new Reader(this);}catch(error){
++        if(error instanceof TypeErrorCtor&&!descriptor(error,'code'))codeOwn(error,'ERR_INVALID_STATE');throw error;
++      }
++      // Releasing an ordinary reader can reject its closed promise; handle it
++      // privately even if the iterator's caller never inspects that promise.
++      chain(call(closed,reader),()=>{},()=>{});
++      let done=false,current,started=false;
++      const finished=value=>({done:true,value});
++      function nextStep(){
++        if(done)return resolve(finished(undefined));
++        return chain(call(read,reader),entry=>{
++          current=undefined;
++          if(entry.done){done=true;call(release,reader);return finished(undefined);}
++          return{value:entry.value,done:false};
++        },error=>{current=undefined;done=true;call(release,reader);throw error;});
++      }
++      function returnStep(value){
++        if(done)return resolve(finished(value));
++        done=true;
++        if(preventCancel){call(release,reader);return resolve(finished(value));}
++        let cancellation;
++        try{cancellation=call(cancel,reader,[value]);}finally{call(release,reader);}
++        return chain(resolve(cancellation),()=>finished(value));
++      }
++      return setPrototype({
++        next(){
++          if(!started){current=resolve();started=true;}
++          current=current!==undefined?chain(current,nextStep,nextStep):nextStep();
++          return current;
++        },
++        return(value){
++          started=true;
++          current=current!==undefined?chain(current,()=>returnStep(value),()=>returnStep(value)):returnStep(value);
++          return current;
++        },
++        [asyncSymbol](){return this;},
++      },iteratorBase);
++    },
++  };
++  define(Stream,'from',{value:methods.from,writable:true,enumerable:false,configurable:true});
++  define(Stream.prototype,'values',{value:methods.values,writable:true,enumerable:true,configurable:true});
++  define(Stream.prototype,asyncSymbol,{value:methods.values,writable:true,enumerable:false,configurable:true});
++  return{from:methods.from,values:methods.values};
++}
+--- /dev/null
++++ b/builtins/node-compat/stream-web.mjs
+@@ -0,0 +1,14 @@
++// Uninstalled m0.9 production candidate. Exactly one private native record;
++// capture/registration/CMake remain separately reviewed integration work.
++import {createCodecModule} from './stream-web-codecs.mjs';
++import {installReadableIteration} from './stream-web-readable-iteration.mjs';
++import {installDataViewBYOB} from './stream-web-byob.mjs';
++export function createStreamWebModule(record){
++  // Validate every private field before reading any possibly untrusted getter.
++  // createCodecModule performs exact own-data/function record validation first.
++  const module=createCodecModule(record);
++  const nativeRead=record.ReadableStreamBYOBReader.prototype.read;
++  installReadableIteration(record);
++  installDataViewBYOB(record,nativeRead);
++  return module;
++}
+--- a/builtins/web/streams/transform-stream-default-controller.cpp
++++ b/builtins/web/streams/transform-stream-default-controller.cpp
+@@ -18,6 +18,17 @@
+ 
+ 
+ namespace builtins::web::streams {
++bool TransformStreamDefaultController::check_receiver(JSContext *cx, JS::HandleValue receiver,
++                                                       const char *method_name) {
++  // METHOD_HEADER_WITH_NAME expands inside each derived static method, so its
++  // unqualified check_receiver call resolves to this guard before Slot reads.
++  if (!is_instance(receiver) ||
++      !JS::GetReservedSlot(&receiver.toObject(), std::to_underlying(Slots::Stream)).isObject()) {
++    return api::throw_error(cx, api::Errors::WrongReceiver, method_name, class_name);
++  }
++  return true;
++}
++
+ JSObject *TransformStreamDefaultController::stream(JSObject *controller) {
+   MOZ_ASSERT(is_instance(controller));
+   return &JS::GetReservedSlot(controller, std::to_underlying(Slots::Stream)).toObject();
+--- a/builtins/web/streams/transform-stream-default-controller.h
++++ b/builtins/web/streams/transform-stream-default-controller.h
+@@ -24,6 +24,9 @@
+                 // call.
+     Count
+   };
++
++  // Public JS entry points must reject the uninitialized class prototype.
++  static bool check_receiver(JSContext *cx, JS::HandleValue receiver, const char *method_name);
+ 
+   using TransformAlgorithmImplementation = JSObject *(JSContext *, JS::HandleObject, JS::HandleValue);
+   using FlushAlgorithmImplementation = JSObject *(JSContext *, JS::HandleObject);
+--- a/cmake/builtins.cmake
++++ b/cmake/builtins.cmake
+@@ -189,3 +189,24 @@
+         message(FATAL_ERROR "NODE_COMPAT_${NODE_COMPAT_FOUNDATION} requires ENABLE_BUILTIN_NODE_COMPAT=ON")
+     endif()
+ endforeach()
++
++# Keep the entire stream/web factory and private native capture optional. The
++# existing web builtins must be explicitly available; add_dependencies is not
++# initializer topology. Their earlier add_builtin declarations install first.
++option(NODE_COMPAT_STREAM_WEB "Enable optional bounded node:stream/web module" OFF)
++if(NODE_COMPAT_STREAM_WEB AND NOT CMAKE_SCRIPT_MODE_FILE)
++    if(NOT TARGET builtin_node_compat)
++        message(FATAL_ERROR "NODE_COMPAT_STREAM_WEB requires ENABLE_BUILTIN_NODE_COMPAT=ON")
++    endif()
++    if(NOT TARGET builtin_web_streams)
++        message(FATAL_ERROR "NODE_COMPAT_STREAM_WEB requires ENABLE_BUILTIN_WEB_STREAMS=ON")
++    endif()
++    if(NOT TARGET builtin_web_text_codec)
++        message(FATAL_ERROR "NODE_COMPAT_STREAM_WEB requires ENABLE_BUILTIN_WEB_TEXT_CODEC=ON")
++    endif()
++    target_sources(builtin_node_compat PRIVATE builtins/node-compat/stream-web-kernel.cpp)
++    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_STREAM_WEB=1)
++    target_include_directories(builtin_node_compat PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
++    add_dependencies(builtin_node_compat builtin_web_streams builtin_web_text_codec)
++    target_link_libraries(builtin_node_compat PRIVATE builtin_web_streams builtin_web_text_codec)
++endif()
+--- a/tests/node-compat/build-engine.sh
++++ b/tests/node-compat/build-engine.sh
+@@ -21,6 +21,7 @@
+ assert_enabled="${NODE_COMPAT_ASSERT:-0}"
+ querystring_enabled="${NODE_COMPAT_QUERYSTRING:-0}"
+ util_enabled="${NODE_COMPAT_UTIL:-0}"
++stream_web_enabled="${NODE_COMPAT_STREAM_WEB:-0}"
+ abi_patch="$repo_root/tests/node-compat/abi-fix/componentize-u32-result.patch"
+ abi_patch_sha=c70c1b76ae9ddeba7cbaad2861f1ecc03710da7241ca6365d00c9ece8243324b
+ base_embedding_sha=95652376ddeb46357c77b8aff2b7bb06bd1ca34ef34443128fc8e83583424831
+@@ -46,9 +47,9 @@
+ if [[ "$events_enabled" != 0 && "$events_enabled" != 1 ]]; then
+   echo 'NODE_COMPAT_EVENTS must be 0 or 1' >&2; exit 1
+ fi
+-for foundation_value in "$string_decoder_enabled" "$assert_enabled" "$querystring_enabled" "$util_enabled"; do
++for foundation_value in "$string_decoder_enabled" "$assert_enabled" "$querystring_enabled" "$util_enabled" "$stream_web_enabled"; do
+   if [[ "$foundation_value" != 0 && "$foundation_value" != 1 ]]; then
+-    echo 'NODE_COMPAT_STRING_DECODER, NODE_COMPAT_ASSERT, NODE_COMPAT_QUERYSTRING and NODE_COMPAT_UTIL must each be 0 or 1' >&2; exit 1
++    echo 'NODE_COMPAT_STRING_DECODER, NODE_COMPAT_ASSERT, NODE_COMPAT_QUERYSTRING, NODE_COMPAT_UTIL and NODE_COMPAT_STREAM_WEB must each be 0 or 1' >&2; exit 1
+   fi
+ done
+ if [[ "$abi_fix" != 1 || "$bigint_fix" != 1 ]]; then
+@@ -100,7 +101,7 @@
+ fi
+ # Preserve every pre-policy source tree, build directory and artifact. Each
+ # selected configuration gets its own embedding output directory as well.
+-policy_suffix="entropy-entry-v1-strict-callback-v3.$entropy_mode.path-$path_enabled.events-$events_enabled.string-decoder-$string_decoder_enabled.assert-$assert_enabled.querystring-$querystring_enabled.util-$util_enabled"
++policy_suffix="entropy-entry-v1-strict-callback-v3.$entropy_mode.path-$path_enabled.events-$events_enabled.string-decoder-$string_decoder_enabled.assert-$assert_enabled.querystring-$querystring_enabled.util-$util_enabled.stream-web-$stream_web_enabled"
+ source_dir="$source_dir-$policy_suffix"
+ build_dir="$build_dir-$policy_suffix"
+ artifact_name=starlingmonkey_embedding.abi-i32-i64-v1
+@@ -234,11 +235,12 @@
+ root=pathlib.Path(sys.argv[1]);paths=sorted(p for p in (root/'embedding').rglob('*') if p.is_file() and p.suffix in ['.cpp','.h'])+[root/'CMakeLists.txt']
+ json.dump([{'path':str(p.relative_to(root)),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in paths],open(sys.argv[2],'w'),indent=2)
+ PYEMBED
+-string_decoder_flag=OFF; assert_flag=OFF; querystring_flag=OFF; util_flag=OFF
++string_decoder_flag=OFF; assert_flag=OFF; querystring_flag=OFF; util_flag=OFF; stream_web_flag=OFF
+ if [[ "$string_decoder_enabled" == 1 ]]; then string_decoder_flag=ON; fi
+ if [[ "$assert_enabled" == 1 ]]; then assert_flag=ON; fi
+ if [[ "$querystring_enabled" == 1 ]]; then querystring_flag=ON; fi
+ if [[ "$util_enabled" == 1 ]]; then util_flag=ON; fi
++if [[ "$stream_web_enabled" == 1 ]]; then stream_web_flag=ON; fi
+ events_flag=OFF
+ if [[ "$events_enabled" == 1 ]]; then events_flag=ON; fi
+ path_flag=OFF
+@@ -248,7 +250,7 @@
+   -DENABLE_BUILTIN_NODE_COMPAT=ON -DNODE_COMPAT_GC_STRESS="$gc_flag" -DNODE_COMPAT_OOM_TESTING="$oom_flag" \
+   -DENABLE_JS_DEBUGGER=OFF -DENABLE_BUILTIN_WPT_SUPPORT=OFF -DNODE_COMPAT_LOCKED_RUST=ON \
+   -DNODE_COMPAT_ENTROPY_MODE="$entropy_mode" -DNODE_COMPAT_PATH="$path_flag" -DNODE_COMPAT_EVENTS="$events_flag" \
+-  -DNODE_COMPAT_STRING_DECODER="$string_decoder_flag" -DNODE_COMPAT_ASSERT="$assert_flag" -DNODE_COMPAT_QUERYSTRING="$querystring_flag" -DNODE_COMPAT_UTIL="$util_flag" \
++  -DNODE_COMPAT_STRING_DECODER="$string_decoder_flag" -DNODE_COMPAT_ASSERT="$assert_flag" -DNODE_COMPAT_QUERYSTRING="$querystring_flag" -DNODE_COMPAT_UTIL="$util_flag" -DNODE_COMPAT_STREAM_WEB="$stream_web_flag" \
+   2>&1 | tee "$work_root/configure-$artifact_name.log"
+ # The repository already versions this aggregate lock. Corrosion's LOCKED
+ # mode must preserve it throughout configuration and compilation.
+@@ -270,9 +272,9 @@
+ if [[ "$build_type" == Debug ]]; then engine_output=starlingmonkey_embedding.debug.wasm; fi
+ cp "$source_dir/lib/$engine_output" "$artifact"
+ 
+-python3 - "$repo_root" "$work_root" "$artifact" "$stress" "$componentize_revision" "$componentize_archive_sha" "$spidermonkey_archive_sha" "$source_dir" "$build_dir" "$abi_fix" "$abi_patch" "$oom" "$build_type" "$input_manifest" "$bigint_fix" "$bigint_patch" "$entropy_mode" "$path_enabled" "$entry_patch" "$events_enabled" "$componentize_input_manifest" "$recipe_before" "$string_decoder_enabled" "$assert_enabled" "$querystring_enabled" "$util_enabled" <<'PY'
++python3 - "$repo_root" "$work_root" "$artifact" "$stress" "$componentize_revision" "$componentize_archive_sha" "$spidermonkey_archive_sha" "$source_dir" "$build_dir" "$abi_fix" "$abi_patch" "$oom" "$build_type" "$input_manifest" "$bigint_fix" "$bigint_patch" "$entropy_mode" "$path_enabled" "$entry_patch" "$events_enabled" "$componentize_input_manifest" "$recipe_before" "$string_decoder_enabled" "$assert_enabled" "$querystring_enabled" "$util_enabled" "$stream_web_enabled" <<'PY'
+ import datetime, hashlib, json, os, pathlib, subprocess, sys
+-repo, work, artifact, stress, componentize, componentize_archive, sm_archive, source_dir, build_dir, abi_fix, abi_patch, oom, build_type, input_manifest, bigint_fix, bigint_patch, entropy_mode, path_enabled, entry_patch, events_enabled, componentize_input_manifest, recipe_before, string_decoder_enabled, assert_enabled, querystring_enabled, util_enabled = sys.argv[1:]
++repo, work, artifact, stress, componentize, componentize_archive, sm_archive, source_dir, build_dir, abi_fix, abi_patch, oom, build_type, input_manifest, bigint_fix, bigint_patch, entropy_mode, path_enabled, entry_patch, events_enabled, componentize_input_manifest, recipe_before, string_decoder_enabled, assert_enabled, querystring_enabled, util_enabled, stream_web_enabled = sys.argv[1:]
+ def digest(path):
+     h = hashlib.sha256()
+     with open(path, 'rb') as source:
+@@ -308,6 +310,7 @@
+     'NODE_COMPAT_ASSERT': 'ON' if assert_enabled == '1' else 'OFF',
+     'NODE_COMPAT_QUERYSTRING': 'ON' if querystring_enabled == '1' else 'OFF',
+     'NODE_COMPAT_UTIL': 'ON' if util_enabled == '1' else 'OFF',
++    'NODE_COMPAT_STREAM_WEB': 'ON' if stream_web_enabled == '1' else 'OFF',
+     'NODE_COMPAT_GC_STRESS': 'ON' if stress == '1' else 'OFF',
+     'NODE_COMPAT_OOM_TESTING': 'ON' if oom == '1' else 'OFF',
+ }
+@@ -325,8 +328,19 @@
+ assert strict_initialization, 'Opt-in profile must compile the strict initializer boundary'
+ registration_commands = [entry['command'] for entry in json.loads(compile_commands) if pathlib.Path(entry['file']).as_posix().endswith('/builtins/node-compat/register.cpp')]
+ assert registration_commands, 'Need actual native module registration compilation'
+-for option in ['NODE_COMPAT_PATH', 'NODE_COMPAT_EVENTS', 'NODE_COMPAT_STRING_DECODER', 'NODE_COMPAT_ASSERT', 'NODE_COMPAT_QUERYSTRING', 'NODE_COMPAT_UTIL']:
++for option in ['NODE_COMPAT_PATH', 'NODE_COMPAT_EVENTS', 'NODE_COMPAT_STRING_DECODER', 'NODE_COMPAT_ASSERT', 'NODE_COMPAT_QUERYSTRING', 'NODE_COMPAT_UTIL', 'NODE_COMPAT_STREAM_WEB']:
+     assert all((('-D' + option + '=1') in entry.split()) == (requested_cmake_options[option] == 'ON') for entry in registration_commands), 'Actual registration compile disagrees with ' + option
++stream_web_commands = [entry['command'] for entry in json.loads(compile_commands) if pathlib.Path(entry['file']).as_posix().endswith('/builtins/node-compat/stream-web-kernel.cpp')]
++assert bool(stream_web_commands) == (stream_web_enabled == '1'), 'Private stream/web capture source must compile only when selected'
++assert all('-DNODE_COMPAT_STREAM_WEB=1' in entry.split() for entry in stream_web_commands), 'Actual private capture compilation must select the module'
++stream_web_prerequisites = {}
++for line in cache_path.read_text().splitlines():
++    key, separator, encoded = line.partition(':')
++    if separator and key in ['ENABLE_BUILTIN_WEB_STREAMS', 'ENABLE_BUILTIN_WEB_TEXT_CODEC']:
++        _, equals, value = encoded.partition('=')
++        if equals: stream_web_prerequisites[key] = value
++if stream_web_enabled == '1':
++    assert stream_web_prerequisites == {'ENABLE_BUILTIN_WEB_STREAMS':'ON', 'ENABLE_BUILTIN_WEB_TEXT_CODEC':'ON'}, 'Selected stream/web must use actual native prerequisites'
+ embedding_commands = [line for line in command('ninja','-C',build_dir,'-t','commands','builtin_componentize_embedding').splitlines() if ' -c ' in line and line.endswith('/embedding/embedding.cpp')]
+ assert embedding_commands and all('-DNODE_COMPAT_ENTROPY_POLICY=1' in entry for entry in embedding_commands), 'Entry policy must reach actual external embedding compilation'
+ assert all(('-DNODE_COMPAT_ENTROPY_RUNTIME_ONLY=1' in entry) == (entropy_mode == 'RUNTIME_ONLY') for entry in embedding_commands)
+@@ -368,6 +382,7 @@
+ if assert_enabled == '1': manifest_paths.append('builtins/node-compat/export-manifest.assert.node-v22.14.0.json')
+ if querystring_enabled == '1': manifest_paths.append('builtins/node-compat/export-manifest.querystring.node-v22.14.0.json')
+ if util_enabled == '1': manifest_paths.append('builtins/node-compat/export-manifest.util.node-v22.14.0.json')
++if stream_web_enabled == '1': manifest_paths.append('builtins/node-compat/export-manifest.stream-web.node-v22.14.0.json')
+ selected_manifests = [{'path':path,'sha256':digest(pathlib.Path(repo)/path),'profileVersion':json.loads((pathlib.Path(repo)/path).read_text())['profileVersion']} for path in manifest_paths]
+ 
+ packaging_module = os.environ.get('NODE_COMPAT_COMPONENTIZE_MODULE')
+@@ -393,7 +408,7 @@
+     'hostApi': 'wasi-0.2.10',
+     'profileEnabled': True, 'entropyPolicy': 'off' if entropy_mode == 'OFF' else 'runtime-only',
+     'entropyEntryPatchApplied': True, 'pathEnabled': path_enabled == '1', 'eventsEnabled': events_enabled == '1',
+-    'stringDecoderEnabled': string_decoder_enabled == '1', 'assertEnabled': assert_enabled == '1', 'querystringEnabled': querystring_enabled == '1', 'utilEnabled': util_enabled == '1', 'selectedModuleManifests': selected_manifests, 'openssl': openssl,
++    'stringDecoderEnabled': string_decoder_enabled == '1', 'assertEnabled': assert_enabled == '1', 'querystringEnabled': querystring_enabled == '1', 'utilEnabled': util_enabled == '1', 'streamWebEnabled': stream_web_enabled == '1', 'selectedModuleManifests': selected_manifests, 'openssl': openssl,
+     'gcStress': stress == '1', 'oomTesting': oom == '1',
+     'strictInitialization': strict_initialization, 'packagingSplicer': packaging_selection,
+     'debuggerEnabled': False, 'wptSupportEnabled': False,
+@@ -413,6 +428,8 @@
+     'compileCommandsSha256': digest(compile_commands_path),
+     'actualEmbeddingCompileCommands': embedding_commands,
+     'actualRegistrationCompileCommands': registration_commands,
++    'actualStreamWebKernelCompileCommands': stream_web_commands,
++    'streamWebPrerequisiteCMakeOptions': stream_web_prerequisites,
+     'buildRecipeSha256': digest(pathlib.Path(repo) / 'tests/node-compat/build-engine.sh'),
+     'buildConfigurationCapture': 'Actual CMake cache and compile-command digests captured after this build completed; not a reconstruction of earlier builds.',
+     'generatedRustProject': {
+--- a/tests/node-compat/foundation-stream-web/production-candidate/native-preflight-contract.json
++++ b/tests/node-compat/foundation-stream-web/production-candidate/native-preflight-contract.json
+@@ -5,7 +5,7 @@
+   "metadataField": "streamWebEnabled",
+   "cmakeOption": "NODE_COMPAT_STREAM_WEB",
+   "manifestPath": "builtins/node-compat/export-manifest.stream-web.node-v22.14.0.json",
+-  "manifestSha256": "16d1d222844282abdc953d08cdd533315edd46b3103c56b6954ca55d55dbacc7",
++  "manifestSha256": "2b96f7df35ffbfab0dd0214acb6c68a4fe01a4db6c77527b0916bdf5ac41cd62",
+   "kernelPath": "builtins/node-compat/stream-web-kernel.cpp",
+   "kernelSha256": "c2301cd467c7bf3c2cee2b3133d6a525c28c7dacfa665a635167d5043073e7c8",
+   "headerPath": "builtins/node-compat/stream-web-factories.generated.h",
+--- a/tests/node-compat/foundation-stream-web/production-candidate/prepared-native-runners.json
++++ b/tests/node-compat/foundation-stream-web/production-candidate/prepared-native-runners.json
+@@ -36,7 +36,7 @@
+     },
+     {
+       "path": "native-preflight-contract.json",
+-      "sha256": "d52a444fcf3b0fa8e5052c720d241b3be9454e2a7292e8812dd0ca651abe653c"
++      "sha256": "ba9928019f535770e0db7c5d8a377a99aa2fca785cbaf0bc7d3d1e087d24a23e"
+     },
+     {
+       "path": "native-preflight.mjs",
+--- /dev/null
++++ b/tests/node-compat/legacy-stream-web-receipts.json
+@@ -0,0 +1,450 @@
++{
++  "schemaVersion": 1,
++  "scope": "Exact immutable ordinary Release/oomTesting=false engine + canonical compiled-input + recipe identities only. Missing stream flag means OFF solely for these tuples. DEBUG/OOM and unbacked historical engines remain excluded; archived selectors are the historical reproduction path. External receipt paths are audit provenance, never runtime file dependencies.",
++  "engines": [
++    {
++      "engineSha256": "165b59a1fac4f3bab14547a28063908193c2b98767bd5fa835ca00b9b6d8adfc",
++      "canonicalSourceManifestSha256": "e6e6e422368c950b946c74b55c2efe121c6091af6a52a186d85ae32f70511321",
++      "buildRecipeSha256": "ef3c91e7b9c20745600a040645e83c41013a44a16184e9ab2f12edda010f84ab",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v5/native-freeze/off-path-events.engine.wasm.build.json",
++          "receiptSha256": "60eda31144c0b7005eab4d25c65758978061d08ba91f761f9c820f1db69f0ffb",
++          "sourceInputManifestSha256": "730d69951269e37892e6d5ec1a9a2b4c75007946fbb47903c95742b9852f1e72",
++          "engineBytes": 9660820,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1.OFF.path-1.events-1.foundations-v5.wasm.build.json",
++          "receiptSha256": "60eda31144c0b7005eab4d25c65758978061d08ba91f761f9c820f1db69f0ffb",
++          "sourceInputManifestSha256": "730d69951269e37892e6d5ec1a9a2b4c75007946fbb47903c95742b9852f1e72",
++          "engineBytes": 9660820,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "17181cc87579cb3784d444e9f0cc481e108522811609bd3382bcd16eea4efc07",
++      "canonicalSourceManifestSha256": "a9a62be4e40803d527e1f9393b6c7d3f6dc48d33eaee7beaa05f02c7d449d52a",
++      "buildRecipeSha256": "d9a99a6602aabfb5c329c8fd89819bdff86665addae8d9c5b79aea7d514297eb",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v1/native-freeze/off-path.engine.wasm.build.json",
++          "receiptSha256": "fa9cb55c57caa3b65a1dceb086c6d90781137806e492ffaf8d4138d96a24b301",
++          "sourceInputManifestSha256": "6d5966146a9fa1886ff7e2085f3237318d4f3808a51b8e5325432f5ac9a370f5",
++          "engineBytes": 9599112,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1.OFF.path-1.foundations-v1.wasm.build.json",
++          "receiptSha256": "fa9cb55c57caa3b65a1dceb086c6d90781137806e492ffaf8d4138d96a24b301",
++          "sourceInputManifestSha256": "6d5966146a9fa1886ff7e2085f3237318d4f3808a51b8e5325432f5ac9a370f5",
++          "engineBytes": 9599112,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "33b9cb248afbb4a3b3653c7b76bd656e51443e6823fa72d712758c742cd59516",
++      "canonicalSourceManifestSha256": "dec46fcec9bf73f9d476baacaec54b9267635c9f0e30e83d775ea6257475e235",
++      "buildRecipeSha256": "ab6227f6f763f62794e34c37ac76cb414a9b8697c423edad229e1412a9aa2515",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v6/native-freeze/off-foundations.engine.wasm.build.json",
++          "receiptSha256": "88772d5dc84ffe8cb6e2ea68d0a69e6930248232214db1a585e74f21a0df4379",
++          "sourceInputManifestSha256": "bd7e7f2726131ae35ed5c9aac66ee592b172482383a02d66d39c59c80538229e",
++          "engineBytes": 9700373,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1.OFF.path-1.events-1.string-decoder-1.assert-1.querystring-1.foundations-v6.wasm.build.json",
++          "receiptSha256": "88772d5dc84ffe8cb6e2ea68d0a69e6930248232214db1a585e74f21a0df4379",
++          "sourceInputManifestSha256": "bd7e7f2726131ae35ed5c9aac66ee592b172482383a02d66d39c59c80538229e",
++          "engineBytes": 9700373,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "347025c9641820c50206a9b6dee3f5e0a60b4d40c326e5c3ca66853c44fa5087",
++      "canonicalSourceManifestSha256": "b9da295dbc5fd32799b0f013cdb507eb3b9181e94d4cca36e9fcf3b87811402e",
++      "buildRecipeSha256": "ef3c91e7b9c20745600a040645e83c41013a44a16184e9ab2f12edda010f84ab",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v4/native-freeze/off-path-events.engine.wasm.build.json",
++          "receiptSha256": "85ccb73339cf7a751fce8673bd110a1692c37f06b61129bc8c60da74f4c86ee2",
++          "sourceInputManifestSha256": "d3b3e952b3970685661cc45b634197ed241aeae539c2154f88f94e0f6ab8c425",
++          "engineBytes": 9660512,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1.OFF.path-1.events-1.foundations-v4.wasm.build.json",
++          "receiptSha256": "85ccb73339cf7a751fce8673bd110a1692c37f06b61129bc8c60da74f4c86ee2",
++          "sourceInputManifestSha256": "d3b3e952b3970685661cc45b634197ed241aeae539c2154f88f94e0f6ab8c425",
++          "engineBytes": 9660512,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "3d106756f65c6dd18b590ba3f41b4cc760635c27fb738b678ead8bccd8a21897",
++      "canonicalSourceManifestSha256": "f3befd1d49185411b11b55edd8b71b776662aa26c39c517237b11c3d993d15eb",
++      "buildRecipeSha256": "ec9fcd46787673fcef106abe24220de1557fa18d3be25abc9e6a51838438f42f",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v3/native-freeze/off-path.engine.wasm.build.json",
++          "receiptSha256": "a0c0a3c9597beba03afdb5106005a6fe3b3e75cc51b69cde36b7478d06b2e993",
++          "sourceInputManifestSha256": "7d1d017fc3b6718fc22eff455a39a18f253da2015cc00989039e038ba38ccbcf",
++          "engineBytes": 9647823,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1.OFF.path-1.foundations-v3.wasm.build.json",
++          "receiptSha256": "a0c0a3c9597beba03afdb5106005a6fe3b3e75cc51b69cde36b7478d06b2e993",
++          "sourceInputManifestSha256": "7d1d017fc3b6718fc22eff455a39a18f253da2015cc00989039e038ba38ccbcf",
++          "engineBytes": 9647823,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "41207c7421113a6f2ea3e371edd9cfc67d6cfdd44e9d9a88152772b9207324c3",
++      "canonicalSourceManifestSha256": "1150aef169b96a6900b8a075c66be7915c62f84483e6a4cfc69ccabfec35b328",
++      "buildRecipeSha256": "09223fdf06006ffa9a4e42e19706b6dd3ccc36aaeb119866769e9f49e29ead8b",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.wasm.build.json",
++          "receiptSha256": "a30305272f306286e2b6779621bc7d2a3f9131a59c3fdedaea760d6fc98abcb0",
++          "sourceInputManifestSha256": "98cba7fc0ff796a34d786a4dfba1f4ba0ba64a5bc3902921c176f9db7d448a39",
++          "engineBytes": 9455855,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "53047d1652db4d9c92ec8d7652a306eb3bd6564f7a457033f708e386955ee004",
++      "canonicalSourceManifestSha256": "ba5d513cb65834c037f2ab3b80c03b1defe906b6e75fb8010c6b061353e3a6de",
++      "buildRecipeSha256": "c9df086a7cfe736fe6dfa63389da95a18c41f3e8f627c4af0e8cec35c9bde287",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v7/native-freeze/runtime-foundations.engine.wasm.build.json",
++          "receiptSha256": "1f09a0e703f48f1ac6ba32adc9c1c9899566f6fddc1a99c9d39b1fa0a1b4b663",
++          "sourceInputManifestSha256": "847348547c2d77445650859db269d57c3eaad89b743ef7aa55e9144fa26f3452",
++          "engineBytes": 9726719,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1.RUNTIME_ONLY.path-1.events-1.string-decoder-1.assert-1.querystring-1.util-1.foundations-v7.wasm.build.json",
++          "receiptSha256": "1f09a0e703f48f1ac6ba32adc9c1c9899566f6fddc1a99c9d39b1fa0a1b4b663",
++          "sourceInputManifestSha256": "847348547c2d77445650859db269d57c3eaad89b743ef7aa55e9144fa26f3452",
++          "engineBytes": 9726719,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "59ff97845e1376853067639cf56f4180c93a9cef75c2d2df1f5087552300bc36",
++      "canonicalSourceManifestSha256": "976209276fcbc07652489c16324a04c292a40a1a5cf06ff5117e1c5056234e93",
++      "buildRecipeSha256": "af5b0e8cd34aae6923dacf32bfaf80f8c05c8f12edf014a3ae3c77d58ed2226f",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v8/native-freeze/runtime-foundations.engine.wasm.build.json",
++          "receiptSha256": "e4a0a439b5a744c0bea46a8f3bca001f97a194be77fd69d5d7123e081266d4c3",
++          "sourceInputManifestSha256": "2fe9f13719f1f3e577514149745f0070da3862c90286bdcb6ee44c23e11c5d2c",
++          "engineBytes": 9731917,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1-strict-callback-v3.RUNTIME_ONLY.path-1.events-1.string-decoder-1.assert-1.querystring-1.util-1.foundations-v8.wasm.build.json",
++          "receiptSha256": "e4a0a439b5a744c0bea46a8f3bca001f97a194be77fd69d5d7123e081266d4c3",
++          "sourceInputManifestSha256": "2fe9f13719f1f3e577514149745f0070da3862c90286bdcb6ee44c23e11c5d2c",
++          "engineBytes": 9731917,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "680fb48a93921e5bfd077d12338d114913eecc5c6e6b12eb8f66e3e9cd8a554b",
++      "canonicalSourceManifestSha256": "1150aef169b96a6900b8a075c66be7915c62f84483e6a4cfc69ccabfec35b328",
++      "buildRecipeSha256": "94cf6e6211c5d8e6c0289c2cf76aea4722f24ec2182586fcf6b7ed7105d5918b",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-fixed.wasm.build.json",
++          "receiptSha256": "b3a4115e83631e3a030267f55f628edf7e71b0558db2dd2a48614b563041986d",
++          "sourceInputManifestSha256": null,
++          "engineBytes": 9455464,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.phase1.release.wasm.build.json",
++          "receiptSha256": "2781f6848c499fcc4e1676af9e6e3e1a156f9655f47694e9fe9a419811fdb54b",
++          "sourceInputManifestSha256": null,
++          "engineBytes": 9455464,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "69bf0d270ad408353f962d5e2ab7ac3bc0f3804e432540b10ea8098a22133879",
++      "canonicalSourceManifestSha256": "976209276fcbc07652489c16324a04c292a40a1a5cf06ff5117e1c5056234e93",
++      "buildRecipeSha256": "af5b0e8cd34aae6923dacf32bfaf80f8c05c8f12edf014a3ae3c77d58ed2226f",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v8/native-freeze/gc-foundations.engine.wasm.build.json",
++          "receiptSha256": "472c516aead295516b711e96472f666ff133df9c68db32627eb59c18443730d1",
++          "sourceInputManifestSha256": "2fe9f13719f1f3e577514149745f0070da3862c90286bdcb6ee44c23e11c5d2c",
++          "engineBytes": 9726413,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.gc-stress.entropy-entry-v1-strict-callback-v3.OFF.path-1.events-1.string-decoder-1.assert-1.querystring-1.util-1.foundations-v8.wasm.build.json",
++          "receiptSha256": "472c516aead295516b711e96472f666ff133df9c68db32627eb59c18443730d1",
++          "sourceInputManifestSha256": "2fe9f13719f1f3e577514149745f0070da3862c90286bdcb6ee44c23e11c5d2c",
++          "engineBytes": 9726413,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "71c16b52d62beb1c9cae27420fd2b5135c400caf4745b8e872ea5cd9d5921bfa",
++      "canonicalSourceManifestSha256": "a9a62be4e40803d527e1f9393b6c7d3f6dc48d33eaee7beaa05f02c7d449d52a",
++      "buildRecipeSha256": "d9a99a6602aabfb5c329c8fd89819bdff86665addae8d9c5b79aea7d514297eb",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v1/native-freeze/runtime-path.engine.wasm.build.json",
++          "receiptSha256": "be9e33c85e8ed0b4cc142a8d0b950fce97f4ca68ca59d65ea11a2feb08255e89",
++          "sourceInputManifestSha256": "6d5966146a9fa1886ff7e2085f3237318d4f3808a51b8e5325432f5ac9a370f5",
++          "engineBytes": 9606170,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1.RUNTIME_ONLY.path-1.foundations-v1.wasm.build.json",
++          "receiptSha256": "be9e33c85e8ed0b4cc142a8d0b950fce97f4ca68ca59d65ea11a2feb08255e89",
++          "sourceInputManifestSha256": "6d5966146a9fa1886ff7e2085f3237318d4f3808a51b8e5325432f5ac9a370f5",
++          "engineBytes": 9606170,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "8d260bf44128c57e4bfe4053d3c6532d9625458eeb6d78dbe2bc6a8fbbfcb068",
++      "canonicalSourceManifestSha256": "1c8182e55e55cb8cb73bbed8e45532f7d1525c4821d3f41dd720d340cdcc0ec6",
++      "buildRecipeSha256": "ec9fcd46787673fcef106abe24220de1557fa18d3be25abc9e6a51838438f42f",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v2/native-freeze/runtime-path.engine.wasm.build.json",
++          "receiptSha256": "25c6d2a91bca88e48a7f582691c222133d2e2e7afb39cf7cb774dba21fd0ec76",
++          "sourceInputManifestSha256": "fcfd9bff4d7e367b95e294b4bc1e0eccd8313f1ed581d8c53f3b78bcd7ac1d04",
++          "engineBytes": 9654564,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1.RUNTIME_ONLY.path-1.foundations-v2.wasm.build.json",
++          "receiptSha256": "25c6d2a91bca88e48a7f582691c222133d2e2e7afb39cf7cb774dba21fd0ec76",
++          "sourceInputManifestSha256": "fcfd9bff4d7e367b95e294b4bc1e0eccd8313f1ed581d8c53f3b78bcd7ac1d04",
++          "engineBytes": 9654564,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "99fdaa97c2fbdea67cb7e5463d3dd2ca10c6981615acb4483d442079f6aab65c",
++      "canonicalSourceManifestSha256": "a3c4ab8140f253086671f4fa4c8396121021fa6fe3786edcf81c6beef717f379",
++      "buildRecipeSha256": "4c369266cf11b9a0f74aff6ba9492b25b69aa41f899733aa5f568241506d5977",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.allocation-r2.wasm.build.json",
++          "receiptSha256": "bd49f76d7ae0b80002fcf695413421c794fcc39dd3b87fe78ba0a849b1bdd86e",
++          "sourceInputManifestSha256": "38254d9c289352d0c90a0167fc5c277ad02dfa91e882cb81b1bd82d306ac5027",
++          "engineBytes": 9455863,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "b02d17366c905ad46108a4c4ca705213572c5f3a6b8dd9bc52494730a7dfe0ad",
++      "canonicalSourceManifestSha256": "1c8182e55e55cb8cb73bbed8e45532f7d1525c4821d3f41dd720d340cdcc0ec6",
++      "buildRecipeSha256": "ec9fcd46787673fcef106abe24220de1557fa18d3be25abc9e6a51838438f42f",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v2/native-freeze/off-path.engine.wasm.build.json",
++          "receiptSha256": "2693bdf84ba0ef85504717271ee61bc7dc368a072b2d2d7d719a16ee3a77f0e4",
++          "sourceInputManifestSha256": "fcfd9bff4d7e367b95e294b4bc1e0eccd8313f1ed581d8c53f3b78bcd7ac1d04",
++          "engineBytes": 9647504,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1.OFF.path-1.foundations-v2.wasm.build.json",
++          "receiptSha256": "2693bdf84ba0ef85504717271ee61bc7dc368a072b2d2d7d719a16ee3a77f0e4",
++          "sourceInputManifestSha256": "fcfd9bff4d7e367b95e294b4bc1e0eccd8313f1ed581d8c53f3b78bcd7ac1d04",
++          "engineBytes": 9647504,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "c89d9b4f0b5d8decac81e76dec030167e716bf2071c073d58e58a95a2f510de7",
++      "canonicalSourceManifestSha256": "b9da295dbc5fd32799b0f013cdb507eb3b9181e94d4cca36e9fcf3b87811402e",
++      "buildRecipeSha256": "ef3c91e7b9c20745600a040645e83c41013a44a16184e9ab2f12edda010f84ab",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v4/native-freeze/runtime-path-events.engine.wasm.build.json",
++          "receiptSha256": "53d6fe6f19a620d1c6e58b042074be7b177c183d3ff6317166b25779c4260902",
++          "sourceInputManifestSha256": "d3b3e952b3970685661cc45b634197ed241aeae539c2154f88f94e0f6ab8c425",
++          "engineBytes": 9667578,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1.RUNTIME_ONLY.path-1.events-1.foundations-v4.wasm.build.json",
++          "receiptSha256": "53d6fe6f19a620d1c6e58b042074be7b177c183d3ff6317166b25779c4260902",
++          "sourceInputManifestSha256": "d3b3e952b3970685661cc45b634197ed241aeae539c2154f88f94e0f6ab8c425",
++          "engineBytes": 9667578,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "d2df3d27e9fed343f457dd6bfda381ffe2dd9a0ac8f83a59aa09afcad9a7a87c",
++      "canonicalSourceManifestSha256": "dec46fcec9bf73f9d476baacaec54b9267635c9f0e30e83d775ea6257475e235",
++      "buildRecipeSha256": "ab6227f6f763f62794e34c37ac76cb414a9b8697c423edad229e1412a9aa2515",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v6/native-freeze/runtime-foundations.engine.wasm.build.json",
++          "receiptSha256": "47d76e3c5fc241741adbed1219e205ad63644e8c7daef96c2640163cd856adc4",
++          "sourceInputManifestSha256": "bd7e7f2726131ae35ed5c9aac66ee592b172482383a02d66d39c59c80538229e",
++          "engineBytes": 9707433,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1.RUNTIME_ONLY.path-1.events-1.string-decoder-1.assert-1.querystring-1.foundations-v6.wasm.build.json",
++          "receiptSha256": "47d76e3c5fc241741adbed1219e205ad63644e8c7daef96c2640163cd856adc4",
++          "sourceInputManifestSha256": "bd7e7f2726131ae35ed5c9aac66ee592b172482383a02d66d39c59c80538229e",
++          "engineBytes": 9707433,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "e16c19fc567753517d7b61b65372dd7dc86de8f839e7acab959b5cf5eaf294c9",
++      "canonicalSourceManifestSha256": "976209276fcbc07652489c16324a04c292a40a1a5cf06ff5117e1c5056234e93",
++      "buildRecipeSha256": "af5b0e8cd34aae6923dacf32bfaf80f8c05c8f12edf014a3ae3c77d58ed2226f",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v8/native-freeze/off-foundations.engine.wasm.build.json",
++          "receiptSha256": "857dde83661919ac0c494b17be1cfd7bb2d5b4724067b6cffb433b7c252d9dad",
++          "sourceInputManifestSha256": "2fe9f13719f1f3e577514149745f0070da3862c90286bdcb6ee44c23e11c5d2c",
++          "engineBytes": 9724864,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1-strict-callback-v3.OFF.path-1.events-1.string-decoder-1.assert-1.querystring-1.util-1.foundations-v8.wasm.build.json",
++          "receiptSha256": "857dde83661919ac0c494b17be1cfd7bb2d5b4724067b6cffb433b7c252d9dad",
++          "sourceInputManifestSha256": "2fe9f13719f1f3e577514149745f0070da3862c90286bdcb6ee44c23e11c5d2c",
++          "engineBytes": 9724864,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "e37e0d9de30a17c22c48b1d0d449016866be851aa418ef35603f0b1788721d6f",
++      "canonicalSourceManifestSha256": "f3befd1d49185411b11b55edd8b71b776662aa26c39c517237b11c3d993d15eb",
++      "buildRecipeSha256": "ec9fcd46787673fcef106abe24220de1557fa18d3be25abc9e6a51838438f42f",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v3/native-freeze/runtime-path.engine.wasm.build.json",
++          "receiptSha256": "edc9a82f45f371b569bd202c6db02b19e54d094a2baa3ce71a1ef11c4f38f048",
++          "sourceInputManifestSha256": "7d1d017fc3b6718fc22eff455a39a18f253da2015cc00989039e038ba38ccbcf",
++          "engineBytes": 9654890,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1.RUNTIME_ONLY.path-1.foundations-v3.wasm.build.json",
++          "receiptSha256": "edc9a82f45f371b569bd202c6db02b19e54d094a2baa3ce71a1ef11c4f38f048",
++          "sourceInputManifestSha256": "7d1d017fc3b6718fc22eff455a39a18f253da2015cc00989039e038ba38ccbcf",
++          "engineBytes": 9654890,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "ee92d5d451c16eb7ce83e0306e8dab6920f4aacd9f2c4bb9d6e5e4af2c20ea09",
++      "canonicalSourceManifestSha256": "ba5d513cb65834c037f2ab3b80c03b1defe906b6e75fb8010c6b061353e3a6de",
++      "buildRecipeSha256": "c9df086a7cfe736fe6dfa63389da95a18c41f3e8f627c4af0e8cec35c9bde287",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v7/native-freeze/off-foundations.engine.wasm.build.json",
++          "receiptSha256": "7c18df4fa8dec31742e0cd4eb65bb48e2f89450b0ee93d61b9d8e406038cea9e",
++          "sourceInputManifestSha256": "847348547c2d77445650859db269d57c3eaad89b743ef7aa55e9144fa26f3452",
++          "engineBytes": 9719461,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1.OFF.path-1.events-1.string-decoder-1.assert-1.querystring-1.util-1.foundations-v7.wasm.build.json",
++          "receiptSha256": "7c18df4fa8dec31742e0cd4eb65bb48e2f89450b0ee93d61b9d8e406038cea9e",
++          "sourceInputManifestSha256": "847348547c2d77445650859db269d57c3eaad89b743ef7aa55e9144fa26f3452",
++          "engineBytes": 9719461,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    },
++    {
++      "engineSha256": "ff770f47dea834da5077fa10f4c1af1e89165519e9d67b664e9b7abf1bfcdb5b",
++      "canonicalSourceManifestSha256": "e6e6e422368c950b946c74b55c2efe121c6091af6a52a186d85ae32f70511321",
++      "buildRecipeSha256": "ef3c91e7b9c20745600a040645e83c41013a44a16184e9ab2f12edda010f84ab",
++      "externalReceipts": [
++        {
++          "receiptPath": "/tmp/starling-node-compat/foundations-v5/native-freeze/runtime-path-events.engine.wasm.build.json",
++          "receiptSha256": "7c0460d6ac854eeaafa9f57200c4c814efd2d031d4eccb545306d3d7f6ad0d66",
++          "sourceInputManifestSha256": "730d69951269e37892e6d5ec1a9a2b4c75007946fbb47903c95742b9852f1e72",
++          "engineBytes": 9667891,
++          "buildType": "Release",
++          "oomTesting": false
++        },
++        {
++          "receiptPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-i32-i64-v1.entropy-entry-v1.RUNTIME_ONLY.path-1.events-1.foundations-v5.wasm.build.json",
++          "receiptSha256": "7c0460d6ac854eeaafa9f57200c4c814efd2d031d4eccb545306d3d7f6ad0d66",
++          "sourceInputManifestSha256": "730d69951269e37892e6d5ec1a9a2b4c75007946fbb47903c95742b9852f1e72",
++          "engineBytes": 9667891,
++          "buildType": "Release",
++          "oomTesting": false
++        }
++      ]
++    }
++  ]
++}
+--- /dev/null
++++ b/tests/node-compat/legacy-stream-web-test-receipt.json
+@@ -0,0 +1,1242 @@
++{
++  "schemaVersion": 1,
++  "engineSha256": "e16c19fc567753517d7b61b65372dd7dc86de8f839e7acab959b5cf5eaf294c9",
++  "buildRecipeSha256": "af5b0e8cd34aae6923dacf32bfaf80f8c05c8f12edf014a3ae3c77d58ed2226f",
++  "profileEnabled": true,
++  "pathEnabled": true,
++  "eventsEnabled": true,
++  "stringDecoderEnabled": true,
++  "assertEnabled": true,
++  "querystringEnabled": true,
++  "utilEnabled": true,
++  "observedCMakeOptions": {
++    "CMAKE_BUILD_TYPE": "Release",
++    "ENABLE_BUILTIN_NODE_COMPAT": "ON",
++    "ENABLE_BUILTIN_WPT_SUPPORT": "OFF",
++    "ENABLE_JS_DEBUGGER": "OFF",
++    "NODE_COMPAT_ASSERT": "ON",
++    "NODE_COMPAT_ENTROPY_MODE": "OFF",
++    "NODE_COMPAT_EVENTS": "ON",
++    "NODE_COMPAT_GC_STRESS": "OFF",
++    "NODE_COMPAT_LOCKED_RUST": "ON",
++    "NODE_COMPAT_OOM_TESTING": "OFF",
++    "NODE_COMPAT_PATH": "ON",
++    "NODE_COMPAT_QUERYSTRING": "ON",
++    "NODE_COMPAT_STRING_DECODER": "ON",
++    "NODE_COMPAT_UTIL": "ON",
++    "USE_WASM_OPT": "ON",
++    "WEVAL": "OFF"
++  },
++  "selectedModuleManifests": [
++    {
++      "path": "builtins/node-compat/export-manifest.node-v22.14.0.json",
++      "sha256": "0e482334c46240f1cc4a20e97530a2339e14339f29dc14c27e025f1e6d218439",
++      "profileVersion": "sm-node-22.14.0-m0.8"
++    },
++    {
++      "path": "builtins/node-compat/export-manifest.path.node-v22.14.0.json",
++      "sha256": "70c15899224ff4e8bf8bf3eafe2778622ab77d1981a82ff95814245408fc8ca6",
++      "profileVersion": "sm-node-22.14.0-m0.2"
++    },
++    {
++      "path": "builtins/node-compat/export-manifest.events.node-v22.14.0.json",
++      "sha256": "1f9224fc53faac8f6d9b8ca6ba57dffb2ce5a862aa6d064c181788f4cf89fb58",
++      "profileVersion": "sm-node-22.14.0-m0.3"
++    },
++    {
++      "path": "builtins/node-compat/export-manifest.string-decoder.node-v22.14.0.json",
++      "sha256": "e4fdf44af26cb5c80729a44e06a3d8c58c8d37f083cd8ae3c779c366b0aefe3a",
++      "profileVersion": "sm-node-22.14.0-m0.4"
++    },
++    {
++      "path": "builtins/node-compat/export-manifest.assert.node-v22.14.0.json",
++      "sha256": "815429917fe9a4378f09b1ce345b0a51b8f9622f2743dac2087167621cecd4d0",
++      "profileVersion": "sm-node-22.14.0-m0.5"
++    },
++    {
++      "path": "builtins/node-compat/export-manifest.querystring.node-v22.14.0.json",
++      "sha256": "0f58f6280715e206709fc49d1fec1ea8d4597a4b990e90dbf52a2f504faef882",
++      "profileVersion": "sm-node-22.14.0-m0.6"
++    },
++    {
++      "path": "builtins/node-compat/export-manifest.util.node-v22.14.0.json",
++      "sha256": "dc8a4ba0756bcc31156498282232e3710538e372c82462353a875be075820fed",
++      "profileVersion": "sm-node-22.14.0-m0.7"
++    }
++  ],
++  "sourceManifest": [
++    {
++      "path": "builtins/install_builtins.cpp",
++      "sha256": "5505f41a11079e4668ffb0aeb1718a0fb840674f585a4ba1ff39d4d27ae60bf0"
++    },
++    {
++      "path": "builtins/node-compat/assert-factories.generated.h",
++      "sha256": "c5502d92ed2621271bcc339c6aaa078b487bb4cc4c17bf8bfa239a54d5c83d27"
++    },
++    {
++      "path": "builtins/node-compat/assert-strict.mjs",
++      "sha256": "9774157f6a2829ebcb903f3df2db93a9aaf8c40f5bbda03d6dd2b16797998d91"
++    },
++    {
++      "path": "builtins/node-compat/assert.mjs",
++      "sha256": "3637bc6bc031a28448597b477996a55353e9a4cadf0b299adb6786e4a15689a1"
++    },
++    {
++      "path": "builtins/node-compat/buffer-facade.mjs",
++      "sha256": "4af877ca8ebb0273c71d5289fc2e60084623ef57ff10b0a6735181e65af8452d"
++    },
++    {
++      "path": "builtins/node-compat/buffer.cpp",
++      "sha256": "7f73ce790e6b23195a9bfa583bacdbf45dfb9fa9aed00489f66952d93ca37cf8"
++    },
++    {
++      "path": "builtins/node-compat/child-process.mjs",
++      "sha256": "25bd89f2728a257e1dd8e576eb711ec51b73a759915f8de79e44bb4b336387f9"
++    },
++    {
++      "path": "builtins/node-compat/entropy-bridge.cpp",
++      "sha256": "525352af873ad1bac3598ae8e0ab1226411357e6a5d0530a9cb0969988f20071"
++    },
++    {
++      "path": "builtins/node-compat/entropy-policy.cpp",
++      "sha256": "efdff496d591ce01a5841dcf38aeed61228ec0d330b39931cca627d8520edeb8"
++    },
++    {
++      "path": "builtins/node-compat/events-factories.generated.h",
++      "sha256": "7542bbd1dd708b03d0b0f7d1a8467b0057de583b7a1e39bf02e96cc4b90962da"
++    },
++    {
++      "path": "builtins/node-compat/events.mjs",
++      "sha256": "65cf8a644214bfa1f06f8e432270a077640a5f3d79c1e242a381b816fc13311d"
++    },
++    {
++      "path": "builtins/node-compat/export-manifest.assert.node-v22.14.0.json",
++      "sha256": "815429917fe9a4378f09b1ce345b0a51b8f9622f2743dac2087167621cecd4d0"
++    },
++    {
++      "path": "builtins/node-compat/export-manifest.events.node-v22.14.0.json",
++      "sha256": "1f9224fc53faac8f6d9b8ca6ba57dffb2ce5a862aa6d064c181788f4cf89fb58"
++    },
++    {
++      "path": "builtins/node-compat/export-manifest.node-v22.14.0.json",
++      "sha256": "0e482334c46240f1cc4a20e97530a2339e14339f29dc14c27e025f1e6d218439"
++    },
++    {
++      "path": "builtins/node-compat/export-manifest.path.node-v22.14.0.json",
++      "sha256": "70c15899224ff4e8bf8bf3eafe2778622ab77d1981a82ff95814245408fc8ca6"
++    },
++    {
++      "path": "builtins/node-compat/export-manifest.querystring.node-v22.14.0.json",
++      "sha256": "0f58f6280715e206709fc49d1fec1ea8d4597a4b990e90dbf52a2f504faef882"
++    },
++    {
++      "path": "builtins/node-compat/export-manifest.string-decoder.node-v22.14.0.json",
++      "sha256": "e4fdf44af26cb5c80729a44e06a3d8c58c8d37f083cd8ae3c779c366b0aefe3a"
++    },
++    {
++      "path": "builtins/node-compat/export-manifest.util.node-v22.14.0.json",
++      "sha256": "dc8a4ba0756bcc31156498282232e3710538e372c82462353a875be075820fed"
++    },
++    {
++      "path": "builtins/node-compat/factories.generated.h",
++      "sha256": "cc04376c304ce2c4fe5a6f17eff54256123f02bdfe88555880e1e888babfc869"
++    },
++    {
++      "path": "builtins/node-compat/generate-assert-factories.mjs",
++      "sha256": "ddf083dfb88250d1389adabe8503fd52eca1fe34bdd8965bd47bb041f1bea151"
++    },
++    {
++      "path": "builtins/node-compat/generate-factories.mjs",
++      "sha256": "9e1db6627585c64e1584a171134f85a71ea62b29bb2e7a669d43d4d68e638bd8"
++    },
++    {
++      "path": "builtins/node-compat/generate-querystring-factories.mjs",
++      "sha256": "e61bcfc6bba4ca3e93bcba2856cd9784772ca0548bcc65768a0c97ae200e3003"
++    },
++    {
++      "path": "builtins/node-compat/generate-string-decoder-factory.mjs",
++      "sha256": "95c8fc238e3e7fd0f8a0ed444d0d623b0d0c141a0ec63912322b947cf787cf87"
++    },
++    {
++      "path": "builtins/node-compat/generate-util-factories.mjs",
++      "sha256": "0e7ac94d3e92bc2f79361525d4934db95915b698906cec6dd001ca5eebbeddf5"
++    },
++    {
++      "path": "builtins/node-compat/manifest.schema.json",
++      "sha256": "f4a2b226dac9f655ab1f8d711a417384c5f6d4084b7bcb60fbc64284a171e0d3"
++    },
++    {
++      "path": "builtins/node-compat/oom-testing.h",
++      "sha256": "7fc456216297b3048a3c026ed39aa7710ccb29ceedc67a0fec1159a5620f3101"
++    },
++    {
++      "path": "builtins/node-compat/path-factories.generated.h",
++      "sha256": "6e532ae164f9bffc53424a6e784b356d0f945c630b9d6d8110f5fef80b9bbf56"
++    },
++    {
++      "path": "builtins/node-compat/path-matcher.mjs",
++      "sha256": "d5b8d8e92c24b80d42d42d25fcf9b349b8a9a7aa8c4165e889cf2f8b6de3364e"
++    },
++    {
++      "path": "builtins/node-compat/path-sources.json",
++      "sha256": "3549191da3dce26ed1208f1c86d204275f561767c2ccbcbd2266522c6bd6eaff"
++    },
++    {
++      "path": "builtins/node-compat/path-vendor/balanced-match/index.mjs",
++      "sha256": "bfd71925c0eb86131b2fcec5c3c6a32f2a36de2108b8d721a436994564a112c7"
++    },
++    {
++      "path": "builtins/node-compat/path-vendor/brace-expansion/index.mjs",
++      "sha256": "353125318eff2f45d0af161a03ea1e84907c5d9c1026d48f1a965d1c70d9ba8a"
++    },
++    {
++      "path": "builtins/node-compat/path-vendor/entry.mjs",
++      "sha256": "0df2530b278a2106063587d105191182b1f35d8b345f21aab114b90b6225eb33"
++    },
++    {
++      "path": "builtins/node-compat/path-vendor/minimatch/assert-valid-pattern.mjs",
++      "sha256": "4a505d04755cfaea3206043244612b5f91c947ccbe09793f130ea0e0f3482eb8"
++    },
++    {
++      "path": "builtins/node-compat/path-vendor/minimatch/escape.mjs",
++      "sha256": "3d3e1d653e7d49ba3e6337f03287db4df88b63715ec521138925e7a15c55ea4d"
++    },
++    {
++      "path": "builtins/node-compat/path-vendor/minimatch/index.mjs",
++      "sha256": "331e19f2ff921364549d869a770a6aa9a2589a318f64fd5ff2cc8ac812742ef4"
++    },
++    {
++      "path": "builtins/node-compat/path-vendor/minimatch/unescape.mjs",
++      "sha256": "87848db49fc796f010cfbdf27a928b379a4867a6f074504858f9a011e4356b52"
++    },
++    {
++      "path": "builtins/node-compat/path-vendor/nonrecursive-glob-match/index.mjs",
++      "sha256": "80758d417dffa5fd55e6411818a77c9c426e491fa757c31c45d8e3cc481d2372"
++    },
++    {
++      "path": "builtins/node-compat/path-vendor/nonrecursive-glob-match/parse-class.mjs",
++      "sha256": "f290843ffecadefdcba530442b389a26d3e4e40b767cee44205c47746338fc85"
++    },
++    {
++      "path": "builtins/node-compat/path-vendor/package-pins.json",
++      "sha256": "f3c2ca7a0b59e977513c410bbc5b64352f2503f2aa1a111adc8cc1017954ed99"
++    },
++    {
++      "path": "builtins/node-compat/path-vendor/resource-budget.mjs",
++      "sha256": "23146d938e4d7ea6bea99976d4fe84dd78e7367bc177b588592f0acfe70fb578"
++    },
++    {
++      "path": "builtins/node-compat/path-vendor/source-manifest.json",
++      "sha256": "221150e41b3079b89811a2b9d112122be85cf413f04d13e592092b05bcc239e0"
++    },
++    {
++      "path": "builtins/node-compat/path-vendor/unicode-categories.mjs",
++      "sha256": "075226e0b9966540fa7e538788186f214e14ed2f4f3efeb6eef656640f1ea7e2"
++    },
++    {
++      "path": "builtins/node-compat/path.mjs",
++      "sha256": "ec7231b0fc404d5a1af5469bc9f95e10f3267bd37ec3b19bc6a79750638753fc"
++    },
++    {
++      "path": "builtins/node-compat/querystring-factories.generated.h",
++      "sha256": "8bd7c70107b0ae33ae09be100e122be97584c8a02da43a07297d6aa0be42c4c9"
++    },
++    {
++      "path": "builtins/node-compat/querystring.mjs",
++      "sha256": "e9dbdc4ddffd91fdf6aef911074c8cc458b0505e16354d94dafdf1d7a0fae91b"
++    },
++    {
++      "path": "builtins/node-compat/register.cpp",
++      "sha256": "820a7d9c794aa6905b815cc68f2dce06f1f89c62767d0841898ebfd578dd798a"
++    },
++    {
++      "path": "builtins/node-compat/string-decoder-factories.generated.h",
++      "sha256": "7722cd08dc9399628d9c8077f3f11b49d7c62bdea75f67d727d467b6a4a909d4"
++    },
++    {
++      "path": "builtins/node-compat/string-decoder-sources.json",
++      "sha256": "453e35cb098b8936dcb77fac92d34b565e67429ac8663631b30f71460c4ded8d"
++    },
++    {
++      "path": "builtins/node-compat/string-decoder.mjs",
++      "sha256": "24270ecf80e42f99383935e6ffcfd52f2139881a20a5abe2523cd49964e5a630"
++    },
++    {
++      "path": "builtins/node-compat/unsupported.mjs",
++      "sha256": "013c1934c72a8abfb3e134f29baeb49098a4fda6fad2966df033b5f24ff0957e"
++    },
++    {
++      "path": "builtins/node-compat/util-core.mjs",
++      "sha256": "9044180871db58ad240511bf6506f4920fc0e055008ca9c1e316354ff77649bb"
++    },
++    {
++      "path": "builtins/node-compat/util-factories.generated.h",
++      "sha256": "81ae4ae2e0956c9a5ff9a991be00d5a4cc267b2545e10f956e26501cd0163b58"
++    },
++    {
++      "path": "builtins/node-compat/util-metadata.mjs",
++      "sha256": "13e5b3d9d0c37c089195003ec4974b25ca68296f317aef7ff232b3617918cc4b"
++    },
++    {
++      "path": "builtins/node-compat/util-types.mjs",
++      "sha256": "e7e6987f4686febe8b68e35fc972d7b0a3aaaaf8d30d08c1dafe962f551e65c4"
++    },
++    {
++      "path": "builtins/node-compat/util-unsupported.mjs",
++      "sha256": "5985a6d8645f518485880706b52c1c1a4d01a34b7c5d9ecbec72a03f6e80eb1c"
++    },
++    {
++      "path": "builtins/node-compat/util.mjs",
++      "sha256": "51364823bd0e09f56152f7450b12ddd01de0f2f64ab96591780051aa2c9fbef6"
++    },
++    {
++      "path": "builtins/node-compat/validate-manifest.mjs",
++      "sha256": "b28fe321a8bcbef5f2f671d800d8c316e4a12ed08fbe50f3efb39202efdfe6f1"
++    },
++    {
++      "path": "builtins/web/abort/abort-controller.cpp",
++      "sha256": "4a1714b4b07203feac0b5be4177f9b45c954dc17911845c7825c72ec5f2b2352"
++    },
++    {
++      "path": "builtins/web/abort/abort-controller.h",
++      "sha256": "9216aa5be96b8b8a09080dbf7f8ab6d1ffb27199c314708b9a0e491a59a67106"
++    },
++    {
++      "path": "builtins/web/abort/abort-signal.cpp",
++      "sha256": "12086edfed66950f8830c759d9900f4792adf3354f4d5468e74a217dc58bbebd"
++    },
++    {
++      "path": "builtins/web/abort/abort-signal.h",
++      "sha256": "ba8b1ce78deaabf0e86dae56b9eaf79e59e55f179b8a0deda3ef6bed4f8f9b46"
++    },
++    {
++      "path": "builtins/web/abort/weak-index-set.h",
++      "sha256": "0a919f6ee4c6625708370d7778d054ab809b2d844a862f563090ce4697041967"
++    },
++    {
++      "path": "builtins/web/base64.cpp",
++      "sha256": "3d9c126fcdcb37e5c38353a592afcfda74e0b1081a70e85a09193361efb83466"
++    },
++    {
++      "path": "builtins/web/base64.h",
++      "sha256": "c31b0d657535513a7339ba480afa359e4e9f891e68bf67a7db89a869a964e3aa"
++    },
++    {
++      "path": "builtins/web/blob.cpp",
++      "sha256": "7102e687bc4088453afb30cf6644463dd720bc03809ddc53bb964129500eeaf3"
++    },
++    {
++      "path": "builtins/web/blob.h",
++      "sha256": "abe552afc11c8915dfd5b22988ae3e26659a949fc9b11623feb26aadf0d9dd2b"
++    },
++    {
++      "path": "builtins/web/console.cpp",
++      "sha256": "fb10843c97632329f7c15eab3292344b1ab5ee18f3c2a7bf9482f616bf8b34c8"
++    },
++    {
++      "path": "builtins/web/console.h",
++      "sha256": "46c234b4740759019d253553d55b721de9641a9e225c840d471636038141f97f"
++    },
++    {
++      "path": "builtins/web/crypto/buffer-source.h",
++      "sha256": "c4e74035c3b4df036081f410a1857fc14ea29ca6b671aa70bce4f89a0c2f9585"
++    },
++    {
++      "path": "builtins/web/crypto/crypto-algorithm.cpp",
++      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8"
++    },
++    {
++      "path": "builtins/web/crypto/crypto-algorithm.h",
++      "sha256": "67f0a22237ec7ba0258faf36226a5606aa2b8913348328ab3c199caacdae3193"
++    },
++    {
++      "path": "builtins/web/crypto/crypto-key-ec-components.cpp",
++      "sha256": "2b3a17e269be0d125d518876cd026b6e1a7757b29f0e58d788afe3759d23360e"
++    },
++    {
++      "path": "builtins/web/crypto/crypto-key-ec-components.h",
++      "sha256": "683001cf209f3c74756dea63bba0ad79a482be5221cc24ef509b104d4baace59"
++    },
++    {
++      "path": "builtins/web/crypto/crypto-key-rsa-components.cpp",
++      "sha256": "507982e73cfac7fe0a4af6aaee887a921df96b2c4f7659b48087ff682a4771df"
++    },
++    {
++      "path": "builtins/web/crypto/crypto-key-rsa-components.h",
++      "sha256": "821db0b207c881053b070f5cc9e1676872a7cca92a9e3952b6f220f16600e5a6"
++    },
++    {
++      "path": "builtins/web/crypto/crypto-key.cpp",
++      "sha256": "4ceb7cd64049e23db83bdd4e7c71900cb70a114f68fa85a093cf94666c661a11"
++    },
++    {
++      "path": "builtins/web/crypto/crypto-key.h",
++      "sha256": "a46acec82fbf3adbe5fc2599caf422a1ef699c2d7679eb5692ab1cb7e835580d"
++    },
++    {
++      "path": "builtins/web/crypto/crypto-raii.h",
++      "sha256": "1f380e18b8bed8e8f4789215e85f4661238607c761624a01637bd66fedf3a2c0"
++    },
++    {
++      "path": "builtins/web/crypto/crypto.cpp",
++      "sha256": "33a529f855a2bf3ec91ede66cb538c60868628c8535813b8db1377e02b2de3d5"
++    },
++    {
++      "path": "builtins/web/crypto/crypto.h",
++      "sha256": "d6e6979d4ef12879f49b7b5a7f9ba44a821c1928a386fdeb676adfa259c77ff1"
++    },
++    {
++      "path": "builtins/web/crypto/json-web-key.cpp",
++      "sha256": "7cb60d1c764f3b3fbef62f4b0c45beefbad01b3dd53ba342acf937eaa4830b55"
++    },
++    {
++      "path": "builtins/web/crypto/json-web-key.h",
++      "sha256": "602bd4f5737c53968fd33dd3aa5f3170e9c250ee217367417856a2e9a79016ac"
++    },
++    {
++      "path": "builtins/web/crypto/subtle-crypto.cpp",
++      "sha256": "f58d225c0374cc91522a427c7921f06c04afb73a458836c743da246318b29f99"
++    },
++    {
++      "path": "builtins/web/crypto/subtle-crypto.h",
++      "sha256": "995a68266233280b4459b6407ff9470f3be463d3e897c55dfa930e776f597e6f"
++    },
++    {
++      "path": "builtins/web/crypto/uuid.cpp",
++      "sha256": "412d2f148790f8aa2faa5e5e4c22a61a8a804e27e9061a88d0ddc1e1d9b335b8"
++    },
++    {
++      "path": "builtins/web/crypto/uuid.h",
++      "sha256": "013e01e606dff092571792c037f26e4a5b8bcc9e82fa56e3c253ea3a391b5466"
++    },
++    {
++      "path": "builtins/web/dom-exception.cpp",
++      "sha256": "7d51a56e77de10c80d90611056695a517af312120543e60c3d230cc1ae6632f7"
++    },
++    {
++      "path": "builtins/web/dom-exception.h",
++      "sha256": "30ad9153abf8ba738e7968df6c34f95cd8b6ca56f3b477396947380b7ac3ef96"
++    },
++    {
++      "path": "builtins/web/event/custom-event.cpp",
++      "sha256": "6d4f69388559ae1db2a031d7f8e497bc57d059a5b575a06fdad7f71b73002534"
++    },
++    {
++      "path": "builtins/web/event/custom-event.h",
++      "sha256": "e3f7c13df5dfee26eac2e27d53a3e09a21c20415f0caf36fa2d819c7d4ad941f"
++    },
++    {
++      "path": "builtins/web/event/event-target.cpp",
++      "sha256": "431267539ab361832094fd212af3b3605241ea0f2ad196b132c6df78e33896d5"
++    },
++    {
++      "path": "builtins/web/event/event-target.h",
++      "sha256": "31e3c9414e260ef3e7d959aa16ead48a268c7b9ef6166b3283bc50689b4c558a"
++    },
++    {
++      "path": "builtins/web/event/event.cpp",
++      "sha256": "2514974869dd00834f666a1fd6fe7fd10cbbf6f9c5dab9186ba28dd20d672f11"
++    },
++    {
++      "path": "builtins/web/event/event.h",
++      "sha256": "fc02b5e2debe58f7f99e076f271282e8ab4ea22fe49ae2cb4d6915be282bb0fc"
++    },
++    {
++      "path": "builtins/web/event/global-event-target.cpp",
++      "sha256": "ed9af74351155434a340f9489395c63a4a609e78bf706e13e6b02a2a7053fe9c"
++    },
++    {
++      "path": "builtins/web/event/global-event-target.h",
++      "sha256": "05ab68a1e532cee03f1c2ad2f08c1a23fbd9e9c803e6a066c42265f108c937c2"
++    },
++    {
++      "path": "builtins/web/fetch/fetch-api.cpp",
++      "sha256": "0992832f377bd45986e79447f463f1de2ff609f32d53723e0ef04de2c7178cf2"
++    },
++    {
++      "path": "builtins/web/fetch/fetch-api.h",
++      "sha256": "b0e6da4277caa80f180bd4a6d30d69ea039d2a9ed6b7bf7b82f946813ccabeb4"
++    },
++    {
++      "path": "builtins/web/fetch/fetch-errors.h",
++      "sha256": "446b06aa907c82c6995537e273b304fdb5bc6b9166d683aabf1bdfc3f5d1effe"
++    },
++    {
++      "path": "builtins/web/fetch/fetch-utils.cpp",
++      "sha256": "4ab6ea2442c5c90bb91b2b4e4039f29b1c4aae54c8afc558221eb804cac9b7a4"
++    },
++    {
++      "path": "builtins/web/fetch/fetch-utils.h",
++      "sha256": "c131ff996e7246d331743ac263b01dca86fc889394e2f675395351c9c10b8db0"
++    },
++    {
++      "path": "builtins/web/fetch/fetch_event.cpp",
++      "sha256": "232b45f96c22c5299f7c0363ba42fcd9643ca66915569f50fe7f5328f4862645"
++    },
++    {
++      "path": "builtins/web/fetch/fetch_event.h",
++      "sha256": "da85ed3e64416651e72d7f0e753251055a306739a822e69f8ac7a066f6fbab80"
++    },
++    {
++      "path": "builtins/web/fetch/headers.cpp",
++      "sha256": "579e55194b1658f0cb265c6b67f808fa64611b09a01cf03c53c3eecea52e30ed"
++    },
++    {
++      "path": "builtins/web/fetch/headers.h",
++      "sha256": "ce12434f464a9c6cdbb31ade1917aa8404f37e12e6888bec40aa5e18baa1df53"
++    },
++    {
++      "path": "builtins/web/fetch/request-response.cpp",
++      "sha256": "82c93feef45b8603ae1e6641ce9140d660cd8f8baf7334856e5aa17a55e7a7f7"
++    },
++    {
++      "path": "builtins/web/fetch/request-response.h",
++      "sha256": "1bf4120a089d14aca5b86d6409a51a27c61b3c6d1f073b55805277be494df401"
++    },
++    {
++      "path": "builtins/web/file.cpp",
++      "sha256": "dedd92ed4735520df8575fbecf015d1d62c065033dbc4ce7fc8864350bff7c3c"
++    },
++    {
++      "path": "builtins/web/file.h",
++      "sha256": "24274f320548afac6fe35d8328a6273403c602fbf5e359bc63eb24bba34ac25b"
++    },
++    {
++      "path": "builtins/web/form-data/form-data-encoder.cpp",
++      "sha256": "cdea2a622cd22b96389d82101fa957a3b70441dfcd8fd8352c148969bf417abe"
++    },
++    {
++      "path": "builtins/web/form-data/form-data-encoder.h",
++      "sha256": "ae0254daa13d14827098df2f3d0957fa3364dde5557f58789c7bf6f4e206af8b"
++    },
++    {
++      "path": "builtins/web/form-data/form-data-parser.cpp",
++      "sha256": "33d66ee074269e18e51c214ef1fbd605c382765456ddd2d46920e924b2de6178"
++    },
++    {
++      "path": "builtins/web/form-data/form-data-parser.h",
++      "sha256": "144c5f2bd5945a06731ace7f8116e54db4e5163a862a255796f423adde93dc13"
++    },
++    {
++      "path": "builtins/web/form-data/form-data.cpp",
++      "sha256": "ba5bc500e83ebc432b81e68a33f6165f0906ebdc4580b24830668957360c8f57"
++    },
++    {
++      "path": "builtins/web/form-data/form-data.h",
++      "sha256": "3b78d57ed107311467db6a8af237c776419fd25d4c73290dd7dde33d9be58656"
++    },
++    {
++      "path": "builtins/web/global_self.cpp",
++      "sha256": "980b4b252b5fd3648157dc5b75f3e075629220edde94cbdb8661adb176ac8b09"
++    },
++    {
++      "path": "builtins/web/global_self.h",
++      "sha256": "f9acb65a6eb49a3e25d2e8d9c95ca34caed0ce1cb1e7aabfa17460b68f4c3907"
++    },
++    {
++      "path": "builtins/web/performance.cpp",
++      "sha256": "18a962f8811544882f7cc02237c7afdbfb0878c1107225fd9eb6812bf0dca2ed"
++    },
++    {
++      "path": "builtins/web/performance.h",
++      "sha256": "675c7d94c76a543a7e997846403adead00d5bb6bb9010d40aada1987215dc8a0"
++    },
++    {
++      "path": "builtins/web/queue-microtask.cpp",
++      "sha256": "4682acab4029684ac66c8da699dabcb6b752f8622f0fcf8d919d822d3cd571d1"
++    },
++    {
++      "path": "builtins/web/queue-microtask.h",
++      "sha256": "21cbc748c1050ba551db03a99d75233ddbce54524b643dcead200fc3dfc9cea3"
++    },
++    {
++      "path": "builtins/web/streams/buf-reader.cpp",
++      "sha256": "022b6d9ee025ca52952d3a7195b78bf6a0115471a52483ba7054225efdd4d324"
++    },
++    {
++      "path": "builtins/web/streams/buf-reader.h",
++      "sha256": "bd51de0e163973943e3e53ae20471f84442d34f88bb0e6ff6452fcafc700b572"
++    },
++    {
++      "path": "builtins/web/streams/compression-stream.cpp",
++      "sha256": "158cd6b6810472c09eff9af159cd5810508432a360339dff2c073fd61bbb7207"
++    },
++    {
++      "path": "builtins/web/streams/compression-stream.h",
++      "sha256": "41a95209df8e592d15d377ff8b65a069102179c32c628bcf3860903de5f2196d"
++    },
++    {
++      "path": "builtins/web/streams/decompression-stream.cpp",
++      "sha256": "cf0984e055b2b6c0208db38b2f599503775b13ca757b22efd22aedce4ecca967"
++    },
++    {
++      "path": "builtins/web/streams/decompression-stream.h",
++      "sha256": "ca0875a283adb7bc019c7f4ea2a78b3c43cfc398a5c061fe800db6508825acbf"
++    },
++    {
++      "path": "builtins/web/streams/native-stream-sink.cpp",
++      "sha256": "0d6a7de53c0a1d21f7a20d8e4aeb55d8d1d637f1cc5acde7383411c6ce5101c6"
++    },
++    {
++      "path": "builtins/web/streams/native-stream-sink.h",
++      "sha256": "feb4ec49642d7f14f75f5e4e345b7905fb2a16c17449dc7ecd01b8ef6b18c889"
++    },
++    {
++      "path": "builtins/web/streams/native-stream-source.cpp",
++      "sha256": "450e8432de465989cc0168d7a29e8c67441e0f2f6cac3d7e60ed7babff800461"
++    },
++    {
++      "path": "builtins/web/streams/native-stream-source.h",
++      "sha256": "e484f68395015b15343d813783636ea4290865b39c88ae202e28937b12467d97"
++    },
++    {
++      "path": "builtins/web/streams/stream-errors.h",
++      "sha256": "e8ed9e8213e8f8b84b4c0481b7c5871141419d5729ae92f0ad4de227534c310e"
++    },
++    {
++      "path": "builtins/web/streams/streams.cpp",
++      "sha256": "991221159a7d6bdd2924906b5a7cb5c0943dcef5c8e127764fd9d67a03104919"
++    },
++    {
++      "path": "builtins/web/streams/streams.h",
++      "sha256": "6071a91e9f5e81c6543e2c086730a77d770bd6d604ede188dd4e774ee74bd709"
++    },
++    {
++      "path": "builtins/web/streams/transform-stream-default-controller.cpp",
++      "sha256": "047a37780700db8f6fd7cb3a384f125c2d5b33a84de3d6c2ee4f9c8137c8e2ad"
++    },
++    {
++      "path": "builtins/web/streams/transform-stream-default-controller.h",
++      "sha256": "045e71b099ea58f457c76bf506e00beea3f6893a69568fead91a49e60685c170"
++    },
++    {
++      "path": "builtins/web/streams/transform-stream.cpp",
++      "sha256": "c8c58ea78a10567c7ac9815ab25b0c943dfae5c23c419a245cfc2e3ed8761e0a"
++    },
++    {
++      "path": "builtins/web/streams/transform-stream.h",
++      "sha256": "1df5eaac111c1f724209d3f87da902418984cd40bd831e69e29fe61969dd30e3"
++    },
++    {
++      "path": "builtins/web/structured-clone.cpp",
++      "sha256": "01e8f188f9457c799dab6e7dd567c2d51bcededd4a6e55127a96900d4d8ccf5b"
++    },
++    {
++      "path": "builtins/web/structured-clone.h",
++      "sha256": "6a6f308a506fef490cf8ad2ab6ae9bd138b8fa19f07086708635661e393a4d83"
++    },
++    {
++      "path": "builtins/web/text-codec/text-codec-errors.h",
++      "sha256": "4264d28c8ae2b54c7165b02af49226f78f4973327c096e7f382c30be8fb8b9de"
++    },
++    {
++      "path": "builtins/web/text-codec/text-codec.cpp",
++      "sha256": "03774a3a9dc65b6cc7aca8f35d8c7d342817841be566b397048ed4c495d69f88"
++    },
++    {
++      "path": "builtins/web/text-codec/text-codec.h",
++      "sha256": "980d66ff97c87e8128fb5fd18ab72d6c0c40cc20f4e19d9b23b9801f813b99fa"
++    },
++    {
++      "path": "builtins/web/text-codec/text-decoder.cpp",
++      "sha256": "4697d8951a724d92e7550d48bd10cd2652d4d789797dc90ad8401216e9a4512c"
++    },
++    {
++      "path": "builtins/web/text-codec/text-decoder.h",
++      "sha256": "73b866b9cb1efecfb0d5b2b1cd38e6320673d674ef61378a0002e8f05c40fe07"
++    },
++    {
++      "path": "builtins/web/text-codec/text-encoder.cpp",
++      "sha256": "32230064c1ea0bc66ffbc5f9ddd6a97f46a8bc47a7c9e72caaddf5745f8986c7"
++    },
++    {
++      "path": "builtins/web/text-codec/text-encoder.h",
++      "sha256": "bfe7fbb46b07da224c5a8217595e762be4cadf4b223fb3e7c29c324f376c25c5"
++    },
++    {
++      "path": "builtins/web/timers.cpp",
++      "sha256": "2995842e10417b53cb02ed6d48bfa49b8bc0c076637e928f8c457e47e9e91294"
++    },
++    {
++      "path": "builtins/web/timers.h",
++      "sha256": "1c04d3943bfe7455ae43aaa9282eaeb1621802f4b6987fc35797fed1d1ab54f6"
++    },
++    {
++      "path": "builtins/web/url.cpp",
++      "sha256": "7b0d79d0394f19ae554b29ee0f374d09d575d9c59d781178b69d2797176f8f8b"
++    },
++    {
++      "path": "builtins/web/url.h",
++      "sha256": "f0ac8e6d76a6f04abec33b71c2b5fa9e4e9aa92818f487150c2561c0d367e810"
++    },
++    {
++      "path": "builtins/web/worker-location.cpp",
++      "sha256": "d7e915734c514a64585395c041ee3e9a97db7a868d2eb19b2dd2946443033776"
++    },
++    {
++      "path": "builtins/web/worker-location.h",
++      "sha256": "d0ed8c98d5620a3a6eafc3bdc96909a1ae7491eb47d152d364054e846c2c7d0f"
++    },
++    {
++      "path": "runtime/allocator.cpp",
++      "sha256": "b19ab2d4bd86f8fd8a9c828fb711ede22d5b99b00a1f25d79963df470fd84260"
++    },
++    {
++      "path": "runtime/allocator.h",
++      "sha256": "0b7fda3406f43fe3d9512618287988fd710081538a86514f03df59075e38b99d"
++    },
++    {
++      "path": "runtime/builtin.cpp",
++      "sha256": "748d1a66da5ac67e892ba0e71a12a84c21347bcc8521b0b921f14208a8b40351"
++    },
++    {
++      "path": "runtime/crates/staticlib-template/Cargo.lock",
++      "sha256": "46a469ce88f8334da3cd64872191b927eb969c84f8c08b58c8ec2501b205b30a"
++    },
++    {
++      "path": "runtime/debugger.cpp",
++      "sha256": "34108ed0c2d26647477bd193916e70a9150af735800d1c740227db43c60fa2da"
++    },
++    {
++      "path": "runtime/debugger.h",
++      "sha256": "c32e4600d7896bd097b1bf6d2537760c65f401ddfe62563bb923e6e5517e3260"
++    },
++    {
++      "path": "runtime/decode.cpp",
++      "sha256": "12aa20a98a6a8d5d42c405c17bad0a29b492fc78781dead158334fe0df2c5abf"
++    },
++    {
++      "path": "runtime/decode.h",
++      "sha256": "b38beb5261554c219d895f319ec9ec56fbb77862537c7b85093ec4dcb908ec99"
++    },
++    {
++      "path": "runtime/encode.cpp",
++      "sha256": "6ed989ed6f94814c1c1af7bd17ed0608b1d6acdf965cee21de29efef242528e2"
++    },
++    {
++      "path": "runtime/encode.h",
++      "sha256": "ea5f0b1be6bab3016e56d5a9e66ef6c935f6447879f7f25db7d7333cd3a25ae4"
++    },
++    {
++      "path": "runtime/engine.cpp",
++      "sha256": "2e85b4305f64757c172a3ee1723cfafe4666708fa192cafd2535563a200074bb"
++    },
++    {
++      "path": "runtime/event_loop.cpp",
++      "sha256": "7eabda627c0627281fda4cede3ca79d71d9a262d170f34ca835ee2f877924cf8"
++    },
++    {
++      "path": "runtime/event_loop.h",
++      "sha256": "e61fff76b41a5709099b94e0735b87bcf302df5b6521e348a77b662be0fad9d9"
++    },
++    {
++      "path": "runtime/js.cpp",
++      "sha256": "e96bbc5d0d329ccc79ad18fdae0296a1e54df071031eab240d7800fd96b99507"
++    },
++    {
++      "path": "runtime/script_loader.cpp",
++      "sha256": "479c23822b5e8b5ec9ea2b449d45905b455cad953a02d3208268d54f03645413"
++    },
++    {
++      "path": "runtime/script_loader.h",
++      "sha256": "814a1b0fbf0b30ac264f49e3c1875b934d74a9a47a4e5e1b400bd71fabe64824"
++    },
++    {
++      "path": "include/builtin.h",
++      "sha256": "19b759137fe14d8b7bca33c40ec50108e4501277b01a921427b4b64c836bf072"
++    },
++    {
++      "path": "include/config-parser.h",
++      "sha256": "4919bbd63f5e3e167c1c6b276309ccc7253787209fdfe76d4c512f2115568fc2"
++    },
++    {
++      "path": "include/errors.h",
++      "sha256": "e910d6a634b063faed83c7b55ff05ac9a4c9f0dd9905a183ddd9f48a0114e24e"
++    },
++    {
++      "path": "include/extension-api.h",
++      "sha256": "d743a7fcc0566eb85f382fec2f82b4c768a1043ca29b26e9fdef6f576e6789b8"
++    },
++    {
++      "path": "include/host_api.h",
++      "sha256": "34c5c4811e6da1e17d91de64d9f0c62dde90b731f539d75576d27fceb81ebf69"
++    },
++    {
++      "path": "include/node-compat-entropy.h",
++      "sha256": "6414e413a377aa21a039c175e90e26916911e88a071f29042cd1c47cfbee0fae"
++    },
++    {
++      "path": "cmake/CPM.cmake",
++      "sha256": "b7b2cf12a5687de6153a20aa0305d49000b5eafd3a391ca4521babcca8b79d24"
++    },
++    {
++      "path": "cmake/add_as_subproject.cmake",
++      "sha256": "f7556cc83bf102c940e3f4e3b9b353599b10a20efb3d45d9139ed235c8999679"
++    },
++    {
++      "path": "cmake/add_builtin.cmake",
++      "sha256": "f6400ac768b555d08dcc29255fd1b9f6d170a434917fa4de74ee2b308aa9b03a"
++    },
++    {
++      "path": "cmake/binaryen.cmake",
++      "sha256": "4478b9d900e4dcc1ec66caa08e8459faafebfaf5aa460578e8ad897706729d75"
++    },
++    {
++      "path": "cmake/build-crates.cmake",
++      "sha256": "b4f4a71a07f484f5d76abf6b1f63671e6c2a378a281b36e79c506afcf6b14798"
++    },
++    {
++      "path": "cmake/builtins.cmake",
++      "sha256": "6b78a1063a38517987f9b71b91a599843ec2f5e38439c38044ab2960279b87c4"
++    },
++    {
++      "path": "cmake/cbindgen.cmake",
++      "sha256": "197a3b2076aa86d4b213a78e547ed0c0ecf70b5c48a4a9295cc29e51b964392d"
++    },
++    {
++      "path": "cmake/compile-flags.cmake",
++      "sha256": "400a3af71680b66de8e161e6a826880808b96d38b41d58796b2a6d20045822a2"
++    },
++    {
++      "path": "cmake/init-corrosion.cmake",
++      "sha256": "b4f64da4677fa941000e206d2786f95646f7d9b4534de82e08b9f7a2a44c2580"
++    },
++    {
++      "path": "cmake/lint.cmake",
++      "sha256": "5be8f59b250c525f83a91f61ce5d23a2f4634435938cc8b51f703c4486093840"
++    },
++    {
++      "path": "cmake/manage-git-source.cmake",
++      "sha256": "3d753314739f5d7b8359cc54e139430aa1096c8ff93b42d0e5c5df2a7b735725"
++    },
++    {
++      "path": "cmake/node-compat-policy.cmake",
++      "sha256": "c2eecc2559f02ecf1008d6ff48d13be488fdcae2b9db98a9a86e951c35fb1245"
++    },
++    {
++      "path": "cmake/openssl.cmake",
++      "sha256": "98f9c55db6efc23cbc1e1dc9429577e00284ae105cb596729d6174ff9f93c1ee"
++    },
++    {
++      "path": "cmake/spidermonkey.cmake",
++      "sha256": "af02f2af5ac9d5ceeb6e6e1b63ff433f33377b52d1ec1719732f008c12ad2da7"
++    },
++    {
++      "path": "cmake/toolchain.cmake",
++      "sha256": "313decc4936527185db6b3edecb89959a16be511060065835f316f604f5d8a9d"
++    },
++    {
++      "path": "cmake/wasi-sdk.cmake",
++      "sha256": "f8bfdb49c724757fe9af07483a6304510faa7e90dd0dae68d1ca3d8509c8b18e"
++    },
++    {
++      "path": "cmake/wasm-tools.cmake",
++      "sha256": "cfb960a8e29b946aea8b7e050807dc843a2908ea333503c0f78e4099e6e46652"
++    },
++    {
++      "path": "cmake/wasmtime.cmake",
++      "sha256": "b009d2d63371731d3caad42fcda6d5907d7ef037bdc06049a09340450b871196"
++    },
++    {
++      "path": "cmake/weval.cmake",
++      "sha256": "50507769cecbe8bc72374e95f05683a53f0ba277906eb8ef612cc56438daf3f5"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/bindings/bindings.c",
++      "sha256": "d7636adf27a1a215844b0dfcc34ad9b0936c3522171d8ee60c7f744e4d09dab0"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/bindings/bindings.h",
++      "sha256": "fcf11b6625f733be508de1f47d8d7bf8d1d9db46430d631d670fe8ea08ebc993"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/bindings/bindings_component_type.o",
++      "sha256": "dee3d7637a59067637e96a5b9dfe5f33f8e7675dea8caee7cc7b43ac487b3c1b"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/handles.h",
++      "sha256": "3dc820b61f2640580cec8b8f386f1159ecd61b63676b568da5e1acdc2e4aa3a6"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/host_api.cmake",
++      "sha256": "da2cec5a7dda2dba90d91cf74573f00aebaf48c2c8737615616a0bdf1a777049"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/host_api.cpp",
++      "sha256": "10ccb1f84f659195eddc1dab5f8152cdfaa21da660345d07563fa867e87e0a4c"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/host_call.cpp",
++      "sha256": "649667e0636ef398173ac2dfecb5f34e03e5605290efc3e689b4cbcf8a719c9b"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/include/exports.h",
++      "sha256": "163a3fd84e39bdfeeadba322df3be3a299b1a55a249232d002776c04cf2c0383"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/preview1-adapter-debug/wasi_snapshot_preview1.wasm",
++      "sha256": "988224282d03fe0bd3c25b62344aef265b1a8e1f5804bdbc34d6442507fabcc0"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/preview1-adapter-release/wasi_snapshot_preview1.wasm",
++      "sha256": "988224282d03fe0bd3c25b62344aef265b1a8e1f5804bdbc34d6442507fabcc0"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/command-extended.wit",
++      "sha256": "4a397af3d8eaf66a4afdbe32a22190d3d64684cc7c47334fb1fc834680237abe"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/cli/command.wit",
++      "sha256": "da467a3a1b7a1bf6d9ec10b5bc5cbb90ddbc912b34495e19c1d5fe6c5b130349"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/cli/environment.wit",
++      "sha256": "8d4f13e628d2e8f029f6d668d8075db5e6c8867238c0436cc966dd9a535148e1"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/cli/exit.wit",
++      "sha256": "337522eb41c89e660b1dabc1bae362acc462f9cbfdcb9546e790e371580175a2"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/cli/imports.wit",
++      "sha256": "8cb6df9f4860399cac4640df6e9cb5eeea35ce70920a2f3fb631911311870bc0"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/cli/run.wit",
++      "sha256": "50815a16aaebae4b99d2e2f9de69ddf30fc27249f41ad3cf477c4e796edf5792"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/cli/stdio.wit",
++      "sha256": "6311ad8251ff4e0452c5be30ee70d9d6c41971c31e566dc1029d653182cd69fe"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/cli/terminal.wit",
++      "sha256": "57b139fed58792c8dcac6cd74caf4baadda64f49b53181a999b5d6080694925c"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/clocks/monotonic-clock.wit",
++      "sha256": "2e974279ccee050c5ea32117f83cff50d1b3146763db2a60c3e8afeb774dad47"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/clocks/wall-clock.wit",
++      "sha256": "55b7978bad3fcf9b0886be4644834e8bf9e3553bba018d8fd9201482369cb6b8"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/clocks/world.wit",
++      "sha256": "015589355de95f274258599abf01290405b316d806bf2d97df0609077d970edf"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/filesystem/preopens.wit",
++      "sha256": "872e66229d4d44c0ac97751720f396729c9464f1b628fc6bda3ed2079a82e6f1"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/filesystem/types.wit",
++      "sha256": "f26dadcbcc7b231893c5f0094b729eabeb0643dca182697433fa8ab6ab786d20"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/filesystem/world.wit",
++      "sha256": "9e1ffb6f850441124c4fe07bcede8cb3c4b6186f1dc020cb9189020b8a853c2b"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/http/handler.wit",
++      "sha256": "96882590ae9934ca52f031eccc91704d0caf80c6b3227b6e1177e947ce135b24"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/http/proxy.wit",
++      "sha256": "57aa4c16de7ad4677046682959dd998abdf22bded708b57cee071a84c30fba3f"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/http/types.wit",
++      "sha256": "54565a9b1d701d43db8cd919924bdf6a9ba01b31113985043866881807a2d839"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/io/error.wit",
++      "sha256": "5c0cb7d20bca9d98233f13076132081e5aa12bc825a823066ff27d4cea834a0c"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/io/poll.wit",
++      "sha256": "7164789188166c7b19c34f63375f9f7c61546254b9f5992ac7562daafaf8c8fc"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/io/streams.wit",
++      "sha256": "41204f72fd3568897f9f217fc4840cd8ccf117bd53cc4f53ea6eacc7712bf76f"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/io/world.wit",
++      "sha256": "358617cc366d0c4528571fc983acb9431a4516b7c8582d93930b54c80125bc1a"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/random/insecure-seed.wit",
++      "sha256": "9ebba944fef13d4db4a124519349ebf03febaff40f78f818d2c77c926281eb12"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/random/insecure.wit",
++      "sha256": "28880bdfebda2f39f36f5fe5a1d20f6f1e76f1793ff6e973e34ff8cb4cdc633d"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/random/random.wit",
++      "sha256": "b36eb876e39d3a0d63d6ca0c6fc4e84278ddc22c48173906645ed3dae3ef0c79"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/random/world.wit",
++      "sha256": "7db07eadfefe2d2f042b5b7a283d5c5b8ab2a25276c352cfcc6cc9fd1a7b5fc7"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/sockets/instance-network.wit",
++      "sha256": "ad100127c74b967064cf5d8e1770f6f0d787ef55f07ba9f6b334bc4c98c82282"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/sockets/ip-name-lookup.wit",
++      "sha256": "fdfd3f54f7b82457c3b08b7c941c0a50a1fc15cdf23d692ccc5680eeb29313cd"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/sockets/network.wit",
++      "sha256": "db6583f0e2425abbb7621a26716371983e9753ec1c44c580a888a603e74a8840"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/sockets/tcp-create-socket.wit",
++      "sha256": "6a9175598eb628ee8a14989efa0ef4e3244aae1d339f1c882467c5c8226e02ef"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/sockets/tcp.wit",
++      "sha256": "aa7a316ce0cfb8b42c0f592b5096d218da8ad75e7878f06329954e22040c3ee5"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/sockets/udp-create-socket.wit",
++      "sha256": "058da3ade225a22ae9f7329453a51cf55174f3253b7a4163d10bc46bc7c53b85"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/sockets/udp.wit",
++      "sha256": "411998b320d08fce10400c840f0ca0ebef49c5a4fb13f94011bbce2bbd5972fc"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/deps/sockets/world.wit",
++      "sha256": "9281c12b9611117e98674eb3f00bd9c4eb2e49f1386f0d6173b9c88181180d12"
++    },
++    {
++      "path": "host-apis/wasi-0.2.0/wit/main.wit",
++      "sha256": "0d5e6de12b6b305a225c07c1f07a851881bbb503a8b80b7fd1693627e5287f35"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/bindings/bindings.c",
++      "sha256": "07e401fc25244f3bad83f8facbe23747509fd5b3c25fa135614ec53fb6e7011e"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/bindings/bindings.h",
++      "sha256": "9ee84774327349fa970b5d60b55abbc0d676e5edf1bb0718b19167561569a168"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/bindings/bindings_component_type.o",
++      "sha256": "adeca9727f8da755e04e1954dba0de170519e953be11ebc9dea1e476d44457ca"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/host_api.cmake",
++      "sha256": "897f83e608e72a07d8a2c416a8dc3512613adb74adcd6a067161514c2e52b48f"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/include/sockets.h",
++      "sha256": "83b56853ad15090105630acb6f54ecc372d4adab288b25faab67039826553c82"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/sockets.cpp",
++      "sha256": "6c3099395ebede2d7b80ab2a0514815595bc43b201799b41e6338152f611795f"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/wit/command-extended.wit",
++      "sha256": "a934b6d1dd801785b685099e71734cb02814053ca53d82fe0b917fa0240e67c9"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/wit/deps/wasi-cli-0.2.3/package.wit",
++      "sha256": "ed55bdaf6dc734c1d5e876deed75235884e08afdba94eb170d8f27b7b6728e94"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/wit/deps/wasi-clocks-0.2.3/package.wit",
++      "sha256": "029b4bbe4ae9890b98ba59fb1fb55d4d65941e76df7bf1181d2eae7c978bdfed"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/wit/deps/wasi-filesystem-0.2.3/package.wit",
++      "sha256": "9f41092ee8809c002c7503277f9d2b483537b393d6785eb50218bb833ae03c80"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/wit/deps/wasi-http-0.2.3/package.wit",
++      "sha256": "4b2582239b1ba99b56428db2ee2190dedba933703a02b2fb910e29b5bae29a3c"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/wit/deps/wasi-io-0.2.3/package.wit",
++      "sha256": "ce36837c85c8ee21706a06ee7c18a8e53bd475cb9dd493d44677af69a71ee30f"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/wit/deps/wasi-random-0.2.3/package.wit",
++      "sha256": "00311ff489457f90d3f3bdb5422d8ae515829cb3e4d8e9309ecce9910a837602"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/wit/deps/wasi-sockets-0.2.3/package.wit",
++      "sha256": "af8e6f6f748132db261a099f8e1b540be850c1002aef128e5051b04cd7766119"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/wit/main.wit",
++      "sha256": "44420c24995527e94e4385576577b1a3b315b3e71e937afb297f377479d98920"
++    },
++    {
++      "path": "host-apis/wasi-0.2.3/wkg.lock",
++      "sha256": "695014ec7d66063696f8f8b179d63c435f01ec647111095eb278884e22fac7d5"
++    },
++    {
++      "path": "host-apis/wasi-0.2.10/bindings/bindings.c",
++      "sha256": "af92e5d6cd38f7463d8a6096dfa4f1d372f250dfc2c6a34b808fb3fe89d782da"
++    },
++    {
++      "path": "host-apis/wasi-0.2.10/bindings/bindings.h",
++      "sha256": "65d87ea7ee6f846139addc8177050fd4def9012de331c9997ccf80977105184e"
++    },
++    {
++      "path": "host-apis/wasi-0.2.10/bindings/bindings_component_type.o",
++      "sha256": "c48f1ae980766fdb2decaa417fe0eaf618a56e26cb7f36c329c92a1ff60439c2"
++    },
++    {
++      "path": "host-apis/wasi-0.2.10/host_api.cmake",
++      "sha256": "2762ac595ee3cfab7e3975ddbe62b6ac5bbccbd99952c8362a0d3e823bce1e1b"
++    },
++    {
++      "path": "host-apis/wasi-0.2.10/wit/command-extended.wit",
++      "sha256": "8cb972cfce7685452d119f10f7eccb0796dde02591d345b9e270e449c4551443"
++    },
++    {
++      "path": "host-apis/wasi-0.2.10/wit/deps/wasi-cli-0.2.10/package.wit",
++      "sha256": "214c0036896b988fd7cd9dc5dfc602078b831b628759375d6b68fadbbe2b60da"
++    },
++    {
++      "path": "host-apis/wasi-0.2.10/wit/deps/wasi-clocks-0.2.10/package.wit",
++      "sha256": "9e42d4fdecf00b70298f1d02fa09df4899219fda0b92784fd915b60e21cd41a2"
++    },
++    {
++      "path": "host-apis/wasi-0.2.10/wit/deps/wasi-filesystem-0.2.10/package.wit",
++      "sha256": "ec3b02ebd6d643f84c7944d777a58efd7c5e4dcf59cdacc10c5ef1df1c7d957b"
++    },
++    {
++      "path": "host-apis/wasi-0.2.10/wit/deps/wasi-http-0.2.10/package.wit",
++      "sha256": "3e0c539616f3f1d677d530543dc41a7bb46787039a417c27976c119868bae7ea"
++    },
++    {
++      "path": "host-apis/wasi-0.2.10/wit/deps/wasi-io-0.2.10/package.wit",
++      "sha256": "799bbdc5b45e4c7136d8e6e0f870cf8c73323663a959d420bb66a1bda8e8ea4f"
++    },
++    {
++      "path": "host-apis/wasi-0.2.10/wit/deps/wasi-random-0.2.10/package.wit",
++      "sha256": "3f2205fb68718fb9ed864c41e8a2f45066bb7caf4d69ee399279d736ed4c52c1"
++    },
++    {
++      "path": "host-apis/wasi-0.2.10/wit/deps/wasi-sockets-0.2.10/package.wit",
++      "sha256": "634f12cdd1c5f9cceb711db97af320086828221e5d57a8121a273f5f3938b62a"
++    },
++    {
++      "path": "host-apis/wasi-0.2.10/wit/main.wit",
++      "sha256": "677c8c78d91cc3e3ae21250bc0cb5ef7f06edab7c232699f9ed15f33cb929919"
++    },
++    {
++      "path": "host-apis/wasi-0.2.10/wkg.lock",
++      "sha256": "46b52f1ee4d18376db0753a9c39d7d8c0a45cda6d3b4220e27d60eb8a6dce077"
++    },
++    {
++      "path": "crates/rust-encoding/Cargo.toml",
++      "sha256": "aec3ad78ce9efd1d4f8757c265050d3dcae00e9f05f4fa09ed08a6c6d04437cf"
++    },
++    {
++      "path": "crates/rust-encoding/src/lib.rs",
++      "sha256": "bb03554bf0c10781b1e2751868203f59a51b2913d9c78fca61be704bf8abcf2f"
++    },
++    {
++      "path": "crates/rust-hooks/Cargo.toml",
++      "sha256": "93da73d4d02556cebfec89add43dfc1708167f013507124b46bce82da2a1c97e"
++    },
++    {
++      "path": "crates/rust-hooks/src/lib.rs",
++      "sha256": "63e0f2aa294128bd1515c276bd96969324bda7f12732cf2611e4b5c128631d1a"
++    },
++    {
++      "path": "crates/rust-hooks/src/wrappers.cpp",
++      "sha256": "5305ee87ba0d01dda2b73f22793080a3ca46366e61720183d95f499048ef1b0b"
++    },
++    {
++      "path": "crates/rust-multipart/Cargo.toml",
++      "sha256": "c7d165baa0d2555c31772c6678e459fddf0501ae50a496ffa46a7e6c9a6775af"
++    },
++    {
++      "path": "crates/rust-multipart/cbindgen.toml",
++      "sha256": "d62b022954faafb71825283d08ce34e7b47cf477d0de227c1f21decceddb4d65"
++    },
++    {
++      "path": "crates/rust-multipart/fuzz/Cargo.toml",
++      "sha256": "5a55deb4c828585f138f6dd8124137f2bc17435f427c96a0be7f39cb3bef4a75"
++    },
++    {
++      "path": "crates/rust-multipart/fuzz/fuzz_targets/fuzz_multipart.rs",
++      "sha256": "8e8de3601da7479cef8f6c66debfb28e838efcb889a11beac54c07118308d72b"
++    },
++    {
++      "path": "crates/rust-multipart/rust-multipart-ffi.h",
++      "sha256": "ca12ef362e619b257fc91bab370ca7a8dd537905b7d3d389a36e0639d2a992cb"
++    },
++    {
++      "path": "crates/rust-multipart/src/capi.rs",
++      "sha256": "9ba068aaca7e1274b78b271e3fa1a2467bbc4307d2249e4feb919770cdde9c30"
++    },
++    {
++      "path": "crates/rust-multipart/src/error.rs",
++      "sha256": "8dae3604f8a189bc00377b664f87ce6578e04a0bd76b8d30b8f5847a81d9edb0"
++    },
++    {
++      "path": "crates/rust-multipart/src/lib.rs",
++      "sha256": "be8e1d2caf2914b94e887abc5a7e307ffecee8a21cfec2ed0b5368dfeb961a89"
++    },
++    {
++      "path": "crates/rust-multipart/src/parser.rs",
++      "sha256": "f2c7b7161793a291215ec836d26e3f7fbcd1b3f228873e99c3d2bf3bad5f16a6"
++    },
++    {
++      "path": "crates/rust-multipart/src/trivia.rs",
++      "sha256": "c6d632807bcfc62dc0ba6d8cbbae6211df460444ecc1ffa3a0475a8f0a6a8f54"
++    },
++    {
++      "path": "crates/rust-multipart/tests/integration.rs",
++      "sha256": "47ef964d108f0361365e9339e1ee8e0cde273dce22ea01966cf010fcc25ce95e"
++    },
++    {
++      "path": "crates/rust-url/Cargo.lock",
++      "sha256": "340396c8ae9d1b8ac9b3735115f046dd1b5933aefee6efc16a0c0eb32f1ca124"
++    },
++    {
++      "path": "crates/rust-url/Cargo.toml",
++      "sha256": "4da992dca47710c60a9fc390e1dfa3f1cc99bfa9b9a3fa7f1f0e700dfcb056cd"
++    },
++    {
++      "path": "crates/rust-url/cbindgen.toml",
++      "sha256": "5dc2e2b4a535d2722aaa1973e8a9c0ff19c47b02d472734be3858cc2f003405b"
++    },
++    {
++      "path": "crates/rust-url/rust-url.h",
++      "sha256": "98f2a64bfb98a9963001906be2823eae8132b8bc3b77f7b99157fe0d572f8c0c"
++    },
++    {
++      "path": "crates/rust-url/src/lib.rs",
++      "sha256": "636538d53710dd506d3cba59a3157cc8f728d7e20ffe2d49dce690441405b380"
++    },
++    {
++      "path": "deps/patches/getuid.patch",
++      "sha256": "20cdb686e143504c4eaf02c692b51dc0c60a9249b24a399ea7840604cedfcf45"
++    },
++    {
++      "path": "deps/patches/rand.patch",
++      "sha256": "99c567b2cab315c282e0ba3609dfa47fc4a0ded1ef96acb9ed25c837a1a1f5f6"
++    },
++    {
++      "path": "CMakeLists.txt",
++      "sha256": "f3add1cc03a2e13882e10b2c05aaebd93dd948d38b3d1fc8ffc27b28f9e9a465"
++    },
++    {
++      "path": "rust-toolchain.toml",
++      "sha256": "f151bdd323df44287e82119ddd6f77692274cf18bb446bf2a5d31b59fdfda534"
++    }
++  ],
++  "fixtureScope": "Known immutable legacy receipt identity for selector tests only, not an executed synthetic engine"
++}
+--- a/tests/node-compat/module-selection-test.mjs
++++ b/tests/node-compat/module-selection-test.mjs
+@@ -8,7 +8,7 @@
+ import { fileURLToPath, pathToFileURL } from 'node:url';
+ import { loadToolchain } from './toolchain.mjs';
+ import { builtinMap, CORE_MANIFEST, PATH_MANIFEST, EVENTS_MANIFEST,
+-  STRING_DECODER_MANIFEST, ASSERT_MANIFEST, QUERYSTRING_MANIFEST, UTIL_MANIFEST,
++  STRING_DECODER_MANIFEST, ASSERT_MANIFEST, QUERYSTRING_MANIFEST, UTIL_MANIFEST, STREAM_WEB_MANIFEST,
+   selectedManifestsForEngine } from './module-selection.mjs';
+ import { bundleProfile, createProfilePlugin } from './profile-bundler.mjs';
+ 
+@@ -28,6 +28,7 @@
+   ['Assert', 'assertEnabled', 'NODE_COMPAT_ASSERT', ASSERT_MANIFEST],
+   ['Querystring', 'querystringEnabled', 'NODE_COMPAT_QUERYSTRING', QUERYSTRING_MANIFEST],
+   ['Util', 'utilEnabled', 'NODE_COMPAT_UTIL', UTIL_MANIFEST],
++  ['StreamWeb', 'streamWebEnabled', 'NODE_COMPAT_STREAM_WEB', STREAM_WEB_MANIFEST],
+ ].map(async ([name, field, option, path]) => {
+   const bytes = await readFile(join(repository, path));
+   return { name, field, option, path, bytes, sha256: hash(bytes), manifest: JSON.parse(bytes) };
+@@ -53,8 +54,8 @@
+ }
+ function receipt(pathEnabled) {
+   return {
+-    profileEnabled: true, pathEnabled,
+-    observedCMakeOptions: { NODE_COMPAT_PATH: pathEnabled ? 'ON' : 'OFF' },
++    profileEnabled: true, pathEnabled, streamWebEnabled: false,
++    observedCMakeOptions: { NODE_COMPAT_PATH: pathEnabled ? 'ON' : 'OFF', NODE_COMPAT_STREAM_WEB: 'OFF' },
+     selectedModuleManifests: sources.slice(0, pathEnabled ? 2 : 1).map(({ path, sha256, manifest }) =>
+       ({ path, sha256, profileVersion: manifest.profileVersion })),
+     sourceManifest: sources.map(({ path, sha256 }) => ({ path, sha256 })),
+@@ -96,7 +97,7 @@
+   });
+   await test('historical core-only receipt remains bounded', () => {
+     const metadata = receipt(false);
+-    delete metadata.pathEnabled; delete metadata.observedCMakeOptions; delete metadata.selectedModuleManifests;
++    delete metadata.pathEnabled; metadata.observedCMakeOptions = { NODE_COMPAT_STREAM_WEB: 'OFF' }; delete metadata.selectedModuleManifests;
+     assert.equal(selectedManifestsForEngine(metadata).length, 1);
+   });
+   for (const pathEnabled of [false, true]) {
+@@ -106,7 +107,7 @@
+       assert.throws(() => selectedManifestsForEngine(metadata), /CMake|Path selection/);
+     });
+     await test(`explicit Path=${pathEnabled} requires observed flag`, () => {
+-      const metadata = receipt(pathEnabled); delete metadata.observedCMakeOptions;
++      const metadata = receipt(pathEnabled); delete metadata.observedCMakeOptions.NODE_COMPAT_PATH;
+       assert.throws(() => selectedManifestsForEngine(metadata), /CMake|Path selection/);
+     });
+   }
+@@ -350,6 +351,30 @@
+       await assert.rejects(() => bundle(input, manifests), /not admitted/);
+     });
+   }
++  await test('known immutable legacy stream feature absence stays OFF', async () => {
++    const legacy = JSON.parse(await readFile(new URL('./legacy-stream-web-test-receipt.json', import.meta.url)));
++    const selected = selectedManifestsForEngine(legacy);
++    assert.equal(builtinMap(selected)['node:stream/web'], undefined);
++    const reordered = structuredClone(legacy); reordered.sourceManifest.reverse();
++    assert.equal(builtinMap(selectedManifestsForEngine(reordered))['node:stream/web'], undefined, 'Canonical inventory digest ignores entry order');
++  });
++  for (const [name, mutate] of [
++    ['source-list spoof', value => value.sourceManifest[0].sha256 = '0'.repeat(64)],
++    ['recipe spoof', value => value.buildRecipeSha256 = '0'.repeat(64)],
++    ['engine spoof', value => value.engineSha256 = '0'.repeat(64)],
++    ['observed-only flag', value => value.observedCMakeOptions.NODE_COMPAT_STREAM_WEB = 'OFF'],
++  ]) await test('legacy stream absence rejects ' + name, async () => {
++    const legacy = JSON.parse(await readFile(new URL('./legacy-stream-web-test-receipt.json', import.meta.url))); mutate(legacy);
++    assert.throws(() => selectedManifestsForEngine(legacy), /legacy|streamWebEnabled/);
++  });
++  await test('unknown synthetic receipt must explicitly declare new stream flag', () => {
++    const metadata = receipt(false); delete metadata.streamWebEnabled; delete metadata.observedCMakeOptions.NODE_COMPAT_STREAM_WEB;
++    assert.throws(() => selectedManifestsForEngine(metadata), /legacy|streamWebEnabled/);
++  });
++  await test('owned undefined stream flag is not historical absence', () => {
++    const metadata = receipt(false); metadata.streamWebEnabled = undefined;
++    assert.throws(() => selectedManifestsForEngine(metadata), /boolean/);
++  });
+   // Exhaustive independent feature selection, including each foundation with
+   // Path/Events both enabled and disabled. Receipts here are synthetic.
+   const pathBit = 1 << foundations.length, eventsBit = pathBit << 1;
+--- a/tests/node-compat/module-selection.mjs
++++ b/tests/node-compat/module-selection.mjs
+@@ -15,6 +15,7 @@
+ export const ASSERT_MANIFEST = 'builtins/node-compat/export-manifest.assert.node-v22.14.0.json';
+ export const QUERYSTRING_MANIFEST = 'builtins/node-compat/export-manifest.querystring.node-v22.14.0.json';
+ export const UTIL_MANIFEST = 'builtins/node-compat/export-manifest.util.node-v22.14.0.json';
++export const STREAM_WEB_MANIFEST = 'builtins/node-compat/export-manifest.stream-web.node-v22.14.0.json';
+ assert.equal(process.version, 'v22.14.0', 'Native module admission uses the pinned Node release inventory');
+ const repository = fileURLToPath(new URL('../../', import.meta.url));
+ const schema = JSON.parse(readFileSync(new URL('../../builtins/node-compat/manifest.schema.json', import.meta.url)));
+@@ -23,6 +24,27 @@
+ const bareAliases = new Set(builtinModules.filter(id => !id.startsWith('node:')));
+ const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+ export const coreManifest = validateManifest(JSON.parse(readFileSync(resolve(repository, CORE_MANIFEST))), schema);
++// Missing new-feature fields are accepted solely for exact immutable historical
++// engine + compiled-input + recipe identities. This is not a future default.
++const streamWebLegacy = JSON.parse(readFileSync(new URL('./legacy-stream-web-receipts.json', import.meta.url)));
++assert.equal(streamWebLegacy.schemaVersion, 1);
++function canonicalSourceManifestDigest(entries) {
++  assert(Array.isArray(entries), 'Legacy receipt needs compiled sourceManifest');
++  const seen = new Set();
++  const canonical = entries.map(entry => {
++    assert(entry && typeof entry.path === 'string' && /^[0-9a-f]{64}$/.test(entry.sha256), 'Invalid legacy source entry');
++    assert(!seen.has(entry.path), 'Duplicate legacy source path'); seen.add(entry.path);
++    return { path: entry.path, sha256: entry.sha256 };
++  }).sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
++  return digest(JSON.stringify(canonical));
++}
++function knownLegacyStreamWebOff(metadata) {
++  if (!/^[0-9a-f]{64}$/.test(metadata.engineSha256) || !/^[0-9a-f]{64}$/.test(metadata.buildRecipeSha256)) return false;
++  const sourceDigest = canonicalSourceManifestDigest(metadata.sourceManifest);
++  return streamWebLegacy.engines.some(entry => entry.engineSha256 === metadata.engineSha256 &&
++    entry.canonicalSourceManifestSha256 === sourceDigest && entry.buildRecipeSha256 === metadata.buildRecipeSha256);
++}
++
+ 
+ export function builtinMap(selectedManifests = [coreManifest]) {
+   assert(Array.isArray(selectedManifests) && selectedManifests.length, 'Select at least one explicit native module manifest');
+@@ -45,6 +67,16 @@
+ 
+ export function selectedManifestsForEngine(metadata, { sourceRoot = repository } = {}) {
+   assert.equal(metadata.profileEnabled, true);
++
++  const streamWebDeclared = Object.hasOwn(metadata, 'streamWebEnabled');
++  if (streamWebDeclared) {
++    assert.equal(typeof metadata.streamWebEnabled, 'boolean', 'streamWebEnabled must be a boolean');
++    assert.equal(metadata.observedCMakeOptions?.NODE_COMPAT_STREAM_WEB, metadata.streamWebEnabled ? 'ON' : 'OFF', 'Engine streamWebEnabled disagrees with actual CMake option');
++  } else {
++    assert(!Object.hasOwn(metadata.observedCMakeOptions ?? {}, 'NODE_COMPAT_STREAM_WEB') && knownLegacyStreamWebOff(metadata),
++      'Absent streamWebEnabled is OFF only for pinned immutable legacy engine/source/recipe identities');
++  }
++
+   const expectedPaths = [CORE_MANIFEST];
+   for (const [field, option, path] of [
+     ['pathEnabled', 'NODE_COMPAT_PATH', PATH_MANIFEST],
+@@ -53,6 +85,7 @@
+     ['assertEnabled', 'NODE_COMPAT_ASSERT', ASSERT_MANIFEST],
+     ['querystringEnabled', 'NODE_COMPAT_QUERYSTRING', QUERYSTRING_MANIFEST],
+     ['utilEnabled', 'NODE_COMPAT_UTIL', UTIL_MANIFEST],
++    ['streamWebEnabled', 'NODE_COMPAT_STREAM_WEB', STREAM_WEB_MANIFEST],
+   ]) {
+     assert(metadata[field] === undefined || typeof metadata[field] === 'boolean', `${field} must be a boolean`);
+     const enabled = metadata[field] === true;

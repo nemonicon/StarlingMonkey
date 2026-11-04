@@ -1,0 +1,421 @@
+{
+  "schema": 1,
+  "proposalVersion": "stream-consumers-source-v1",
+  "node": "v22.14.0",
+  "nodeOnly": true,
+  "installed": false,
+  "inventory": {
+    "module": "node:stream/consumers",
+    "aliases": [
+      "stream/consumers"
+    ],
+    "exports": [
+      "arrayBuffer",
+      "blob",
+      "buffer",
+      "default",
+      "json",
+      "text"
+    ],
+    "defaultType": "object",
+    "defaultKeys": [
+      "arrayBuffer",
+      "blob",
+      "buffer",
+      "text",
+      "json"
+    ],
+    "defaultFrozen": false,
+    "defaultPrototype": "Object.prototype",
+    "functions": {
+      "arrayBuffer": {
+        "name": "arrayBuffer",
+        "length": 1,
+        "constructorName": "AsyncFunction",
+        "defaultIdentity": true,
+        "ownKeys": [
+          "length",
+          "name"
+        ]
+      },
+      "blob": {
+        "name": "blob",
+        "length": 1,
+        "constructorName": "AsyncFunction",
+        "defaultIdentity": true,
+        "ownKeys": [
+          "length",
+          "name"
+        ]
+      },
+      "buffer": {
+        "name": "buffer",
+        "length": 1,
+        "constructorName": "AsyncFunction",
+        "defaultIdentity": true,
+        "ownKeys": [
+          "length",
+          "name"
+        ]
+      },
+      "json": {
+        "name": "json",
+        "length": 1,
+        "constructorName": "AsyncFunction",
+        "defaultIdentity": true,
+        "ownKeys": [
+          "length",
+          "name"
+        ]
+      },
+      "text": {
+        "name": "text",
+        "length": 1,
+        "constructorName": "AsyncFunction",
+        "defaultIdentity": true,
+        "ownKeys": [
+          "length",
+          "name"
+        ]
+      }
+    },
+    "namespace": {
+      "prototype": "null",
+      "toString": "[object Module]",
+      "then": "undefined"
+    },
+    "globalBlobEqualsBufferBlob": true,
+    "globalBufferIdentity": true
+  },
+  "text": [
+    {
+      "name": "empty and string chunks",
+      "result": [
+        "",
+        "abcd",
+        "abc"
+      ]
+    },
+    {
+      "name": "split UTF8 BOM and incomplete final sequence",
+      "result": "A€�"
+    },
+    {
+      "name": "strings do not flush a pending byte decoder",
+      "result": "X€"
+    },
+    {
+      "name": "strings do not consume decoder BOM state",
+      "result": "AB﻿C"
+    },
+    {
+      "name": "string surrogate halves concatenate without UTF8 conversion",
+      "result": "😀"
+    },
+    {
+      "name": "typed views decode only visible raw bytes",
+      "result": [
+        "AB",
+        "AB",
+        "AB",
+        "\u0000AB\u0000"
+      ]
+    },
+    {
+      "name": "eager decoding precedes later mutation of reused chunk",
+      "result": "AB"
+    },
+    {
+      "name": "undefined byte chunk is an empty decoder input",
+      "result": "A"
+    },
+    {
+      "name": "invalid byte chunks reject with error type and code",
+      "result": [
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        }
+      ]
+    },
+    {
+      "name": "sync iterator yielded promises are unwrapped",
+      "result": "AB"
+    },
+    {
+      "name": "async iterator yielded promise value is not unwrapped",
+      "result": {
+        "fulfilled": false,
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      }
+    },
+    {
+      "name": "body decoding failure closes the iterator once",
+      "result": {
+        "error": {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        "log": [
+          "iterator",
+          "next",
+          "return"
+        ]
+      }
+    },
+    {
+      "name": "next rejection propagates original error without return",
+      "result": {
+        "same": true,
+        "log": [
+          "next"
+        ]
+      }
+    },
+    {
+      "name": "sync iterator body failure invokes finally",
+      "result": {
+        "error": {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        "log": [
+          "finally"
+        ]
+      }
+    },
+    {
+      "name": "json consumes streaming text before parsing",
+      "result": {
+        "value": {
+          "x": 2
+        },
+        "log": [
+          "complete"
+        ]
+      }
+    },
+    {
+      "name": "json syntax failure occurs after iterator completion",
+      "result": {
+        "error": {
+          "fulfilled": false,
+          "name": "SyntaxError"
+        },
+        "log": [
+          "complete"
+        ]
+      }
+    },
+    {
+      "name": "literal BOM json differs from byte BOM",
+      "result": {
+        "literal": {
+          "fulfilled": false,
+          "name": "SyntaxError"
+        },
+        "bytes": {
+          "x": 1
+        }
+      }
+    },
+    {
+      "name": "native Promise result and supported async non-construction",
+      "result": {
+        "promise": true,
+        "then": "function",
+        "value": "a",
+        "text": {
+          "name": "TypeError"
+        },
+        "json": {
+          "name": "TypeError"
+        }
+      }
+    }
+  ],
+  "blob": [
+    {
+      "name": "blob parts remain references through iterator completion",
+      "result": {
+        "bytes": [
+          67,
+          67
+        ],
+        "log": [
+          "complete"
+        ]
+      }
+    },
+    {
+      "name": "blob mutation at final done is observed",
+      "result": [
+        90
+      ]
+    },
+    {
+      "name": "mixed string and incomplete bytes use a different path from text",
+      "result": {
+        "text": "X€",
+        "blobText": "�X��",
+        "bytes": [
+          226,
+          88,
+          130,
+          172
+        ]
+      }
+    },
+    {
+      "name": "Blob string parts repair surrogates independently",
+      "result": {
+        "text": "😀",
+        "blobText": "��"
+      }
+    },
+    {
+      "name": "object parts convert after source completion",
+      "result": {
+        "log": [
+          "complete",
+          "convert:B"
+        ],
+        "text": "B"
+      }
+    },
+    {
+      "name": "Blob part conversion failure happens after iteration without close",
+      "result": {
+        "error": {
+          "fulfilled": false,
+          "name": "TypeError"
+        },
+        "log": [
+          "next",
+          "next"
+        ]
+      }
+    },
+    {
+      "name": "Blob output type and Node global Buffer.Blob identity",
+      "result": {
+        "globalEqualsBufferBlob": true,
+        "instance": true,
+        "prototype": true,
+        "size": 2,
+        "type": "",
+        "originalType": "text/plain",
+        "text": "AB"
+      }
+    },
+    {
+      "name": "native Blob constructor snapshots parts and returned arrays are independent",
+      "result": {
+        "size": 2,
+        "first": [
+          88,
+          66
+        ],
+        "second": [
+          65,
+          66
+        ],
+        "bytes": [
+          65,
+          89
+        ],
+        "independent": true,
+        "blobText": "AB"
+      }
+    },
+    {
+      "name": "consumer buffer is a real Buffer over exact returned bytes",
+      "result": {
+        "bytes": [
+          65,
+          66
+        ],
+        "isBuffer": true,
+        "offset": 0,
+        "backingBytes": 2
+      }
+    },
+    {
+      "name": "Blob stream default reader reads copied owned bytes",
+      "result": {
+        "first": [
+          90,
+          98,
+          99
+        ],
+        "done": true,
+        "blobText": "abc"
+      }
+    },
+    {
+      "name": "Blob stream is a byte stream with ordinary BYOB reads",
+      "result": {
+        "bytes": [
+          97,
+          98
+        ],
+        "done": false
+      }
+    },
+    {
+      "name": "Blob text removes BOM and replaces malformed UTF8",
+      "result": [
+        "A",
+        "�"
+      ]
+    }
+  ],
+  "sources": {
+    "node-checks.mjs": "6f551fe7129824cdbd8a671e9378b984aaa5aafaea70fdb1dece22daab801a3a",
+    "run-node.mjs": "ddae784be17305f70d9a18de64d871038b93ece514caababc7ac26dfa879f7e4"
+  },
+  "nodeEmbeddedSources": {
+    "stream/consumers": {
+      "sha256": "54d61333b48acae5855a33eb99ec9cbacc3f60a4b6b47e53302cfd88d66f77f0",
+      "bytes": 1743
+    },
+    "internal/blob": {
+      "sha256": "858bcb3fd7604a7548fdd43c14dbb26dc7f6849d23e0d6b6a66a67fc14af5967",
+      "bytes": 13389
+    },
+    "internal/encoding": {
+      "sha256": "0887d9335ebc6f9f81e4b98851baef1382646c2e5da690025bddf74392dea5b0",
+      "bytes": 17473
+    }
+  },
+  "scope": "Small ordinary bounded Node22 oracle cases. No guest/native Blob probe; no getter/detach/shared/OOM lifetime test; no classic stream or production support claim."
+}

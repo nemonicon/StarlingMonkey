@@ -1,0 +1,1011 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_ONLY_REVERSIBLE_V2_DERIVATIONS",
+  "files": [
+    {
+      "original": "tests/node-compat/foundation-scheduler/production-regression-candidate-v3/admission.mjs",
+      "originalSha256": "92d22a6d81ab6cb2d2f507c37e675247f4880cf96d1bea1de2eb4dd79864147d",
+      "generated": "admission.mjs",
+      "generatedSha256": "ace5351f38b4b68c8b562647cd266302ca249e66588645f9e7d44ff59fbab212",
+      "edits": [
+        {
+          "tag": "replace",
+          "oldStart": 2,
+          "oldEnd": 3,
+          "newStart": 2,
+          "newEnd": 3,
+          "before": [
+            "import {isAbsolute,relative,basename} from 'node:path';\n"
+          ],
+          "after": [
+            "import {isAbsolute,relative,basename,resolve} from 'node:path';\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 8,
+          "oldEnd": 10,
+          "newStart": 8,
+          "newEnd": 16,
+          "before": [
+            "export function validateProductionMetadata(metadata,{gcStress,expectedSources,expectedExternal}={}){\n",
+            "  assert(object(metadata),'Production metadata must be an object');assert.equal(typeof gcStress,'boolean');\n"
+          ],
+          "after": [
+            "export function validatePinBoundary(root,paths=[]){\n",
+            "  assert.equal(typeof root,'string');assert(!root.includes('\\0')&&isAbsolute(root));\n",
+            "  assert.equal(root,resolve(root),'Pin root must be canonical');\n",
+            "  for(const path of paths){assert.equal(typeof path,'string');assert(!path.includes('\\0')&&isAbsolute(path));\n",
+            "    assert.equal(path,resolve(path),'Pin child path must be canonical');const rel=relative(root,path);assert(rel&&!rel.startsWith('..')&&!isAbsolute(rel));}\n",
+            "}\n",
+            "export function validateProductionMetadata(metadata,{gcStress,entropyPolicy='off',expectedSources,expectedExternal}={}){\n",
+            "  assert(object(metadata),'Production metadata must be an object');assert.equal(typeof gcStress,'boolean');assert(['off','runtime-only'].includes(entropyPolicy));assert(!(gcStress&&entropyPolicy==='runtime-only'),'No RuntimeOnly GC variant admitted');\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 17,
+          "oldEnd": 19,
+          "newStart": 23,
+          "newEnd": 25,
+          "before": [
+            "  assert.equal(metadata.entropyPolicy,'off');assert.equal(metadata.hostApi,'wasi-0.2.10');\n",
+            "  for(const [key,value]of Object.entries({CMAKE_BUILD_TYPE:'Release',WEVAL:'OFF',USE_WASM_OPT:'ON',ENABLE_BUILTIN_NODE_COMPAT:'ON',ENABLE_JS_DEBUGGER:'OFF',ENABLE_BUILTIN_WPT_SUPPORT:'OFF',NODE_COMPAT_LOCKED_RUST:'ON',NODE_COMPAT_OOM_TESTING:'OFF',NODE_COMPAT_ENTROPY_MODE:'OFF',NODE_COMPAT_INTERNAL_TICKS:'ON',NODE_COMPAT_PATH:'ON',NODE_COMPAT_EVENTS:'ON',NODE_COMPAT_STRING_DECODER:'ON',NODE_COMPAT_ASSERT:'ON',NODE_COMPAT_QUERYSTRING:'ON',NODE_COMPAT_UTIL:'ON',NODE_COMPAT_STREAM_WEB:'ON',NODE_COMPAT_GC_STRESS:gcStress?'ON':'OFF'}))\n"
+          ],
+          "after": [
+            "  assert.equal(metadata.entropyPolicy,entropyPolicy);assert.equal(metadata.hostApi,'wasi-0.2.10');\n",
+            "  for(const [key,value]of Object.entries({CMAKE_BUILD_TYPE:'Release',WEVAL:'OFF',USE_WASM_OPT:'ON',ENABLE_BUILTIN_NODE_COMPAT:'ON',ENABLE_JS_DEBUGGER:'OFF',ENABLE_BUILTIN_WPT_SUPPORT:'OFF',NODE_COMPAT_LOCKED_RUST:'ON',NODE_COMPAT_OOM_TESTING:'OFF',NODE_COMPAT_ENTROPY_MODE:entropyPolicy==='off'?'OFF':'RUNTIME_ONLY',NODE_COMPAT_INTERNAL_TICKS:'ON',NODE_COMPAT_PATH:'ON',NODE_COMPAT_EVENTS:'ON',NODE_COMPAT_STRING_DECODER:'ON',NODE_COMPAT_ASSERT:'ON',NODE_COMPAT_QUERYSTRING:'ON',NODE_COMPAT_UTIL:'ON',NODE_COMPAT_STREAM_WEB:'ON',NODE_COMPAT_GC_STRESS:gcStress?'ON':'OFF'}))\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 31,
+          "oldEnd": 32,
+          "newStart": 37,
+          "newEnd": 38,
+          "before": [
+            "  return Object.freeze({state:'pure-production-metadata-shape-checked',sourceFiles:306,gcStress,artifactProof:false,runtimeProof:false});\n"
+          ],
+          "after": [
+            "  return Object.freeze({state:'pure-production-metadata-shape-checked',sourceFiles:306,gcStress,entropyPolicy,artifactProof:false,runtimeProof:false});\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 33,
+          "oldEnd": 38,
+          "newStart": 39,
+          "newEnd": 44,
+          "before": [
+            "export function selectActualPin(document,{gcStress}={}){\n",
+            "  assert.equal(typeof gcStress,'boolean');assert(object(document)&&document.schemaVersion===1);\n",
+            "  assert.equal(document.state,'REVIEWED_REAL_PRODUCTION_FREEZES_V1','Actual production pins are unconfigured; require a new reviewed revision');\n",
+            "  const label=gcStress?'gc-off':'normal-off',pin=document.variants?.[label];assert(object(pin),'Actual production variant pins are absent');\n",
+            "  assert.equal(pin.state,'reviewed-real-production-freeze');assert.equal(pin.gcStress,gcStress);assert.equal(pin.sourceFiles,306);\n"
+          ],
+          "after": [
+            "export function selectActualPin(document,{gcStress,entropyPolicy='off'}={}){\n",
+            "  assert.equal(typeof gcStress,'boolean');assert(['off','runtime-only'].includes(entropyPolicy));assert(!(gcStress&&entropyPolicy==='runtime-only'),'No RuntimeOnly GC variant admitted');assert(object(document)&&document.schemaVersion===1);\n",
+            "  assert.equal(document.state,'REVIEWED_REAL_PRODUCTION_CAPABILITY_FREEZES_V1','Actual production pins are unconfigured; require a new reviewed revision');\n",
+            "  const label=entropyPolicy==='runtime-only'?'normal-runtime':gcStress?'gc-off':'normal-off',pin=document.variants?.[label];assert(object(pin),'Actual production variant pins are absent');\n",
+            "  assert.equal(pin.state,'reviewed-real-production-freeze');assert.equal(pin.gcStress,gcStress);assert.equal(pin.entropyPolicy,entropyPolicy);assert.equal(pin.sourceFiles,306);\n"
+          ]
+        },
+        {
+          "tag": "insert",
+          "oldStart": 41,
+          "oldEnd": 41,
+          "newStart": 47,
+          "newEnd": 48,
+          "before": [],
+          "after": [
+            "  validatePinBoundary(pin.freezeRoot);\n"
+          ]
+        },
+        {
+          "tag": "insert",
+          "oldStart": 44,
+          "oldEnd": 44,
+          "newStart": 51,
+          "newEnd": 52,
+          "before": [],
+          "after": [
+            "    validatePinBoundary(pin.freezeRoot,[path]);\n"
+          ]
+        },
+        {
+          "tag": "insert",
+          "oldStart": 48,
+          "oldEnd": 48,
+          "newStart": 56,
+          "newEnd": 57,
+          "before": [],
+          "after": [
+            "    validatePinBoundary(pin.freezeRoot,[row.path]);\n"
+          ]
+        }
+      ]
+    },
+    {
+      "original": "tests/node-compat/foundation-scheduler/production-regression-candidate-v3/preflight.mjs",
+      "originalSha256": "ce36d285104006b99a1308f7d5376ed41dbb9e0236dfcf8fad239d115c3898af",
+      "generated": "preflight.mjs",
+      "generatedSha256": "0874b1af780c835a4efac71a479bd2ee9d5cf3e09d67141eb6e6f44dfba5da7d",
+      "edits": [
+        {
+          "tag": "replace",
+          "oldStart": 31,
+          "oldEnd": 32,
+          "newStart": 31,
+          "newEnd": 32,
+          "before": [
+            "export async function verifyProductionTicks({gcStress=false}={}){\n"
+          ],
+          "after": [
+            "export async function verifyProductionTicks({gcStress=false,entropyPolicy='off'}={}){\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 34,
+          "oldEnd": 35,
+          "newStart": 34,
+          "newEnd": 35,
+          "before": [
+            "  const pin=selectActualPin(JSON.parse(pinBytes),{gcStress}); // FIRST gate; null cannot reach a loader.\n"
+          ],
+          "after": [
+            "  const pin=selectActualPin(JSON.parse(pinBytes),{gcStress,entropyPolicy}); // FIRST gate; null cannot reach a loader.\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 51,
+          "oldEnd": 52,
+          "newStart": 51,
+          "newEnd": 52,
+          "before": [
+            "  validateProductionMetadata(metadata,{gcStress,expectedSources:policy.expectedNativeSourceManifest,expectedExternal:external});\n"
+          ],
+          "after": [
+            "  validateProductionMetadata(metadata,{gcStress,entropyPolicy,expectedSources:policy.expectedNativeSourceManifest,expectedExternal:external});\n"
+          ]
+        },
+        {
+          "tag": "insert",
+          "oldStart": 76,
+          "oldEnd": 76,
+          "newStart": 76,
+          "newEnd": 77,
+          "before": [],
+          "after": [
+            "    assert.equal(args.includes('-DNODE_COMPAT_ENTROPY_RUNTIME_ONLY=1'),entropyPolicy==='runtime-only');\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 89,
+          "oldEnd": 91,
+          "newStart": 90,
+          "newEnd": 92,
+          "before": [
+            "  const {nativePreflight}=await import('../../foundation-stream-web/production-candidate/native-preflight.mjs');\n",
+            "  const safety=await nativePreflight({streamWebEnabled:true});assert.equal(safety.metadata.engineSha256,pin.engineSha256);\n"
+          ],
+          "after": [
+            "  const {nativePreflight}=await import('./native-safety.mjs');\n",
+            "  const safety=await nativePreflight({streamWebEnabled:true,entropyPolicy});assert.equal(safety.metadata.engineSha256,pin.engineSha256);\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 98,
+          "oldEnd": 99,
+          "newStart": 99,
+          "newEnd": 100,
+          "before": [
+            "    report:{state:'fixed-production-private-ticks-preflight-passed',engineSha256:pin.engineSha256,commandsPath:pin.commandsPath,sourceFilesVerified:306,recipeSha256:RECIPE,freezeReceiptSha256:pin.freezeReceiptSha256,inputClosure,gcStress,scope:'Read-only admission; no runtime/scheduler/reset/ALS proof'}};\n"
+          ],
+          "after": [
+            "    report:{state:'fixed-production-private-ticks-preflight-passed',engineSha256:pin.engineSha256,commandsPath:pin.commandsPath,sourceFilesVerified:306,recipeSha256:RECIPE,freezeReceiptSha256:pin.freezeReceiptSha256,inputClosure,gcStress,entropyPolicy,scope:'Read-only admission; no runtime/scheduler/reset/ALS proof'}};\n"
+          ]
+        }
+      ]
+    },
+    {
+      "original": "tests/node-compat/foundation-stream-web/production-candidate/native-preflight.mjs",
+      "originalSha256": "ee83495efdd417c2283b8acfad6c57783ea355e803cf2e6fdca107cd9ee55699",
+      "generated": "native-safety.mjs",
+      "generatedSha256": "c1186d2aa99428306635d1c6b6d35b492ee3bafe7d5eb55d558ab3b17f170d7c",
+      "edits": [
+        {
+          "tag": "replace",
+          "oldStart": 8,
+          "oldEnd": 9,
+          "newStart": 8,
+          "newEnd": 9,
+          "before": [
+            "export async function nativePreflight({streamWebEnabled}){\n"
+          ],
+          "after": [
+            "export async function nativePreflight({streamWebEnabled,entropyPolicy}){\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 15,
+          "oldEnd": 16,
+          "newStart": 15,
+          "newEnd": 16,
+          "before": [
+            "  const contract=JSON.parse(await readFile(new URL('./native-preflight-contract.json',import.meta.url)));\n"
+          ],
+          "after": [
+            "  const contract=JSON.parse(await readFile(new URL('../../foundation-stream-web/production-candidate/native-preflight-contract.json',import.meta.url)));\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 22,
+          "oldEnd": 23,
+          "newStart": 22,
+          "newEnd": 23,
+          "before": [
+            "  assert.equal(metadata.entropyPolicy,'off','This runner selects no host interfaces');\n"
+          ],
+          "after": [
+            "  assert(['off','runtime-only'].includes(entropyPolicy));assert.equal(metadata.entropyPolicy,entropyPolicy,'Explicit fixed capability variant required');\n"
+          ]
+        }
+      ]
+    },
+    {
+      "original": "tests/node-compat/foundation-add-abort/production-native-m0.11/harness.mjs",
+      "originalSha256": "1410bba5f73d28382966ccb8c8f68bfc8282af5a4c449c8b093474c967c27e3c",
+      "generated": "focused/harness.mjs",
+      "generatedSha256": "5edc6831b69deb69f1cc599e1d3c4dc24fd3b3aed2ed91ef1c9a8b54e318ce85",
+      "edits": [
+        {
+          "tag": "replace",
+          "oldStart": 6,
+          "oldEnd": 10,
+          "newStart": 6,
+          "newEnd": 11,
+          "before": [
+            "import {loadToolchain} from '../../toolchain.mjs';\n",
+            "import {loadComponentizer} from '../../componentizer.mjs';\n",
+            "import {bundleProfile} from '../../profile-bundler.mjs';\n",
+            "import {decodeCliString} from '../../foundations/native-scalar-harness.mjs';\n"
+          ],
+          "after": [
+            "import {variantOptions} from '../capabilities.mjs';\n",
+            "import {loadToolchain} from '../../../toolchain.mjs';\n",
+            "import {loadComponentizer} from '../../../componentizer.mjs';\n",
+            "import {bundleProfile} from '../../../profile-bundler.mjs';\n",
+            "import {decodeCliString} from '../../../foundations/native-scalar-harness.mjs';\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 12,
+          "oldEnd": 15,
+          "newStart": 13,
+          "newEnd": 18,
+          "before": [
+            " const admitted=await preflight({gcStress}),{engine,sourceRoot,metadata}=admitted;\n",
+            " const here=dirname(fileURLToPath(import.meta.url)),output=resolve(process.env.NODE_COMPAT_ADD_ABORT_OUTPUT??'/tmp/starling-node-compat/foundations-v11/add-abort-'+metadata.entropyPolicy+(gcStress?'-gc':''));\n",
+            " await mkdir(output,{recursive:true});await writeFile(join(output,'started.json'),JSON.stringify({engine,engineSha256:metadata.engineSha256})+'\\n',{flag:'wx'});\n"
+          ],
+          "after": [
+            " const requested=variantOptions(process.env.NODE_COMPAT_FOLLOWON_VARIANT);assert.equal(requested.gcStress,gcStress);\n",
+            " const admitted=await preflight(requested),{engine,sourceRoot,metadata}=admitted;\n",
+            " assert(process.env.NODE_COMPAT_ADD_ABORT_OUTPUT);\n",
+            " const here=dirname(fileURLToPath(import.meta.url)),output=resolve(process.env.NODE_COMPAT_ADD_ABORT_OUTPUT);\n",
+            " assert(process.env.NODE_COMPAT_ADD_ABORT_OUTPUT);await mkdir(output,{recursive:false});await writeFile(join(output,'started.json'),JSON.stringify({engine,engineSha256:metadata.engineSha256})+'\\n',{flag:'wx'});\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 17,
+          "oldEnd": 18,
+          "newStart": 20,
+          "newEnd": 21,
+          "before": [
+            " for(const name of ['engine-pins.json','public-cases.mjs','run-node.mjs','node-results.json','component.mjs','require.cjs','profile.wit','preflight.mjs','harness.mjs','run-component.mjs','gc-component.mjs','run-gc.mjs']){\n"
+          ],
+          "after": [
+            " for(const name of ['public-cases.mjs','run-node.mjs','node-results.json','component.mjs','require.cjs','profile.wit','preflight.mjs','harness.mjs','run-component.mjs','gc-component.mjs','run-gc.mjs']){\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 49,
+          "oldEnd": 50,
+          "newStart": 52,
+          "newEnd": 53,
+          "before": [
+            " async function finish(){for(const item of sourceFiles)assert.equal(hash(await readFile(item.path)),item.sha256,item.path);assert.equal(hash(await readFile(engine)),metadata.engineSha256);assert.equal(hash(await readFile(engine+'.build.json')),admitted.report.engineMetadataSha256);await preflight({gcStress});}\n"
+          ],
+          "after": [
+            " async function finish(){for(const item of sourceFiles)assert.equal(hash(await readFile(item.path)),item.sha256,item.path);assert.equal(hash(await readFile(engine)),metadata.engineSha256);assert.equal(hash(await readFile(engine+'.build.json')),admitted.report.engineMetadataSha256);await admitted.recheck();await preflight(requested);}\n"
+          ]
+        }
+      ]
+    },
+    {
+      "original": "tests/node-compat/foundation-add-abort/production-native-m0.11/run-component.mjs",
+      "originalSha256": "2f82b4b8bc92b5e2826b918ab449de0306a233238cbd499ff04a611fb1bcdefc",
+      "generated": "focused/run-component.mjs",
+      "generatedSha256": "36e18a5e5848130b7c420d5d8e3cc04b627273d4f64f4581208a21dcf9c3873c",
+      "edits": [
+        {
+          "tag": "replace",
+          "oldStart": 60,
+          "oldEnd": 61,
+          "newStart": 60,
+          "newEnd": 61,
+          "before": [
+            "const report={state:'M11_ORDINARY_NATIVE_ADD_ABORT_LISTENER_PASSED',recordedAtUtc:new Date().toISOString(),...h.evidence,\n"
+          ],
+          "after": [
+            "const report={state:'NEW_PRODUCTION306_ORDINARY_NATIVE_ADD_ABORT_LISTENER_PASSED',recordedAtUtc:new Date().toISOString(),...h.evidence,\n"
+          ]
+        }
+      ]
+    },
+    {
+      "original": "tests/node-compat/foundation-add-abort/production-native-m0.11/run-gc.mjs",
+      "originalSha256": "5a8a30f60009957b425bb704b23e95b8c45d7a3fa918aa9fbce1c049b1df2adb",
+      "generated": "focused/run-gc.mjs",
+      "generatedSha256": "fef594d67e23aaae5437e917d5babae12814ce7d7ab824fb7ba7e10a863eea60",
+      "edits": [
+        {
+          "tag": "replace",
+          "oldStart": 19,
+          "oldEnd": 20,
+          "newStart": 19,
+          "newEnd": 20,
+          "before": [
+            "await h.finish();const report={state:'M11_RELEASE_MOVING_GC_COMBINED_OWNER_GATE_PASSED',recordedAtUtc:new Date().toISOString(),...h.evidence,\n"
+          ],
+          "after": [
+            "await h.finish();const report={state:'NEW_PRODUCTION306_RELEASE_MOVING_GC_COMBINED_OWNER_GATE_PASSED',recordedAtUtc:new Date().toISOString(),...h.evidence,\n"
+          ]
+        }
+      ]
+    },
+    {
+      "original": "tests/node-compat/foundation-add-abort/production-native-m0.11/run-callback-return.mjs",
+      "originalSha256": "9c9bcd2c8ea738123ea1303d5ae338eb996f13aa29e965259836f969ca70b971",
+      "generated": "focused/run-callback-return.mjs",
+      "generatedSha256": "4b05092910b51b5dbd28c24b75a27b2c95a8f6dc759f5c46eccd463b5f3a5792",
+      "edits": [
+        {
+          "tag": "replace",
+          "oldStart": 22,
+          "oldEnd": 23,
+          "newStart": 22,
+          "newEnd": 23,
+          "before": [
+            " scope:'Safe ordinary returned objects only; get then increments a counter and returns undefined. No throwing/rejecting thenable, asynchronous listener Promise, Error poisoning, fault, raw/private memory or old engine path. Native304/manifest/CMake/recipe unchanged; fix belongs to future scheduler/callback-result routing work.'};\n"
+          ],
+          "after": [
+            " scope:'Safe ordinary returned objects only; get then increments a counter and returns undefined. No throwing/rejecting thenable, asynchronous listener Promise, Error poisoning, fault, raw/private memory or old engine path. Production306 is newly source/config pinned; inherited callback-return semantics unchanged; fix belongs to future scheduler/callback-result routing work.'};\n"
+          ]
+        }
+      ]
+    },
+    {
+      "original": "tests/node-compat/foundations/http-v11.mjs",
+      "originalSha256": "f8a5aa42d6902d4f7a953f124849751f3a4b2b20dbf8df716c9002b7402fe2fa",
+      "generated": "http-component.mjs",
+      "generatedSha256": "6f493122080c604c6184c8baf9a0d938c87505abeb533b39ae1e32f6130eae8e",
+      "edits": [
+        {
+          "tag": "replace",
+          "oldStart": 0,
+          "oldEnd": 1,
+          "newStart": 0,
+          "newEnd": 1,
+          "before": [
+            "// Unapplied core m0.11 proposal; complete HTTP-v10 protected29/schema5 retained.\n"
+          ],
+          "after": [
+            "// New production306 source proposal; unchanged HTTP-v11 protected29/schema5 body.\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 16,
+          "oldEnd": 26,
+          "newStart": 16,
+          "newEnd": 26,
+          "before": [
+            "import { run as runProtectedAbort } from '../foundation-add-abort/production-native-m0.10/component.mjs';\n",
+            "import { run as runStreamWeb } from '../foundation-stream-web/production-candidate/native-component.mjs';\n",
+            "import { createIncomingHandler } from '../wasmcloud/http.mjs';\n",
+            "import { runChecks as runBufferAndEntropy } from '../entropy/http.mjs';\n",
+            "import { run as runPath } from '../foundation-path/component.mjs';\n",
+            "import { run as runEvents } from '../foundation-events/native-component.mjs';\n",
+            "import { run as runStringDecoder } from '../foundation-string-decoder/native-component.mjs';\n",
+            "import { run as runAssert } from '../foundation-assert/native-component.mjs';\n",
+            "import { run as runQuerystring } from '../foundation-querystring/native-component.mjs';\n",
+            "import { run as runUtil } from '../foundation-util/native-component.mjs';\n"
+          ],
+          "after": [
+            "import { run as runProtectedAbort } from '../../foundation-add-abort/production-native-m0.10/component.mjs';\n",
+            "import { run as runStreamWeb } from '../../foundation-stream-web/production-candidate/native-component.mjs';\n",
+            "import { createIncomingHandler } from '../../wasmcloud/http.mjs';\n",
+            "import { runChecks as runBufferAndEntropy } from '../../entropy/http.mjs';\n",
+            "import { run as runPath } from '../../foundation-path/component.mjs';\n",
+            "import { run as runEvents } from '../../foundation-events/native-component.mjs';\n",
+            "import { run as runStringDecoder } from '../../foundation-string-decoder/native-component.mjs';\n",
+            "import { run as runAssert } from '../../foundation-assert/native-component.mjs';\n",
+            "import { run as runQuerystring } from '../../foundation-querystring/native-component.mjs';\n",
+            "import { run as runUtil } from '../../foundation-util/native-component.mjs';\n"
+          ]
+        }
+      ]
+    },
+    {
+      "original": "tests/node-compat/wasmcloud/build-http.mjs",
+      "originalSha256": "7958c63a8c14cd8ec56c371e7ee7b673b8cea86f5f0b4a264546938cb71b2cb7",
+      "generated": "runners/http-build.mjs",
+      "generatedSha256": "5bca405388c303b28c4e860a7b1fa7ca1d3fc98a9ba2adbcf672d05b727b4426",
+      "edits": [
+        {
+          "tag": "replace",
+          "oldStart": 6,
+          "oldEnd": 15,
+          "newStart": 6,
+          "newEnd": 15,
+          "before": [
+            "import { loadToolchain } from '../toolchain.mjs';\n",
+            "import { loadComponentizer } from '../componentizer.mjs';\n",
+            "import { createProfilePlugin } from '../profile-bundler.mjs';\n",
+            "import { selectedManifestsForEngine } from '../module-selection.mjs';\n",
+            "import { selectCoreExpectations, coreExpectationsForGuest } from '../core-expectations.mjs';\n",
+            "import { RANDOM } from '../entropy/selection-policy.mjs';\n",
+            "import { makeOracleCorpus } from '../oracle.mjs';\n",
+            "import { componentizeSelectedHTTP } from './http-stubbing.mjs';\n",
+            "import { auditClockDependency } from './type-audit.mjs';\n"
+          ],
+          "after": [
+            "import { loadToolchain } from '../../../toolchain.mjs';\n",
+            "import { loadComponentizer } from '../../../componentizer.mjs';\n",
+            "import { createProfilePlugin } from '../../../profile-bundler.mjs';\n",
+            "import { selectedManifestsForEngine } from '../../../module-selection.mjs';\n",
+            "import { selectCoreExpectations, coreExpectationsForGuest } from '../../../core-expectations.mjs';\n",
+            "import { RANDOM } from '../../../entropy/selection-policy.mjs';\n",
+            "import { makeOracleCorpus } from '../../../oracle.mjs';\n",
+            "import { componentizeSelectedHTTP } from '../../../wasmcloud/http-stubbing.mjs';\n",
+            "import { auditClockDependency } from '../../../wasmcloud/type-audit.mjs';\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 16,
+          "oldEnd": 17,
+          "newStart": 16,
+          "newEnd": 22,
+          "before": [
+            "const here = dirname(fileURLToPath(import.meta.url));\n"
+          ],
+          "after": [
+            "import {verifyProductionTicks} from '../preflight.mjs';\n",
+            "import {verifyComputedLiveInputs} from '../computed-inputs.mjs';\n",
+            "const productionAdmission=await verifyProductionTicks({entropyPolicy:'runtime-only'});\n",
+            "const computedManifestPath=productionAdmission.report.inputClosure.path,computedManifestSha256=productionAdmission.report.inputClosure.sha256;\n",
+            "const sourceHere=dirname(fileURLToPath(import.meta.url));\n",
+            "const here=resolve(sourceHere,'../../../wasmcloud');\n"
+          ]
+        },
+        {
+          "tag": "insert",
+          "oldStart": 60,
+          "oldEnd": 60,
+          "newStart": 65,
+          "newEnd": 66,
+          "before": [],
+          "after": [
+            "const computedBeforeCopy=await verifyComputedLiveInputs({manifestPath:computedManifestPath,expectedManifestSha256:computedManifestSha256,repository});\n"
+          ]
+        },
+        {
+          "tag": "insert",
+          "oldStart": 61,
+          "oldEnd": 61,
+          "newStart": 67,
+          "newEnd": 68,
+          "before": [],
+          "after": [
+            "const computedAfterCopy=await verifyComputedLiveInputs({manifestPath:computedManifestPath,expectedManifestSha256:computedManifestSha256,repository});\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 66,
+          "oldEnd": 73,
+          "newStart": 73,
+          "newEnd": 80,
+          "before": [
+            "const httpEntry = resolve(process.env.NODE_COMPAT_HTTP_ENTRY ?? join(here, 'http.mjs'));\n",
+            "const protectedAbortFoundationsFixture = ['http-v10.mjs', 'http-v11.mjs'].some(name => httpEntry === resolve(here, '../foundations/'+name));\n",
+            "const streamWebFoundationsFixture = protectedAbortFoundationsFixture || httpEntry === resolve(here, '../foundations/http-v9.mjs');\n",
+            "const utilFoundationsFixture = ['http-v7.mjs', 'http-v8.mjs', 'http-v9.mjs', 'http-v10.mjs', 'http-v11.mjs']\n",
+            "  .some(name => httpEntry === resolve(here, '../foundations/'+name));\n",
+            "const expandedFoundationsFixture = utilFoundationsFixture || httpEntry === resolve(here, '../foundations/http-v6.mjs');\n",
+            "const foundationsIntegrationFixture = expandedFoundationsFixture || httpEntry === resolve(here, '../foundations/http.mjs');\n"
+          ],
+          "after": [
+            "const httpEntry=resolve(sourceHere,'../http-component.mjs');\n",
+            "if(process.env.NODE_COMPAT_HTTP_ENTRY)assert.equal(resolve(process.env.NODE_COMPAT_HTTP_ENTRY),httpEntry);\n",
+            "const protectedAbortFoundationsFixture = httpEntry===resolve(sourceHere,'../http-component.mjs');\n",
+            "const streamWebFoundationsFixture = protectedAbortFoundationsFixture;\n",
+            "const utilFoundationsFixture = protectedAbortFoundationsFixture;\n",
+            "const expandedFoundationsFixture = utilFoundationsFixture;\n",
+            "const foundationsIntegrationFixture = expandedFoundationsFixture;\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 78,
+          "oldEnd": 81,
+          "newStart": 85,
+          "newEnd": 88,
+          "before": [
+            "  // engines or Events-OFF. This is read-only and includes all 304 source pins.\n",
+            "  const { preflight } = await import('../foundation-add-abort/production-native-m0.10/preflight.mjs');\n",
+            "  const admitted = await preflight();\n"
+          ],
+          "after": [
+            "  // engines or Events-OFF. This is read-only and includes all 306 source pins.\n",
+            "  const { preflight } = await import('../focused-preflight.mjs');\n",
+            "  const admitted = await preflight({entropyPolicy:'runtime-only'});\n"
+          ]
+        },
+        {
+          "tag": "insert",
+          "oldStart": 282,
+          "oldEnd": 282,
+          "newStart": 289,
+          "newEnd": 291,
+          "before": [],
+          "after": [
+            "audit.currentProductionAdmission=productionAdmission.report;\n",
+            "audit.computedLiveInputChecks={beforeCopy:computedBeforeCopy,afterCopy:computedAfterCopy};\n"
+          ]
+        },
+        {
+          "tag": "insert",
+          "oldStart": 283,
+          "oldEnd": 283,
+          "newStart": 292,
+          "newEnd": 293,
+          "before": [],
+          "after": [
+            "await productionAdmission.recheck();\n"
+          ]
+        }
+      ]
+    },
+    {
+      "original": "tests/node-compat/foundations/audit-http-v11.mjs",
+      "originalSha256": "0de8c0275f845006fa2372a219d5bef7a3d389e05b530d5af785f543ef3208cf",
+      "generated": "audit-http.mjs",
+      "generatedSha256": "28be000ac84e52ff465bfd5da0583b46175ad0e9b9dd430fc694963fa8f56063",
+      "edits": [
+        {
+          "tag": "replace",
+          "oldStart": 6,
+          "oldEnd": 10,
+          "newStart": 6,
+          "newEnd": 10,
+          "before": [
+            "import { selectCoreExpectations, validateCoreRuntimeReport } from '../core-expectations.mjs';\n",
+            "import { preflight } from '../foundation-add-abort/production-native-m0.10/preflight.mjs';\n",
+            "import { checkFoundationsHTTPReport } from './assert-http-report.mjs';\n",
+            "import { checkEntropyHTTPReport, checkEntropyHTTPSamples } from '../entropy/assert-http-report.mjs';\n"
+          ],
+          "after": [
+            "import { selectCoreExpectations, validateCoreRuntimeReport } from '../../core-expectations.mjs';\n",
+            "import {verifyHTTPReady} from './http-contract.mjs';\n",
+            "import { checkFoundationsHTTPReport } from '../../foundations/assert-http-report.mjs';\n",
+            "import { checkEntropyHTTPReport, checkEntropyHTTPSamples } from '../../entropy/assert-http-report.mjs';\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 13,
+          "oldEnd": 15,
+          "newStart": 13,
+          "newEnd": 16,
+          "before": [
+            "const root = resolve(process.env.NODE_COMPAT_HTTP_V11_ROOT ?? '/tmp/starling-node-compat/foundations-v11');\n",
+            "const repository = resolve(here, '../../..');\n"
+          ],
+          "after": [
+            "const ready=await verifyHTTPReady();\n",
+            "const root=ready.pin.root;\n",
+            "const repository = resolve(here, '../../../..');\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 17,
+          "oldEnd": 22,
+          "newStart": 18,
+          "newEnd": 23,
+          "before": [
+            "const sourceInputs = await json(join(root, 'http-v11-inputs.json'));\n",
+            "for (const file of sourceInputs.sourceFiles) assert.equal(hash(await readFile(join(repository, file.path))), file.sha256, file.path);\n",
+            "const admitted = await preflight();\n",
+            "assert.equal(admitted.report.engineSha256, '2e3731ce248be1d8ede0f5672dd87b48fb1731dfddb045bfaabaeea02534a36d');\n",
+            "assert.equal(admitted.report.engineMetadataSha256, '9adc95f3966ea5b12a4d2b6753b32f2f72ce736990e649d55bf367e808bbc07a');\n"
+          ],
+          "after": [
+            "const sourceInputs = await json(join(root, 'http-inputs.json'));\n",
+            "assert.equal(sourceInputs.sourceInputClosure.sha256,ready.admission.report.inputClosure.sha256);\n",
+            "const admitted=ready.admission;\n",
+            "assert.equal(admitted.report.engineSha256,ready.pin.engineSha256);\n",
+            "assert.equal(admitted.pin.receiptSha256,ready.pin.engineReceiptSha256);\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 30,
+          "oldEnd": 32,
+          "newStart": 31,
+          "newEnd": 33,
+          "before": [
+            "const fixedComponent = await json(join(root,'http-v11-component-pins.json'));\n",
+            "assert.equal(fixedComponent.state,'actual-packaged-component-audited');\n"
+          ],
+          "after": [
+            "const fixedComponent=ready.pin;\n",
+            "assert.equal(fixedComponent.state,'reviewed-real-runtime-http-component');\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 38,
+          "oldEnd": 39,
+          "newStart": 39,
+          "newEnd": 40,
+          "before": [
+            "assert.equal(audit.httpEntry,join(here,'http-v11.mjs'));\n"
+          ],
+          "after": [
+            "assert.equal(audit.httpEntry,join(here,'http-component.mjs'));\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 71,
+          "oldEnd": 72,
+          "newStart": 72,
+          "newEnd": 73,
+          "before": [
+            "  'http-v11-inputs.json', 'http-v11-component-pins.json', 'http-joint-build.log',\n"
+          ],
+          "after": [
+            "  'http-inputs.json', 'observed-http-component-seal.json', 'http-joint-build.log',\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 83,
+          "oldEnd": 88,
+          "newStart": 84,
+          "newEnd": 87,
+          "before": [
+            "const sourceFiles = [...sourceInputs.sourceFiles];\n",
+            "for (const path of ['http-v11.md']) {\n",
+            "  const bytes = await readFile(join(here,path));\n",
+            "  sourceFiles.push({path:'tests/node-compat/foundations/'+path,bytes:bytes.length,sha256:hash(bytes)});\n",
+            "}\n"
+          ],
+          "after": [
+            "const sourceManifestBytes=await readFile(admitted.report.inputClosure.path);\n",
+            "assert.equal(hash(sourceManifestBytes),admitted.report.inputClosure.sha256,'Source seal changed before JSON parsing');\n",
+            "const sourceFiles=JSON.parse(sourceManifestBytes).inputs;\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 89,
+          "oldEnd": 90,
+          "newStart": 88,
+          "newEnd": 89,
+          "before": [
+            "  state:'HTTP_V11_BOTH_UNMODIFIED_HOSTS_PASSED', verifiedAtUtc:new Date().toISOString(), node:process.version,\n"
+          ],
+          "after": [
+            "  state:'PRODUCTION306_HTTP_BOTH_UNMODIFIED_HOSTS_PASSED', verifiedAtUtc:new Date().toISOString(), node:process.version,\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 99,
+          "oldEnd": 100,
+          "newStart": 98,
+          "newEnd": 99,
+          "before": [
+            "  sourceReceiptTiming:'All 24 integration inputs were hashed before packaging and reverified after both hosts; native 304-source/config/macro admission and fixed Runtime engine/receipt pins are reverified here.',\n"
+          ],
+          "after": [
+            "  sourceReceiptTiming:'The complete sealed source closure was authenticated before packaging and reverified after both hosts; native306/config/macro admission, fixed Runtime engine and independently reviewed component pins are reverified here.',\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 109,
+          "oldEnd": 110,
+          "newStart": 108,
+          "newEnd": 110,
+          "before": [
+            "const output = resolve(process.env.NODE_COMPAT_HTTP_V11_RESULTS ?? join(here,'http-v11-results.json'));\n"
+          ],
+          "after": [
+            "await ready.recheck();\n",
+            "const output=resolve(process.env.NODE_COMPAT_PRODUCTION_HTTP_RESULTS??join(root,'http-results.json'));\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 111,
+          "oldEnd": 112,
+          "newStart": 111,
+          "newEnd": 112,
+          "before": [
+            "console.log(JSON.stringify({state:report.state,output,componentSha256:componentHash,requestsPerHost:3,protectedAbortGroups:29,sourceFilesVerified:sourceFiles.length,nativeSources:304},null,2));\n"
+          ],
+          "after": [
+            "console.log(JSON.stringify({state:report.state,output,componentSha256:componentHash,requestsPerHost:3,protectedAbortGroups:29,sourceFilesVerified:sourceFiles.length,nativeSources:306},null,2));\n"
+          ]
+        }
+      ]
+    },
+    {
+      "original": "tests/node-compat/foundation-scheduler/production-followon-capability-v1/freeze-inputs.py",
+      "originalSha256": "d52bb86fc46800b53a40e0eb899c1087bb21bbb5d23f596d6695123353505a43",
+      "generated": "freeze-inputs.py",
+      "generatedSha256": "54f4acc3a3b2aec5ebbdbe28c5b6acb20a26f48b2dd482a8891a79efb4dcbae9",
+      "edits": [
+        {
+          "tag": "insert",
+          "oldStart": 51,
+          "oldEnd": 51,
+          "newStart": 51,
+          "newEnd": 62,
+          "before": [],
+          "after": [
+            "live_computed = [\n",
+            "    'host-apis/wasi-0.2.10/wit/deps/' + name + '/package.wit'\n",
+            "    for name in ['wasi-cli-0.2.10', 'wasi-clocks-0.2.10', 'wasi-filesystem-0.2.10',\n",
+            "                 'wasi-http-0.2.10', 'wasi-io-0.2.10', 'wasi-random-0.2.10', 'wasi-sockets-0.2.10']\n",
+            "] + ['host-apis/wasi-0.2.0/preview1-adapter-release/wasi_snapshot_preview1.wasm']\n",
+            "assert len(live_computed) == 8\n",
+            "for name in live_computed:\n",
+            "    add(REPO / name)\n",
+            "actual_wit_files = sorted(path.relative_to(REPO).as_posix()\n",
+            "                          for path in (REPO / 'host-apis/wasi-0.2.10/wit/deps').rglob('*') if path.is_file())\n",
+            "assert actual_wit_files == sorted(live_computed[:7])\n"
+          ]
+        },
+        {
+          "tag": "insert",
+          "oldStart": 72,
+          "oldEnd": 72,
+          "newStart": 83,
+          "newEnd": 84,
+          "before": [],
+          "after": [
+            "            'liveComputedHTTPInputs': live_computed,\n"
+          ]
+        }
+      ]
+    },
+    {
+      "original": "tests/node-compat/foundation-scheduler/production-followon-capability-v1/check-source.py",
+      "originalSha256": "f1185a37d4991ccb2546e7a8989925797ddb2dd68d1f0199f54d14ad8787c1ea",
+      "generated": "check-source.py",
+      "generatedSha256": "d139d0c7f370ba02924fd07fecf94b945ae737cb03c2b60697744cee0efb9ce9",
+      "edits": [
+        {
+          "tag": "insert",
+          "oldStart": 18,
+          "oldEnd": 18,
+          "newStart": 18,
+          "newEnd": 30,
+          "before": [],
+          "after": [
+            "expected_live = [\n",
+            "    'host-apis/wasi-0.2.10/wit/deps/' + name + '/package.wit'\n",
+            "    for name in ['wasi-cli-0.2.10', 'wasi-clocks-0.2.10', 'wasi-filesystem-0.2.10',\n",
+            "                 'wasi-http-0.2.10', 'wasi-io-0.2.10', 'wasi-random-0.2.10', 'wasi-sockets-0.2.10']\n",
+            "] + ['host-apis/wasi-0.2.0/preview1-adapter-release/wasi_snapshot_preview1.wasm']\n",
+            "assert seal['liveComputedHTTPInputs'] == expected_live\n",
+            "sealed = {(HERE / row['path']).resolve(): row for row in seal['inputs']}\n",
+            "for name in expected_live:\n",
+            "    actual = (REPO / name).resolve()\n",
+            "    assert actual in sealed and sealed[actual]['sha256'] == sha(actual)\n",
+            "actual_wit = sorted(path.relative_to(REPO).as_posix() for path in (REPO / 'host-apis/wasi-0.2.10/wit/deps').rglob('*') if path.is_file())\n",
+            "assert actual_wit == sorted(expected_live[:7]), 'Every actual recursive cp file must be in the explicit live set'\n"
+          ]
+        },
+        {
+          "tag": "insert",
+          "oldStart": 44,
+          "oldEnd": 44,
+          "newStart": 56,
+          "newEnd": 60,
+          "before": [],
+          "after": [
+            "copy_at = after.index(\"await cp(join(repository, 'host-apis/wasi-0.2.10/wit/deps')\")\n",
+            "assert after.index('const computedBeforeCopy=') < copy_at < after.index('const computedAfterCopy=')\n",
+            "assert \"const httpEntry=resolve(sourceHere,'../http-component.mjs');\" in after\n",
+            "assert \"preview2Adapter: preview1AdapterPath\" in after\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 61,
+          "oldEnd": 62,
+          "newStart": 77,
+          "newEnd": 78,
+          "before": [
+            "assert tests['tests'] == tests['passed'] == 75\n"
+          ],
+          "after": [
+            "assert tests['tests'] == tests['passed'] == 87\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 67,
+          "oldEnd": 68,
+          "newStart": 83,
+          "newEnd": 86,
+          "before": [
+            "          'primitivePinAndManifestSealFunctionsUnchanged': True, 'hostOnlyTests': 75,\n"
+          ],
+          "after": [
+            "          'primitivePinAndManifestSealFunctionsUnchanged': True, 'hostOnlyTests': 87,\n",
+            "          'actualLiveComputedInputsVerified': 8, 'actualRecursiveCopyFilesVerified': 7,\n",
+            "          'adapterWorldFixtureAndOracleReadsAudited': True,\n"
+          ]
+        }
+      ]
+    },
+    {
+      "original": "tests/node-compat/foundation-scheduler/production-followon-capability-v1/http-contract.mjs",
+      "originalSha256": "1cc3780276ddb6f8bc6a857c98571d97dca7a5bfa3c0e762fea901d6c29f0875",
+      "generated": "http-contract.mjs",
+      "generatedSha256": "23a0a5c3acd94855cbe8744b36fc3010f2cc6458c7e5c719b7c9a38c306a072a",
+      "edits": [
+        {
+          "tag": "insert",
+          "oldStart": 7,
+          "oldEnd": 7,
+          "newStart": 7,
+          "newEnd": 8,
+          "before": [],
+          "after": [
+            "import {LIVE_COMPUTED_INPUTS} from './computed-inputs.mjs';\n"
+          ]
+        },
+        {
+          "tag": "insert",
+          "oldStart": 42,
+          "oldEnd": 42,
+          "newStart": 43,
+          "newEnd": 46,
+          "before": [],
+          "after": [
+            " const copied=audit.computedLiveInputChecks;assert.deepEqual(copied.beforeCopy,copied.afterCopy);\n",
+            " assert.equal(copied.beforeCopy.state,'EXACT_EIGHT_LIVE_HTTP_INPUTS_MATCH_SEAL');assert.equal(copied.beforeCopy.files,8);assert.equal(copied.beforeCopy.witFiles,7);assert.equal(copied.beforeCopy.adapterFiles,1);\n",
+            " assert.deepEqual(copied.beforeCopy.inputs.map(x=>x.name),LIVE_COMPUTED_INPUTS);\n"
+          ]
+        }
+      ]
+    },
+    {
+      "original": "tests/node-compat/foundation-scheduler/production-followon-capability-v1/test-host.mjs",
+      "originalSha256": "a7e87a60aab2c1b499c770ddadbde52f29b2916d632e682353b631c28c2f2ac1",
+      "generated": "test-host.mjs",
+      "generatedSha256": "298a9e9db242f7186118a84572a00a2976f6a01136de910bec54bd276d35f689",
+      "edits": [
+        {
+          "tag": "insert",
+          "oldStart": 12,
+          "oldEnd": 12,
+          "newStart": 12,
+          "newEnd": 13,
+          "before": [],
+          "after": [
+            "import {LIVE_COMPUTED_INPUTS,requireComputedRows,validateWitPackageNames,verifyComputedLiveInputs} from './computed-inputs.mjs';\n"
+          ]
+        },
+        {
+          "tag": "insert",
+          "oldStart": 124,
+          "oldEnd": 124,
+          "newStart": 125,
+          "newEnd": 131,
+          "before": [],
+          "after": [
+            "const computedManifestPath=join(here,'input-freeze.json'),computedBytes=await readFile(computedManifestPath),computedRows=JSON.parse(computedBytes).inputs;\n",
+            "await asyncTest('all eight actual live cp/adapter inputs are sealed and unchanged',async()=>{const proof=await verifyComputedLiveInputs({manifestPath:computedManifestPath,expectedManifestSha256:hash(computedBytes),repository:repo});assert.equal(proof.files,8);});\n",
+            "for(const name of LIVE_COMPUTED_INPUTS)test('missing live computed input rejects '+name,()=>{const without=computedRows.filter(row=>resolve(here,row.path)!==resolve(repo,name));assert.throws(()=>requireComputedRows(without,{manifestPath:computedManifestPath,repository:repo}),/not sealed/);});\n",
+            "test('frozen control copy does not replace a live WIT path',()=>{const without=computedRows.filter(row=>resolve(here,row.path)!==resolve(repo,LIVE_COMPUTED_INPUTS[0]));without.push({path:'/tmp/frozen-control/package.wit',sha256:'1'.repeat(64),bytes:1});assert.throws(()=>requireComputedRows(without,{manifestPath:computedManifestPath,repository:repo}),/not sealed/);});\n",
+            "test('unlisted cp directory rejects',()=>assert.throws(()=>validateWitPackageNames(['unexpected'])));\n",
+            "await asyncTest('computed seal digest checked before following rows',async()=>assert.rejects(verifyComputedLiveInputs({manifestPath:computedManifestPath,expectedManifestSha256:'0'.repeat(64),repository:repo}),/before parsing/));\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 126,
+          "oldEnd": 127,
+          "newStart": 133,
+          "newEnd": 134,
+          "before": [
+            " entryNegativeChildren:negativeChildren,scratchSealCases:7,componentizerToolchainOrHostRun:false,nativeBuild:false,guestExecuted:false,oldV11FilesModified:false};\n"
+          ],
+          "after": [
+            " entryNegativeChildren:negativeChildren,scratchSealCases:7,computedLiveInputsVerifiedReadOnly:8,componentizerToolchainOrHostRun:false,nativeBuild:false,guestExecuted:false,oldV11FilesModified:false};\n"
+          ]
+        }
+      ]
+    },
+    {
+      "original": "tests/node-compat/foundation-scheduler/production-followon-capability-v1/README.md",
+      "originalSha256": "9ba9ff8dbb525e2c91d943c096bfd3a7c28e6a26bbcb1b697430f4c26c49fe3a",
+      "generated": "README.md",
+      "generatedSha256": "24e30d3befc1ff850f88f09cd8ae728b366005c92403f0ab615511a05e5797e4",
+      "edits": [
+        {
+          "tag": "replace",
+          "oldStart": 0,
+          "oldEnd": 1,
+          "newStart": 0,
+          "newEnd": 1,
+          "before": [
+            "This is a **source-only, unapplied follow-on packet** for production306 focused Events and standard WASI HTTP transport. It derives a finite RuntimeOnly extension from frozen production-regression-candidate-v3; that packet, live source, accepted v11 artifacts and other follow-on packets are unchanged. All three engine pin records and the HTTP component pin remain `null`. Every public entry and the internal HTTP builder refuses unconfigured engine pins before loading a toolchain, packager, component, or host. No native build, link, guest or host ran. Source/host-only checks are preparation evidence, not new compatibility acceptance.\n"
+          ],
+          "after": [
+            "This is the **source-only, unapplied v2 follow-on packet** for production306 focused Events and standard WASI HTTP transport. It preserves v1 seal `6e611622...` as superseded: v1's 75 checks did not detect eight missing computed live inputs, so they were not source-readiness approval. V2 explicitly seals the seven live repository WIT dependency files and live Preview1 adapter, with a digest-before-rows check and exact-directory verification before/after the future copy. It derives the same finite RuntimeOnly extension from frozen production-regression-candidate-v3; that packet, live source, accepted v11 artifacts and other follow-on packets are unchanged. All three engine pin records and the HTTP component pin remain `null`. Every public entry and the internal HTTP builder refuses unconfigured engine pins before loading a toolchain, packager, component, or host. No native build, link, guest or host ran. Source/host-only checks are preparation evidence, not new compatibility acceptance.\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 4,
+          "oldEnd": 5,
+          "newStart": 4,
+          "newEnd": 5,
+          "before": [
+            "The copied input-seal functions retain v3's primitive expected pin/manifest digests. A post-run check rejects changed pin bytes, then verifies the exact manifest buffer before JSON parsing or following rows. Returned report objects and buffers do not supply expected digests. New native and HTTP pin paths must be absolute, normalized and NUL-free; child paths stay inside their canonical roots, and the HTTP read walk has an explicit termination guard. Existing v3 remains immutable. The 75 host-only checks include malformed path roots, namespace/capability constraints, null-pin entry failures, rejection of unchanged real old metadata, and seven owned-scratch seal cases. Synthetic positive metadata has no engine path/hash and reports neither artifact nor runtime proof.\n"
+          ],
+          "after": [
+            "The copied input-seal functions retain v3's primitive expected pin/manifest digests. A post-run check rejects changed pin bytes, then verifies the exact manifest buffer before JSON parsing or following rows. Returned report objects and buffers do not supply expected digests. New native and HTTP pin paths must be absolute, normalized and NUL-free; child paths stay inside their canonical roots, and the HTTP read walk has an explicit termination guard. Existing v3 remains immutable. The 87 host-only checks include malformed path roots, namespace/capability constraints, null-pin entry failures, rejection of unchanged real old metadata, seven owned-scratch seal cases, and the eight actual live input memberships. A frozen control copy cannot replace a live path. Synthetic positive metadata has no engine path/hash and reports neither artifact nor runtime proof.\n"
+          ]
+        },
+        {
+          "tag": "replace",
+          "oldStart": 16,
+          "oldEnd": 17,
+          "newStart": 16,
+          "newEnd": 17,
+          "before": [
+            "The source closure unions the authenticated parent v3 input inventory with the finite new import graph and explicitly enumerated HTTP computed oracles/world/transport sources. Parent historical engines remain data-only lineage controls, not new-source proof; no binary is copied here. Native306 and external embedding3 are separate future artifact partitions. `transformations.json` records reversible line edits for every derived sibling, and source checks compare preserved guest/host semantic blocks. All actual artifact-success branches remain unexecuted. The 2 GiB launch gate, 800 MiB stop threshold and stopped DEBUG/OOM/fault/SDK branches are unchanged.\n"
+          ],
+          "after": [
+            "The source closure unions the authenticated parent v3 input inventory with the finite new import graph and explicitly enumerated HTTP computed oracles/world/transport sources. It includes the physical live `host-apis/wasi-0.2.10/wit/deps/*/package.wit` files and live `host-apis/wasi-0.2.0/preview1-adapter-release/wasi_snapshot_preview1.wasm`; frozen source/control copies do not substitute for them. World and HTTP fixture/oracle reads are separately sealed, while generator/native header reads are covered by the future frozen source306 partition. Stock package comparison bytes retain the existing toolchain/componentizer artifact-provenance contract. Copied CLI/filesystem/socket package definitions do not select those host capabilities. Parent historical engines remain data-only lineage controls, not new-source proof; no binary is copied here. Native306 and external embedding3 are separate future artifact partitions. `transformations.json` records reversible line edits for every derived sibling, and source checks compare preserved guest/host semantic blocks. All actual artifact-success branches remain unexecuted. The 2 GiB launch gate, 800 MiB stop threshold and stopped DEBUG/OOM/fault/SDK branches are unchanged.\n"
+          ]
+        }
+      ]
+    }
+  ],
+  "supersededV1IndexSha256": "6e6116228ee1dfadb987313547903d038bf4992c1003dd3cb5525f07bc2df091",
+  "oldFilesModified": false
+}

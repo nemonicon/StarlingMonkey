@@ -1,0 +1,123 @@
+--- a/tests/node-compat/build-diagnostic-engine.sh
++++ b/tests/node-compat/build-diagnostic-engine.sh
+@@ -32,6 +32,9 @@
+ fi
+ [[ "$ticks_enabled" == 1 ]] || { echo 'Private diagnostic producer requires NODE_COMPAT_INTERNAL_TICKS=1' >&2; exit 1; }
+ diag_root="$repo_root/tests/node-compat/foundation-scheduler/diagnostic-candidate-v1"
++link_root="$repo_root/tests/node-compat/foundation-scheduler/diagnostic-producer-v3-link1"
++link_helper_sha=770999c380661e92ab2ea7843cefff303d5b82a7dfe1f3a13813549570ae52ca
++link_policy_sha=368664c7d46b3c23c16abb1a5a0de7f385ad9ae407d07267a7afad24df506938
+ diag_cpp="$repo_root/tests/node-compat/foundation-scheduler/diagnostic-candidate-v1/test-extension.cpp"
+ layer_root="$repo_root/tests/node-compat/foundation-scheduler/integration-candidate-v1"
+ tick_patch="$repo_root/tests/node-compat/foundation-scheduler/taskqueue-owner-v2/componentize-taskqueue-ticks.UNAPPLIED.patch"
+@@ -116,7 +119,7 @@
+ # Preserve every pre-policy source tree, build directory and artifact. Each
+ # selected configuration gets its own embedding output directory as well.
+ policy_suffix="entropy-entry-v1-strict-callback-v3-protected-abort-v2.$entropy_mode.path-$path_enabled.events-$events_enabled.string-decoder-$string_decoder_enabled.assert-$assert_enabled.querystring-$querystring_enabled.util-$util_enabled.stream-web-$stream_web_enabled"
+-policy_suffix="$policy_suffix.private-ticks-v1-$ticks_enabled.diagnostic-ticks-v2"
++policy_suffix="$policy_suffix.private-ticks-v1-$ticks_enabled.diag-link1"
+ source_dir="$source_dir-$policy_suffix"
+ build_dir="$build_dir-$policy_suffix"
+ artifact_name=starlingmonkey_embedding.abi-i32-i64-v1
+@@ -125,6 +128,10 @@
+ if [[ "$build_type" == Debug ]]; then artifact_name="$artifact_name.debug"; fi
+ artifact_name="$artifact_name.$policy_suffix"
+ if [[ -n "$artifact_tag" ]]; then artifact_name="$artifact_name.$artifact_tag"; fi
++longest_capture_name="componentize-native-inputs-$artifact_name.json"
++if (( ${#longest_capture_name} > 255 )); then
++  echo 'Artifact tag would exceed NAME_MAX for a required receipt; choose a shorter tag' >&2; exit 1
++fi
+ artifact="$work_root/artifacts/$artifact_name.wasm"
+ if [[ "$oom" == 1 ]]; then artifact="$work_root/artifacts/$artifact_name.raw.wasm"; fi
+ if [[ -e "$artifact" || -e "$artifact.build.json" ]]; then
+@@ -280,8 +287,11 @@
+ if [[ "$events_enabled" == 1 ]]; then events_flag=ON; fi
+ path_flag=OFF
+ if [[ "$path_enabled" == 1 ]]; then path_flag=ON; fi
++[[ "$(sha256_file "$link_root/link-policy.py")" == "$link_helper_sha" ]] || { echo 'Unreviewed link concurrency helper' >&2; exit 1; }
++[[ "$(sha256_file "$link_root/policy.json")" == "$link_policy_sha" ]] || { echo 'Unreviewed link concurrency policy' >&2; exit 1; }
+ cmake -S "$source_dir" -B "$build_dir" -G Ninja \
+   -DCMAKE_BUILD_TYPE="$build_type" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DWEVAL=OFF -DUSE_WASM_OPT=ON \
++  -DCMAKE_EXE_LINKER_FLAGS="-Wl,--threads=1,--thinlto-jobs=1" \
+   -DENABLE_BUILTIN_NODE_COMPAT=ON -DNODE_COMPAT_GC_STRESS="$gc_flag" -DNODE_COMPAT_OOM_TESTING="$oom_flag" \
+   -DNODE_COMPAT_INTERNAL_TICKS="$ticks_flag" \
+   -DCMAKE_PROJECT_ComponentizeJS_INCLUDE="$diag_root/diagnostic.cmake" -DENABLE_BUILTIN_DIAGNOSTICS_INTERNAL_TICKS=ON \
+@@ -321,12 +331,22 @@
+ parent_commands_after="$parent_command_root/after.commands.txt"
+ cache_before="$parent_command_root/CMakeCache.before.txt"
+ compile_commands_before="$parent_command_root/compile_commands.before.json"
++final_link_before="$parent_command_root/final-link.before.commands.txt"
++final_link_after="$parent_command_root/final-link.after.commands.txt"
++final_link_validation_before="$parent_command_root/final-link.before.validation.json"
++final_link_validation_after="$parent_command_root/final-link.after.validation.json"
+ cp "$build_dir/CMakeCache.txt" "$cache_before"
+ cp "$build_dir/compile_commands.json" "$compile_commands_before"
+ ninja -C "$build_dir" -t commands builtin_componentize_embedding builtin_diagnostics_internal_ticks > "$parent_commands_before"
++ninja -C "$build_dir" -t commands starling-raw.wasm/starling-raw.wasm > "$final_link_before"
++python3 "$link_root/link-policy.py" "$final_link_before" "$build_dir" "$work_root" "$repo_root" > "$final_link_validation_before"
+ MAKEFLAGS="-j$build_jobs" cmake --build "$build_dir" --target starlingmonkey_embedding --parallel "$build_jobs" \
+   2>&1 | tee "$work_root/build-$artifact_name.log"
+ ninja -C "$build_dir" -t commands builtin_componentize_embedding builtin_diagnostics_internal_ticks > "$parent_commands_after"
++ninja -C "$build_dir" -t commands starling-raw.wasm/starling-raw.wasm > "$final_link_after"
++python3 "$link_root/link-policy.py" "$final_link_after" "$build_dir" "$work_root" "$repo_root" > "$final_link_validation_after"
++cmp "$final_link_before" "$final_link_after"
++cmp "$final_link_validation_before" "$final_link_validation_after"
+ cmp "$parent_commands_before" "$parent_commands_after"
+ cmp "$cache_before" "$build_dir/CMakeCache.txt"
+ cmp "$compile_commands_before" "$build_dir/compile_commands.json"
+@@ -336,9 +356,9 @@
+ if [[ "$build_type" == Debug ]]; then engine_output=starlingmonkey_embedding.debug.wasm; fi
+ cp "$source_dir/lib/$engine_output" "$artifact"
+ 
+-python3 - "$repo_root" "$work_root" "$artifact" "$stress" "$componentize_revision" "$componentize_archive_sha" "$spidermonkey_archive_sha" "$source_dir" "$build_dir" "$abi_fix" "$abi_patch" "$oom" "$build_type" "$input_manifest" "$bigint_fix" "$bigint_patch" "$entropy_mode" "$path_enabled" "$entry_patch" "$events_enabled" "$componentize_input_manifest" "$recipe_before" "$string_decoder_enabled" "$assert_enabled" "$querystring_enabled" "$util_enabled" "$stream_web_enabled" "$ticks_enabled" "$diag_root" "$diag_install_before" "$parent_commands_before" "$parent_commands_after" "$cache_before" "$compile_commands_before" <<'PY'
++python3 - "$repo_root" "$work_root" "$artifact" "$stress" "$componentize_revision" "$componentize_archive_sha" "$spidermonkey_archive_sha" "$source_dir" "$build_dir" "$abi_fix" "$abi_patch" "$oom" "$build_type" "$input_manifest" "$bigint_fix" "$bigint_patch" "$entropy_mode" "$path_enabled" "$entry_patch" "$events_enabled" "$componentize_input_manifest" "$recipe_before" "$string_decoder_enabled" "$assert_enabled" "$querystring_enabled" "$util_enabled" "$stream_web_enabled" "$ticks_enabled" "$diag_root" "$diag_install_before" "$parent_commands_before" "$parent_commands_after" "$cache_before" "$compile_commands_before" "$final_link_before" "$final_link_after" "$final_link_validation_before" "$final_link_validation_after" "$link_root" "$link_helper_sha" "$link_policy_sha" <<'PY'
+ import datetime, hashlib, json, os, pathlib, subprocess, sys
+-repo, work, artifact, stress, componentize, componentize_archive, sm_archive, source_dir, build_dir, abi_fix, abi_patch, oom, build_type, input_manifest, bigint_fix, bigint_patch, entropy_mode, path_enabled, entry_patch, events_enabled, componentize_input_manifest, recipe_before, string_decoder_enabled, assert_enabled, querystring_enabled, util_enabled, stream_web_enabled, ticks_enabled, diag_root, diag_install_before, parent_commands_before, parent_commands_after, cache_before, compile_commands_before = sys.argv[1:]
++repo, work, artifact, stress, componentize, componentize_archive, sm_archive, source_dir, build_dir, abi_fix, abi_patch, oom, build_type, input_manifest, bigint_fix, bigint_patch, entropy_mode, path_enabled, entry_patch, events_enabled, componentize_input_manifest, recipe_before, string_decoder_enabled, assert_enabled, querystring_enabled, util_enabled, stream_web_enabled, ticks_enabled, diag_root, diag_install_before, parent_commands_before, parent_commands_after, cache_before, compile_commands_before, final_link_before, final_link_after, final_link_validation_before, final_link_validation_after, link_root, link_helper_sha, link_policy_sha = sys.argv[1:]
+ def digest(path):
+     h = hashlib.sha256()
+     with open(path, 'rb') as source:
+@@ -366,6 +386,7 @@
+ # treating an upstream default or a command-line request as measured provenance.
+ requested_cmake_options = {
+     'CMAKE_BUILD_TYPE': build_type, 'WEVAL': 'OFF', 'USE_WASM_OPT': 'ON',
++    'CMAKE_EXE_LINKER_FLAGS': '-Wl,--threads=1,--thinlto-jobs=1',
+     'ENABLE_BUILTIN_NODE_COMPAT': 'ON', 'ENABLE_JS_DEBUGGER': 'OFF',
+     'ENABLE_BUILTIN_WPT_SUPPORT': 'OFF', 'NODE_COMPAT_LOCKED_RUST': 'ON',
+     'NODE_COMPAT_ENTROPY_MODE': entropy_mode, 'NODE_COMPAT_PATH': 'ON' if path_enabled == '1' else 'OFF',
+@@ -654,6 +675,35 @@
+  'testModuleIds':['starling:test-internal-ticks','starling:test-initializer-ticks'],
+  'scope':'Explicit private diagnostic only. Production admission must reject. No public process/global/ALS, host service or reset/cancellation claim.'}
+ 
++link_root = pathlib.Path(link_root)
++assert digest(link_root / 'link-policy.py') == link_helper_sha == '770999c380661e92ab2ea7843cefff303d5b82a7dfe1f3a13813549570ae52ca'
++assert digest(link_root / 'policy.json') == link_policy_sha == '368664c7d46b3c23c16abb1a5a0de7f385ad9ae407d07267a7afad24df506938'
++link_policy = json.loads((link_root / 'policy.json').read_text())
++assert pathlib.Path(final_link_before).read_bytes() == pathlib.Path(final_link_after).read_bytes()
++assert pathlib.Path(final_link_validation_before).read_bytes() == pathlib.Path(final_link_validation_after).read_bytes()
++link_validation = json.loads(pathlib.Path(final_link_validation_after).read_text())
++assert link_validation['version'] == link_policy['evidenceVersion']
++assert link_validation['policySha256'] == link_policy_sha
++assert link_validation['rawSha256'] == digest(final_link_after)
++assert link_validation['rawBytes'] == pathlib.Path(final_link_after).stat().st_size
++assert metadata['observedCMakeOptions']['CMAKE_EXE_LINKER_FLAGS'] == link_policy['requestedCMakeOptions']['CMAKE_EXE_LINKER_FLAGS']
++metadata['linkerConcurrencyPolicy'] = {
++ 'version':link_policy['version'], 'policyPath':str(link_root / 'policy.json'), 'policySha256':link_policy_sha,
++ 'helperPath':str(link_root / 'link-policy.py'), 'helperSha256':link_helper_sha,
++ 'parentDiagnosticRecipeSha256':link_policy['parentDiagnosticRecipeSha256'],
++ 'parentProductionRecipeSha256':link_policy['parentProductionRecipeSha256'],
++ 'productionSourceInputs':306, 'diagnosticSourceInputs':2,
++ 'requestedCMake':link_policy['requestedCMakeOptions'],
++ 'observedCMake':{'CMAKE_EXE_LINKER_FLAGS':metadata['observedCMakeOptions']['CMAKE_EXE_LINKER_FLAGS']},
++ 'finalLinkCommandEvidence': {
++   'version':link_policy['evidenceVersion'],
++   'collectionCommand':['ninja','-C',build_dir,'-t','commands','starling-raw.wasm/starling-raw.wasm'],
++   'buildDirectory':build_dir, 'before':file_evidence(final_link_before), 'after':file_evidence(final_link_after),
++   'validationBefore':file_evidence(final_link_validation_before), 'validationAfter':file_evidence(final_link_validation_after),
++   'exactRawBytesUnchanged':True, 'exactValidationBytesUnchanged':True, 'validated':link_validation},
++ 'nativeOrSdkSourceChanges':False, 'resourceBenefitMeasured':False,
++ 'requiredLauncherGates':link_policy['launchGates'],
++ 'scope':'Ordinary Release/Release-GC diagnostic host-build concurrency experiment only; no new runtime semantics or acceptance claim.'}
+ with open(artifact + '.build.json', 'w') as output:
+     json.dump(metadata, output, indent=2); output.write('\n')
+ print(artifact)

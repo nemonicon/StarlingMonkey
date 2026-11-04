@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "node": "v22.14.0",
+  "toolchain": "/tmp/starling-node-compat/native-toolchain-lock",
+  "versions": {
+    "@bytecodealliance/jco": "1.40.0",
+    "@bytecodealliance/jco-std": "0.10.0",
+    "unenv": "2.0.0-rc.24",
+    "readable-stream": "4.7.0"
+  },
+  "sourceFiles": [
+    {
+      "path": "@bytecodealliance/jco/dist/node-builtins/assert.js",
+      "sha256": "5a3eda28e7d68760c89faeb2160ef0e4b7c34cf5e42316537754d56493918b2b",
+      "bytes": 2056
+    },
+    {
+      "path": "@bytecodealliance/jco-std/dist/wasi/0.2.x/node/24.x.x/assert/index.js",
+      "sha256": "136fa19730d6bc4a4a18f6f66054ae056140a63aa9861d93c8ded6ac2c47ce1d",
+      "bytes": 18027
+    },
+    {
+      "path": "@bytecodealliance/jco-std/dist/wasi/0.2.x/node/24.x.x/assert/assertion-error.js",
+      "sha256": "b94c1640efc87e22056007620d529d5d6227b2c42d278e3f3b82eb3c47b32b4e",
+      "bytes": 3574
+    },
+    {
+      "path": "@bytecodealliance/jco-std/dist/wasi/0.2.x/node/24.x.x/test/assert.js",
+      "sha256": "17a1f3e6dbfc15c2de5b1a1f4aebd26160a3911b554de9a03625ea27ddf6b66f",
+      "bytes": 2445
+    },
+    {
+      "path": "unenv/dist/runtime/node/assert.mjs",
+      "sha256": "d933366fa550f4c973f4286c41dff0dbb97abd9657a2ba28bd8df9b9a0be820e",
+      "bytes": 20767
+    },
+    {
+      "path": "unenv/dist/runtime/node/assert/strict.mjs",
+      "sha256": "1ae7c76d7e5fc23bb0bf7c2200b06b35449832efc5479af1dd060edb422d6638",
+      "bytes": 1036
+    },
+    {
+      "path": "readable-stream/lib/ours/errors.js",
+      "sha256": "45d098df354b167e00400d769931ff0c02f929d50d29d3751293580bd6134bdb",
+      "bytes": 10135
+    }
+  ],
+  "observations": [
+    "Jco createAssertBuiltin/assertAdapter exports Node24 Assert; isolated pinned22 proposal intentionally excludes Assert",
+    "Jco-std locked code lives under node/24.x.x; not a pinned22 conformance oracle",
+    "unenv isDeepEqual/isDeepStrictEqual use JSON serialization equality; not reused",
+    "unenv error-code constructors are generic Error aliases; not reused",
+    "readable-stream4.7.0/lib uses no assert-module import in inspected tree; lib/ours/errors.js has its own private assert helper",
+    "Published locked trees expose test/assert.js as node:test runtime helper, not a dedicated Assert adapter conformance suite"
+  ],
+  "primaryReferences": [
+    "https://github.com/nodejs/node/blob/v22.14.0/lib/assert.js",
+    "https://github.com/nodejs/node/blob/v22.14.0/lib/assert/strict.js",
+    "https://github.com/nodejs/node/blob/v22.14.0/lib/internal/assert/assertion_error.js",
+    "https://github.com/nodejs/node/blob/v22.14.0/lib/internal/assert/utils.js",
+    "https://github.com/nodejs/node/blob/v22.14.0/test/parallel/test-assert.js"
+  ],
+  "testSourceReview": "Pinned Node test-assert basics, Error-message identity, exception matching, unmatched doesNotThrow propagation and generated diagnostics reviewed. Full Node upstream suite has NOT been executed against the prototype.",
+  "scope": "Source inspection only; API oracle and prototype results are recorded separately in node-results.json"
+}

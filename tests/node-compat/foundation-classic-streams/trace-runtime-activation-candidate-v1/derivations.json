@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_ONLY_PATH_AND_TRACE_PROVENANCE_WIRING",
+  "files": [
+    {
+      "path": "payload/harness/component-driver.mjs",
+      "origin": "tests/node-compat/foundation-classic-streams/production-runtime-activated-v3/harness/component-driver.mjs",
+      "beforeSha256": "c8000335e25fb8bf4d8b7260abefc8f96a4a89f34d0e2856c00e79e1fef2a288",
+      "afterSha256": "a75f1d0beefdd4d7fd73f0a1b106771fa6129923037fe651e77c272a5210e45e",
+      "edits": [
+        {
+          "before": "'../../../toolchain.mjs'",
+          "after": "'file:///tmp/starling-node-compat/classic-trace-source-v1/tests/node-compat/toolchain.mjs'",
+          "count": 1
+        },
+        {
+          "before": "'../../../profile-bundler.mjs'",
+          "after": "'file:///tmp/starling-node-compat/classic-trace-source-v1/tests/node-compat/profile-bundler.mjs'",
+          "count": 1
+        },
+        {
+          "before": "'../../../module-selection.mjs'",
+          "after": "'file:///tmp/starling-node-compat/classic-trace-source-v1/tests/node-compat/module-selection.mjs'",
+          "count": 1
+        },
+        {
+          "before": "'../../../capability-policy.mjs'",
+          "after": "'file:///tmp/starling-node-compat/classic-trace-source-v1/tests/node-compat/capability-policy.mjs'",
+          "count": 1
+        },
+        {
+          "before": "'../../../componentizer.mjs'",
+          "after": "'file:///tmp/starling-node-compat/classic-trace-source-v1/tests/node-compat/componentizer.mjs'",
+          "count": 1
+        },
+        {
+          "before": "'../../../foundations/native-scalar-harness.mjs'",
+          "after": "'file:///tmp/starling-node-compat/classic-trace-source-v1/tests/node-compat/foundations/native-scalar-harness.mjs'",
+          "count": 1
+        },
+        {
+          "before": "const REPOSITORY=resolve(HERE,'../../../../..');",
+          "after": "const REPOSITORY='/tmp/starling-node-compat/classic-trace-source-v1';",
+          "count": 1
+        },
+        {
+          "before": "'/tmp/starling-node-compat/classic-integration-v1'",
+          "after": "'/tmp/starling-node-compat/classic-trace-runtime-v1'",
+          "count": 1
+        }
+      ],
+      "exactReverse": true
+    },
+    {
+      "path": "runtime-preflight.template.mjs",
+      "origin": "tests/node-compat/foundation-classic-streams/production-runtime-activated-v3/runtime-preflight.template.mjs",
+      "beforeSha256": "63a414d7a4ce8a27c94ea636094f8c198f25047771d5c241a820a92b5657a6e1",
+      "afterSha256": "368db286ee723ef48ac1f75da7c54236d80200316887003b872935b0f4963c31",
+      "edits": [
+        {
+          "before": "import {fileURLToPath} from 'node:url';",
+          "after": "import {fileURLToPath,pathToFileURL} from 'node:url';",
+          "count": 1
+        },
+        {
+          "before": "const SELECTOR_SHA='@SELECTOR_SHA@',ADMISSION_SHA='@ADMISSION_SHA@';",
+          "after": "const SELECTOR_SHA='@SELECTOR_SHA@',ADMISSION_SHA='@ADMISSION_SHA@',ROOT_REVIEW_SHA='@ROOT_REVIEW_SHA@';\nconst SOURCE_ROOT='/tmp/starling-node-compat/classic-trace-source-v1';\nconst SOURCE_CONTRACT='sm-classic-trace-source-v1';",
+          "count": 1
+        },
+        {
+          "before": "{PINS_SHA,INPUTS_SHA,RECIPE_SHA,SELECTOR_SHA,ADMISSION_SHA}",
+          "after": "{PINS_SHA,INPUTS_SHA,RECIPE_SHA,SELECTOR_SHA,ADMISSION_SHA,ROOT_REVIEW_SHA}",
+          "count": 1
+        },
+        {
+          "before": " await seal();",
+          "after": " await regular(join(HERE,'root-review-receipt.json'),ROOT_REVIEW_SHA);\n await seal();",
+          "count": 1
+        },
+        {
+          "before": " assert.equal(metadata.sourceManifest.length,342);assert.equal(metadata.componentizeSourceManifest.length,3);",
+          "after": " assert.equal(metadata.sourceManifest.length,342);assert.equal(metadata.componentizeSourceManifest.length,3);\n assert.equal(metadata.classicTraceSourcePolicy?.version,SOURCE_CONTRACT);assert.deepEqual(metadata.classicTraceSourcePolicy,pin.classicTraceSourcePolicy);",
+          "count": 1
+        },
+        {
+          "before": "freeze.state,'immutable-release-engine-frozen'",
+          "after": "freeze.state,'immutable-trace-release-engine-frozen'",
+          "count": 1
+        },
+        {
+          "before": "const liveSelector=resolve(HERE,'../../module-selection.mjs'),liveAdmission=resolve(HERE,'../../classic-streams-admission.mjs');",
+          "after": "const liveSelector=join(SOURCE_ROOT,'tests/node-compat/module-selection.mjs'),liveAdmission=join(SOURCE_ROOT,'tests/node-compat/classic-streams-admission.mjs');",
+          "count": 1
+        },
+        {
+          "before": "await import('../../module-selection.mjs')",
+          "after": "await import(pathToFileURL(liveSelector))",
+          "count": 1
+        },
+        {
+          "before": "await import('../../core-expectations.mjs')",
+          "after": "await import(pathToFileURL(join(SOURCE_ROOT,'tests/node-compat/core-expectations.mjs')))",
+          "count": 1
+        },
+        {
+          "before": "async function recheck(){await regular(pinsPath,PINS_SHA);",
+          "after": "async function recheck(){await regular(pinsPath,PINS_SHA);await regular(join(HERE,'root-review-receipt.json'),ROOT_REVIEW_SHA);",
+          "count": 1
+        }
+      ],
+      "exactReverse": true
+    },
+    {
+      "path": "payload/trace/component-driver.mjs",
+      "origin": "tests/node-compat/foundation-classic-streams/stream-trace-regression-candidate-v2/component-driver.mjs",
+      "beforeSha256": "e7cec9c8eb115092c79351aeaf7e7f38e360598eea1010d9756a6ad453622550",
+      "afterSha256": "cf9aac3c06969fad9b6f00ef68ede6047ff0154b2e8baf968b4d712842961f64",
+      "edits": [
+        {
+          "before": "'../../toolchain.mjs'",
+          "after": "'file:///tmp/starling-node-compat/classic-trace-source-v1/tests/node-compat/toolchain.mjs'",
+          "count": 1
+        },
+        {
+          "before": "'../../componentizer.mjs'",
+          "after": "'file:///tmp/starling-node-compat/classic-trace-source-v1/tests/node-compat/componentizer.mjs'",
+          "count": 1
+        },
+        {
+          "before": "'../../profile-bundler.mjs'",
+          "after": "'file:///tmp/starling-node-compat/classic-trace-source-v1/tests/node-compat/profile-bundler.mjs'",
+          "count": 1
+        },
+        {
+          "before": "'../../module-selection.mjs'",
+          "after": "'file:///tmp/starling-node-compat/classic-trace-source-v1/tests/node-compat/module-selection.mjs'",
+          "count": 1
+        },
+        {
+          "before": "'../../foundations/native-scalar-harness.mjs'",
+          "after": "'file:///tmp/starling-node-compat/classic-trace-source-v1/tests/node-compat/foundations/native-scalar-harness.mjs'",
+          "count": 1
+        },
+        {
+          "before": "repository=resolve(here,'../../../..')",
+          "after": "repository='/tmp/starling-node-compat/classic-trace-source-v1'",
+          "count": 1
+        },
+        {
+          "before": "'../production-runtime-activated-v3/harness/completion.mjs'",
+          "after": "'../harness/completion.mjs'",
+          "count": 1
+        },
+        {
+          "before": " await publishCompletion({output,report,paths:tracked.paths});",
+          "after": " if(differences.length){await write(join(output,'trace-counterexamples.json'),JSON.stringify(report,null,2)+'\\n',{flag:'wx'});assert.deepEqual(retained[0].observed,oracle.nodeObserved,'Corrected trace guest must match the pinned Node11 oracle');}\n await publishCompletion({output,report,paths:tracked.paths});",
+          "count": 1
+        },
+        {
+          "before": "status:'REAL_COMPONENT_PUBLIC_STREAM_TRACE_OBSERVATIONS_COMPLETE'",
+          "after": "status:'CORRECTED_REAL_COMPONENT_PUBLIC_STREAM_TRACE_NODE11_PASSED'",
+          "count": 1
+        },
+        {
+          "before": "Node trace differences are reported, not suppressed or forced.",
+          "after": "Node trace parity is mandatory; full counterexamples are retained before a mismatch throws.",
+          "count": 1
+        }
+      ],
+      "exactReverse": true,
+      "intentionalNewGate": "Node11 exact parity; historical model parity is not required"
+    }
+  ],
+  "unchangedHarnessFiles": 9,
+  "guestBodiesChanged": false
+}

@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "node": "v22.14.0",
+  "componentizeJs": "0.23.0",
+  "wasmtime": "wasmtime 42.0.1 (6844a83b5 2026-02-25)",
+  "sourceSha256": "8dc345673d986db859f8125e88fec0b7031f0e1599c14bc93fb4342f5bf32835",
+  "world": "package test:unsigned;\nworld check {\n  export unsigned: func(value: u32) -> u32;\n  export signed: func(value: u32) -> s32;\n  export constant: func() -> u32;\n  export describe: func(value: u32) -> string;\n}",
+  "variants": [
+    {
+      "name": "native",
+      "engineSha256": "da69618da72315c3b3f20d105708fd625a3b7c0691f49329201036c3c2fd5796",
+      "componentSha256": "d9b40d96105796d43a448064db79d80d0b75e634a659f1e0d1fd9457d470e8eb",
+      "emittedImports": [],
+      "results": [
+        {
+          "call": "unsigned(2147483647)",
+          "expected": 2147483647,
+          "observed": 2147483647,
+          "matches": true
+        },
+        {
+          "call": "unsigned(2147483648)",
+          "expected": 2147483648,
+          "observed": 0,
+          "matches": false
+        },
+        {
+          "call": "unsigned(2342402100)",
+          "expected": 2342402100,
+          "observed": 109051904,
+          "matches": false
+        },
+        {
+          "call": "unsigned(4294967295)",
+          "expected": 4294967295,
+          "observed": 4292870144,
+          "matches": false
+        },
+        {
+          "call": "signed(2342402100)",
+          "expected": -1952565196,
+          "observed": -1952565196,
+          "matches": true
+        },
+        {
+          "call": "constant()",
+          "expected": 2342402100,
+          "observed": 109051904,
+          "matches": false
+        }
+      ],
+      "internalStringControl": {
+        "value": 2342402100,
+        "unsigned": 2342402100,
+        "signed": -1952565196,
+        "constant": 2342402100
+      }
+    },
+    {
+      "name": "released",
+      "engineSha256": "6094cd93d966f9bec9b01332db6e0eedbaf22f60b745c9f823f21e33cbd4d365",
+      "componentSha256": "2d967904e03c29f5e5ab9e5d95faa9c2d7e30a1a439ec8a83e109e3c31dc6f94",
+      "emittedImports": [],
+      "results": [
+        {
+          "call": "unsigned(2147483647)",
+          "expected": 2147483647,
+          "observed": 2147483647,
+          "matches": true
+        },
+        {
+          "call": "unsigned(2147483648)",
+          "expected": 2147483648,
+          "observed": 0,
+          "matches": false
+        },
+        {
+          "call": "unsigned(2342402100)",
+          "expected": 2342402100,
+          "observed": 109051904,
+          "matches": false
+        },
+        {
+          "call": "unsigned(4294967295)",
+          "expected": 4294967295,
+          "observed": 4292870144,
+          "matches": false
+        },
+        {
+          "call": "signed(2342402100)",
+          "expected": -1952565196,
+          "observed": -1952565196,
+          "matches": true
+        },
+        {
+          "call": "constant()",
+          "expected": 2342402100,
+          "observed": 109051904,
+          "matches": false
+        }
+      ],
+      "internalStringControl": {
+        "value": 2342402100,
+        "unsigned": 2342402100,
+        "signed": -1952565196,
+        "constant": 2342402100
+      }
+    }
+  ],
+  "conclusion": "Both pinned engines produce incorrect high-u32 results while signed and in-guest/string controls remain correct. No Buffer code is involved.",
+  "benchmarkWorkaround": "Return FNV checksums as s32 using |0; host reinterprets bits as u32. Input sizes and iteration counts stay below 2^31.",
+  "limits": "This reproduces the result-transport defect; it does not establish its exact implementation cause or fix."
+}

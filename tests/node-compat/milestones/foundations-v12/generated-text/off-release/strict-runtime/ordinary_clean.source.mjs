@@ -1,0 +1,1 @@
+let calls=0;export async function run(){let seen=0,handled=null;seen++;handled='clean';await Promise.resolve();await Promise.resolve();return JSON.stringify({calls:++calls,seen,handled})}

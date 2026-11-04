@@ -1,0 +1,60 @@
+--- a/harness/completion.mjs
++++ b/harness/completion.mjs
+@@ -44,14 +44,36 @@
+ 
+ export function trackedWriter(output) {
+   const paths = new Set();
++  const written = new Map();
+   async function write(path, data, options) {
+     const { target } = below(output, path);
+     assert(options?.flag === 'wx', 'Tracked outputs require exclusive creation');
+     await ordinaryParent(output, target);
+     await writeFile(target, data, options);
+     paths.add(target);
++    const bytes = typeof data === 'string' ? Buffer.from(data, options.encoding ?? 'utf8') : Buffer.from(data);
++    written.set(target, { sha256: hash(bytes), bytes: bytes.length });
+   }
+-  return Object.freeze({ write, paths });
++  // Jco may emit a shared interface declaration for multiple components.
++  // Only exact declarations created by this writer may be reused. All other
++  // outputs retain exclusive creation; an old directory is never repaired.
++  async function writeGenerated(path, data, options) {
++    const { target, name } = below(output, path);
++    assert(options?.flag === 'wx', 'Generated outputs require exclusive creation');
++    if (!paths.has(target)) return write(target, data, options);
++    assert(/^interfaces\/[A-Za-z0-9][A-Za-z0-9._-]*\.d\.ts$/.test(name),
++      'Only already-tracked interface declarations may repeat');
++    await ordinaryParent(output, target);
++    const previous = await ordinaryFile(output, target);
++    const bytes = typeof data === 'string' ? Buffer.from(data, options.encoding ?? 'utf8') : Buffer.from(data);
++    const original = written.get(target);
++    assert(original && original.sha256 === previous.sha256 && original.bytes === previous.bytes,
++      'Tracked declaration changed after creation');
++    assert.equal(hash(bytes), original.sha256, 'Repeated declaration differs');
++    assert.equal(bytes.length, original.bytes, 'Repeated declaration length differs');
++    assert((await readFile(target)).equals(bytes), 'Repeated declaration bytes differ');
++  }
++  return Object.freeze({ write, writeGenerated, paths });
+ }
+ 
+ // The caller must finish its final admission.recheck() BEFORE calling this.
+--- a/harness/component-driver.mjs
++++ b/harness/component-driver.mjs
+@@ -126,7 +126,7 @@
+     const {files}=await transpile(component,{name:'classic',wasiShim:true});
+     for(const [name,bytes] of Object.entries(files)) {
+       await mkdir(dirname(join(output,name)),{recursive:true});
+-      await writeOutput(join(output,name),bytes,{flag:'wx'});
++      await tracked.writeGenerated(join(output,name),bytes,{flag:'wx'});
+     }
+     const modulePath=join(output,'classic.js');
+     const instance=await import(pathToFileURL(modulePath));
+@@ -181,7 +181,7 @@
+       const generated=await transpile(built.component,{name:test.name,wasiShim:true});
+       for(const [name,bytes] of Object.entries(generated.files)) {
+         await mkdir(dirname(join(output,name)),{recursive:true});
+-        await writeOutput(join(output,name),bytes,{flag:'wx'});
++        await tracked.writeGenerated(join(output,name),bytes,{flag:'wx'});
+       }
+       await admission.recheck();
+       return{componentPath,modulePath:join(output,test.name+'.js'),sourceSha256:hash(test.source),

@@ -1,0 +1,154 @@
+--- a/admission.mjs
++++ b/admission.mjs
+@@ -2,16 +2,18 @@
+ import {dirname,join} from 'node:path';
+ import {lstat} from 'node:fs/promises';
+ import {fileURLToPath,pathToFileURL} from 'node:url';
+-import {descriptor,regular,sha} from './authority.mjs';
+-import {indexed,deepFreeze,local} from './proofs.mjs';
+-import {need} from './transport.mjs';
+-import {PARSER} from './parser-tuple.mjs';
++import {descriptor,regular,sha} from '../cost-jco-correctness-candidate-v2/authority.mjs';
++import {indexed,deepFreeze,local} from '../cost-jco-correctness-candidate-v2/proofs.mjs';
++import {need} from '../cost-jco-correctness-candidate-v2/transport.mjs';
++import {PARSER} from '../cost-jco-correctness-candidate-v2/parser-tuple.mjs';
+ const HERE=dirname(fileURLToPath(import.meta.url));
+ export const TOOLING='ff208e72d0b87933aa75cdeb7c1ae16f29aa6ae94c357318a9d6676af04b36b8',GUEST='ebe8fa901a3516358539c0458b09cad822308f9a3b0c76db33015ff378a8eae8',PUBLICATION='4621f7e72b4fb0555a5df630b1aedd4d2a04743b0db9188fc50099779f07387b';
+ export const COMPONENT='cf3110b3af503fecd2408781a4dcb53b21670b74cd94e3266c4f0b86f795d794';
+-export const ARMS=Object.freeze(['native-on','fflate-on','fflate-off']),OUTPUT='/private/tmp/starling-node-compat/zlib-cost-jco-correctness-v2';
++export const ARMS=Object.freeze(['native-on','fflate-on','fflate-off']),OUTPUT='/private/tmp/starling-node-compat/zlib-cost-jco-correctness-v3';
+ export const NODE=Object.freeze({path:'/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node',sha256:'e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0',bytes:108619024});
+ const PARENTS=Object.freeze({
++ 'cost-jco-correctness-candidate-v2':'d2516c934df3fa8f3ecd58b187cc2bc0f28fab996ab97ada0854e4988d9befeb',
++ 'independent-cost-jco-correctness-v2-source-review-v1':'751147af6cda28a9f32b6c8e16ec22db9dc3a2b4592d38a32342f0bb99e28ecd',
+  'cost-component-glue-amendment-v1':COMPONENT,
+  'cost-component-wit-amendment-v1':'e7252156f464f3a73621c002d01b95fa309ebc8208934539687d54d885257caa',
+  'cost-component-candidate-v1':'a2fa62b3ab63a6aca044aec9a83c1ff5a09edaa208eb615226a13845bf1522f9',
+@@ -19,7 +21,7 @@
+  'cost-jco-correctness-candidate-v1':'610295513e79ffa3a926c466f2b07a05d465694e8ee7de706f3966052f8f305a'});
+ function proof(value){need(value?.index&&value?.result,'Actual indexed proof required');for(const name of['index','result']){const r=descriptor(value[name]);need(Number.isSafeInteger(r.bytes)&&r.bytes>0,'Actual bounded proof bytes');}}
+ export function authorityModel(v,sourceSha){
+- sha(sourceSha);need(v?.schemaVersion===1&&v.state==='ROOT_REVIEWED_ZLIB_COST_JCO_CORRECTNESS_V2'&&v.action==='untimed-jco-correctness'&&v.actionAllowed===true,'Dedicated actual Root correctness authority; NULL/unreviewed refuses');
++ sha(sourceSha);need(v?.schemaVersion===1&&v.state==='ROOT_REVIEWED_ZLIB_COST_JCO_CORRECTNESS_V3'&&v.action==='untimed-jco-correctness'&&v.actionAllowed===true,'Dedicated actual Root correctness authority; NULL/unreviewed refuses');
+  need(v.correctnessSourceIndexSha256===sourceSha&&v.componentSourceIndexSha256===COMPONENT&&v.toolingSourceIndexSha256===TOOLING&&v.guestSourceIndexSha256===GUEST&&v.sourcePublicationIndexSha256===PUBLICATION,'Exact current source/component/native publication ancestry');
+  need(v.outputRoot===OUTPUT&&v.workerTimeoutMs===600000&&v.retainedRotations===3&&v.primaryCases===30&&v.primaryEncoderStreams===45&&v.primaryCrossdecodeEdges===135&&v.ffOffEncodings===15&&v.ffOffNodeEdges===15&&v.ffOffGuestEdges===45,'Exact finite untimed scope');
+  need(v.nativeInputs===350&&v.metadataProjection===false&&v.operationalAdmission===false&&v.sourcePromotionAllowed===false&&v.pilotOrTimingAllowed===false&&v.stockWasmtimeExecutionAllowed===false&&v.nodeMatrixCodecCallsAllowed===true&&v.ordinaryGuestCallsAllowed===true,'No admission/promotion/WT/timing extension; actual untimed Node/Jco calls need explicit authority');
+@@ -46,8 +48,8 @@
+ export async function correctnessPreflight({correctnessSourceIndexSha256,rootAction}={}){
+  need(correctnessSourceIndexSha256&&rootAction,'NULL correctness authority refuses before source/artifact/output access');const expectedSourceSha=sha(correctnessSourceIndexSha256),rootRow=descriptor(rootAction),rootBytes=await regular(rootRow),v=deepFreeze(JSON.parse(rootBytes));authorityModel(v,expectedSourceSha);
+  const own=await sourceIndex(HERE,expectedSourceSha),parents=[];for(const[name,digest]of Object.entries(PARENTS))parents.push(await sourceIndex(join(HERE,'..',name),digest));
+- const peer=await indexed(v.sourceIndependentReview,{state:'INDEPENDENT_ZLIB_COST_JCO_CORRECTNESS_SOURCE_REVIEW_PASSED_V2'});need(peer.data.correctnessSourceIndexSha256===expectedSourceSha&&peer.data.sourceOnly===true&&peer.data.sourceReviewPassed===true&&peer.data.ownerActionsInvoked===false,'Own exact independent source review');
+- const {componentPreflight}=await import('../cost-component-glue-amendment-v1/guard.mjs');const {checkOwnedTerminal,parsePublicWit,parsePublicDts,checkTranspileMetadata}=await import('./glue-policy.mjs');
++ const peer=await indexed(v.sourceIndependentReview,{state:'INDEPENDENT_ZLIB_COST_JCO_CORRECTNESS_SOURCE_REVIEW_PASSED_V3'});need(peer.data.correctnessSourceIndexSha256===expectedSourceSha&&peer.data.sourceOnly===true&&peer.data.sourceReviewPassed===true&&peer.data.ownerActionsInvoked===false,'Own exact independent source review');
++ const {componentPreflight}=await import('../cost-component-glue-amendment-v1/guard.mjs');const {checkOwnedTerminal,parsePublicWit,parsePublicDts,checkTranspileMetadata}=await import('../cost-jco-correctness-candidate-v2/glue-policy.mjs');
+  const frames={},reviews=[];
+  for(const arm of ARMS){
+   const authorityRow=descriptor(v.componentBuildAuthorities[arm]),buildAuthority=JSON.parse(await regular(authorityRow));
+--- a/run.mjs
++++ b/run.mjs
+@@ -3,16 +3,16 @@
+ import {fileURLToPath,pathToFileURL} from 'node:url';
+ import {mkdir,lstat,readdir,readFile,statfs} from 'node:fs/promises';
+ import {correctnessPreflight,NODE,COMPONENT,TOOLING,GUEST} from './admission.mjs';
+-import {descriptor,regular,hash} from './authority.mjs';
+-import {need} from './transport.mjs';
+-import {DurableOutput} from './durable.mjs';
+-import {runOwnedCommand} from './durable-host.mjs';
+-import {primaryJobs,primaryStreams,offJobs} from './plan.mjs';
+-import {requireCoverage} from './coverage.mjs';
+-import {parseOracleBytes} from './oracle-data.mjs';
+-import {assertSameStream} from './scenarios.mjs';
++import {descriptor,regular,hash} from '../cost-jco-correctness-candidate-v2/authority.mjs';
++import {need} from '../cost-jco-correctness-candidate-v2/transport.mjs';
++import {DurableOutput} from '../cost-jco-correctness-candidate-v2/durable.mjs';
++import {runOwnedCommand} from '../cost-jco-correctness-candidate-v2/durable-host.mjs';
++import {primaryJobs,primaryStreams,offJobs} from '../cost-jco-correctness-candidate-v2/plan.mjs';
++import {requireCoverage} from '../cost-jco-correctness-candidate-v2/coverage.mjs';
++import {parseOracleBytes} from '../cost-jco-correctness-candidate-v2/oracle-data.mjs';
++import {assertSameStream} from '../cost-jco-correctness-candidate-v2/scenarios.mjs';
+ import {executeFreshNodeEdges} from './node-edges.mjs';
+-const HERE=dirname(fileURLToPath(import.meta.url));
++const HERE=dirname(fileURLToPath(import.meta.url)),DONOR=join(HERE,'..','cost-jco-correctness-candidate-v2');
+ function childName(root,path){const name=relative(root,path);need(name&&!isAbsolute(name)&&!name.startsWith('../')&&!name.includes('\\')&&name.split('/').every(v=>v&&v!=='.'&&v!=='..'),'Bounded owned output name');return name;}
+ async function disk(minimum){const s=await statfs('/private/tmp/starling-node-compat');need(s.bavail*s.bsize>=minimum,'Operational disk guard; no space/recovery guarantee');}
+ async function collectJob(output,root,job,sourceSha,componentSha){
+@@ -26,10 +26,10 @@
+ }
+ export async function runCorrectness(options){
+  const admitted=await correctnessPreflight(options); // NULL/proofs fail BEFORE output
+- const casesRow=descriptor(admitted.criticalSourceFiles.find(row=>row.path===join(HERE,'cases.json'))),cases=JSON.parse(await regular(casesRow)),oracleBytes=await regular(admitted.oracle),data=parseOracleBytes(oracleBytes,admitted.oracle.sha256,cases);
++ const casesRow=descriptor(admitted.criticalSourceFiles.find(row=>row.path===join(DONOR,'cases.json'))),cases=JSON.parse(await regular(casesRow)),oracleBytes=await regular(admitted.oracle),data=parseOracleBytes(oracleBytes,admitted.oracle.sha256,cases);
+  await disk(2*1024**3);await admitted.recheck();const output=await DurableOutput.create(admitted.outputRoot),primary=[],mainEdges=[],offEncodings=[],offNodeEdges=[],offGuestEdges=[],origins=[],streams=new Map();
+  const write=(path,value)=>output.write(path,value,{json:true}),writeBytes=(path,value)=>output.write(path,value);
+- const checkOwned=(await import('./glue-policy.mjs')).checkOwnedTerminal;
++ const checkOwned=(await import('../cost-jco-correctness-candidate-v2/glue-policy.mjs')).checkOwnedTerminal;
+  try{
+   await mkdir(join(output.root,'jobs'),{mode:0o700});await mkdir(join(output.root,'processes'),{mode:0o700});
+   const criticalFiles=[...admitted.criticalSourceFiles,admitted.rootAction];
+@@ -37,7 +37,7 @@
+    await disk(800*1024**2);const artifact=admitted.frames[job.arm].artifact;
+    const value={schemaVersion:1,state:'PARENT_AUDITED_ZLIB_COST_JCO_WORKER_V2',parentAuditedActualComponents:true,correctnessSourceIndexSha256:admitted.sourceSha,componentSourceIndexSha256:COMPONENT,parentOutputRoot:output.root,outputRoot:join(output.root,'jobs',name),jobName:name,job,artifact,oracle:admitted.oracle,cases:casesRow,criticalFiles};
+    const row=await write('descriptors/'+name+'.json',value);need(row.bytes<=4*1024*1024,'Finite worker descriptor file, never a giant CLI argument');const d={path:join(output.root,row.path),sha256:row.sha256,bytes:row.bytes},registered=new Set();
+-   const status=await runOwnedCommand({output:output.root,name,executable:NODE.path,args:[join(HERE,'worker.mjs'),JSON.stringify(d)],write:(path,data)=>output.write(childName(output.root,path),data),register:path=>registered.add(path),timeoutMs:600000,maxOutputBytes:16*1024*1024,onProgress:event=>process.stdout.write(JSON.stringify({event:'untimed-correctness-operational-heartbeat',...event})+'\n')});
++   const status=await runOwnedCommand({output:output.root,name,executable:NODE.path,args:[join(DONOR,'worker.mjs'),JSON.stringify(d)],write:(path,data)=>output.write(childName(output.root,path),data),register:path=>registered.add(path),timeoutMs:600000,maxOutputBytes:16*1024*1024,onProgress:event=>process.stdout.write(JSON.stringify({event:'untimed-correctness-operational-heartbeat',...event})+'\n')});
+    // All raw pipes/terminal are persisted before any success assertion.
+    for(const path of registered){const raw=await readFile(path),name=childName(output.root,path);output.rows.set(name,{path:name,sha256:hash(raw),bytes:raw.length});}
+    checkOwned(status);const collected=await collectJob(output,value.outputRoot,job,admitted.sourceSha,artifact.component.sha256);origins.push({job,workerResults:collected.row,workerCompletion:collected.completion,ownedTerminal:status.terminalPath,ownedRawExitCode:0,component:artifact.component,actualFreshOwnedProcess:true});return collected.data.observed;
+@@ -63,9 +63,9 @@
+    const stream=ordered[index],kind=arm==='fflate-off'?'off-guest-crossdecode':'main-crossdecode',result=await run({kind,arm,stream},'edge-'+arm+'-'+String(index).padStart(2,'0'));need(result.decoder===arm&&result.streamId===stream.streamId&&result.provider===stream.provider&&result.fullRawFixtureEqual===true,'Actual guest edge identity');(arm==='fflate-off'?offGuestEdges:mainEdges).push(result);
+   }
+   const coverage=requireCoverage({primary,mainEdges,offEncodings,offNodeEdges,offGuestEdges});await admitted.recheck();await output.recheck();
+-  const result=await write('results.json',{schemaVersion:1,state:'UNTIMED_ZLIB_COST_JCO_CORRECTNESS_COMPLETE_PENDING_INDEPENDENT_REVIEW_V2',correctnessSourceIndexSha256:admitted.sourceSha,componentSourceIndexSha256:COMPONENT,toolingSourceIndexSha256:TOOLING,guestSourceIndexSha256:GUEST,rootAction:admitted.rootAction,oracle:admitted.oracle,components:Object.fromEntries(Object.entries(admitted.frames).map(([arm,v])=>[arm,v.artifact.component])),coverage,primary,mainEdges,offEncodings,offNodeEdges,offGuestEdges,origins,allNewOwnedWorkersCompletedZero:true,wasmtimeExecuted:false,pilotOrTimingExecuted:false,metadataProjection:false,operationalAdmission:false,runtimeAcceptanceClaim:false});
+-  const index=await write('index.json',{schemaVersion:1,files:[...output.rows.values()]});const completion=await write('completion.json',{schemaVersion:1,state:'UNTIMED_JCO_CORRECTNESS_COMPLETE_EXTERNAL_PARENT_ZERO_AND_REVIEW_REQUIRED_V2',results:result,index,sourceIndexSha256:admitted.sourceSha,timingAllowed:false,operationalAdmission:false});await output.recheck();return{index,completion};
+- }catch(error){let postFailureSourceAuditPassed=false;try{await admitted.recheck();postFailureSourceAuditPassed=true;}catch{}try{await write('failure.json',{schemaVersion:1,state:'UNTIMED_JCO_CORRECTNESS_FAILED_NOT_ACCEPTED_V2',thrownType:typeof error,fullPartialRawOutputsRetained:true,completedJobOrigins:origins,postFailureSourceAuditPassed,timingAllowed:false,operationalAdmission:false});}catch{}throw error;}
++  const result=await write('results.json',{schemaVersion:1,state:'UNTIMED_ZLIB_COST_JCO_CORRECTNESS_COMPLETE_PENDING_INDEPENDENT_REVIEW_V3',correctnessSourceIndexSha256:admitted.sourceSha,componentSourceIndexSha256:COMPONENT,toolingSourceIndexSha256:TOOLING,guestSourceIndexSha256:GUEST,rootAction:admitted.rootAction,oracle:admitted.oracle,components:Object.fromEntries(Object.entries(admitted.frames).map(([arm,v])=>[arm,v.artifact.component])),coverage,primary,mainEdges,offEncodings,offNodeEdges,offGuestEdges,origins,allNewOwnedWorkersCompletedZero:true,wasmtimeExecuted:false,pilotOrTimingExecuted:false,metadataProjection:false,operationalAdmission:false,runtimeAcceptanceClaim:false});
++  const index=await write('index.json',{schemaVersion:1,files:[...output.rows.values()]});const completion=await write('completion.json',{schemaVersion:1,state:'UNTIMED_JCO_CORRECTNESS_COMPLETE_EXTERNAL_PARENT_ZERO_AND_REVIEW_REQUIRED_V3',results:result,index,sourceIndexSha256:admitted.sourceSha,timingAllowed:false,operationalAdmission:false});await output.recheck();return{index,completion};
++ }catch(error){let postFailureSourceAuditPassed=false;try{await admitted.recheck();postFailureSourceAuditPassed=true;}catch{}try{await write('failure.json',{schemaVersion:1,state:'UNTIMED_JCO_CORRECTNESS_FAILED_NOT_ACCEPTED_V3',thrownType:typeof error,fullPartialRawOutputsRetained:true,completedJobOrigins:origins,postFailureSourceAuditPassed,timingAllowed:false,operationalAdmission:false});}catch{}throw error;}
+  finally{await output.close();}
+ }
+ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){need(process.argv.length===3,'One exact external Root config descriptor');const options=JSON.parse(await regular(JSON.parse(process.argv[2])));process.stdout.write(JSON.stringify(await runCorrectness(options))+'\n');}
+--- a/node-edges.mjs
++++ b/node-edges.mjs
+@@ -2,8 +2,31 @@
+ // the reviewed Node executable, exact guest decodeNodeStream source, sourceBinding
+ // and all source/native/tool proofs BEFORE injecting these actual APIs.
+ // This module imports no Node-zlib/fflate/guest module and calls nothing at import.
+-import {need,fullBytes,equalBytes,hash} from './transport.mjs';
+-import {consumeFNV1a} from './fixtures.mjs';
++import {need,fullBytes,equalBytes,hash} from '../cost-jco-correctness-candidate-v2/transport.mjs';
++import {consumeFNV1a} from '../cost-jco-correctness-candidate-v2/fixtures.mjs';
++const typedArrayPrototype=Object.getPrototypeOf(Uint8Array.prototype);
++const viewBuffer=Object.getOwnPropertyDescriptor(typedArrayPrototype,'buffer').get;
++const viewOffset=Object.getOwnPropertyDescriptor(typedArrayPrototype,'byteOffset').get;
++const viewLength=Object.getOwnPropertyDescriptor(typedArrayPrototype,'byteLength').get;
++export const MAX_NODE_RETAINED_BINARY_BYTES=16*1024*1024;
++// This is the actual Node-decoder retention callback, independently testable with
++// ordinary data and the real durable writer, without calling any decoder/codec.
++export function createNodeRetention({Buffer,write,writeBytes,retained,name}){
++ need(Buffer&&typeof Buffer.isBuffer==='function'&&typeof write==='function'&&typeof writeBytes==='function'&&Array.isArray(retained)&&/^[A-Za-z0-9._-]+$/.test(name),'Finite exact Node retention writers/name');
++ return async(label,value)=>{
++  need(/^[A-Za-z0-9._-]+$/.test(label),'Finite exact Node retention label');
++  const binary=ArrayBuffer.isView(value)&&(Object.getPrototypeOf(value)===Uint8Array.prototype||(Buffer.isBuffer(value)&&Object.getPrototypeOf(value)===Buffer.prototype));
++  let snapshot;
++  if(binary){
++   // Intrinsic branded getters ignore own property shadows. Copy only this view,
++   // synchronously before calling/awaiting a writer; never expose its backing AB.
++   const buffer=viewBuffer.call(value),offset=viewOffset.call(value),length=viewLength.call(value);
++   need(length<=MAX_NODE_RETAINED_BINARY_BYTES,'Full Node binary retention exceeds16MiB; refuse, never clip');
++   snapshot=new Uint8Array(length);snapshot.set(new Uint8Array(buffer,offset,length));
++  }
++  const path=name+'-'+label+(binary?'.bin':'.json'),row=await(binary?writeBytes(path,snapshot):write(path,value));retained.push(row);return row;
++ };
++}
+ export async function executeFreshNodeEdges({streams,decodeNodeStream,Buffer,nodeZlib,sourceBinding,rawFixtures,write,writeBytes,prefix}){
+  need(typeof decodeNodeStream==='function'&&typeof write==='function'&&typeof writeBytes==='function','Actual authenticated Node decoder and durable JSON/binary retention required');
+  need(Array.isArray(streams)&&[15,45].includes(streams.length)&&new Set(streams.map(row=>row.streamId)).size===streams.length,'Finite separate 45-main or15-off stream set');
+@@ -16,7 +39,7 @@
+   // Genuine existing API in guest-v2/node-oracle.mjs; this source only arranges
+   // new calls. Its retain callback records Node typed returns/errors BEFORE its
+   // assertions; no previous decodedOwnStreams row supplies a fresh matrix edge.
+-  const retained=[];const retain=async(label,value)=>{need(/^[A-Za-z0-9._-]+$/.test(label),'Finite exact Node retention label');const binary=Buffer.isBuffer(value),path=name+'-'+label+(binary?'.bin':'.json');const row=await(binary?writeBytes(path,value):write(path,value));retained.push(row);return row;};
++  const retained=[];const retain=createNodeRetention({Buffer,write,writeBytes,retained,name});
+   const observed=await decodeNodeStream({Buffer,nodeZlib,record,expectedRaw:raw,sourceBinding,retain});
+   const whole=await write(name+'-observed.json',{schemaVersion:1,observed,retained,partial:true});
+   need(observed.streamId===record.streamId&&observed.provider===record.provider&&observed.decoder==='node-22.14.0'&&observed.fullRawEqual===true,'Actual fresh Node edge identity');

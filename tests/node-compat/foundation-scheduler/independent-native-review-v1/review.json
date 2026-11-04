@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_REVIEW_COMPLETE_NO_CONCRETE_BLOCKER_FOUND_RUNTIME_UNVERIFIED",
+  "timestampUtc": "2026-11-03T17:06:11.257239+00:00",
+  "reviewer": "/root/entropy_integration",
+  "inputs": [
+    {
+      "path": "runtime/node_tick_queue.h",
+      "sha256": "1ba57af75273fb8f2142e87d1731a1c20b930e5aaa92da60cee8b12a2608a8e1",
+      "bytes": 1629
+    },
+    {
+      "path": "runtime/node_tick_queue.cpp",
+      "sha256": "33efec1a06f09bf3680aaaa710f74253a527f5480285d02dce7ffc3e317e0336",
+      "bytes": 5293
+    },
+    {
+      "path": "runtime/event_loop.h",
+      "sha256": "e86cb8dfc703af27f70a9c4ec4644a1f6b3a46043474af1e108fa95e038baa86",
+      "bytes": 3125
+    },
+    {
+      "path": "runtime/event_loop.cpp",
+      "sha256": "2230e3fe751ee323e7e60a0e609aaa652006f2f6fd26e965766b9f09700d3182",
+      "bytes": 12504
+    },
+    {
+      "path": "runtime/engine.cpp",
+      "sha256": "bb96b3e0cfa681c59e7d4dfbb0fe6d4a213a76b868dda4d296845cfa5e90633b",
+      "bytes": 26262
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "880dbef157355efd97802fc630e5d61ffd97940ea9b7dbba42f1f0d077454df9",
+      "bytes": 5686
+    },
+    {
+      "path": "cmake/builtins.cmake",
+      "sha256": "1ad350b7ff41a29d9104b9962e1532f25c31f9815e175dbc7d6387ae081e182d",
+      "bytes": 9370
+    },
+    {
+      "path": "include/extension-api.h",
+      "sha256": "d743a7fcc0566eb85f382fec2f82b4c768a1043ca29b26e9fdef6f576e6789b8",
+      "bytes": 7219
+    },
+    {
+      "path": "tests/node-compat/build-engine.sh",
+      "sha256": "869d188de3843b5d527d236a9e5c9af6ba1193f118dc9ad786df6266e1606173",
+      "bytes": 44177
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/diagnostic-candidate-v1/source/tests/node-compat/build-diagnostic-engine.sh",
+      "sha256": "380527dfcac1fd1f661efac87c68aa8aeac281d1c9e3be28d2b3ae9884bab6a5",
+      "bytes": 49226
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/taskqueue-owner-v2/componentize-taskqueue-ticks.UNAPPLIED.patch",
+      "sha256": "a6c3a34e06bc98ebc5a2f9ff943ceeb127e337d5b0bb349fc92d21cc123b576f",
+      "bytes": 1242
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/integration-candidate-v1/layer-policy.py",
+      "sha256": "78521feeefe299360228e5db76bfde0b11e6eeee93bd2374cd39b2fe695b610c",
+      "bytes": 6720
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/integration-candidate-v1/policy.json",
+      "sha256": "98e80d36b8eb9b7ac99de54832288bd8eec148fa1b9fe0b27b3bada4d12b2cd0",
+      "bytes": 49199
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/diagnostic-candidate-v1/pins.json",
+      "sha256": "7afbe65eef3f76fbc8b784c2fac1843e60f716e130e8154c9c1c8a439da078b8",
+      "bytes": 1226
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/diagnostic-candidate-v1/test-extension.cpp",
+      "sha256": "6dedb686dcd2890c708e07f210d32f731657f9d0f901375115867fcbdb6d083e",
+      "bytes": 6282
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/diagnostic-candidate-v1/diagnostic.cmake",
+      "sha256": "a3d62a4ad0441f430c485f258aadb4359b728d2586b2d52fdb8e5ce88f667746",
+      "bytes": 471
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-adoption-v1/freeze-diagnostic-engine.py",
+      "sha256": "7323eb9af12039712da64c06195ed692aa3f7f4534733c3b146f32a65e37d572",
+      "bytes": 9661
+    }
+  ],
+  "sourceHashValidation": {
+    "productionManifestEntries": 306,
+    "diagnosticExtraEntries": 2,
+    "bothRecipePinsAndEmbeddingPatchMatch": true
+  },
+  "blockers": [],
+  "areas": [
+    {
+      "area": "ownership/rooting",
+      "finding": "No source blocker found. Existing PersistentRooted<TaskQueue> owns and traces InternalTickQueue GCVector. Each slot holds Heap callback and private dense argument array; CallArgs/Rooted objects protect allocation. Array allocation succeeds before count/argument insertion commits. Dispatch roots callback/array and extracted argv before removing slot edges, then enters callback realm. No borrowed native JS payload spans JS calls.",
+      "sources": [
+        "runtime/event_loop.cpp::TaskQueue::trace",
+        "runtime/node_tick_queue.cpp::enqueue",
+        "runtime/node_tick_queue.cpp::drain_ticks"
+      ]
+    },
+    {
+      "area": "limits/errors",
+      "finding": "No source blocker found. Native CreateError/rooted strings define own code without ambient JS Error construction. Pending4096, per-tickargs1024, totalargs65536 and executed65536 bounds are explicit. Executed count spans all tick/job rounds in one checkpoint. Failed enqueue commits no callback; direct checkpoint/dispatch failure discards queue and RAII clears active flag. Tick budget does not bound Promise job work.",
+      "sources": [
+        "runtime/node_tick_queue.cpp::fail",
+        "runtime/node_tick_queue.cpp::checkpoint"
+      ]
+    },
+    {
+      "area": "ordering",
+      "finding": "No source blocker found for stated design. ModuleEvaluation drains complete RunJobs first; classic/task/initializer/finalizer origins drain ticks first, then complete RunJobs and repeat for new ticks. No per-Promise-job tick interposition. Native task selection follows checkpoint/finalizer work and later iterations use TaskOrExport. Actual classic first-startup priority remains deferred; current diagnostic content is ESM-only.",
+      "sources": [
+        "runtime/node_tick_queue.cpp::checkpoint",
+        "runtime/event_loop.cpp::run_event_loop",
+        "runtime/engine.cpp::eval_toplevel"
+      ]
+    },
+    {
+      "area": "exception/discard",
+      "finding": "No new blocker under fatal-instance-discard policy. Layered uncaught EventTarget latch is checked after complete Promise checkpoint; event-loop failure exits discard FIFO edges. Direct pre-snapshot cleanup failure can return before tick checkpoint, aborting the instance rather than proving universal queue reset. No reuse after fatal failure or safe reset/cancellation/request teardown claim.",
+      "sources": [
+        "runtime/event_loop.cpp::exit_event_loop",
+        "runtime/event_loop.cpp::drain_finalization_registry_cleanups",
+        "runtime/engine.cpp::reset"
+      ]
+    },
+    {
+      "area": "initializer/snapshot/export",
+      "finding": "No source blocker found. INIT checkpoint runs in actual INIT realm before content; early finish_pre_initialization and separate post-bind embedding final boundary require tick quiescence. Existing strict post-bind run_event_loop drains getter jobs/ticks first. Fresh export checks rather than discards stale state. INIT dynamic-import fixture tests import/job/tick completion before content BODY, not synchronous initial-tick priority.",
+      "sources": [
+        "runtime/engine.cpp::run_initialization_script",
+        "runtime/engine.cpp::finish_pre_initialization",
+        "componentize-taskqueue-ticks.UNAPPLIED.patch::call/componentize_initialize"
+      ]
+    },
+    {
+      "area": "optional-cost/capabilities",
+      "finding": "No source blocker found. DefaultOFF requires core. Queue TU/layout/callers are macro-gated through extension_api. No host import/service/process namespace/global is added. ON allocates4096 slots lazily on first enqueue, retains full slot-vector tracing cost on later GC even if empty, and allocates a private dense args array per enqueue plus rooted argv per dispatch. Size/startup/memory/throughput require actual evidence.",
+      "sources": [
+        "CMakeLists.txt",
+        "cmake/builtins.cmake",
+        "runtime/node_tick_queue.cpp::enqueue/trace"
+      ]
+    },
+    {
+      "area": "layered-build-provenance",
+      "finding": "No source blocker found. Exact ABI/I64/entry/strict ancestry remains; only exact already-layered embedding is reversed before replay. Patch/helper/policy/finalembedding hashes fixed. 306source inventory checked before/after. Historical strict/protected source maps remain separate; actual native/embedding compiler commands must agree with requested/observed macro and strict policy, required layout TUs, and one queue TU only if enabled. This review supplies no actual compilation evidence.",
+      "sources": [
+        "tests/node-compat/build-engine.sh",
+        "integration-candidate-v1/layer-policy.py"
+      ]
+    },
+    {
+      "area": "diagnostic-freezer",
+      "finding": "No producer schema blocker found. engineBytes/compileCommandsPath/OpenSSL sourceFilesVerified4650 keys match producer. Exact inputs306+2=308;61layout+1embedding+1diagnostic are checked separately with required macros, Release/OFFentropy/all7modules and generated installation. Variant targets prohibit overwrite; shared destinations must match. Sidecar copied byte-identically and original build paths retained as provenance. gcStress selects ordinary/GC label. Separate actual preflight/freeze remains required.",
+      "sources": [
+        "production-adoption-v1/freeze-diagnostic-engine.py",
+        "diagnostic-candidate-v1/source/tests/node-compat/build-diagnostic-engine.sh"
+      ]
+    }
+  ],
+  "nonblockingNotes": [
+    {
+      "id": "R1",
+      "severity": "nonblocking-fail-closed-operational-note",
+      "detail": "Variant target prevalidation precedes copying, but shared308-source destinations are validated incrementally after variant copies. A shared conflict can leave unaccepted partial variant output before failing closed. Preserve it; never overwrite a retry. Fresh retry namespace currently needs reviewed helper revision because output namespace is hardcoded. No wrong-success/overwrite path under planned held immutable-source flow."
+    },
+    {
+      "id": "R2",
+      "severity": "explicit-scope-limit",
+      "detail": "Freezer rejects leaf symlinks/output-base symlink but is not a hostile concurrent-filesystem defense: ancestor dirs are not all independently rejected and engine.resolve follows an input symlink. Trusted held directories and separate preflights remain required."
+    },
+    {
+      "id": "R3",
+      "severity": "staged-producer-state",
+      "detail": "Live tests/node-compat/build-diagnostic-engine.sh is currently absent because producer remains staged. Review hashed its pinned source copy. Freezer requires coherent producer adoption/build first; an initial review-packet setup mistakenly requested the absent live file, produced only an empty new directory, and made no source/candidate/runtime change."
+    }
+  ],
+  "requiredNextGates": [
+    "Actual Release diagnostic build and306+2 inputs/61+1+1 compile evidence",
+    "Diagnostic preflight before and after immutable ordinary/GC freeze",
+    "Real zero-import ESM/task/export/INIT/late-bind/limit/error/fatal-discard components on retained Jco and fresh Wasmtime",
+    "Release-GC valid-API argument/lifetime tests; no OOM/fault claim",
+    "Current first-startup classic priority remains deferred",
+    "Full current core/allocator/optional/stream/strict/protected/selectedHTTP gates before production scheduler acceptance"
+  ],
+  "resetSafeReuse": "OPEN; unsupported",
+  "buildOrGuestExecutedByReviewer": false,
+  "productionOrCandidateOrArchiveModifiedByReviewer": false
+}

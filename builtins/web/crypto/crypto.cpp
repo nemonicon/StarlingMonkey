@@ -3,6 +3,9 @@
 #include "host_api.h"
 #include "subtle-crypto.h"
 #include "uuid.h"
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+#include "node-compat-entropy.h"
+#endif
 
 bool is_int_typed_array(JSObject *obj) {
   return JS_IsInt8Array(obj) || JS_IsUint8Array(obj) || JS_IsInt16Array(obj) ||
@@ -42,19 +45,37 @@ bool Crypto::get_random_values(JSContext *cx, unsigned argc, JS::Value *vp) {
     return false;
   }
 
-  JS::AutoCheckCannotGC noGC(cx);
-  bool is_shared = false;
-  auto *buffer = static_cast<uint8_t *>(JS_GetArrayBufferViewData(typed_array, &is_shared, noGC));
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+  if (!builtins::node_compat::entropy::require(cx, "crypto.getRandomValues")) return false;
+#endif
 
   auto res = host_api::Random::get_bytes(byte_length);
   if (const auto *err = res.to_err()) {
-    noGC.reset();
     HANDLE_ERROR(cx, *err);
     return false;
   }
 
   auto bytes = std::move(res.unwrap());
-  std::copy_n(bytes.begin(), byte_length, buffer);
+  if (bytes.size() != byte_length || (byte_length && !bytes.begin())) {
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+    if (bytes.begin()) builtins::node_compat::entropy::clear(bytes.begin(), bytes.size());
+    return builtins::node_compat::entropy::invalid_result(cx, "crypto.getRandomValues");
+#else
+    JS_ReportErrorASCII(cx, "crypto.getRandomValues: invalid host entropy result");
+    return false;
+#endif
+  }
+  // Root the input across the host/canonical allocation. Acquire its data only
+  // after that call, and release the no-GC borrow before freeing host bytes.
+  {
+    JS::AutoCheckCannotGC noGC(cx);
+    bool is_shared = false;
+    auto *buffer = static_cast<uint8_t *>(JS_GetArrayBufferViewData(typed_array, &is_shared, noGC));
+    if (byte_length) std::copy_n(bytes.begin(), byte_length, buffer);
+  }
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+  builtins::node_compat::entropy::clear(bytes.begin(), bytes.size());
+#endif
 
   args.rval().setObject(*typed_array);
   return true;

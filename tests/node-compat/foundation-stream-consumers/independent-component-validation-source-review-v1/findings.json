@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "disposition": "HOLD_NO_ACTIVATION",
+  "findings": [
+    {
+      "id": "C355-COMP-M1",
+      "severity": "mandatory-fix",
+      "disposition": "HOLD_BEFORE_ACTIVATION",
+      "title": "Correct CJS refusals are rejected by the OFF driver diagnostic assertion",
+      "detail": "Both literal-CJS fixtures take the pinned bundler CommonJS refusal branch. The driver accepts only the ESM diagnostic prefix, so a correct CJS refusal fails the source-defined OFF gate before componentization.",
+      "evidence": [
+        "oldDriverDenialMatcher",
+        "cjsDiagnostic",
+        "esmDiagnostic",
+        "literalCjsFixture"
+      ],
+      "fixtureRows": [
+        {
+          "specifier": "node:stream/consumers",
+          "kind": "literal-cjs",
+          "actualPinnedDiagnosticTemplateResult": "CommonJS require is not admitted: node:stream/consumers",
+          "oldDriverMatcherAccepts": false,
+          "pureTemplateEvaluationOnly": true
+        },
+        {
+          "specifier": "stream/consumers",
+          "kind": "literal-cjs",
+          "actualPinnedDiagnosticTemplateResult": "CommonJS require is not admitted: stream/consumers",
+          "oldDriverMatcherAccepts": false,
+          "pureTemplateEvaluationOnly": true
+        }
+      ],
+      "runtimeReproductionClaim": false
+    },
+    {
+      "id": "C355-COMP-M2",
+      "severity": "retention-gap",
+      "disposition": "FIX_IN_SUCCESSOR",
+      "title": "Nonstring Jco transport values would fail before raw retention",
+      "detail": "observed() checks typeof raw before saving raw.txt. The declared current exports return strings, so this is a failure-evidence retention gap, not a demonstrated guest ABI or semantic failure. A typed envelope before the type guard must avoid inspecting opaque values.",
+      "evidence": [
+        "rawTypeBeforeRetention"
+      ],
+      "runtimeReproductionClaim": false
+    }
+  ],
+  "citations": {
+    "oldDriverDenialMatcher": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/run-validation.mjs",
+      "line": 52,
+      "sha256": "ad00797e8fd2a60f7427b509fdc27866c2d45f66565fe47f30dfdb78c8bc8e45",
+      "needle": "assert(failure&&/Node builtin is not admitted by this profile:/.test(failure.message))"
+    },
+    "cjsDiagnostic": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/packaging-tools/tests/node-compat/profile-bundler.mjs",
+      "line": 86,
+      "sha256": "d1333e8c795098dbab12d1ad93b10fd5b27176541c9a053632531dabde36a4bc",
+      "needle": "CommonJS require is not admitted: ${specifier}"
+    },
+    "esmDiagnostic": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/packaging-tools/tests/node-compat/profile-bundler.mjs",
+      "line": 46,
+      "sha256": "d1333e8c795098dbab12d1ad93b10fd5b27176541c9a053632531dabde36a4bc",
+      "needle": "Node builtin is not admitted by this profile: ${source}"
+    },
+    "literalCjsFixture": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/disabled-fixtures.mjs",
+      "line": 6,
+      "sha256": "4e2ce1b7f43977a6f3caa0ebd1546bd0368535cfc7608dbe223689c0d7ebf4b2",
+      "needle": "kind:'literal-cjs'"
+    },
+    "rawTypeBeforeRetention": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/run-validation.mjs",
+      "line": 46,
+      "sha256": "ad00797e8fd2a60f7427b509fdc27866c2d45f66565fe47f30dfdb78c8bc8e45",
+      "needle": "assert.equal(typeof raw,'string')"
+    },
+    "genuineBootstrap": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/runtime-preflight.template.mjs",
+      "line": 22,
+      "sha256": "2da1f4f652a43ace849d5468176e9fbb31e8b38794793a8ead4b8808b9af4489",
+      "needle": "consumersBootstrapPreflight"
+    },
+    "providedManifestBundle": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/run-validation.mjs",
+      "line": 44,
+      "sha256": "ad00797e8fd2a60f7427b509fdc27866c2d45f66565fe47f30dfdb78c8bc8e45",
+      "needle": "builtinManifests:admission.selectedManifests"
+    },
+    "publicWit": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/run-validation.mjs",
+      "line": 42,
+      "sha256": "ad00797e8fd2a60f7427b509fdc27866c2d45f66565fe47f30dfdb78c8bc8e45",
+      "needle": "export run: func(index: u32) -> string"
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "state": "PASS_BOUNDED_KEY_OWNER_SOURCE_API_REVIEW_RUNTIME_HELD",
+  "candidateIndexSha256": "216d0272025145f70c3a1e1c5e4f27cc3cc47ef6f97ae8131467e803db3c47d0",
+  "indexedFiles": 35,
+  "originalContextReferences": 1185,
+  "sourceAfterimages": 4,
+  "exactEdits": 18,
+  "exactPatchSha256": "4db295228de73dc8b5f8bc2da8aa31ae7376b8a564a64fd51a112eb9d267615e",
+  "reservedSlotCount": 8,
+  "allSignVerifyBodyBytesUnchanged": true,
+  "borrowSites": [
+    [
+      803,
+      "std::span<uint8_t> keyData = CryptoKey::hmacKeyData(key);"
+    ],
+    [
+      835,
+      "std::span<uint8_t> keyData = CryptoKey::hmacKeyData(key);"
+    ],
+    [
+      879,
+      "EVP_PKEY *pkey = CryptoKey::key(key);"
+    ],
+    [
+      1030,
+      "EVP_PKEY *pkey = CryptoKey::key(key);"
+    ],
+    [
+      1064,
+      "if (!ctx || EVP_DigestSignInit(ctx.get(), nullptr, nullptr, nullptr, CryptoKey::key(key)) != 1) {"
+    ],
+    [
+      1121,
+      "if (!ctx || EVP_DigestVerifyInit(ctx.get(), nullptr, nullptr, nullptr, CryptoKey::key(key)) != 1) {"
+    ],
+    [
+      1167,
+      "EvpPkeyCtxPtr ctx(EVP_PKEY_CTX_new(CryptoKey::key(key), nullptr));"
+    ],
+    [
+      1238,
+      "EvpPkeyCtxPtr ctx(EVP_PKEY_CTX_new(CryptoKey::key(key), nullptr));"
+    ]
+  ],
+  "publicGetterPrototypeGuardsUnchanged": 4,
+  "sdkStoredExitCodes": [
+    0,
+    0
+  ],
+  "sdkExitObservedByThisReader": false,
+  "dependencyCounts": {
+    "crypto-key": 1089,
+    "crypto-algorithm": 1103
+  },
+  "uniqueLogicalDependencies": 1104,
+  "headersHashedBeforeSyntaxClaim": false,
+  "sdkOrCompilerRerun": false,
+  "ownerFunctionImportedOrExecuted": false,
+  "keyImportSignVerifyOrGcExecuted": false,
+  "nativeOrGuestExecuted": false,
+  "operationalAdmission": false,
+  "futureAuthority": null,
+  "candidateBytesChanged": false
+}

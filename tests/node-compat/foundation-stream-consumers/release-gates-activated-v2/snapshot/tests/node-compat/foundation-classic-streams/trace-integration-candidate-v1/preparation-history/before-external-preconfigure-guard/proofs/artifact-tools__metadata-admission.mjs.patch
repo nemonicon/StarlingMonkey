@@ -1,0 +1,21 @@
+--- a/tests/node-compat/foundation-classic-streams/integration-candidate-v1/artifact-tools/metadata-admission.mjs
++++ b/artifact-tools/metadata-admission.mjs
+@@ -9,7 +9,9 @@
+ const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+ const contract=JSON.parse(await readFile(join(here,'../admission-pins.json')));
+ export const RECIPE=contract.productionRecipeSha256;
+-const TOOL_PINS_SHA='f68267eff5126af83c099346d07e5befbf6261ed4ca245e14a68f292f32087e3';
++const sourcePolicy=JSON.parse(await readFile(join(here,'../policy.json')));
++assert.equal(hash(await readFile(join(here,'../policy.json'))),contract.policySha256);
++const TOOL_PINS_SHA='3a2e83e4794b5e2c444d9508447e3141fadf43bb3cf326b69996de8b1a3ad5ec';
+ export const LABELS=Object.freeze(['normal-off','normal-runtime','gc-off','disabled-off']);
+ export function classify(metadata,label){
+  assert(LABELS.includes(label));assert(metadata&&typeof metadata==='object'&&!Array.isArray(metadata));
+@@ -21,6 +23,7 @@
+  for(const[field,value]of Object.entries(options))assert.equal(metadata[field],value,field);
+  for(const field of ['profileEnabled','strictInitialization','abiFixEnabled','bigIntFixEnabled','pathEnabled','eventsEnabled','stringDecoderEnabled','assertEnabled','querystringEnabled','utilEnabled','streamWebEnabled','internalTicksEnabled'])assert.equal(metadata[field],true,field);
+  for(const field of ['oomTesting','debuggerEnabled','wptSupportEnabled'])assert.equal(metadata[field],false,field);
++ assert.deepEqual(metadata.classicTraceSourcePolicy,sourcePolicy.classicTraceSourcePolicy,'Corrected source provenance required before engine use');
+  return Object.freeze(options);
+ }
+ async function regularBelow(root,relative,sha,bytes){

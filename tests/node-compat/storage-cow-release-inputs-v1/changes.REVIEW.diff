@@ -1,0 +1,219 @@
+--- tests/node-compat/storage-cow-release-inputs-v1/history/provisional-v1/cow.py	2026-11-03 19:48:03
++++ tests/node-compat/storage-cow-release-inputs-v1/cow.py	2026-11-03 19:52:02
+@@ -107,6 +107,13 @@
+     assert identity(file_stat(path)) == identity(value['before']),path
+ 
+ 
++def require_owned_backup(path,owned,old):
++    assert owned and path is not None,'No owned rollback link'
++    current = file_stat(path)
++    assert current['regular'] and not current['symlink'],'Rollback path no longer regular'
++    assert (current['device'],current['inode']) == (old['device'],old['inode']),'Rollback path no longer matches old target inode'
++
++
+ def freeze():
+     proofs = []
+     for name,digest in PROOFS:
+@@ -165,27 +172,39 @@
+     journal = journal_path.open('x')
+ 
+     def record(value):
+-        journal.write(json.dumps({'timestampUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),**value},sort_keys=True)+'\n')
+-        journal.flush();os.fsync(journal.fileno())
++        try:
++            journal.write(json.dumps({'timestampUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),**value},sort_keys=True)+'\n')
++            journal.flush();os.fsync(journal.fileno())
++            return True
++        except OSError as error:
++            # Preserve in-memory status even if later failure logging also fails.
++            summary['evidenceErrors'].append({'stage':'journal-write','event':value.get('event'),'error':str(error)})
++            return False
+ 
++    def require_record(value):
++        if not record(value):
++            raise RuntimeError('Required journal write failed; stop before further adoption')
++
+     summary = {'schemaVersion':1,'state':'DRY_RUN_NO_CLONEFILE_CALL' if not args.apply else 'APPLY_IN_PROGRESS',
+                'apply':args.apply,'run':run,'helperSha256':sha(__file__),
+                'frozenInputs':str(snapshot),'frozenInputsSha256':sha(snapshot),
+                'expectedInventory':str(args.expected_inventory) if args.apply else None,
+                'rootBuildQuiescenceAcknowledged':args.root_build_quiescent,
+                'journal':str(journal_path),'clonefileCalls':0,'successfulClonefileCalls':0,
+-               'adoptedTargets':0,'pairs':[],'failures':[],
++               'adoptedTargets':0,'pairs':[],'failures':[],'evidenceErrors':[],
+                'freeBytesBeforeNonreserved':shutil.disk_usage(BASE).free,
+                'uniqueExtentRecoveryProved':False,'exclusivePhysicalBytesRecovered':None,
+                'compilerGuestOrSdkInputExecution':False}
+-    record({'event':'start',**summary})
++    if not record({'event':'start',**summary}):
++        summary['failures'].append({'stage':'start-journal','error':'Cannot authenticate a mutation run'})
+     if not args.apply:
+         for pair in frozen['pairs']:
+             record({'event':'inventory','name':pair['name'],'source':pair['source'],'target':pair['target']})
+     else:
+         selected = [str(Path(row[key]['path'])) for row in frozen['pairs'] for key in ['source','target']]
+         lsof = subprocess.run(['/usr/sbin/lsof','-nP','--',*selected],capture_output=True,text=True)
+-        record({'event':'lsof-preapply','returncode':lsof.returncode,'stdout':lsof.stdout,'stderr':lsof.stderr})
++        if not record({'event':'lsof-preapply','returncode':lsof.returncode,'stdout':lsof.stdout,'stderr':lsof.stderr}):
++            summary['failures'].append({'stage':'preapply-journal','error':'Cannot record quiescence'})
+         if not (lsof.returncode == 1 and not lsof.stdout and not lsof.stderr):
+             summary['failures'].append({'stage':'preapply-quiescence','error':'Selected inputs open or lsof failed'})
+         for pair in frozen['pairs']:
+@@ -193,11 +212,11 @@
+                 break
+             source,target = Path(pair['source']['path']),Path(pair['target']['path'])
+             temporary = backup = None
+-            temporary_owned = replaced = restored = False
++            temporary_owned = backup_owned = replaced = restored = False
+             try:
+                 check_preimage(pair['source']);check_preimage(pair['target'])
+                 free = shutil.disk_usage(BASE).free
+-                record({'event':'headroom','name':pair['name'],'freeBytes':free,'requiredBytes':RESERVE_BYTES})
++                require_record({'event':'headroom','name':pair['name'],'freeBytes':free,'requiredBytes':RESERVE_BYTES})
+                 if free < RESERVE_BYTES:
+                     raise RuntimeError('Less than64MiB operational metadata headroom; no clone attempted')
+                 # Prepare symbol/ABI only in the explicit apply branch.
+@@ -209,16 +228,18 @@
+                 os.close(fd);os.unlink(name)  # Only our newly created empty reservation.
+                 temporary = Path(name)
+                 assert not os.path.lexists(temporary)
+-                record({'event':'clone-prepared','name':pair['name'],'source':str(source),'target':str(target),'temporary':str(temporary)})
++                require_record({'event':'clone-prepared','name':pair['name'],'source':str(source),'target':str(target),'temporary':str(temporary)})
+                 ctypes.set_errno(0)
+                 summary['clonefileCalls'] += 1
+                 result = clonefile(os.fsencode(source),os.fsencode(temporary),ctypes.c_uint32(CLONE_NOFOLLOW))
+                 error_number = ctypes.get_errno()
+-                record({'event':'clonefile-result','name':pair['name'],'returncode':result,'errno':error_number,'flags':CLONE_NOFOLLOW})
++                if result == 0:
++                    # Ownership/accounting must precede fallible journal I/O.
++                    temporary_owned = True
++                    summary['successfulClonefileCalls'] += 1
++                require_record({'event':'clonefile-result','name':pair['name'],'returncode':result,'errno':error_number,'flags':CLONE_NOFOLLOW})
+                 if result != 0:
+                     raise OSError(error_number,os.strerror(error_number))
+-                temporary_owned = True
+-                summary['successfulClonefileCalls'] += 1
+                 clone = file_stat(temporary)
+                 assert clone['regular'] and not clone['symlink'] and clone['nlink'] == 1 and clone['flags'] == 0
+                 assert clone['device'] == pair['source']['before']['device']
+@@ -232,9 +253,10 @@
+                 check_preimage(pair['source']);check_preimage(pair['target'])
+                 backup = target.parent/('.storage-cow-original-'+uuid.uuid4().hex+'.rollback')
+                 os.link(target,backup,follow_symlinks=False)
+-                assert file_stat(backup)['inode'] == pair['target']['before']['inode']
++                backup_owned = True  # Only a successful link authorizes restore/unlink.
++                require_owned_backup(backup,backup_owned,pair['target']['before'])
+                 assert file_stat(target)['nlink'] == 2
+-                record({'event':'prepared','name':pair['name'],'source':str(source),'target':str(target),
++                require_record({'event':'prepared','name':pair['name'],'source':str(source),'target':str(target),
+                         'temporary':str(temporary),'rollback':str(backup),'clone':file_stat(temporary),
+                         'targetBefore':pair['target']['before'],'sha256':pair['target']['sha256']})
+                 os.replace(temporary,target)
+@@ -244,18 +266,22 @@
+                 assert after['inode'] == clone['inode'] and after['inode'] != pair['source']['before']['inode']
+                 assert metadata(target) == pair['target']['metadata'] and sha(target) == pair['target']['sha256']
+                 check_preimage(pair['source'])
+-                record({'event':'after','name':pair['name'],'target':str(target),'after':file_stat(target),
++                require_record({'event':'after','name':pair['name'],'target':str(target),'after':file_stat(target),
+                         'sha256':pair['target']['sha256'],'requiredMetadataVerified':True,'sourcePreimageUnchanged':True})
+-                backup.unlink();backup = None  # Only our old-target rollback link, after verified adoption.
+-                record({'event':'rollback-link-released','name':pair['name'],'target':str(target)})
++                adoption = {'name':pair['name'],'target':str(target),'sha256':pair['target']['sha256'],
++                            'before':pair['target']['before'],'after':file_stat(target),'directClonefileReturn':0}
++                require_owned_backup(backup,backup_owned,pair['target']['before'])
++                backup.unlink();backup_owned = False;backup = None
++                # This target is now irreversibly adopted: count it before logging.
+                 summary['adoptedTargets'] += 1
+-                summary['pairs'].append({'name':pair['name'],'target':str(target),'sha256':pair['target']['sha256'],
+-                                         'before':pair['target']['before'],'after':file_stat(target),'directClonefileReturn':0})
++                summary['pairs'].append(adoption)
++                require_record({'event':'rollback-link-released','name':pair['name'],'target':str(target)})
+             except Exception as error:
+                 failure = {'name':pair['name'],'error':str(error),'replaced':replaced,'originalRestored':False}
+-                if replaced and backup is not None:
++                if replaced and backup_owned and backup is not None:
+                     try:
+-                        os.replace(backup,target);backup = None
++                        require_owned_backup(backup,backup_owned,pair['target']['before'])
++                        os.replace(backup,target);backup_owned = False;backup = None
+                         assert file_stat(target)['inode'] == pair['target']['before']['inode']
+                         assert metadata(target) == pair['target']['metadata'] and sha(target) == pair['target']['sha256']
+                         restored = True;failure['originalRestored'] = True
+@@ -266,12 +292,26 @@
+                 summary['failures'].append(failure)
+                 record({'event':'failure',**failure})
+             finally:
+-                if backup is not None and not replaced:
+-                    # Failed before adoption: remove only our extra link if the old target still owns that inode.
+-                    if file_stat(target)['inode'] == pair['target']['before']['inode']:
+-                        backup.unlink();backup = None
+-                if temporary_owned and temporary is not None and os.path.lexists(temporary):
+-                    temporary.unlink()  # Only a clone known to have been created successfully by this call.
++                try:
++                    if backup_owned and backup is not None and not replaced:
++                        # EEXIST/failed os.link never sets ownership and cannot enter here.
++                        require_owned_backup(backup,backup_owned,pair['target']['before'])
++                        current = file_stat(target)
++                        assert (current['device'],current['inode']) == (pair['target']['before']['device'],pair['target']['before']['inode'])
++                        backup.unlink();backup_owned = False;backup = None
++                except Exception as cleanup_error:
++                    failure = {'stage':'rollback-link-cleanup','name':pair['name'],
++                               'type':type(cleanup_error).__name__,'error':str(cleanup_error),
++                               'retainedOwnedRollback':str(backup) if backup_owned else None}
++                    summary['failures'].append(failure);record({'event':'cleanup-failure',**failure})
++                try:
++                    if temporary_owned and temporary is not None and os.path.lexists(temporary):
++                        temporary.unlink();temporary_owned = False;temporary = None
++                except Exception as cleanup_error:
++                    failure = {'stage':'clone-temporary-cleanup','name':pair['name'],
++                               'type':type(cleanup_error).__name__,'error':str(cleanup_error),
++                               'retainedOwnedTemporary':str(temporary) if temporary_owned else None}
++                    summary['failures'].append(failure);record({'event':'cleanup-failure',**failure})
+                 # On a failed syscall, never unlink an unexpected destination: ownership is unproved.
+     source_checks = []
+     for pair in frozen['pairs']:
+@@ -282,18 +322,36 @@
+             source_checks.append({'name':pair['name'],'unchanged':False,'error':str(error)})
+             summary['failures'].append({'stage':'source-postcheck','name':pair['name'],'error':str(error)})
+     summary['sourcePostchecks'] = source_checks
+-    summary['completed'] = not summary['failures']
+-    summary['state'] = ('APPLY_VERIFIED' if summary['completed'] else 'APPLY_FAILED_STOPPED') if args.apply else ('DRY_RUN_NO_CLONEFILE_CALL' if summary['completed'] else 'DRY_RUN_FAILED_NO_CLONEFILE_CALL')
+     summary['freeBytesAfterNonreserved'] = shutil.disk_usage(BASE).free
+     summary['nonexclusiveFreeDeltaBytes'] = summary['freeBytesAfterNonreserved']-summary['freeBytesBeforeNonreserved']
++
++    def update_status():
++        summary['completed'] = not summary['failures'] and not summary['evidenceErrors']
++        summary['state'] = ('APPLY_VERIFIED' if summary['completed'] else 'APPLY_FAILED_STOPPED') if args.apply else ('DRY_RUN_NO_CLONEFILE_CALL' if summary['completed'] else 'DRY_RUN_FAILED_NO_CLONEFILE_CALL')
++
++    update_status()
+     record({'event':'finish',**summary})
+-    journal.close()
+-    summary['journalSha256'] = sha(journal_path)
++    try:
++        journal.close()
++    except OSError as error:
++        summary['evidenceErrors'].append({'stage':'journal-close','error':str(error)})
++    try:
++        summary['journalSha256'] = sha(journal_path)
++    except OSError as error:
++        summary['evidenceErrors'].append({'stage':'journal-hash','error':str(error)})
++    update_status()
+     summary_path = RECEIPTS/(run+'.summary.json')
+-    with summary_path.open('x') as stream:
+-        json.dump(summary,stream,indent=2,sort_keys=True);stream.write('\n')
+-    print(json.dumps({'summary':str(summary_path),**summary},indent=2))
+-    if summary['failures']:
++    try:
++        with summary_path.open('x') as stream:
++            json.dump(summary,stream,indent=2,sort_keys=True);stream.write('\n')
++            stream.flush();os.fsync(stream.fileno())
++    except OSError as error:
++        summary['evidenceErrors'].append({'stage':'summary-write','error':str(error)})
++        update_status()
++    # Like the reviewed native launcher: final storage failure keeps full status
++    # on stdout, including verified adoptions. No crash/ENOSPC guarantee follows.
++    print(json.dumps({'summary':str(summary_path),**summary},indent=2),flush=True)
++    if not summary['completed']:
+         raise SystemExit(1)
+ 
+ 

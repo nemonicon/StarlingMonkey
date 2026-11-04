@@ -1,0 +1,1 @@
+import{run}from"/tmp/starling-node-compat/foundations-v11/release-gates-v2/strict-sync/deployed_number.js";try{await run();console.log('UNEXPECTED_SUCCESS');process.exitCode=2;}catch(error){console.log('EXPECTED_FATAL_EXPORT');}

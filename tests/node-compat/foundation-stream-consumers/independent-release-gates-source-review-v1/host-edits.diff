@@ -1,0 +1,621 @@
+--- preimages/1/tests/node-compat/run.mjs
++++ snapshot/tests/node-compat/run.mjs
+@@ -1,3 +1,4 @@
++import {selectedManifestsForValidation, coreExpectationsForValidation} from "../../../native-preflight.mjs";
+ // Native integration only: no released-engine fallback and no JS Buffer kernel.
+ import assert from 'node:assert/strict';
+ import { createHash } from 'node:crypto';
+@@ -8,8 +9,8 @@
+ import { loadToolchain } from './toolchain.mjs';
+ import { loadComponentizer } from './componentizer.mjs';
+ import { bundleProfile } from './profile-bundler.mjs';
+-import { selectedManifestsForEngine } from './module-selection.mjs';
+-import { selectCoreExpectations, coreExpectationsForGuest, unsupportedMessagePattern, validateCoreRuntimeReport } from './core-expectations.mjs';
++
++import {coreExpectationsForGuest, unsupportedMessagePattern, validateCoreRuntimeReport} from './core-expectations.mjs';
+ import { makeOracleCorpus } from './oracle.mjs';
+ 
+ const here = dirname(fileURLToPath(import.meta.url));
+@@ -57,8 +58,8 @@
+ await writeFile(join(output, 'package.json'), '{"type":"module"}\n');
+ try { await symlink(join(toolchain, 'node_modules'), join(output, 'node_modules'), 'dir'); }
+ catch (error) { if (error.code !== 'EEXIST') throw error; }
+-const builtinManifests = selectedManifestsForEngine(engineMetadata, { sourceRoot });
+-const coreExpectations = selectCoreExpectations(engineMetadata, { sourceRoot });
++const builtinManifests = selectedManifestsForValidation(engineMetadata, { sourceRoot });
++const coreExpectations = coreExpectationsForValidation(engineMetadata, { sourceRoot });
+ const corpus = makeOracleCorpus();
+ const virtualModules = { 'node-compat:oracle-vectors': `export default ${JSON.stringify(corpus)};`,
+   'node-compat:core-expectations': `export default ${JSON.stringify(coreExpectationsForGuest(coreExpectations))};` };
+
+--- preimages/2/tests/node-compat/foundations/native-scalar-harness.mjs
++++ snapshot/tests/node-compat/foundations/native-scalar-harness.mjs
+@@ -1,3 +1,4 @@
++import {selectedManifestsForValidation} from "../../../../native-preflight.mjs";
+ // Host-side correctness helper for optional native foundation gates.
+ // This module is never bundled into a product component.
+ import assert from 'node:assert/strict';
+@@ -9,7 +10,7 @@
+ import { loadToolchain } from '../toolchain.mjs';
+ import { loadComponentizer } from '../componentizer.mjs';
+ import { bundleProfile } from '../profile-bundler.mjs';
+-import { selectedManifestsForEngine } from '../module-selection.mjs';
++
+ export const hash = value => createHash('sha256').update(value).digest('hex');
+ 
+ export function decodeCliString(source) {
+@@ -44,7 +45,7 @@
+   for (const input of metadata.sourceManifest) assert.equal(hash(await readFile(join(sourceRoot, input.path))), input.sha256, input.path);
+   const registrar = await readFile(join(sourceRoot, 'builtins/node-compat/register.cpp'), 'utf8');
+   assert.match(registrar, /options\.setForceStrictMode\(\)/, 'Selected native registrar must preserve ESM strictness');
+-  const builtinManifests = selectedManifestsForEngine(metadata, { sourceRoot });
++  const builtinManifests = selectedManifestsForValidation(metadata, { sourceRoot });
+   const output = resolve(process.env[outputVariable] ?? '/tmp/starling-node-compat/native-'+kind);
+   await mkdir(output, { recursive: true }); await writeFile(join(output, 'package.json'), '{"type":"module"}\n');
+   const toolchain = await loadToolchain(), selected = await loadComponentizer(toolchain);
+@@ -94,7 +95,7 @@
+     assert.equal(hash(await readFile(offEngine)), offMetadata.engineSha256); assert.notEqual(offMetadata[enabledField], true);
+     const offRoot = resolve(process.env[sourceVariable] ?? sourceRoot);
+     for (const item of offMetadata.sourceManifest) assert.equal(hash(await readFile(join(offRoot, item.path))), item.sha256, item.path);
+-    const offManifests = selectedManifestsForEngine(offMetadata, { sourceRoot: offRoot }); let failure;
++    const offManifests = selectedManifestsForValidation(offMetadata, { sourceRoot: offRoot }); let failure;
+     try { await bundleProfile({ ...toolchain, builtinManifests: offManifests, input }); } catch (error) { failure = error; }
+     assert(failure); assert.match(failure.message, /not admitted/);
+     return { engineSha256: offMetadata.engineSha256, sourceRoot: offRoot, receiptSha256: hash(offMetadataBytes), receipt: offMetadata,
+@@ -113,5 +114,5 @@
+     host: hostMetadata, harnessSha256: hash(await readFile(fileURLToPath(import.meta.url))) };
+   return { metadata, output, builtinManifests, build, bundle, expectInitialization, runHost, offAdmission, verifyOracleSources, evidence,
+     importFixture: fixture => import(pathToFileURL(fixture.modulePath)),
+-    writeReport: async report => { await writeFile(join(output, 'results.json'), JSON.stringify(report, null, 2)+'\n'); await writeFile(join(here, 'native-component-results.json'), JSON.stringify(report, null, 2)+'\n'); } };
++    writeReport: async report => { await writeFile(join(output, 'results.json'), JSON.stringify(report, null, 2)+'\n'); await writeFile(join(output, 'native-component-results.json'), JSON.stringify(report, null, 2)+'\n'); } };
+ }
+
+--- preimages/3/tests/node-compat/foundation-stream-web/production-candidate/native-preflight.mjs
++++ snapshot/tests/node-compat/foundation-stream-web/production-candidate/native-preflight.mjs
+@@ -1,10 +1,11 @@
++import {selectedManifestsForValidation} from "../../../../../native-preflight.mjs";
+ // PREPARED/UNEXECUTED. Both runners call this BEFORE componentization or any
+ // invalid native receiver fixture. No old engine admission or bypass exists.
+ import assert from 'node:assert/strict';
+ import {readFile} from 'node:fs/promises';
+ import {createHash} from 'node:crypto';
+ import {resolve,join} from 'node:path';
+-import {selectedManifestsForEngine} from '../../module-selection.mjs';
++
+ const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+ export async function nativePreflight({streamWebEnabled}){
+   assert.equal(process.version,'v22.14.0');
+@@ -44,14 +45,14 @@
+     assert.equal(hash(helper),inputs.get(contract.strictFactoryHelperPath));assert(helper.includes(contract.strictFactoryRequiredSymbol));
+     // This intentionally depends on future shared admission support. Current
+     // module-selection does not yet admit streamWebEnabled and must reject it.
+-    builtinManifests=selectedManifestsForEngine(metadata,{sourceRoot});
++    builtinManifests=selectedManifestsForValidation(metadata,{sourceRoot});
+     const selected=builtinManifests.find(manifest=>Object.hasOwn(manifest.modules,'node:stream/web'));
+     assert(selected,'Installed stream/web manifest must be admitted by shared selection');
+     assert.equal(selected.profileVersion,contract.profileVersion);
+     assert.deepEqual(selected.modules['node:stream/web'].aliases,['stream/web']);
+     assert.equal(selected.modules['node:stream/web'].exports.length,18);assert.deepEqual(selected.requiredHostInterfaces,[]);
+   }
+-  if(!streamWebEnabled){builtinManifests=selectedManifestsForEngine(metadata,{sourceRoot});
++  if(!streamWebEnabled){builtinManifests=selectedManifestsForValidation(metadata,{sourceRoot});
+     assert(!builtinManifests.some(manifest=>Object.hasOwn(manifest.modules,'node:stream/web')),'OFF control must not admit the module');}
+   return{engine,sourceRoot,wasmtime,metadata,contract,builtinManifests,hash,
+     safetyAudit:{state:'preflight-verified-before-fixture',streamWebEnabled,nativeGuardSources:contract.nativeGuardSources,
+
+--- preimages/4/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/common/runners/allocator.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/common/runners/allocator.mjs
+@@ -1,3 +1,4 @@
++import {coreExpectationsForValidation} from "../../../../../../../native-preflight.mjs";
+ // Actual installed m0.11 direct-U8 allocator/helper gate. Historical isolated prototypes
+ // are source/oracle controls only and are never bundled or injected here.
+ import assert from 'node:assert/strict';
+@@ -7,7 +8,7 @@
+ import {dirname,join,resolve} from 'node:path';
+ import {fileURLToPath,pathToFileURL} from 'node:url';
+ import {nativeHarness,hash} from '../../../../foundations/native-scalar-harness.mjs';
+-import {selectCoreExpectations,coreExpectationsForGuest,unsupportedMessagePattern} from '../../../../core-expectations.mjs';
++import {coreExpectationsForGuest, unsupportedMessagePattern} from '../../../../core-expectations.mjs';
+ import {loadToolchain} from '../../../../toolchain.mjs';
+ import {loadComponentizer} from '../../../../componentizer.mjs';
+ import {bundleProfile} from '../../../../profile-bundler.mjs';
+@@ -23,7 +24,7 @@
+ assert.equal(h.metadata.observedCMakeOptions.CMAKE_BUILD_TYPE,'Release');
+ assert.equal(h.metadata.observedCMakeOptions.WEVAL,'OFF');
+ for(const key of ['oomTesting','wptSupportEnabled'])assert.equal(h.metadata[key],false);
+-const policy=selectCoreExpectations(h.metadata,{sourceRoot:h.evidence.sourceRoot});
++const policy=coreExpectationsForValidation(h.metadata,{sourceRoot:h.evidence.sourceRoot});
+ assert.equal(policy.coreVersion,'sm-node-22.14.0-m0.11');assert.equal(policy.allocUnsafePolicy,'zeroed-no-pool-direct-u8-v1');
+ const tc=await loadToolchain(),oracleBytes=await readFile(join(parent,'node-results.json')),
+   oracle=JSON.parse(oracleBytes),checksSource=await readFile(join(parent,'checks.mjs'),'utf8');
+@@ -108,7 +109,7 @@
+   assert.equal(oldMetadata.engineSha256,'ee92d5d451c16eb7ce83e0306e8dab6920f4aacd9f2c4bb9d6e5e4af2c20ea09');
+   assert.equal(oldMetadata.sourceManifest.length,293);
+   for(const item of oldMetadata.sourceManifest)assert.equal(hash(await readFile(join(oldRoot,item.path))),item.sha256,item.path);
+-  const oldPolicy=selectCoreExpectations(oldMetadata,{sourceRoot:oldRoot});assert.equal(oldPolicy.coreVersion,'sm-node-22.14.0-m0.1');
++  const oldPolicy=coreExpectationsForValidation(oldMetadata,{sourceRoot:oldRoot});assert.equal(oldPolicy.coreVersion,'sm-node-22.14.0-m0.1');
+   const selected=await loadComponentizer(tc),oldOptions={engine:oldEngine,preview2Adapter:h.evidence.adapter.path,
+     witWorld:'package test:allocator-old-core; world test { export run: func() -> string; }',worldName:'test',
+     disableFeatures:['stdio','random','clocks','http','fetch-event'],selectedInterfaces:[]},oldInitialization=[];
+@@ -129,7 +130,7 @@
+   assert.equal(hash(await readFile(delegatedEngine)),'1098e7531004a4ca1b47f2ca80527a01e64cd3392d28d760da37326c08a85154');
+   assert.equal(delegatedMetadata.engineSha256,'1098e7531004a4ca1b47f2ca80527a01e64cd3392d28d760da37326c08a85154');
+   for(const item of delegatedMetadata.sourceManifest)assert.equal(hash(await readFile(join(delegatedRoot,item.path))),item.sha256,item.path);
+-  const delegatedPolicy=selectCoreExpectations(delegatedMetadata,{sourceRoot:delegatedRoot});
++  const delegatedPolicy=coreExpectationsForValidation(delegatedMetadata,{sourceRoot:delegatedRoot});
+   assert.equal(delegatedPolicy.coreVersion,'sm-node-22.14.0-m0.8');assert.equal(delegatedPolicy.allocUnsafePolicy,'zeroed-no-pool-v1');
+   const delegatedSource=`import{Buffer}from'node:buffer';let calls=0;export function run(){const savedInteger=Number.isInteger,savedFinite=Number.isFinite;let integerCalls=0,finiteCalls=0,value;try{Number.isInteger=()=>{integerCalls++;return true};Number.isFinite=()=>{finiteCalls++;return true};value=Buffer.allocUnsafe(3.75)}finally{Number.isInteger=savedInteger;Number.isFinite=savedFinite}return JSON.stringify({calls:++calls,integerCalls,finiteCalls,length:value.length,brand:Buffer.isBuffer(value),zero:[...value].every(byte=>byte===0)})}`;
+   const delegatedOptions={...oldOptions,engine:delegatedEngine,witWorld:'package test:allocator-delegated-control; world test { export run: func() -> string; }'};
+
+--- preimages/5/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/common/runners/allocator-gc.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/common/runners/allocator-gc.mjs
+@@ -1,3 +1,4 @@
++import {coreExpectationsForValidation} from "../../../../../../../native-preflight.mjs";
+ // Ordinary Release moving-GC gate. Uses public Buffer calls and the existing
+ // rooted NODE_COMPAT_GC_STRESS boundaries; no DEBUG, fault or memory inspection.
+ import assert from 'node:assert/strict';
+@@ -8,7 +9,7 @@
+ import { fileURLToPath, pathToFileURL } from 'node:url';
+ import { loadToolchain } from '../../../../toolchain.mjs';
+ import { loadComponentizer } from '../../../../componentizer.mjs';
+-import { selectCoreExpectations } from '../../../../core-expectations.mjs';
++
+ import { decodeCliString } from '../../../../foundations/native-scalar-harness.mjs';
+ import { verifyProductionTicks } from '../preflight.mjs';
+ 
+@@ -30,14 +31,14 @@
+ assert.equal(metadata.strictEventExceptionPolicy.embeddingBoundaryPatchSha256,
+   '84a91c1f74dbdcf653ef7ced5fa2876abffc32d5da591a1ca2df4a4908406ad2');
+ for(const item of metadata.sourceManifest)assert.equal(hash(await readFile(join(sourceRoot,item.path))),item.sha256,item.path);
+-const core=selectCoreExpectations(metadata,{sourceRoot});
++const core=coreExpectationsForValidation(metadata,{sourceRoot});
+ assert.equal(core.coreVersion,'sm-node-22.14.0-m0.11');
+ assert.equal(core.allocUnsafePolicy,'zeroed-no-pool-direct-u8-v1');
+ const admitted=await verifyProductionTicks({gcStress:true});
+ assert.equal(admitted.report.engineSha256,metadata.engineSha256);
+ assert.equal(admitted.sourceRoot,sourceRoot);
+ const pins=admitted.pin;
+-assert.equal(pins.state,'reviewed-real-classic-trace-production-freeze');
++assert.equal(pins.state,'reviewed-consumers355-native-build-for-validation');
+ assert.equal(hash(await readFile(pins.freezeReceiptPath)),pins.freezeReceiptSha256);
+ assert.equal(metadata.engineSha256,pins.engineSha256);
+ assert.equal(hash(await readFile(engine+'.build.json')),pins.receiptSha256);
+
+--- preimages/6/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/helpers/native-scalar-harness.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/helpers/native-scalar-harness.mjs
+@@ -1,3 +1,4 @@
++import {selectedManifestsForValidation} from "../../../../../../../native-preflight.mjs";
+ // Host-side correctness helper for optional native foundation gates.
+ // This module is never bundled into a product component.
+ import assert from 'node:assert/strict';
+@@ -9,7 +10,7 @@
+ import { loadToolchain } from '../../../../toolchain.mjs';
+ import { loadComponentizer } from '../../../../componentizer.mjs';
+ import { bundleProfile } from '../../../../profile-bundler.mjs';
+-import { selectedManifestsForEngine } from '../../../../module-selection.mjs';
++
+ export const hash = value => createHash('sha256').update(value).digest('hex');
+ 
+ // BEGIN FINITE CLASSIC REGISTRAR ORACLE ANCESTRY
+@@ -103,7 +104,7 @@
+   for (const input of metadata.sourceManifest) assert.equal(hash(await readFile(join(sourceRoot, input.path))), input.sha256, input.path);
+   const registrar = await readFile(join(sourceRoot, 'builtins/node-compat/register.cpp'), 'utf8');
+   assert.match(registrar, /options\.setForceStrictMode\(\)/, 'Selected native registrar must preserve ESM strictness');
+-  const builtinManifests = selectedManifestsForEngine(metadata, { sourceRoot });
++  const builtinManifests = selectedManifestsForValidation(metadata, { sourceRoot });
+   const registrarProof = {
+     oracleBytes: await readFile(join(here,'native-node-results.json')),
+     tickPolicyBytes: await readFile(join(repository,'tests/node-compat/foundation-scheduler/integration-candidate-v1/policy.json')),
+@@ -160,7 +161,7 @@
+     assert.equal(hash(await readFile(offEngine)), offMetadata.engineSha256); assert.notEqual(offMetadata[enabledField], true);
+     const offRoot = resolve(process.env[sourceVariable] ?? sourceRoot);
+     for (const item of offMetadata.sourceManifest) assert.equal(hash(await readFile(join(offRoot, item.path))), item.sha256, item.path);
+-    const offManifests = selectedManifestsForEngine(offMetadata, { sourceRoot: offRoot }); let failure;
++    const offManifests = selectedManifestsForValidation(offMetadata, { sourceRoot: offRoot }); let failure;
+     try { await bundleProfile({ ...toolchain, builtinManifests: offManifests, input }); } catch (error) { failure = error; }
+     assert(failure); assert.match(failure.message, /not admitted/);
+     return { engineSha256: offMetadata.engineSha256, sourceRoot: offRoot, receiptSha256: hash(offMetadataBytes), receipt: offMetadata,
+
+--- preimages/7/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/runners/path.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/runners/path.mjs
+@@ -1,3 +1,4 @@
++import {selectedManifestsForValidation} from "../../../../../../../native-preflight.mjs";
+ import assert from 'node:assert/strict';
+ import { createHash } from 'node:crypto';
+ import { spawnSync } from 'node:child_process';
+@@ -6,7 +7,7 @@
+ import { fileURLToPath, pathToFileURL } from 'node:url';
+ import { loadToolchain } from '../../../../toolchain.mjs';
+ import { loadComponentizer } from '../../../../componentizer.mjs';
+-import { selectedManifestsForEngine } from '../../../../module-selection.mjs';
++
+ import { bundleProfile } from '../../../../profile-bundler.mjs';
+ const here = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../foundation-path');
+ const repository = resolve(here, '../../..');
+@@ -25,7 +26,7 @@
+   const path = resolve(sourceRoot, entry.path); assert(path.startsWith(sourceRoot + '/'));
+   assert.equal(hash(await readFile(path)), entry.sha256, 'Stale engine source: ' + entry.path);
+ }
+-const builtinManifests = selectedManifestsForEngine(metadata, { sourceRoot });
++const builtinManifests = selectedManifestsForValidation(metadata, { sourceRoot });
+ assert(builtinManifests.some(manifest => Object.hasOwn(manifest.modules, 'node:path')));
+ const toolchain = await loadToolchain();
+ const { componentize, provenance } = await loadComponentizer(toolchain);
+
+--- preimages/8/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/runners/events.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/runners/events.mjs
+@@ -1,3 +1,4 @@
++import {selectedManifestsForValidation} from "../../../../../../../native-preflight.mjs";
+ // Actual optional builtin gate. Requires a v4 Events-enabled OFF engine. The
+ // native module import remains external; no JS events adapter is bundled.
+ import assert from 'node:assert/strict';
+@@ -9,7 +10,7 @@
+ import { loadToolchain } from '../../../../toolchain.mjs';
+ import { loadComponentizer } from '../../../../componentizer.mjs';
+ import { bundleProfile } from '../../../../profile-bundler.mjs';
+-import { selectedManifestsForEngine } from '../../../../module-selection.mjs';
++
+ assert.equal(process.version, 'v22.14.0');
+ assert(process.env.NODE_COMPAT_ENGINE && process.env.NODE_COMPAT_WASMTIME);
+ const here = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../foundation-events'), repository = resolve(here, '../../..');
+@@ -20,7 +21,7 @@
+ assert.equal(metadata.observedCMakeOptions.NODE_COMPAT_EVENTS, 'ON'); assert.equal(metadata.protectedAbortListenerEnabled, true); assert.equal(metadata.strictEventExceptionPolicy?.version, 'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1-classic-streams-source-v1'); assert.equal(metadata.entropyPolicy, 'off');
+ assert.equal(metadata.debuggerEnabled, false); assert.equal(metadata.gcStress, false);
+ for (const input of metadata.sourceManifest) assert.equal(hash(await readFile(join(sourceRoot, input.path))), input.sha256, input.path);
+-const builtinManifests = selectedManifestsForEngine(metadata, { sourceRoot });
++const builtinManifests = selectedManifestsForValidation(metadata, { sourceRoot });
+ assert(builtinManifests.some(manifest => Object.hasOwn(manifest.modules, 'node:events')));
+ const output = resolve(process.env.NODE_COMPAT_EVENTS_OUTPUT ?? '/tmp/starling-node-compat/foundation-events-native');
+ await mkdir(output, { recursive: true }); await writeFile(join(output, 'package.json'), '{"type":"module"}\n');
+@@ -79,7 +80,7 @@
+   assert.equal(hash(await readFile(offEngine)), offMetadata.engineSha256); assert.notEqual(offMetadata.eventsEnabled, true);
+   const offSourceRoot = resolve(process.env.NODE_COMPAT_EVENTS_OFF_SOURCE_ROOT ?? sourceRoot);
+   for (const input of offMetadata.sourceManifest) assert.equal(hash(await readFile(join(offSourceRoot,input.path))),input.sha256,input.path);
+-  const offManifests = selectedManifestsForEngine(offMetadata,{sourceRoot:offSourceRoot}); let failure;
++  const offManifests = selectedManifestsForValidation(offMetadata,{sourceRoot:offSourceRoot}); let failure;
+   try { await bundleProfile({...toolchain,builtinManifests:offManifests,input:join(here,'native-component.mjs')}); } catch(error) {failure=error;}
+   assert(failure); assert.match(failure.message,/not admitted/);
+   offAdmission={engineSha256:offMetadata.engineSha256,sourceFilesVerified:offMetadata.sourceManifest.length,error:failure.message,scope:'Actual OFF selection rejects events before packaging; no adapter fallback'};
+
+--- preimages/9/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/runners/string-decoder.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/runners/string-decoder.mjs
+@@ -1,3 +1,4 @@
++import {selectedManifestsForValidation} from "../../../../../../../native-preflight.mjs";
+ // Ordinary gates for the installed, explicitly selected m0.4 builtin.
+ import assert from 'node:assert/strict';
+ import {createHash} from 'node:crypto';
+@@ -7,7 +8,7 @@
+ import {spawnSync} from 'node:child_process';
+ import {loadToolchain} from '../../../../toolchain.mjs';
+ import {loadComponentizer} from '../../../../componentizer.mjs';
+-import {selectedManifestsForEngine,STRING_DECODER_MANIFEST} from '../../../../module-selection.mjs';
++import {STRING_DECODER_MANIFEST} from '../../../../module-selection.mjs';
+ import {bundleProfile} from '../../../../profile-bundler.mjs';
+ const here=resolve(dirname(fileURLToPath(import.meta.url)), '../../../../foundation-string-decoder'),repository=resolve(here,'../../..');
+ const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+@@ -28,7 +29,7 @@
+ const helperPath='builtins/node-compat/register.cpp',helper=await readFile(join(sourceRoot,helperPath));
+ assert.equal(hash(helper),metadata.sourceManifest.find(entry=>entry.path===helperPath)?.sha256);
+ assert(helper.toString().includes('options.setForceStrictMode();'),'Factory compilation must preserve strict ESM semantics');
+-const builtinManifests=selectedManifestsForEngine(metadata,{sourceRoot});
++const builtinManifests=selectedManifestsForValidation(metadata,{sourceRoot});
+ assert(metadata.selectedModuleManifests.some(entry=>entry.path===STRING_DECODER_MANIFEST));
+ const selected=builtinManifests.find(manifest=>Object.hasOwn(manifest.modules,'node:string_decoder'));
+ assert.equal(selected.profileVersion,'sm-node-22.14.0-m0.4');
+
+--- preimages/10/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/native-safety.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/native-safety.mjs
+@@ -1,10 +1,11 @@
++import {selectedManifestsForValidation} from "../../../../../../native-preflight.mjs";
+ // PREPARED/UNEXECUTED. Both runners call this BEFORE componentization or any
+ // invalid native receiver fixture. No old engine admission or bypass exists.
+ import assert from 'node:assert/strict';
+ import {readFile} from 'node:fs/promises';
+ import {createHash} from 'node:crypto';
+ import {resolve,join} from 'node:path';
+-import {selectedManifestsForEngine} from '../../../module-selection.mjs';
++
+ const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+ export async function nativePreflight({streamWebEnabled,entropyPolicy}){
+   assert.equal(process.version,'v22.14.0');
+@@ -44,14 +45,14 @@
+     assert.equal(hash(helper),inputs.get(contract.strictFactoryHelperPath));assert(helper.includes(contract.strictFactoryRequiredSymbol));
+     // This intentionally depends on future shared admission support. Current
+     // module-selection does not yet admit streamWebEnabled and must reject it.
+-    builtinManifests=selectedManifestsForEngine(metadata,{sourceRoot});
++    builtinManifests=selectedManifestsForValidation(metadata,{sourceRoot});
+     const selected=builtinManifests.find(manifest=>Object.hasOwn(manifest.modules,'node:stream/web'));
+     assert(selected,'Installed stream/web manifest must be admitted by shared selection');
+     assert.equal(selected.profileVersion,contract.profileVersion);
+     assert.deepEqual(selected.modules['node:stream/web'].aliases,['stream/web']);
+     assert.equal(selected.modules['node:stream/web'].exports.length,18);assert.deepEqual(selected.requiredHostInterfaces,[]);
+   }
+-  if(!streamWebEnabled){builtinManifests=selectedManifestsForEngine(metadata,{sourceRoot});
++  if(!streamWebEnabled){builtinManifests=selectedManifestsForValidation(metadata,{sourceRoot});
+     assert(!builtinManifests.some(manifest=>Object.hasOwn(manifest.modules,'node:stream/web')),'OFF control must not admit the module');}
+   return{engine,sourceRoot,wasmtime,metadata,contract,builtinManifests,hash,
+     safetyAudit:{state:'preflight-verified-before-fixture',streamWebEnabled,nativeGuardSources:contract.nativeGuardSources,
+
+--- preimages/11/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/helpers/native-scalar-harness.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/helpers/native-scalar-harness.mjs
+@@ -1,3 +1,4 @@
++import {assertRegistrarOracleAncestry} from "../../../../../../../native-preflight.mjs";
+ import {selectedManifestsForValidation} from "../../../../../../../native-preflight.mjs";
+ // Host-side correctness helper for optional native foundation gates.
+ // This module is never bundled into a product component.
+@@ -13,64 +14,11 @@
+ 
+ export const hash = value => createHash('sha256').update(value).digest('hex');
+ 
+-// BEGIN FINITE CLASSIC REGISTRAR ORACLE ANCESTRY
+-export function verifyClassicRegistrarOracle({kind, oracle, requiredNames, registrar, metadata, proof}) {
+-  const path='builtins/node-compat/register.cpp';
+-  const before='19eef9879c94e5232238f6df738d57057d384fa025849ee319fcf51eb06eda2b';
+-  const after='2848f059fb5693aa37c54945bff685444c8431007ceaec59d3335d01f7aced4a';
+-  const documents={
+-    assert:{sha:'cbb3bcb3f6bc9e97b12b1a61167483ac0f949de199ae6bd0172926419f4c01a3',required:['assert.mjs','assert-strict.mjs','assert-factories.generated.h','export-manifest.assert.node-v22.14.0.json']},
+-    querystring:{sha:'e59e05a7cb470970d9bcce230f359cf74bf62a00b094510a2df16d4ab3f901a4',required:['querystring.mjs','querystring-factories.generated.h','export-manifest.querystring.node-v22.14.0.json']},
+-    util:{sha:'489cb9cf4fbe256201f70e385d4326ea32552d2f2a1f187211d9409e73838816',required:['util.mjs','util-types.mjs','util-core.mjs','util-metadata.mjs','util-unsupported.mjs','export-manifest.util.node-v22.14.0.json','generate-util-factories.mjs','util-factories.generated.h']}
+-  };
+-  assert(Object.hasOwn(documents,kind),'Only three pinned strict-script oracles have this registrar ancestry');
+-  const expected=documents[kind];
+-  assert.equal(hash(proof.oracleBytes),expected.sha,'Exact unchanged Node oracle document required');
+-  assert.deepEqual(oracle,JSON.parse(proof.oracleBytes),'Caller oracle differs from captured bytes');
+-  assert.deepEqual([...requiredNames].sort(),[...expected.required].sort(),'Exact facade-source check set required');
+-  assert.equal(oracle.registrarSha256,before);
+-  // Authenticate both policy documents and both exact native patches BEFORE
+-  // parsing policy rows. The Tick patch never changes register.cpp.
+-  assert.equal(hash(proof.tickPolicyBytes),'98e80d36b8eb9b7ac99de54832288bd8eec148fa1b9fe0b27b3bada4d12b2cd0');
+-  assert.equal(hash(proof.tickPatchBytes),'e286ebeb3f09b438999422dbc2059fed565ef71b98d9f7f62b09291fb5eb5491');
+-  assert.equal(hash(proof.classicPolicyBytes),'891a4c53dd4a7b7d776c21003acdd12c7944c6a3eca019a1d9b2be620ed8b11c');
+-  assert.equal(hash(proof.classicPatchBytes),'0574b88e1126e616e4adaac2d7dea4435657c70e2d07a429531218aff24bd73c');
+-  const tick=JSON.parse(proof.tickPolicyBytes),classic=JSON.parse(proof.classicPolicyBytes);
+-  assert.equal(tick.version,'sm-private-ticks-source-v1');
+-  assert.equal(tick.nativePatchSha256,hash(proof.tickPatchBytes));
+-  assert(!Object.hasOwn(tick.sourceLayer,path),'Tick registrar must remain unchanged');
+-  assert.equal(classic.parentPolicySha256,hash(proof.tickPolicyBytes));
+-  assert.equal(classic.parentRecipeSha256,'869d188de3843b5d527d236a9e5c9af6ba1193f118dc9ad786df6266e1606173');
+-  assert.deepEqual(classic.parentExpectedNativeSourceManifest,tick.expectedNativeSourceManifest);
+-  assert.equal(tick.expectedNativeSourceManifest.length,306);
+-  assert.equal(tick.expectedNativeSourceManifest.find(row=>row.path===path)?.sha256,before);
+-  assert.deepEqual(classic.sourceLayer[path],{beforeSha256:before,afterSha256:after});
+-  assert.equal(classic.nativePatchSha256,hash(proof.classicPatchBytes));
+-  assert.equal(classic.expectedNativeSourceManifest.length,342);
+-  assert.equal(classic.expectedNativeSourceManifest.find(row=>row.path===path)?.sha256,after);
+-  assert.equal(metadata.buildRecipeSha256,'3694c88b7d000f27e11ffcac835fe0b205b2075f5b1d8d29c61f5b0038ba1cf3');
+-  assert.notEqual(metadata.syntheticMetadataOnly,true);assert.notEqual(metadata.diagnosticOnly,true);
+-  assert.equal(metadata.classicStreamsEnabled,true);assert.equal(metadata.internalTicksEnabled,true);
+-  assert.equal(metadata.observedCMakeOptions.CMAKE_BUILD_TYPE,'Release');
+-  assert.equal(metadata.classicStreamsPolicy.policyFileSha256,hash(proof.classicPolicyBytes));
+-  assert.equal(metadata.classicStreamsPolicy.nativePatchSha256,hash(proof.classicPatchBytes));
+-  assert.equal(metadata.internalTickPolicy.parentPrivateTickPolicyFileSha256,hash(proof.tickPolicyBytes));
+-  assert.equal(metadata.internalTickPolicy.policyFileSha256,hash(proof.classicPolicyBytes));
+-  assert.equal(classic.classicTraceSourcePolicy.version,'sm-classic-trace-source-v1');
+-  assert.deepEqual(metadata.classicTraceSourcePolicy,classic.classicTraceSourcePolicy);
+-  assert.equal(metadata.sourceManifest.length,342);
+-  const rows=metadata.sourceManifest.map(row=>({path:row.path,sha256:row.sha256}));
+-  assert.equal(new Set(rows.map(row=>row.path)).size,342);
+-  assert.deepEqual(rows,classic.expectedNativeSourceManifest,'Actual342 source manifest must match the pinned Classic afterimage');
+-  assert.equal(hash(registrar),after,'Captured actual registrar must be the exact342 afterimage');
+-  assert.match(registrar,/options\.setForceStrictMode\(\)/,'Force-strict compilation must remain');
+-  for(const name of requiredNames)
+-    assert.equal(rows.find(row=>row.path==='builtins/node-compat/'+name)?.sha256,oracle.sources[name],'Unchanged oracle facade/source '+name);
+-  return {version:'exact-classic342-registrar-oracle-ancestry-v1',kind,oracleSha256:expected.sha,
+-    oracleRegistrarSha256:before,actualRegistrarSha256:after,tickRegistrarChanged:false,
+-    classicPatchSha256:hash(proof.classicPatchBytes),oracleRewritten:false,metadataProjected:false};
++// BEGIN FINITE 306 -> 342 -> 350 -> 355 REGISTRAR ORACLE ANCESTRY
++export function verifyClassicRegistrarOracle(argumentsObject) {
++  return assertRegistrarOracleAncestry(argumentsObject);
+ }
+-// END FINITE CLASSIC REGISTRAR ORACLE ANCESTRY
++// END FINITE 306 -> 342 -> 350 -> 355 REGISTRAR ORACLE ANCESTRY
+ 
+ export function decodeCliString(source) {
+   let normalized = '';
+
+--- preimages/12/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/focused-preflight.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/focused-preflight.mjs
+@@ -1,3 +1,4 @@
++import {selectedManifestsForValidation} from "../../../../../../native-preflight.mjs";
+ // Host-only exact production admission before any protected receiver fixture.
+ import assert from 'node:assert/strict';
+ import {verifyProductionTicks,hash} from './preflight.mjs';
+@@ -7,10 +8,9 @@
+  const{engine,sourceRoot,metadata,pin}=admitted;
+  assert.equal(metadata.eventsEnabled,true);assert.equal(metadata.protectedAbortListenerEnabled,true);
+  assert.equal(metadata.protectedAbortListenerPolicy.enabled,true);
+- const{selectedManifestsForEngine}=await import('../../../module-selection.mjs');
+- const builtinManifests=selectedManifestsForEngine(metadata,{sourceRoot});
++ const builtinManifests=selectedManifestsForValidation(metadata,{sourceRoot});
+  assert.equal(builtinManifests.find(x=>x.modules['node:events'])?.profileVersion,'sm-node-22.14.0-m0.10');
+  return{...admitted,builtinManifests,report:{...admitted.report,engine,sourceRoot,
+   engineMetadataSha256:pin.receiptSha256,entropyPolicy,gcStress,guardNegativesAllowed:true,
+-  scope:'Only newly fixed classic342 Events-ON with actual layered macro/source/config proof; never Events-OFF or historical guard-absent receivers.'}};
++  scope:'Only genuine consumers355 Events-ON with actual layered macro/source/config proof; never Events-OFF or historical guard-absent receivers.'}};
+ }
+
+--- preimages/13/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/common/preflight.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/common/preflight.mjs
+@@ -1,39 +1,21 @@
+-// All three replay modes use the real342 fixed-artifact gate first.
++// Genuine full355 validation-only bridge; no metadata projection or operational admission.
+ import assert from 'node:assert/strict';
+-import {createHash} from 'node:crypto';
+-import {readFile,lstat,writeFile} from 'node:fs/promises';
+-import {dirname,join,resolve} from 'node:path';
+-import {fileURLToPath} from 'node:url';
+-import {classicPreflight} from '../native-preflight.mjs';
+-export const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+-const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+-export async function verifyInputClosure({manifestPath=join(root,'input-freeze.json'),expectedSha256}={}){
+- const stat=await lstat(manifestPath);assert(stat.isFile()&&!stat.isSymbolicLink());const bytes=await readFile(manifestPath),sha256=hash(bytes);
+- if(expectedSha256!==undefined)assert.equal(sha256,expectedSha256,'Replay source seal changed');
+- const document=JSON.parse(bytes);assert.equal(document.schemaVersion,1);const seen=new Set();
+- for(const row of document.inputs){assert(typeof row.path==='string'&&!row.path.includes('\0')&&!seen.has(row.path));seen.add(row.path);const path=resolve(dirname(manifestPath),row.path),stat=await lstat(path);assert(stat.isFile()&&!stat.isSymbolicLink());const data=await readFile(path);assert.equal(data.length,row.bytes);assert.equal(hash(data),row.sha256,path);}
+- return{path:manifestPath,sha256,files:seen.size};
+-}
++import {writeFile,lstat} from 'node:fs/promises';
++import {join,resolve} from 'node:path';
++import {validationPreflight,verifyFamily,hash} from "../../../../../../native-preflight.mjs";
++export {hash};
++export async function verifyInputClosure(){return verifyFamily();}
+ export async function verifyProductionTicks({gcStress=false,entropyPolicy='off'}={}){
+- assert.equal(typeof gcStress,'boolean');assert(['off','runtime-only'].includes(entropyPolicy));assert(!(gcStress&&entropyPolicy==='runtime-only'),'RuntimeGC is unavailable');
++ assert.equal(typeof gcStress,'boolean');assert(['off','runtime-only'].includes(entropyPolicy));assert(!(gcStress&&entropyPolicy==='runtime-only'));
+  const variant=entropyPolicy==='runtime-only'?'normal-runtime':gcStress?'gc-off':'normal-off';
+- const production=await classicPreflight({variant}); // Null stops before a loader/output/historical-control read.
+- assert.equal(production.metadata.classicStreamsEnabled,true);
+- process.env.NODE_COMPAT_ENGINE=production.enginePath;process.env.NODE_COMPAT_ENGINE_SOURCE_ROOT=production.sourceRoot;
+- assert(process.env.NODE_COMPAT_WASMTIME,'Explicit stock Wasmtime42 executable required');
+- const wasmtime=resolve(process.env.NODE_COMPAT_WASMTIME),wasmtimeStat=await lstat(wasmtime);assert(wasmtimeStat.isFile()&&!wasmtimeStat.isSymbolicLink());
+- assert.equal(hash(await readFile(wasmtime)),'a85dec9fcbbad23d0e038e5a99604114dbe9aa77bc784e4bce0f33013eb33c1c');
+- for(const[key,value]of Object.entries({NODE_COMPAT_TOOLCHAIN:'/tmp/starling-node-compat/native-toolchain-lock',NODE_COMPAT_COMPONENTIZE_MODULE:'/tmp/starling-node-compat/import-abi-clock-v2-build/package/src/componentize.js'})){
+-  if(process.env[key])assert.equal(resolve(process.env[key]),value,key);process.env[key]=value;
+- }
+- const inputClosure=await verifyInputClosure();
+- const expectedManifest=inputClosure.sha256,path=inputClosure.path,privateRecheck=production.recheck;
+- async function recheck(){await privateRecheck();await verifyInputClosure({manifestPath:path,expectedSha256:expectedManifest});
+-  assert.equal(hash(await readFile(wasmtime)),'a85dec9fcbbad23d0e038e5a99604114dbe9aa77bc784e4bce0f33013eb33c1c');}
+- const report={state:'fixed-classic342-regression-admission-passed',variant,engineSha256:production.pin.engineSha256,
+-  sourceFilesVerified:342,recipeSha256:production.pin.recipeSha256,freezeReceiptSha256:production.pin.freezeReceiptSha256,
+-  entropyPolicy,gcStress,inputClosure,scope:'Read-only actual artifact/source/config admission; no runtime result or historical-source projection'};
+- return{...production,engine:production.enginePath,engineSha256:production.pin.engineSha256,sourceFilesVerified:342,report,recheck};
++ const native=await validationPreflight({variant});
++ process.env.NODE_COMPAT_ENGINE=native.enginePath;process.env.NODE_COMPAT_ENGINE_SOURCE_ROOT=native.sourceRoot;
++ const inputClosure=await verifyFamily();
++ const report={state:'genuine-consumers355-validation-only-admission-passed',variant,engineSha256:native.pin.engineSha256,
++  sourceFilesVerified:355,recipeSha256:native.pin.recipeSha256,freezeReceiptSha256:native.pin.freezeReceiptSha256,
++  entropyPolicy,gcStress,inputClosure,validationBootstrapOnly:true,operationalAdmission:false,
++  scope:'Actual full355 build/source/config admission only; no runtime result or source projection'};
++ return{...native,engine:native.enginePath,engineSha256:native.pin.engineSha256,sourceFilesVerified:355,report};
+ }
+ export async function requireFreshOutput(variable){assert(process.env[variable],'Choose a fresh output: '+variable);const output=resolve(process.env[variable]);try{await lstat(output);assert.fail('Output exists: '+output);}catch(error){if(error.code!=='ENOENT')throw error;}return output;}
+ export async function completeRegression(variable,admission){await admission.recheck();await writeFile(join(resolve(process.env[variable]),'production-admission-complete.json'),JSON.stringify({...admission.report,consumedInputsRecheckedAfterRun:true},null,2)+'\n',{flag:'wx'});}
+
+--- preimages/14/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/preflight.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/preflight.mjs
+@@ -1,12 +1,2 @@
+-// Fixed classic342 artifact gate replaces, rather than projects, the old306 gate.
+-import {dirname,join} from 'node:path';
+-import {fileURLToPath} from 'node:url';
+-import {verifyProductionTicks as verifyNative,verifyInputClosure,hash,requireFreshOutput,completeRegression} from '../common/preflight.mjs';
+-export {verifyInputClosure,hash,requireFreshOutput,completeRegression};
+-const here=dirname(fileURLToPath(import.meta.url));
+-export async function verifyProductionTicks(options={}){
+- const production=await verifyNative(options);
+- const inputClosure=await verifyInputClosure({manifestPath:join(here,'input-freeze.json')}),path=inputClosure.path,expected=inputClosure.sha256;
+- async function recheck(){await production.recheck();await verifyInputClosure({manifestPath:path,expectedSha256:expected});}
+- return{...production,report:{...production.report,inputClosure},recheck};
+-}
++// Same authenticated family closure as common gates; no relocated historical manifest.
++export {verifyProductionTicks,verifyInputClosure,hash,requireFreshOutput,completeRegression} from '../common/preflight.mjs';
+
+--- preimages/15/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/preflight.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/preflight.mjs
+@@ -12,7 +12,7 @@
+ 
+ export async function verifyReleaseOff(){
+   const production=await verifyProductionTicks({gcStress:false});
+-  return{production,report:{state:'classic342-release-off-fixed-artifact-admission-passed',production:production.report,runtimeProof:false},recheck:production.recheck};
++  return{production,report:{state:'consumers355-validation-release-off-fixed-artifact-admission-passed',production:production.report,runtimeProof:false},recheck:production.recheck};
+ }
+ 
+ export function controlEnvironment(name,document,environment){
+
+--- preimages/16/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/run-release.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/run-release.mjs
+@@ -9,7 +9,7 @@
+ const output=await requireFreshOutput('NODE_COMPAT_PRODUCTION_RELEASE_OUTPUT');await mkdir(output);
+ const jobs=releaseJobs(here,output),environment=fixedEnvironment(admission,process.env);
+ assert.equal(jobs.length,8);
+-const result={schemaVersion:1,state:'running',engineSha256:admission.production.engineSha256,sourceFiles:342,admission:admission.report,
++const result={schemaVersion:1,state:'running',engineSha256:admission.production.engineSha256,sourceFiles:355,admission:admission.report,
+   jobs:[],reusedResults:0,resumeSupported:false,scope:'Fresh ordinary Release entropy-OFF private-ticks core/allocator/Web/six-foundation/strict4 replay only; HTTP and GC are separate gates'};
+ const path=join(output,'results.json');await publish(path,result);
+ try{
+
+--- preimages/17/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/run-optional.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/run-optional.mjs
+@@ -7,7 +7,7 @@
+ const output=await requireFreshOutput('NODE_COMPAT_OPTIONAL_OUTPUT');await mkdir(output);
+ const environment=fixedEnvironment(admission,process.env);
+ const jobs=modules.map(name=>({name,runner:join(here,'run-'+name+'.mjs'),variable:moduleOutputVariable(name),output:join(output,name)}));
+-const result={schemaVersion:1,state:'running',engineSha256:admission.production.engineSha256,sourceFiles:342,
++const result={schemaVersion:1,state:'running',engineSha256:admission.production.engineSha256,sourceFiles:355,
+   admission:admission.report,modules:[],scope:'Fresh complete six-foundation replay only; no prior pass reuse or scheduler/ALS/reset proof'};
+ const path=join(output,'results.json');await publish(path,result);
+ try{
+
+--- preimages/18/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/focused/run-component.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/focused/run-component.mjs
+@@ -58,7 +58,7 @@
+  ['primitive_undefined',"const c=new AbortController();addAbortListener(c.signal,()=>{throw undefined});c.abort();"],
+ ]){fatal.push(await h.fatal('abort_m11_fatal_'+name,prefix+`export function run(){${body}return'must-not-return'}`));console.log(JSON.stringify({fatal:name,rejectedOnBoth:true}));}
+ await h.finish();
+-const report={state:'NEW_CLASSIC342_ORDINARY_NATIVE_ADD_ABORT_LISTENER_PASSED',recordedAtUtc:new Date().toISOString(),...h.evidence,
++const report={state:'NEW_CONSUMERS355_VALIDATION_ORDINARY_NATIVE_ADD_ABORT_LISTENER_PASSED',recordedAtUtc:new Date().toISOString(),...h.evidence,
+  runnerSha256:hash(await readFile(fileURLToPath(import.meta.url))),nodeOracleSha256:hash(oracleBytes),publicNodeGroups:oracle.passed,
+  main:{fixture:main,calls,freshWasmtime:fresh},aliases:{fixture:aliases,calls:aliasCalls,freshWasmtime:aliasFresh},initializers,
+  benign:{fixture:benign,calls:benignCalls,freshWasmtime:benignFresh},fatal,
+
+--- preimages/19/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/common/preflight.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/common/preflight.mjs
+@@ -2,12 +2,13 @@
+ import assert from 'node:assert/strict';
+ import {writeFile,lstat} from 'node:fs/promises';
+ import {join,resolve} from 'node:path';
+-import {validationPreflight,verifyFamily,hash} from "../../../../../../native-preflight.mjs";
++import {validationPreflight,verifyFamily,assertActionContext,hash} from "../../../../../../native-preflight.mjs";
+ export {hash};
+ export async function verifyInputClosure(){return verifyFamily();}
+ export async function verifyProductionTicks({gcStress=false,entropyPolicy='off'}={}){
+  assert.equal(typeof gcStress,'boolean');assert(['off','runtime-only'].includes(entropyPolicy));assert(!(gcStress&&entropyPolicy==='runtime-only'));
+  const variant=entropyPolicy==='runtime-only'?'normal-runtime':gcStress?'gc-off':'normal-off';
++ await assertActionContext({variant});
+  const native=await validationPreflight({variant});
+  process.env.NODE_COMPAT_ENGINE=native.enginePath;process.env.NODE_COMPAT_ENGINE_SOURCE_ROOT=native.sourceRoot;
+  const inputClosure=await verifyFamily();
+
+--- preimages/20/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/off/preflight.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/off/preflight.mjs
+@@ -2,5 +2,5 @@
+ import {join,resolve} from 'node:path';
+ import {verifyProductionTicks,requireFreshOutput} from '../common/preflight.mjs';
+ export {requireFreshOutput};
+-export async function verifyFollowonOff(){const production=await verifyProductionTicks({gcStress:false});return{production,report:{state:'classic342-off-followon-admission-passed',production:production.report,runtimeProof:false},recheck:production.recheck};}
++export async function verifyFollowonOff(){const production=await verifyProductionTicks({gcStress:false});return{production,report:{state:'consumers355-validation-off-followon-admission-passed',production:production.report,runtimeProof:false},recheck:production.recheck};}
+ export async function completeFollowon(variable,admission){await admission.recheck();await writeFile(join(resolve(process.env[variable]),'followon-admission-complete.json'),JSON.stringify({...admission.report,consumedInputsRecheckedAfterRun:true},null,2)+'\n',{flag:'wx'});}
+
+--- preimages/21/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/focused/run-gc.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/focused/run-gc.mjs
+@@ -17,7 +17,7 @@
+ const initializer=prefix+"let completed=0;const c=new AbortController();addAbortListener(c.signal,()=>{throw{toString(){return'M11_ROOTED_AFTER_'+completed}}});c.abort();"+loops+"export function run(){return'must-not-return'}";
+ const initial=await h.expectInitialization('abort_m11_gc_latched_init',initializer,/M11_ROOTED_AFTER_8/);
+ const fatal=await h.fatal('abort_m11_gc_latched_fatal',prefix+"export function run(){let completed=0;const c=new AbortController();addAbortListener(c.signal,()=>{throw{toString(){return'M11_DEPLOYED_ROOTED_AFTER_'+completed}}});c.abort();"+loops+"return'must-not-return'}");
+-await h.finish();const report={state:'NEW_CLASSIC342_RELEASE_MOVING_GC_COMBINED_OWNER_GATE_PASSED',recordedAtUtc:new Date().toISOString(),...h.evidence,
++await h.finish();const report={state:'NEW_CONSUMERS355_VALIDATION_RELEASE_MOVING_GC_COMBINED_OWNER_GATE_PASSED',recordedAtUtc:new Date().toISOString(),...h.evidence,
+  runnerSha256:hash(await readFile(fileURLToPath(import.meta.url))),actualKernelCommand:kernel[0],clean:{fixture,calls,freshWasmtime:fresh},initializer:initial,fatal,
+  scope:'Existing Release Buffer kernel JS::NonIncrementalGC(Shrink) boundaries only; eight valid hex roundtrips per clean invocation with signal/protected/ordinary/once/disposers/receiver and callback values alive, then post-GC protected registration/disposal/nested once tests.',
+  limits:['Combined owners/callback/key behavior is verified; the factory closure also owns the Symbol, so this does not isolate prototype-only Symbol liveness.','The initializer reports its first latched object after eight valid roundtrips; deployed fatal calls prove failure/discard, not thrown-object identity across WIT.','Event.currentTarget/this restoration is not ALS or AsyncResource propagation.','No DEBUG/OOM/fault/private GC metadata/raw memory/malformed ABI or old prototype path. No performance claim.']};
+
+--- preimages/22/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/focused/run-callback-return.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/focused/run-callback-return.mjs
+@@ -20,5 +20,5 @@
+  fixture,node:{observed:node,executable:process.execPath,executableSha256:hash(await readFile(process.execPath))},jco:{freshInstance:true,observed:jco},wasmtime:fresh,observationSources:sourceFiles,
+  limitation:'Pinned Node22 reads .then on a fresh ordinary EventTarget or protected AbortSignal callback return. Selected native EventTarget currently ignores rval, so those getter effects are absent. Already-aborted queued callback return is correctly discarded on both.',
+  sourceBasis:{node:'lib/internal/event_target.js dispatch addCatch(result)',guest:'EventTarget::inner_invoke JS::Call stores rooted rval and does not process it'},
+- scope:'Safe ordinary returned objects only; get then increments a counter and returns undefined. No throwing/rejecting thenable, asynchronous listener Promise, Error poisoning, fault, raw/private memory or old engine path. Classic342 is newly source/config pinned; inherited callback-return semantics unchanged; fix belongs to future scheduler/callback-result routing work.'};
++ scope:'Safe ordinary returned objects only; get then increments a counter and returns undefined. No throwing/rejecting thenable, asynchronous listener Promise, Error poisoning, fault, raw/private memory or old engine path. Consumers355 is bound through the genuine validation-only source/config gate; inherited callback-return semantics unchanged; fix belongs to future scheduler/callback-result routing work.'};
+ await h.save(report);console.log(JSON.stringify({state:report.state,nodeCompatibilityPassed:false,node,guest:jco,emittedImports:fixture.emittedImports,output:h.output},null,2));
+
+--- preimages/23/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/common/runners/allocator-gc.mjs
++++ snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/common/runners/allocator-gc.mjs
+@@ -97,7 +97,7 @@
+ await admitted.recheck();
+ const report={schema:1,state:'installed-m0.11-ordinary-release-moving-gc-pass',engineSha256:metadata.engineSha256,
+   engineReceiptSha256:hash(await readFile(engine+'.build.json')),sourceFilesVerified:metadata.sourceManifest.length,
+-  sourceRoot,coreExpectations:core,productionTickAdmission:admitted.report,fixedGCAdmission:{variant:admitted.report.variant,pinState:pins.state,pins,freezeReceiptPath:pins.freezeReceiptPath,freezeReceiptSha256:pins.freezeReceiptSha256,scope:'Actual classic freeze pin; delegated classicPreflight/recheck owns the authority bytes. No old pin-schema projection.'},runnerSha256:hash(await readFile(fileURLToPath(import.meta.url))),
++  sourceRoot,coreExpectations:core,productionTickAdmission:admitted.report,fixedGCAdmission:{variant:admitted.report.variant,pinState:pins.state,pins,freezeReceiptPath:pins.freezeReceiptPath,freezeReceiptSha256:pins.freezeReceiptSha256,scope:'Actual consumers355 freeze pin; genuine consumersBootstrapPreflight/recheck owns the authority bytes. No old pin-schema projection.'},runnerSha256:hash(await readFile(fileURLToPath(import.meta.url))),
+   sourceSha256:hash(source),componentSha256:hash(component),componentBytes:component.length,interfaceAudit,
+   emittedWit:await componentWit(component),componentizerProvenance:selected.provenance,compileCommand:command.command,
+   calls,wasmtime:{observed,stderr:host.stderr},

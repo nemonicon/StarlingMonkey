@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_ONLY_EXACT_OUTPUT_RETRY_DERIVATION",
+  "parentIndexSha256": "ced484750a07c7897b0e40f64da85416d32793bf083082072d304b094ceec982",
+  "bodyChanges": "Only explicit import rebasing and Wasmtime output references v1 to v2; all semantic/validator/config/artifact checks identical.",
+  "records": [
+    {
+      "original": "capability/run-http-wasmtime.mjs",
+      "target": "run-http-wasmtime-body.mjs",
+      "beforeSha256": "42da43b9aca02b36e24d7a3b27d1f0e164c577ed5d3cda033028718f68f61d74",
+      "afterSha256": "68bd51934821e970ae6568640cd49fc08d79142f46d11a228cf9b88965fff157",
+      "edits": [
+        {
+          "old": "from './http-contract.mjs'",
+          "new": "from '../classic-http-candidate-v1/capability/http-contract.mjs'",
+          "occurrences": 1
+        },
+        {
+          "old": "from './preflight.mjs'",
+          "new": "from '../classic-http-candidate-v1/capability/preflight.mjs'",
+          "occurrences": 1
+        },
+        {
+          "old": "'http-joint/wasmtime-v1'",
+          "new": "'http-joint/wasmtime-v2'",
+          "occurrences": 1
+        },
+        {
+          "old": "import('./hosts/test-wasmtime-http.mjs')",
+          "new": "import('../classic-http-candidate-v1/capability/hosts/test-wasmtime-http.mjs')",
+          "occurrences": 1
+        }
+      ],
+      "reverseExact": true
+    },
+    {
+      "original": "capability/audit-http.mjs",
+      "target": "audit-http-body.mjs",
+      "beforeSha256": "a3e4df84db36ee2dd9c03e80e273d80cd25bdc99114655fcdb99889723da45c7",
+      "afterSha256": "e5bd87f5237f559ac61f0677f747cd1b54a771a93fcce6f6b53c705554282a3b",
+      "edits": [
+        {
+          "old": "from './http-contract.mjs'",
+          "new": "from '../classic-http-candidate-v1/capability/http-contract.mjs'",
+          "occurrences": 1
+        },
+        {
+          "old": "from './preflight.mjs'",
+          "new": "from '../classic-http-candidate-v1/capability/preflight.mjs'",
+          "occurrences": 1
+        },
+        {
+          "old": "from './validate-hosts.mjs'",
+          "new": "from '../classic-http-candidate-v1/capability/validate-hosts.mjs'",
+          "occurrences": 1
+        },
+        {
+          "old": "http-joint/wasmtime-v1/",
+          "new": "http-joint/wasmtime-v2/",
+          "occurrences": 2
+        }
+      ],
+      "reverseExact": true
+    }
+  ],
+  "componentOrGuestOrHostExecuted": false
+}

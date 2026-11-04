@@ -1,0 +1,260 @@
+--- a/builtins/web/event/event-target.h
++++ b/builtins/web/event/event-target.h
+@@ -26,6 +26,9 @@
+   bool capture{};
+   bool once{};
+   bool removed{};
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++  bool resist_stop_propagation{};
++#endif
+ 
+   // Define equality: only callback, type, and capture matter.
+   bool operator==(const EventListener &other) const {
+@@ -60,7 +63,13 @@
+   static const JSFunctionSpec methods[];
+   static const JSPropertySpec properties[];
+ 
+-  enum class Slots : uint8_t { Listeners, Count };
++  enum class Slots : uint8_t {
++    Listeners,
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++    NodeAbortResistKey,
++#endif
++    Count
++  };
+ 
+   static bool add_listener(JSContext *cx, HandleObject self, HandleValue type, HandleValue callback,
+                            HandleValue opts);
+@@ -71,8 +80,15 @@
+ 
+   static JSObject *create(JSContext *cx);
+ 
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++  static bool check_receiver(JSContext *cx, HandleValue receiver, const char *method_name);
++#endif
+   static bool init(JSContext *cx, HandleObject self);
+   static bool init_class(JSContext *cx, HandleObject global);
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++  // NEW internal guest bridge, declared/implemented by this proposal only.
++  static JS::Symbol *node_abort_resist_key();
++#endif
+   static bool constructor(JSContext *cx, unsigned argc, Value *vp);
+   static void finalize(JS::GCContext *gcx, JSObject *self);
+   static void trace(JSTracer *trc, JSObject *self);
+--- a/builtins/web/event/event-target.cpp
++++ b/builtins/web/event/event-target.cpp
+@@ -7,6 +7,11 @@
+ 
+ #include "js/GCPolicyAPI.h"
+ #include "mozilla/Assertions.h"
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++#include "js/Id.h"
++#include "js/Symbol.h"
++#include "global-event-target.h"
++#endif
+ #ifdef NODE_COMPAT_STRICT_INITIALIZATION
+ #include "event_loop.h"
+ #include "mozilla/ScopeExit.h"
+@@ -43,7 +48,9 @@
+ 
+ // https://dom.spec.whatwg.org/#event-flatten-more
+ bool flatten_more_opts(JSContext *cx, JS::HandleValue opts, bool *capture, bool *once,
+-                       JS::MutableHandleValue passive, JS::MutableHandleValue signal) {
++                       JS::MutableHandleValue passive, JS::MutableHandleValue signal,
++                       bool *resist_stop_propagation) {
++  *resist_stop_propagation = false;
+   // To flatten more options, run these steps:
+   // - Let capture be the result of flattening options.
+   *capture = false;
+@@ -88,7 +95,17 @@
+     signal.set(val);
+   }
+ 
+-  // - Return capture, passive, once, and signal.
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++  JS::RootedSymbol symbol(cx, builtins::web::event::EventTarget::node_abort_resist_key());
++  if (symbol) {
++    JS::RootedId id(cx, JS::PropertyKey::Symbol(symbol));
++    if (!JS_GetPropertyById(cx, obj, id, &val)) {
++      return false;
++    }
++    *resist_stop_propagation = JS::ToBoolean(val);
++  }
++#endif
++  // - Return capture, passive, once, signal, and the selected guest-only flag.
+   return true;
+ }
+ 
+@@ -192,6 +209,22 @@
+     JS_PS_END,
+ };
+ 
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++bool EventTarget::check_receiver(JSContext *cx, HandleValue receiver, const char *method_name) {
++  if (!is_instance(receiver)) {
++    return api::throw_error(cx, api::Errors::WrongReceiver, method_name, class_name);
++  }
++  const JS::Value &state = JS::GetReservedSlot(&receiver.toObject(), std::to_underlying(Slots::Listeners));
++  // Only trusted native initialization writes this inaccessible slot, using
++  // PrivateValue. The pinned Value API tags private pointers as doubles; there
++  // is no isPrivate(). Reject undefined prototypes before calling toPrivate().
++  if (!state.isDouble() || !state.toPrivate()) {
++    return api::throw_error(cx, api::Errors::WrongReceiver, method_name, class_name);
++  }
++  return true;
++}
++#endif
++
+ EventTarget::ListenerList *EventTarget::listeners(JSObject *self) {
+   MOZ_ASSERT(is_instance(self));
+ 
+@@ -240,10 +273,12 @@
+   bool capture = false;
+   bool once = false;
+   bool passive = false;
++  bool resist_stop_propagation = false;
+   RootedValue passive_val(cx);
+   RootedValue signal_val(cx);
+ 
+-  if (!flatten_more_opts(cx, opts_val, &capture, &once, &passive_val, &signal_val)) {
++  if (!flatten_more_opts(cx, opts_val, &capture, &once, &passive_val, &signal_val,
++                         &resist_stop_propagation)) {
+     return false;
+   }
+ 
+@@ -296,6 +331,16 @@
+     return type == listener->type && callback_val == listener->callback.get() &&
+            capture == listener->capture;
+   });
++
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++  if (it != list->end() && (*it)->removed) {
++    // A dispatch clone can still own this removed once record. Never revive it:
++    // retire only the target-list reference, then append a fresh record below.
++    // Existing clones must keep seeing removed=true throughout their traversal.
++    list->erase(it);
++    it = list->end();
++  }
++#endif
+ 
+   if (it == list->end()) {
+     auto listener = mozilla::MakeRefPtr<EventListener>();
+@@ -306,6 +351,9 @@
+     listener->capture = capture;
+     listener->once = once;
+     listener->removed = false;
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++    listener->resist_stop_propagation = resist_stop_propagation;
++#endif
+ 
+ #ifdef NODE_COMPAT_STRICT_INITIALIZATION
+     if (!list->append(listener)) {
+@@ -323,6 +371,9 @@
+     (*it)->passive = passive;
+     (*it)->once = once;
+     (*it)->removed = false;
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++    (*it)->resist_stop_propagation = resist_stop_propagation;
++#endif
+ 
+ #ifdef NODE_COMPAT_STRICT_INITIALIZATION
+     // Preserve the owning reference before erase invalidates this iterator.
+@@ -532,6 +583,12 @@
+     if (listener->removed) {
+       continue;
+     }
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++    if (Event::has_flag(event, EventFlag::StopImmediatePropagation) &&
++        !listener->resist_stop_propagation) {
++      continue;
++    }
++#endif
+ 
+     // 1. If event's type attribute value is not listener's type, then continue.
+     if (listener->type != type_sv) {
+@@ -585,8 +642,16 @@
+ 
+     bool callback_ok;
+     if (JS::IsCallable(callback_obj)) {
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++      // Preserve the global API's hidden-target convention; ordinary native
++      // EventTarget/AbortSignal function listeners receive their actual target.
++      RootedObject receiver(cx, Event::current_target(event));
++      if (receiver == global_event_target()) receiver = engine->global();
++      callback_ok = JS::Call(cx, receiver, callback_val, args, &rval);
++#else
+       auto global = engine->global();
+       callback_ok = JS::Call(cx, global, callback_val, args, &rval);
++#endif
+     } else {
+       RootedValue handle_fn(cx);
+       if (!JS_GetProperty(cx, callback_obj, "handleEvent", &handle_fn)) {
+@@ -632,7 +697,10 @@
+ 
+     // 14. If event's stop immediate propagation flag is set, then break.
+     if (Event::has_flag(event, EventFlag::StopImmediatePropagation)) {
+-#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++      // Continue in registration order; later unprotected records are skipped.
++      continue;
++#elif defined(NODE_COMPAT_STRICT_INITIALIZATION)
+       break;
+ #else
+       return true;
+@@ -707,8 +775,26 @@
+   list->trace(trc);
+ }
+ 
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++JS::Symbol *EventTarget::node_abort_resist_key() {
++  if (!proto_obj.initialized() || !proto_obj.get()) return nullptr;
++  const JS::Value &key = JS::GetReservedSlot(proto_obj, std::to_underlying(Slots::NodeAbortResistKey));
++  return key.isSymbol() ? key.toSymbol() : nullptr;
++}
++#endif
++
+ bool EventTarget::init_class(JSContext *cx, JS::HandleObject global) {
+-  return init_class_impl(cx, global);
++  if (!init_class_impl(cx, global)) return false;
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++  JS::RootedString description(cx, JS_NewStringCopyZ(cx, "kResistStopPropagation"));
++  if (!description) return false;
++  JS::RootedSymbol key(cx, JS::NewSymbol(cx, description));
++  if (!key) return false;
++  // Native reserved slots are traced before the custom class trace hook. The
++  // key is owned by this existing prototype, not by a new static GC root.
++  JS::SetReservedSlot(proto_obj, std::to_underlying(Slots::NodeAbortResistKey), JS::SymbolValue(key));
++#endif
++  return true;
+ }
+ 
+ } // namespace builtins::web::event
+--- a/builtins/node-compat/register.cpp
++++ b/builtins/node-compat/register.cpp
+@@ -9,6 +9,8 @@
+ #endif
+ #ifdef NODE_COMPAT_EVENTS
+ #include "events-factories.generated.h"
++#include "../web/event/event-target.h"
++#include "js/Symbol.h"
+ #endif
+ #ifdef NODE_COMPAT_STRING_DECODER
+ #include "string-decoder-factories.generated.h"
+@@ -69,8 +71,15 @@
+ 
+ #ifdef NODE_COMPAT_EVENTS
+ static bool install_events(api::Engine *engine) {
+-  JS::RootedValue module(engine->cx());
+-  if (!evaluate_factory(engine->cx(), kEventsFactorySource, JS::UndefinedHandleValue, &module)) return false;
++  auto *cx = engine->cx();
++  JS::RootedSymbol key(cx, builtins::web::event::EventTarget::node_abort_resist_key());
++  if (!key) {
++    JS_ReportErrorASCII(cx, "ERR_SM_NODE_PROFILE_INITIALIZATION: protected EventTarget key unavailable");
++    return false;
++  }
++  JS::RootedValue argument(cx, JS::SymbolValue(key));
++  JS::RootedValue module(cx);
++  if (!evaluate_factory(cx, kEventsFactorySource, argument, &module)) return false;
+   return engine->define_builtin_module("node:events", module) &&
+          engine->define_builtin_module("events", module);
+ }

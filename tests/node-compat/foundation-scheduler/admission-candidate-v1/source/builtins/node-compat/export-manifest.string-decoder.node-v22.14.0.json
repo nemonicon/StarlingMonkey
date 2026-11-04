@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "profileVersion": "sm-node-22.14.0-m0.4",
+  "nodeVersion": "v22.14.0",
+  "status": "Optional bounded StringDecoder foundation selected only by NODE_COMPAT_STRING_DECODER=ON; requires the core Buffer and native web codec builtins. Other manifests remain unchanged.",
+  "moduleContract": "Exactly the two pinned Node22 ESM bindings StringDecoder and default. The ordinary mutable default object initially has only StringDecoder, identical to the named constructor. Named bindings capture their initial values; default-object mutation does not synchronize ESM bindings. Selected literal CommonJS lowering returns default. Runtime require and syncBuiltinESMExports remain excluded.",
+  "modules": {
+    "node:string_decoder": {
+      "aliases": [
+        "string_decoder"
+      ],
+      "status": "partial",
+      "exports": [
+        "StringDecoder",
+        "default"
+      ],
+      "callablePolicy": "StringDecoder supports the listed UTF-8 aliases and hex, including ordinary constructor/call receivers and captured private encoding. Node-recognized deferred encodings throw ERR_SM_NODE_UNSUPPORTED at construction, including during componentization. Unknown labels throw TypeError ERR_UNKNOWN_ENCODING. No Proxy or host operation is used.",
+      "supportedStatic": [
+        "StringDecoder"
+      ],
+      "supportedPrototype": [
+        "write",
+        "end",
+        "text",
+        "lastChar",
+        "lastNeed",
+        "lastTotal"
+      ],
+      "encodingNames": [
+        "utf8",
+        "utf-8",
+        "hex"
+      ],
+      "limits": {
+        "inputBytes": 16777216,
+        "stateBytes": 7,
+        "lastCharBytes": 4,
+        "pendingInputBytes": 3
+      },
+      "deviations": [
+        "Only UTF-8 and hex are implemented. ASCII, latin1/binary, UTF-16LE/UCS-2, base64 and base64url are recognized but explicitly unavailable; no full StringDecoder support is claimed.",
+        "Encoding names are case-insensitive under the pinned normalization algorithm; undefined, null and the empty string select UTF-8. Boxed/custom labels use the tested length-before-lowercase coercion order.",
+        "write accepts strings unchanged and ordinary fixed unshared ArrayBufferViews as raw bytes; bare ArrayBuffer, shared, resizable and detached byte inputs are rejected. Input cap violations throw RangeError ERR_SM_NODE_LIMIT.",
+        "Strings passed to write are returned unchanged before receiver validation and do not consume pending bytes. The byte cap applies to byte input, not this zero-copy string passthrough.",
+        "State uses owned seven-byte fixed Buffer storage, with a fresh live four-byte lastChar view on every read. Node Buffer pool machinery and undocumented storage identities beyond the tested state/view contract are not implemented.",
+        "Public encoding mutation does not change the private constructor-selected encoding. Mutating carry bytes is observable. Arbitrary replacement/corruption of the exposed internal-symbol storage, counter fields or encoding marker is excluded; detached or out-of-bounds-count storage is rejected with TypeError ERR_SM_NODE_DECODER_STATE.",
+        "text clears pending counters before the observable input.slice(offset) call and then uses the observable receiver.write. It validates view backing/limits before slice may allocate; resizable/shared/detached views remain excluded.",
+        "Detailed error messages, deliberately modified Buffer constructors/species, cross-realm inputs and arbitrary mutation of captured intrinsics during installation are not claimed. After installation the facade uses captured codec/Buffer methods and byte-view length getters.",
+        "No async context, scheduler, filesystem, process, entropy or other host interface is required. Correct generic native TextDecoder ownership is a prerequisite; unrelated fatal-decoding lifecycle and Rust allocator-abort behavior are not solved by this facade."
+      ]
+    }
+  },
+  "requiredHostInterfaces": []
+}

@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "verifiedAtUtc": "2026-11-03T01:28:39.587Z",
+  "node": "v22.14.0",
+  "componentizer": {
+    "schemaVersion": 1,
+    "selection": "patched-import-i32-v1",
+    "modulePath": "/private/tmp/starling-node-compat/import-abi-build/package/src/componentize.js",
+    "manifestPath": "/private/tmp/starling-node-compat/import-abi-build/package/splicer-build.json",
+    "manifestSha256": "e909d1c4eedc317152eb6b8e36c67e81e46463841724410212494301ed119db1",
+    "packagingVersion": "componentize-js-0.23.0+sm-import-i32.v1",
+    "patch": {
+      "id": "sm-import-i32.v1",
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/abi-fix/componentize-import-i32-v1.patch",
+      "sha256": "d300e345cb56a5bb1560f1f993c2cc763bca273e6bcf51e38aadc8e27d84782c",
+      "source": "crates/spidermonkey-embedding-splicer/src/splice.rs",
+      "baseSourceSha256": "abb62bc9580a9f8b8e8026950f6bb285f64373a905ae770718612508dafa301a",
+      "patchedSourceSha256": "f54d9d7562c525131def2a89d512883118d3c7a6af29a1e1021dfec76c31a048"
+    },
+    "lock": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/abi-fix/splicer-Cargo.v1.lock",
+      "sha256": "6472e3cd45eeaacdd5f7133e8eaab8e4411ef77272812d97dd6ac729462f6ffd",
+      "baseSha256": "c8b5312c03dc69cb3b5747149ea2bf4820b0e8763fc73f6bd60e771a873c09f0",
+      "repair": "Only replace the inconsistent js-component-bindgen 2.10.1 local lock entry with the declared published 2.11.0 registry package and its checksum; all other lock entries are unchanged.",
+      "registryPackage": {
+        "name": "js-component-bindgen",
+        "version": "2.11.0",
+        "sha256": "d73b9c04f15dd549239f5302dd6a80be973d055b93c6ad60b7d8d0c9ab07f9b9"
+      }
+    },
+    "checkedFiles": [
+      {
+        "path": "src/componentize.js",
+        "sha256": "e58ef4f3b126f4a3fd07c61b368930bbf02dd0029f0f03e4c6928528e994e559"
+      },
+      {
+        "path": "src/platform.js",
+        "sha256": "7a510717aae2a99b24b95aa80f3f40288a9ca6b1bc77129d833ebd67f62e1370"
+      },
+      {
+        "path": "package.json",
+        "sha256": "62deec3b3c95aec1d87352f50022f1232823779f5e5fa45b01a380345f038559"
+      },
+      {
+        "path": "lib/spidermonkey-embedding-splicer.js",
+        "sha256": "a4aceb62d760ca39eb6c8abfb4e4e4cc0c2abafb302a162f8a08b8a71699ae37"
+      },
+      {
+        "path": "lib/spidermonkey-embedding-splicer.core.wasm",
+        "sha256": "5029939694148ea66c72fe5a8f7f5db406b473cde1f2eda8964fd005254a6cdb"
+      },
+      {
+        "path": "lib/spidermonkey-embedding-splicer.core2.wasm",
+        "sha256": "30fff64b635b191d59e59b6b2aadf117f3e4c6326db35111f69a19ea1bd42a4e"
+      }
+    ],
+    "build": {
+      "rustc": "rustc 1.96.1 (31fca3adb 2026-06-26)",
+      "cargo": "cargo 1.96.1 (356927216 2026-06-26)",
+      "target": "wasm32-wasip1",
+      "profile": "release",
+      "locked": true,
+      "corePath": "/tmp/starling-node-compat/import-abi-build/target/wasm32-wasip1/release/splicer_component.wasm",
+      "coreSha256": "6c1e800f232aec295586c243f260b307011fda62042257a0ad5ee3226324357d",
+      "componentPath": "/tmp/starling-node-compat/import-abi-build/obj/splicer.component.wasm",
+      "componentSha256": "49255278644dd21e32f58deb1a286fb78c139806fa58ece800e07ce0149ed07d",
+      "jcoVersion": "1.40.0",
+      "commands": [
+        [
+          "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+          "/tmp/starling-node-compat/native-toolchain-lock/node_modules/@bytecodealliance/jco/dist/jco.js",
+          "new",
+          "/tmp/starling-node-compat/import-abi-build/target/wasm32-wasip1/release/splicer_component.wasm",
+          "-o",
+          "/tmp/starling-node-compat/import-abi-build/obj/splicer.component.wasm",
+          "--wasi-reactor"
+        ],
+        [
+          "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+          "/tmp/starling-node-compat/native-toolchain-lock/node_modules/@bytecodealliance/jco/dist/jco.js",
+          "transpile",
+          "-q",
+          "--name",
+          "spidermonkey-embedding-splicer",
+          "/tmp/starling-node-compat/import-abi-build/obj/splicer.component.wasm",
+          "-o",
+          "/tmp/starling-node-compat/import-abi-build/package/lib",
+          "--",
+          "-O1"
+        ]
+      ]
+    },
+    "scope": "Guest packaging only; native guest engine and host executable selected separately"
+  },
+  "tool": {
+    "path": "/tmp/starling-node-compat/improved-build/cache/wasm-tools/1448/wasm-tools",
+    "version": "wasm-tools 1.235.0 (e26d5ebea 2025-06-13)",
+    "sha256": "b332dd79057dafdcc8a36ca933d0d499acea506b56b1ea28e28fbb036c9e713d"
+  },
+  "source": "(module\n  (import \"wasi_snapshot_preview1\" \"clock_time_get\"\n    (func $clock (param i32 i64 i32) (result i32)))\n  (memory (export \"memory\") 1)\n  (func (export \"errno\") (param $pointer i32) (result i32)\n    i32.const 1 i64.const 0 local.get $pointer call $clock))\n",
+  "sourceSha256": "ccf945c6c0ea391400822c2feb891fdef4eee3e2fae1430adf7f29dd9216dcac",
+  "runnerSha256": "8bcc6255b3f4f800398b0e8c650e0d6d992649afde42702772ceb6118f402397",
+  "stubbedSha256": "dae609f6644e93d862b45407dc2c59b1999b17ebbc1505a4415213f44f6e0ca1",
+  "emittedImports": [],
+  "observations": [
+    {
+      "pointer": 0,
+      "errno": 0,
+      "expectedSuccessErrno": 0,
+      "timestamp": "1793669319576000000",
+      "correctSuccessErrno": true,
+      "errnoEqualsPointer": true
+    },
+    {
+      "pointer": 8,
+      "errno": 8,
+      "expectedSuccessErrno": 0,
+      "timestamp": "1793669319576000000",
+      "correctSuccessErrno": false,
+      "errnoEqualsPointer": true
+    },
+    {
+      "pointer": 64,
+      "errno": 64,
+      "expectedSuccessErrno": 0,
+      "timestamp": "1793669319576000000",
+      "correctSuccessErrno": false,
+      "errnoEqualsPointer": true
+    },
+    {
+      "pointer": 1024,
+      "errno": 1024,
+      "expectedSuccessErrno": 0,
+      "timestamp": "1793669319576000000",
+      "correctSuccessErrno": false,
+      "errnoEqualsPointer": true
+    }
+  ],
+  "expected": "broken",
+  "verifiedFinding": "The pinned disabled-clock preview1 stub writes a nonzero timestamp but returns the destination pointer as errno instead of success 0.",
+  "limits": "This independent stub repro does not capture either TimeStamp operand at the observed DEBUG GC assertion; it establishes the syscall-result defect, not its complete runtime consequence."
+}

@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "profileVersion": "sm-node-22.14.0-m0.9",
+  "nodeVersion": "v22.14.0",
+  "status": "Optional bounded stream/web foundation selected only by NODE_COMPAT_STREAM_WEB=ON; requires the existing native web streams and text-codec builtins. No host interface is selected. Support is limited to the explicit policy below.",
+  "moduleContract": "Exactly the 17 pinned Node22 named exports plus default. The mutable ordinary default object initially maps each name to the same function; ESM bindings capture initial values without syncBuiltinESMExports. Proposed literal CommonJS lowering returns default; runtime require remains excluded. Private record capture is guest implementation detail, never a host service.",
+  "modules": {
+    "node:stream/web": {
+      "aliases": [
+        "stream/web"
+      ],
+      "status": "partial",
+      "exports": [
+        "ByteLengthQueuingStrategy",
+        "CompressionStream",
+        "CountQueuingStrategy",
+        "DecompressionStream",
+        "ReadableByteStreamController",
+        "ReadableStream",
+        "ReadableStreamBYOBReader",
+        "ReadableStreamBYOBRequest",
+        "ReadableStreamDefaultController",
+        "ReadableStreamDefaultReader",
+        "TextDecoderStream",
+        "TextEncoderStream",
+        "TransformStream",
+        "TransformStreamDefaultController",
+        "WritableStream",
+        "WritableStreamDefaultController",
+        "WritableStreamDefaultWriter",
+        "default"
+      ],
+      "callablePolicy": "Reuse thirteen real native stream/strategy constructors, implement native-bulk UTF8 codec stream facades plus serialized ReadableStream.from/values/asyncIterator, and adapt ordinary DataView BYOB requests through same-backing Uint8Array views. Compression/decompression bindings are explicit functions throwing ERR_SM_NODE_UNSUPPORTED when called or constructed. All unsupported and resource-limit errors use own coded properties; no Proxy export substitute.",
+      "supportedStatic": [
+        "ReadableStream.from"
+      ],
+      "supportedPrototype": [
+        "ReadableStream.values",
+        "ReadableStream[Symbol.asyncIterator]",
+        "ReadableStreamBYOBReader.read:ordinary fixed unshared views,min1",
+        "TextEncoderStream.encoding",
+        "TextEncoderStream.readable",
+        "TextEncoderStream.writable",
+        "TextDecoderStream.encoding",
+        "TextDecoderStream.fatal",
+        "TextDecoderStream.ignoreBOM",
+        "TextDecoderStream.readable",
+        "TextDecoderStream.writable"
+      ],
+      "encodingNames": [
+        "utf-8"
+      ],
+      "limits": {
+        "encoderSourceUtf16UnitsPerChunk": 1048576,
+        "decoderInputBytesPerChunk": 16777216,
+        "byobViewBytes": 16777216,
+        "pendingEncoderSurrogateUnits": 1
+      },
+      "importOnlyExports": [
+        "CompressionStream",
+        "DecompressionStream"
+      ],
+      "deviations": [
+        "This optional bounded module does not claim complete node:stream/web or Web Streams conformance. Existing native operations beyond the recorded ordinary corpus retain their existing implementation and unverified overloads.",
+        "TextDecoderStream supports UTF8 only through native label normalization. Other known native labels throw ERR_SM_NODE_UNSUPPORTED after the recorded getter effects; unknown labels use RangeError ERR_ENCODING_NOT_SUPPORTED.",
+        "Decoder inputs are fixed attached unshared BufferSources. Shared, resizable and detached decoder inputs are rejected explicitly; native generic TextDecoder retains its separate broader contract. Buffer-source validation can materialize inline typed-array ArrayBuffers.",
+        "BYOB supports only ordinary local unmodified fixed unshared typed-array/DataView views with default/null/min1. min>1, shared/resizable backing, subclass/cross-realm/modified layout views are rejected. Proxy reader receivers are excluded although Node22 can accept a Proxy of a genuine reader.",
+        "DataView requests use a Uint8Array view over the same backing/offset/length, then a DataView over the moved result. This introduces no explicit byte copy but makes no claim about native transfer copies. The broken old-native DataView branch is never entered.",
+        "WritableStreamDefaultController.signal remains absent and requires native implementation; it is not fabricated from sink.abort. Native retained constructor error codes and Transform controller arity have recorded differences.",
+        "A released native BYOB reader throws TypeError without Node ERR_INVALID_STATE. Source error objects retain identity; this difference is not hidden by message parsing or blanket TypeError relabeling.",
+        "The optional profile replaces eight static/prototype descriptors while preserving native constructor/prototype identities. Installation runs once in the content realm before application initialization; no runtime syncBuiltinESMExports is provided.",
+        "The uninitialized Transform controller prototype is rejected by guarded public operations. Native class/slot validation independently protects web methods. The Node-facing wrapper attaches ERR_INVALID_THIS for that prototype only; other invalid native receiver paths can retain uncoded TypeError. Full receiver error-code parity is not claimed.",
+        "Native classes are captured through public JS_GetClassObject and existing retained prototype roots in the content realm. The private BYOB callback uses public JS::IsReadableStreamBYOBReader and excludes scripted Proxy receivers; no temporary initialization streams or public test hook is used.",
+        "from uses HWM0, async protocol preference and an async-from-sync generator bridge. values serializes pending next/return, releases/cancels on close/error/return, supports preventCancel. Arbitrary protocol mutation, Promise.prototype.then immunity, worker transfer and cross-realm semantics are not claimed.",
+        "Per-operation input caps do not bound application-retained queues, total lifetime stream output or arbitrarily many queued iterator calls. Compression output limits, native allocation failure/fatal Rust allocator behavior and complete scheduler/async-context behavior remain separate gates.",
+        "No new global TextEncoderStream/TextDecoderStream name is installed by this module proposal; existing native global constructor identities are reused where present.",
+        "CompressionStream and DecompressionStream remain explicit import-only/deferred callable bindings until ownership, cleanup, malformed-input and expansion-budget hardening and ordinary tests pass. No native compression transform was invoked by these candidate tests."
+      ]
+    }
+  },
+  "requiredHostInterfaces": []
+}

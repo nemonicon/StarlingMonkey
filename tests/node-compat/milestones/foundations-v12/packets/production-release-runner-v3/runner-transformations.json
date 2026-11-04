@@ -1,0 +1,350 @@
+{
+  "schemaVersion": 1,
+  "state": "ISOLATED_REVERSIBLE_ADMISSION_PATH_AND_REPORT_TRANSFORMS",
+  "files": [
+    {
+      "original": "tests/node-compat/foundation-path/run.mjs",
+      "originalSha256": "fb04146712223ff5280d3a09b7bc5dc3c471cce4f490f135f0707dc4d97b74be",
+      "generated": "runners/path.mjs",
+      "generatedSha256": "2675f0130318e53ec1b8141f420c05df7bdb8345979a77a8bd39709773f10bd0",
+      "kind": "runner",
+      "module": "path",
+      "changes": [
+        {
+          "before": "from '../toolchain.mjs'",
+          "after": "from '../../../toolchain.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../componentizer.mjs'",
+          "after": "from '../../../componentizer.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../module-selection.mjs'",
+          "after": "from '../../../module-selection.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../profile-bundler.mjs'",
+          "after": "from '../../../profile-bundler.mjs'",
+          "count": 1
+        },
+        {
+          "before": "dirname(fileURLToPath(import.meta.url))",
+          "after": "resolve(dirname(fileURLToPath(import.meta.url)), '../../../foundation-path')",
+          "count": 1
+        },
+        {
+          "before": "for (const [file, flags] of [['semantic.mjs', []], ['glob.mjs', ['--expose-internals']]]) {",
+          "after": "const oracleScripts = resolve(dirname(fileURLToPath(import.meta.url)), '../oracles');\nconst oracleOutput = join(output, 'node-oracles');\nawait mkdir(output, { recursive: true }); await mkdir(oracleOutput, { recursive: false });\nfor (const [file, flags] of [['semantic.mjs', []], ['glob.mjs', ['--expose-internals']]]) {",
+          "count": 1
+        },
+        {
+          "before": "join(here, file)",
+          "after": "join(oracleScripts, file)",
+          "count": 1
+        },
+        {
+          "before": "{ encoding: 'utf8', timeout: 30000 }",
+          "after": "{ encoding: 'utf8', timeout: 30000, env: { ...process.env, NODE_COMPAT_PATH_ORACLE_OUTPUT: oracleOutput } }",
+          "count": 1
+        },
+        {
+          "before": "join(here, 'lexical-vectors.json')",
+          "after": "join(oracleOutput, 'lexical-vectors.json')",
+          "count": 1
+        },
+        {
+          "before": "join(here, 'glob-vectors.json')",
+          "after": "join(oracleOutput, 'glob-vectors.json')",
+          "count": 1
+        },
+        {
+          "before": "join(here, 'glob-results.json')",
+          "after": "join(oracleOutput, 'glob-results.json')",
+          "count": 1
+        },
+        {
+          "before": "join(here, 'semantic-results.json')",
+          "after": "join(oracleOutput, 'semantic-results.json')",
+          "count": 1
+        },
+        {
+          "before": "({ path, sha256: hash(await readFile(join(here, path))) })",
+          "after": "({ path, actualPath: ['lexical-vectors.json', 'glob-vectors.json'].includes(path) ? join(oracleOutput, path) : join(here, path), sha256: hash(await readFile(['lexical-vectors.json', 'glob-vectors.json'].includes(path) ? join(oracleOutput, path) : join(here, path))) })",
+          "count": 1
+        },
+        {
+          "before": "join(here, 'results.json')",
+          "after": "join(output, 'native-component-results.json')",
+          "count": 1
+        }
+      ],
+      "reverseDeclaredEditsRestoresOriginalBytes": true
+    },
+    {
+      "original": "tests/node-compat/foundation-events/run-native-component.mjs",
+      "originalSha256": "8c995f3b2812a3bb3613f64b404beb7ad2e7b2b007854015dabcd8e06fa583a3",
+      "generated": "runners/events.mjs",
+      "generatedSha256": "3b82f7bd713275f28bbbd3b1d6ac3cafdb2651e0710bb1854fc6d2e661dad811",
+      "kind": "runner",
+      "module": "events",
+      "changes": [
+        {
+          "before": "from '../toolchain.mjs'",
+          "after": "from '../../../toolchain.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../componentizer.mjs'",
+          "after": "from '../../../componentizer.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../profile-bundler.mjs'",
+          "after": "from '../../../profile-bundler.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../module-selection.mjs'",
+          "after": "from '../../../module-selection.mjs'",
+          "count": 1
+        },
+        {
+          "before": "dirname(fileURLToPath(import.meta.url))",
+          "after": "resolve(dirname(fileURLToPath(import.meta.url)), '../../../foundation-events')",
+          "count": 1
+        },
+        {
+          "before": "'sm-uncaught-event-v3-protected-abort-v2'",
+          "after": "'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1'",
+          "count": 1
+        },
+        {
+          "before": "join(here, 'native-component-results.json')",
+          "after": "join(output, 'native-component-results.json')",
+          "count": 1
+        }
+      ],
+      "reverseDeclaredEditsRestoresOriginalBytes": true
+    },
+    {
+      "original": "tests/node-compat/foundation-string-decoder/run-native-component.mjs",
+      "originalSha256": "92ed7a10003fb3aca7a40de9a45971bbafd3b3234e3b74f582637860b937c981",
+      "generated": "runners/string-decoder.mjs",
+      "generatedSha256": "d86d6bf3cc56d43c7681dfdc592ca8391671fa5d1d124d079e2b435689c48511",
+      "kind": "runner",
+      "module": "string-decoder",
+      "changes": [
+        {
+          "before": "from '../toolchain.mjs'",
+          "after": "from '../../../toolchain.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../componentizer.mjs'",
+          "after": "from '../../../componentizer.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../module-selection.mjs'",
+          "after": "from '../../../module-selection.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../profile-bundler.mjs'",
+          "after": "from '../../../profile-bundler.mjs'",
+          "count": 1
+        },
+        {
+          "before": "dirname(fileURLToPath(import.meta.url))",
+          "after": "resolve(dirname(fileURLToPath(import.meta.url)), '../../../foundation-string-decoder')",
+          "count": 1
+        },
+        {
+          "before": "join(here,'native-component-results.json')",
+          "after": "join(output,'native-component-results.json')",
+          "count": 1
+        }
+      ],
+      "reverseDeclaredEditsRestoresOriginalBytes": true
+    },
+    {
+      "original": "tests/node-compat/foundation-assert/run-native-component.mjs",
+      "originalSha256": "c183e8937a0b92e981af28bff84c4a93d032767233792f92178b62fa7a01f8a0",
+      "generated": "runners/assert.mjs",
+      "generatedSha256": "7ce872a19efba79ac9d355dbd76c2efcbdf4cf3f3b9334414ce49c446be209b6",
+      "kind": "runner",
+      "module": "assert",
+      "changes": [
+        {
+          "before": "from '../foundations/native-scalar-harness.mjs'",
+          "after": "from '../helpers/native-scalar-harness.mjs'",
+          "count": 1
+        },
+        {
+          "before": "import { dirname, join } from 'node:path';",
+          "after": "import { dirname, join, resolve } from 'node:path';",
+          "count": 1
+        },
+        {
+          "before": "dirname(fileURLToPath(import.meta.url))",
+          "after": "resolve(dirname(fileURLToPath(import.meta.url)), '../../../foundation-assert')",
+          "count": 1
+        }
+      ],
+      "reverseDeclaredEditsRestoresOriginalBytes": true
+    },
+    {
+      "original": "tests/node-compat/foundation-querystring/run-native-component.mjs",
+      "originalSha256": "cd5b9206e80b499b5ee65b711b69531bff5c6067d5dbaaf6240e9fcbb0fba201",
+      "generated": "runners/querystring.mjs",
+      "generatedSha256": "dd0fb531a8c6a49ce1d0b0af75ca7a6f3a3cacf14d6d8c59ba4c75a89e985ca9",
+      "kind": "runner",
+      "module": "querystring",
+      "changes": [
+        {
+          "before": "from '../foundations/native-scalar-harness.mjs'",
+          "after": "from '../helpers/native-scalar-harness.mjs'",
+          "count": 1
+        },
+        {
+          "before": "import { dirname, join } from 'node:path';",
+          "after": "import { dirname, join, resolve } from 'node:path';",
+          "count": 1
+        },
+        {
+          "before": "dirname(fileURLToPath(import.meta.url))",
+          "after": "resolve(dirname(fileURLToPath(import.meta.url)), '../../../foundation-querystring')",
+          "count": 1
+        }
+      ],
+      "reverseDeclaredEditsRestoresOriginalBytes": true
+    },
+    {
+      "original": "tests/node-compat/foundation-util/run-native-component.mjs",
+      "originalSha256": "944f3519e9e61ce28845b9ba6f03d64fcafe51fa08aa99cd26ea7fd7d1870aa9",
+      "generated": "runners/util.mjs",
+      "generatedSha256": "bd111fc32b7570790179ec7a8682b78f345c8d7f41e809133da400ebf9eff450",
+      "kind": "runner",
+      "module": "util",
+      "changes": [
+        {
+          "before": "from '../foundations/native-scalar-harness.mjs'",
+          "after": "from '../helpers/native-scalar-harness.mjs'",
+          "count": 1
+        },
+        {
+          "before": "import {dirname,join} from 'node:path';",
+          "after": "import {dirname,join,resolve} from 'node:path';",
+          "count": 1
+        },
+        {
+          "before": "dirname(fileURLToPath(import.meta.url))",
+          "after": "resolve(dirname(fileURLToPath(import.meta.url)), '../../../foundation-util')",
+          "count": 1
+        }
+      ],
+      "reverseDeclaredEditsRestoresOriginalBytes": true
+    },
+    {
+      "original": "tests/node-compat/foundations/native-scalar-harness.mjs",
+      "originalSha256": "01a17006e04e7db3d644d63fe778d112abbc807a5612e9fd90ece1a914d57acd",
+      "generated": "helpers/native-scalar-harness.mjs",
+      "generatedSha256": "27b9bb371ce666cde141dbde3fb143c845e7ea9d17397dcfd53bdc16115b363e",
+      "kind": "helper",
+      "module": null,
+      "changes": [
+        {
+          "before": "from '../toolchain.mjs'",
+          "after": "from '../../../toolchain.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../componentizer.mjs'",
+          "after": "from '../../../componentizer.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../profile-bundler.mjs'",
+          "after": "from '../../../profile-bundler.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../module-selection.mjs'",
+          "after": "from '../../../module-selection.mjs'",
+          "count": 1
+        },
+        {
+          "before": "resolve(dirname(fileURLToPath(import.meta.url)), '../../..')",
+          "after": "resolve(dirname(fileURLToPath(import.meta.url)), '../../../../..')",
+          "count": 1
+        },
+        {
+          "before": "join(here, 'native-component-results.json')",
+          "after": "join(output, 'native-component-results.json')",
+          "count": 1
+        }
+      ],
+      "reverseDeclaredEditsRestoresOriginalBytes": true
+    },
+    {
+      "original": "tests/node-compat/foundation-path/semantic.mjs",
+      "originalSha256": "ab8ed309f445f7737ac2a82c0f2c723faf14ce42b1b9d722fb9a4bed2bd02870",
+      "generated": "oracles/semantic.mjs",
+      "generatedSha256": "23fe6d8eed334a3eae580655d9a859a048f0097bcd957259cf4218a230701cbf",
+      "kind": "oracle",
+      "module": "semantic",
+      "changes": [
+        {
+          "before": "from '../../../builtins/node-compat/path.mjs'",
+          "after": "from '../../../../../builtins/node-compat/path.mjs'",
+          "count": 1
+        },
+        {
+          "before": "const here = dirname(fileURLToPath(import.meta.url));",
+          "after": "const here = resolve(dirname(fileURLToPath(import.meta.url)), '../../../foundation-path');\nassert(process.env.NODE_COMPAT_PATH_ORACLE_OUTPUT, 'Explicit fresh oracle output required');\nconst oracleOutput = resolve(process.env.NODE_COMPAT_PATH_ORACLE_OUTPUT);",
+          "count": 1
+        },
+        {
+          "before": "await writeFile(join(here,",
+          "after": "await writeFile(join(oracleOutput,",
+          "count": 2
+        }
+      ],
+      "reverseDeclaredEditsRestoresOriginalBytes": true
+    },
+    {
+      "original": "tests/node-compat/foundation-path/glob.mjs",
+      "originalSha256": "87955952adbb0ba1d6fa69b48b0f708f99cfb1d335131866b2c7ef1357eda986",
+      "generated": "oracles/glob.mjs",
+      "generatedSha256": "befc3e984b1b82e33ad008943e85a2461dca424e9f1d27561edfdeda455df619",
+      "kind": "oracle",
+      "module": "glob",
+      "changes": [
+        {
+          "before": "from '../../../builtins/node-compat/path.mjs'",
+          "after": "from '../../../../../builtins/node-compat/path.mjs'",
+          "count": 1
+        },
+        {
+          "before": "import { dirname, join } from 'node:path';",
+          "after": "import { dirname, join, resolve } from 'node:path';",
+          "count": 1
+        },
+        {
+          "before": "const here = dirname(fileURLToPath(import.meta.url));",
+          "after": "const here = resolve(dirname(fileURLToPath(import.meta.url)), '../../../foundation-path');\nassert(process.env.NODE_COMPAT_PATH_ORACLE_OUTPUT, 'Explicit fresh oracle output required');\nconst oracleOutput = resolve(process.env.NODE_COMPAT_PATH_ORACLE_OUTPUT);",
+          "count": 1
+        },
+        {
+          "before": "await writeFile(join(here,",
+          "after": "await writeFile(join(oracleOutput,",
+          "count": 3
+        }
+      ],
+      "reverseDeclaredEditsRestoresOriginalBytes": true
+    }
+  ]
+}

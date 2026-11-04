@@ -1,0 +1,36 @@
+{
+  "schema": "isolated-finite-export-contract-v1",
+  "contractVersion": "stream-consumers-prototype-v1",
+  "selectedProductionProfileVersion": null,
+  "nodeVersion": "v22.14.0",
+  "installed": false,
+  "module": "node:stream/consumers",
+  "aliases": ["stream/consumers"],
+  "exports": ["arrayBuffer", "blob", "buffer", "default", "json", "text"],
+  "default": {
+    "type": "object",
+    "frozen": false,
+    "keysInOrder": ["arrayBuffer", "blob", "buffer", "text", "json"],
+    "initialNamedBindingIdentities": true,
+    "mutablePropertiesDoNotRewriteNamedBindings": true
+  },
+  "proposedPartial": ["text", "json"],
+  "deferred": ["arrayBuffer", "blob", "buffer"],
+  "callablePolicy": {
+    "supported": "async functions, arity1, nonconstructible like Node; invalid source iteration follows the built-in for-await semantics",
+    "deferred": "ordinary named functions, arity1, throw ERR_SM_NODE_UNSUPPORTED synchronously on call and construction; this intentionally differs from Node async-function shape"
+  },
+  "inputPolicy": "Plain sync/async iterables; strings or undefined/fixed unshared ArrayBuffer/ArrayBufferView chunks. No Web reader adapter or installed classic Stream API. Shared/resizable/detached backing remains outside the prototype.",
+  "requiredHostInterfaces": [],
+  "limits": {"MAX_BYTE_INPUT":1048576,"MAX_STRING_INPUT_CODE_UNITS":1048576,"MAX_OUTPUT_CODE_UNITS":1048576,"MAX_CHUNKS":4096},
+  "deviations": [
+    "This is not a schema-valid selected production manifest: the coordinator must assign an optional profile version and integrate finite native bindings after gates.",
+    "No Node24 bytes export, stream/iter module, classic Stream support or nextTick queue is introduced.",
+    "Node global Blob equals node:buffer.Blob; the current selected profile's Buffer.Blob is a deferred function distinct from its native global Blob. No identity parity is claimed.",
+    "Resource-limit errors are profile RangeErrors with ERR_SM_NODE_LIMIT. Early cap rejection closes the iterator; Node has no matching small profile limits.",
+    "The decoded output cap limits strings before JSON parsing; no exact cap on parser heap/object count or genuine OOM guarantee is claimed.",
+    "Direct SharedArrayBuffer is rejected as an invalid BufferSource by this prototype; shared-backed views are explicitly unsupported. No shared-memory data is read.",
+    "Error text/stacks and arbitrary application primordial mutations outside the captured dependencies are not a complete Node contract.",
+    "Native guest behavior, snapshot/resumption, iterator cancellation and zero emitted imports require a later real component gate."
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "state": "FINITE_DISPATCH_306_BRANCH_UNCHANGED",
+  "beforeSha256": "ef46951437138aab4e7759b0a733495c5ef2259c23ed6187438b20611a1e5991",
+  "afterSha256": "57968dc834e9f9efa90e8e26eb1ace60dff182b816f33e36fea15e1fee22ef85",
+  "unchanged306AdmissionSha256": "7680fa6b39bd9784c58bfb3d8af452e3b75beb6a23a3a841661d6777fdccd6f8",
+  "edits": [
+    {
+      "old": "import {validatePrivateTickSourceAdmission} from './private-ticks-admission.mjs';",
+      "new": "import {validatePrivateTickSourceAdmission} from './private-ticks-admission.mjs';\nimport {validateClassicSourceAdmission} from './classic-streams-admission.mjs';"
+    },
+    {
+      "old": "export const STREAM_WEB_MANIFEST = 'builtins/node-compat/export-manifest.stream-web.node-v22.14.0.json';",
+      "new": "export const STREAM_WEB_MANIFEST = 'builtins/node-compat/export-manifest.stream-web.node-v22.14.0.json';\nexport const CLASSIC_STREAMS_MANIFEST = 'builtins/node-compat/classic-streams/export-manifest.classic-streams.node-v22.14.0.json';"
+    },
+    {
+      "old": "  const privateTicks = validatePrivateTickSourceAdmission(metadata, {sourceRoot,\n    parentProtectedSources:protectedAbortV1Sources,parentProtectedPatch:protectedAbortV1Patch});",
+      "new": "  const classic = validateClassicSourceAdmission(metadata, {sourceRoot,\n    parentProtectedSources:protectedAbortV1Sources,parentProtectedPatch:protectedAbortV1Patch});\n  const privateTicks = classic ?? validatePrivateTickSourceAdmission(metadata, {sourceRoot,\n    parentProtectedSources:protectedAbortV1Sources,parentProtectedPatch:protectedAbortV1Patch});"
+    },
+    {
+      "old": "    ['streamWebEnabled', 'NODE_COMPAT_STREAM_WEB', STREAM_WEB_MANIFEST],",
+      "new": "    ['streamWebEnabled', 'NODE_COMPAT_STREAM_WEB', STREAM_WEB_MANIFEST],\n    ['classicStreamsEnabled', 'NODE_COMPAT_CLASSIC_STREAMS', CLASSIC_STREAMS_MANIFEST],"
+    }
+  ]
+}

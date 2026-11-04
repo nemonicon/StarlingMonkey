@@ -1,0 +1,794 @@
+{
+  "schemaVersion": 1,
+  "verifiedAtUtc": "2026-11-03T04:00:59.969Z",
+  "node": "v22.14.0",
+  "executable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+  "executableSha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+  "execArgv": [],
+  "nodeOptionsPresent": false,
+  "sharedEdgeCasesSha256": "85adf9ffc9ce33463de34d20db48f1cec2b8274e4ac4188ab88bbe9081238f33",
+  "originalEdgeSourceSha256": "3dddbe9a24a80570da9d518d32f28f0b01a87fcf0c174893d0d44cc0210824fc",
+  "originalEdgeResultsSha256": "34904e9c7983b560cf5a982b05c518ddd7cd06c5f5d9d8325fa25fc9ce8becb9",
+  "edge": {
+    "cases": [
+      {
+        "name": "real Promise species result controls callback resource (pending)",
+        "passed": true,
+        "observations": [
+          {
+            "label": "species-getter",
+            "store": "REGISTER"
+          },
+          {
+            "label": "species-constructor-before",
+            "store": "REGISTER"
+          },
+          {
+            "label": "species-constructor-after",
+            "store": "REGISTER"
+          },
+          {
+            "label": "reaction",
+            "store": "SPECIES"
+          },
+          {
+            "label": "after-await",
+            "store": "<undefined>"
+          }
+        ],
+        "details": {
+          "verified": "The callback executes on the real result Promise resource created inside the species constructor, under SPECIES rather than REGISTER."
+        }
+      },
+      {
+        "name": "real Promise species result controls callback resource (settled)",
+        "passed": true,
+        "observations": [
+          {
+            "label": "species-getter",
+            "store": "REGISTER"
+          },
+          {
+            "label": "species-constructor-before",
+            "store": "REGISTER"
+          },
+          {
+            "label": "species-constructor-after",
+            "store": "REGISTER"
+          },
+          {
+            "label": "reaction",
+            "store": "SPECIES"
+          },
+          {
+            "label": "after-await",
+            "store": "<undefined>"
+          }
+        ],
+        "details": {
+          "verified": "The callback executes on the real result Promise resource created inside the species constructor, under SPECIES rather than REGISTER."
+        }
+      },
+      {
+        "name": "plain-object species has no result Promise callback resource (pending)",
+        "passed": true,
+        "observations": [
+          {
+            "label": "species-getter",
+            "store": "REGISTER"
+          },
+          {
+            "label": "species-constructor",
+            "store": "SPECIES"
+          },
+          {
+            "label": "reaction",
+            "store": "<undefined>"
+          },
+          {
+            "label": "capability-resolve",
+            "store": "<undefined>"
+          },
+          {
+            "label": "after-await",
+            "store": "<undefined>"
+          }
+        ],
+        "details": {
+          "verified": "The callback and capability resolver run on shared root resource ID0, without REGISTER or SPECIES, because the result capability is not a Promise."
+        }
+      },
+      {
+        "name": "plain-object species has no result Promise callback resource (settled)",
+        "passed": true,
+        "observations": [
+          {
+            "label": "species-getter",
+            "store": "REGISTER"
+          },
+          {
+            "label": "species-constructor",
+            "store": "SPECIES"
+          },
+          {
+            "label": "reaction",
+            "store": "<undefined>"
+          },
+          {
+            "label": "capability-resolve",
+            "store": "<undefined>"
+          },
+          {
+            "label": "after-await",
+            "store": "<undefined>"
+          }
+        ],
+        "details": {
+          "verified": "The callback and capability resolver run on shared root resource ID0, without REGISTER or SPECIES, because the result capability is not a Promise."
+        }
+      },
+      {
+        "name": "run restores only its own ALS instance entry",
+        "passed": true,
+        "observations": [
+          {
+            "label": "inside",
+            "store": "A",
+            "secondStore": "B"
+          },
+          {
+            "label": "after-a-run",
+            "store": "<undefined>",
+            "secondStore": "B"
+          },
+          {
+            "label": "captured-child",
+            "store": "<undefined>",
+            "secondStore": "B"
+          }
+        ],
+        "details": {
+          "verified": "Restoring the entire prior context map would incorrectly discard the other instance’s enterWith mutation."
+        }
+      },
+      {
+        "name": "nested thenable jobs share one mutable Promise resource; earlier child keeps snapshot",
+        "passed": true,
+        "observations": [
+          {
+            "label": "first-thenable",
+            "store": "CREATION-A"
+          },
+          {
+            "label": "first-after-enterWith",
+            "store": "MUTATED-X"
+          },
+          {
+            "label": "child-captured-before-mutation",
+            "store": "CREATION-A"
+          },
+          {
+            "label": "second-thenable",
+            "store": "MUTATED-X"
+          },
+          {
+            "label": "await-continuation",
+            "store": "AWAIT-D"
+          },
+          {
+            "label": "outer-after",
+            "store": "<undefined>"
+          }
+        ],
+        "details": {
+          "verified": "The same target Promise resource retains enterWith changes across assimilation jobs, while an independently created child retains its earlier map value."
+        }
+      },
+      {
+        "name": "plain species callbacks share a mutable root resource without leaking into earlier children",
+        "passed": true,
+        "observations": [
+          {
+            "label": "outside-child-captured-before",
+            "store": "<undefined>"
+          },
+          {
+            "label": "first-plain-before",
+            "store": "<undefined>"
+          },
+          {
+            "label": "first-plain-after",
+            "store": "ROOT-X"
+          },
+          {
+            "label": "second-plain",
+            "store": "ROOT-X"
+          },
+          {
+            "label": "inside-child-after-mutation",
+            "store": "ROOT-X"
+          },
+          {
+            "label": "ordinary-await-after",
+            "store": "<undefined>"
+          }
+        ],
+        "details": {
+          "verified": "ID0 is a mutable shared resource, not a new immutable-empty context for each plain-species job. Pre-existing and newly registered child resources keep their respective captures."
+        }
+      },
+      {
+        "name": "repeated AsyncResource calls retain mutation while an earlier child stays unchanged",
+        "passed": true,
+        "observations": [
+          {
+            "label": "resource-first-before",
+            "store": "RESOURCE-A"
+          },
+          {
+            "label": "resource-first-after",
+            "store": "RESOURCE-B"
+          },
+          {
+            "label": "outer-between",
+            "store": "<undefined>"
+          },
+          {
+            "label": "resource-second",
+            "store": "RESOURCE-B"
+          },
+          {
+            "label": "child-captured-before",
+            "store": "RESOURCE-A"
+          },
+          {
+            "label": "outer-after",
+            "store": "<undefined>"
+          }
+        ],
+        "details": {
+          "verified": "The resource cell changes, but a previously created child cell must not alias that mutable cell."
+        }
+      },
+      {
+        "name": "disable then re-enable exposes an old pending resource store",
+        "passed": true,
+        "observations": [
+          {
+            "label": "new-run",
+            "store": "NEW"
+          },
+          {
+            "label": "old-after-reenable",
+            "store": "OLD"
+          },
+          {
+            "label": "outer-after",
+            "store": "<undefined>"
+          }
+        ],
+        "details": {
+          "verified": "Re-enable does not permanently invalidate old resource entries. A generation scheme that permanently deletes OLD would diverge."
+        }
+      }
+    ],
+    "caseCount": 9,
+    "observationCount": 44,
+    "assertionPropagationChecked": true,
+    "comparisonScope": "store semantics only; lifecycle/ID assertions excluded",
+    "originalLabelsStoresAndCountsIdentical": true
+  },
+  "sharedCasesSha256": "839d4e331a538259d654931469869cb318c4fc7b259545afd6ba711aa88c8023",
+  "runnerSha256": "7fdf32a336354a30f65960309f22f5b38098099d1ec826627c28664fa9aa02a8",
+  "originalOracleSourceSha256": "6dc28ffcb866f66b739fb3a72ec20c93d6b0fe51562c497dd386629c9ec08cb7",
+  "originalOracleResultsSha256": "69b292f6b61820d0edee5ae6f301d0d7928920e431116b113565f0f97939f6a1",
+  "originalLabelsStoresAndCountsIdentical": true,
+  "crossRunNormalization": "Execution IDs/resource class names and the unspecified relative completion order of the two independent native filesystem requests only; all shared case assertions remain unchanged.",
+  "cases": [
+    {
+      "name": "run return, throw and temporary-context restoration",
+      "passed": true,
+      "observations": [
+        {
+          "label": "before",
+          "store": "<undefined>",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "inside-A",
+          "store": "A",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "inside-B",
+          "store": "B",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "after-nested-run",
+          "store": "A",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "inside-throw",
+          "store": "THROW",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "after-throw",
+          "store": "A",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "after",
+          "store": "<undefined>",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        }
+      ]
+    },
+    {
+      "name": "interleaved pending, settled and primitive awaits",
+      "passed": true,
+      "observations": [
+        {
+          "label": "A:before",
+          "store": "A",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "B:before",
+          "store": "B",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "B:pending",
+          "store": "B",
+          "resourceKind": "Promise",
+          "executionAsyncId": 31
+        },
+        {
+          "label": "A:pending",
+          "store": "A",
+          "resourceKind": "Promise",
+          "executionAsyncId": 28
+        },
+        {
+          "label": "B:settled",
+          "store": "B",
+          "resourceKind": "Promise",
+          "executionAsyncId": 41
+        },
+        {
+          "label": "A:settled",
+          "store": "A",
+          "resourceKind": "Promise",
+          "executionAsyncId": 43
+        },
+        {
+          "label": "B:primitive",
+          "store": "B",
+          "resourceKind": "Promise",
+          "executionAsyncId": 45
+        },
+        {
+          "label": "A:primitive",
+          "store": "A",
+          "resourceKind": "Promise",
+          "executionAsyncId": 47
+        },
+        {
+          "label": "after-workers",
+          "store": "<undefined>",
+          "resourceKind": "Promise",
+          "executionAsyncId": 35
+        }
+      ]
+    },
+    {
+      "name": "pending then handlers capture registration including empty root",
+      "passed": true,
+      "observations": [
+        {
+          "label": "registered-A",
+          "store": "A",
+          "resourceKind": "Promise",
+          "executionAsyncId": 49
+        },
+        {
+          "label": "registered-root",
+          "store": "<undefined>",
+          "resourceKind": "Promise",
+          "executionAsyncId": 50
+        },
+        {
+          "label": "registered-B",
+          "store": "B",
+          "resourceKind": "Promise",
+          "executionAsyncId": 51
+        },
+        {
+          "label": "after",
+          "store": "<undefined>",
+          "resourceKind": "Promise",
+          "executionAsyncId": 56
+        }
+      ]
+    },
+    {
+      "name": "settled then handlers capture registration rather than promise creation",
+      "passed": true,
+      "observations": [
+        {
+          "label": "registered-A",
+          "store": "A",
+          "resourceKind": "Promise",
+          "executionAsyncId": 62
+        },
+        {
+          "label": "registered-root",
+          "store": "<undefined>",
+          "resourceKind": "Promise",
+          "executionAsyncId": 63
+        },
+        {
+          "label": "registered-B",
+          "store": "B",
+          "resourceKind": "Promise",
+          "executionAsyncId": 64
+        }
+      ]
+    },
+    {
+      "name": "thenable assimilation uses resolved promise creation context",
+      "passed": true,
+      "observations": [
+        {
+          "label": "thenable.then",
+          "store": "PROMISE-CREATION-A",
+          "resourceKind": "Promise",
+          "executionAsyncId": 74
+        },
+        {
+          "label": "await-continuation",
+          "store": "AWAIT-REGISTRATION-D",
+          "resourceKind": "Promise",
+          "executionAsyncId": 76
+        }
+      ]
+    },
+    {
+      "name": "root-created promise assimilation stays empty despite resolver context",
+      "passed": true,
+      "observations": [
+        {
+          "label": "thenable.then",
+          "store": "<undefined>",
+          "resourceKind": "Promise",
+          "executionAsyncId": 83
+        },
+        {
+          "label": "await-continuation",
+          "store": "AWAIT-A",
+          "resourceKind": "Promise",
+          "executionAsyncId": 84
+        }
+      ]
+    },
+    {
+      "name": "Promise.resolve thenable uses call-time promise creation context",
+      "passed": true,
+      "observations": [
+        {
+          "label": "thenable.then",
+          "store": "RESOLVE-A",
+          "resourceKind": "Promise",
+          "executionAsyncId": 90
+        },
+        {
+          "label": "await-continuation",
+          "store": "AWAIT-B",
+          "resourceKind": "Promise",
+          "executionAsyncId": 92
+        }
+      ]
+    },
+    {
+      "name": "finally and subsequent reactions keep separate registration contexts",
+      "passed": true,
+      "observations": [
+        {
+          "label": "finally",
+          "store": "FINALLY-A",
+          "resourceKind": "Promise",
+          "executionAsyncId": 99
+        },
+        {
+          "label": "after-finally",
+          "store": "THEN-B",
+          "resourceKind": "Promise",
+          "executionAsyncId": 100
+        }
+      ]
+    },
+    {
+      "name": "all and race retain each user callback registration context",
+      "passed": true,
+      "observations": [
+        {
+          "label": "race-callback",
+          "store": "RACE-CALLBACK",
+          "resourceKind": "Promise",
+          "executionAsyncId": 118
+        },
+        {
+          "label": "all-callback",
+          "store": "ALL-CALLBACK",
+          "resourceKind": "Promise",
+          "executionAsyncId": 117
+        }
+      ]
+    },
+    {
+      "name": "queueMicrotask captures the registration context",
+      "passed": true,
+      "observations": [
+        {
+          "label": "A",
+          "store": "A",
+          "resourceKind": "AsyncResource",
+          "executionAsyncId": 128
+        },
+        {
+          "label": "root",
+          "store": "<undefined>",
+          "resourceKind": "AsyncResource",
+          "executionAsyncId": 130
+        },
+        {
+          "label": "B",
+          "store": "B",
+          "resourceKind": "AsyncResource",
+          "executionAsyncId": 132
+        }
+      ]
+    },
+    {
+      "name": "native timeout callback captures registration and cancellation suppresses callback",
+      "passed": true,
+      "observations": [
+        {
+          "label": "timeout-A",
+          "store": "TIMEOUT-A",
+          "resourceKind": "Timeout",
+          "executionAsyncId": 142
+        },
+        {
+          "label": "after-cancelled-window",
+          "store": "<undefined>",
+          "resourceKind": "Promise",
+          "executionAsyncId": 152,
+          "cancelledFired": false
+        }
+      ]
+    },
+    {
+      "name": "interval enterWith changes the same resource for later callbacks",
+      "passed": true,
+      "observations": [
+        {
+          "label": "first-start",
+          "store": "INTERVAL-A",
+          "resourceKind": "Timeout",
+          "executionAsyncId": 153
+        },
+        {
+          "label": "temporary-run",
+          "store": "TEMP",
+          "resourceKind": "Timeout",
+          "executionAsyncId": 153
+        },
+        {
+          "label": "after-temporary-run",
+          "store": "INTERVAL-A",
+          "resourceKind": "Timeout",
+          "executionAsyncId": 153
+        },
+        {
+          "label": "first-after-enterWith",
+          "store": "INTERVAL-B",
+          "resourceKind": "Timeout",
+          "executionAsyncId": 153
+        },
+        {
+          "label": "second-start",
+          "store": "INTERVAL-B",
+          "resourceKind": "Timeout",
+          "executionAsyncId": 153
+        },
+        {
+          "label": "after-interval",
+          "store": "<undefined>",
+          "resourceKind": "Promise",
+          "executionAsyncId": 155
+        }
+      ]
+    },
+    {
+      "name": "native filesystem callback and promise I/O retain registration contexts",
+      "passed": true,
+      "observations": [
+        {
+          "label": "fs-callback",
+          "store": "FS-CALLBACK-A",
+          "resourceKind": "FSReqCallback",
+          "executionAsyncId": 195
+        },
+        {
+          "label": "fs-await",
+          "store": "FS-AWAIT-B",
+          "resourceKind": "Promise",
+          "executionAsyncId": 169
+        }
+      ]
+    },
+    {
+      "name": "disable without re-enable hides an old pending continuation store",
+      "passed": true,
+      "observations": [
+        {
+          "label": "old-after-disable",
+          "store": "<undefined>",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        }
+      ]
+    },
+    {
+      "name": "disable then re-enable can reveal the old pending resource store again",
+      "passed": true,
+      "observations": [
+        {
+          "label": "new-run",
+          "store": "NEW",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "old-after-reenable",
+          "store": "OLD",
+          "resourceKind": "Promise",
+          "executionAsyncId": 218
+        }
+      ]
+    },
+    {
+      "name": "a continuation registered while disabled remains empty after re-enable",
+      "passed": true,
+      "observations": [
+        {
+          "label": "old-first-disabled",
+          "store": "<undefined>",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "new-run",
+          "store": "NEW",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "old-second-after-reenable",
+          "store": "<undefined>",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        }
+      ]
+    },
+    {
+      "name": "separate ALS instances preserve independent stores",
+      "passed": true,
+      "observations": [
+        {
+          "label": "both-after-await",
+          "store": "ONE",
+          "resourceKind": "Promise",
+          "executionAsyncId": 236,
+          "secondStore": "TWO"
+        },
+        {
+          "label": "after",
+          "store": "<undefined>",
+          "resourceKind": "Promise",
+          "executionAsyncId": 237,
+          "secondStore": "<undefined>"
+        }
+      ]
+    },
+    {
+      "name": "snapshot restores capture context and then restores its caller",
+      "passed": true,
+      "observations": [
+        {
+          "label": "snapshot-body",
+          "store": "SNAPSHOT-A",
+          "resourceKind": "AsyncResource",
+          "executionAsyncId": 242
+        },
+        {
+          "label": "snapshot-caller-after",
+          "store": "CALLER-B",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "after",
+          "store": "<undefined>",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        }
+      ]
+    },
+    {
+      "name": "resource reuse retains enterWith state; fresh resource starts empty",
+      "passed": true,
+      "observations": [
+        {
+          "label": "reused-first-before",
+          "store": "<undefined>",
+          "resourceKind": "AsyncResource",
+          "executionAsyncId": 247
+        },
+        {
+          "label": "reused-first-after",
+          "store": "REQUEST-ONE",
+          "resourceKind": "AsyncResource",
+          "executionAsyncId": 247
+        },
+        {
+          "label": "outer-after-first",
+          "store": "<undefined>",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "reused-second",
+          "store": "REQUEST-ONE",
+          "resourceKind": "AsyncResource",
+          "executionAsyncId": 247
+        },
+        {
+          "label": "fresh-second",
+          "store": "<undefined>",
+          "resourceKind": "AsyncResource",
+          "executionAsyncId": 248
+        },
+        {
+          "label": "outer-after-second",
+          "store": "<undefined>",
+          "resourceKind": "Object",
+          "executionAsyncId": 0
+        }
+      ]
+    }
+  ],
+  "caseCount": 19,
+  "observationCount": 63,
+  "injectedImplementations": {
+    "AsyncLocalStorage": "node:async_hooks",
+    "AsyncResource": "node:async_hooks",
+    "queueMicrotask": "native Node global",
+    "timers": "native Node setTimeout/clearTimeout/setInterval/clearInterval",
+    "filesystem": "native node:fs and node:fs/promises reading this runner source"
+  },
+  "scope": "This run uses real Node APIs. The shared cases accept injected APIs for separate guest experiments; guest AsyncTask completion/repeating resources must be labeled as stand-ins and cannot establish real WASI timer/filesystem propagation."
+}

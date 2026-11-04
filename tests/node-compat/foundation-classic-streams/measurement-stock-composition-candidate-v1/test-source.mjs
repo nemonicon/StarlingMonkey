@@ -1,0 +1,49 @@
+// Pure source/data contract checks. Never invoke a driver, preflight or bundler.
+import assert from 'node:assert/strict';
+import {readFile,mkdir,writeFile} from 'node:fs/promises';
+import {dirname,join,resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {hash,parentRoot,parentIndexSha256,pairSha256,failureRoot,failureSha256,threeArmProofIndexSha256,threeArmProofResultSha256,validateAuthorityShape,validateArmRecord,verifyCollector} from './provenance.mjs';
+const here=dirname(fileURLToPath(import.meta.url)),checks=[];
+function ok(name,fn){fn();checks.push(name);}
+const failureRaw=await readFile(failureRoot);assert.equal(hash(failureRaw),failureSha256);const failure=JSON.parse(failureRaw);
+const authority={schemaVersion:1,state:'ROOT_REVIEWED_COMMON_BYTE_THREE_ARMS_FOR_STOCK_ONLY_COMPOSITION_V1',failedParentRootReceiptSha256:failureSha256,sourceFamilyIndexSha256:parentIndexSha256,pairPinsSha256:pairSha256,failedParentRawOuterExit:1,wholeFailedParentPassed:false,arms:['native-on','canonical-on','canonical-off'],independentProofIndexPath:'/synthetic/test-only/index.json',independentProofIndexSha256:threeArmProofIndexSha256,independentProofResultPath:'/synthetic/test-only/results.json',independentProofResultSha256:threeArmProofResultSha256,completedArmRecords:failure.completedArmRecords,runtimeAcceptanceClaim:false,timingAllowed:false};
+ok('synthetic shape only; not actual Root approval',()=>assert.equal(validateAuthorityShape(authority),authority));
+for(const [name,mutate] of [['null authority',()=>null],['unreviewed',a=>{a.state='UNREVIEWED';return a;}],['old raw exit rewrite',a=>{a.failedParentRawOuterExit=0;return a;}],['old source rewrite',a=>{a.sourceFamilyIndexSha256='0'.repeat(64);return a;}],['pair rewrite',a=>{a.pairPinsSha256='0'.repeat(64);return a;}],['missing arm',a=>{a.arms.pop();return a;}],['timing claim',a=>{a.timingAllowed=true;return a;}],['acceptance claim',a=>{a.runtimeAcceptanceClaim=true;return a;}],['different proof',a=>{a.independentProofIndexSha256='0'.repeat(64);return a;}]])ok(name,()=>assert.throws(()=>validateAuthorityShape(mutate(structuredClone(authority)))));
+const original=await readFile(join(parentRoot,'prepare-correctness.mjs'),'utf8');
+const driver=await readFile(join(here,'run-stock-only.mjs'),'utf8'),derivation=JSON.parse(await readFile(join(here,'driver-derivation.json')));let restored=driver;
+for(const edit of [...derivation.edits].reverse()){ok('reverse '+checks.length,()=>assert.equal(restored.split(edit.new).length-1,1));restored=restored.replace(edit.new,edit.old);}
+ok('whole original full driver restored exactly',()=>assert.equal(restored,original));
+ok('driver afterimage hash',()=>assert.equal(hash(driver),derivation.afterSha256));
+ok('driver beforeimage hash',()=>assert.equal(hash(original),derivation.beforeSha256));
+const binding=JSON.parse(await readFile(join(here,'bundle-binding-derivation.json'))),bundle=await readFile(join(here,'bundle-stock.mjs'),'utf8');let unbound=bundle;
+for(const row of [...binding.edits].reverse()){assert.equal(unbound.split(row.new).length-1,1);unbound=unbound.replace(row.new,row.old);}
+ok('only bundle source-root binding differs from reviewed afterimage',()=>assert.equal(hash(unbound),binding.beforeSha256));
+const helper=await readFile(join(here,'stock-graph.mjs')),helperOrigin=await readFile(join(here,'../measurement-stock-graph-amendment-v1/stock-graph.mjs'));
+ok('pure helper byte identical to amendment',()=>assert.equal(hash(helper),hash(helperOrigin)));
+ok('stock selection only',()=>{assert(driver.includes("for(const arm of ['stock-on'])"));assert(!driver.includes('for(const arm of arms)'));});
+ok('full14-case retained3/fresh/WT loops preserved',()=>{for(const text of ['for(let i=0;i<14;i++)','for(let round=0;round<3;round++)','for(let i=-2;i<14;i++)','timeoutMs:deadlinePolicy.publicCaseMs'])assert(driver.includes(text));});
+ok('parent preflight/body import, not projected metadata',()=>{assert(driver.includes("from '../measurement-execution-activated-v2/runtime-preflight.mjs'"));assert(driver.includes("await executionPreflight({variant:'benchmark-classic-on'})"));assert(driver.includes("await executionPreflight({variant:'benchmark-classic-off'})"));});
+ok('authority and collector verify before loaders/output',()=>{const gate=driver.indexOf('await verifyThreeArmAuthority(authorityPath,authoritySha)');assert(gate>=0&&gate<driver.indexOf('loadToolchain()')&&gate<driver.indexOf('await mkdir(output'));});
+ok('last recheck precedes completion publication',()=>assert(driver.lastIndexOf('await recheckCollector();')<driver.indexOf("await writeFile(join(output,'stock-completion.json')")));
+ok('only actual parent guest root used for bundling',()=>assert(bundle.includes("'../measurement-execution-activated-v2'")));
+const common=JSON.parse(await readFile(join(parentRoot,'node-common-oracle.json'))),controls=JSON.parse(await readFile(join(parentRoot,'node-control-oracle.json'))),oracle=[...common.cases,...controls.cases];
+assert.equal(oracle.length,14);
+const identity={defaultGraph:true,promisesGraph:true,eventEmitterPrototype:true,selectedTickType:'function',decoderA:'A',bufferView:true,bufferSameAsBefore:false,globalSameAsProvider:true,beforeBufferType:'function',globalChangedDuringProvider:true};
+const probe={callbacks:1,trace:['microtask','selected-tick'],queueDepthObserved:false,terminalQueueEmptyObserved:false};
+const rows=start=>oracle.map((row,i)=>({calls:start+i,setup:row.setup,result:row.expected}));
+const record={arm:'stock-on',correctnessPassed:true,identityPassed:true,checkpointProbePassed:true,emittedImports:[],interfaceAudit:{emittedImports:[]},bundleSha256:'test-only',graph:{arm:'stock-on',bundleSha256:'test-only'},identity,checkpointProbe:probe,correctness:{retainedRotations:3,rounds:[rows(1),rows(15),rows(29)],freshRows:rows(1),wasmtime:[{expression:'identity()',status:0,signal:null,observed:identity},{expression:'checkpoint-probe()',status:0,signal:null,observed:probe},...oracle.map((row,i)=>({expression:'inspect('+i+')',status:0,signal:null,observed:{calls:1,setup:row.setup,result:row.expected}}))]}};
+ok('synthetic record uses exact full pinned14 Node values; not a guest pass',()=>validateArmRecord(record,'stock-on',oracle));
+ok('full retained result mutation fails without large assert formatting',()=>{const broken={...record,correctness:{...record.correctness,rounds:[[{...record.correctness.rounds[0][0],result:{changed:true}},...record.correctness.rounds[0].slice(1)],...record.correctness.rounds.slice(1)]}};assert.throws(()=>validateArmRecord(broken,'stock-on',oracle),/Recorded data mismatch/);});
+ok('WT raw status not replaceable by truthy pass',()=>{const broken={...record,correctness:{...record.correctness,wasmtime:[{...record.correctness.wasmtime[0],status:1},...record.correctness.wasmtime.slice(1)]}};assert.throws(()=>validateArmRecord(broken,'stock-on',oracle));});
+ok('retained counters remain exact',()=>{const broken={...record,correctness:{...record.correctness,freshRows:[{...record.correctness.freshRows[0],calls:2},...record.correctness.freshRows.slice(1)]}};assert.throws(()=>validateArmRecord(broken,'stock-on',oracle),/Recorded data mismatch/);});
+const output=resolve(process.argv[2]??'');assert(output.startsWith('/tmp/starling-node-compat/'));await mkdir(output,{recursive:false});
+const scratch=join(output,'scratch');await mkdir(scratch);const listed=join(scratch,'listed.txt');await writeFile(listed,'before',{flag:'wx'});
+const manifest=JSON.stringify({schemaVersion:1,inputs:[{path:listed,sha256:hash('before'),bytes:6}]})+'\n';await writeFile(join(scratch,'input-freeze.json'),manifest,{flag:'wx'});
+const index=JSON.stringify({schemaVersion:1,files:[{path:'input-freeze.json',sha256:hash(manifest),bytes:Buffer.byteLength(manifest)}]})+'\n';await writeFile(join(scratch,'index.json'),index,{flag:'wx'});
+await verifyCollector(scratch,hash(index));checks.push('own scratch closure valid, no actual artifact');
+await writeFile(listed,'tamper');await assert.rejects(()=>verifyCollector(scratch,hash(index)));checks.push('own scratch listed file tamper refuses');await writeFile(listed,'before');
+await writeFile(join(scratch,'input-freeze.json'),'{unparseable');await assert.rejects(()=>verifyCollector(scratch,hash(index)),error=>error.name==='AssertionError');checks.push('manifest hash checked before parse/rows');
+await assert.rejects(()=>verifyCollector(scratch,'0'.repeat(64)));checks.push('index hash mismatch refuses');
+await writeFile(join(output,'results.json'),JSON.stringify({schemaVersion:1,state:'STOCK_ONLY_AND_COMPOSITION_SOURCE_TESTS_PASSED',passed:checks.length,checks,syntheticRecordOnly:true,actualGuestOrPreflightOrArtifactVerifierOrBundlerOrHostExecuted:false,actualOldArmsOrSourceModified:false},null,2)+'\n',{flag:'wx'});
+console.log(JSON.stringify({passed:checks.length,output}));

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "parentRecipeSha256": "71b48d2e70c5e003fcbcce7620366744c089dd55036036e52926224dfa2614f7",
+  "afterRecipeSha256": "08cce9ccf122808a56e0283241b3f7aa1c80373e33591ce18621e9fa263c5398",
+  "edits": [
+    {
+      "old": "repo_root=\"$(cd \"$(dirname \"${BASH_SOURCE[0]}\")/../..\" && pwd -P)\"",
+      "new": "packet_root=\"$(cd \"$(dirname \"${BASH_SOURCE[0]}\")\" && pwd -P)\"\nrepo_root=\"$(cd \"$packet_root/../../../..\" && pwd -P)\"\n[[ $# == 1 ]] || { echo \"Need exact reviewed source packet index SHA\" >&2; exit 1; }\npython3 \"$packet_root/verify-packet.py\" \"$1\"\nbenchmark_root=\"$repo_root/tests/node-compat/foundation-classic-streams/measurement-extension-candidate-v1\"",
+      "count": 1
+    },
+    {
+      "old": "layer_root=\"$repo_root/tests/node-compat/foundation-classic-streams/integration-candidate-v1\"",
+      "new": "[[ \"$build_type\" == Release && \"$stress\" == 0 && \"$oom\" == 0 && \"$entropy_mode\" == OFF && \"$build_jobs\" == 1 && -z \"$artifact_tag\" ]] || { echo \"Benchmark requires Release/OFF/no stress/one job/empty tag\" >&2; exit 1; }\nfor value in \"$ticks_enabled\" \"$path_enabled\" \"$events_enabled\" \"$string_decoder_enabled\" \"$assert_enabled\" \"$querystring_enabled\" \"$util_enabled\" \"$stream_web_enabled\"; do\n  [[ \"$value\" == 1 ]] || { echo \"Benchmark requires every shared prerequisite\" >&2; exit 1; }\ndone\nlayer_root=\"$repo_root/tests/node-compat/foundation-classic-streams/integration-candidate-v1\"",
+      "count": 1
+    },
+    {
+      "old": "policy_suffix=\"$policy_suffix.private-ticks-v1-$ticks_enabled.classic-v1-$classic_enabled\"",
+      "new": "policy_suffix=\"$policy_suffix.private-ticks-v1-$ticks_enabled.classic-v1-$classic_enabled.classic-bench-v1\"",
+      "count": 1
+    },
+    {
+      "old": "artifact_name=\"$artifact_name.classic-v1.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled\"",
+      "new": "artifact_name=\"sm-classic-bench-v1.c$classic_enabled\"",
+      "count": 1
+    },
+    {
+      "old": "sha256_file \"$repo_root/tests/node-compat/build-engine.sh\" > \"$recipe_before\"",
+      "new": "sha256_file \"$packet_root/build-classic-benchmark-engine.sh\" > \"$recipe_before\"\naddon_manifest=\"$work_root/benchmark-inputs-$artifact_name.json\"\npython3 \"$packet_root/benchmark-policy.py\" capture \"$addon_manifest\"",
+      "count": 1
+    },
+    {
+      "old": "  -DCMAKE_BUILD_TYPE=\"$build_type\" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DWEVAL=OFF -DUSE_WASM_OPT=ON \\",
+      "new": "  -DCMAKE_BUILD_TYPE=\"$build_type\" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DWEVAL=OFF -DUSE_WASM_OPT=ON \\\n  -DCMAKE_EXE_LINKER_FLAGS=\"\" -DCMAKE_PROJECT_ComponentizeJS_INCLUDE=\"$benchmark_root/benchmark.cmake\" -DENABLE_BUILTIN_DIAGNOSTICS_CLASSIC_BENCHMARK=ON \\",
+      "count": 1
+    },
+    {
+      "old": "# Ninja does not provide Make's jobserver to the OpenSSL external project.",
+      "new": "python3 \"$packet_root/benchmark-policy.py\" before \"$build_dir\" \"$artifact\" \"$addon_manifest\"\n# Ninja does not provide Make's jobserver to the OpenSSL external project.",
+      "count": 1
+    },
+    {
+      "old": "\"$classic_enabled\" <<'PY'",
+      "new": "\"$classic_enabled\" \"$packet_root\" <<'PY'",
+      "count": 1
+    },
+    {
+      "old": "stream_web_enabled, ticks_enabled, classic_enabled = sys.argv[1:]",
+      "new": "stream_web_enabled, ticks_enabled, classic_enabled, packet_root = sys.argv[1:]",
+      "count": 1
+    },
+    {
+      "old": "assert digest(pathlib.Path(repo)/'tests/node-compat/build-engine.sh') == pathlib.Path(recipe_before).read_text().strip()",
+      "new": "assert digest(pathlib.Path(packet_root)/'build-classic-benchmark-engine.sh') == pathlib.Path(recipe_before).read_text().strip()",
+      "count": 1
+    },
+    {
+      "old": "    if line.startswith('CMAKE_PROJECT_ComponentizeJS_INCLUDE:'): assert line.partition('=')[2] == '', 'No diagnostic CMake extension'",
+      "new": "    if line.startswith('CMAKE_PROJECT_ComponentizeJS_INCLUDE:'): assert line.partition('=')[2] == str(pathlib.Path(repo)/'tests/node-compat/foundation-classic-streams/measurement-extension-candidate-v1/benchmark.cmake'), 'Exact benchmark include only'",
+      "count": 1
+    },
+    {
+      "old": "    'buildRecipeSha256': digest(pathlib.Path(repo) / 'tests/node-compat/build-engine.sh'),",
+      "new": "    'buildRecipeSha256': digest(pathlib.Path(packet_root) / 'build-classic-benchmark-engine.sh'),",
+      "count": 1
+    },
+    {
+      "old": "with open(artifact + '.build.json', 'w') as output:",
+      "new": "benchmark_spec = importlib.util.spec_from_file_location('classic_benchmark_build_policy',pathlib.Path(packet_root)/'benchmark-policy.py')\nbenchmark = importlib.util.module_from_spec(benchmark_spec);benchmark_spec.loader.exec_module(benchmark)\nmetadata = benchmark.decorate(metadata, pathlib.Path(artifact))\n\nwith open(artifact + '.build.json', 'x') as output:",
+      "count": 1
+    }
+  ],
+  "exactReverseProof": true,
+  "producerInvoked": false
+}

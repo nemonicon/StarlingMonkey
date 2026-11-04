@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "proposal": "private-taskqueue-owned-ticks-v2",
+  "status": "UNAPPLIED-UNCOMPILED-UNLINKED-UNEXECUTED",
+  "selectedWasiInterfaces": [],
+  "hostChanges": [],
+  "newPersistentRoots": 0,
+  "owner": "existing PersistentRooted<TaskQueue>; new traced member",
+  "publicEngineRunEventLoopAbiChanged": false,
+  "initialEvaluationOrigin": "actual EngineConfig.module_mode at direct internal run_event_loop call",
+  "snapshotBoundary": "final post-bindExports check; early EngineState Initialized is insufficient",
+  "deployedEntry": "empty inactive queue required before fresh user dispatch; no entropy-state reuse as owner",
+  "privateFactoryArgument": "native callable created in actual factory realm; no process/global/module export in production",
+  "workModel": "tick FIFO before full Promise checkpoint; all Promise jobs drain before newly queued ticks; first ESM checkpoint starts with jobs",
+  "limits": {
+    "pendingCallbacks": 4096,
+    "argumentsPerCallback": 1024,
+    "pendingArgumentValues": 65536,
+    "callbacksPerCheckpoint": 65536
+  },
+  "limitDoesNotBound": ["referenced application object graph size", "individual callback cost", "independent Promise job chains"],
+  "failure": {
+    "enqueue": "own coded error; no partial entry; a caught error can continue",
+    "directCallback": "preserve original pending thrown value; stop and drop queued tick roots",
+    "checkpointLimit": "own ERR_SM_NODE_SCHEDULER_LIMIT; fail whole boundary, no yield",
+    "reentry": "own ERR_SM_NODE_SCHEDULER_REENTRY; no nested loop/checkpoint",
+    "staleBoundary": "own ERR_SM_NODE_SCHEDULER_STATE; never silently discard stale entry work",
+    "returnedPromise": "existing unhandled rejection tracking; return value ignored",
+    "existingEventPolicy": "unchanged layered strict/protected checks; no per-tick event-latch take or false callback parity claim"
+  },
+  "reset": {
+    "status": "OPEN",
+    "stagedPrecondition": "idle before any reset-owned state mutation",
+    "safeResetOrReuseEstablished": false,
+    "knownNativeIssue": "two AsyncTask cancel implementations assert unreachable; q.tasks range-for not safe for future JS-capable cancellation/mutation",
+    "requiredDecision": "reset-in-progress guard for enqueue/loop/reset plus traced cancellation owner and void task-enqueue policy; broader Promise/finalizer cleanup",
+    "testGuard": "diagnostic checks active-reset rejection only, never executes Engine.reset"
+  },
+  "als": {
+    "implemented": false,
+    "futureCapture": "actual resource-model-v3 new_resource(cx,current_token,true) once per tick enqueue",
+    "futureTrace": "Heap resource field traced with callback/arguments, rooted before dequeue",
+    "futureDispatch": "actual rooted Scope/RAII restore, independent of callback realm",
+    "notSupplied": ["Promise hook integration", "real native I/O capture", "request/resource owner policy", "async IDs", "fatal allocation metadata decision"]
+  },
+  "diagnosticModuleOnly": {
+    "starling:test-internal-ticks": ["nextTick", "scheduleTask", "attemptReentry", "checkResetGuard", "default"],
+    "starling:test-initializer-ticks": ["nextTick", "default"],
+    "applicationInitializerObservation": "created by ordinary existing defineBuiltinModule, not a native global",
+    "factoryRecordChange": false,
+    "globalAdded": false,
+    "rawComponentizeOnly": true
+  },
+  "requiredGates": [
+    "root source review before SDK syntax",
+    "private corrected source and actual metadata flags",
+    "SDK syntax then ordinary Release and Release-GC",
+    "real initialization/module/task/post-bind/deployed boundaries",
+    "FIFO/identity/ring/limits/caught noncommit/throw/reentry/GC",
+    "empty snapshot and repeated exports; no reset equivalence claim",
+    "zero imports for pure immediate-task component on Jco and Wasmtime",
+    "selected standard-host world import and lifecycle checks",
+    "size, memory/retention, throughput evidence before optimization"
+  ]
+}

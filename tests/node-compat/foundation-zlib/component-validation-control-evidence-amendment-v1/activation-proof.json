@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "beforeSha256": "7037ca11cd7b1f85ab5c60ab0ea1447e3373336afd55149b6dae356ad29594f5",
+  "afterSha256": "39b189a2d026717d3383d2c28c29b15e06f8142afa6189427dd725027ce35e65",
+  "edits": [
+    {
+      "old": "OUTPUT=HERE.parent/'component-validation-activated-v1'",
+      "new": "BASE=HERE.parent/'component-validation-candidate-v1'\nBASE_INDEX='a7eca2349282a29649806c327c41ea19f01be9673c0bd7c72201f30672819816'\nOUTPUT=HERE.parent/'component-validation-activated-v2'",
+      "count": 1
+    },
+    {
+      "old": "own=indexed(HERE,own_sha)",
+      "new": "own=indexed(HERE,own_sha);base_rows=indexed(BASE,BASE_INDEX)",
+      "count": 1
+    },
+    {
+      "old": "payload={name:regular(HERE/name)for name in names}",
+      "new": "payload={name:regular(BASE/name)for name in names};payload['run-validation.mjs']=regular(HERE/'proposed/run-validation.mjs')",
+      "count": 1
+    },
+    {
+      "old": "[(HERE,own,own_sha),(bootstrap,boot_rows,bootstrap_sha)]",
+      "new": "[(HERE,own,own_sha),(BASE,base_rows,BASE_INDEX),(bootstrap,boot_rows,bootstrap_sha)]",
+      "count": 1
+    },
+    {
+      "old": "original=json.loads(regular(HERE/'tool-seal.json'))",
+      "new": "original=json.loads(regular(BASE/'tool-seal.json'))",
+      "count": 1
+    },
+    {
+      "old": "'producerIndexSha256':own_sha,'bootstrapIndexSha256':bootstrap_sha",
+      "new": "'producerIndexSha256':own_sha,'parentSourceIndexSha256':BASE_INDEX,'mandatoryControlEvidenceAmendmentIndexSha256':own_sha,'bootstrapIndexSha256':bootstrap_sha",
+      "count": 1
+    }
+  ],
+  "bootstrapAuthorityOrMetadataChanged": false
+}

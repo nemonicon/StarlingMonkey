@@ -1,0 +1,1 @@
+import {isProxy} from 'node:util/types';Promise.resolve().then(()=>isProxy({}));export function run(){return ''}

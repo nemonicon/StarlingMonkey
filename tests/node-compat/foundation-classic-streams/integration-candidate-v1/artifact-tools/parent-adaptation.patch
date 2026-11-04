@@ -1,0 +1,514 @@
+--- a/artifact_common.py
++++ b/artifact_common.py
+@@ -11,14 +11,16 @@
+     raise RuntimeError('Artifact validation requires Python assertions enabled')
+ 
+ HERE = Path(__file__).resolve().parent
+-REPO = HERE.parents[3]
+-OUTPUT = Path('/tmp/starling-node-compat/production-scheduler-artifacts-v1/native-freeze')
+-RECIPE = '869d188de3843b5d527d236a9e5c9af6ba1193f118dc9ad786df6266e1606173'
+-POLICY = '98e80d36b8eb9b7ac99de54832288bd8eec148fa1b9fe0b27b3bada4d12b2cd0'
+-HELPER = '78521feeefe299360228e5db76bfde0b11e6eeee93bd2374cd39b2fe695b610c'
++REPO = HERE.parents[4]
++OUTPUT = Path('/tmp/starling-node-compat/production-classic-artifacts-v1/native-freeze')
++CONTRACT = json.loads((HERE.parent / 'admission-pins.json').read_bytes())
++RECIPE = CONTRACT['productionRecipeSha256']
++POLICY = CONTRACT['policySha256']
++HELPER = CONTRACT['helperSha256']
+ EMBEDDING = '9dcb63beaf55ff6af9ca4d2019316d4a167657c02ed76a1bf246012da0bcd205'
+ ADAPTER = '988224282d03fe0bd3c25b62344aef265b1a8e1f5804bdbc34d6442507fabcc0'
+-LABELS = ('normal-off', 'normal-runtime', 'gc-off')
++LABELS = ('normal-off', 'normal-runtime', 'gc-off', 'disabled-off')
++TOOL_PINS_SHA = 'f68267eff5126af83c099346d07e5befbf6261ed4ca245e14a68f292f32087e3'
+ 
+ def sha(path):
+     value = hashlib.sha256()
+@@ -36,6 +38,30 @@
+     assert path.is_file() and not path.is_symlink(), path
+     assert sha(path) == expected, path
+     return path
++
++def checked_below(root, relative, expected):
++    root = Path(root)
++    assert root.is_absolute() and not root.is_symlink() and root.is_dir()
++    assert isinstance(relative, str) and '\0' not in relative and '\\' not in relative
++    assert not Path(relative).is_absolute() and all(part not in ('', '.', '..') for part in relative.split('/'))
++    path = root
++    for part in relative.split('/'):
++        path /= part
++        assert not path.is_symlink(), path
++    return checked(path, expected)
++
++def tool_dependencies(repo=REPO):
++    pins_path = checked(HERE / 'tool-pins.json', TOOL_PINS_SHA)
++    pins = json.loads(pins_path.read_bytes())
++    assert pins['schemaVersion'] == 1 and pins['recipeSha256'] == RECIPE
++    assert pins['sourcePolicySha256'] == POLICY and pins['sourceHelperSha256'] == HELPER
++    assert pins['nativeSources'] == 342 and pins['reviewedEnginePins'] is None
++    rows = pins['toolDependencies']
++    assert len(rows) == len({row['path'] for row in rows})
++    for row in rows:
++        path = checked_below(repo, row['path'], row['sha256'])
++        assert path.stat().st_size == row['bytes']
++    return rows
+ 
+ def capture_regular(path):
+     path = Path(path)
+@@ -50,8 +76,15 @@
+     assert isinstance(metadata, dict)
+     assert 'diagnosticOnly' not in metadata or metadata['diagnosticOnly'] is False, 'Diagnostic receipts forbidden before engine use'
+     assert 'internalTickDiagnosticPolicy' not in metadata, 'Diagnostic policy forbidden before engine use'
+-    assert metadata.get('buildRecipeSha256') == RECIPE, 'Production recipe869 required before engine use'
++    assert metadata.get('buildRecipeSha256') == RECIPE, 'Current classic342 production recipe required before engine use'
+     assert metadata.get('syntheticMetadataOnly', False) is False, 'Synthetic metadata forbidden before engine use'
++    assert metadata.get('classicStreamsEnabled') is (label != 'disabled-off')
++    for field in ('profileEnabled', 'pathEnabled', 'eventsEnabled', 'stringDecoderEnabled',
++                  'assertEnabled', 'querystringEnabled', 'utilEnabled', 'streamWebEnabled',
++                  'internalTicksEnabled', 'strictInitialization', 'abiFixEnabled', 'bigIntFixEnabled'):
++        assert metadata.get(field) is True, field
++    for field in ('oomTesting', 'debuggerEnabled', 'wptSupportEnabled'):
++        assert metadata.get(field) is False, field
+     gc = label == 'gc-off'
+     entropy = 'runtime-only' if label == 'normal-runtime' else 'off'
+     assert metadata.get('gcStress') is gc and metadata.get('entropyPolicy') == entropy
+@@ -69,16 +102,28 @@
+         seen.add(name)
+     return rows
+ 
+-def compile_command(command, runtime):
++def compile_command(command, runtime, source=None, classic=True, gc=False):
+     args = shlex.split(command)
+     assert args.count('-c') == 1 and '-fsyntax-only' not in args
+-    assert '-O3' in args and '-DNDEBUG' in args and not any(x.startswith('-DDEBUG') for x in args)
++    assert '-D' not in args and '-U' not in args, 'Need captured joined macro arguments'
++    assert '-O3' in args and '-DNDEBUG' in args and '-UNDEBUG' not in args and not any(x.startswith('-DDEBUG') for x in args)
+     for flag in ('NODE_COMPAT_INTERNAL_TICKS', 'NODE_COMPAT_STRICT_INITIALIZATION',
+                  'NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER', 'NODE_COMPAT_ENTROPY_POLICY'):
+         definitions = [x for x in args if x == '-D' + flag or x.startswith('-D' + flag + '=')]
+         assert definitions == ['-D' + flag + '=1'], flag
++        assert '-U' + flag not in args, flag
+     runtime_definitions = [x for x in args if x == '-DNODE_COMPAT_ENTROPY_RUNTIME_ONLY' or x.startswith('-DNODE_COMPAT_ENTROPY_RUNTIME_ONLY=')]
+     assert runtime_definitions == (['-DNODE_COMPAT_ENTROPY_RUNTIME_ONLY=1'] if runtime else [])
++    assert '-UNODE_COMPAT_ENTROPY_RUNTIME_ONLY' not in args
++    if source is not None:
++        assert args[args.index('-c') + 1].endswith('/' + source), 'Compiler input disagrees with recorded native source'
++        for flag, enabled in (
++                ('NODE_COMPAT_CLASSIC_STREAMS', classic and source.startswith('builtins/node-compat/')),
++                ('NODE_COMPAT_STREAM_WEB', source.startswith('builtins/node-compat/')),
++                ('NODE_COMPAT_GC_STRESS', gc and source.startswith('builtins/node-compat/'))):
++            definitions = [x for x in args if x == '-D' + flag or x.startswith('-D' + flag + '=')]
++            assert definitions == (['-D' + flag + '=1'] if enabled else []), flag
++            assert '-U' + flag not in args, flag
+     return args
+ 
+ def embedding_command(raw, source):
+@@ -148,9 +193,10 @@
+     receipt = json.loads(receipt_data)
+     assert receipt['schema'] == 1 and receipt['state'] == 'immutable-release-engine-frozen'
+     assert receipt['label'] == label and receipt['recipeSha256'] == RECIPE
+-    assert receipt['nativeInputsVerified'] == 306 and receipt['externalEmbeddingInputsVerified'] == 3
++    assert receipt['nativeInputsVerified'] == 342 and receipt['externalEmbeddingInputsVerified'] == 3
+     assert receipt['actualLayoutCompileCommands'] == 61 and receipt['actualEmbeddingCompileCommands'] == 1
+     assert receipt['actualStrictCompileCommands'] == 4
++    assert receipt['actualClassicPrivateCompileCommands'] == 5
+     engine = output / (label + '.engine.wasm')
+     metadata_path = Path(str(engine) + '.build.json')
+     metadata = json.loads(checked(metadata_path, receipt['receiptSha256']).read_bytes())
+@@ -166,7 +212,7 @@
+         destination(path, output)
+         checked(path, row['sha256'])
+         assert path.stat().st_size == row['bytes']
+-    native = manifest(metadata['sourceManifest'], 306)
++    native = manifest(metadata['sourceManifest'], 342)
+     external = manifest(metadata['componentizeSourceManifest'], 3)
+     for entries, prefix in ((native, 'source'), (external, 'componentize-source')):
+         for row in entries:
+@@ -176,8 +222,16 @@
+                            (label + '-CMakeCache.txt', metadata['cmakeCacheSha256']),
+                            (label + '-compile_commands.json', metadata['compileCommandsSha256']),
+                            ('build-engine.sh', RECIPE), ('source-policy.json', POLICY),
+-                           ('source-policy-helper.py', HELPER), ('tooling/wasi_snapshot_preview1.wasm', ADAPTER)):
++                           ('source-policy-helper.py', HELPER), ('tooling/wasi_snapshot_preview1.wasm', ADAPTER),
++                           ('artifact-tools/tool-pins.json', TOOL_PINS_SHA)):
+         assert inventory[str(output / name)]['sha256'] == expected
++    tool_pins = json.loads((output / 'artifact-tools/tool-pins.json').read_bytes())
++    assert tool_pins['recipeSha256'] == RECIPE and tool_pins['reviewedEnginePins'] is None
++    assert len(receipt['toolDependencyClosure']) == len(tool_pins['toolDependencies'])
++    for row in tool_pins['toolDependencies']:
++        frozen = str(output / 'tooling/repository' / row['path'])
++        assert inventory[frozen]['sha256'] == row['sha256'] and inventory[frozen]['bytes'] == row['bytes']
++        assert {'sourcePath': row['path'], 'path': frozen, 'sha256': row['sha256'], 'bytes': row['bytes']} in receipt['toolDependencyClosure']
+     frozen_policy = json.loads((output / 'source-policy.json').read_bytes())
+     assert sorted(native, key=lambda row: row['path']) == frozen_policy['expectedNativeSourceManifest']
+     evidence = receipt['postBuildEmbeddingEvidence']
+@@ -185,10 +239,16 @@
+     assert evidence['beforeBuildCaptureExists'] is False and evidence['exitCode'] == 0
+     assert inventory[evidence['path']]['sha256'] == evidence['sha256']
+     assert embedding_command(Path(evidence['path']).read_bytes(), evidence['sourcePath']) == metadata['actualEmbeddingCompileCommands'] == evidence['compileCommands']
++    assert receipt['classicStreamsEnabled'] is metadata['classicStreamsEnabled']
++    assert metadata['openssl']['completeSourceAudit']['sourceFilesVerified'] == 4650
++    assert metadata['openssl']['completeSourceAudit']['beforeAndAfterBuild'] is True
+     hashes = {row['sha256'] for row in receipt['copies']}
+     for value in (metadata['generatedRustProject']['manifestSha256'], metadata['generatedRustProject']['lockSha256'],
+                   metadata['openssl']['receiptSha256'], metadata['openssl']['completeSourceAudit']['beforeReportSha256']):
+         assert value in hashes, 'Missing frozen Rust/OpenSSL evidence'
++    library = metadata['openssl']['library']
++    assert inventory[str(output / (label + '-libcrypto.a'))]['sha256'] == library['sha256']
++    assert inventory[str(output / (label + '-libcrypto.a'))]['bytes'] == library['bytes']
+     assert receipt['allInputsValidatedBeforeCopies'] is True and receipt['allCopiesAndOriginalsRehashed'] is True
+     checked(receipt_path, receipt_digest)
+     if return_receipt_digest:
+--- a/build-one.py
++++ b/build-one.py
+@@ -1,4 +1,4 @@
+-"""One-job production306 launcher with bounded cleanup of its own new session only.
++"""One-job production342 launcher with bounded cleanup of its own new session only.
+ 
+ Importing this module launches nothing. Tests may call the lifecycle helpers
+ with benign Python children; main is the separately reviewed native launcher.
+@@ -14,7 +14,7 @@
+ import time
+ 
+ 
+-RECIPE_SHA256 = '869d188de3843b5d527d236a9e5c9af6ba1193f118dc9ad786df6266e1606173'
++RECIPE_SHA256 = json.loads((Path(__file__).resolve().parent.parent / 'admission-pins.json').read_bytes())['productionRecipeSha256']
+ MINIMUM_FREE = 800 * 1024 * 1024
+ REQUIRED_START_FREE = 2 * 1024 * 1024 * 1024
+ 
+@@ -228,14 +228,17 @@
+         raise RuntimeError('Launcher validation requires Python assertions enabled')
+     assert len(sys.argv) == 2
+     label = sys.argv[1]
+-    assert label in ('normal-off', 'normal-runtime', 'gc-off')
++    assert label in ('normal-off', 'normal-runtime', 'gc-off', 'disabled-off')
+     sys.dont_write_bytecode = True
+-    from artifact_common import OUTPUT, verify_frozen_variant
+-    root = Path(__file__).resolve().parents[4]
++    from artifact_common import OUTPUT, verify_frozen_variant, tool_dependencies
++    root = Path(__file__).resolve().parents[5]
+     work = Path('/tmp/starling-node-compat/improved-build')
+-    output = Path('/tmp/starling-node-compat/production-scheduler-artifacts-v1/builds') / label
++    output = Path('/tmp/starling-node-compat/production-classic-artifacts-v1/builds') / label
+     recipe = root / 'tests/node-compat/build-engine.sh'
+     assert digest(recipe) == RECIPE_SHA256
++    # Source/dependency pins must agree before preparing output or launching a
++    # native build. Current admission-pins is sealed by fixed tool-pins bytes.
++    tool_dependencies(root)
+     prior = None
+     if label == 'gc-off':
+         prior_path, prior_receipt, prior_metadata = verify_frozen_variant('normal-off')
+@@ -248,9 +251,10 @@
+         'NODE_COMPAT_OOM_TESTING': '0', 'NODE_COMPAT_BUILD_ROOT': str(work),
+         'NODE_COMPAT_ABI_FIX': '1', 'NODE_COMPAT_BIGINT_FIX': '1',
+         'NODE_COMPAT_INTERNAL_TICKS': '1',
++        'NODE_COMPAT_CLASSIC_STREAMS': '0' if label == 'disabled-off' else '1',
+         'NODE_COMPAT_ENTROPY_MODE': 'RUNTIME_ONLY' if label == 'normal-runtime' else 'OFF',
+         'NODE_COMPAT_GC_STRESS': '1' if label == 'gc-off' else '0',
+-        'NODE_COMPAT_ARTIFACT_TAG': 'p306v1',
++        'NODE_COMPAT_ARTIFACT_TAG': 'p342v1',
+         **{'NODE_COMPAT_' + name: '1' for name in
+            ('PATH', 'EVENTS', 'STRING_DECODER', 'ASSERT', 'QUERYSTRING', 'UTIL', 'STREAM_WEB')},
+     }
+--- a/freeze-engine.py
++++ b/freeze-engine.py
+@@ -1,4 +1,4 @@
+-"""Freeze one completed production869 variant. main is never run by source tests."""
++"""Freeze one completed classic342 Release variant. main is never run by source tests."""
+ import sys
+ sys.dont_write_bytecode = True
+ import datetime
+@@ -8,27 +8,29 @@
+ import subprocess
+ from artifact_common import (HERE, REPO, OUTPUT, RECIPE, POLICY, HELPER, EMBEDDING, ADAPTER,
+                              classify, checked, sha, digest, manifest, compile_command,
+-                             embedding_command, validate_plan, execute_plan)
++                             embedding_command, validate_plan, execute_plan,
++                             capture_regular, checked_below, tool_dependencies)
+ 
+ NODE = '/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node'
+ 
+ def main():
+-    assert len(sys.argv) in (3, 4), 'ENGINE normal-off|normal-runtime|gc-off [EXACT_SOURCE_ROOT]'
++    assert len(sys.argv) in (3, 4), 'ENGINE normal-off|normal-runtime|gc-off|disabled-off [EXACT_SOURCE_ROOT]'
+     original_engine = Path(sys.argv[1]).absolute()
+     label = sys.argv[2]
+     source_root = Path(sys.argv[3]).resolve(strict=True) if len(sys.argv) == 4 else REPO
+     metadata_path = Path(str(original_engine) + '.build.json')
+-    metadata_bytes = checked(metadata_path, sha(metadata_path)).read_bytes()
++    metadata_bytes, metadata_digest = capture_regular(metadata_path)
+     metadata = json.loads(metadata_bytes)
+     # No output creation, engine stat/read or Ninja call precedes this gate.
+     gc, entropy = classify(metadata, label)
+     assert source_root == REPO, 'Only the actual configured repository is supported; no path projection'
++    dependency_rows = tool_dependencies(source_root)
+     runtime = entropy == 'runtime-only'
+     recipe = checked(REPO / 'tests/node-compat/build-engine.sh', RECIPE)
+-    policy_path = checked(HERE.parent / 'integration-candidate-v1/policy.json', POLICY)
+-    helper_path = checked(HERE.parent / 'integration-candidate-v1/layer-policy.py', HELPER)
++    policy_path = checked(HERE.parent / 'policy.json', POLICY)
++    helper_path = checked(HERE.parent / 'layer-policy.py', HELPER)
+     policy = json.loads(policy_path.read_bytes())
+-    native = manifest(metadata['sourceManifest'], 306)
++    native = manifest(metadata['sourceManifest'], 342)
+     assert sorted(native, key=lambda x: x['path']) == policy['expectedNativeSourceManifest']
+     spec = importlib.util.spec_from_file_location('production_artifact_source_policy', helper_path)
+     layer = importlib.util.module_from_spec(spec)
+@@ -38,8 +40,8 @@
+     admission_command = [NODE, str(HERE / 'metadata-admission.mjs'), str(metadata_path), label, str(source_root)]
+     admission_process = subprocess.run(admission_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+     admission = json.loads(admission_process.stdout)
+-    assert admission['state'] == 'ACTUAL_FINITE_SOURCE_SELECTOR_PASSED_NO_ENGINE_EXECUTION'
+-    assert admission['sourceFiles'] == 306 and admission['engineBytesRead'] is False
++    assert admission['state'] == 'ACTUAL_FINITE_CLASSIC_SOURCE_SELECTOR_PASSED_NO_ENGINE_EXECUTION'
++    assert admission['sourceFiles'] == 342 and admission['engineBytesRead'] is False
+ 
+     cache_path = checked(Path(metadata['cmakeCachePath']), metadata['cmakeCacheSha256'])
+     build = cache_path.parent
+@@ -55,8 +57,10 @@
+     required = {'CMAKE_BUILD_TYPE': 'Release', 'WEVAL': 'OFF', 'USE_WASM_OPT': 'ON',
+                 'NODE_COMPAT_ENTROPY_MODE': 'RUNTIME_ONLY' if runtime else 'OFF',
+                 'NODE_COMPAT_INTERNAL_TICKS': 'ON', 'NODE_COMPAT_GC_STRESS': 'ON' if gc else 'OFF',
++                'NODE_COMPAT_CLASSIC_STREAMS': 'OFF' if label == 'disabled-off' else 'ON',
+                 'NODE_COMPAT_OOM_TESTING': 'OFF', 'ENABLE_BUILTIN_WPT_SUPPORT': 'OFF',
+-                'ENABLE_JS_DEBUGGER': 'OFF', 'NODE_COMPAT_LOCKED_RUST': 'ON'}
++                'ENABLE_JS_DEBUGGER': 'OFF', 'NODE_COMPAT_LOCKED_RUST': 'ON',
++                **{'NODE_COMPAT_' + name: 'ON' for name in ('PATH', 'EVENTS', 'STRING_DECODER', 'ASSERT', 'QUERYSTRING', 'UTIL', 'STREAM_WEB')}}
+     for key, value in required.items():
+         assert cache.get(key) == value, key
+     assert not cache.get('CMAKE_PROJECT_ComponentizeJS_INCLUDE', ''), 'No diagnostic CMake extension'
+@@ -87,9 +91,16 @@
+     assert embedding == metadata['actualEmbeddingCompileCommands']
+     assert embedding == metadata['internalTickPolicy']['actualEmbeddingCompileCommands']
+     assert embedding == metadata['protectedAbortListenerPolicy']['actualEmbeddingCompileCommands']
+-    layer.validate_compilation(database, embedding, True, source_root)
+-    for command in layout + embedding:
+-        compile_command(command, runtime)
++    layer.validate_classic_compilation(database, embedding, source_root, metadata)
++    for row in rows:
++        source = next(name for name in cpp if row['file'].endswith('/' + name))
++        compile_command(row['command'], runtime, source, label != 'disabled-off', gc)
++    compile_command(embedding[0], runtime, 'embedding/embedding.cpp', label != 'disabled-off', gc)
++    private_paths = policy['privateTargetCpp']
++    private = [row['command'] for row in rows if any(row['file'].endswith('/' + path) for path in private_paths)]
++    assert len(private) == 5 and sorted(private) == sorted(metadata['classicStreamsPolicy']['actualPrivateTargetCompileCommands'])
++    registration = [row['command'] for row in rows if row['file'].endswith('/builtins/node-compat/register.cpp')]
++    assert registration == metadata['actualRegistrationCompileCommands'] == metadata['classicStreamsPolicy']['actualRegistrationCompileCommands']
+     kernel = [row['command'] for row in rows if row['file'].endswith('/builtins/node-compat/buffer.cpp')]
+     assert len(kernel) == 1 and ('-DNODE_COMPAT_GC_STRESS=1' in compile_command(kernel[0], runtime)) is gc
+     # Only after actual finite metadata/source/command checks may engine bytes be read.
+@@ -99,6 +110,8 @@
+         assert stream.read(8) == b'\0asm\x01\0\0\0', 'Expected a core Wasm engine artifact'
+     audit = metadata['openssl']['completeSourceAudit']
+     assert audit['sourceFilesVerified'] == 4650 and audit['beforeAndAfterBuild'] is True
++    assert Path(audit['sourceDirectory']) == Path(metadata['openssl']['sourceDir'])
++    assert audit['receiptSha256'] == metadata['openssl']['receiptSha256']
+     before_audit = json.loads(checked(Path(audit['beforeReportPath']), audit['beforeReportSha256']).read_bytes())
+     assert before_audit['state'] == 'verified-complete-source'
+     for key, value in before_audit.items():
+@@ -118,11 +131,20 @@
+         ('openssl-configure.txt', metadata['openssl']['configureRecipe']['path'], metadata['openssl']['configureRecipe']['sha256']),
+         ('openssl-configdata.pm', metadata['openssl']['configdata']['path'], metadata['openssl']['configdata']['sha256']),
+         ('Cargo.toml', rust['manifestPath'], rust['manifestSha256']), ('Cargo.lock', rust['lockPath'], rust['lockSha256']),
++        ('libcrypto.a', library['path'], library['sha256']),
+     ]
+     plan = []
++    planned = {}
+     def add(original, name, expected, shared=False):
+         path = checked(Path(original), expected)
+-        plan.append({'original': path, 'target': OUTPUT / name, 'sha256': expected, 'shared': shared})
++        target = OUTPUT / name
++        if target in planned:
++            previous = planned[target]
++            assert shared and previous['shared'] and previous['sha256'] == expected and previous['original'] == path, 'Conflicting duplicate planned input'
++            return
++        row = {'original': path, 'target': target, 'sha256': expected, 'shared': shared}
++        planned[target] = row
++        plan.append(row)
+     def generated(data, name):
+         plan.append({'original': None, 'data': data, 'target': OUTPUT / name, 'sha256': digest(data), 'shared': False})
+     add(engine, label + '.engine.wasm', metadata['engineSha256'])
+@@ -141,24 +163,38 @@
+     add(policy_path, 'source-policy.json', POLICY, True)
+     add(helper_path, 'source-policy-helper.py', HELPER, True)
+     add(adapter, 'tooling/wasi_snapshot_preview1.wasm', ADAPTER, True)
++    assert any(row['path'] == 'host-apis/wasi-0.2.0/preview1-adapter-release/wasi_snapshot_preview1.wasm' and row['sha256'] == ADAPTER for row in native)
++    for row in dependency_rows:
++        original = checked_below(source_root, row['path'], row['sha256'])
++        add(original, 'tooling/repository/' + row['path'], row['sha256'], True)
+     licenses = []
+     for original in sorted((source_root / 'builtins/node-compat').rglob('*')):
+         if original.is_file() and original.name.startswith(('LICENSE', 'NOTICE')):
+             name = str(original.relative_to(source_root))
+             add(original, 'source/' + name, sha(original), True)
+             licenses.append({'path': name, 'sha256': sha(original)})
+-    for name in ['freeze-engine.py', 'artifact_common.py', 'metadata-admission.mjs']:
++    openssl_license = checked(Path(metadata['openssl']['sourceDir']) / 'LICENSE.txt', sha(Path(metadata['openssl']['sourceDir']) / 'LICENSE.txt'))
++    add(openssl_license, 'dependency-licenses/openssl-LICENSE.txt', sha(openssl_license), True)
++    licenses.append({'path': 'dependency-licenses/openssl-LICENSE.txt', 'sha256': sha(openssl_license), 'sourceAuditFiles': 4650})
++    for name in ['build-one.py', 'freeze-engine.py', 'artifact_common.py', 'metadata-admission.mjs',
++                 'export-pin-candidate.py', 'tool-pins.json', 'parent-inputs.json']:
+         add(HERE / name, 'artifact-tools/' + name, sha(HERE / name), True)
++    for original in sorted((HERE / 'ancestry/production-artifacts-v1').iterdir()):
++        assert original.is_file() and not original.is_symlink()
++        add(original, 'artifact-tools/ancestry/production-artifacts-v1/' + original.name, sha(original), True)
+     receipt_path = OUTPUT / (label + '-freeze-receipt.json')
++    checked(metadata_path, metadata_digest)
++    tool_dependencies(source_root)
+     validate_plan(plan, receipt_path)  # ALL inputs/destinations checked before any copy.
+     execute_plan(plan)
+     receipt = {'schema': 1, 'state': 'immutable-release-engine-frozen', 'label': label,
+         'engine': str(OUTPUT / (label + '.engine.wasm')), 'engineSha256': metadata['engineSha256'],
+         'engineBytes': metadata['engineBytes'], 'receiptSha256': digest(metadata_bytes),
+         'sourceRoot': str(OUTPUT / 'source'), 'componentizeSourceRoot': str(OUTPUT / 'componentize-source'),
+-        'nativeInputsVerified': 306, 'externalEmbeddingInputsVerified': 3, 'recipeSha256': RECIPE,
++        'nativeInputsVerified': 342, 'externalEmbeddingInputsVerified': 3, 'recipeSha256': RECIPE,
+         'actualLayoutCompileCommands': 61, 'actualStrictCompileCommands': 4, 'actualEmbeddingCompileCommands': 1,
+         'entropyPolicy': entropy, 'gcStress': gc, 'coreVersion': admission['coreExpectations']['coreVersion'],
++        'classicStreamsEnabled': metadata['classicStreamsEnabled'], 'actualClassicPrivateCompileCommands': 5,
+         'coreSources': admission['coreExpectations']['sourceHashes'], 'licenses': licenses,
+         'observedCMakeOptions': metadata['observedCMakeOptions'], 'originalEngine': str(engine),
+         'originalMetadataPath': str(metadata_path), 'originalReceiptPreserved': True,
+@@ -171,9 +207,12 @@
+         'toolingInputs': [{'role': 'live-preview1-adapter-copy', 'original': str(adapter),
+             'path': str(OUTPUT / 'tooling/wasi_snapshot_preview1.wasm'), 'sha256': ADAPTER, 'bytes': 53512,
+             'additionalNativeInput': False, 'doesNotReplaceLiveRuntimeSeal': True}],
++        'toolDependencyClosure': [{'sourcePath': row['path'], 'path': str(OUTPUT / 'tooling/repository' / row['path']),
++                                 'sha256': row['sha256'], 'bytes': row['bytes']} for row in dependency_rows],
+         'copies': [{'path': str(row['target']), 'original': str(row['original']) if row['original'] else None,
+                     'sha256': row['sha256'], 'bytes': row['target'].stat().st_size, 'shared': row['shared']} for row in plan],
+-        'dependencyReferences': [{'kind': 'linked-libcrypto-not-copied', **library}],
++        'dependencyReferences': [{'kind': 'linked-libcrypto-frozen-copy', **library,
++                                 'frozenPath': str(OUTPUT / (label + '-libcrypto.a'))}],
+         'allInputsValidatedBeforeCopies': True, 'allCopiesAndOriginalsRehashed': True,
+         'partialOutputOnFailure': 'Preserved; no receipt or pin export implies acceptance',
+         'helperSha256': sha(Path(__file__)), 'guestExecutedByHelper': False}
+--- a/export-pin-candidate.py
++++ b/export-pin-candidate.py
+@@ -8,9 +8,10 @@
+ def candidate(label, output=OUTPUT):
+     receipt_path, receipt, metadata, receipt_digest = verify_frozen_variant(label, output, return_receipt_digest=True)
+     rows = [{'path': row['path'], 'sha256': row['sha256'], 'bytes': row['bytes']} for row in receipt['copies']]
+-    return {'state': 'unreviewed-production-freeze-pin-candidate',
+-        'label': label, 'gcStress': metadata['gcStress'], 'entropyPolicy': metadata['entropyPolicy'],
+-        'sourceFiles': 306, 'recipeSha256': RECIPE, 'engineBytes': receipt['engineBytes'],
++    return {'state': 'unreviewed-classic-production-freeze-pin-candidate',
++        'variant': label, 'label': label, 'gcStress': metadata['gcStress'], 'entropyPolicy': metadata['entropyPolicy'],
++        'classicStreamsEnabled': metadata['classicStreamsEnabled'],
++        'sourceFiles': 342, 'recipeSha256': RECIPE, 'engineBytes': receipt['engineBytes'],
+         'engineSha256': receipt['engineSha256'], 'receiptSha256': receipt['receiptSha256'],
+         'cmakeCacheSha256': metadata['cmakeCacheSha256'], 'compileCommandsSha256': metadata['compileCommandsSha256'],
+         'freezeReceiptSha256': receipt_digest, 'freezeRoot': str(output),
+@@ -18,10 +19,12 @@
+         'componentizeSourceRoot': str(output / 'componentize-source'), 'cachePath': str(output / (label + '-CMakeCache.txt')),
+         'commandsPath': str(output / (label + '-compile_commands.json')), 'recipePath': str(output / 'build-engine.sh'),
+         'freezeReceiptPath': str(receipt_path), 'coreSources': receipt['coreSources'], 'frozenFiles': rows,
++        'parentEmbeddingCommandPath': receipt['postBuildEmbeddingEvidence']['path'],
++        'parentEmbeddingCommandSha256': receipt['postBuildEmbeddingEvidence']['sha256'],
+         'reviewRequired': True, 'runtimeAcceptanceClaim': False}
+ 
+ def main():
+-    assert len(sys.argv) >= 3, 'FRESH_OUTPUT_JSON normal-off|normal-runtime|gc-off [more completed labels]'
++    assert len(sys.argv) >= 3, 'FRESH_OUTPUT_JSON normal-off|normal-runtime|gc-off|disabled-off [more completed labels]'
+     output = Path(sys.argv[1]).absolute()
+     assert not output.exists() and not output.is_symlink(), 'Never overwrite pin data'
+     labels = sys.argv[2:]
+@@ -29,9 +32,10 @@
+     variants = {label: None for label in LABELS}
+     for label in labels:
+         variants[label] = candidate(label)
+-    document = {'schemaVersion': 1, 'state': 'UNREVIEWED_PRODUCTION_PIN_CANDIDATES_V1',
++    document = {'schemaVersion': 1, 'state': 'UNREVIEWED_CLASSIC_PRODUCTION_PIN_CANDIDATES_V1',
+         'variants': variants, 'requiresIndependentReviewAndNewAdmissionRevision': True,
+-        'notAcceptedByEitherReviewedPinSelector': True, 'guestExecutedByExporter': False}
++        'notAcceptedByReviewedClassicPinSelector': True, 'consumerPinsModified': False,
++        'guestExecutedByExporter': False}
+     with output.open('x') as stream:
+         json.dump(document, stream, indent=2)
+         stream.write('\n')
+--- a/metadata-admission.mjs
++++ b/metadata-admission.mjs
+@@ -1,39 +1,61 @@
+ // Actual finite source admission only. No engine bytes, Wasm or toolchain loads.
++// Dynamic contract values are fixed by tool-pins and the packet source seal.
+ import assert from 'node:assert/strict';
+-import {readFile} from 'node:fs/promises';
++import {readFile,lstat} from 'node:fs/promises';
+ import {createHash} from 'node:crypto';
+ import {dirname,resolve,join} from 'node:path';
+-import {fileURLToPath} from 'node:url';
+-import {validateProductionMetadata} from '../production-followon-capability-v2/admission.mjs';
+-import {selectedManifestsForEngine} from '../../module-selection.mjs';
+-import {selectCoreExpectations} from '../../core-expectations.mjs';
++import {fileURLToPath,pathToFileURL} from 'node:url';
+ const here=dirname(fileURLToPath(import.meta.url));
+-const hash=b=>createHash('sha256').update(b).digest('hex');
+-export const RECIPE='869d188de3843b5d527d236a9e5c9af6ba1193f118dc9ad786df6266e1606173';
++const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
++const contract=JSON.parse(await readFile(join(here,'../admission-pins.json')));
++export const RECIPE=contract.productionRecipeSha256;
++const TOOL_PINS_SHA='f68267eff5126af83c099346d07e5befbf6261ed4ca245e14a68f292f32087e3';
++export const LABELS=Object.freeze(['normal-off','normal-runtime','gc-off','disabled-off']);
+ export function classify(metadata,label){
+- assert(['normal-off','normal-runtime','gc-off'].includes(label));
+- assert(metadata&&typeof metadata==='object'&&!Array.isArray(metadata));
++ assert(LABELS.includes(label));assert(metadata&&typeof metadata==='object'&&!Array.isArray(metadata));
+  assert(metadata.diagnosticOnly===undefined||metadata.diagnosticOnly===false,'Diagnostic receipts forbidden before engine use');
+  assert(!Object.hasOwn(metadata,'internalTickDiagnosticPolicy'),'Diagnostic policy forbidden before engine use');
+- assert.equal(metadata.buildRecipeSha256,RECIPE,'Production recipe869 required before engine use');
+- const options={gcStress:label==='gc-off',entropyPolicy:label==='normal-runtime'?'runtime-only':'off'};
+- assert.equal(metadata.gcStress,options.gcStress);assert.equal(metadata.entropyPolicy,options.entropyPolicy);
+- return options;
++ assert(metadata.syntheticMetadataOnly===undefined||metadata.syntheticMetadataOnly===false,'Synthetic source models forbidden before engine use');
++ assert.equal(metadata.buildRecipeSha256,RECIPE,'Current classic342 production recipe required before engine use');
++ const options={gcStress:label==='gc-off',entropyPolicy:label==='normal-runtime'?'runtime-only':'off',classicStreamsEnabled:label!=='disabled-off'};
++ for(const[field,value]of Object.entries(options))assert.equal(metadata[field],value,field);
++ for(const field of ['profileEnabled','strictInitialization','abiFixEnabled','bigIntFixEnabled','pathEnabled','eventsEnabled','stringDecoderEnabled','assertEnabled','querystringEnabled','utilEnabled','streamWebEnabled','internalTicksEnabled'])assert.equal(metadata[field],true,field);
++ for(const field of ['oomTesting','debuggerEnabled','wptSupportEnabled'])assert.equal(metadata[field],false,field);
++ return Object.freeze(options);
++}
++async function regularBelow(root,relative,sha,bytes){
++ assert(typeof relative==='string'&&!relative.includes('\0')&&!relative.includes('\\')&&relative.split('/').every(part=>part&&part!=='.'&&part!=='..'));
++ assert(!relative.startsWith('/'));assert((await lstat(root)).isDirectory()&&!(await lstat(root)).isSymbolicLink());
++ let path=root;for(const part of relative.split('/')){path=join(path,part);assert(!(await lstat(path)).isSymbolicLink(),path);}
++ assert((await lstat(path)).isFile());const data=await readFile(path);assert.equal(hash(data),sha,path);assert.equal(data.length,bytes,path);return data;
+ }
+ export async function admit(metadata,label,sourceRoot){
+- const options=classify(metadata,label);
+- const policyBytes=await readFile(join(here,'../integration-candidate-v1/policy.json'));
+- assert.equal(hash(policyBytes),'98e80d36b8eb9b7ac99de54832288bd8eec148fa1b9fe0b27b3bada4d12b2cd0');
++ const options=classify(metadata,label);sourceRoot=resolve(sourceRoot);
++ const toolBytes=await readFile(join(here,'tool-pins.json'));assert.equal(hash(toolBytes),TOOL_PINS_SHA);
++ const tools=JSON.parse(toolBytes);assert.equal(tools.recipeSha256,RECIPE);assert.equal(tools.nativeSources,342);assert.equal(tools.reviewedEnginePins,null);
++ for(const row of tools.toolDependencies)await regularBelow(sourceRoot,row.path,row.sha256,row.bytes);
++ const policyBytes=await readFile(join(here,'../policy.json'));assert.equal(hash(policyBytes),contract.policySha256);
+  const policy=JSON.parse(policyBytes);
+- assert.equal(hash(await readFile(join(here,'../integration-candidate-v1/layer-policy.py'))),'78521feeefe299360228e5db76bfde0b11e6eeee93bd2374cd39b2fe695b610c');
+- const external=[{path:'embedding/embedding.cpp',sha256:policy.embedding.afterSha256},{path:'embedding/embedding.h',sha256:'de2c1ae6c7f881902675d79e4bedaeece6953e70e1eac8291165ad0d5cd0eb0e'},{path:'CMakeLists.txt',sha256:'4bd9bb94f5b79a2c9eb8ef7d98bc4b712e7b9cc2702467436a87e1845240c5e8'}];
+- validateProductionMetadata(metadata,{...options,expectedSources:policy.expectedNativeSourceManifest,expectedExternal:external});
++ const parentPins=JSON.parse(await readFile(join(sourceRoot,'tests/node-compat/foundation-scheduler/admission-candidate-v1/pins.json')));
++ // Imports use actual installed finite code only after its exact source hash and
++ // complete tool-dependency graph above have passed. No 306-to342 projection.
++ const {validateClassicSourceAdmission}=await import(pathToFileURL(join(sourceRoot,'tests/node-compat/classic-streams-admission.mjs')));
++ const classic=validateClassicSourceAdmission(metadata,{sourceRoot,
++  parentProtectedSources:parentPins.parentProtected.sourceSha256,parentProtectedPatch:parentPins.parentProtected.patchSha256});
++ assert.equal(classic.sourceInputs,342);assert.equal(classic.classicStreamsEnabled,options.classicStreamsEnabled);
++ const {selectedManifestsForEngine}=await import(pathToFileURL(join(sourceRoot,'tests/node-compat/module-selection.mjs')));
+  const manifests=selectedManifestsForEngine(metadata,{sourceRoot});
++ const ids=manifests.flatMap(value=>Object.keys(value.modules));
++ assert.equal(ids.includes('node:stream'),options.classicStreamsEnabled);assert.equal(ids.includes('node:stream/promises'),options.classicStreamsEnabled);
++ const {selectCoreExpectations}=await import(pathToFileURL(join(sourceRoot,'tests/node-compat/core-expectations.mjs')));
+  const core=selectCoreExpectations(metadata,{sourceRoot});assert.equal(core.coreVersion,'sm-node-22.14.0-m0.11');assert.equal(core.allocUnsafePolicy,'zeroed-no-pool-direct-u8-v1');
+- return{state:'ACTUAL_FINITE_SOURCE_SELECTOR_PASSED_NO_ENGINE_EXECUTION',label,options,sourceRoot,
+-  sourceFiles:306,externalSources:external,selectedManifestCount:manifests.length,coreExpectations:core,
+-  policySha256:hash(policyBytes),selectorSourceSha256:hash(await readFile(join(here,'../../module-selection.mjs'))),
+-  admissionSourceSha256:hash(await readFile(join(here,'../../private-ticks-admission.mjs'))),engineBytesRead:false,guestExecuted:false};
++ assert.equal(metadata.componentizeSourceManifest.length,3);
++ assert.equal(metadata.componentizeSourceManifest.find(row=>row.path==='embedding/embedding.cpp')?.sha256,policy.embedding.afterSha256);
++ return{state:'ACTUAL_FINITE_CLASSIC_SOURCE_SELECTOR_PASSED_NO_ENGINE_EXECUTION',label,options,sourceRoot,
++  sourceFiles:342,externalSources:metadata.componentizeSourceManifest,selectedManifestCount:manifests.length,coreExpectations:core,
++  classicSourceAdmission:classic,policySha256:hash(policyBytes),toolPinsSha256:hash(toolBytes),toolDependenciesVerified:tools.toolDependencies.length,
++  selectorSourceSha256:hash(await readFile(join(sourceRoot,'tests/node-compat/module-selection.mjs'))),
++  admissionSourceSha256:hash(await readFile(join(sourceRoot,'tests/node-compat/classic-streams-admission.mjs'))),engineBytesRead:false,guestExecuted:false};
+ }
+ if(process.argv[1]===fileURLToPath(import.meta.url)){
+  assert.equal(process.version,'v22.14.0');assert.deepEqual(process.execArgv,[]);assert(!process.env.NODE_OPTIONS);

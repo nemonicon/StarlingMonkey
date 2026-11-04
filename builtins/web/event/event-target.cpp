@@ -7,6 +7,15 @@
 
 #include "js/GCPolicyAPI.h"
 #include "mozilla/Assertions.h"
+#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+#include "js/Id.h"
+#include "js/Symbol.h"
+#include "global-event-target.h"
+#endif
+#ifdef NODE_COMPAT_STRICT_INITIALIZATION
+#include "event_loop.h"
+#include "mozilla/ScopeExit.h"
+#endif
 
 namespace {
 
@@ -39,7 +48,9 @@ bool flatten_opts(JSContext *cx, JS::HandleValue opts, bool *rval) {
 
 // https://dom.spec.whatwg.org/#event-flatten-more
 bool flatten_more_opts(JSContext *cx, JS::HandleValue opts, bool *capture, bool *once,
-                       JS::MutableHandleValue passive, JS::MutableHandleValue signal) {
+                       JS::MutableHandleValue passive, JS::MutableHandleValue signal,
+                       bool *resist_stop_propagation) {
+  *resist_stop_propagation = false;
   // To flatten more options, run these steps:
   // - Let capture be the result of flattening options.
   *capture = false;
@@ -84,7 +95,17 @@ bool flatten_more_opts(JSContext *cx, JS::HandleValue opts, bool *capture, bool 
     signal.set(val);
   }
 
-  // - Return capture, passive, once, and signal.
+#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+  JS::RootedSymbol symbol(cx, builtins::web::event::EventTarget::node_abort_resist_key());
+  if (symbol) {
+    JS::RootedId id(cx, JS::PropertyKey::Symbol(symbol));
+    if (!JS_GetPropertyById(cx, obj, id, &val)) {
+      return false;
+    }
+    *resist_stop_propagation = JS::ToBoolean(val);
+  }
+#endif
+  // - Return capture, passive, once, signal, and the selected guest-only flag.
   return true;
 }
 
@@ -188,6 +209,22 @@ const JSPropertySpec EventTarget::properties[] = {
     JS_PS_END,
 };
 
+#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+bool EventTarget::check_receiver(JSContext *cx, HandleValue receiver, const char *method_name) {
+  if (!is_instance(receiver)) {
+    return api::throw_error(cx, api::Errors::WrongReceiver, method_name, class_name);
+  }
+  const JS::Value &state = JS::GetReservedSlot(&receiver.toObject(), std::to_underlying(Slots::Listeners));
+  // Only trusted native initialization writes this inaccessible slot, using
+  // PrivateValue. The pinned Value API tags private pointers as doubles; there
+  // is no isPrivate(). Reject undefined prototypes before calling toPrivate().
+  if (!state.isDouble() || !state.toPrivate()) {
+    return api::throw_error(cx, api::Errors::WrongReceiver, method_name, class_name);
+  }
+  return true;
+}
+#endif
+
 EventTarget::ListenerList *EventTarget::listeners(JSObject *self) {
   MOZ_ASSERT(is_instance(self));
 
@@ -236,10 +273,12 @@ bool EventTarget::add_listener(JSContext *cx, HandleObject self, HandleValue typ
   bool capture = false;
   bool once = false;
   bool passive = false;
+  bool resist_stop_propagation = false;
   RootedValue passive_val(cx);
   RootedValue signal_val(cx);
 
-  if (!flatten_more_opts(cx, opts_val, &capture, &once, &passive_val, &signal_val)) {
+  if (!flatten_more_opts(cx, opts_val, &capture, &once, &passive_val, &signal_val,
+                         &resist_stop_propagation)) {
     return false;
   }
 
@@ -293,6 +332,16 @@ bool EventTarget::add_listener(JSContext *cx, HandleObject self, HandleValue typ
            capture == listener->capture;
   });
 
+#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+  if (it != list->end() && (*it)->removed) {
+    // A dispatch clone can still own this removed once record. Never revive it:
+    // retire only the target-list reference, then append a fresh record below.
+    // Existing clones must keep seeing removed=true throughout their traversal.
+    list->erase(it);
+    it = list->end();
+  }
+#endif
+
   if (it == list->end()) {
     auto listener = mozilla::MakeRefPtr<EventListener>();
     listener->callback = callback_val;
@@ -302,8 +351,18 @@ bool EventTarget::add_listener(JSContext *cx, HandleObject self, HandleValue typ
     listener->capture = capture;
     listener->once = once;
     listener->removed = false;
+#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+    listener->resist_stop_propagation = resist_stop_propagation;
+#endif
 
+#ifdef NODE_COMPAT_STRICT_INITIALIZATION
+    if (!list->append(listener)) {
+      JS_ReportOutOfMemory(cx);
+      return false;
+    }
+#else
     list->append(listener);
+#endif
   } else if((*it)->removed) {
     // if existing listener was marked for removal, then move it to the end of the list
     // and update its removed flag. This is done to ensure the order of listeners. We only
@@ -312,9 +371,22 @@ bool EventTarget::add_listener(JSContext *cx, HandleObject self, HandleValue typ
     (*it)->passive = passive;
     (*it)->once = once;
     (*it)->removed = false;
+#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+    (*it)->resist_stop_propagation = resist_stop_propagation;
+#endif
 
+#ifdef NODE_COMPAT_STRICT_INITIALIZATION
+    // Preserve the owning reference before erase invalidates this iterator.
+    auto listener = *it;
+    list->erase(it);
+    if (!list->append(listener)) {
+      JS_ReportOutOfMemory(cx);
+      return false;
+    }
+#else
     list->erase(it);
     list->append(*it);
+#endif
   }
 
   // - If listener's signal is not null, then add the following abort steps to it:
@@ -497,12 +569,26 @@ bool EventTarget::inner_invoke(JSContext *cx, HandleObject event,
   *found = false;
 
   bool listeners_removed = false;
+#ifdef NODE_COMPAT_STRICT_INITIALIZATION
+  RootedObject current_target(cx, Event::current_target(event));
+  auto remove_once_listeners = mozilla::MakeScopeExit([&] {
+    if (listeners_removed) {
+      listeners(current_target)->eraseIf([](const auto &listener) { return listener->removed; });
+    }
+  });
+#endif
 
   // 2. For each listener of listeners, whose removed is false:
   for (const auto &listener : list) {
     if (listener->removed) {
       continue;
     }
+#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+    if (Event::has_flag(event, EventFlag::StopImmediatePropagation) &&
+        !listener->resist_stop_propagation) {
+      continue;
+    }
+#endif
 
     // 1. If event's type attribute value is not listener's type, then continue.
     if (listener->type != type_sv) {
@@ -534,6 +620,11 @@ bool EventTarget::inner_invoke(JSContext *cx, HandleObject event,
     if (listener->passive) {
       Event::set_flag(event, EventFlag::InPassiveListener, true);
     }
+#ifdef NODE_COMPAT_STRICT_INITIALIZATION
+    auto reset_passive_flag = mozilla::MakeScopeExit([&] {
+      Event::set_flag(event, EventFlag::InPassiveListener, false);
+    });
+#endif
 
     // 10. If global is a Window object, then record timing info for event listener given event and
     // listener. N/A
@@ -549,37 +640,75 @@ bool EventTarget::inner_invoke(JSContext *cx, HandleObject event,
     RootedValueArray<1> args(cx);
     args[0].setObject(*event);
 
+    bool callback_ok;
     if (JS::IsCallable(callback_obj)) {
+#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+      // Preserve the global API's hidden-target convention; ordinary native
+      // EventTarget/AbortSignal function listeners receive their actual target.
+      RootedObject receiver(cx, Event::current_target(event));
+      if (receiver == global_event_target()) receiver = engine->global();
+      callback_ok = JS::Call(cx, receiver, callback_val, args, &rval);
+#else
       auto global = engine->global();
-      JS::Call(cx, global, callback_val, args, &rval);
+      callback_ok = JS::Call(cx, global, callback_val, args, &rval);
+#endif
     } else {
       RootedValue handle_fn(cx);
       if (!JS_GetProperty(cx, callback_obj, "handleEvent", &handle_fn)) {
+#ifdef NODE_COMPAT_STRICT_INITIALIZATION
+        callback_ok = false;
+#else
         return false;
+#endif
+      } else {
+        callback_ok = JS::Call(cx, callback_val, handle_fn, args, &rval);
       }
-      JS::Call(cx, callback_val, handle_fn, args, &rval);
     }
+#ifdef NODE_COMPAT_STRICT_INITIALIZATION
+    if (!callback_ok && !JS_IsExceptionPending(cx)) {
+      core::EventLoop::record_failed_event_invocation();
+      return false;
+    }
+#else
+    (void)callback_ok;
+#endif
 
     if (JS_IsExceptionPending(cx)) {
       // TODO: report an exception as in spec:
       // https://html.spec.whatwg.org/multipage/webappapis.html#report-an-exception
       // https://github.com/bytecodealliance/StarlingMonkey/issues/239
+#ifdef NODE_COMPAT_STRICT_INITIALIZATION
+      if (!core::EventLoop::record_pending_event_exception(cx)) {
+        return false;
+      }
+#else
       auto msg = "Exception in event listener for " + listener->type;
       engine->dump_pending_exception(msg.c_str());
       JS_ClearPendingException(cx);
+#endif
     }
 
-    // 12. Unset event's in passive listener flag.
+    // 12. Unset event's in passive listener flag (strict mode uses the guard).
+#ifndef NODE_COMPAT_STRICT_INITIALIZATION
     Event::set_flag(event, Event::EventFlag::InPassiveListener, false);
+#endif
     // 13. If global is a Window object, then set global's current event to currentEvent.
     // N/A
 
     // 14. If event's stop immediate propagation flag is set, then break.
     if (Event::has_flag(event, EventFlag::StopImmediatePropagation)) {
+#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+      // Continue in registration order; later unprotected records are skipped.
+      continue;
+#elif defined(NODE_COMPAT_STRICT_INITIALIZATION)
+      break;
+#else
       return true;
+#endif
     }
   }
 
+#ifndef NODE_COMPAT_STRICT_INITIALIZATION
   if (listeners_removed) {
     auto *current_target = Event::current_target(event);
     MOZ_ASSERT(is_instance(current_target));
@@ -588,6 +717,7 @@ bool EventTarget::inner_invoke(JSContext *cx, HandleObject event,
     MOZ_ASSERT(target_list);
     target_list->eraseIf([](const auto &listener) { return listener->removed; });
   }
+#endif
 
   return true;
 }
@@ -645,8 +775,26 @@ void EventTarget::trace(JSTracer *trc, JSObject *self) {
   list->trace(trc);
 }
 
+#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+JS::Symbol *EventTarget::node_abort_resist_key() {
+  if (!proto_obj.initialized() || !proto_obj.get()) return nullptr;
+  const JS::Value &key = JS::GetReservedSlot(proto_obj, std::to_underlying(Slots::NodeAbortResistKey));
+  return key.isSymbol() ? key.toSymbol() : nullptr;
+}
+#endif
+
 bool EventTarget::init_class(JSContext *cx, JS::HandleObject global) {
-  return init_class_impl(cx, global);
+  if (!init_class_impl(cx, global)) return false;
+#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+  JS::RootedString description(cx, JS_NewStringCopyZ(cx, "kResistStopPropagation"));
+  if (!description) return false;
+  JS::RootedSymbol key(cx, JS::NewSymbol(cx, description));
+  if (!key) return false;
+  // Native reserved slots are traced before the custom class trace hook. The
+  // key is owned by this existing prototype, not by a new static GC root.
+  JS::SetReservedSlot(proto_obj, std::to_underlying(Slots::NodeAbortResistKey), JS::SymbolValue(key));
+#endif
+  return true;
 }
 
 } // namespace builtins::web::event

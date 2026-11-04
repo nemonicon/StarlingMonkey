@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "verifiedAtUtc": "2026-11-03T02:37:34.995542+00:00",
+  "milestone": "allocation-r2",
+  "goalStatus": "active; full roadmap incomplete",
+  "releaseEngineSha256": "99fdaa97c2fbdea67cb7e5463d3dd2ca10c6981615acb4483d442079f6aab65c",
+  "verifiedArchivedSourceFiles": 191,
+  "sourceArchive": "/tmp/starling-node-compat/allocation-r2-native-freeze/source",
+  "packagingSelection": "patched-import-i32-clock-v2",
+  "pureComponentSha256": "6ea02d9f664d2d919c7d51ee0d42507dc254ee6da00b2a5035b6ca056e5c8218",
+  "pureImports": [],
+  "httpComponentSha256": "10992f81afe2651379a4554d52e5e89bddc73418d0a34d6b95c5acd00c630b28",
+  "httpImports": [
+    "wasi:clocks/monotonic-clock@0.2.10",
+    "wasi:http/types@0.2.10",
+    "wasi:io/error@0.2.10",
+    "wasi:io/poll@0.2.10",
+    "wasi:io/streams@0.2.10"
+  ],
+  "clockFunctions": [],
+  "nativeCasesPerCall": {
+    "strings": 381,
+    "bytes": 250,
+    "spoofs": 3,
+    "sizes": 8,
+    "publicInputShadows": 4
+  },
+  "samePureInstanceCalls": [
+    1,
+    2
+  ],
+  "httpRequests": {
+    "wasmtime42": 3,
+    "wasmcloud2_11": 3
+  },
+  "abi": {
+    "scalarExports": {
+      "engineSha256": "99fdaa97c2fbdea67cb7e5463d3dd2ca10c6981615acb4483d442079f6aab65c",
+      "passed": 339,
+      "wasmtime": 20,
+      "imports": []
+    },
+    "importI32": {
+      "engineSha256": "3f5bf602ad2d1507db5c1bcd5b938984aba9ca65af4c5a840b5bf8fcd09d370f",
+      "passed": 333,
+      "wasmtime": 7,
+      "imports": [],
+      "note": "Native3f5 engine identical in both splicer arms to isolate imported-I32 correction; negative-s64 failures remain a separately recorded old-native control."
+    },
+    "rawActualI32Reader": {
+      "engineSha256": "99fdaa97c2fbdea67cb7e5463d3dd2ca10c6981615acb4483d442079f6aab65c",
+      "passed": 9,
+      "imports": [],
+      "note": "Forces actual raw Double carriers including negative s32, independent of SpiderMonkey boxing."
+    },
+    "signedUnsignedI64": {
+      "engineSha256": "99fdaa97c2fbdea67cb7e5463d3dd2ca10c6981615acb4483d442079f6aab65c",
+      "passed": 377,
+      "wasmtime": 13,
+      "imports": []
+    },
+    "loaderGates": 18,
+    "completeSourceAudit": {
+      "filesPerSourceTree": 270,
+      "profiles": 2,
+      "unrelatedSourceTamperRejected": true,
+      "capture": "Observed after original builds; original immutable package receipts are preserved."
+    },
+    "debugDiagnostic": {
+      "generalIndirectMemory": "unavailable: confirmed64byte displacement; defaultfailfast",
+      "safeDiagnosticWorldSha256": "2384f23573d9f9264940b5f2e574ca06d43ad3a43587beb53f2fc308cd3ebb84",
+      "safeDiagnostic": "Explicit no-import no-argument s32 allocator world only; all4realallocationfailure sites retained",
+      "sourceReport": "../oom/results.json"
+    },
+    "legacyEngineGuards": {
+      "normalMode": "byte-matching sidecar plus observed Release/Debug required",
+      "legacyMode": "missing sidecar only released6094; unknown historical configuration only knownRelease6094/3f5 with explicit legacyDiagnostic",
+      "actualComponentPositiveControls": 3,
+      "unknownRenamedDebugRejected": true
+    }
+  },
+  "oom": {
+    "engineSha256": "0d63dd0ce2839a5a2f29837f583703829c1c0dcd543bef525b161d711beeb6e5",
+    "componentSha256": "a689b71a1010580bcd7e46f330e23b6e7b2d4d691cc81261bcecbc4eec3b52ed",
+    "imports": [],
+    "faultPoints": [
+      "decode-utf8-staging",
+      "decode-uint8array",
+      "encode-malloc-staging",
+      "encode-js-string"
+    ],
+    "repeatedJcoStatuses": [
+      67583,
+      133119,
+      198655
+    ],
+    "freshWasmtimeStatus": 67583,
+    "resultCarrier": {
+      "wit": "run: func() -> s32",
+      "passedMask": "0x7ff",
+      "callCountBits": "bits16..30",
+      "failure": "negative stage number",
+      "failureStages": {
+        "1": "initial integrity",
+        "2": "decode UTF8 staging OOM",
+        "3": "decode Uint8Array OOM",
+        "4": "decode recovery",
+        "5": "encode malloc staging OOM",
+        "6": "encode JS string OOM",
+        "7": "32 recovery pairs",
+        "8": "unsupported Error distinction",
+        "9": "bounded RangeError distinction",
+        "10": "final integrity"
+      },
+      "reason": "DEBUG indirect canonical-memory bindings are unavailable. The scoped scalar path never accesses the shifted DEBUG memory view; every Buffer/string/Error operation is checked inside the guest."
+    },
+    "recoveryPairsPerCall": 32
+  },
+  "upstream": {
+    "strictInitialization": 9,
+    "adaptedStarlingE2E": 19,
+    "componentizeBuiltins": 15,
+    "ownershipCallbacks": 2,
+    "fullCryptoIntegration": "not rerun; preserved prior OpenSSL Preview1 entropy failure remains open"
+  },
+  "reports": [
+    {
+      "path": "native.json",
+      "sha256": "660c3f0b20f1675c671339a2dd580be06cf140ebf7c5147f5f38bc99bd0e7bb1",
+      "source": "/tmp/starling-node-compat/phase1-validation/allocation-r2/native/results.json"
+    },
+    {
+      "path": "http.json",
+      "sha256": "0e41db1ceb49ad2017a240620bfb065f68b06e675e6bbf9f9da724761b815c94",
+      "source": "/tmp/starling-node-compat/phase1-validation/allocation-r2/http/component-audit.json"
+    },
+    {
+      "path": "wasmtime-http.json",
+      "sha256": "eefdf4338bf80cfbb90664b0329233950725b394f4b314bf124ea11d4099d0e0",
+      "source": "/tmp/starling-node-compat/phase1-validation/allocation-r2/http/wasmtime-results.json"
+    },
+    {
+      "path": "wasmcloud-http.json",
+      "sha256": "e4a2e0a50763163914d2f4426476553809907e502d561a696d182e344c05ad2a",
+      "source": "/tmp/starling-node-compat/phase1-validation/allocation-r2/wasmcloud/host-results.json"
+    },
+    {
+      "path": "upstream.json",
+      "sha256": "243987b6bd233bed85e4375d3c5d626243bb59ca3d43a21c36f74076e15f19ea",
+      "source": "/Users/dan/dev/StarlingMonkey/tests/node-compat/upstream/allocation-r2-results.json"
+    },
+    {
+      "path": "oom/results.json",
+      "sha256": "9a084beaad97d301a15c318b95cb598fb0a2eb956a24baf80896cb7b412eb0c8",
+      "source": "/Users/dan/dev/StarlingMonkey/tests/node-compat/oom/results.json"
+    },
+    {
+      "path": "abi/current-validation.json",
+      "sha256": "7eecd3a08d9656d528692b8ed72a294246336c177e249572b28b60cf3b8ceb3f",
+      "source": "/Users/dan/dev/StarlingMonkey/tests/node-compat/abi-fix/current-validation.json"
+    },
+    {
+      "path": "abi/results.current.json",
+      "sha256": "2658f4fcb5110d663ccb2e6407fe423cccae66e1b69d4d0347802af7c7f85cd3",
+      "source": "/Users/dan/dev/StarlingMonkey/tests/node-compat/abi-fix/results.current.json"
+    },
+    {
+      "path": "abi/import-v2-results.json",
+      "sha256": "2b7bd27c1e9b394ce318c730caedf596b5989f4a04f19ff9ab191287413b0ba7",
+      "source": "/Users/dan/dev/StarlingMonkey/tests/node-compat/abi-fix/import-v2-results.json"
+    },
+    {
+      "path": "abi/raw-i32-reader-v2-results.json",
+      "sha256": "1ba11ea79272373f323d86687bfa9976ad15b07a0985ad82295a843fa95d5983",
+      "source": "/Users/dan/dev/StarlingMonkey/tests/node-compat/abi-fix/raw-i32-reader-v2-results.json"
+    },
+    {
+      "path": "abi/i64-v2-results.json",
+      "sha256": "617069bf00bea28c6b7a4d4d701fc223d02d7b154e53104dc494590c92e114d0",
+      "source": "/Users/dan/dev/StarlingMonkey/tests/node-compat/abi-fix/i64-v2-results.json"
+    },
+    {
+      "path": "abi/loader-test-results.json",
+      "sha256": "c22ac3cb2ff56960eec139c5a651d067d1c962dd796a99a9960c85987f240142",
+      "source": "/Users/dan/dev/StarlingMonkey/tests/node-compat/abi-fix/loader-test-results.json"
+    },
+    {
+      "path": "abi/splicer-source-audit-results.json",
+      "sha256": "bdb6eac263db8ebcc89f1482fde1ae000db265033a0bb98e58fae6818fa8b7df",
+      "source": "/Users/dan/dev/StarlingMonkey/tests/node-compat/abi-fix/splicer-source-audit-results.json"
+    },
+    {
+      "path": "abi/legacy-engine-guard-results.json",
+      "sha256": "c9c67eddcdcfb2e4d3ed24acda0578de0058ade4a2f7e00457b099c8d3892ca7",
+      "source": "/Users/dan/dev/StarlingMonkey/tests/node-compat/abi-fix/legacy-engine-guard-results.json"
+    }
+  ],
+  "limitations": [
+    "Selected bounded Node profile, not complete Node or Buffer support",
+    "DEBUG indirect bindings are unavailable; OOM acceptance uses only the exact guarded scalar diagnostic world",
+    "Four native kernel allocation API scopes, not engine-wide exhaustive OOM",
+    "SharedArrayBuffer construction and cross-realm parity remain unverified in guest",
+    "HTTP counters reset; same-instance HTTP reuse and request isolation remain unproven",
+    "Historical performance data predates the clock-stub correction; refresh is pending",
+    "Entropy bridge/policy and Phase 3 foundations remain unfinished"
+  ]
+}

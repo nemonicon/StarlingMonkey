@@ -1,0 +1,267 @@
+--- a/harness/component-driver.mjs
++++ b/harness/component-driver.mjs
+@@ -3,7 +3,7 @@
+ import assert from 'node:assert/strict';
+ import { createHash } from 'node:crypto';
+ import { spawnSync } from 'node:child_process';
+-import { readFile, writeFile, mkdir, symlink } from 'node:fs/promises';
++import { readFile, mkdir, symlink } from 'node:fs/promises';
+ import { dirname, join, resolve } from 'node:path';
+ import { fileURLToPath, pathToFileURL } from 'node:url';
+ import { loadToolchain } from '../../../toolchain.mjs';
+@@ -12,6 +12,7 @@
+ import { selectedInterfacePolicy, SECURE_RANDOM_INTERFACE } from '../../../capability-policy.mjs';
+ import { unsupportedInitializers, caughtInitializer } from './deferred-snippets.mjs';
+ import { deployedFatal, deployedCleanControls } from './deployed-fixtures.mjs';
++import { trackedWriter, publishCompletion } from './completion.mjs';
+ 
+ const WASMTIME_SHA256='a85dec9fcbbad23d0e038e5a99604114dbe9aa77bc784e4bce0f33013eb33c1c';
+ const PREVIEW1_ADAPTER_SHA256='988224282d03fe0bd3c25b62344aef265b1a8e1f5804bdbc34d6442507fabcc0';
+@@ -36,7 +37,9 @@
+   await admission.recheck();
+   const output=resolve(process.env.NODE_COMPAT_CLASSIC_OUTPUT??join('/tmp/starling-node-compat/classic-integration-v1',variant));
+   await mkdir(output,{recursive:true});
+-  await writeFile(join(output,'package.json'),'{"type":"module"}\n',{flag:'wx'});
++  const tracked=trackedWriter(output);
++  const writeOutput=tracked.write;
++  await writeOutput(join(output,'package.json'),'{"type":"module"}\n',{flag:'wx'});
+   const toolchain=await loadToolchain();
+   const builtinManifests=selectedManifestsForEngine(metadata,{sourceRoot});
+   const manifestModuleIds=builtinManifests.flatMap(manifest=>Object.keys(manifest.modules));
+@@ -52,7 +55,9 @@
+     return lowered;
+   }
+ 
++  let completedReport;
+   try {
++   execution: {
+     if(variant==='disabled-off') {
+       assert(!manifestModuleIds.includes('node:stream') && !manifestModuleIds.includes('node:stream/promises'));
+       const failures=[];
+@@ -60,7 +65,7 @@
+         const input=join(output,'disabled-'+failures.length+(commonJS?'.cjs':'.mjs'));
+         const source=commonJS?'module.exports=require('+JSON.stringify(id)+');\n':
+           'import * as value from '+JSON.stringify(id)+'; export {value};\n';
+-        await writeFile(input,source,{flag:'wx'});
++        await writeOutput(input,source,{flag:'wx'});
+         let error;
+         try { await bundleProfile({...toolchain,builtinManifests,input}); } catch(caught) { error=caught; }
+         assert(error,'Unselected module must fail before packaging: '+id);
+@@ -68,10 +73,10 @@
+         failures.push({id,commonJS,sourceSha256:hash(source),error:error.message});
+       }
+       await admission.recheck();
+-      await writeFile(join(output,'results.json'),JSON.stringify({schemaVersion:1,variant,
++      completedReport={schemaVersion:1,variant,
+         status:'FUTURE_CLASSIC_DISABLED_ADMISSION_GATE_PASSED',engineSha256:metadata.engineSha256,
+-        pin,failures,componentizerInvoked:false,componentBuilt:false,hostExecuted:false},null,2)+'\n',{flag:'wx'});
+-      return;
++        pin,failures,componentizerInvoked:false,componentBuilt:false,hostExecuted:false};
++      break execution;
+     }
+ 
+     assert(manifestModuleIds.includes('node:stream') && manifestModuleIds.includes('node:stream/promises'));
+@@ -104,7 +109,7 @@
+     const capabilityPolicy=selectedInterfacePolicy(metadata,options);
+     assert.deepEqual(capabilityPolicy.selectedInterfaces,selectedInterfaces);
+     const lowered=await bundle(join(HERE,'guest.mjs'),expectedImports);
+-    await writeFile(join(output,'classic.bundle.mjs'),lowered.code,{flag:'wx'});
++    await writeOutput(join(output,'classic.bundle.mjs'),lowered.code,{flag:'wx'});
+     await admission.recheck();
+     const {component,interfaceAudit}=await selected.componentize(lowered.code,options);
+     await admission.recheck();
+@@ -117,11 +122,11 @@
+       assert.deepEqual([...rootWorld[1].matchAll(/^\s*export\s+([^;]+);/gm)].map(match=>match[1]),['run: func() -> string']);
+     }
+     const componentPath=join(output,'classic.component.wasm');
+-    await writeFile(componentPath,component,{flag:'wx'});
++    await writeOutput(componentPath,component,{flag:'wx'});
+     const {files}=await transpile(component,{name:'classic',wasiShim:true});
+     for(const [name,bytes] of Object.entries(files)) {
+       await mkdir(dirname(join(output,name)),{recursive:true});
+-      await writeFile(join(output,name),bytes,{flag:'wx'});
++      await writeOutput(join(output,name),bytes,{flag:'wx'});
+     }
+     const modulePath=join(output,'classic.js');
+     const instance=await import(pathToFileURL(modulePath));
+@@ -163,7 +168,7 @@
+ 
+     async function buildDeployed(test) {
+       const input=join(output,test.name+'.source.mjs');
+-      await writeFile(input,test.source,{flag:'wx'});
++      await writeOutput(input,test.source,{flag:'wx'});
+       const bundled=await bundle(input,['node:stream']);
+       await admission.recheck();
+       const built=await selected.componentize(bundled.code,options);
+@@ -172,11 +177,11 @@
+       const wit=await componentWit(built.component);
+       assert.match(wit,/export run: func\(\) -> string;/);
+       const componentPath=join(output,test.name+'.component.wasm');
+-      await writeFile(componentPath,built.component,{flag:'wx'});
++      await writeOutput(componentPath,built.component,{flag:'wx'});
+       const generated=await transpile(built.component,{name:test.name,wasiShim:true});
+       for(const [name,bytes] of Object.entries(generated.files)) {
+         await mkdir(dirname(join(output,name)),{recursive:true});
+-        await writeFile(join(output,name),bytes,{flag:'wx'});
++        await writeOutput(join(output,name),bytes,{flag:'wx'});
+       }
+       await admission.recheck();
+       return{componentPath,modulePath:join(output,test.name+'.js'),sourceSha256:hash(test.source),
+@@ -189,7 +194,7 @@
+     // Jco child and a fresh Wasmtime process; neither failed instance is reused.
+     const fatalFixture=await buildDeployed(deployedFatal);
+     const fatalChild=join(output,'deployed-fatal-child.mjs');
+-    await writeFile(fatalChild,
++    await writeOutput(fatalChild,
+       'import {run} from '+JSON.stringify(pathToFileURL(fatalFixture.modulePath).href)+';\n'+
+       "try{await run();console.log('UNEXPECTED_FATAL_RETURN');process.exitCode=2;}catch(error){console.log('EXPECTED_FATAL_DISCARD');}\n",{flag:'wx'});
+     await admission.recheck();
+@@ -240,7 +245,7 @@
+     const initializationFailures=[];
+     for(const [index,test] of unsupportedInitializers.entries()) {
+       const input=join(output,'initializer-'+index+'.mjs');
+-      await writeFile(input,test.source,{flag:'wx'});
++      await writeOutput(input,test.source,{flag:'wx'});
+       const bundled=await bundle(input,null);
+       // Unused imports may be removed by the bundler. The actual imports below
+       // are recorded; only registered classic modules may remain.
+@@ -261,13 +266,15 @@
+         sourceSha256:hash(test.source),bundleSha256:hash(bundled.code),imports:bundled.imports,error:error.message});
+     }
+     const caughtInput=join(output,'initializer-caught-control.mjs');
+-    await writeFile(caughtInput,caughtInitializer.source,{flag:'wx'});
++    await writeOutput(caughtInput,caughtInitializer.source,{flag:'wx'});
+     const caughtBundle=await bundle(caughtInput,null);
+     assert(caughtBundle.imports.every(id=>id==='node:stream'||id==='node:stream/promises'));
+     await admission.recheck();
+     const caught=await selected.componentize(caughtBundle.code,options);
+     await admission.recheck();
+     assert.deepEqual(caught.interfaceAudit.emittedImports,selectedInterfaces);
++    const caughtComponentPath=join(output,'initializer-caught-control.component.wasm');
++    await writeOutput(caughtComponentPath,caught.component,{flag:'wx'});
+     await admission.recheck();
+     const report={schemaVersion:1,status:'FUTURE_CLASSIC_REAL_COMPONENT_GATES_PASSED',variant,
+       engineSha256:metadata.engineSha256,engineReceipt:metadata,sourceRoot,pin,
+@@ -279,10 +286,13 @@
+       wasmtime:{path:host,sha256:WASMTIME_SHA256,version:version.stdout.trim(),observed:wasmtimeObserved,
+         stdoutSha256:hash(result.stdout),stderr:result.stderr},initializationFailures,
+       deployedFailures,deployedControls,
+-      caughtInitializerControl:{sourceSha256:hash(caughtInitializer.source),bundleSha256:hash(caughtBundle.code),
++      caughtInitializerControl:{componentPath:caughtComponentPath,sourceSha256:hash(caughtInitializer.source),bundleSha256:hash(caughtBundle.code),
+         componentSha256:hash(caught.component),interfaceAudit:caught.interfaceAudit},
+       gcStressConfigured:variant==='gc-off',
+       scope:'Pure guest classic streams; no process/timers/FS/sockets/HTTP capability, no ALS propagation or safe failed-instance reuse claim'};
+-    await writeFile(join(output,'results.json'),JSON.stringify(report,null,2)+'\n',{flag:'wx'});
++    completedReport=report;
++   }
+   } finally { await admission.recheck(); }
++  assert(completedReport,'A completed semantic gate must provide its report');
++  await publishCompletion({output,report:completedReport,paths:tracked.paths});
+ }
+--- /dev/null
++++ b/harness/completion.mjs
+@@ -0,0 +1,104 @@
++// Host-side artifact preservation only. No guest or toolchain imports.
++import assert from 'node:assert/strict';
++import { createHash } from 'node:crypto';
++import { lstat, readFile, writeFile } from 'node:fs/promises';
++import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
++
++const hash = bytes => createHash('sha256').update(bytes).digest('hex');
++
++function below(output, path) {
++  const root = resolve(output), target = resolve(path), name = relative(root, target);
++  assert(name && name !== '..' && !name.startsWith('..' + sep) && !isAbsolute(name), 'Output must be below its own directory');
++  return { root, target, name };
++}
++
++async function ordinaryParent(output, path) {
++  const { root, target } = below(output, path);
++  let cursor = dirname(target);
++  for (;;) {
++    const stat = await lstat(cursor);
++    assert(stat.isDirectory() && !stat.isSymbolicLink(), cursor);
++    if (cursor === root) return;
++    const parent = dirname(cursor);
++    assert.notEqual(parent, cursor, 'Output root must be reachable');
++    cursor = parent;
++  }
++}
++
++async function ordinaryFile(output, path) {
++  const { root, target, name } = below(output, path);
++  const rootStat = await lstat(root);
++  assert(rootStat.isDirectory() && !rootStat.isSymbolicLink(), root);
++  let cursor = target;
++  while (cursor !== root) {
++    const stat = await lstat(cursor);
++    assert(!stat.isSymbolicLink(), cursor);
++    if (cursor === target) assert(stat.isFile(), cursor);
++    const parent = dirname(cursor);
++    assert.notEqual(parent, cursor, 'Output root must be reachable');
++    cursor = parent;
++  }
++  const data = await readFile(target);
++  return { path: name, sha256: hash(data), bytes: data.length };
++}
++
++export function trackedWriter(output) {
++  const paths = new Set();
++  async function write(path, data, options) {
++    const { target } = below(output, path);
++    assert(options?.flag === 'wx', 'Tracked outputs require exclusive creation');
++    await ordinaryParent(output, target);
++    await writeFile(target, data, options);
++    paths.add(target);
++  }
++  return Object.freeze({ write, paths });
++}
++
++// The caller must finish its final admission.recheck() BEFORE calling this.
++// A success-looking results file alone is never a completion gate. If writing,
++// hashing, or publication fails, preserve partial outputs and fail the process.
++export async function publishCompletion({ output, report, paths }) {
++  assert(paths instanceof Set && report && typeof report === 'object');
++  const resultsPath = join(resolve(output), 'results.json');
++  const completionPath = join(resolve(output), 'completion.json');
++  await ordinaryParent(output, resultsPath);
++  for (const path of paths) {
++    const { target } = below(output, path);
++    assert(target !== resultsPath && target !== completionPath, 'Results and completion are exclusively published here');
++  }
++  // Refuse an old completion before creating a fresh report. No overwrite or
++  // automatic repair of a previous/partial output tree is performed.
++  try {
++    await lstat(completionPath);
++    assert.fail('Completion already exists');
++  } catch (error) {
++    if (error.code !== 'ENOENT') throw error;
++  }
++  const files = [];
++  for (const path of [...paths].sort()) files.push(await ordinaryFile(output, path));
++  const resultsBytes = Buffer.from(JSON.stringify(report, null, 2) + '\n');
++  await writeFile(resultsPath, resultsBytes, { flag: 'wx' });
++  const results = await ordinaryFile(output, resultsPath);
++  assert.equal(results.sha256, hash(resultsBytes));
++  files.push(results);
++  files.sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
++  const completion = {
++    schemaVersion: 1,
++    state: 'CLASSIC_GATE_OUTPUTS_COMPLETE_REQUIRES_EXTERNAL_EXIT_ZERO',
++    variant: report.variant,
++    reportStatus: report.status,
++    engineSha256: report.engineSha256,
++    results,
++    files,
++    componentFiles: files.filter(row => row.path.endsWith('.component.wasm')).map(row => row.path),
++    generatedWasmFiles: files.filter(row => row.path.endsWith('.wasm') && !row.path.endsWith('.component.wasm')).map(row => row.path),
++    generatedJavaScriptFiles: files.filter(row => row.path.endsWith('.js')).map(row => row.path),
++    finalAdmissionRecheckCompletedBeforeReportPublication: true,
++    requiresIndependentTerminalExitCodeZero: true,
++    terminalExitCodeObservedByThisHelper: null,
++    runtimeAcceptanceClaim: false,
++    scope: 'Hashes the actual files written by this run. The external collector must rehash them and require raw terminal exit 0. No self-hash, node_modules traversal, or crash/concurrent-writer guarantee.'
++  };
++  await writeFile(completionPath, JSON.stringify(completion, null, 2) + '\n', { flag: 'wx' });
++  return completion;
++}

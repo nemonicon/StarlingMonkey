@@ -1,0 +1,1 @@
+import * as q from "node:querystring"; q.parse("x".repeat(1048577)); export function run(){return '';}

@@ -1,0 +1,15 @@
+--- a/taskqueue-owner-v3/test-extension.UNCOMPILED.cpp
++++ b/diagnostic-candidate-v1/test-extension.cpp
+@@ -94,9 +94,9 @@
+   return true;
+ }
+ const JSFunctionSpec functions[] = {
+-  JS_FN("scheduleTask", schedule_task, 1, 0),
+-  JS_FN("attemptReentry", attempt_reentry, 0, 0),
+-  JS_FN("checkResetGuard", check_reset_guard, 0, 0), JS_FS_END,
++  JS_FN("scheduleTask", schedule_task, 1, JSPROP_ENUMERATE),
++  JS_FN("attemptReentry", attempt_reentry, 0, JSPROP_ENUMERATE),
++  JS_FN("checkResetGuard", check_reset_guard, 0, JSPROP_ENUMERATE), JS_FS_END,
+ };
+ } // namespace
+ bool install(api::Engine* engine) {

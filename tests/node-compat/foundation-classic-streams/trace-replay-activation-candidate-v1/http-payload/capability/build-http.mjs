@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {join,resolve} from 'node:path';
+import {verifyProductionTicks,requireFreshOutput,completeRegression,hash} from './preflight.mjs';
+const admission=await verifyProductionTicks();
+assert(process.env.NODE_COMPAT_PRODUCTION_HTTP_ROOT);const root=resolve(process.env.NODE_COMPAT_PRODUCTION_HTTP_ROOT);
+assert.equal(resolve(process.env.NODE_COMPAT_HTTP_OUTPUT),join(root,'http-joint'));
+const path=join(root,'http-inputs.json'),bytes=await readFile(path),expected=hash(bytes),inputs=JSON.parse(bytes);
+assert.equal(inputs.state,'CLASSIC342_HTTP_INPUTS_FROZEN_BEFORE_PACKAGING');assert.equal(inputs.nativeAdmission.engineSha256,admission.pin.engineSha256);
+assert.equal(inputs.sourceInputClosure.sha256,admission.report.inputClosure.sha256);
+await requireFreshOutput('NODE_COMPAT_HTTP_OUTPUT');await import('./runners/http-build.mjs');
+assert.equal(hash(await readFile(path)),expected);await completeRegression('NODE_COMPAT_HTTP_OUTPUT',admission);

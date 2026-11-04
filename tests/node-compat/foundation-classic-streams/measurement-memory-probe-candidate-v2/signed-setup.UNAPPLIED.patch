@@ -1,0 +1,197 @@
+--- measurement-memory-probe-candidate-v1/contracts.mjs
++++ measurement-memory-probe-candidate-v2/contracts.mjs
+@@ -21,7 +21,7 @@
+ function rawJson(value,max){assert.equal(typeof value,'string');assert(Buffer.byteLength(value)<=max);const parsed=JSON.parse(value);assert.equal(JSON.stringify(parsed),value,'Canonical expected JSON only');return parsed;}
+ export function validateDescriptor(d){
+  keys(d,['schemaVersion','state','sourceIndexSha256','parentPhaseSha256','arm','comparison','repetition','runOrder','position','component','modulePath','coreFiles','criticalFiles','expected','nativeEvidence']);
+- assert.equal(d.schemaVersion,1);assert.equal(d.state,'PARENT_AUTHENTICATED_SMALL_MEMORY_WORKER_INPUT_V1');assert(SHA.test(d.sourceIndexSha256));assert.equal(d.parentPhaseSha256,phaseSha);
++ assert.equal(d.schemaVersion,1);assert.equal(d.state,'PARENT_AUTHENTICATED_SMALL_MEMORY_WORKER_INPUT_V2');assert(SHA.test(d.sourceIndexSha256));assert.equal(d.parentPhaseSha256,phaseSha);
+  const scheduled=schedule().filter(row=>row.arm===d.arm&&row.comparison===d.comparison&&row.repetition===d.repetition&&row.position===d.position);assert.equal(scheduled.length,1);assert.deepEqual(d.runOrder,scheduled[0].runOrder);
+  const tuple=tuples[d.arm],root=artifactRoot(d.arm);assert(tuple);assert.equal(d.modulePath,root+'/common_byte.js');assert.deepEqual(d.coreFiles,['common_byte.core.wasm']);
+  keys(d.component,['path','sha256','bytes']);assert.deepEqual(d.component,{path:root+'/common-byte.component.wasm',sha256:tuple[0],bytes:tuple[1]});
+@@ -30,7 +30,7 @@
+   {path:root+'/common_byte.d.ts',sha256:'e6e5d4c3d021092d6a6b662c6235f34987eca59672915aa18ab0e1618f3defe8',bytes:2209},packageFile(d.arm)]);
+  keys(d.expected,['identityRaw','probeRaw','cases']);rawJson(d.expected.identityRaw,4096);rawJson(d.expected.probeRaw,1024);assert.equal(d.expected.cases.length,2);
+  for(const [i,index] of [1,5].entries()){
+-  const row=d.expected.cases[i];keys(row,['index','iterations','setupReturn','batchRaw','units']);assert.equal(row.index,index);assert.equal(row.iterations,1);assert.equal(typeof row.setupReturn,'string');assert(Buffer.byteLength(row.setupReturn)<=1024);
++  const row=d.expected.cases[i];keys(row,['index','iterations','setupReturn','batchRaw','units']);assert.equal(row.index,index);assert.equal(row.iterations,1);requireS32(row.setupReturn);assert.equal(row.setupReturn,index===1?151852933:-1502831163,'Pinned Node setup result');
+   const expected=rawJson(row.batchRaw,2048);assert.equal(expected.result.iterations,1);assert.equal(expected.result.totalUnits,index===1?8192:4194304);assert.equal(row.units,expected.result.totalUnits);assert.deepEqual(expected.result.records,[]);
+  }
+  keys(d.nativeEvidence,['engineSha256','metadataSha256','notLoadedByWorker']);assert.equal(d.nativeEvidence.notLoadedByWorker,true);
+@@ -39,10 +39,25 @@
+ }
+ export function validateAuthority(value,ownSha){
+  keys(value,['schemaVersion','state','sourceIndexSha256','memorySupplementAllowed','throughputReplacement','runtimeAcceptanceClaim','phase','timingReport','timingRootReceipt','integrityIndex']);
+- assert.equal(value.schemaVersion,1);assert.equal(value.state,'ROOT_REVIEWED_COMMON_BYTE_PROCESS_RSS_SUPPLEMENT_V1');assert.equal(value.sourceIndexSha256,ownSha);assert(SHA.test(ownSha));assert.equal(value.memorySupplementAllowed,true);
++ assert.equal(value.schemaVersion,1);assert.equal(value.state,'ROOT_REVIEWED_COMMON_BYTE_PROCESS_RSS_SUPPLEMENT_V2');assert.equal(value.sourceIndexSha256,ownSha);assert(SHA.test(ownSha));assert.equal(value.memorySupplementAllowed,true);
+  assert.equal(value.throughputReplacement,false);assert.equal(value.runtimeAcceptanceClaim,false);
+  for(const [name,sha256] of Object.entries({phase:phaseSha,timingReport:timingSha,timingRootReceipt:timingRootSha,integrityIndex:integritySha})){
+   keys(value[name],['path','sha256']);assert.equal(value[name].sha256,sha256);assert.equal(typeof value[name].path,'string');assert(value[name].path.startsWith('/')&&!value[name].path.includes('\0')&&value[name].path.length<=1024);
+  }
+  return structuredClone(value);
+ }
++export function requireS32(value){assert.equal(typeof value,'number','setup public ABI is signed32 number');assert(Number.isInteger(value)&&value>=-2147483648&&value<=2147483647,'setup must be finite signed32');return value;}
++export function requirePublicReturn(name,actual,expected){
++ if(name==='setup'){requireS32(actual);requireS32(expected);assert.equal(actual,expected,'Exact signed32 setup result');return;}
++ assert(['identity','checkpointProbe','batch'].includes(name),'Unknown public scalar');assert.equal(typeof actual,'string');assert.equal(typeof expected,'string');
++ if(JSON.stringify(JSON.parse(actual))!==expected)throw new Error('Public string JSON mismatch: '+name+' (whole raw return retained)');
++}
++export function buildExpectedCases(oracle,compactExpected){
++ return[1,5].map(index=>{const compact=compactExpected(oracle,index,1);return{index,iterations:1,setupReturn:requireS32(oracle[index].setup),batchRaw:JSON.stringify(compact),units:compact.result.totalUnits};});
++}
++export function buildDescriptor({sourceIndexSha256,row,record,expectedCases,native}){
++ const component={path:record.componentPath,sha256:record.componentSha256,bytes:record.componentBytes};
++ return validateDescriptor({schemaVersion:1,state:'PARENT_AUTHENTICATED_SMALL_MEMORY_WORKER_INPUT_V2',sourceIndexSha256,parentPhaseSha256:phaseSha,...row,component,modulePath:record.modulePath,coreFiles:record.coreFiles,
++  criticalFiles:[component,...['common_byte.core.wasm','common_byte.js','common_byte.d.ts'].map(name=>{const f=record.transpiledFiles.find(f=>f.name===name);assert(f);return{path:artifactRoot(row.arm)+'/'+name,sha256:f.sha256,bytes:f.bytes};}),packageFile(row.arm)],
++  expected:{identityRaw:JSON.stringify(record.identity),probeRaw:JSON.stringify(record.checkpointProbe),cases:expectedCases},nativeEvidence:{...native,notLoadedByWorker:true}});
++}
+--- measurement-memory-probe-candidate-v1/parent.mjs
++++ measurement-memory-probe-candidate-v2/parent.mjs
+@@ -13,7 +13,7 @@
+ async function pinned(path,sha,max=1024*1024){const info=await lstat(path);assert(info.isFile()&&!info.isSymbolicLink()&&info.size<=max);const raw=await readFile(path);assert(raw.length<=max);assert.equal(hash(raw),sha,path);return raw;}
+ async function ownIndex(){const raw=await pinned(join(here,'index.json'),ownSha),index=JSON.parse(raw);assert.equal(index.schemaVersion,1);const seen=new Set();for(const row of index.files){const path=resolve(here,row.path),name=relative(here,path);assert(name&&name!=='..'&&!name.startsWith('..'+sep)&&!isAbsolute(name)&&!seen.has(name));seen.add(name);await streamed({...row,path});}const found=index.files.filter(row=>row.path==='input-freeze.json');assert.equal(found.length,1);return{index,inputSha:found[0].sha256};}
+ const {index,inputSha}=await ownIndex();
+-const {validateAuthority,validateDescriptor,schedule,artifactRoot,packageFile,timingSourceSha,instantiateSha,phaseSha,timingSha}=await import('./contracts.mjs');
++const {validateAuthority,buildDescriptor,buildExpectedCases,requirePublicReturn,schedule,timingSourceSha,instantiateSha,phaseSha,timingSha}=await import('./contracts.mjs');
+ const authorityRaw=await pinned(authorityPath,authoritySha,16384),authority=validateAuthority(JSON.parse(authorityRaw),ownSha);
+ // No output, provider, artifact or historical proof access occurs for NULL or
+ // unreviewed authority. The expected input-manifest digest is a captured primitive.
+@@ -40,12 +40,13 @@
+  for(const name of ['freshFull20And14','freshReplay','freshHttpBothHosts']){const row=phase[name];await streamed({path:row.reportPath,sha256:row.reportSha256});await streamed({path:row.rootReviewPath,sha256:row.rootReviewSha256});}
+  const {compactExpected}=await import(pathToFileURL(join(old,'compact-oracle.mjs')));
+  const oracle=[...JSON.parse(await readFile(join(old,'node-common-oracle.json'))).cases,...JSON.parse(await readFile(join(old,'node-control-oracle.json'))).cases];assert.equal(oracle.length,14);
+- const expectedCases=[1,5].map(index=>({index,iterations:1,setupReturn:oracle[index].setup,batchRaw:JSON.stringify(compactExpected(oracle,index,1)),units:compactExpected(oracle,index,1).result.totalUnits}));
++ const expectedCases=buildExpectedCases(oracle,compactExpected);
+  return{phase,expectedCases,ownInputsCount,nativeEvidence:{on:{engineSha256:on.pin.engineSha256,metadataSha256:on.pin.metadataSha256},off:{engineSha256:off.pin.engineSha256,metadataSha256:off.pin.metadataSha256}}};
+ }
+ await streamed({path:process.execPath,sha256:'e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0'});
+ const before=await auditParent();
+ const output=resolve(outputArg??'');assert(output===outputArg&&output.startsWith('/tmp/starling-node-compat/'));
++assert.equal(output,'/tmp/starling-node-compat/production-common-byte-process-rss-supplement-v2');
+ try{await lstat(output);assert.fail('Fresh exclusive output required');}catch(error){if(error.code!=='ENOENT')throw error;}
+ const outputParent=await lstat(dirname(output));assert(outputParent.isDirectory()&&!outputParent.isSymbolicLink());
+ const startingDisk=await statfs(dirname(output));assert(startingDisk.bavail*startingDisk.bsize>=2*1024**3,'2GiB starting capacity guard');
+@@ -56,10 +57,7 @@
+ const self=await persist(join(output,'worker-self-manifest.json'),selfManifest),descriptors=[];
+ for(const row of schedule()){
+  const r=before.phase.components[row.arm],native=before.nativeEvidence[row.arm==='canonical-off'?'off':'on'];
+- const component={path:r.componentPath,sha256:r.componentSha256,bytes:r.componentBytes};
+- const descriptor=validateDescriptor({schemaVersion:1,state:'PARENT_AUTHENTICATED_SMALL_MEMORY_WORKER_INPUT_V1',sourceIndexSha256:ownSha,parentPhaseSha256:phaseSha,...row,component,modulePath:r.modulePath,coreFiles:r.coreFiles,
+-  criticalFiles:[component,...['common_byte.core.wasm','common_byte.js','common_byte.d.ts'].map(name=>{const f=r.transpiledFiles.find(f=>f.name===name);assert(f);return{path:join(artifactRoot(row.arm),name),sha256:f.sha256,bytes:f.bytes};}),packageFile(row.arm)],
+-  expected:{identityRaw:JSON.stringify(r.identity),probeRaw:JSON.stringify(r.checkpointProbe),cases:before.expectedCases},nativeEvidence:{...native,notLoadedByWorker:true}});
++ const descriptor=buildDescriptor({sourceIndexSha256:ownSha,row,record:r,expectedCases:before.expectedCases,native});
+  const label=row.comparison+'.rep-'+row.repetition+'.'+row.arm,workerOutput=join(output,'workers',label);await mkdir(workerOutput);descriptors.push({...row,label,workerOutput,descriptor:await persist(join(workerOutput,'descriptor.json'),descriptor)});
+ }
+ await persist(join(output,'started.json'),{schemaVersion:1,state:'PROCESS_RSS_SUPPLEMENT_STARTED',sourceIndexSha256:ownSha,authority:{path:authorityPath,sha256:authoritySha},phaseSha256:phaseSha,timingReportSha256:timingSha,workers:18,order:'AB/BA/AB per comparison; each worker small then large; N1 only',throughputProtocolChanged:false,throughputClaim:false,runtimeAcceptanceClaim:false});
+@@ -72,7 +70,8 @@
+   assert(captured.terminalExitZeroObserved&&captured.ownedGroupGone&&captured.status===0&&captured.error===null,'Fresh worker requires actual exit zero and owned cleanup');
+   const actual=JSON.parse(captured.stdout);await persist(join(output,row.label+'.observed.json'),actual);assert.equal(actual.state,'SMALL_PUBLIC_PROCESS_RSS_WORKER_OBSERVED');assert.equal(actual.freshProcessPid,captured.pid);assert.equal(actual.descriptorSha256,row.descriptor.sha256);assert.equal(actual.sourceIndexSha256,ownSha);for(const key of ['arm','comparison','repetition','runOrder','position'])assert.equal(JSON.stringify(actual[key]),JSON.stringify(row[key]));assert.equal(actual.publicCalls,7);assert.deepEqual(actual.caseOrder,[1,5]);assert.equal(actual.iterationsEach,1);
+   const descriptor=JSON.parse(await pinned(row.descriptor.path,row.descriptor.sha256,16384)),expected=[descriptor.expected.identityRaw,descriptor.expected.probeRaw,...descriptor.expected.cases.flatMap(c=>[c.setupReturn,c.batchRaw]),descriptor.expected.probeRaw];assert.equal(actual.rawReturns.length,7);
+-  for(const [i,value] of actual.rawReturns.entries()){const literal=i===2||i===4;const serialized=literal?value.rawReturn:JSON.stringify(JSON.parse(value.rawReturn));assert.equal(serialized,expected[i],'Parent independently checks retained public raw returns');}
++  const names=['identity','checkpointProbe','setup','batch','setup','batch','checkpointProbe'];
++  for(const [i,value] of actual.rawReturns.entries()){assert.equal(value.publicExport,names[i]);assert.equal(value.rawReturnType,typeof value.rawReturn);requirePublicReturn(names[i],value.rawReturn,expected[i]);}
+   observations.push({...row,descriptorSha256:row.descriptor.sha256,actual,terminalPath:captured.terminalPath,wholeProcessElapsedMs:captured.wholeProcessElapsedMs});
+  }
+ }catch(error){failure={name:error.name,message:error.message};await persist(join(output,'failure-before-source-audit.json'),{failure,completedWorkers:observations.length,partialObservationOnly:true});}
+--- measurement-memory-probe-candidate-v1/worker.mjs
++++ measurement-memory-probe-candidate-v2/worker.mjs
+@@ -23,7 +23,7 @@
+ const expectedPaths=[join(here,'worker.mjs'),join(here,'contracts.mjs'),resolve(here,'../measurement-execution-activated-v2/instantiate.mjs')];
+ for(const [i,row] of manifest.files.entries()){assert.deepEqual(Object.keys(row).sort(),['bytes','path','sha256']);assert.equal(row.path,expectedPaths[i]);assert(SHA.test(row.sha256)&&Number.isSafeInteger(row.bytes)&&row.bytes>0&&row.bytes<=65536);await streamed(row,dirname(row.path));}
+ assert.equal(manifest.files[2].sha256,'0b9d3cee8d40160a9fa0c56165e60d6a8ef57e10a9c722069f30d5f162c3492b');
+-const {validateDescriptor,artifactRoot,packageFile}=await import('./contracts.mjs');
++const {validateDescriptor,requirePublicReturn,artifactRoot,packageFile}=await import('./contracts.mjs');
+ const raw=await small(descriptorPath,descriptorSha,16384),descriptor=validateDescriptor(JSON.parse(raw));assert.equal(descriptor.sourceIndexSha256,manifest.sourceIndexSha256);
+ assert.equal(output.split('/').at(-1),descriptor.comparison+'.rep-'+descriptor.repetition+'.'+descriptor.arm);
+ const snapshots=[{stage:'bootstrap-before-descriptor',rssBytes:bootstrapRssBytes,elapsedSinceEntryMs:0},{stage:'pre-critical-file-hash',rssBytes:rss(),elapsedSinceEntryMs:performance.now()-started}];
+@@ -31,10 +31,10 @@
+ async function persist(name,value){assert(/^[a-z0-9-]+$/.test(name));const path=join(output,name+'.json');await writeFile(path,JSON.stringify(value,null,2)+'\n',{flag:'wx'});const handle=await open(path,'r');try{await handle.sync();}finally{await handle.close();}}
+ function snapshot(stage){const value={stage,rssBytes:rss(),elapsedSinceEntryMs:performance.now()-started};snapshots.push(value);return value;}
+ async function progress(stage,detail={}){const record={stage,...detail,partialObservationOnly:true,requiresExternalExitZero:true};process.stderr.write(JSON.stringify(record)+'\n');await persist(String(++writeSequence).padStart(2,'0')+'-'+stage,record);}
+-async function exactCall(instance,name,args,expectedRaw,label,{literal=false}={}){
++async function exactCall(instance,name,args,expectedRaw,label){
+  await progress('before-'+label,{publicExport:name,arguments:args});const start=performance.now(),actual=await instance.exports[name](...args),elapsedMs=performance.now()-start;
+- const observed={label,publicExport:name,arguments:args,rawReturn:actual,elapsedMs,rssBytes:rss()};rawReturns.push(observed);await persist('raw-'+label,observed);await progress('returned-'+label);
+- assert.equal(typeof actual,'string');const serialized=literal?actual:JSON.stringify(JSON.parse(actual));if(serialized!==expectedRaw)throw new Error('Public scalar mismatch: '+label+' (whole raw return retained)');return elapsedMs;
++ const observed={label,publicExport:name,arguments:args,rawReturn:actual,rawReturnType:typeof actual,elapsedMs,rssBytes:rss()};rawReturns.push(observed);await persist('raw-'+label,observed);await progress('returned-'+label);
++ requirePublicReturn(name,actual,expectedRaw);return elapsedMs;
+ }
+ let failure=null;
+ try{
+@@ -45,7 +45,7 @@
+  stages.push({stage:'first-identity-export',elapsedMs:await exactCall(instance,'identity',[],descriptor.expected.identityRaw,'identity')});snapshot('after-identity');
+  stages.push({stage:'first-checkpoint-probe',elapsedMs:await exactCall(instance,'checkpointProbe',[],descriptor.expected.probeRaw,'probe-before')});snapshot('after-identity-and-probe');
+  for(const [i,row] of descriptor.expected.cases.entries()){
+-  const label=i===0?'small':'large';stages.push({stage:label+'-setup',elapsedMs:await exactCall(instance,'setup',[row.index],row.setupReturn,label+'-setup',{literal:true})});snapshot('after-'+label+'-setup');
++  const label=i===0?'small':'large';stages.push({stage:label+'-setup',elapsedMs:await exactCall(instance,'setup',[row.index],row.setupReturn,label+'-setup')});snapshot('after-'+label+'-setup');
+   stages.push({stage:label+'-single-batch',elapsedMs:await exactCall(instance,'batch',[row.index,1],row.batchRaw,label+'-batch')});snapshot('after-'+label);
+  }
+  stages.push({stage:'final-checkpoint-probe',elapsedMs:await exactCall(instance,'checkpointProbe',[],descriptor.expected.probeRaw,'probe-after')});snapshot('after-final-probe');
+--- measurement-memory-probe-candidate-v1/tests.mjs
++++ measurement-memory-probe-candidate-v2/tests.mjs
+@@ -1,19 +1,24 @@
+ // Pure descriptor and source-data tests only. Never imports either action entry.
+ import assert from 'node:assert/strict';
+ import {readFile} from 'node:fs/promises';
++import {createHash} from 'node:crypto';
+ import {dirname,join} from 'node:path';
+ import {fileURLToPath} from 'node:url';
+-import {validateDescriptor,validateAuthority,schedule,artifactRoot,packageFile,tuples,phaseSha,timingSha,timingRootSha,integritySha} from './contracts.mjs';
++import {validateDescriptor,validateAuthority,buildDescriptor,buildExpectedCases,requirePublicReturn,requireS32,schedule,packageFile,phaseSha,timingSha,timingRootSha,integritySha} from './contracts.mjs';
++import {compactExpected} from '../measurement-execution-activated-v2/compact-oracle.mjs';
+ const here=dirname(fileURLToPath(import.meta.url));let passed=0;const check=(name,fn)=>{fn();passed++;};
+-const sha='1'.repeat(64),tuple=tuples['native-on'],root=artifactRoot('native-on');
+-const descriptor={schemaVersion:1,state:'PARENT_AUTHENTICATED_SMALL_MEMORY_WORKER_INPUT_V1',sourceIndexSha256:sha,parentPhaseSha256:phaseSha,arm:'native-on',comparison:'same-engine-binding',repetition:0,runOrder:['native-on','canonical-on'],position:0,
+- component:{path:root+'/common-byte.component.wasm',sha256:tuple[0],bytes:tuple[1]},modulePath:root+'/common_byte.js',coreFiles:['common_byte.core.wasm'],criticalFiles:[
+- {path:root+'/common-byte.component.wasm',sha256:tuple[0],bytes:tuple[1]},
+- {path:root+'/common_byte.core.wasm',sha256:tuple[2],bytes:tuple[3]},
+- {path:root+'/common_byte.js',sha256:'747296bc080f83a7a97657224a6aff71cfeaff124a47d4266c5c65124d99a53c',bytes:133860},
+- {path:root+'/common_byte.d.ts',sha256:'e6e5d4c3d021092d6a6b662c6235f34987eca59672915aa18ab0e1618f3defe8',bytes:2209},packageFile('native-on')],
+- expected:{identityRaw:'{}',probeRaw:'{}',cases:[1,5].map(index=>({index,iterations:1,setupReturn:'setup',batchRaw:JSON.stringify({result:{iterations:1,totalUnits:index===1?8192:4194304,records:[]}}),units:index===1?8192:4194304}))},
+- nativeEvidence:{engineSha256:'12a8f7dc79e12e8bc3519b3fe72e898b226bbabde6930e63d3a6c30706b88274',metadataSha256:'f2f67947631136647259b7ba40422d6fb89fe943b1b74d2db4c5754bbfcc2c31',notLoadedByWorker:true}};
++const sha='1'.repeat(64),hash=raw=>createHash('sha256').update(raw).digest('hex'),base=dirname(here),old=join(base,'measurement-execution-activated-v2');
++async function pinned(path,digest){const raw=await readFile(path);assert.equal(hash(raw),digest);return raw;}
++const oldIndex=JSON.parse(await pinned(join(old,'index.json'),'1b801439258792c19b9cbc2527d04940c35fb0750f4c26b82a30df6802407612'));
++const oracles=[];for(const name of ['node-common-oracle.json','node-control-oracle.json']){const row=oldIndex.files.find(r=>r.path===name);assert(row);oracles.push(...JSON.parse(await pinned(join(old,name),row.sha256)).cases);}
++const phase=JSON.parse(await pinned(join(base,'production-adoption-v1/reviewed-composed-timing-phase-v1.json'),phaseSha));
++const wit=(await pinned('/tmp/starling-node-compat/production-common-byte-correctness-v2/native-on/emitted.wit','53336fc899248b72ca00055a55af04acbdd06e9f03270173b67e9a633407b77d')).toString();
++const declarations=(await pinned('/tmp/starling-node-compat/production-common-byte-correctness-v2/native-on/common_byte.d.ts','e6e5d4c3d021092d6a6b662c6235f34987eca59672915aa18ab0e1618f3defe8')).toString();
++check('actual signed32 ABI from pinned emittedWIT and declarations',()=>{assert(wit.includes('export setup: func(index: u32) -> s32;'));assert(declarations.includes('setup(index: number): number'));for(const name of ['batch','identity','checkpoint-probe'])assert(wit.split('\n').some(line=>line.includes('export '+name+':')&&line.includes('-> string;')));});
++const expectedCases=buildExpectedCases(oracles,compactExpected);check('genuine two Node setup values retained as numbers',()=>assert.deepEqual(expectedCases.map(r=>r.setupReturn),[151852933,-1502831163]));
++const descriptors=schedule().map(row=>{const record=phase.components[row.arm];return buildDescriptor({sourceIndexSha256:sha,row,record,expectedCases,native:{engineSha256:record.engineSha256,metadataSha256:record.engineMetadataSha256}});});
++check('actual parent builder validates all18 genuine phase/oracle descriptors',()=>{assert.equal(descriptors.length,18);for(const d of descriptors){assert.deepEqual(validateDescriptor(d),d);assert.deepEqual(d.expected.cases.map(r=>r.setupReturn),[151852933,-1502831163]);}});
++const descriptor=descriptors[0],root=dirname(descriptor.modulePath);
+ check('bounded descriptor accepted as data, not artifact proof',()=>assert.deepEqual(validateDescriptor(descriptor),descriptor));
+ for(const [name,change] of [
+  ['old full measure entry',d=>{d.modulePath=root+'/measure.mjs';}],
+@@ -34,9 +39,20 @@
+  ['extra repetition',d=>{d.repetition=3;}],
+  ['unreviewed phase',d=>{d.parentPhaseSha256=sha;}]
+ ])check(name,()=>{const d=structuredClone(descriptor);change(d);assert.throws(()=>validateDescriptor(d));});
+-const authority={schemaVersion:1,state:'ROOT_REVIEWED_COMMON_BYTE_PROCESS_RSS_SUPPLEMENT_V1',sourceIndexSha256:sha,memorySupplementAllowed:true,throughputReplacement:false,runtimeAcceptanceClaim:false,
++for(const [name,value] of [['string','151852933'],['NaN',NaN],['fraction',1.25],['high',2147483648],['low',-2147483649],['infinity',Infinity],['null',null]]){
++ check('typed setup '+name+' refused by descriptor and shared public guard',()=>{const d=structuredClone(descriptor);d.expected.cases[0].setupReturn=value;assert.throws(()=>validateDescriptor(d));assert.throws(()=>requirePublicReturn('setup',value,151852933));});
++}
++check('signed32 limits accepted without string coercion',()=>{assert.equal(requireS32(-2147483648),-2147483648);assert.equal(requireS32(2147483647),2147483647);});
++check('shared typed return guard accepts both genuine setup returns',()=>{for(const row of expectedCases)requirePublicReturn('setup',row.setupReturn,row.setupReturn);});
++check('incorrect integer setup result rejected strictly',()=>assert.throws(()=>requirePublicReturn('setup',151852934,151852933)));
++check('incorrect numeric expected result rejected in actual descriptor construction',()=>{const bad=structuredClone(expectedCases);bad[0].setupReturn++;const row=schedule()[0],record=phase.components[row.arm];assert.throws(()=>buildDescriptor({sourceIndexSha256:sha,row,record,expectedCases:bad,native:{engineSha256:record.engineSha256,metadataSha256:record.engineMetadataSha256}}));});
++check('number expected cannot be string-coerced',()=>assert.throws(()=>requirePublicReturn('setup',151852933,'151852933')));
++check('five other public returns remain JSON strings',()=>{for(const d of descriptors){requirePublicReturn('identity',d.expected.identityRaw,d.expected.identityRaw);requirePublicReturn('checkpointProbe',d.expected.probeRaw,d.expected.probeRaw);for(const row of d.expected.cases){requirePublicReturn('batch',row.batchRaw,row.batchRaw);assert.throws(()=>requirePublicReturn('batch',JSON.parse(row.batchRaw),row.batchRaw));}}});
++check('actual construction fails on string oracle setup before output',()=>{const bad=structuredClone(oracles);bad[1].setup=String(bad[1].setup);assert.throws(()=>buildExpectedCases(bad,compactExpected));});
++const authority={schemaVersion:1,state:'ROOT_REVIEWED_COMMON_BYTE_PROCESS_RSS_SUPPLEMENT_V2',sourceIndexSha256:sha,memorySupplementAllowed:true,throughputReplacement:false,runtimeAcceptanceClaim:false,
+  phase:{path:'/fixture/phase.json',sha256:phaseSha},timingReport:{path:'/fixture/report.json',sha256:timingSha},timingRootReceipt:{path:'/fixture/root.json',sha256:timingRootSha},integrityIndex:{path:'/fixture/index.json',sha256:integritySha}};
+ check('authority shape accepted, no file/artifact/action claim',()=>assert.deepEqual(validateAuthority(authority,sha),authority));
++check('old v1 Root permission cannot activate v2',()=>assert.throws(()=>validateAuthority({...authority,state:'ROOT_REVIEWED_COMMON_BYTE_PROCESS_RSS_SUPPLEMENT_V1'},sha)));
+ for(const [name,change] of [
+  ['null authority',()=>null],['unknown source',v=>({...v,sourceIndexSha256:'2'.repeat(64)})],['unreviewed state',v=>({...v,state:'UNREVIEWED'})],['implicit old timing permission',v=>({...v,memorySupplementAllowed:false})],['old report mutation',v=>({...v,timingReport:{...v.timingReport,sha256:sha}})],['throughput replacement',v=>({...v,throughputReplacement:true})],['oversized authority path',v=>({...v,phase:{...v.phase,path:'/'+ 'x'.repeat(2048)}})]
+ ])check(name,()=>assert.throws(()=>validateAuthority(change(structuredClone(authority)),sha)));
+@@ -44,7 +60,7 @@
+ const worker=await readFile(join(here,'worker.mjs'),'utf8'),parent=await readFile(join(here,'parent.mjs'),'utf8');
+ check('worker imports no full-proof audit/entry',()=>{for(const forbidden of ['auditComposedCorrectness','executionPreflight','verifyConsumedSeal','selectTimingPhase','measure-body.mjs','audit-inputs.mjs','input-freeze.json'])assert(!worker.includes(forbidden));});
+ check('worker authenticates self before dynamic helper or binding load',()=>{assert(worker.indexOf('const manifestRaw=')<worker.indexOf("await import('./contracts.mjs')"));assert(worker.indexOf('const raw=await small(descriptorPath')<worker.indexOf('await import(pathToFileURL(expectedPaths[2]))'));});
+-check('whole raw scalar persistence precedes equality',()=>assert(worker.indexOf("await persist('raw-'+label,observed)")<worker.indexOf('if(serialized!==expectedRaw)')));
++check('whole typed raw scalar persistence precedes shared guard',()=>{assert(worker.includes('rawReturn:actual,rawReturnType:typeof actual'));assert(worker.indexOf("await persist('raw-'+label,observed)")<worker.indexOf('requirePublicReturn(name,actual,expectedRaw)'));});
+ check('public-only scope no private probe/forced GC',()=>{for(const forbidden of ['global.gc(','.exports.memory','getHeapStatistics','getHeapSnapshot','v8.writeHeapSnapshot','_malloc','WebAssembly.Memory','NODE_COMPAT_GC_STRESS'])assert(!worker.includes(forbidden));});
+ check('null authority checked before parent proof/code imports and output',()=>{const gate=parent.indexOf('validateAuthority(JSON.parse(authorityRaw),ownSha)');assert(gate<parent.indexOf("await import(pathToFileURL(join(timing,'admission.mjs')))"));assert(gate<parent.indexOf('await mkdir(output)'));});
+ check('old timing/corpus not imported as worker',()=>assert(!parent.includes("collectWorker(join(timing,'measure.mjs')")));

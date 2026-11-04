@@ -1,0 +1,1 @@
+import{spawn}from'node:child_process';let seen=0,code=null,calls=0;const registry=new FinalizationRegistry(()=>{seen++;try{spawn()}catch(error){code=error.code}});function register(){registry.register({},0)}register();export function run(){return JSON.stringify({calls:++calls,seen,code})}

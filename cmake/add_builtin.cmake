@@ -55,6 +55,7 @@ function(add_builtin)
 
         foreach(DEPENDENCY IN ITEMS ${DEPENDENCIES})
             get_target_property(TYPE ${DEPENDENCY} TYPE)
+            get_target_property(DEPENDENCY_INTERFACE_INCLUDES ${DEPENDENCY} INTERFACE_INCLUDE_DIRECTORIES)
             if(NOT ${TYPE} MATCHES "UTILITY")
                 # A built-in might specify a specific dependency
                 # (e.g. "OpenSSL::Crypto").  Ensure that if this dependency
@@ -83,8 +84,15 @@ function(add_builtin)
             # because this code runs at configure time and this directory
             # will be created during compilation time.  This, however,
             # doesn't cause compilation issues.
-            target_include_directories(${LIB_NAME}
-                       PRIVATE ${CMAKE_BINARY_DIR}/deps/${DEPENDENCY}/include)
+            if(DEPENDENCY_INTERFACE_INCLUDES)
+                # Imported targets can select a configuration-keyed install
+                # directory (OpenSSL's entropy variants do). Never shadow it
+                # with headers from an old unkeyed dependency installation.
+                target_include_directories(${LIB_NAME} PRIVATE ${DEPENDENCY_INTERFACE_INCLUDES})
+            else()
+                target_include_directories(${LIB_NAME}
+                           PRIVATE ${CMAKE_BINARY_DIR}/deps/${DEPENDENCY}/include)
+            endif()
         endforeach()
     endif ()
 

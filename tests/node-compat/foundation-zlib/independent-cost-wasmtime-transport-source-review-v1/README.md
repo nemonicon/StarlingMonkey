@@ -1,0 +1,5 @@
+Source review passed for the bounded Wasmtime42 transport proposal. All 29 indexed files and 52 original-context input rows were rehashed before and after inspection. The exact locked wasm-wave crate and its 21 captured members agree; invocation parsing and single-string display follow the pinned run source. All 15 known Node stream argv-size models were independently reconstructed as data.
+
+The owner's 49 pure, 40 source/data and 2 syntax results were authenticated without rerunning them. No proposed helper, CLI, component, export, codec, worker or timing action ran in this review. No runtime authority or portability proof follows. The exact final environment, additional kernel/per-argument accounting, actual string ABI, small crossdecode and largest all-provider request remain future gates. Original source bytes are unchanged.
+
+The first reviewer data-reader import failed before any output because system Python lacks tomllib. The corrected finite data reader is described in reader-history.json; no owner code was invoked.

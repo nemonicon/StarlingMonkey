@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "profileVersion": "sm-node-22.14.0-m0.6",
+  "nodeVersion": "v22.14.0",
+  "status": "Prepared optional bounded Querystring facade; planned NODE_COMPAT_QUERYSTRING=ON selection. Shared registration/build integration and native component gates are pending.",
+  "moduleContract": "Exactly8 pinned ESM exports. Default is an ordinary object whose initial method references match the named exports; encode===stringify and decode===parse. Reassigning a default property does not rewrite named bindings, while parser/stringifier use mutable default escape/unescape hooks as pinned Node does. Future selected literal CommonJS lowering may return default; runtime require and syncBuiltinESMExports remain excluded. Depends on the existing guest Buffer constructor supplied privately to the factory; no global Buffer injection or new host capability.",
+  "modules": {
+    "node:querystring": {
+      "aliases": [
+        "querystring"
+      ],
+      "status": "partial",
+      "exports": [
+        "decode",
+        "default",
+        "encode",
+        "escape",
+        "parse",
+        "stringify",
+        "unescape",
+        "unescapeBuffer"
+      ],
+      "callablePolicy": "Nonstring unescapeBuffer overloads throw TypeError ERR_SM_NODE_UNSUPPORTED with operation on call or construction. Resource caps throw RangeError ERR_SM_NODE_LIMIT. No blank objects, universal Proxy or silent failure substitutes for declared bindings. Null-prototype output; duplicate key aggregation; safe own __proto__ fields; custom separators/equal delimiters; Node1000 default segment limit; positive integer maxKeys decrement and exact pinned fractional/nonpositive/NaN/Infinity behavior within profile hard caps. Empty segments count toward Node maxKeys. Custom decoder callbacks receive plus as %20 and exceptions fall back through mutable default.unescape. Callback return values are not restricted to strings, following pinned Node behavior. Captured native URI encoding/decoding fast paths. On malformed UTF16, escape emulates Node22 legacy surrogate pairing and terminal URIError ERR_INVALID_URI. Malformed percent fallback scans UTF16 code units into bytes modulo256 then decodes nonfatal UTF8 preserving BOM through existing guest Buffer.toString. No URLSearchParams or TextEncoder substitution.",
+      "limits": {
+        "inputCodeUnits": 1048576,
+        "parsedSegments": 65536,
+        "stringifyKeys": 65536,
+        "stringifyValues": 65536,
+        "stringifyOutputCodeUnits": 16777216
+      },
+      "deviations": [
+        "Profile hard caps are additional to Node maxKeys and cannot be disabled by maxKeys0, negative, fractional, NaN or Infinity. Failed caps may occur after earlier callback/getter effects; no rollback is promised.",
+        "Nonstring unescapeBuffer is explicitly deferred, including fallback after a failing nonstring unescape coercion. Native successful unescape scalar/object coercions remain supported within output input-size bound.",
+        "unescapeBuffer allocates using supported captured Buffer.alloc rather than deferred allocUnsafe. Every returned byte is initialized; Buffer pooling/uninitialized unused backing semantics are not claimed.",
+        "Buffer allocation, shared slice views, Uint8Array brand and UTF8 replacement follow the bounded core Buffer profile. This does not expand its encodings, limits or APIs.",
+        "Native intrinsic and Buffer allocation/slice references are captured. Application callbacks and mutable default hooks execute with Node's inspected invocation order; arbitrary engine-specific stack/error formatting is not claimed.",
+        "Proxy-backed arrays with noninteger/nonfinite reported lengths are deferred. Exact out-of-memory behavior and performance/size comparison remain unmeasured."
+      ],
+      "supportedStatic": [
+        "parse",
+        "decode",
+        "stringify",
+        "encode",
+        "escape",
+        "unescape",
+        "unescapeBuffer"
+      ]
+    }
+  },
+  "requiredHostInterfaces": []
+}

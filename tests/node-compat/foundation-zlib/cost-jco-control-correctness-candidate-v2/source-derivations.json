@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-jco-control-correctness-candidate-v1/run.mjs",
+        "sha256": "690faa023b4b9615140e609876ac5961408fde7cebb733b720a5d59a7d1c5ebe",
+        "bytes": 7190
+      },
+      "afterimage": "run.mjs",
+      "afterSha256": "bc60109c835633d739685933ce43c7b6355fe89fcdc58fda2ed156e64d13fa37",
+      "edits": [
+        {
+          "old": "await mkdir(join(output.root,'jobs'),{mode:0o700});const checkOwned=",
+          "new": "await mkdir(join(output.root,'jobs'),{mode:0o700});await mkdir(join(output.root,'processes'),{mode:0o700});const checkOwned=",
+          "count": 1,
+          "afterOffsetAtEdit": 1464
+        },
+        {
+          "old": "args:[join(HERE,'worker.mjs')",
+          "new": "args:[join(HERE,'../cost-jco-control-correctness-candidate-v1/worker.mjs')",
+          "count": 1,
+          "afterOffsetAtEdit": 2628
+        },
+        {
+          "old": "UNTIMED_ZLIB_JCO_CONTROLS_COMPLETE_PENDING_INDEPENDENT_REVIEW_V1",
+          "new": "UNTIMED_ZLIB_JCO_CONTROLS_COMPLETE_PENDING_INDEPENDENT_REVIEW_V2",
+          "count": 1,
+          "afterOffsetAtEdit": 5679
+        },
+        {
+          "old": "CONTROLS_COMPLETE_EXTERNAL_PARENT_ZERO_AND_REVIEW_REQUIRED'",
+          "new": "CONTROLS_COMPLETE_EXTERNAL_PARENT_ZERO_AND_REVIEW_REQUIRED_V2'",
+          "count": 1,
+          "afterOffsetAtEdit": 6459
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-jco-control-correctness-candidate-v1/admission.mjs",
+        "sha256": "465559631e01f5d53cc2866ace8223ff00af0e83c6ea5b9286e7431920d028ae",
+        "bytes": 8783
+      },
+      "afterimage": "admission.mjs",
+      "afterSha256": "e69a7989ca8504fd0e6b57d8ef166125234640469d936d33e2d3cb04103b5de4",
+      "edits": [
+        {
+          "old": "/zlib-cost-jco-control-correctness-v1'",
+          "new": "/zlib-cost-jco-control-correctness-v2'",
+          "count": 1,
+          "afterOffsetAtEdit": 1069
+        },
+        {
+          "old": "ROOT_REVIEWED_ZLIB_COST_JCO_CONTROL_CORRECTNESS_V1",
+          "new": "ROOT_REVIEWED_ZLIB_COST_JCO_CONTROL_CORRECTNESS_V2",
+          "count": 1,
+          "afterOffsetAtEdit": 1547
+        },
+        {
+          "old": "INDEPENDENT_ZLIB_COST_JCO_CONTROL_SOURCE_REVIEW_PASSED_V1",
+          "new": "INDEPENDENT_ZLIB_COST_JCO_CONTROL_SOURCE_REVIEW_PASSED_V2",
+          "count": 1,
+          "afterOffsetAtEdit": 7103
+        },
+        {
+          "old": "const peer=await indexed(authority.sourceIndependentReview",
+          "new": "const original=await sourceIndex(join(HERE,'../cost-jco-control-correctness-candidate-v1'),'ad0d651fdb8653a8a708514131bad52cf8cc05b657c6cefd92604aca3c3f7a23');\n const lineageRow=own.rows.find(r=>r.path===join(HERE,'lineage.json'));need(lineageRow,'Exact failure lineage');const lineage=deepFreeze(JSON.parse(await regular(lineageRow))),failure=await indexed(lineage.failureReview,{state:'INDEPENDENT_ZLIB_COST_JCO_CONTROL_V1_PRE_WORKER_FAILURE_VERIFIED'});need(failure.data.finding==='COST-CONTROL-PARENT-DIRECTORY-M1','Actual prior pre-worker failure, never old control pass');await regular(lineage.rootFailure);await regular(lineage.requiredCorrection);\n const peer=await indexed(authority.sourceIndependentReview",
+          "count": 1,
+          "afterOffsetAtEdit": 7036
+        },
+        {
+          "old": "await own.recheck();await priorSource.recheck();",
+          "new": "await own.recheck();await original.recheck();await failure.recheck();await regular(lineage.rootFailure);await regular(lineage.requiredCorrection);await priorSource.recheck();",
+          "count": 1,
+          "afterOffsetAtEdit": 8974
+        },
+        {
+          "old": "[...own.rows,...frame.criticalSourceFiles,rootRow]",
+          "new": "[...own.rows,...original.rows,...frame.criticalSourceFiles,rootRow]",
+          "count": 1,
+          "afterOffsetAtEdit": 9501
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    }
+  ],
+  "guestOrWorkerPayloadChanged": false
+}

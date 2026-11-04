@@ -1,0 +1,39 @@
+def sha(path):
+    result = hashlib.sha256()
+    with Path(path).open('rb') as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b''):
+            result.update(block)
+    return result.hexdigest()
+
+
+def regular(path):
+    info = Path(path).lstat()
+    assert stat.S_ISREG(info.st_mode) and not stat.S_ISLNK(info.st_mode), path
+    return info
+
+
+def check(path, expected=None, size=None):
+    path = Path(path)
+    info = regular(path)
+    digest = sha(path)
+    if expected is not None:
+        assert digest == expected, path
+    if size is not None:
+        assert info.st_size == size, path
+    return digest, info.st_size
+
+
+def load(path, expected=None):
+    check(path, expected)
+    return json.loads(Path(path).read_bytes())
+
+
+def no_links(path, root):
+    path, root = Path(path), Path(root)
+    relative = path.relative_to(root)
+    cursor = root
+    assert not cursor.is_symlink(), root
+    for part in relative.parts:
+        cursor /= part
+        assert not cursor.is_symlink(), cursor
+

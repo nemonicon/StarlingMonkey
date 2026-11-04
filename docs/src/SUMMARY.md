@@ -11,6 +11,7 @@
 
 - [Project workflow using `just`](./developer/just.md)
 - [Developing Builtins in C++](./developer/builtins-cpp.md)
+- [Opt-in Node compatibility profile](./developer/node-compat.md)
 - [🚧 Developing Builtins in Rust](./developer/builtins-rust.md)
 - [ Developing Changes to SpiderMonkey](./developer/spidermonkey.md)
 - [🚧 Debugging StarlingMonkey application](./developer/debugging.md)

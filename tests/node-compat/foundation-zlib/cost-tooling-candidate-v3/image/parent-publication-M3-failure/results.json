@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "state": "INDEPENDENT_COST_TOOLING_M3_PRECOPY_FAILURE_CONFIRMED",
+  "sourceIndexSha256": "6793721e6781bf045825f2a1c83108f97136f682fdae4d725ece4c31c750891b",
+  "rootFailureReceiptSha256": "072dafb208503a2f3b45d69f0230abb3d4104240e2c02962c6d83c00be789457",
+  "finding": "COST-TOOLING-M3",
+  "actualExternalRawExitCode": 1,
+  "targetAbsentIncludingNoDanglingSymlink": true,
+  "basePlanRows": 5058,
+  "basePlanModeMismatches": 0,
+  "dynamicProofRows": 20,
+  "dynamicSourceModes": [
+    420
+  ],
+  "desiredOutputModeMisusedAsSourceMode": 384,
+  "firstFailingSource": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/independent-cost-tooling-v2-source-review-v1/index.json",
+  "cause": "source(row) interprets row.mode as expected input permission; dynamic capsule constructor sets same field to intended0600 output while genuine source files are0644",
+  "requiredCorrection": "Separate captured source permission from desired output permission, retain source hash/size/mode drift checks and destination-mode checks, never chmod original files or remove validation",
+  "priorReviewScopeCorrection": "9fc source PASS is preserved historically; it missed source/output permission divergence. Prior22 tiny text tests forced original source0600 and requested output0600, so did not cover real0644 to0600 copying. Publisherv2 is now held.",
+  "codecOrNativeOrGuestOrTimingActionObserved": false,
+  "ownOwnerPublisherPreflightHelperOrLibraryOrCodecActionsInvoked": false,
+  "noCopiesInference": "Observed target absence plus exact source control flow and Root terminal traceback before Publication constructor; no syscall instrumentation claim",
+  "sourceOnlyReadData": true,
+  "successorReviewRequired": true
+}

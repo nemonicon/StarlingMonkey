@@ -1,0 +1,453 @@
+{
+  "schema": 1,
+  "atUtc": "2026-11-03T03:44:25.143Z",
+  "node": "v22.14.0",
+  "catalogueSha256": "a9b23a7158e4cfc1951ac166511a2b3d4b8d8b3714794a8757f5198597f80d01",
+  "policySha256": "5d52d79f5abc344a752cef70e7533ea48ef291fbe81b398ddd849df1ee23c025",
+  "testSha256": "55d454ab82dcfdacc29b991ad970ce032c44a217908dca5dce502a1c739486cb",
+  "passed": 76,
+  "failed": 0,
+  "records": [
+    {
+      "name": "valid-off",
+      "status": "pass"
+    },
+    {
+      "name": "valid-runtime-only",
+      "status": "pass"
+    },
+    {
+      "name": "historical-no-modern-fields-no-selection",
+      "status": "pass"
+    },
+    {
+      "name": "historical-explicit-selection",
+      "status": "pass"
+    },
+    {
+      "name": "selected-copy-independent-of-caller-mutation",
+      "status": "pass"
+    },
+    {
+      "name": "missing-selected",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Policy engines require explicit selectedInterfaces"
+    },
+    {
+      "name": "selected-string",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "selectedInterfaces must be an array of exact interface names"
+    },
+    {
+      "name": "selected-object",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "selectedInterfaces must be an array of exact interface names"
+    },
+    {
+      "name": "selected-non-string",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "selectedInterfaces must be an array of exact interface names"
+    },
+    {
+      "name": "duplicate-selected",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Duplicate selected interface"
+    },
+    {
+      "name": "wrong-version",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Not a pinned standard WASI0.2.10 interface: wasi:random/random@0.2.12"
+    },
+    {
+      "name": "unversioned",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Not a pinned standard WASI0.2.10 interface: wasi:random/random"
+    },
+    {
+      "name": "wildcard",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Not a pinned standard WASI0.2.10 interface: wasi:random/*"
+    },
+    {
+      "name": "custom-service",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Not a pinned standard WASI0.2.10 interface: custom:host/entropy@1.0.0"
+    },
+    {
+      "name": "insecure-random",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "This profile selects only secure WASI random, never insecure random/seed"
+    },
+    {
+      "name": "insecure-seed",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "This profile selects only secure WASI random, never insecure random/seed"
+    },
+    {
+      "name": "missing-entropy-policy-modern-mode",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Modern entropy configuration requires an explicit entropyPolicy"
+    },
+    {
+      "name": "unknown-entropy-policy",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Unknown engine entropy policy"
+    },
+    {
+      "name": "missing-profile-flag",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Entropy policy requires the actually configured Node profile"
+    },
+    {
+      "name": "profile-false",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Entropy policy requires the actually configured Node profile"
+    },
+    {
+      "name": "profile-string",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Entropy policy requires the actually configured Node profile"
+    },
+    {
+      "name": "configured-profile-off",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Entropy policy requires the actually configured Node profile"
+    },
+    {
+      "name": "configured-profile-missing",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Entropy policy requires the actually configured Node profile"
+    },
+    {
+      "name": "wrong-configured-entropy",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Entropy metadata disagrees with actual configured option"
+    },
+    {
+      "name": "missing-configured-entropy",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Entropy metadata disagrees with actual configured option"
+    },
+    {
+      "name": "observed-options-array",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "observedCMakeOptions must be an object"
+    },
+    {
+      "name": "entry-patch-flag-missing",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Actual private deployed-entry patch is required exactly once"
+    },
+    {
+      "name": "entry-patch-flag-false",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Actual private deployed-entry patch is required exactly once"
+    },
+    {
+      "name": "entry-patch-flag-string-false",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Actual private deployed-entry patch is required exactly once"
+    },
+    {
+      "name": "entry-patch-receipt-missing",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Actual private deployed-entry patch is required exactly once"
+    },
+    {
+      "name": "entry-patch-receipts-object",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "componentizeJsPatches must be an array of named patch receipts"
+    },
+    {
+      "name": "entry-patch-receipts-invalid-member",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "componentizeJsPatches must be an array of named patch receipts"
+    },
+    {
+      "name": "entry-patch-receipt-duplicate",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Actual private deployed-entry patch is required exactly once"
+    },
+    {
+      "name": "entry-patch-applied-false",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Actual private deployed-entry patch is required exactly once"
+    },
+    {
+      "name": "entry-patch-applied-string-false",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Actual private deployed-entry patch is required exactly once"
+    },
+    {
+      "name": "entry-patch-wrong-hash",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Actual private deployed-entry patch is required exactly once"
+    },
+    {
+      "name": "runtime-random-disabled",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Runtime entropy requires the selected secure random interface and retained random feature"
+    },
+    {
+      "name": "runtime-random-not-selected",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Runtime entropy requires the selected secure random interface and retained random feature"
+    },
+    {
+      "name": "disabled-string",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "disableFeatures must be an array of feature names"
+    },
+    {
+      "name": "disabled-non-string",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "disableFeatures must be an array of feature names"
+    },
+    {
+      "name": "disabled-duplicate",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Duplicate disableFeatures entry"
+    },
+    {
+      "name": "disabled-unknown",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Unknown pinned ComponentizeJS feature: imaginary"
+    },
+    {
+      "name": "enabled-override",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Do not override the explicit disabled-feature contract"
+    },
+    {
+      "name": "enabled-object",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "enableFeatures must be an array of feature names"
+    },
+    {
+      "name": "enabled-non-string",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "enableFeatures must be an array of feature names"
+    },
+    {
+      "name": "enabled-duplicate",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Duplicate enableFeatures entry"
+    },
+    {
+      "name": "off-random-feature-retained",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "OFF entropy requires disabled random and no random import selection"
+    },
+    {
+      "name": "off-random-selected",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "OFF entropy requires disabled random and no random import selection"
+    },
+    {
+      "name": "malformed-metadata-null",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Engine metadata must be an object"
+    },
+    {
+      "name": "malformed-metadata-array",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Engine metadata must be an object"
+    },
+    {
+      "name": "malformed-options-null",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Component options must be an object"
+    },
+    {
+      "name": "modern-entry-flag-no-policy",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Modern entropy configuration requires an explicit entropyPolicy"
+    },
+    {
+      "name": "modern-entry-receipt-no-policy",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Modern entropy configuration requires an explicit entropyPolicy"
+    },
+    {
+      "name": "audit-off-empty-component",
+      "status": "pass"
+    },
+    {
+      "name": "audit-runtime-standard-component",
+      "status": "pass"
+    },
+    {
+      "name": "audit-unused-selected-capability-recorded",
+      "status": "pass"
+    },
+    {
+      "name": "audit-off-emits-random",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Unselected emitted host interface: wasi:random/random@0.2.10"
+    },
+    {
+      "name": "audit-runtime-missing-random",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Runtime entropy engine did not emit its required secure random interface"
+    },
+    {
+      "name": "audit-unselected-standard",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Unselected emitted host interface: wasi:cli/environment@0.2.10"
+    },
+    {
+      "name": "audit-wrong-random-version",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Unselected emitted host interface: wasi:random/random@0.2.12"
+    },
+    {
+      "name": "audit-unversioned-random",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Unselected emitted host interface: wasi:random/random"
+    },
+    {
+      "name": "audit-insecure-random",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Unselected emitted host interface: wasi:random/insecure@0.2.10"
+    },
+    {
+      "name": "audit-custom-import",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Unselected emitted host interface: custom:host/entropy@1.0.0"
+    },
+    {
+      "name": "audit-malformed-policy-false",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Malformed selected-interface policy"
+    },
+    {
+      "name": "audit-malformed-policy-undefined",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Malformed selected-interface policy"
+    },
+    {
+      "name": "audit-malformed-policy-schema",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Malformed selected-interface policy"
+    },
+    {
+      "name": "audit-malformed-policy-catalogue",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Malformed selected-interface policy"
+    },
+    {
+      "name": "audit-malformed-policy-entropy",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Malformed selected-interface policy"
+    },
+    {
+      "name": "audit-malformed-policy-selected-type",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "selectedInterfaces must be an array of exact interface names"
+    },
+    {
+      "name": "audit-malformed-policy-selected-duplicate",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Duplicate selected interface"
+    },
+    {
+      "name": "audit-malformed-policy-off-selects-random",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "OFF policy cannot select random"
+    },
+    {
+      "name": "audit-malformed-policy-runtime-missing-selection",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Runtime policy must select secure random"
+    },
+    {
+      "name": "audit-component-must-be-bytes",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Final component must be bytes"
+    },
+    {
+      "name": "audit-malformed-component-binary-rejected",
+      "status": "pass",
+      "rejectedCode": null,
+      "error": "Failed to decode wit component\nunexpected end-of-file (at offset 0x0)"
+    },
+    {
+      "name": "audit-explicit-null-historical-sentinel",
+      "status": "pass"
+    },
+    {
+      "name": "wrapper-audits-finalizer-replacement",
+      "status": "pass",
+      "rejectedCode": "ERR_SM_NODE_CAPABILITY_SELECTION",
+      "error": "Unselected emitted host interface: custom:host/entropy@1.0.0",
+      "engineSha256": "99fdaa97c2fbdea67cb7e5463d3dd2ca10c6981615acb4483d442079f6aab65c",
+      "scope": "Existing Release engine exercises packaging callback only; no new production entropy engine claim"
+    }
+  ],
+  "scope": "Build policy/receipt validation and real minimal component WIT names/versions. Empty imported instance types do not establish WASI ABI conformance, native entropy behavior or host instantiation."
+}

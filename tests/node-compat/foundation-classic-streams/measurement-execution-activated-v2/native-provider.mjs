@@ -1,0 +1,10 @@
+import Stream,* as stream from 'node:stream';
+import * as promises from 'node:stream/promises';
+import {Buffer} from 'node:buffer';
+import * as events from 'node:events';
+import {StringDecoder} from 'node:string_decoder';
+import {nextTick} from 'starling:test-classic-benchmark';
+if(Stream!==stream.default)throw new Error('Installed finite default binding required');
+export const dependencies={Buffer,EventEmitter:events.EventEmitter,StringDecoder,nextTick};
+export {stream,promises};
+export default Stream;

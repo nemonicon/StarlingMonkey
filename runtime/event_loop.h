@@ -3,6 +3,9 @@
 
 #include "extension-api.h"
 #include "jsapi.h"
+#ifdef NODE_COMPAT_INTERNAL_TICKS
+#include "node_tick_queue.h"
+#endif
 
 namespace core {
 
@@ -12,6 +15,17 @@ public:
    * Initialize the event loop
    */
   static void init(JSContext *cx);
+
+#ifdef NODE_COMPAT_STRICT_INITIALIZATION
+  // Internal guest policy: retain the first uncaught event exception until a
+  // checkpoint. Capture failure leaves the current pending exception intact.
+  static bool record_pending_event_exception(JSContext *cx);
+  // False means an exception is pending (or capture failed). Existing pending
+  // exceptions take precedence; a retained event value is restored otherwise.
+  static bool take_pending_event_exception(JSContext *cx);
+  static void record_failed_event_invocation();
+  static bool event_exception_policy_failed();
+#endif
 
   /**
    * Check if there are any pending tasks (io requests or timers) to process.
@@ -23,6 +37,16 @@ public:
    * See run_event_loop in extension-api.h for the complete description.
    */
   static bool run_event_loop(api::Engine *engine, double total_compute);
+#ifdef NODE_COMPAT_INTERNAL_TICKS
+  // Existing two-argument entry remains the TaskOrExport wrapper.
+  static bool run_event_loop(api::Engine *engine, double total_compute, TickCheckpointOrigin origin);
+  // Internal captured factory argument; no public process/module/global API.
+  static JSObject* create_internal_next_tick(JSContext* cx);
+  static bool require_internal_ticks_quiescent(JSContext* cx);
+  static bool internal_tick_checkpoint_active();
+  static bool require_internal_tick_reset_allowed(JSContext* cx);
+  static bool run_internal_tick_checkpoint(JSContext* cx, TickCheckpointOrigin origin);
+#endif
 
   /**
    * Run the FinalizationRegistry cleanups that collections have queued, and the microtasks they

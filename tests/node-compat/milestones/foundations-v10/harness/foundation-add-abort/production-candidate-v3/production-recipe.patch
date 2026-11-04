@@ -1,0 +1,94 @@
+--- a/tests/node-compat/build-engine.sh
++++ b/tests/node-compat/build-engine.sh
+@@ -31,6 +31,7 @@
+ entry_patch="$repo_root/tests/node-compat/entropy/componentize-entry-policy-v1.patch"
+ entry_patch_sha=a12c00a0913a2a03e4cea3ab0e525c5cec56d4e0101d33076d6a3687df824f99
+ entry_embedding_sha=78f4bef1a5e9172112cea64743c1e5f6d7ba7b942a40dafd0fc42bcbbb7c95c7
++strict_event_embedding_sha=9a7c30bad8b9e69257ed5a4c132d46b9c0ddc48924edb3dfe288e9b565766977
+ componentize_revision=4d812f5a7b524cea5bcfd565cac55f3fab876a57
+ componentize_archive_sha=8178fb678ec1b8a33bbf3fa8db066bffe4dbf6a92c235150f56622b44ea27e10
+ spidermonkey_tag=FIREFOX_147_0_4_RELEASE_STARLING
+@@ -99,7 +100,7 @@
+ fi
+ # Preserve every pre-policy source tree, build directory and artifact. Each
+ # selected configuration gets its own embedding output directory as well.
+-policy_suffix="entropy-entry-v1.$entropy_mode.path-$path_enabled.events-$events_enabled.string-decoder-$string_decoder_enabled.assert-$assert_enabled.querystring-$querystring_enabled.util-$util_enabled"
++policy_suffix="entropy-entry-v1-strict-callback-v3.$entropy_mode.path-$path_enabled.events-$events_enabled.string-decoder-$string_decoder_enabled.assert-$assert_enabled.querystring-$querystring_enabled.util-$util_enabled"
+ source_dir="$source_dir-$policy_suffix"
+ build_dir="$build_dir-$policy_suffix"
+ artifact_name=starlingmonkey_embedding.abi-i32-i64-v1
+@@ -146,10 +147,10 @@
+   embedding_sha="$(sha256_file "$source_dir/embedding/embedding.cpp")"
+   if [[ "$embedding_sha" == "$base_embedding_sha" ]]; then
+     patch -p1 -d "$source_dir" < "$abi_patch"
+-  elif [[ "$embedding_sha" != "$fixed_embedding_sha" && !( "$bigint_fix" == 1 && "$embedding_sha" == "$bigint_embedding_sha" ) && "$embedding_sha" != "$entry_embedding_sha" ]]; then
++  elif [[ "$embedding_sha" != "$fixed_embedding_sha" && !( "$bigint_fix" == 1 && "$embedding_sha" == "$bigint_embedding_sha" ) && "$embedding_sha" != "$entry_embedding_sha" && "$embedding_sha" != "$strict_event_embedding_sha" ]]; then
+     echo 'Unexpected ComponentizeJS embedding source; refusing an ambiguous ABI patch' >&2; exit 1
+   fi
+-  [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$fixed_embedding_sha" || ( "$bigint_fix" == 1 && "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$bigint_embedding_sha" ) || "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$entry_embedding_sha" ]] || { echo 'ABI patched source hash mismatch' >&2; exit 1; }
++  [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$fixed_embedding_sha" || ( "$bigint_fix" == 1 && "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$bigint_embedding_sha" ) || "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$entry_embedding_sha" || "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$strict_event_embedding_sha" ]] || { echo 'ABI patched source hash mismatch' >&2; exit 1; }
+ elif [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" != "$base_embedding_sha" ]]; then
+   echo 'Unpatched build requires the exact upstream embedding source' >&2; exit 1
+ fi
+@@ -158,13 +159,20 @@
+   if [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$fixed_embedding_sha" ]]; then
+     patch -p1 -d "$source_dir" < "$bigint_patch"
+   fi
+-  [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$bigint_embedding_sha" || "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$entry_embedding_sha" ]] || { echo 'BigInt patched source mismatch' >&2; exit 1; }
++  [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$bigint_embedding_sha" || "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$entry_embedding_sha" || "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$strict_event_embedding_sha" ]] || { echo 'BigInt patched source mismatch' >&2; exit 1; }
+ fi
+ [[ "$(sha256_file "$entry_patch")" == "$entry_patch_sha" ]] || { echo 'Entry patch hash mismatch' >&2; exit 1; }
+ if [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$bigint_embedding_sha" ]]; then
+   patch -p1 -d "$source_dir" < "$entry_patch"
+ fi
+-[[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$entry_embedding_sha" ]] || { echo 'Entry patched source mismatch' >&2; exit 1; }
++[[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$entry_embedding_sha" || "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$strict_event_embedding_sha" ]] || { echo 'Entry patched source mismatch' >&2; exit 1; }
++strict_event_patch="$repo_root/tests/node-compat/foundation-add-abort/componentize-strict-event-boundary-v2.patch"
++[[ "$(sha256_file "$strict_event_patch")" == 84a91c1f74dbdcf653ef7ced5fa2876abffc32d5da591a1ca2df4a4908406ad2 ]]
++if [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$entry_embedding_sha" ]]; then
++  patch -p1 -d "$source_dir" < "$strict_event_patch"
++fi
++[[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$strict_event_embedding_sha" ]] || { echo 'Strict event boundary source mismatch' >&2; exit 1; }
++
+ sm_variant=release
+ if [[ "$build_type" == Debug ]]; then
+   sm_variant=debug
+@@ -322,6 +330,13 @@
+ embedding_commands = [line for line in command('ninja','-C',build_dir,'-t','commands','builtin_componentize_embedding').splitlines() if ' -c ' in line and line.endswith('/embedding/embedding.cpp')]
+ assert embedding_commands and all('-DNODE_COMPAT_ENTROPY_POLICY=1' in entry for entry in embedding_commands), 'Entry policy must reach actual external embedding compilation'
+ assert all(('-DNODE_COMPAT_ENTROPY_RUNTIME_ONLY=1' in entry) == (entropy_mode == 'RUNTIME_ONLY') for entry in embedding_commands)
++assert all('-DNODE_COMPAT_STRICT_INITIALIZATION=1' in entry.split() for entry in embedding_commands), 'Strict callback policy must reach actual external embedding compilation'
++strict_callback_sources = {'builtins/web/event/event-target.cpp': '431267539ab361832094fd212af3b3605241ea0f2ad196b132c6df78e33896d5', 'runtime/engine.cpp': '2e85b4305f64757c172a3ee1723cfafe4666708fa192cafd2535563a200074bb', 'runtime/event_loop.cpp': '7eabda627c0627281fda4cede3ca79d71d9a262d170f34ca835ee2f877924cf8', 'runtime/event_loop.h': 'e61fff76b41a5709099b94e0735b87bcf302df5b6521e348a77b662be0fad9d9'}
++for relative, expected in strict_callback_sources.items():
++    assert digest(pathlib.Path(repo) / relative) == expected, 'Unreviewed strict callback source: ' + relative
++strict_callback_commands = [entry['command'] for entry in json.loads(compile_commands) if any(pathlib.Path(entry['file']).as_posix().endswith('/' + relative) for relative in strict_callback_sources if relative.endswith('.cpp'))]
++assert len(strict_callback_commands) == 3 and all('-DNODE_COMPAT_STRICT_INITIALIZATION=1' in entry.split() for entry in strict_callback_commands), 'Actual callback translation units must all compile the selected strict policy'
++
+ receipt_path = pathlib.Path(build_dir) / 'openssl-profile-receipt.txt'
+ openssl = dict(line.split('=', 1) for line in receipt_path.read_text().splitlines())
+ assert openssl['profile'] == 'ON' and openssl['entropy'] == entropy_mode and openssl['randSeed'] == 'none'
+@@ -420,6 +435,24 @@
+ }
+ if bigint_fix == '1': metadata['componentizeJsPatches'].append({'name': 'canonical-signed-and-unsigned-i64-bigint-bits-v1', 'path': bigint_patch, 'sha256': digest(bigint_patch), 'baseRevision': componentize, 'applied': True, 'files': ['embedding/embedding.cpp']})
+ metadata['componentizeJsPatches'].append({'name':'node-compat-runtime-entry-v1','path':entry_patch,'sha256':digest(entry_patch),'baseRevision':componentize,'applied':True,'files':['embedding/embedding.cpp']})
++strict_callback_patch = pathlib.Path(repo) / 'tests/node-compat/foundation-add-abort/strict-event-v3.patch'
++strict_boundary_patch = pathlib.Path(repo) / 'tests/node-compat/foundation-add-abort/componentize-strict-event-boundary-v2.patch'
++assert digest(strict_callback_patch) == '9b2e54c9527a5c078221ad49f67f7354c9fb1df00eb99f0720b3d7874402603a'
++assert digest(strict_boundary_patch) == '84a91c1f74dbdcf653ef7ced5fa2876abffc32d5da591a1ca2df4a4908406ad2'
++assert digest(pathlib.Path(source_dir) / 'embedding/embedding.cpp') == '9a7c30bad8b9e69257ed5a4c132d46b9c0ddc48924edb3dfe288e9b565766977'
++metadata['componentizeJsPatches'].append({'name':'strict-post-binding-and-execution-checkpoints-v2','path':str(strict_boundary_patch),'sha256':digest(strict_boundary_patch),'baseRevision':componentize,'applied':True,'files':['embedding/embedding.cpp']})
++metadata['strictEventExceptionPolicy'] = {
++    'version':'sm-uncaught-event-v3', 'patchSha256':digest(strict_callback_patch),
++    'embeddingBoundaryPatchSha256':digest(strict_boundary_patch),
++    'nativeSourceSha256':strict_callback_sources,
++    'actualNativeCompileCommands':strict_callback_commands,
++    'policy':'Uncaught callback errors and unhandled rejections fail the drained export boundary; discard failed instances.',
++    'deployedUnhandledRejections':'fatal-after-drained-jobs-before-result-marshalling',
++    'captureFailurePath':'Source-reviewed only; not fault-injected',
++    'failedInvocationPath':'Separate terminal flag; source-reviewed only, no fault injection',
++    'scope':'Selected profile only. Registration getter timing, listener receiver parity, explicit reset and full request teardown are not proved by this policy.',
++}
++
+ with open(artifact + '.build.json', 'w') as output:
+     json.dump(metadata, output, indent=2); output.write('\n')
+ print(artifact)

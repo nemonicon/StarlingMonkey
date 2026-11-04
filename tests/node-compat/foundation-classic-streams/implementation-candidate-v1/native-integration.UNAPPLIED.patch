@@ -1,0 +1,133 @@
+--- a/builtins/node-compat/register.cpp
++++ b/builtins/node-compat/register.cpp
+@@ -4,6 +4,10 @@
+ #include "js/CompilationAndEvaluation.h"
+ #include "js/SourceText.h"
+ #include "factories.generated.h"
++#ifdef NODE_COMPAT_CLASSIC_STREAMS
++#include "classic-streams/factories.generated.h"
++#include "event_loop.h"
++#endif
+ #ifdef NODE_COMPAT_PATH
+ #include "path-factories.generated.h"
+ #endif
+@@ -70,7 +74,7 @@
+ #endif
+ 
+ #ifdef NODE_COMPAT_EVENTS
+-static bool install_events(api::Engine *engine) {
++static bool install_events(api::Engine *engine, JS::MutableHandleValue installed_module) {
+   auto *cx = engine->cx();
+   JS::RootedSymbol key(cx, builtins::web::event::EventTarget::node_abort_resist_key());
+   if (!key) {
+@@ -80,15 +84,18 @@
+   JS::RootedValue argument(cx, JS::SymbolValue(key));
+   JS::RootedValue module(cx);
+   if (!evaluate_factory(cx, kEventsFactorySource, argument, &module)) return false;
++  installed_module.set(module);
+   return engine->define_builtin_module("node:events", module) &&
+          engine->define_builtin_module("events", module);
+ }
+ #endif
+ 
+ #ifdef NODE_COMPAT_STRING_DECODER
+-static bool install_string_decoder(api::Engine *engine, JS::HandleValue buffer_constructor) {
++static bool install_string_decoder(api::Engine *engine, JS::HandleValue buffer_constructor,
++                                   JS::MutableHandleValue installed_module) {
+   JS::RootedValue module(engine->cx());
+   if (!evaluate_factory(engine->cx(), kStringDecoderFactorySource, buffer_constructor, &module)) return false;
++  installed_module.set(module);
+   return engine->define_builtin_module("node:string_decoder", module) &&
+          engine->define_builtin_module("string_decoder", module);
+ }
+@@ -149,6 +156,46 @@
+   if (!evaluate_factory(cx, kStreamWebFactorySource, argument, &module)) return false;
+   return engine->define_builtin_module("node:stream/web", module) &&
+          engine->define_builtin_module("stream/web", module);
++}
++#endif
++
++#ifdef NODE_COMPAT_CLASSIC_STREAMS
++static bool install_classic_streams(api::Engine *engine, JS::HandleValue buffer_constructor,
++                                    JS::HandleValue events_module, JS::HandleValue decoder_module) {
++  auto *cx = engine->cx();
++  // CONTENT realm is already entered by install(). Native prerequisite globals
++  // and the retained factory records precede this call; no module-loader getter.
++  JS::RootedObject argument(cx, JS_NewPlainObject(cx));
++  JS::RootedObject next_tick(cx, core::EventLoop::create_internal_next_tick(cx));
++  if (!argument || !next_tick) return false;
++  JS::RootedValue tick_value(cx, JS::ObjectValue(*next_tick));
++  if (!JS_DefineProperty(cx, argument, "Buffer", buffer_constructor, 0) ||
++      !JS_DefineProperty(cx, argument, "events", events_module, 0) ||
++      !JS_DefineProperty(cx, argument, "nextTick", tick_value, 0)) return false;
++  JS::RootedObject decoder(cx, &decoder_module.toObject());
++  JS::RootedValue value(cx);
++  if (!JS_GetProperty(cx, decoder, "StringDecoder", &value) ||
++      !JS_DefineProperty(cx, argument, "StringDecoder", value, 0)) return false;
++  for (const char *name : {"AbortSignal", "AbortController"}) {
++    if (!JS_GetProperty(cx, engine->global(), name, &value) ||
++        !JS_DefineProperty(cx, argument, name, value, 0)) return false;
++  }
++  if (!JS_GetProperty(cx, engine->global(), "Symbol", &value) || !value.isObject()) return false;
++  JS::RootedObject symbol(cx, &value.toObject());
++  if (!JS_GetProperty(cx, symbol, "dispose", &value) ||
++      !JS_DefineProperty(cx, argument, "disposeSymbol", value, 0) ||
++      !JS_GetProperty(cx, symbol, "asyncDispose", &value) ||
++      !JS_DefineProperty(cx, argument, "asyncDisposeSymbol", value, 0)) return false;
++  JS::RootedValue argument_value(cx, JS::ObjectValue(*argument)), graph_value(cx);
++  if (!evaluate_factory(cx, kClassicStreamsFactorySource, argument_value, &graph_value)) return false;
++  JS::RootedObject graph(cx, &graph_value.toObject());
++  JS::RootedValue root(cx), promises(cx);
++  if (!JS_GetProperty(cx, graph, "root", &root) ||
++      !JS_GetProperty(cx, graph, "promises", &promises)) return false;
++  return engine->define_builtin_module("node:stream", root) &&
++         engine->define_builtin_module("stream", root) &&
++         engine->define_builtin_module("node:stream/promises", promises) &&
++         engine->define_builtin_module("stream/promises", promises);
+ }
+ #endif
+ 
+@@ -179,10 +226,15 @@
+   if (!install_path(engine)) return false;
+ #endif
+ #ifdef NODE_COMPAT_EVENTS
+-  if (!install_events(engine)) return false;
++  JS::RootedValue events_module(cx);
++  if (!install_events(engine, &events_module)) return false;
+ #endif
+ #ifdef NODE_COMPAT_STRING_DECODER
+-  if (!install_string_decoder(engine, buffer_constructor)) return false;
++  JS::RootedValue decoder_module(cx);
++  if (!install_string_decoder(engine, buffer_constructor, &decoder_module)) return false;
++#endif
++#ifdef NODE_COMPAT_CLASSIC_STREAMS
++  if (!install_classic_streams(engine, buffer_constructor, events_module, decoder_module)) return false;
+ #endif
+ #ifdef NODE_COMPAT_ASSERT
+   if (!install_assert(engine)) return false;
+--- a/cmake/builtins.cmake
++++ b/cmake/builtins.cmake
+@@ -229,3 +229,23 @@
+     endif()
+     target_compile_definitions(extension_api INTERFACE NODE_COMPAT_INTERNAL_TICKS=1)
+ endif()
++
++# UNAPPLIED classic source candidate: pure JS state machines over existing guest
++# byte/event/decoder primitives and the private FIFO. No external host service.
++option(NODE_COMPAT_CLASSIC_STREAMS "Enable optional bounded node:stream classic core" OFF)
++if(NODE_COMPAT_CLASSIC_STREAMS AND NOT CMAKE_SCRIPT_MODE_FILE)
++    if(NOT TARGET builtin_node_compat)
++        message(FATAL_ERROR "NODE_COMPAT_CLASSIC_STREAMS requires ENABLE_BUILTIN_NODE_COMPAT=ON")
++    endif()
++    foreach(CLASSIC_PREREQUISITE EVENTS STRING_DECODER INTERNAL_TICKS)
++        if(NOT NODE_COMPAT_${CLASSIC_PREREQUISITE})
++            message(FATAL_ERROR "NODE_COMPAT_CLASSIC_STREAMS requires NODE_COMPAT_${CLASSIC_PREREQUISITE}=ON")
++        endif()
++    endforeach()
++    if(NOT TARGET builtin_web_abort)
++        message(FATAL_ERROR "NODE_COMPAT_CLASSIC_STREAMS requires existing native web AbortSignal/AbortController")
++    endif()
++    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_CLASSIC_STREAMS=1)
++    # The Events prerequisite already links/initializes web Event/Abort. This
++    # feature does not select web streams, clocks, stdio or new WASI imports.
++endif()

@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "builtins/web/crypto/crypto-raii.h",
+      "beforeSha256": "1f380e18b8bed8e8f4789215e85f4661238607c761624a01637bd66fedf3a2c0",
+      "afterimage": "afterimages/builtins/web/crypto/crypto-raii.h",
+      "afterSha256": "4ecb84967839a25c1228420764cda74f357197eb6377ab284127c219524b7f77",
+      "edits": [
+        {
+          "path": "builtins/web/crypto/crypto-raii.h",
+          "old": "#include <memory>\n",
+          "new": "#include <memory>\n#include <vector>\n#include <openssl/crypto.h>\n",
+          "count": 1
+        },
+        {
+          "path": "builtins/web/crypto/crypto-raii.h",
+          "old": "namespace detail {\n",
+          "new": "namespace detail {\n  // Own the vector itself. Wipe its logical secret bytes before releasing storage,\n  // including local import failures before ownership reaches a CryptoKey slot.\n  // This does not erase capacity beyond size or other copies of the key.\n  struct SecretByteVectorDeleter {\n    void operator()(std::vector<uint8_t> *bytes) const noexcept {\n      if (bytes) {\n        if (!bytes->empty()) { OPENSSL_cleanse(bytes->data(), bytes->size()); }\n        delete bytes;\n      }\n    }\n  };\n\n",
+          "count": 1
+        },
+        {
+          "path": "builtins/web/crypto/crypto-raii.h",
+          "old": "using BignumPtr =",
+          "new": "using SecretByteVectorPtr = std::unique_ptr<std::vector<uint8_t>, detail::SecretByteVectorDeleter>;\nusing BignumPtr =",
+          "count": 1
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "path": "builtins/web/crypto/crypto-key.h",
+      "beforeSha256": "a46acec82fbf3adbe5fc2599caf422a1ef699c2d7679eb5692ab1cb7e835580d",
+      "afterimage": "afterimages/builtins/web/crypto/crypto-key.h",
+      "afterSha256": "74ec1ef5179471be2f8086049e97f349623095d81c183eba7e2f14a9547230be",
+      "edits": [
+        {
+          "path": "builtins/web/crypto/crypto-key.h",
+          "old": "class CryptoKey : public BuiltinNoConstructor<CryptoKey> {",
+          "new": "// A key's native cleanup stays on the zone-owning foreground thread. JS-valued\n// reserved slots are traced by SpiderMonkey; the private owners have no GC edges.\nstruct CryptoKeyClassPolicy {\n  template <typename Impl> static constexpr JSClassOps class_ops() {\n    return {.finalize = &finalize<Impl>};\n  }\n  static constexpr uint32_t class_flags() { return JSCLASS_FOREGROUND_FINALIZE; }\n  template <typename Impl> static void finalize(JS::GCContext *gcx, JSObject *obj) {\n    Impl::finalize(gcx, obj);\n  }\n};\n\nclass CryptoKey : public BuiltinImpl<CryptoKey, CryptoKeyClassPolicy> {",
+          "count": 1
+        },
+        {
+          "path": "builtins/web/crypto/crypto-key.h",
+          "old": "    // We store a JS::PrivateValue in this slot, it will contain either the raw key data.\n    // It will either be an `EVP_PKEY *` or an `uint8_t *`.\n    // `uint8_t *` is used only for HMAC keys, `EVP_PKEY *` is used for all the other key types.\n    Key,\n    KeyData,\n    KeyDataLength,",
+          "new": "    // Private owning EVP_PKEY* for RSA/EC/Ed25519; undefined until publication.\n    Key,\n    // Private owning std::vector<uint8_t>* for HMAC; undefined until publication.\n    // Recovered with SecretByteVectorPtr's wiping deleter during finalization.\n    KeyData,\n    // Reserved to preserve the private slot layout; the owning vector supplies size.\n    KeyDataLength,",
+          "count": 1
+        },
+        {
+          "path": "builtins/web/crypto/crypto-key.h",
+          "old": "  static bool init_class(JSContext *cx, JS::HandleObject global);",
+          "new": "  // Preserve the existing globally installed, nonconstructible CryptoKey surface.\n  static bool constructor(JSContext *cx, [[maybe_unused]] unsigned argc,\n                          [[maybe_unused]] JS::Value *vp) {\n    return api::throw_error(cx, api::Errors::NoCtorBuiltin, class_name);\n  }\n  static bool init_class(JSContext *cx, JS::HandleObject global);\n  static void finalize(JS::GCContext *gcx, JSObject *obj);",
+          "count": 1
+        },
+        {
+          "path": "builtins/web/crypto/crypto-key.h",
+          "old": "std::unique_ptr<std::vector<uint8_t>> data, unsigned long length,",
+          "new": "SecretByteVectorPtr data, unsigned long length,",
+          "count": 1
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "path": "builtins/web/crypto/crypto-key.cpp",
+      "beforeSha256": "4ceb7cd64049e23db83bdd4e7c71900cb70a114f68fa85a093cf94666c661a11",
+      "afterimage": "afterimages/builtins/web/crypto/crypto-key.cpp",
+      "afterSha256": "9e1e93c15cc68702398e2f2a7779efedb9d2a20fd014b003a2acde94a0a29ecc",
+      "edits": [
+        {
+          "path": "builtins/web/crypto/crypto-key.cpp",
+          "old": "  return BuiltinImpl<CryptoKey>::init_class_impl(cx, global);\n}",
+          "new": "  return BuiltinImpl<CryptoKey, CryptoKeyClassPolicy>::init_class_impl(cx, global);\n}\n\nvoid CryptoKey::finalize(JS::GCContext *, JSObject *obj) {\n  // New objects and the prototype can have no owner yet. Inspect each owner slot\n  // independently of Algorithm/Type, which may not be initialized on an error path.\n  const auto key = JS::GetReservedSlot(obj, std::to_underlying(Slots::Key));\n  if (!key.isUndefined()) {\n    JS::SetReservedSlot(obj, std::to_underlying(Slots::Key), JS::UndefinedValue());\n    detail::EvpPkeyDeleter{}(static_cast<EVP_PKEY *>(key.toPrivate()));\n  }\n  const auto data = JS::GetReservedSlot(obj, std::to_underlying(Slots::KeyData));\n  if (!data.isUndefined()) {\n    JS::SetReservedSlot(obj, std::to_underlying(Slots::KeyData), JS::UndefinedValue());\n    detail::SecretByteVectorDeleter{}(static_cast<std::vector<uint8_t> *>(data.toPrivate()));\n  }\n}",
+          "count": 1
+        },
+        {
+          "path": "builtins/web/crypto/crypto-key.cpp",
+          "old": "std::unique_ptr<std::vector<uint8_t>> data, unsigned long length,",
+          "new": "SecretByteVectorPtr data, unsigned long length,",
+          "count": 1
+        },
+        {
+          "path": "builtins/web/crypto/crypto-key.cpp",
+          "old": "  JS::SetReservedSlot(instance, std::to_underlying(Slots::KeyDataLength), JS::Int32Value(data->size()));\n  JS::SetReservedSlot(instance, std::to_underlying(Slots::KeyData), JS::PrivateValue(data.release()->data()));",
+          "new": "  // Transfer the recoverable vector owner only after all fallible JS work.\n  JS::SetReservedSlot(instance, std::to_underlying(Slots::KeyData), JS::PrivateValue(data.release()));",
+          "count": 1
+        },
+        {
+          "path": "builtins/web/crypto/crypto-key.cpp",
+          "old": "  auto p = mozilla::MakeUnique<uint8_t[]>(keyData->exponent.size());",
+          "new": "  mozilla::UniquePtr<uint8_t[], JS::FreePolicy> p{\n      static_cast<uint8_t *>(JS_malloc(cx, keyData->exponent.size()))};\n  if (!p) {\n    JS_ReportOutOfMemory(cx);\n    return nullptr;\n  }",
+          "count": 1
+        },
+        {
+          "path": "builtins/web/crypto/crypto-key.cpp",
+          "old": "  JS::RootedObject byte_array(cx, JS_NewUint8ArrayWithBuffer(cx, buffer, 0, keyData->exponent.size()));\n  JS::RootedValue publicExponent",
+          "new": "  JS::RootedObject byte_array(cx, JS_NewUint8ArrayWithBuffer(cx, buffer, 0, keyData->exponent.size()));\n  if (!byte_array) {\n    return nullptr;\n  }\n  JS::RootedValue publicExponent",
+          "count": 1
+        },
+        {
+          "path": "builtins/web/crypto/crypto-key.cpp",
+          "old": "  return {\n      static_cast<uint8_t *>(JS::GetReservedSlot(self, std::to_underlying(Slots::KeyData)).toPrivate()),\n      static_cast<size_t>(JS::GetReservedSlot(self, std::to_underlying(Slots::KeyDataLength)).toInt32())};",
+          "new": "  auto *owner = static_cast<std::vector<uint8_t> *>(\n      JS::GetReservedSlot(self, std::to_underlying(Slots::KeyData)).toPrivate());\n  MOZ_ASSERT(owner);\n  return {owner->data(), owner->size()};",
+          "count": 1
+        },
+        {
+          "path": "builtins/web/crypto/crypto-key.cpp",
+          "old": "  int result = EVP_PKEY_fromdata(ctx.get(), &pkey_raw, key_type, params.get());\n  if (result <= 0 || !pkey_raw) {\n    return nullptr;\n  }\n\n  auto pkey = EvpPkeyPtr(pkey_raw);",
+          "new": "  int result = EVP_PKEY_fromdata(ctx.get(), &pkey_raw, key_type, params.get());\n  auto pkey = EvpPkeyPtr(pkey_raw);\n  if (result <= 0 || !pkey_raw) {\n    return nullptr;\n  }",
+          "count": 1
+        },
+        {
+          "path": "builtins/web/crypto/crypto-key.cpp",
+          "old": "  if (EVP_PKEY_fromdata(ctx.get(), &pkey_raw, key_type, params.get()) <= 0) {\n    return nullptr;\n  }\n\n  auto pkey = EvpPkeyPtr(pkey_raw);",
+          "new": "  int result = EVP_PKEY_fromdata(ctx.get(), &pkey_raw, key_type, params.get());\n  auto pkey = EvpPkeyPtr(pkey_raw);\n  if (result <= 0) {\n    return nullptr;\n  }",
+          "count": 1
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "beforeSha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "afterimage": "afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+      "afterSha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755",
+      "edits": [
+        {
+          "path": "builtins/web/crypto/crypto-algorithm.cpp",
+          "old": "  std::unique_ptr<std::vector<uint8_t>> data;",
+          "new": "  SecretByteVectorPtr data;",
+          "count": 1
+        },
+        {
+          "path": "builtins/web/crypto/crypto-algorithm.cpp",
+          "old": "    data = std::make_unique<std::vector<uint8_t>>(key_bytes.begin(), key_bytes.end());",
+          "new": "    data = SecretByteVectorPtr(new std::vector<uint8_t>(key_bytes.begin(), key_bytes.end()));",
+          "count": 1
+        },
+        {
+          "path": "builtins/web/crypto/crypto-algorithm.cpp",
+          "old": "    data = std::make_unique<std::vector<uint8_t>>(data_string.begin(), data_string.end());",
+          "new": "    data = SecretByteVectorPtr(new std::vector<uint8_t>(data_string.begin(), data_string.end()));",
+          "count": 1
+        }
+      ],
+      "forwardAndReverseExact": true
+    }
+  ],
+  "nativeWorktreeChanged": false,
+  "runtimeValidation": null
+}

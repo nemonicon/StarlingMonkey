@@ -1,0 +1,495 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "origin": "tests/node-compat/foundation-classic-streams/trace-integration-candidate-v1/layer-policy.py",
+      "path": "layer-policy.py",
+      "beforeSha256": "43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9",
+      "afterSha256": "eb8a30888a6ed2e3f5930bfe65e7b66917327f88ccf787403485e82306b67fd9",
+      "edits": [
+        {
+          "old": "def verify_trace_ancestry():\n    previous=HERE.parent/'integration-candidate-v1'\n    assert digest(previous/'policy.json')==POLICY['classicTraceSourcePolicy']['previousPolicySha256']\n    assert digest(previous/'layer-policy.py')==POLICY['classicTraceSourcePolicy']['previousHelperSha256']\n    assert digest(previous/'source/tests/node-compat/build-engine.sh')==POLICY['classicTraceSourcePolicy']['previousRecipeSha256']\n    old=json.loads((previous/'policy.json').read_bytes())\n    before={row['path']:row['sha256']for row in old['expectedNativeSourceManifest']}\n    after={row['path']:row['sha256']for row in POLICY['expectedNativeSourceManifest']}\n    changes={row['path']:row for row in POLICY['classicTraceSourcePolicy']['changes']}\n    assert len(before)==len(after)==342 and set(before)==set(after)\n    assert len(changes)==3 and sum(before[path]==after[path]for path in before)==339\n    for path,row in changes.items():assert before[path]==row['beforeSha256']and after[path]==row['afterSha256']\n    assert POLICY['strictPolicyVersion']==old['strictPolicyVersion']\n    assert POLICY['protectedPolicyVersion']==old['protectedPolicyVersion']\n    assert POLICY['embedding']==old['embedding']and POLICY['nativePatchSha256']==old['nativePatchSha256']\n    fix=HERE.parent/'trace-semantics-candidate-v1'\n    assert digest(fix/'index.json')==POLICY['classicTraceSourcePolicy']['fixSourceIndexSha256']\n    for row in json.loads((fix/'index.json').read_bytes())['files']:\n        target=fix/row['path'];assert not target.is_symlink()and target.stat().st_size==row['bytes']and digest(target)==row['sha256']\n    assert digest(fix/'canonical-3file.UNAPPLIED.patch')==POLICY['classicTraceSourcePolicy']['sourceDeltaPatchSha256']\n    assert digest(fix/'transformation-proof.json')==POLICY['classicTraceSourcePolicy']['transformationProofSha256']\n    return True\nverify_trace_ancestry()\n",
+          "new": "def verify_zlib_ancestry():\n    root=HERE.parents[1]/'foundation-classic-streams/trace-integration-candidate-v1'\n    zlib=HERE.parent/'integration-candidate-v1'\n    authority=POLICY['zlibSourcePolicy']\n    for path,key in [(root/'index.json','parentTraceIndexSha256'),(root/'policy.json','parentTracePolicySha256'),(root/'layer-policy.py','parentTraceHelperSha256'),(root/'source/tests/node-compat/build-engine.sh','parentTraceRecipeSha256'),(zlib/'index.json','sourceIndexSha256')]:assert digest(path)==authority[key]\n    for base in [root,zlib]:\n        for row in json.loads((base/'index.json').read_bytes())['files']:\n            path=base/row['path'];assert not path.is_symlink()and path.is_file()and path.stat().st_size==row['bytes']and digest(path)==row['sha256']\n    before={row['path']:row['sha256']for row in json.loads((root/'policy.json').read_bytes())['expectedNativeSourceManifest']}\n    after={row['path']:row['sha256']for row in POLICY['expectedNativeSourceManifest']}\n    assert len(before)==342 and len(after)==350 and set(after)-set(before)==set(authority['addedSources'])\n    changes={row['path']:row for row in authority['changes']};assert len(changes)==2\n    assert sum(before[path]==after[path]for path in before)==340\n    for path,row in changes.items():assert before[path]==row['beforeSha256']and after[path]==row['afterSha256']\n    assert POLICY['classicTraceSourcePolicy']==json.loads((root/'policy.json').read_bytes())['classicTraceSourcePolicy']\n    return True\nverify_zlib_ancestry()\n",
+          "count": 1,
+          "afterOffsets": [
+            856
+          ]
+        },
+        {
+          "old": "POLICY_SHA256='891a4c53dd4a7b7d776c21003acdd12c7944c6a3eca019a1d9b2be620ed8b11c'",
+          "new": "POLICY_SHA256='f0ef44e08dd70d4ee3a9d266c2881d496821f2890b9df614c0c93a4ec55892e9'",
+          "count": 1,
+          "afterOffsets": [
+            341
+          ]
+        },
+        {
+          "old": "len(rows)==len({row['path']for row in rows})==342",
+          "new": "len(rows)==len({row['path']for row in rows})==350",
+          "count": 1,
+          "afterOffsets": [
+            3335
+          ]
+        },
+        {
+          "old": "Unreviewed342 source",
+          "new": "Unreviewed350 source",
+          "count": 1,
+          "afterOffsets": [
+            3626
+          ]
+        },
+        {
+          "old": "native,queue=PARENT.validate_compilation(entries,embedding,ticks,repo)",
+          "new": "native,queue=PARENT.validate_compilation([row for row in entries if row['file']!=str(Path(repo)/'builtins/node-compat/zlib/kernel.cpp')],embedding,ticks,repo)",
+          "count": 1,
+          "afterOffsets": [
+            5378
+          ]
+        },
+        {
+          "old": "and(web or name!='builtins/node-compat/stream-web-kernel.cpp')",
+          "new": "and(web or name!='builtins/node-compat/stream-web-kernel.cpp')and(metadata['zlibEnabled']or name!='builtins/node-compat/zlib/kernel.cpp')",
+          "count": 1,
+          "afterOffsets": [
+            5772
+          ]
+        },
+        {
+          "old": "assert len(cpp)==61",
+          "new": "assert len(cpp)==62",
+          "count": 1,
+          "afterOffsets": [
+            5915
+          ]
+        },
+        {
+          "old": "_macro(words,'NODE_COMPAT_CLASSIC_STREAMS',classic and name in POLICY['privateTargetCpp'])",
+          "new": "_macro(words,'NODE_COMPAT_CLASSIC_STREAMS',classic and name in POLICY['privateTargetCpp'])\n        _macro(words,'NODE_COMPAT_ZLIB',metadata['zlibEnabled']and name.startswith('builtins/node-compat/'))\n        assert not any(word.startswith(('-DZ_PREFIX','-UZ_PREFIX','-include','-imacros','-Wl,-lz'))or word in ['-lz','-lzlib']for word in words)",
+          "count": 1,
+          "afterOffsets": [
+            6621
+          ]
+        },
+        {
+          "old": "_macro(words,'NODE_COMPAT_CLASSIC_STREAMS',False)",
+          "new": "_macro(words,'NODE_COMPAT_CLASSIC_STREAMS',False)\n        _macro(words,'NODE_COMPAT_ZLIB',False)\n        assert not any(word.startswith(('-DZ_PREFIX','-UZ_PREFIX','-include','-imacros','-Wl,-lz'))or word in ['-lz','-lzlib']for word in words)",
+          "count": 1,
+          "afterOffsets": [
+            7807
+          ]
+        },
+        {
+          "old": "len(private)==(5 if web else 4)",
+          "new": "len(private)==(5 if web else 4)+int(metadata['zlibEnabled'])",
+          "count": 1,
+          "afterOffsets": [
+            8377
+          ]
+        },
+        {
+          "old": "return native,queue,private",
+          "new": "return [row['command']for row in rows],queue,private",
+          "count": 1,
+          "afterOffsets": [
+            8442
+          ]
+        },
+        {
+          "old": "'addedSourcePaths':POLICY['addedSourcePaths']",
+          "new": "'addedSourcePaths':POLICY['classicAddedSourcePaths']",
+          "count": 1,
+          "afterOffsets": [
+            12072
+          ]
+        },
+        {
+          "old": "'scope':'Actual342 source/command observations; parent306 is immutable source ancestry, not projected engine metadata.'",
+          "new": "'scope':'Actual350 source/command observations; parent342/306 are immutable ancestry, never projected metadata.'",
+          "count": 1,
+          "afterOffsets": [
+            11469
+          ]
+        },
+        {
+          "old": "    return metadata\n",
+          "new": "    zlib=metadata['zlibEnabled'];assert type(zlib)is bool\n    for field in ['requestedCMakeOptions','observedCMakeOptions']:assert metadata[field]['NODE_COMPAT_ZLIB']==('ON'if zlib else'OFF')\n    metadata['zlibSourcePolicy']=copy.deepcopy(POLICY['zlibSourcePolicy'])\n    metadata['zlibPolicy']={'version':'sm-bounded-zlib-install-v1','enabled':zlib,'policyFileSha256':POLICY_SHA256,'helperSha256':digest(__file__),\n      'moduleManifest':POLICY['zlibManifest'],'moduleManifestSha256':POLICY['zlibManifestSha256'],'requiredHostInterfaces':[],\n      'actualKernelCompileCommands':[row['command']for row in entries if row['file']==str(Path(repo)/'builtins/node-compat/zlib/kernel.cpp')],\n      'runtimeBackendProof':{'verified':False,'version':None,'vernum':None}}\n    return metadata\n",
+          "count": 1,
+          "afterOffsets": [
+            12905
+          ]
+        }
+      ],
+      "reverseExact": true
+    },
+    {
+      "origin": "tests/node-compat/foundation-classic-streams/trace-integration-candidate-v1/source/tests/node-compat/build-engine.sh",
+      "path": "source/tests/node-compat/build-engine.sh",
+      "beforeSha256": "3694c88b7d000f27e11ffcac835fe0b205b2075f5b1d8d29c61f5b0038ba1cf3",
+      "afterSha256": "89c3580c967bf0290f500fc20dfbeadc363cabb5494ffeed1ff44b958cc0a814",
+      "edits": [
+        {
+          "old": "classic-trace-v1-build",
+          "new": "zlib-v1-build",
+          "count": 1,
+          "afterOffsets": [
+            404
+          ]
+        },
+        {
+          "old": "foundation-classic-streams/trace-integration-candidate-v1",
+          "new": "foundation-zlib/native-integration-candidate-v1",
+          "count": 3,
+          "afterOffsets": [
+            2051,
+            16962,
+            22574
+          ]
+        },
+        {
+          "old": "43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9",
+          "new": "eb8a30888a6ed2e3f5930bfe65e7b66917327f88ccf787403485e82306b67fd9",
+          "count": 5,
+          "afterOffsets": [
+            8838,
+            9722,
+            22669,
+            30498,
+            45624
+          ]
+        },
+        {
+          "old": "891a4c53dd4a7b7d776c21003acdd12c7944c6a3eca019a1d9b2be620ed8b11c",
+          "new": "f0ef44e08dd70d4ee3a9d266c2881d496821f2890b9df614c0c93a4ec55892e9",
+          "count": 2,
+          "afterOffsets": [
+            8965,
+            9849
+          ]
+        },
+        {
+          "old": "classic_enabled=\"${NODE_COMPAT_CLASSIC_STREAMS:-0}\"",
+          "new": "classic_enabled=\"${NODE_COMPAT_CLASSIC_STREAMS:-0}\"\nzlib_enabled=\"${NODE_COMPAT_ZLIB:-0}\"\nif [[ \"$zlib_enabled\" != 0 && \"$zlib_enabled\" != 1 ]]; then echo \"NODE_COMPAT_ZLIB must be0or1\" >&2; exit 1; fi",
+          "count": 1,
+          "afterOffsets": [
+            1161
+          ]
+        },
+        {
+          "old": "trace-v1.$entropy_mode",
+          "new": "zlib-v1.$entropy_mode",
+          "count": 2,
+          "afterOffsets": [
+            6456,
+            7035
+          ]
+        },
+        {
+          "old": ".t$ticks_enabled.c$classic_enabled\"",
+          "new": ".t$ticks_enabled.c$classic_enabled.z$zlib_enabled\"",
+          "count": 2,
+          "afterOffsets": [
+            6609,
+            7203
+          ]
+        },
+        {
+          "old": "# Freeze the complete compiled-input inventory",
+          "new": "zlib_flag=OFF; if [[ \"$zlib_enabled\" == 1 ]]; then zlib_flag=ON; fi\n# Freeze the complete compiled-input inventory",
+          "count": 1,
+          "afterOffsets": [
+            16507
+          ]
+        },
+        {
+          "old": "-DNODE_COMPAT_INTERNAL_TICKS=\"$ticks_flag\" -DNODE_COMPAT_CLASSIC_STREAMS=\"$classic_flag\"",
+          "new": "-DNODE_COMPAT_INTERNAL_TICKS=\"$ticks_flag\" -DNODE_COMPAT_CLASSIC_STREAMS=\"$classic_flag\" -DNODE_COMPAT_ZLIB=\"$zlib_flag\"",
+          "count": 1,
+          "afterOffsets": [
+            19154
+          ]
+        },
+        {
+          "old": "# The repository already versions this aggregate lock.",
+          "new": "[[ \"$(sha256_file \"$layer_root/codec-evidence.py\")\" == 265ef1aa0fc8ff038dfd897c23c4954d3cef6abad34dc7a823846e50417b69b6 ]] || exit 1\npython3 \"$layer_root/codec-evidence.py\" before \"$spidermonkey_dir\" \"$build_dir\" \"$work_root/codec-$artifact_name.before.json\"\ncodec_before_sha=\"$(sha256_file \"$work_root/codec-$artifact_name.before.json\")\"\n# The repository already versions this aggregate lock.",
+          "count": 1,
+          "afterOffsets": [
+            19752
+          ]
+        },
+        {
+          "old": "\"$ticks_enabled\" \"$classic_enabled\" <<'PY'",
+          "new": "\"$ticks_enabled\" \"$classic_enabled\" \"$zlib_enabled\" \"$spidermonkey_dir\" \"$codec_before_sha\" <<'PY'",
+          "count": 1,
+          "afterOffsets": [
+            22282
+          ]
+        },
+        {
+          "old": "ticks_enabled, classic_enabled = sys.argv[1:]",
+          "new": "ticks_enabled, classic_enabled, zlib_enabled, spidermonkey_dir, codec_before_sha = sys.argv[1:]",
+          "count": 1,
+          "afterOffsets": [
+            22818
+          ]
+        },
+        {
+          "old": "'NODE_COMPAT_CLASSIC_STREAMS': 'ON' if classic_enabled == '1' else 'OFF',",
+          "new": "'NODE_COMPAT_CLASSIC_STREAMS': 'ON' if classic_enabled == '1' else 'OFF',\n    'NODE_COMPAT_ZLIB': 'ON' if zlib_enabled == '1' else 'OFF',",
+          "count": 1,
+          "afterOffsets": [
+            25847
+          ]
+        },
+        {
+          "old": "'NODE_COMPAT_STREAM_WEB', 'NODE_COMPAT_CLASSIC_STREAMS']:",
+          "new": "'NODE_COMPAT_STREAM_WEB', 'NODE_COMPAT_CLASSIC_STREAMS', 'NODE_COMPAT_ZLIB']:",
+          "count": 1,
+          "afterOffsets": [
+            27608
+          ]
+        },
+        {
+          "old": "selected_manifests = [",
+          "new": "if zlib_enabled == '1': manifest_paths.append('builtins/node-compat/export-manifest.zlib.node-v22.14.0.json')\nselected_manifests = [",
+          "count": 1,
+          "afterOffsets": [
+            37108
+          ]
+        },
+        {
+          "old": "'classicStreamsEnabled': classic_enabled == '1',",
+          "new": "'classicStreamsEnabled': classic_enabled == '1', 'zlibEnabled': zlib_enabled == '1',",
+          "count": 1,
+          "afterOffsets": [
+            39744
+          ]
+        },
+        {
+          "old": "with open(artifact + '.build.json', 'w') as output:",
+          "new": "codec_file=layer_file.parent/'codec-evidence.py'\nassert digest(codec_file)=='265ef1aa0fc8ff038dfd897c23c4954d3cef6abad34dc7a823846e50417b69b6'\ncodec_spec=importlib.util.spec_from_file_location('bounded_zlib_codec_evidence',codec_file)\ncodec=importlib.util.module_from_spec(codec_spec);codec_spec.loader.exec_module(codec)\nartifact_name=pathlib.Path(artifact).name.removesuffix('.wasm')\nmetadata['zlibPolicy']['codecWitness']=codec.after(repo,spidermonkey_dir,build_dir,pathlib.Path(work)/('codec-'+artifact_name+'.before.json'),pathlib.Path(work)/('codec-'+artifact_name+'.evidence'),metadata,codec_before_sha)\nwith open(artifact + '.build.json', 'x') as output:",
+          "count": 1,
+          "afterOffsets": [
+            46716
+          ]
+        }
+      ],
+      "reverseExact": true
+    },
+    {
+      "origin": "tests/node-compat/foundation-classic-streams/trace-integration-candidate-v1/source/tests/node-compat/classic-streams-admission.mjs",
+      "path": "source/tests/node-compat/zlib-admission.mjs",
+      "beforeSha256": "46acb447c5e2acc6f33d94d3d21e90c1495a8da2d593e08b0f3c21e84e738d24",
+      "afterSha256": "4696da1e8b86a46ba242686ef4613c4081bbaa814dcd60d9f0050f0c9496f416",
+      "edits": [
+        {
+          "old": "function hinted(metadata){return metadata.buildRecipeSha256===RECIPE_SHA||Object.hasOwn(metadata,'classicStreamsEnabled')||Object.hasOwn(metadata,'classicStreamsPolicy')||\n Object.hasOwn(metadata.requestedCMakeOptions??{},'NODE_COMPAT_CLASSIC_STREAMS')||Object.hasOwn(metadata.observedCMakeOptions??{},'NODE_COMPAT_CLASSIC_STREAMS')||\n (Array.isArray(metadata.sourceManifest)&&metadata.sourceManifest.some(row=>typeof row?.path==='string'&&row.path.startsWith('builtins/node-compat/classic-streams/'))) ||\n String(metadata.strictEventExceptionPolicy?.version).includes('classic-streams')||String(metadata.protectedAbortListenerPolicy?.version).includes('classic-streams');}\n",
+          "new": "function hinted(metadata){return metadata.buildRecipeSha256===RECIPE_SHA||Object.hasOwn(metadata,'zlibEnabled')||Object.hasOwn(metadata,'zlibPolicy')||Object.hasOwn(metadata,'zlibSourcePolicy')||Object.hasOwn(metadata.observedCMakeOptions??{},'NODE_COMPAT_ZLIB')||Object.hasOwn(metadata.requestedCMakeOptions??{},'NODE_COMPAT_ZLIB')||(Array.isArray(metadata.sourceManifest)&&metadata.sourceManifest.some(row=>typeof row?.path==='string'&&row.path.startsWith('builtins/node-compat/zlib/')));}\n",
+          "count": 1,
+          "afterOffsets": [
+            6291
+          ]
+        },
+        {
+          "old": "validateClassicSourceModel",
+          "new": "validateZlibSourceModel",
+          "count": 2,
+          "afterOffsets": [
+            6799,
+            18054
+          ]
+        },
+        {
+          "old": "validateClassicSourceAdmission",
+          "new": "validateZlibSourceAdmission",
+          "count": 1,
+          "afterOffsets": [
+            17762
+          ]
+        },
+        {
+          "old": "foundation-classic-streams/trace-integration-candidate-v1",
+          "new": "foundation-zlib/native-integration-candidate-v1",
+          "count": 3,
+          "afterOffsets": [
+            4614,
+            4861,
+            5036
+          ]
+        },
+        {
+          "old": "275033a645ed9dd3f3f8770baa6d2a5ddb5702fa0d34ff115d912ddcf9b077d8",
+          "new": "b63926c4fd8feb31ac270bea7ea337bc4656d5ed5b2dec76a2cfa64af0de0588",
+          "count": 1,
+          "afterOffsets": [
+            339
+          ]
+        },
+        {
+          "old": "3694c88b7d000f27e11ffcac835fe0b205b2075f5b1d8d29c61f5b0038ba1cf3",
+          "new": "89c3580c967bf0290f500fc20dfbeadc363cabb5494ffeed1ff44b958cc0a814",
+          "count": 1,
+          "afterOffsets": [
+            424
+          ]
+        },
+        {
+          "old": "length,342",
+          "new": "length,350",
+          "count": 2,
+          "afterOffsets": [
+            6009,
+            9858
+          ]
+        },
+        {
+          "old": "sourceInputs:342",
+          "new": "sourceInputs:350",
+          "count": 1,
+          "afterOffsets": [
+            17574
+          ]
+        },
+        {
+          "old": "length,36",
+          "new": "length,44",
+          "count": 1,
+          "afterOffsets": [
+            6060
+          ]
+        },
+        {
+          "old": "length,38",
+          "new": "length,46",
+          "count": 1,
+          "afterOffsets": [
+            6116
+          ]
+        },
+        {
+          "old": "cpp.length,61",
+          "new": "cpp.length,62",
+          "count": 1,
+          "afterOffsets": [
+            15078
+          ]
+        },
+        {
+          "old": "['classicStreamsEnabled','NODE_COMPAT_CLASSIC_STREAMS']",
+          "new": "['classicStreamsEnabled','NODE_COMPAT_CLASSIC_STREAMS'],['zlibEnabled','NODE_COMPAT_ZLIB']",
+          "count": 1,
+          "afterOffsets": [
+            8145
+          ]
+        },
+        {
+          "old": "&&(metadata.streamWebEnabled||path!=='builtins/node-compat/stream-web-kernel.cpp')",
+          "new": "&&(metadata.streamWebEnabled||path!=='builtins/node-compat/stream-web-kernel.cpp')&&(metadata.zlibEnabled||path!=='builtins/node-compat/zlib/kernel.cpp')",
+          "count": 1,
+          "afterOffsets": [
+            15212
+          ]
+        },
+        {
+          "old": "macro(tokens,'NODE_COMPAT_ENTROPY_POLICY',true);",
+          "new": "macro(tokens,'NODE_COMPAT_ENTROPY_POLICY',true);macro(tokens,'NODE_COMPAT_ZLIB',metadata.zlibEnabled&&path.startsWith('builtins/node-compat/'));",
+          "count": 1,
+          "afterOffsets": [
+            15821
+          ]
+        },
+        {
+          "old": "  release(tokens);",
+          "new": "  release(tokens);\n  assert(!tokens.some(word=>['-DZ_PREFIX','-UZ_PREFIX','-include','-imacros','-Wl,-lz'].some(prefix=>word.startsWith(prefix))||['-lz','-lzlib'].includes(word)),'No second codec, forced header or prefix ABI');",
+          "count": 1,
+          "afterOffsets": [
+            15616
+          ]
+        },
+        {
+          "old": "classic.addedSourcePaths,policy.addedSourcePaths",
+          "new": "classic.addedSourcePaths,policy.classicAddedSourcePaths",
+          "count": 1,
+          "afterOffsets": [
+            14654
+          ]
+        },
+        {
+          "old": "metadata.streamWebEnabled?5:4",
+          "new": "(metadata.streamWebEnabled?5:4)+Number(metadata.zlibEnabled)",
+          "count": 1,
+          "afterOffsets": [
+            17538
+          ]
+        },
+        {
+          "old": " return Object.freeze({branch:",
+          "new": " assert.deepEqual(metadata.zlibSourcePolicy,policy.zlibSourcePolicy);\n const zlib=metadata.zlibPolicy;assert.equal(zlib?.version,'sm-bounded-zlib-install-v1');assert.equal(zlib.enabled,metadata.zlibEnabled);\n assert.equal(zlib.policyFileSha256,pins.policySha256);assert.equal(zlib.helperSha256,pins.helperSha256);\n assert.equal(zlib.moduleManifest,policy.zlibManifest);assert.equal(zlib.moduleManifestSha256,policy.zlibManifestSha256);assert.deepEqual(zlib.requiredHostInterfaces,[]);\n assert.deepEqual(zlib.actualKernelCompileCommands,metadata.zlibEnabled?[layout.get('builtins/node-compat/zlib/kernel.cpp')]:[]);\n assert.deepEqual(zlib.runtimeBackendProof,{verified:false,version:null,vernum:null});\n return Object.freeze({zlibEnabled:metadata.zlibEnabled,branch:",
+          "count": 1,
+          "afterOffsets": [
+            17914
+          ]
+        },
+        {
+          "old": "export function validateZlibSourceAdmission(metadata,options)",
+          "new": "export function validateZlibBuildSourceAdmission(metadata,options)",
+          "count": 1,
+          "afterOffsets": [
+            18900
+          ]
+        },
+        {
+          "old": " return validateZlibSourceModel(metadata,options);",
+          "new": " const result=validateZlibSourceModel(metadata,options);\n const witness=metadata.zlibPolicy.codecWitness;assert.equal(witness?.version,'sm-selected-moz-z-codec-source-link-witness-v1');assert.equal(witness.sourceInputsCheckedBeforeAndAfterBuild,true);\n assert.equal(witness.archive.sha256,'298b85501657189dc66139242abf5aeb4e981b8db7c37cc5a69d1151ec40aacc');assert.equal(witness.archive.bytes,538170426);assert.deepEqual(witness.runtimeBackendProof,{verified:false,version:null,vernum:null});\n assert.deepEqual(witness.actualKernelCompileCommands,metadata.zlibPolicy.actualKernelCompileCommands);assert.equal(witness.postBuildLinkEvidence.commands.length,1);\n return result;",
+          "count": 1,
+          "afterOffsets": [
+            19202
+          ]
+        },
+        {
+          "old": "//342-source admission, not runtime proof.306 branch remains in its unchanged module.",
+          "new": "//350-source build validation is separate from CLOSED operational admission.\n//Historical unhinted342/306 receipts retain their unchanged selectors.",
+          "count": 1,
+          "afterOffsets": [
+            0
+          ]
+        },
+        {
+          "old": "export function validateZlibBuildSourceAdmission(metadata,options){",
+          "new": "// Operational admission stays closed until a separately reviewed runtime-evidence\n// revision. Build/freezer/bootstrap consumers use the explicitly named raw gate.\nexport function validateZlibSourceAdmission(metadata){\n assert(metadata&&typeof metadata==='object');\n if(!hinted(metadata))return null;\n assert.fail('Zlib350 operational admission CLOSED: native build/validation bootstrap is not codec approval');\n}\nexport function validateZlibBuildSourceAdmission(metadata,options){",
+          "count": 1,
+          "afterOffsets": [
+            18963
+          ]
+        }
+      ],
+      "reverseExact": true
+    },
+    {
+      "origin": "tests/node-compat/foundation-zlib/integration-candidate-v1/source/tests/node-compat/module-selection.mjs",
+      "path": "source/tests/node-compat/module-selection.mjs",
+      "beforeSha256": "3cd82d473dec7155c9e3eed7ddc227c8d7137b9b16b9cd815410c3939b76655c",
+      "afterSha256": "018b3a5565db72e65dee3d522ed4902ba31d04d59f306fb7d6d560c0a6944599",
+      "edits": [
+        {
+          "old": "validateZlibSourceAdmission(metadata); // Closed for both ON/OFF new lineages until actual proof.",
+          "new": "const zlib=validateZlibSourceAdmission(metadata,{sourceRoot,parentProtectedSources:protectedAbortV1Sources,parentProtectedPatch:protectedAbortV1Patch});",
+          "count": 1,
+          "afterOffsets": [
+            6625
+          ]
+        },
+        {
+          "old": "const classic = validateClassicSourceAdmission(metadata,",
+          "new": "const classic = zlib ?? validateClassicSourceAdmission(metadata,",
+          "count": 1,
+          "afterOffsets": [
+            6780
+          ]
+        }
+      ],
+      "reverseExact": true
+    }
+  ],
+  "sourceOnly": true
+}

@@ -1,0 +1,60 @@
+"""Owned source/data tests only. No action module or artifact verifier import."""
+from pathlib import Path
+import ast,hashlib,importlib.util,json,sys
+sys.dont_write_bytecode=True
+HERE=Path(__file__).resolve().parent
+def sha(raw):return hashlib.sha256(raw).hexdigest()
+def main():
+ assert len(sys.argv)==2;output=Path(sys.argv[1]);assert str(output).startswith('/tmp/starling-node-compat/')and not output.exists();output.mkdir(parents=True,exist_ok=False)
+ spec=importlib.util.spec_from_file_location('pure_future_pair_authority',HERE/'authority.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+ checks=[]
+ def check(name,value=True):assert value,name;checks.append(name)
+ def rejects(name,value):
+  raw=(json.dumps(value)+'\n').encode();path=output/('negative-'+str(len(checks))+'.json');path.write_bytes(raw)
+  try:module.load_pair(path,sha(raw),output/'review-must-not-be-read.json','0'*64)
+  except(AssertionError,KeyError,TypeError):check(name)
+  else:raise AssertionError('Unexpected pure authority acceptance')
+ rejects('null future authority',None)
+ rejects('checked in null pair template',json.loads((HERE/'future-pair-authority.json').read_bytes()))
+ rejects('old v2 authority',{'schemaVersion':1,'state':'ROOT_REVIEWED_CLASSIC_TRACE_BENCHMARK_DIAGNOSTIC_FREEZES_V2'})
+ rejects('unreviewed exporter authority',{'schemaVersion':1,'state':'UNREVIEWED_CLASSIC_TRACE_BENCHMARK_DIAGNOSTIC_PIN_CANDIDATES_V3'})
+ actual_on=json.loads((HERE.parent/'production-adoption-v1/reviewed-diagnostic-v3-on-pins.json').read_bytes())
+ rejects('existing real ON only review does not expand to pair',actual_on)
+ rejects('production authority not diagnostic',{'schemaVersion':1,'state':'REVIEWED_REAL_CLASSIC_TRACE_PRODUCTION_FREEZES_V1'})
+ bad=output/'malformed.json';bad.write_bytes(b'{bad')
+ try:module.document(bad,'1'*64)
+ except AssertionError:check('primitive hash checked before parsing')
+ else:raise AssertionError('Malformed JSON was followed')
+ owner=(HERE/'activate.py').read_text();tree=ast.parse(owner)
+ check('future source producer hash authenticates40 before genuine backend import',owner.index('producer=indexed(PRODUCER,INDEX)')<owner.index("spec_from_file_location('benchmark_common'"))
+ check('separate reviewed pair before artifact imports',owner.index('load_pair(pin_path')<owner.index("spec_from_file_location('benchmark_common'"))
+ check('actual native backend no metadata projection',"backend.require_source_root(CANONICAL)"in owner and'backend.verify_frozen(label)'in owner and"metadata['classicStreamsEnabled']is(label==LABELS[0])"in owner)
+ check('both actual tuple observations compared','all(pin[key]==value for key,value in observed.items())'in owner)
+ check('actual342/addon2/tool92/frozen and two tool trees carried',all(v in owner for v in["receipt['copies']","metadata['sourceManifest']",'backend.capture_addons()','backend.tool_dependencies(CANONICAL)',"original['toolTrees']","original['toolLinks']"]))
+ check('exclusive and rechecked before and after staging',"stage.mkdir(exist_ok=False)"in owner and"open('xb')"in owner and owner.index('recheck();assert not OUTPUT.exists()')<owner.index('stage.mkdir')and owner.rfind('recheck()')>owner.index('stage.mkdir'))
+ common=HERE.parent/'measurement-common-byte-domain-candidate-v1';original=HERE.parent/'measurement-workload-candidate-v1'
+ for name,source in [('workload.mjs',common/'workload.mjs'),('control-workload.mjs',original/'workload.mjs'),('stock-provider.mjs',common/'stock-provider.mjs'),('node-common-oracle.json',common/'evidence/node-results.json')]:check('byte identical '+name,(HERE/name).read_bytes()==source.read_bytes())
+ proposed=Path('/private/tmp/starling-node-compat/classic-benchmark-trace-v2-source/builtins/node-compat/classic-streams')
+ for name in['classic-streams.mjs','classic-core.generated.mjs']:check('actual corrected canonical source exact '+name,(HERE/name).read_bytes()==(proposed/name).read_bytes())
+ core=(HERE/'classic-core.generated.mjs').read_text();facade=(HERE/'classic-streams.mjs').read_text().replace("import {createClassicCore} from './classic-core.generated.mjs';\n",'').replace('export function ','function ')
+ factory="(function(dependencies){\n'use strict';\n"+core.replace('export function ','function ')+facade+'\nreturn createClassicStreams(dependencies);\n})'
+ header=(proposed/'factories.generated.h').read_text();check('canonical literal exact corrected installed header',header.split('R"SM_NODE_PROFILE(')[1].split(')SM_NODE_PROFILE";')[0]==factory)
+ check('canonical supported injection slots only no util slot','node:util'not in(HERE/'canonical-provider.mjs').read_text()and 'const {Buffer,events,StringDecoder,nextTick,'in core)
+ bundle=(HERE/'bundle-matched.mjs').read_text();check('stock default plugin options no scheduler or provider source override','nodeBuiltinPlugin({imports:[],exports:[]},{})'in bundle and "nodeGlobals()"in bundle and 'streamSchedulerModule'not in bundle)
+ check('stock99 graph unchanged plus finite guest sources','assert.equal(prior.length,99)'in bundle and 'processEdges.length,7'in bundle)
+ guest=(HERE/'guest.mjs').read_text();check('initial capture evaluated before provider dependency',guest.index("'./capture-before.mjs'")<guest.index("'benchmark:provider'"))
+ check('stock Buffer global mutation observed not replaced','bufferSameAsBefore:Buffer===bufferBeforeProvider'in guest and 'globalChangedDuringProvider:'in guest and 'globalThis.Buffer ='not in guest)
+ check('no queue empty or work counter claim','queueDepthObserved:false'in guest and 'terminalQueueEmptyObserved:false'in guest)
+ check('ordinary guest no timer host service or public process',all(v not in guest for v in['performance.now','process.','Date.now','WebAssembly.Memory']))
+ measure=(HERE/'measure.mjs').read_text();check('timing explicit future Root phase and window','NODE_COMPAT_COMMON_BYTE_TIMING_APPROVED'in measure and'selectTimingPhase(JSON.parse(phaseRaw))'in measure)
+ check('calibration public1 then bounded shared N no adaptive rerun','chooseBatch(pilots[0].firstBatchMs,pilots[1].firstBatchMs)'in measure and"'--calibrate'"in measure)
+ check('only126 timed workers and42 calibration','samples.length,126'in measure and'calibrations.length,21'in measure)
+ check('checks progress outside timed interval',measure.index("progress('timed-sample'")<measure.index('const start=performance.now(),value=await invoke()'))
+ instantiate=(HERE/'instantiate.mjs').read_text();check('no memory export observation or hook','Memory'not in instantiate and 'Object.values'not in instantiate and'capacityBytes:null'in measure and'growCount:null'in measure)
+ prepare=(HERE/'prepare-correctness.mjs').read_text();check('full14 min/max component records fresh retained and Wasmtime',all(v in prepare for v in['i<14','round<3',"fresh-Wasmtime",'expectedIdentity','checkpointProbe','selectedInterfaces:[]']))
+ check('actualcorrectness recorded before timing authority',"timingAllowed:false"in prepare and "ACTUAL_COMMON_BYTE_FOUR_ARM_CORRECTNESS_PASSED"in prepare)
+ for path in HERE.glob('*.py'):ast.parse(path.read_text());check('Python AST '+path.name)
+ output_family=HERE.parent/'measurement-execution-activated-v1';check('future activated and staging families absent',not output_family.exists()and not output_family.is_symlink()and not output_family.with_name(output_family.name+'.staging').exists())
+ report={'schemaVersion':1,'state':'SOURCE_AND_NEGATIVE_PAIR_AUTHORITY_CHECKS_PASSED','passed':len(checks),'checks':checks,'realONAuthorityReadAsJSONOnly':True,'ownerActionOrArtifactVerifierOrNodeWorkloadOrGuestOrNativeOrTargetHostOrTimingExecuted':False}
+ (output/'results.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps({'passed':len(checks),'output':str(output)}))
+if __name__=='__main__':main()

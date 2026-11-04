@@ -1,0 +1,35 @@
+--- a/embedding/embedding.cpp
++++ b/embedding/embedding.cpp
+@@ -311,6 +311,14 @@
+   if (!Runtime.engine->run_event_loop()) {
+     Runtime.engine->abort("(call) event loop error");
+   }
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++  // All current jobs and finalizer callbacks have drained. Handlers attached
++  // by later microtasks already removed their promises from this set.
++  if (Runtime.engine->has_unhandled_promise_rejections()) {
++    JS_ReportErrorASCII(Runtime.cx, "ERR_SM_NODE_EXECUTION_REJECTION: unhandled promise rejection at export boundary");
++    Runtime.engine->abort("(call) unhandled rejection at export boundary");
++  }
++#endif
+ 
+   LOG("(call) retrieving promise result");
+   auto promise_state = JS::GetPromiseState(promise);
+@@ -491,6 +499,17 @@
+     sprintf(&env_name[0], "EXPORT%zu_RETSIZE", i);
+     fn->retsize = atoi(getenv(env_name));
+   }
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++  // Export-object getters run after StarlingMonkey's pre-initialization
++  // boundary. Drain their jobs and reject uncaught errors before snapshotting.
++  if (!Runtime.engine->run_event_loop()) {
++    Runtime.engine->abort("finalizing export bindings with an uncaught callback exception");
++  }
++  if (Runtime.engine->has_unhandled_promise_rejections()) {
++    JS_ReportErrorASCII(Runtime.cx, "ERR_SM_NODE_INITIALIZATION_REJECTION: unhandled promise rejection after export binding");
++    Runtime.engine->abort("finalizing export bindings with an unhandled rejection");
++  }
++#endif
+ }
+ }
+ 

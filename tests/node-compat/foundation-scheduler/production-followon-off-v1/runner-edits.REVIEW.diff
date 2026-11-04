@@ -1,0 +1,173 @@
+--- tests/node-compat/foundation-add-abort/run-production-v11-sync.mjs
++++ source-only/runners/sync.mjs
+@@ -1,4 +1,4 @@
+-import {verifyProductionV11} from './production-v11-preflight.mjs';
++import {verifyProductionTicks} from '../../production-regression-candidate-v3/preflight.mjs';
+ // Production v11 acceptance; separate output preserves private v3. Historical six-case
+ // initialization-diagnostic.mjs and its failure report remain unchanged.
+ import assert from 'node:assert/strict';
+@@ -6,15 +6,15 @@
+ import {spawnSync} from 'node:child_process';
+ import {dirname,join,resolve} from 'node:path';
+ import {fileURLToPath} from 'node:url';
+-import {nativeHarness,hash} from '../foundations/native-scalar-harness.mjs';
+-const productionPreflight=await verifyProductionV11();
+-const here=dirname(fileURLToPath(import.meta.url));
+-const h=await nativeHarness({kind:'production-v11-strict-event',here,enabledField:'eventsEnabled',option:'NODE_COMPAT_EVENTS',outputVariable:'NODE_COMPAT_STRICT_EVENT_OUTPUT'});
++import {nativeHarness,hash} from '../../../foundations/native-scalar-harness.mjs';
++const productionPreflight=(await verifyProductionTicks({gcStress:false})).report;
++const here=dirname(fileURLToPath(new URL('../../../foundation-add-abort/run-production-v11-sync.mjs',import.meta.url)));
++const h=await nativeHarness({kind:'production-private-ticks-strict-event',here,enabledField:'eventsEnabled',option:'NODE_COMPAT_EVENTS',outputVariable:'NODE_COMPAT_STRICT_EVENT_OUTPUT'});
+ assert.equal(h.metadata.observedCMakeOptions.CMAKE_BUILD_TYPE,'Release');
+ assert.equal(h.metadata.strictInitialization,true);assert.equal(h.metadata.oomTesting,false);
+ const patchSha256=hash(await readFile(join(here,'strict-event-v3.patch')));
+ assert.equal(h.metadata.strictEventExceptionPolicy?.patchSha256,patchSha256);
+-assert.equal(h.metadata.strictEventExceptionPolicy?.version,'sm-uncaught-event-v3-protected-abort-v2');
++assert.equal(h.metadata.strictEventExceptionPolicy?.version,'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1');
+ const prefix="import {spawn} from 'node:child_process';\n";
+ const vectors=[
+  ['direct','spawn();',true,/child_process\.spawn/],
+@@ -59,6 +59,6 @@
+  deployed.push({name,fixture,jcoChild:{status:child.status,stdout:child.stdout,stderr:child.stderr},wasmtime:{status:host.status,stdout:host.stdout,stderr:host.stderr},policy:'Uncaught exported event failure is terminal; component instance discarded, never reused'});
+  console.log(JSON.stringify({deployed:name,rejectedOnBothHosts:true}));
+ }
+-const report={schemaVersion:1,productionPreflight,state:'production-v11-strict-sync-acceptance-passed',recordedAtUtc:new Date().toISOString(),...h.evidence,patchSha256,runnerSha256:hash(await readFile(fileURLToPath(import.meta.url))),initialization,successfulReuse,deployed,limitations:['Actual combined production v11 stream/web ON, entropy OFF engine with core m0.11; v8 and private v3 records are preserved.','Value-only latch preserves thrown values, not the separate ExceptionStack; existing pending direct exceptions take precedence.','Capture-failure path is source-reviewed and not fault-injected.','Protected-listener behavior has separate focused gates; this strict runner does not establish complete Node process/nextTick reporting or request cleanup/ALS support.','Failed exports require discard; successful retained invocations do not claim safe reuse after a fatal export.','Explicit Engine::reset is source-reviewed only: no current public guest/WIT entry invokes it. Moving-GC lifetime is a separate gate.','Ordinary Release only; no DEBUG/fault/private runtime memory observation or malformed ABI carrier.']};
+-await writeFile(join(h.output,'production-v11-sync-results.json'),JSON.stringify(report,null,2)+'\n');await writeFile(join(here,'production-v11-sync-results.json'),JSON.stringify(report,null,2)+'\n');
++const report={schemaVersion:1,productionPreflight,state:'production-private-ticks-strict-sync-acceptance-passed',recordedAtUtc:new Date().toISOString(),...h.evidence,patchSha256,runnerSha256:hash(await readFile(fileURLToPath(import.meta.url))),initialization,successfulReuse,deployed,limitations:['Actual combined production private-ticks stream/web ON, entropy OFF engine with core m0.11; v8 and private v3 records are preserved.','Value-only latch preserves thrown values, not the separate ExceptionStack; existing pending direct exceptions take precedence.','Capture-failure path is source-reviewed and not fault-injected.','Protected-listener behavior has separate focused gates; this strict runner does not establish complete Node process/nextTick reporting or request cleanup/ALS support.','Failed exports require discard; successful retained invocations do not claim safe reuse after a fatal export.','Explicit Engine::reset is source-reviewed only: no current public guest/WIT entry invokes it. Moving-GC lifetime is a separate gate.','Ordinary Release only; no DEBUG/fault/private runtime memory observation or malformed ABI carrier.']};
++await writeFile(join(h.output,'private-ticks-sync-results.json'),JSON.stringify(report,null,2)+'\n');await writeFile(join(h.output,'private-ticks-sync-summary.json'),JSON.stringify(report,null,2)+'\n');
+ console.log(JSON.stringify({state:report.state,initializationCases:initialization.length,deployedCases:deployed.length,output:h.output,imports:[]}));
+--- tests/node-compat/foundation-add-abort/run-production-v11-runtime.mjs
++++ source-only/runners/runtime.mjs
+@@ -1,4 +1,4 @@
+-import {verifyProductionV11} from './production-v11-preflight.mjs';
++import {verifyProductionTicks} from '../../production-regression-candidate-v3/preflight.mjs';
+ // Production v11 boundary acceptance for the unchanged v1 observations and
+ // ordinary caught/handled-later controls. Each fatal instance is discarded.
+ import assert from 'node:assert/strict';
+@@ -6,11 +6,11 @@
+ import {spawnSync} from 'node:child_process';
+ import {dirname,join} from 'node:path';
+ import {fileURLToPath} from 'node:url';
+-import {nativeHarness,hash} from '../foundations/native-scalar-harness.mjs';
+-const productionPreflight=await verifyProductionV11();
+-const here=dirname(fileURLToPath(import.meta.url));
+-const h=await nativeHarness({kind:'production-v11-runtime',here,enabledField:'eventsEnabled',option:'NODE_COMPAT_EVENTS',outputVariable:'NODE_COMPAT_STRICT_EVENT_OUTPUT'});
+-assert.equal(h.metadata.strictEventExceptionPolicy?.version,'sm-uncaught-event-v3-protected-abort-v2');
++import {nativeHarness,hash} from '../../../foundations/native-scalar-harness.mjs';
++const productionPreflight=(await verifyProductionTicks({gcStress:false})).report;
++const here=dirname(fileURLToPath(new URL('../../../foundation-add-abort/run-production-v11-runtime.mjs',import.meta.url)));
++const h=await nativeHarness({kind:'production-private-ticks-runtime',here,enabledField:'eventsEnabled',option:'NODE_COMPAT_EVENTS',outputVariable:'NODE_COMPAT_STRICT_EVENT_OUTPUT'});
++assert.equal(h.metadata.strictEventExceptionPolicy?.version,'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1');
+ assert.equal(h.metadata.strictEventExceptionPolicy.deployedUnhandledRejections,'fatal-after-drained-jobs-before-result-marshalling');
+ assert.equal(h.metadata.strictEventExceptionPolicy?.embeddingBoundaryPatchSha256,hash(await readFile(join(here,'componentize-strict-event-boundary-v2.patch'))));
+ const previous=JSON.parse(await readFile(join(here,'runtime-async-observation-results.json'))),fatal=[];
+@@ -36,5 +36,5 @@
+  const source="let calls=0;export async function run(){let seen=0,handled=null;"+body+"await Promise.resolve();await Promise.resolve();return JSON.stringify({calls:++calls,seen,handled})}";
+  const fixture=await h.build(name.replaceAll('-','_'),source),instance=await h.importFixture(fixture),calls=[];for(let call=1;call<=3;call++){const result=JSON.parse(await instance.run());assert.deepEqual(result,{calls:call,...expected});calls.push(result);}const host=h.runHost(fixture);assert.deepEqual(host.observed,{calls:1,...expected});controls.push({name,fixture,calls,wasmtime:host});console.log(JSON.stringify({name,retainedCalls:3,freshWasmtime:true}));
+ }
+-const report={schemaVersion:1,productionPreflight,state:'production-v11-runtime-unhandled-boundary-acceptance-passed',recordedAtUtc:new Date().toISOString(),...h.evidence,runnerSha256:hash(await readFile(fileURLToPath(import.meta.url))),previousObservationSha256:hash(await readFile(join(here,'runtime-async-observation-results.json'))),fatal,controls,limitations:['Default selected-profile fatal/discard policy after all current jobs/finalizers and before returning/marshalling; not full Node process.on/unhandledRejection/async-hooks semantics.','Two original v1 observation sources are byte-identical; original v1 artifacts/reports unchanged.','Import-free components expose terminal traps at fatal boundaries; guest ERR_SM_NODE_EXECUTION_REJECTION is source-defined, with original reasons available only through a selected diagnostic reporting path.','Internal invocation/capture-failure flags are source-reviewed and not fault-injected; explicit Engine reset/cross-realm/owner teardown remain untested.','Ordinary Release only; no DEBUG/OOM/private guest memory/malformed ABI input.']};
+-await writeFile(join(h.output,'production-v11-runtime-results.json'),JSON.stringify(report,null,2)+'\n');await writeFile(join(here,'production-v11-runtime-results.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({state:report.state,fatalCases:fatal.length,retainedControlCases:controls.length,imports:[]}));
++const report={schemaVersion:1,productionPreflight,state:'production-private-ticks-runtime-unhandled-boundary-acceptance-passed',recordedAtUtc:new Date().toISOString(),...h.evidence,runnerSha256:hash(await readFile(fileURLToPath(import.meta.url))),previousObservationSha256:hash(await readFile(join(here,'runtime-async-observation-results.json'))),fatal,controls,limitations:['Default selected-profile fatal/discard policy after all current jobs/finalizers and before returning/marshalling; not full Node process.on/unhandledRejection/async-hooks semantics.','Two original v1 observation sources are byte-identical; original v1 artifacts/reports unchanged.','Import-free components expose terminal traps at fatal boundaries; guest ERR_SM_NODE_EXECUTION_REJECTION is source-defined, with original reasons available only through a selected diagnostic reporting path.','Internal invocation/capture-failure flags are source-reviewed and not fault-injected; explicit Engine reset/cross-realm/owner teardown remain untested.','Ordinary Release only; no DEBUG/OOM/private guest memory/malformed ABI input.']};
++await writeFile(join(h.output,'private-ticks-runtime-results.json'),JSON.stringify(report,null,2)+'\n');await writeFile(join(h.output,'private-ticks-runtime-summary.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({state:report.state,fatalCases:fatal.length,retainedControlCases:controls.length,imports:[]}));
+--- tests/node-compat/foundation-add-abort/run-production-v11-late.mjs
++++ source-only/runners/late.mjs
+@@ -1,4 +1,4 @@
+-import {verifyProductionV11} from './production-v11-preflight.mjs';
++import {verifyProductionTicks} from '../../production-regression-candidate-v3/preflight.mjs';
+ // Valid public WIT interface getters, after Starling's pre-initialization.
+ import assert from 'node:assert/strict';
+ import {createHash} from 'node:crypto';
+@@ -6,11 +6,11 @@
+ import {readFile,writeFile,mkdir,symlink} from 'node:fs/promises';
+ import {dirname,join,resolve} from 'node:path';
+ import {fileURLToPath,pathToFileURL} from 'node:url';
+-import {loadToolchain} from '../toolchain.mjs';
+-import {loadComponentizer} from '../componentizer.mjs';
+-import {decodeCliString} from '../foundations/native-scalar-harness.mjs';
+-const productionPreflight=await verifyProductionV11();
+-const hash=x=>createHash('sha256').update(x).digest('hex'),here=dirname(fileURLToPath(import.meta.url));
++import {loadToolchain} from '../../../toolchain.mjs';
++import {loadComponentizer} from '../../../componentizer.mjs';
++import {decodeCliString} from '../../../foundations/native-scalar-harness.mjs';
++const productionPreflight=(await verifyProductionTicks({gcStress:false})).report;
++const hash=x=>createHash('sha256').update(x).digest('hex'),here=dirname(fileURLToPath(new URL('../../../foundation-add-abort/run-production-v11-late.mjs',import.meta.url)));
+ const engine=resolve(process.env.NODE_COMPAT_ENGINE),sourceRoot=resolve(process.env.NODE_COMPAT_ENGINE_SOURCE_ROOT),output=resolve(process.env.NODE_COMPAT_STRICT_EVENT_OUTPUT);
+ await mkdir(output,{recursive:true});await writeFile(join(output,'package.json'),'{"type":"module"}\n');
+ const metadata=JSON.parse(await readFile(engine+'.build.json'));assert.equal(hash(await readFile(engine)),metadata.engineSha256);assert.equal(metadata.observedCMakeOptions.CMAKE_BUILD_TYPE,'Release');assert.equal(metadata.strictInitialization,true);assert.equal(metadata.oomTesting,false);assert.equal(metadata.strictEventExceptionPolicy?.embeddingBoundaryPatchSha256,hash(await readFile(join(here,'componentize-strict-event-boundary-v2.patch'))));
+@@ -39,6 +39,6 @@
+  }
+  cases.push(record);console.log(JSON.stringify({name,rejected:!!error}));
+ }
+-const report={schemaVersion:1,productionPreflight,state:'production-v11-post-binding-acceptance-passed',recordedAtUtc:new Date().toISOString(),engineSha256:metadata.engineSha256,engineReceipt:metadata,sourceRoot,sourceFilesVerified:metadata.sourceManifest.length,componentizerProvenance:selected.provenance,runnerSha256:hash(await readFile(fileURLToPath(import.meta.url))),cases,limitations:['Valid public WIT interface getters and ordinary Promise/event operations only; no DEBUG/fault/raw memory or malformed carriers.','Rejects both late event errors and late unhandled Promise rejection after draining; handlers attached by a later microtask remain effective.','Actual production v11 guest embedding patch; no host modification.']};
+-await writeFile(join(output,'production-v11-late-results.json'),JSON.stringify(report,null,2)+'\n');await writeFile(join(here,'production-v11-late-results.json'),JSON.stringify(report,null,2)+'\n');
++const report={schemaVersion:1,productionPreflight,state:'production-private-ticks-post-binding-acceptance-passed',recordedAtUtc:new Date().toISOString(),engineSha256:metadata.engineSha256,engineReceipt:metadata,sourceRoot,sourceFilesVerified:metadata.sourceManifest.length,componentizerProvenance:selected.provenance,runnerSha256:hash(await readFile(fileURLToPath(import.meta.url))),cases,limitations:['Valid public WIT interface getters and ordinary Promise/event operations only; no DEBUG/fault/raw memory or malformed carriers.','Rejects both late event errors and late unhandled Promise rejection after draining; handlers attached by a later microtask remain effective.','Actual production private-ticks guest embedding layer; no host modification.']};
++await writeFile(join(output,'private-ticks-late-results.json'),JSON.stringify(report,null,2)+'\n');await writeFile(join(output,'private-ticks-late-summary.json'),JSON.stringify(report,null,2)+'\n');
+ console.log(JSON.stringify({state:report.state,cases:cases.length,output}));
+--- tests/node-compat/foundation-add-abort/run-production-v11-callbacks.mjs
++++ source-only/runners/callbacks.mjs
+@@ -1,15 +1,15 @@
+-import {verifyProductionV11} from './production-v11-preflight.mjs';
++import {verifyProductionTicks} from '../../production-regression-candidate-v3/preflight.mjs';
+ // Ordinary public operations only, on the pinned combined production v11 engine.
+ // Re-add cases are never run against the old invalidated-iterator code path.
+ import assert from 'node:assert/strict';
+ import {readFile,writeFile} from 'node:fs/promises';
+ import {dirname,join} from 'node:path';
+ import {fileURLToPath} from 'node:url';
+-import {nativeHarness,hash} from '../foundations/native-scalar-harness.mjs';
+-const productionPreflight=await verifyProductionV11();
+-const here=dirname(fileURLToPath(import.meta.url));
+-const h=await nativeHarness({kind:'production-v11-callbacks',here,enabledField:'eventsEnabled',option:'NODE_COMPAT_EVENTS',outputVariable:'NODE_COMPAT_STRICT_EVENT_OUTPUT'});
+-assert.equal(h.metadata.strictEventExceptionPolicy?.version,'sm-uncaught-event-v3-protected-abort-v2');assert.equal(h.metadata.strictEventExceptionPolicy.patchSha256,hash(await readFile(join(here,'strict-event-v3.patch'))));
++import {nativeHarness,hash} from '../../../foundations/native-scalar-harness.mjs';
++const productionPreflight=(await verifyProductionTicks({gcStress:false})).report;
++const here=dirname(fileURLToPath(new URL('../../../foundation-add-abort/run-production-v11-callbacks.mjs',import.meta.url)));
++const h=await nativeHarness({kind:'production-private-ticks-callbacks',here,enabledField:'eventsEnabled',option:'NODE_COMPAT_EVENTS',outputVariable:'NODE_COMPAT_STRICT_EVENT_OUTPUT'});
++assert.equal(h.metadata.strictEventExceptionPolicy?.version,'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1');assert.equal(h.metadata.strictEventExceptionPolicy.patchSha256,hash(await readFile(join(here,'strict-event-v3.patch'))));
+ const initialization=[];
+ for(const[name,body,marker]of[
+  ['finalizer-unsupported',"import{spawn}from'node:child_process';const registry=new FinalizationRegistry(()=>spawn());function register(){registry.register({},0)}register();",/child_process\.spawn/],
+@@ -33,5 +33,5 @@
+ ]){
+  const fixture=await h.build(name.replaceAll('-','_'),source),instance=await h.importFixture(fixture),calls=[];for(let call=1;call<=3;call++){const result=JSON.parse(await instance.run());assert.deepEqual(result,{calls:call,...expected});calls.push(result);}const host=h.runHost(fixture);assert.deepEqual(host.observed,{calls:1,...expected});controls.push({name,fixture,calls,wasmtime:host,deviation:name==='registration-deferred'?'Registration getter timing remains different from pinned Node; intentionally deferred.':null});console.log(JSON.stringify({name,retainedCalls:3,freshWasmtime:true}));
+ }
+-const report={schemaVersion:1,productionPreflight,state:'production-v11-finalizer-getter-cleanup-acceptance-passed',recordedAtUtc:new Date().toISOString(),...h.evidence,runnerSha256:hash(await readFile(fileURLToPath(import.meta.url))),initialization,controls,limitations:['Actual combined production v11 OFF engine; no complete Web/Node EventTarget parity.','Registration getter timing remains separately deferred and is explicitly asserted as a deviation.','First thrown value is observed through ordinary toString/error reporting, not raw guest identity inspection.','Once re-add executes only after verifying the corrected v3 patch/engine source; no old known-invalid path was executed.','Append/capture/invocation failure paths and explicit reset remain source-reviewed only, with no fault testing.','Ordinary Release; no DEBUG/OOM/private guest memory/malformed carriers. Accepted final component imports are empty.']};
+-await writeFile(join(h.output,'production-v11-callback-results.json'),JSON.stringify(report,null,2)+'\n');await writeFile(join(here,'production-v11-callback-results.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({state:report.state,initializationCases:initialization.length,controls:controls.length,imports:[]}));
++const report={schemaVersion:1,productionPreflight,state:'production-private-ticks-finalizer-getter-cleanup-acceptance-passed',recordedAtUtc:new Date().toISOString(),...h.evidence,runnerSha256:hash(await readFile(fileURLToPath(import.meta.url))),initialization,controls,limitations:['Actual combined production private-ticks OFF engine; no complete Web/Node EventTarget parity.','Registration getter timing remains separately deferred and is explicitly asserted as a deviation.','First thrown value is observed through ordinary toString/error reporting, not raw guest identity inspection.','Once re-add executes only after verifying the corrected v3 patch/engine source; no old known-invalid path was executed.','Append/capture/invocation failure paths and explicit reset remain source-reviewed only, with no fault testing.','Ordinary Release; no DEBUG/OOM/private guest memory/malformed carriers. Accepted final component imports are empty.']};
++await writeFile(join(h.output,'private-ticks-callback-results.json'),JSON.stringify(report,null,2)+'\n');await writeFile(join(h.output,'private-ticks-callback-summary.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({state:report.state,initializationCases:initialization.length,controls:controls.length,imports:[]}));
+--- tests/node-compat/foundation-stream-web/production-candidate/run-native-component-v11.mjs
++++ source-only/runners/stream-web.mjs
+@@ -1,13 +1,13 @@
+ // Correctness replay for a freshly frozen m0.11 core engine.
+ // Exact production preflight must pass before componentization.
+ import assert from 'node:assert/strict';
+-import {verifyProductionV11} from '../../foundation-add-abort/production-v11-preflight.mjs';
++import {verifyProductionTicks} from '../../production-regression-candidate-v3/preflight.mjs';
+ import {readFile,writeFile} from 'node:fs/promises';
+ import {dirname,join} from 'node:path';
+ import {fileURLToPath} from 'node:url';
+-import {nativeHarness} from './native-harness.mjs';
+-const here=dirname(fileURLToPath(import.meta.url));
+-const releasePreflight=await verifyProductionV11();
++import {nativeHarness} from '../../../foundation-stream-web/production-candidate/native-harness.mjs';
++const here=dirname(fileURLToPath(new URL('../../../foundation-stream-web/production-candidate/run-native-component-v11.mjs',import.meta.url)));
++const releasePreflight=await verifyProductionTicks({gcStress:false});
+ const harness=await nativeHarness({streamWebEnabled:true,
+   output:process.env.NODE_COMPAT_STREAM_WEB_OUTPUT??'/tmp/starling-node-compat/foundations-v11/stream-web-installed'});
+ const expected={names:JSON.parse(await readFile(join(here,'export-manifest.stream-web.node-v22.14.0.json'))).modules['node:stream/web'].exports.slice().sort()};
+@@ -55,7 +55,7 @@
+   'controller-cases.mjs','controller-node-results.json'].map(path=>'../candidate/'+path),
+   '../iteration/cases.mjs','../iteration/node-results.json','../iteration/intrinsics.mjs','../dataview/cases.mjs','../dataview/node-results.json','../dataview/policy.mjs','../profile.wit'];
+ const trim=({instance,...metadata})=>metadata;
+-const result={schema:1,state:'executed-installed-native',atUtc:new Date().toISOString(),scope:'Installed optional m0.9 ordinary API regressions on new m0.11 core engine; actual native capture/brands and Node-facing controller wrappers',
++const result={schema:1,productionTickAdmission:releasePreflight.report,state:'executed-installed-native',atUtc:new Date().toISOString(),scope:'Installed optional m0.9 ordinary API regressions on production private-ticks m0.11 core engine; actual native capture/brands and Node-facing controller wrappers',
+   engine:harness.engine,engineSha256:harness.metadata.engineSha256,sourceRoot:harness.sourceRoot,metadata:harness.metadata,
+   componentizer:harness.componentizer,safetyAudit:harness.safetyAudit,bundle:{imports:bundled.imports,moduleIds:bundled.moduleIds},
+   component:trim(semantic),calls,wasmtime:harness.wasmtimeVersion,wasmtimeReport,aliases:{...trim(aliases),calls:aliasCalls,wasmtimeReport:aliasHost},topLevelFailures,
+@@ -64,5 +64,5 @@
+     'No application factory/fixture registry; 2 private record tests remain only in preserved source-stage proof',
+     'Native original controller methods are tested independently in the corrected STREAM_WEB=OFF control, not through ON wrappers',
+     'No old native DataView/prototype entry, raw memory, allocation fault or known Node fatal+inherited-code mutation combination is executed']};
+-await writeFile(join(harness.output,'results.json'),JSON.stringify(result,null,2)+'\n');await writeFile(join(here,'native-component-v11-results.json'),JSON.stringify(result,null,2)+'\n');
++await writeFile(join(harness.output,'results.json'),JSON.stringify(result,null,2)+'\n');await writeFile(join(harness.output,'stream-web-summary.json'),JSON.stringify(result,null,2)+'\n');
+ console.log(JSON.stringify({output:harness.output,engineSha256:harness.metadata.engineSha256,installed:true,zeroImports:true,codecs:250,iterations:67,data:26,topLevelFailures:7}));

@@ -1,0 +1,95 @@
+--- tests/node-compat/storage-compaction-earlier-v1/compact.py	2026-11-03 18:41:37
++++ tests/node-compat/storage-compaction-additional-public-v1/compact.py	2026-11-03 19:07:18
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Lossless, journalled macOS filesystem compression of 92 explicitly whitelisted earlier accepted public component/core outputs.
++"""Lossless, journalled macOS filesystem compression of 67 explicitly whitelisted additional completed ordinary public component/core outputs.
+ 
+ This changes filesystem representation only. It never edits WebAssembly bytes.
+ Run without --apply to inventory the deliberately narrow allowlist.
+@@ -23,19 +23,19 @@
+ 
+ BASE = Path('/tmp/starling-node-compat')
+ REPO = Path(__file__).resolve().parents[3]
+-AUDIT_PATH = REPO / 'tests/node-compat/storage-candidate-audit-earlier-v1/results.json'
+-AUDIT_SHA256 = '6a3664ff4ebe283910672090ed4481123ab3d634146781ff7a9321a1302378a8'
++AUDIT_PATH = REPO / 'tests/node-compat/storage-candidate-audit-additional-public-v1/inventory.json'
++AUDIT_SHA256 = 'dc9e37e95736b9ccd8a630513d02c8ad35e2be24d72b2f3f4743c3393e993e96'
+ AUDIT_INDEX_PATH = AUDIT_PATH.with_name('index.json')
+-AUDIT_INDEX_SHA256 = 'e1dcf6ce4608741ab2becd39bf19f9bf81a40aae3371be60ffc8f8dde7dcaa54'
++AUDIT_INDEX_SHA256 = '4fe5ad4a02f75c5a2380d3d6be8d0145a19255ac13baf987be4dbf73f7153cbc'
+ assert hashlib.sha256(AUDIT_PATH.read_bytes()).hexdigest() == AUDIT_SHA256
+ assert hashlib.sha256(AUDIT_INDEX_PATH.read_bytes()).hexdigest() == AUDIT_INDEX_SHA256
+ AUDIT = json.loads(AUDIT_PATH.read_text())
+-assert AUDIT['eligibleCount'] == len(AUDIT['files']) == 92
+-assert len({row['path'] for row in AUDIT['files']}) == 92
+-ROOTS = {f'accepted-{i:02d}': Path(row['root']) for i,row in enumerate(AUDIT['roots'])}
++assert AUDIT['eligibleCount'] == len(AUDIT['files']) == 67
++assert len({row['path'] for row in AUDIT['files']}) == 67
++ROOTS = {f'completed-public-{i:02d}': Path(root) for i,root in enumerate(sorted({row['root'] for row in AUDIT['files']}))}
+ AUDITED = {row['path']:row for row in AUDIT['files']}
+-RECEIPTS = BASE / 'storage-compaction-earlier-v1'
+-EXPECTED_ELIGIBLE_COUNT = 92
++RECEIPTS = BASE / 'storage-compaction-additional-public-v1'
++EXPECTED_ELIGIBLE_COUNT = 67
+ HEADROOM_RESERVE = 64 * 1024 * 1024
+ NAME = re.compile(r'.+\.(?:component|core\d*)\.wasm\Z')
+ EXCLUDED_DIRS = {'native-freeze', 'source', 'sources', 'componentize-source', 'harness',
+@@ -98,8 +98,9 @@
+ 
+ 
+ def verify_report_closure():
+-    # Audit/index authenticate the finite accepted file list and its provenance.
+-    # Re-read every consumed report/JS witness; no component is executed.
++    # Authenticate the exact finite completed-output list. Completion, failed
++    # e2e attempts, build-only and benchmark labels remain distinct; this is not
++    # a release-acceptance or runtime/timing claim.
+     index = json.loads(AUDIT_INDEX_PATH.read_text())
+     for row in index['files']:
+         path = AUDIT_PATH.parent / row['path']
+@@ -107,11 +108,17 @@
+         assert sha256(path) == row['sha256'], path
+     checked = set()
+     for row in AUDIT['files']:
+-        proof = row['completionProof']
+-        pairs = [(REPO/proof['milestoneSummary'], proof['milestoneSummarySha256']),
+-                 (REPO/proof['archivedReport'], proof['reportSha256']),
+-                 (Path(proof['currentOriginalReport']), proof['reportSha256'])]
++        proof = row['terminalProof']
++        assert proof['releaseAcceptanceClaimed'] is False
++        pairs = [(Path(proof['path']),proof['sha256'])]
++        for name in ['hostReport','finalReport']:
++            if name in proof:
++                pairs.append((Path(proof[name]['path']),proof[name]['sha256']))
++        if 'laterAcceptedReport' in proof:
++            pairs.append((Path(proof['laterAcceptedReport']),proof['laterAcceptedReportSha256']))
+         pairs += [(Path(w['path']),w['sha256']) for w in row.get('generatedJsReferences',[])]
++        if 'componentPath' in row:
++            pairs.append((Path(row['componentPath']),row['componentSha256']))
+         for path,digest in pairs:
+             key = (str(path),digest)
+             if key in checked: continue
+@@ -189,9 +196,11 @@
+         'command': ['/usr/bin/ditto', '--hfsCompression', '--noclone', 'SOURCE', 'FRESH_SAME_DIRECTORY_TEMP'],
+         'platform': platform.platform(), 'python': sys.version,
+         'journal': str(journal_path), 'diskFreeBeforeBytes': shutil.disk_usage(BASE).free,
+-        'acceptedAudit':str(AUDIT_PATH), 'acceptedAuditSha256':AUDIT_SHA256,
+-        'acceptedAuditIndexSha256':AUDIT_INDEX_SHA256, 'reportClosureWitnessesVerified':closure_count,
++        'completedPublicAudit':str(AUDIT_PATH), 'completedPublicAuditSha256':AUDIT_SHA256,
++        'completedPublicAuditIndexSha256':AUDIT_INDEX_SHA256, 'reportClosureWitnessesVerified':closure_count,
+         'headroomPolicy':'Before each copy: free >= 2*logicalBytes + 64MiB; not a hidden-allocation guarantee',
++        'releaseAcceptanceOrCompatibilityClaim': False,
++        'terminalProofKindCounts': {kind: sum(row['terminalProof']['kind'] == kind for row in AUDIT['files']) for kind in sorted({row['terminalProof']['kind'] for row in AUDIT['files']})},
+         'compressedFiles': 0, 'eligibleFiles': 0, 'skippedEntries': 0,
+         'logicalBytes': 0, 'oldAllocatedBytes': 0, 'newAllocatedBytes': 0,
+         'physicalBytesRecovered': 0, 'failures': [],
+@@ -205,7 +214,8 @@
+     for path, reason in frozen_entries:
+         if reason is None:
+             value = {'path': str(path), 'before': file_stat(path),
+-                     'metadata': preserved_metadata(path), 'sha256': sha256(path)}
++                     'metadata': preserved_metadata(path), 'sha256': sha256(path),
++                     'terminalProof': AUDITED[str(path)]['terminalProof']}
+             assert stable_identity(file_stat(path)) == stable_identity(value['before'])
+             match_audited_preimage(path,value)
+             frozen[str(path)] = value

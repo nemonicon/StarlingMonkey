@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "donorPath": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/native-integration-candidate-v2/artifact-tools/freeze-engine.py",
+  "donorSha256": "44dd669ab05349514108dadf1a8a72eaae60d969335c8caaa80985a09eacc25f",
+  "afterSha256": "dc479abf2b703080dbaa7b8013a7be531ccd54015955afb1d48c645a89169613",
+  "edits": [
+    {
+      "before": "\"\"\"Freeze one completed consumers355 Release variant. main is never run by source tests.\"\"\"",
+      "after": "\"\"\"Externally authorized corrected CryptoOwner355 freezer. No build or engine execution.\"\"\""
+    },
+    {
+      "before": "from artifact_common import (HERE, REPO, OUTPUT, RECIPE, POLICY, HELPER, EMBEDDING, ADAPTER,",
+      "after": "# This entry is outside the immutable configured stage. Authenticate all source,\n# independent review, Root authority and staged tools before importing helpers.\nimport hashlib\nENTRY = Path(__file__).resolve()\nGUARD_PATH = ENTRY.parent / 'freezer-guard.py'\nassert hashlib.sha256(GUARD_PATH.read_bytes()).hexdigest() == '8ae71e7f6fa44afc08163ae5866a4b81bcdf2f2ef7c67282fbb98b56a1ee0a20'\nassert not GUARD_PATH.is_symlink()\n_guard_spec = importlib.util.spec_from_file_location('crypto_freezer_source_guard', GUARD_PATH)\nguard = importlib.util.module_from_spec(_guard_spec)\n_guard_spec.loader.exec_module(guard)\nCONTEXT = guard.authorize(ENTRY, sys.argv[1:])\n_common_spec = importlib.util.spec_from_file_location('artifact_common', Path(CONTEXT['artifactToolsRoot']) / 'artifact_common.py')\ncommon = importlib.util.module_from_spec(_common_spec)\nsys.modules['artifact_common'] = common\n_common_spec.loader.exec_module(common)\nassert common.HERE == Path(CONTEXT['artifactToolsRoot'])\nassert common.REPO == Path(CONTEXT['configuredSourceRoot'])\nassert common.OUTPUT.resolve() == Path(CONTEXT['freezeRoot'])\nfrom artifact_common import (HERE, REPO, OUTPUT, RECIPE, POLICY, HELPER, EMBEDDING, ADAPTER,"
+    },
+    {
+      "before": "    assert len(sys.argv) in (3, 4), 'ENGINE normal-off|normal-runtime|gc-off|disabled-off [EXACT_SOURCE_ROOT]'\n    original_engine = Path(sys.argv[1]).absolute()\n    label = sys.argv[2]\n    source_root = Path(sys.argv[3]).resolve(strict=True) if len(sys.argv) == 4 else REPO",
+      "after": "    original_engine = Path(CONTEXT['enginePath'])\n    label = CONTEXT['label']\n    source_root = Path(CONTEXT['configuredSourceRoot'])"
+    },
+    {
+      "before": "    assert admission['state'] == 'ACTUAL_FINITE_CONSUMERS_BUILD_ONLY_SELECTOR_PASSED_NO_ENGINE_EXECUTION'\n    assert admission['sourceFiles'] == 355 and admission['engineBytesRead'] is False",
+      "after": "    guard.validate_admission(admission)  # Exact actual CryptoOwner355 selector state, no rewriting."
+    },
+    {
+      "before": "        add(HERE / name, 'artifact-tools/' + name, sha(HERE / name), True)",
+      "after": "        target_name = 'artifact-tools/donor-data/freeze-engine.py' if name == 'freeze-engine.py' else 'artifact-tools/' + name\n        add(HERE / name, target_name, sha(HERE / name), True)\n    add(ENTRY, 'artifact-tools/freeze-engine.py', CONTEXT['active']['sha256'], True)\n    add(GUARD_PATH, 'artifact-tools/active-freezer/freezer-guard.py', sha(GUARD_PATH), True)\n    correction_copies = []\n    for index, row in enumerate(CONTEXT['capsules']):\n        name = label + '-freezer-correction-control/' + str(index) + '-' + Path(row['path']).name\n        add(row['path'], name, row['sha256'])\n        correction_copies.append({'original': row['path'], 'path': str(OUTPUT / name), 'sha256': row['sha256'], 'bytes': row['bytes']})\n    correction_proof = {'schemaVersion': 1, 'state': 'ACTUAL_AUTHORIZED_CRYPTO_FREEZER_SOURCE_CORRECTION_CAPTURE',\n        'amendmentSourceIndex': CONTEXT['sourceIndex'], 'donorSourceIndexSha256': guard.DONOR_SHA,\n        'rootAuthority': CONTEXT['authority'], 'independentSourceReview': {'index': CONTEXT['peerIndex'], 'result': CONTEXT['peerResult']},\n        'configuredSourceRoot': str(REPO), 'stagedArtifactToolsRoot': str(HERE), 'freezeRoot': str(OUTPUT),\n        'activeSource': CONTEXT['active'], 'donorSourceData': CONTEXT['donor'], 'copies': correction_copies,\n        'nativeRecipePolicyHelperAnd922ToolsUnchanged': True, 'engineExecuted': False}\n    correction_bytes = (json.dumps(correction_proof, indent=2) + '\\n').encode()\n    correction_name = label + '-freezer-correction-control.json'\n    generated(correction_bytes, correction_name)"
+    },
+    {
+      "before": "    validate_plan(plan, receipt_path)  # ALL inputs/destinations checked before any copy.\n    execute_plan(plan)",
+      "after": "    guard.recheck(CONTEXT)\n    validate_plan(plan, receipt_path)  # ALL inputs/destinations checked before any copy.\n    execute_plan(plan)\n    guard.recheck(CONTEXT)"
+    },
+    {
+      "before": "        'helperSha256': sha(Path(__file__)), 'guestExecutedByHelper': False}\n    with receipt_path.open('x') as stream:",
+      "after": "        'helperSha256': sha(Path(__file__)), 'guestExecutedByHelper': False,\n        'activeFreezerTooling': {'role': 'ACTUAL_ACTIVE_CORRECTED_FREEZER', 'original': str(ENTRY),\n            'path': str(OUTPUT.resolve() / 'artifact-tools/freeze-engine.py'), 'sha256': CONTEXT['active']['sha256']},\n        'donorFreezerTooling': {'role': 'IMMUTABLE_STAGED_DONOR_DATA_NOT_ACTIVE', 'original': str(HERE / 'freeze-engine.py'),\n            'path': str(OUTPUT.resolve() / 'artifact-tools/donor-data/freeze-engine.py'), 'sha256': CONTEXT['donor']['sha256']},\n        'freezerSourceCorrection': {'path': str(OUTPUT / correction_name), 'sha256': digest(correction_bytes),\n            'bytes': len(correction_bytes), 'sourceIndexSha256': CONTEXT['sourceIndex']['sha256']}}\n    # Preserve genuine OUTPUT spellings in all existing copy rows. Only compare\n    # physical paths for the explicit active/donor role check; never rewrite rows.\n    guard.validate_receipt_roles(receipt, CONTEXT['active']['sha256'], CONTEXT['donor']['sha256'])\n    guard.recheck(CONTEXT)\n    with receipt_path.open('x') as stream:"
+    }
+  ],
+  "editOperations": 7,
+  "reversalVerified": true
+}

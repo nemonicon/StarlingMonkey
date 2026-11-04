@@ -1,0 +1,204 @@
+"""UNEXECUTED source activation: new replay folder inside corrected checkout.
+
+Does not call a native preflight, runner, package loader, guest or host.
+"""
+import sys
+sys.dont_write_bytecode = True
+if not __debug__: raise RuntimeError('Activation requires assertions enabled')
+from pathlib import Path
+import argparse
+import hashlib
+import json
+import os
+import re
+from authority import load_authority, SOURCE_ROOT, RECIPE, POLICY
+
+HERE = Path(__file__).resolve().parent
+REPO = HERE.parents[3]
+FAMILY_RELATIVE = Path('tests/node-compat/foundation-classic-streams')
+BASE = HERE.parent / 'production-regression-activated-v3'
+BASE_SHA = '577dbad5759ef06f075763c2a793ae278fddc15df8f4f61edc9a7d2de51ecb51'
+RUNTIME = HERE.parent / 'production-trace-runtime-activated-v1'
+RUNTIME_SHA = 'e1f87cd6a2fd09ff34055187bfb938c2b094c3fd333ef9f57b6a1eea4c175b78'
+PINS_SHA = '182e8b724d94ebf73450c0ffcea81fb19b902028e2839bd2a9d1452ab7fab5eb'
+REVIEW_SHA = 'ce88ac3495afdf97718a34f7bf2c2360613f95a91f5c193e556c87269b4a8be0'
+# Node canonicalizes import.meta.url. Use that same new source-file identity for
+# relative seals/LIVE8 lookups; native configuredSourceRoot remains untouched.
+CANONICAL_SOURCE_ROOT = SOURCE_ROOT.resolve(strict=True)
+OUTPUT = CANONICAL_SOURCE_ROOT / FAMILY_RELATIVE / 'production-trace-regression-activated-v1'
+
+
+def sha(data): return hashlib.sha256(data).hexdigest()
+
+
+def regular(path, expected=None):
+    path = Path(path); before = path.lstat()
+    assert path.is_file() and not path.is_symlink(), str(path)
+    raw = path.read_bytes(); after = path.lstat()
+    assert (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) == (
+        after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns)
+    if expected is not None: assert sha(raw) == expected, str(path)
+    return raw
+
+
+def indexed(root, expected):
+    rows = json.loads(regular(root / 'index.json', expected))['files']; seen = set()
+    for row in rows:
+        assert row['path'] not in seen and not Path(row['path']).is_absolute(); seen.add(row['path'])
+        path = root
+        for part in row['path'].split('/'):
+            assert part not in ('', '.', '..'); path /= part; assert not path.is_symlink()
+        assert len(regular(path, row['sha256'])) == row['bytes']
+    return rows
+
+
+def source_payload():
+    payload = {}
+    for path in sorted((HERE / 'payload').rglob('*')):
+        if path.is_file(): payload[str(path.relative_to(HERE / 'payload'))] = regular(path)
+    payload['native-preflight.template.mjs'] = regular(HERE / 'native-preflight.template.mjs')
+    assert json.loads(payload['capability/http-component-pins.json'])['component'] is None
+    records = json.loads(regular(BASE / 'derivations.json'))['records']; assert len(records) == 64
+    changed = []
+    for row in records:
+        name = row['destinationPath']; assert name in payload
+        if payload[name] != regular(BASE / name): changed.append(name)
+    assert set(changed) == {'release/helpers/native-scalar-harness.mjs', 'common/runners/allocator-gc.mjs'}
+    return payload, records
+
+
+def map_inputs(name, expected, payload):
+    """Read/validate a finite inherited manifest into future paths; no writes."""
+    old = json.loads(regular(BASE / name, expected)); rows = {}; mappings = []
+    original_base = BASE / Path(name).parent
+    policy = json.loads(regular(HERE.parent / 'trace-integration-candidate-v1/policy.json', POLICY))
+    canonical = {row['path']: row['sha256'] for row in policy['expectedNativeSourceManifest']}
+    tools = json.loads(regular(HERE.parent / 'trace-integration-candidate-v1/artifact-tools/tool-pins.json'))
+    canonical.update({row['path']: row['sha256'] for row in tools['toolDependencies']})
+    def put(target, checksum, size):
+        key = str(target); value = {'path': key, 'sha256': checksum, 'bytes': size}
+        assert key not in rows or rows[key] == value, 'Conflicting mapped consumed path: ' + key
+        rows[key] = value
+    for row in old['inputs']:
+        path = Path(os.path.abspath(original_base / row['path']))
+        if path.is_relative_to(BASE):
+            relative = str(path.relative_to(BASE))
+            if relative == 'capability/input-freeze.json': continue
+            if relative in payload:
+                target = OUTPUT / relative; raw = payload[relative]
+                put(target, sha(raw), len(raw))
+                continue
+        target, expected_hash = path, row['sha256']
+        if path.is_relative_to(REPO):
+            relative = str(path.relative_to(REPO)); target = CANONICAL_SOURCE_ROOT / relative
+            expected_hash = canonical.get(relative, expected_hash)
+            mappings.append({'beforePath': str(path), 'afterPath': str(target),
+                'beforeSha256': row['sha256'], 'afterSha256': expected_hash})
+        raw = regular(target, expected_hash)
+        put(target, expected_hash, len(raw))
+    return old, rows, mappings
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--pins', type=Path, required=True); parser.add_argument('--pins-sha256', required=True)
+    parser.add_argument('--root-review', type=Path, required=True); parser.add_argument('--root-review-sha256', required=True)
+    parser.add_argument('--producer-index-sha256', required=True)
+    args = parser.parse_args()
+    assert args.pins_sha256 == PINS_SHA and args.root_review_sha256 == REVIEW_SHA
+    pins, pin_bytes, review, review_bytes = load_authority(args.pins, PINS_SHA, args.root_review, REVIEW_SHA)
+    own_rows = indexed(HERE, args.producer_index_sha256)
+    base_rows = indexed(BASE, BASE_SHA); assert len(base_rows) == 82
+    runtime_rows = indexed(RUNTIME, RUNTIME_SHA); assert len(runtime_rows) == 26
+    assert regular(RUNTIME / 'runtime-pins.json', PINS_SHA) == pin_bytes
+    assert regular(RUNTIME / 'root-review-receipt.json', REVIEW_SHA) == review_bytes
+    runtime_receipt = json.loads(regular(RUNTIME / 'source-receipt.json'))
+    assert runtime_receipt['state'] == 'ACTUAL_REVIEWED_CLASSIC_TRACE_RUNTIME_FAMILY_CREATED_NOT_EXECUTED'
+    assert runtime_receipt['recipeSha256'] == RECIPE and runtime_receipt['engineMetadataRewritten'] is False
+    for label, pin in pins['variants'].items():
+        for key in ('engineSha256', 'engineBytes', 'receiptSha256', 'freezeReceiptSha256'):
+            assert pin[key] == runtime_receipt['actualArtifacts'][label][key]
+    assert not OUTPUT.exists() and not OUTPUT.is_symlink(), 'Fresh new staged test-source folder only'
+    staging = OUTPUT.with_name(OUTPUT.name + '.staging')
+    assert not staging.exists() and not staging.is_symlink(), 'Preserve previous partial staging'
+    payload, records = source_payload()
+    payload.update({'runtime-pins.json': pin_bytes, 'root-review-receipt.json': review_bytes})
+    binding = {'schemaVersion': 1, 'state': 'ROOT_REVIEWED_CLASSIC_TRACE342_REPLAY_AUTHORITY_BOUND_NOT_EXECUTED',
+        'reviewedPinsSha256': PINS_SHA, 'rootReviewReceiptSha256': REVIEW_SHA,
+        'runtimeRoot': str(RUNTIME), 'runtimeIndexPath': str(RUNTIME / 'index.json'), 'runtimeIndexSha256': RUNTIME_SHA,
+        'requiredExport': 'classicPreflight({variant})', 'sameFourTuplesRequired': True,
+        'configuredSourceRoot': str(SOURCE_ROOT), 'sourceContractVersion': 'sm-classic-trace-source-v1',
+        'sourcePreparationOnly': True, 'runtimeAcceptanceClaim': False,
+        'httpComponentPinRemainsNullAndSealed': True,
+        'laterHTTPHostActivation': 'Fresh corrected combined component/source/entry/audit/inputs and external reviewed phase authority; old phases cannot authorize it.'}
+    payload['activation-reference.json'] = (json.dumps(binding, indent=2) + '\n').encode()
+    root_doc, root_rows, root_mappings = map_inputs('input-freeze.json', 'a9c41e39e811620a27d71cce21f084a17c7c0f785ae69dd6b9d2c29085e23a97', payload)
+    cap_doc, cap_rows, cap_mappings = map_inputs('capability/input-freeze.json', '24ade3ad845315b96190b3977c7f7e256faf1e16ba274f46b86445d1a944475a', payload)
+    assert len(root_doc['inputs']) == 2055 and len(cap_doc['inputs']) == 2054
+    payload['source-mappings.json'] = (json.dumps({'schemaVersion': 1, 'root': root_mappings, 'capability': cap_mappings}, indent=2) + '\n').encode()
+    external = {}
+    def add(path, expected=None):
+        path = Path(path).absolute(); raw = regular(path, expected)
+        row = {'path': str(path), 'sha256': sha(raw), 'bytes': len(raw)}
+        assert str(path) not in external or external[str(path)] == row
+        external[str(path)] = row
+    for root, rows in ((HERE, own_rows), (BASE, base_rows), (RUNTIME, runtime_rows)):
+        add(root / 'index.json')
+        for row in rows: add(root / row['path'], row['sha256'])
+    add(args.pins, PINS_SHA); add(args.root_review, REVIEW_SHA)
+    # The runtime's complete6414/tree/link backend is delegated, not reimplemented.
+    def manifest(rows, cap):
+        rows = {**rows, **external}
+        for name, raw in payload.items():
+            if name in ('input-freeze.json', 'capability/input-freeze.json', 'native-preflight.mjs'): continue
+            target = OUTPUT / name; rows[str(target)] = {'path': str(target), 'sha256': sha(raw), 'bytes': len(raw)}
+        base = OUTPUT / 'capability' if cap else OUTPUT
+        return {'schemaVersion': 1, 'state': 'REVIEWED_CORRECTED_TRACE342_REPLAY_SOURCE_SEAL',
+            'nativeSources': 342, 'parentRootRows': 2055, 'parentCapabilityRows': 2054,
+            'runtimeIndexSha256': RUNTIME_SHA, 'reviewedPinsSha256': PINS_SHA, 'rootReviewReceiptSha256': REVIEW_SHA,
+            'liveComputedInputs': root_doc['liveComputedInputs'], 'httpComponentPin': 'Null and sealed; fresh external phase activation required',
+            'runtimeAcceptanceClaim': False, 'inputs': sorted([{**row, 'path': os.path.relpath(row['path'], base)} for row in rows.values()], key=lambda row: row['path'])}
+    cap = manifest(cap_rows, True); payload['capability/input-freeze.json'] = (json.dumps(cap, indent=2) + '\n').encode()
+    target = OUTPUT / 'capability/input-freeze.json'
+    root_rows[str(target)] = {'path': str(target), 'sha256': sha(payload['capability/input-freeze.json']), 'bytes': len(payload['capability/input-freeze.json'])}
+    root = manifest(root_rows, False); payload['input-freeze.json'] = (json.dumps(root, indent=2) + '\n').encode()
+    compiled = payload['native-preflight.template.mjs'].decode()
+    for key, value in {'AUTHORITY_SHA': sha(payload['activation-reference.json']), 'INPUTS_SHA': sha(payload['input-freeze.json']),
+                       'RUNTIME_INDEX_SHA': RUNTIME_SHA, 'RUNTIME_ROOT': str(RUNTIME)}.items():
+        compiled = compiled.replace('@' + key + '@', value)
+    assert not re.search(r'@[A-Z_]+@', compiled); payload['native-preflight.mjs'] = compiled.encode()
+    payload['README.md'] = b'Corrected trace replay SOURCE family; no passes reused. HTTP pins null. Require fresh raw exits, final rechecks and independent result review.\n'
+    receipt = {'schemaVersion': 1, 'state': 'ACTUAL_REVIEWED_CORRECTED_TRACE_REPLAY_SOURCE_CREATED_NOT_EXECUTED',
+        'producerIndexSha256': args.producer_index_sha256, 'parentIndexSha256': BASE_SHA,
+        'runtimeIndexSha256': RUNTIME_SHA, 'runtimeRoot': str(RUNTIME), 'configuredSourceRoot': str(SOURCE_ROOT),
+        'reviewedPinsSha256': PINS_SHA, 'rootReviewReceiptSha256': REVIEW_SHA,
+        'inheritedBodies': 64, 'currentV3BodiesByteIdentical': 62, 'newChangedHostBodies': 2,
+        'guestSemanticOrOracleBodiesChanged': False, 'fullStrictAndProtectedTagsChanged': False,
+        'bodyHashes': {row['destinationPath']: sha(payload[row['destinationPath']]) for row in records},
+        'inputFreezeSha256': sha(payload['input-freeze.json']), 'capabilityFreezeSha256': sha(payload['capability/input-freeze.json']),
+        'consumedRootRows': len(root['inputs']), 'consumedCapabilityRows': len(cap['inputs']),
+        'httpPinsStillNullAndSealed': True, 'engineMetadataRewritten': False,
+        'nativePreflightOrGuestOrHostExecuted': False, 'runtimeAcceptanceClaim': False}
+    payload['source-receipt.json'] = (json.dumps(receipt, indent=2) + '\n').encode()
+    index = {'schemaVersion': 1, 'state': 'ACTUAL_REVIEWED_CORRECTED_TRACE_REPLAY_SOURCE_FAMILY_NOT_EXECUTED',
+        'files': [{'path': name, 'sha256': sha(raw), 'bytes': len(raw)} for name, raw in sorted(payload.items())], 'runtimeAcceptanceClaim': False}
+    payload['index.json'] = (json.dumps(index, indent=2) + '\n').encode()
+    def recheck():
+        load_authority(args.pins, PINS_SHA, args.root_review, REVIEW_SHA)
+        indexed(RUNTIME, RUNTIME_SHA); indexed(HERE, args.producer_index_sha256)
+        for row in external.values(): regular(row['path'], row['sha256'])
+        for row in root['inputs']:
+            path = Path(os.path.abspath(OUTPUT / row['path']))
+            if not path.is_relative_to(OUTPUT): regular(path, row['sha256'])
+    recheck()
+    staging.mkdir(exist_ok=False)
+    for name, raw in payload.items():
+        path = staging / name; path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open('xb') as out: out.write(raw)
+        regular(path, sha(raw))
+    recheck(); assert not OUTPUT.exists() and not OUTPUT.is_symlink(); staging.rename(OUTPUT)
+    print(json.dumps({'output': str(OUTPUT), 'indexSha256': sha(payload['index.json']),
+        'rootRows': len(root['inputs']), 'capabilityRows': len(cap['inputs']), 'runtimeAcceptanceClaim': False}))
+
+
+if __name__ == '__main__': main()

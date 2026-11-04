@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "atUtc": "2026-11-03T07:03:37.129588+00:00",
+  "kind": "Real cmake/builtins.cmake guards with unrelated target creation mocked; configure only. Real recipe sentinel rejection; no engine compilation.",
+  "sourceSha256": "aab3899313362e6034e1146d401a42899029663ba4ae579269b7ee4950cf6d6d",
+  "recipeSha256": "ab6227f6f763f62794e34c37ac76cb414a9b8697c423edad229e1412a9aa2515",
+  "cases": [
+    {
+      "name": "default-core-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON"
+      ],
+      "accepted": true,
+      "definitions": [
+        "defs-NOTFOUND"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "all-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_PATH=ON",
+        "-DNODE_COMPAT_EVENTS=ON",
+        "-DNODE_COMPAT_STRING_DECODER=ON",
+        "-DNODE_COMPAT_ASSERT=ON",
+        "-DNODE_COMPAT_QUERYSTRING=ON"
+      ],
+      "accepted": true,
+      "definitions": [
+        "NODE_COMPAT_PATH=1",
+        "NODE_COMPAT_EVENTS=1",
+        "NODE_COMPAT_STRING_DECODER=1",
+        "NODE_COMPAT_ASSERT=1",
+        "NODE_COMPAT_QUERYSTRING=1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "all-off-without-core",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=OFF"
+      ],
+      "accepted": true,
+      "definitions": [],
+      "exitCode": 0
+    },
+    {
+      "name": "path-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_PATH=ON"
+      ],
+      "accepted": true,
+      "definitions": [
+        "NODE_COMPAT_PATH=1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "path-without-core",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=OFF",
+        "-DNODE_COMPAT_PATH=ON"
+      ],
+      "accepted": false,
+      "definitions": [],
+      "exitCode": 1
+    },
+    {
+      "name": "events-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_EVENTS=ON"
+      ],
+      "accepted": true,
+      "definitions": [
+        "NODE_COMPAT_EVENTS=1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "events-without-core",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=OFF",
+        "-DNODE_COMPAT_EVENTS=ON"
+      ],
+      "accepted": false,
+      "definitions": [],
+      "exitCode": 1
+    },
+    {
+      "name": "string_decoder-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_STRING_DECODER=ON"
+      ],
+      "accepted": true,
+      "definitions": [
+        "NODE_COMPAT_STRING_DECODER=1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "string_decoder-without-core",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=OFF",
+        "-DNODE_COMPAT_STRING_DECODER=ON"
+      ],
+      "accepted": false,
+      "definitions": [],
+      "exitCode": 1
+    },
+    {
+      "name": "assert-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_ASSERT=ON"
+      ],
+      "accepted": true,
+      "definitions": [
+        "NODE_COMPAT_ASSERT=1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "assert-without-core",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=OFF",
+        "-DNODE_COMPAT_ASSERT=ON"
+      ],
+      "accepted": false,
+      "definitions": [],
+      "exitCode": 1
+    },
+    {
+      "name": "querystring-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_QUERYSTRING=ON"
+      ],
+      "accepted": true,
+      "definitions": [
+        "NODE_COMPAT_QUERYSTRING=1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "querystring-without-core",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=OFF",
+        "-DNODE_COMPAT_QUERYSTRING=ON"
+      ],
+      "accepted": false,
+      "definitions": [],
+      "exitCode": 1
+    },
+    {
+      "name": "existing-engine-rejected",
+      "exitCode": 1,
+      "sentinelPreserved": true,
+      "rejectedBeforeSourcePreparation": true
+    },
+    {
+      "name": "existing-receipt-rejected",
+      "exitCode": 1,
+      "sentinelPreserved": true,
+      "rejectedBeforeSourcePreparation": true
+    }
+  ]
+}

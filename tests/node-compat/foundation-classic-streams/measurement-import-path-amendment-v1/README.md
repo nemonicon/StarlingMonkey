@@ -1,0 +1,11 @@
+# Diagnostic metadata import-path amendment
+
+Source-only UNAPPLIED one-line fix for the corrected benchmark diagnostic producer's late metadata import failure. All 109 native build steps, final link and copy completed, but the overall attempt returned 1: the stdin Python metadata block loaded benchmark-policy.py through importlib without placing its packet directory in sys.path. Its sibling benchmark_common import failed. Outer stderr was empty; the traceback is in the captured build log.
+
+The proposed insertion sys.path.insert(0, str(pathlib.Path(packet_root))) immediately precedes the existing spec loader. It reproduces the sibling-import context that already exists when benchmark-policy.py is invoked directly for pre-build capture. No native, source-policy, scheduling, linkage, capability, metadata-validation or workload rule changes. Exact before/after recipe hashes and a reversible one-line patch are preserved.
+
+Eight bounded source/owned-text host checks passed. They extract only the actual recipe's import fragment, reproduce the missing-import error with tiny stand-in modules, prove the inserted prefix finds the owned sibling from a different cwd and before an owned foreign-cwd sentinel, and retain failure when the sibling is missing. They do not import the real policy, execute decorate, configure, compile, link, invoke Ninja, run Wasm, package components or start hosts.
+
+The failed raw engine 47fd3594a6f52559d9335606817ca14553709ea727c11cd78b38c68d5878301b (9,973,968 bytes) and nine pre-capture files are referenced by exact hash/size. It has no metadata sidecar or after-capture and is unadmitted. Raw launcher/build/outer logs are copied as text evidence. All 36 sealed v2 files are authenticated as ancestry and remain unchanged.
+
+This patch is not authorization to edit or repin the sealed v2 packet, reuse its old before-capture under a changed recipe, or call the raw artifact successful. A separately sealed runnable measurement-producer-candidate-v3 successor must bind the insertion plus fresh short v3 source/build/artifact namespaces and new recipe/contract/transform/input/index references. Parent production3694, corrected342/addon2/external3 and all native semantics stay fixed; reviewed engine pins remain null until actual new build/freeze review.

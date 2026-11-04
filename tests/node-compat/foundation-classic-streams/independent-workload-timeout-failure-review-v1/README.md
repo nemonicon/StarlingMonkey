@@ -1,0 +1,11 @@
+# Independent workload timeout failure review
+
+The original full 20-workload/14-boundary driver terminated with a 55-second Wasmtime spawn timeout and raw exit1. It published no results, completion, or semantic counterexample. Its timed-out case is unknown. Source ordering places all three retained Jco rotations and the fresh Jco rotation before Wasmtime, but those records remained in memory and cannot establish a durable pass.
+
+The independent reader rehashed all19 Root failure evidence files, all21 activated source-index files,525 frozen native copies and521 recorded originals. It authenticated the sealed7489-row manifest bytes without rerunning whole-tool-tree admission. Public binary parsing confirms no component imports, run(case-index:u32)->string and boundaries()->string; the emitted WIT agrees. This is file/data inspection, with no target calls or owner-module imports.
+
+Separate fresh Jco case0 and Wasmtime case0 raw outputs equal the complete Node oracle record, including calls1/setup/result/traces/checksums. A separate fresh Wasmtime case5 timed out at55 seconds. Its subsequent separate600-second-bound control returned exit0 in177.338003875 recorded operational seconds; double-JSON decoding gives exact full Node case5 (pipeline-view-524288,16) equality. Thus55 seconds was insufficient for that case under the observed conditions. It does not identify the original failed case, prove a cause for the full failure, prove all-case deadline adequacy, or establish a performance result.
+
+Original artifacts, source, native files, Root receipts and raw logs were left unchanged. The original full gate remains incomplete and correctness/timing remain unclaimed. A new durable per-case collection/deadline source amendment is a separate dependency.
+
+Own reader history is retained: attempt1 copied an extra trailing digit from a compact message into the expected Root hash; attempt2 assumed every frozen row had an original, whereas four are generated capture rows with null originals. Both failed only in this independent reader; the evidence and owner files were unchanged. The final reader checks525 copies and all521 non-null originals and passes. No native, Node workload, guest, componentizer, host, debugger, memory or fault operation ran.

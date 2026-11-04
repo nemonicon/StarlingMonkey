@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {Buffer} from 'node:buffer';
+import {createHash} from 'node:crypto';
+import {readFile,writeFile} from 'node:fs/promises';
+import {dirname,join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {runProductionCodecExtras,runEncodeIntoSourcePolicy} from './production-extra-cases.mjs';
+assert.equal(process.version,'v22.14.0');assert.deepEqual(process.execArgv,[]);assert(!process.env.NODE_OPTIONS);
+const source=fileURLToPath(import.meta.url),here=dirname(source),hash=value=>createHash('sha256').update(value).digest('hex');
+const result=runProductionCodecExtras({TextEncoder,Buffer});const sourcePolicy=runEncodeIntoSourcePolicy({TextEncoder,expectedPolicy:'node-strict-string'});assert(result.cases.every(item=>item.passed));assert.deepEqual(result.skipped,[]);
+const report={schemaVersion:1,verifiedAtUtc:new Date().toISOString(),node:process.version,executable:process.execPath,executableSha256:hash(await readFile(process.execPath)),execArgv:process.execArgv,nodeOptionsPresent:Boolean(process.env.NODE_OPTIONS),sharedCasesSha256:hash(await readFile(join(here,'production-extra-cases.mjs'))),runnerSha256:hash(await readFile(source)),injectedImplementations:{TextEncoder:'actual Node global',Buffer:'actual node:buffer'},sourcePolicy,...result};
+await writeFile(join(here,'production-extra-node-oracle-results.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({node:report.node,cases:report.caseCount,assertions:report.assertionCount,observations:report.observationCount,capabilities:report.capabilities,passed:true},null,2));

@@ -1,0 +1,112 @@
+--- v1/run-components.UNEXECUTED.mjs
++++ driver-v2/run-components.UNEXECUTED.mjs
+@@ -14,6 +14,9 @@
+ const here=dirname(fileURLToPath(import.meta.url)),repository=resolve(here,'../../../..');
+ const frozenInputBytes=await readFile(join(here,'input-freeze.json')),frozenInputSha256=hash(frozenInputBytes);
+ const frozenInputs=JSON.parse(frozenInputBytes).inputs;
++assert.equal(frozenInputs.length,32,'Driver v2 requires the live adapter in its pre/post source seal');
++const sealedAdapter=frozenInputs.filter(row=>resolve(here,row.path)===join(repository,'host-apis/wasi-0.2.0/preview1-adapter-release/wasi_snapshot_preview1.wasm'));
++assert.equal(sealedAdapter.length,1);assert.equal(sealedAdapter[0].sha256,'988224282d03fe0bd3c25b62344aef265b1a8e1f5804bdbc34d6442507fabcc0');
+ async function verifyFrozenInputs(){
+  assert.equal(hash(await readFile(join(here,'input-freeze.json'))),frozenInputSha256,'Input freeze changed');
+  for(const entry of frozenInputs)assert.equal(hash(await readFile(resolve(here,entry.path))),entry.sha256,'Frozen diagnostic source changed: '+entry.path);
+@@ -164,7 +167,7 @@
+ const sourceManifest=frozenInputs;
+ const result={schemaVersion:1,state:'private-diagnostic-link1-ordinary-components-passed',engineSha256:metadata.engineSha256,
+  engineReceiptSha256:preflight.metadataSha256,sourceRoot:preflight.sourceRoot,declaredSourceInputs:preflight.checked,
+- producerReceipt:metadata,frozenConfiguration:preflight.frozen,link1ConsumerVersion:'sm-private-ticks-link1-consumers-v1',sourceInputsCheckedBeforeAfter:true,inputFreezeSha256:frozenInputSha256,componentizer:selected.provenance,testOnlyPackagingVariant:packaging,
++ producerReceipt:metadata,frozenConfiguration:preflight.frozen,link1ConsumerVersion:'sm-private-ticks-link1-consumers-v1',driverSourceVersion:'sm-private-ticks-link1-driver-v2',consumedInputCount:32,liveAdapterSealedBeforeAfter:true,sourceInputsCheckedBeforeAfter:true,inputFreezeSha256:frozenInputSha256,componentizer:selected.provenance,testOnlyPackagingVariant:packaging,
+  node:{release:process.version,binarySha256:hash(await readFile(process.execPath)),oracleSha256:hash(oracleBytes),expectedPhases:phases},
+  host:{path:host,sha256:hash(await readFile(host)),version:version.stdout.trim()},artifacts,calls,mainHost,
+  classic:{jco:classicJco,wasmtime:classicHost,oracle:classicOracle},initializer:{jco:initJco,wasmtime:initHost},late:{jco:lateJco,wasmtime:lateHost},initializationFailures,pairedControls,runtimeFailures,sourceManifest,
+--- v1/freeze-inputs.py
++++ driver-v2/freeze-inputs.py
+@@ -31,21 +31,25 @@
+     paths.append(new)
+ paths += ['link-evidence.mjs', 'consumer-pins.json', 'build-one-diagnostic.py', 'freeze-inputs.py',
+           '../diagnostic-producer-v3-link1/policy.json', '../diagnostic-producer-v3-link1/link-policy.py',
+-          '../diagnostic-candidate-v1/input-freeze.json']
+-assert len(paths) == len(set(paths)) == 31
++          '../diagnostic-candidate-v1/input-freeze.json',
++          '../../../../host-apis/wasi-0.2.0/preview1-adapter-release/wasi_snapshot_preview1.wasm']
++assert len(paths) == len(set(paths)) == 32
++adapter = HERE / paths[-1]
++assert hashlib.sha256(adapter.read_bytes()).hexdigest() == '988224282d03fe0bd3c25b62344aef265b1a8e1f5804bdbc34d6442507fabcc0'
+ source = (HERE / 'run-components.UNEXECUTED.mjs').read_text()
+ local = ast.literal_eval(re.search(r'const sourceNames=(\[[^;]+\]);', source).group(1))
+ assert len(local) == 16
+ assert set(local).issubset(paths)
+ inputs = [{'path': p, 'sha256': hashlib.sha256((HERE / p).read_bytes()).hexdigest(),
+            'bytes': (HERE / p).stat().st_size} for p in paths]
+-result = {'schemaVersion': 2, 'status': 'source-freeze-before-any-link1-engine-or-component-execution',
++result = {'schemaVersion': 2, 'status': 'source-freeze-before-any-driver-v2-component-execution',
+           'inputs': inputs, 'ancestralInputs': 24, 'ancestralMapping': mapping,
+           'ancestralInputFreezeSha256': hashlib.sha256(ancestral_bytes).hexdigest(),
+-          'originalFixtureAndDriverInputRoles': 16, 'additionalGuardAndEvidenceInputs': 7,
+-          'totalConsumedSourceInputs': 31, 'guestExecuted': False}
++          'originalFixtureAndDriverInputRoles': 16, 'additionalGuardAndEvidenceInputs': 8,
++          'totalConsumedSourceInputs': 32, 'guestExecuted': False,
++          'liveAdapterInput': paths[-1], 'nativeConsumerContractUnchanged': True}
+ output = Path(os.environ.get('NODE_COMPAT_LINK1_INPUT_FREEZE_OUTPUT', str(HERE / 'input-freeze.json')))
+ with output.open('x') as stream:
+     json.dump(result, stream, indent=2)
+     stream.write('\n')
+-print(json.dumps({'state': result['status'], 'inputs': 31, 'ancestry': 24, 'guestExecuted': False}))
++print(json.dumps({'state': result['status'], 'inputs': 32, 'ancestry': 24, 'guestExecuted': False}))
+--- v1/check-source.py
++++ driver-v2/check-source.py
+@@ -15,7 +15,7 @@
+ NODE = '/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node'
+ sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+ snapshot = json.loads((HERE / 'input-freeze.json').read_bytes())
+-assert len(snapshot['inputs']) == 31 and len(snapshot['ancestralMapping']) == 24
++assert len(snapshot['inputs']) == 32 and len(snapshot['ancestralMapping']) == 24
+ for row in snapshot['inputs']:
+     assert sha(HERE / row['path']) == row['sha256']
+ for row in snapshot['ancestralMapping']:
+@@ -29,6 +29,14 @@
+ after = (HERE / 'run-components.UNEXECUTED.mjs').read_text()
+ corpus = lambda text: text.split('const ordinaryWorld=', 1)[1].split('const sourceNames=', 1)[0]
+ assert corpus(before) == corpus(after), 'All packaging, invocation and corpus checks must remain unchanged'
++consumer = HERE.parent / 'diagnostic-link1-consumers-v1'
++fixed_native = ['preflight.mjs','link-evidence.mjs','freeze-diagnostic-engine.py','consumer-pins.json',
++                'build-one-diagnostic.py','diagnostic.cmake','test-extension.cpp']
++for name in fixed_native:
++    assert (HERE/name).read_bytes() == (consumer/name).read_bytes(),name
++native_contract = json.loads((HERE/'consumer-pins.json').read_bytes())
++assert native_contract['freezeRoot'] == '/tmp/starling-node-compat/foundation-scheduler-link1-v1/native-freeze'
++assert native_contract['buildOutputRoot'] == '/tmp/starling-node-compat/foundation-scheduler-link1-v1/builds'
+ 
+ def definitions(path, excluded=()):
+     text = path.read_text()
+@@ -51,21 +59,27 @@
+         syntax.append({'path': path.name, 'exitCode': result.returncode})
+     elif path.suffix == '.py':
+         ast.parse(path.read_text())
+-assert sha(ROOT / 'tests/node-compat/build-diagnostic-engine.sh') == '1e2f15d1aac2f86c3363390cc3c6261721a20c07fea8ca0825c68027154c0e19'
++assert sha(ROOT / 'tests/node-compat/build-diagnostic-engine.sh') == native_contract['diagnosticRecipeSha256']
+ assert sha(ROOT / 'tests/node-compat/build-engine.sh') == '869d188de3843b5d527d236a9e5c9af6ba1193f118dc9ad786df6266e1606173'
+ checks = json.loads((HERE / 'test-results.json').read_bytes())
+ assert checks['tests'] == checks['passed'] == 46 and checks['failures'] == []
+ assert checks['compilerLinkerBuildOrGuestExecuted'] is False
++adapter_checks=json.loads((HERE/'adapter-seal-results.json').read_bytes())
++assert adapter_checks['tests']==adapter_checks['passed']==10
++assert adapter_checks['wholeDriverImportedOrRun'] is False
+ report = {'schemaVersion': 1, 'state': 'LINK1_CONSUMER_SOURCE_SYNTAX_AND_ANCESTRY_PASSED',
+-          'sourceInputsRehashed': 31, 'ancestralInputsRehashed': 24,
++          'sourceInputsRehashed': 32, 'ancestralInputsRehashed': 24,
+           'unchangedLocalFixtureWorkerOracleInputs': 14, 'fullPackagingAndCaseCorpusTextIdentical': True,
+           'launcherLifecycleDefinitionsByteIdentical': {name: hashlib.sha256(body.encode()).hexdigest() for name, body in launcher.items()},
+           'existingFreezerDefinitionsByteIdentical': len(freezer), 'syntax': syntax,
+           'syntheticTestResultsSha256': sha(HERE / 'test-results.json'), 'syntheticTests': 46,
++          'adapterSealTests':10,'adapterSealTestResultsSha256':sha(HERE/'adapter-seal-results.json'),
++          'nativeConsumerFilesByteIdentical':{name:sha(HERE/name) for name in fixed_native},
++          'existingV1FrozenEngineAcceptanceContractUnchanged':True,
+           'liveRecipesUnchanged': True, 'nativeBuildOrGuestExecuted': False,
+           'launcherFreezerAndFutureEngineAcceptance': 'UNTESTED'}
+ output = Path(os.environ.get('NODE_COMPAT_LINK1_SOURCE_CHECK_OUTPUT', str(HERE / 'source-checks.json')))
+ with output.open('x') as stream:
+     json.dump(report, stream, indent=2)
+     stream.write('\n')
+-print(json.dumps({'state': report['state'], 'sourceInputs': 31, 'ancestry': 24, 'unchangedLifecycle': 8}))
++print(json.dumps({'state': report['state'], 'sourceInputs': 32, 'ancestry': 24, 'unchangedLifecycle': 8}))

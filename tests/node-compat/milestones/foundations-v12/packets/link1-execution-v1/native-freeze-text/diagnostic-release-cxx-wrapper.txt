@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# Clang doesn't support overriding where wasm-opt is found, and CMake doesn't allow overriding
+# $PATH for linker/compiler invocations. So we use this script to modify $PATH, and
+# scripts/wasm-opt to hide the real wasm-opt from clang.
+PATH="/Users/dan/dev/StarlingMonkey/scripts:$PATH" /tmp/starling-node-compat/improved-build/cache/wasi-sdk/85e6/bin/clang++ "$@"

@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "state": "INDEPENDENT_SOURCE_ONLY_PRODUCTION_ARTIFACT_MECHANISM_REVIEW_PASSED",
+  "reviewedAtUtc": "2026-11-03T21:38:35.828274+00:00",
+  "reviewedSourceFiles": [
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-artifacts-v1/artifact_common.py",
+      "sha256": "fafc84a81f4e2c450a6f1b2224516f513074ba62a0ffe2cd7af2d78a8f1f15f0",
+      "bytes": 9861
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-artifacts-v1/freeze-engine.py",
+      "sha256": "05beb8f30ff0869d012f22847db0ea379c51ed843b19104aa8346b7c6f69d246",
+      "bytes": 13283
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-artifacts-v1/export-pin-candidate.py",
+      "sha256": "02f67af5cef283bcf887227de736cc590ca6d101b090ae3493a063cb753981fa",
+      "bytes": 2581
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-artifacts-v1/metadata-admission.mjs",
+      "sha256": "c6e742218c400aff7dbd54c923949a743272e04a36c74e2583e32a34cdd569e8",
+      "bytes": 3466
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-artifacts-v1/build-one.py",
+      "sha256": "6a46d8588afa0768ba162648ec404aa18d4cd41ac029c552d423ddef621e0e44",
+      "bytes": 13446
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-artifacts-v1/test-host.py",
+      "sha256": "4c3543c179a35a9e2cc0ab2ffe5b48e81759cf6c56844e50a2d6145c5f4b52b8",
+      "bytes": 9339,
+      "role": "Executed host-only test source; no artifact main"
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-artifacts-v1/test-host.mjs",
+      "sha256": "ef0b30f705e223d9d5569676fb3009ff4b529e9014d975cb6f1426d09a3e00df",
+      "bytes": 3224,
+      "role": "Executed host-only test source; no artifact main"
+    }
+  ],
+  "launcherReview": {
+    "path": "tests/node-compat/foundation-scheduler/production-artifacts-launcher-review-v1/launcher-review.json",
+    "sha256": "2fd58ac3322389ed5b3cb78b50e1ab8474667363447df42f4eb1a1906e4e0a56"
+  },
+  "noRemainingConcreteSourceContractBlockerFound": true,
+  "contracts": {
+    "recipeSha256": "869d188de3843b5d527d236a9e5c9af6ba1193f118dc9ad786df6266e1606173",
+    "nativeInputs": 306,
+    "externalEmbeddingInputs": 3,
+    "nativeCompileCommands": 61,
+    "strictCompileCommands": 4,
+    "queueCompileCommands": 1,
+    "separateEmbeddingCompileCommands": 1,
+    "labels": [
+      "normal-off",
+      "normal-runtime",
+      "gc-off"
+    ],
+    "freezeSchema": 1,
+    "freezeState": "immutable-release-engine-frozen",
+    "beforeEmbeddingCommandCaptureExists": false
+  },
+  "sourceReviewFindings": [
+    {
+      "area": "Actual finite source admission",
+      "status": "reviewed",
+      "evidence": "Freezer rejects old recipe/diagnostic/synthetic/label mismatch before engine read or output, validates actual source policy/helper, then calls metadata-admission.mjs, selectedManifestsForEngine and selectCoreExpectations. This positive branch was not run by reviewer."
+    },
+    {
+      "area": "Actual configuration and compilation",
+      "status": "reviewed",
+      "evidence": "Exact requested/observed cache, native61 unique rows, queue1/strict4 and layered source compilation checks. Parent embedding is absent from native JSON; actual after-build Ninja stdout is parsed by exact -c source operand and compared to three metadata arrays. No before witness is invented."
+    },
+    {
+      "area": "Source and dependency snapshot",
+      "status": "reviewed",
+      "evidence": "Copies native306/external3 plus original sidecar, recipe, cache/DB, Rust manifest/lock, OpenSSL audit/receipt/configure/configdata and attribution. Linked libcrypto remains explicit hash/size reference. Adapter988 is already one of306 and receives a second tooling copy; LIVE runtime seal is independently required."
+    },
+    {
+      "area": "Copy ordering and collision handling",
+      "status": "reviewed",
+      "evidence": "Complete source/destination/receipt plan validation precedes copies; ancestor symlinks rejected; shared targets require exact bytes; variant targets and receipt use exclusive creation; all copies and plan originals rehashed. Partial failures preserve output without acceptance; no whole-freeze atomic guarantee."
+    },
+    {
+      "area": "Receipt validation/export digest consistency",
+      "status": "resolved-before-final-review",
+      "initialObservation": "Exporter formerly re-read receipt hash after parsing different bytes.",
+      "resolution": "capture_regular obtains regular non-symlink bytes plus captured SHA, checks immediately, verify_frozen_variant rechecks after full validation, exporter uses captured digest. Default three-tuple launcher API is preserved."
+    },
+    {
+      "area": "Unreviewed export boundary",
+      "status": "reviewed",
+      "evidence": "Exporter never writes consumer pin files and emits only UNREVIEWED outer/inner states, rejected by real common-v4 and capability-v2 selectors. Freeze receipt hash remains separate from copy inventory."
+    }
+  ],
+  "independentlyRerunHostTests": [
+    {
+      "kind": "python",
+      "tests": 67,
+      "reportPath": "/tmp/starling-node-compat/independent-production-artifacts-host-v1/python-results.json",
+      "sha256": "4890f29ff47720abc1002c0265835dcd6b8b70182197e1332356b2923241bd46",
+      "bytes": 6380
+    },
+    {
+      "kind": "python-stdout",
+      "path": "/tmp/starling-node-compat/independent-production-artifacts-host-v1/python.stdout",
+      "sha256": "6a8beab5a899b638c5bb1f8f15eca671a92db830aade5c89d28620b0cbe7ca98",
+      "bytes": 160
+    },
+    {
+      "kind": "python-stderr",
+      "path": "/tmp/starling-node-compat/independent-production-artifacts-host-v1/python.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "kind": "node",
+      "tests": 17,
+      "reportPath": "/tmp/starling-node-compat/independent-production-artifacts-host-v1/node-results.json",
+      "sha256": "b60f3818424f81bbff9d843f2d56421fa1851a2813a1cb5ec47745736fde049c",
+      "bytes": 1981
+    },
+    {
+      "kind": "node-stdout",
+      "path": "/tmp/starling-node-compat/independent-production-artifacts-host-v1/node.stdout",
+      "sha256": "ae7fe75ecf5b69e715933abbe4cd6b3f826b0dea3832878d0ada62ca6d674216",
+      "bytes": 151
+    },
+    {
+      "kind": "node-stderr",
+      "path": "/tmp/starling-node-compat/independent-production-artifacts-host-v1/node.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ],
+  "hostChecksTotal": 84,
+  "hostChecksScope": "Pure label/command/manifest data, actual old sidecars read without engine access, tiny owned text exclusive-copy fixtures, AST/lifecycle identity and pure selector negatives.",
+  "sourceOnlyLimitations": [
+    "No launcher/freezer/exporter main or actual production freeze was executed by reviewer. Root owns the separate in-flight normalOFF native build and its receipts.",
+    "No engine, compiler, adapter, componentizer, Wasmtime or guest was executed by reviewer.",
+    "No positive artifact-admission or scheduler/runtime/reuse result follows from these source/host checks. Reviewed actual pins and a new explicit activation/wiring/seal revision remain required.",
+    "No induced ENOSPC/crash/hostile concurrent mutation test or transactional whole-freeze durability guarantee is claimed.",
+    "Production recipe869 is unchanged; these tools do not add diagnostic extra sources or link1 flags, capabilities, public process/ALS/reset or performance/resource claims."
+  ],
+  "reviewedSourceFilesModified": false,
+  "artifactMainExecuted": false,
+  "nativeBuildOrGuestExecuted": false,
+  "productionAcceptanceClaimed": false
+}

@@ -1,0 +1,49 @@
+--- a/tests/node-compat/foundation-classic-streams/integration-candidate-v1/layer-policy.py
++++ b/layer-policy.py
+@@ -9,12 +9,37 @@
+ sys.dont_write_bytecode=True
+ if not __debug__:raise RuntimeError('Source policy checks require assertions')
+ HERE=Path(__file__).resolve().parent
+-POLICY_SHA256='137a35959131d5cb5125bb5fc97324dfa4ba2ce18441818dd95cf83d19c88d6f'
++POLICY_SHA256='891a4c53dd4a7b7d776c21003acdd12c7944c6a3eca019a1d9b2be620ed8b11c'
+ PARENT_POLICY_SHA256='98e80d36b8eb9b7ac99de54832288bd8eec148fa1b9fe0b27b3bada4d12b2cd0'
+ PARENT_HELPER_SHA256='78521feeefe299360228e5db76bfde0b11e6eeee93bd2374cd39b2fe695b610c'
+ def digest(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+ assert digest(HERE/'policy.json')==POLICY_SHA256
+ POLICY=json.loads((HERE/'policy.json').read_bytes())
++
++# Exact previous342 source ancestry is data, never an engine metadata adapter.
++def verify_trace_ancestry():
++    previous=HERE.parent/'integration-candidate-v1'
++    assert digest(previous/'policy.json')==POLICY['classicTraceSourcePolicy']['previousPolicySha256']
++    assert digest(previous/'layer-policy.py')==POLICY['classicTraceSourcePolicy']['previousHelperSha256']
++    assert digest(previous/'source/tests/node-compat/build-engine.sh')==POLICY['classicTraceSourcePolicy']['previousRecipeSha256']
++    old=json.loads((previous/'policy.json').read_bytes())
++    before={row['path']:row['sha256']for row in old['expectedNativeSourceManifest']}
++    after={row['path']:row['sha256']for row in POLICY['expectedNativeSourceManifest']}
++    changes={row['path']:row for row in POLICY['classicTraceSourcePolicy']['changes']}
++    assert len(before)==len(after)==342 and set(before)==set(after)
++    assert len(changes)==3 and sum(before[path]==after[path]for path in before)==339
++    for path,row in changes.items():assert before[path]==row['beforeSha256']and after[path]==row['afterSha256']
++    assert POLICY['strictPolicyVersion']==old['strictPolicyVersion']
++    assert POLICY['protectedPolicyVersion']==old['protectedPolicyVersion']
++    assert POLICY['embedding']==old['embedding']and POLICY['nativePatchSha256']==old['nativePatchSha256']
++    fix=HERE.parent/'trace-semantics-candidate-v1'
++    assert digest(fix/'index.json')==POLICY['classicTraceSourcePolicy']['fixSourceIndexSha256']
++    for row in json.loads((fix/'index.json').read_bytes())['files']:
++        target=fix/row['path'];assert not target.is_symlink()and target.stat().st_size==row['bytes']and digest(target)==row['sha256']
++    assert digest(fix/'canonical-3file.UNAPPLIED.patch')==POLICY['classicTraceSourcePolicy']['sourceDeltaPatchSha256']
++    assert digest(fix/'transformation-proof.json')==POLICY['classicTraceSourcePolicy']['transformationProofSha256']
++    return True
++verify_trace_ancestry()
+ PARENT_ROOT=HERE.parents[1]/'foundation-scheduler/integration-candidate-v1'
+ assert digest(PARENT_ROOT/'policy.json')==PARENT_POLICY_SHA256
+ assert digest(PARENT_ROOT/'layer-policy.py')==PARENT_HELPER_SHA256
+@@ -114,6 +139,7 @@
+       'limits':PARENT.POLICY['limits'],'addsExternalCapabilities':False,'publicProcessModule':False,
+       'resetSafeReuse':'OPEN; cancellation and teardown not established',
+       'scope':'Actual342 source/command observations; parent306 is immutable source ancestry, not projected engine metadata.'}
++    metadata['classicTraceSourcePolicy']=copy.deepcopy(POLICY['classicTraceSourcePolicy'])
+     metadata['classicStreamsPolicy']={
+       'version':POLICY['classicPolicyVersion'],'enabled':metadata['classicStreamsEnabled'],'policyFileSha256':POLICY_SHA256,'helperSha256':digest(__file__),
+       'parentRecipeSha256':POLICY['parentRecipeSha256'],'parentSourceManifestCanonicalSha256':POLICY['parentNativeManifestCanonicalSha256'],

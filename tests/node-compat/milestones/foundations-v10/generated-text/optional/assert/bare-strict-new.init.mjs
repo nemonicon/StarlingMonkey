@@ -1,0 +1,1 @@
+import * as a from "assert/strict"; new a.doesNotReject(); export function run(){return '';}

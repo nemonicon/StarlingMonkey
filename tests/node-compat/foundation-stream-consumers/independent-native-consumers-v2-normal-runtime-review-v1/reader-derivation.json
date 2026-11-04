@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "parentReader": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/independent-native-consumers-v2-disabled-off-review-v1/verify.py",
+  "parentReaderSha256": "88c9dc6d3c7e15a4d5257710b9e09b8e0c0cb38d0a3afb0d99a9c6f9fbbf0260",
+  "changes": [
+    {
+      "before": "disabled-off",
+      "after": "normal-runtime",
+      "occurrences": 17
+    },
+    {
+      "before": "81ffa152cf1bbdc7dbd59d7390478964be1a0ae213f636710692c2a08c3e5110",
+      "after": "b227a8d2e6fb6b83da556d3520dceec82d5e1978801ba3c607bc9a31aa28ad60",
+      "occurrences": 1
+    },
+    {
+      "before": "8e05a70593c09fd41eadcd56b6de47da9892a2acbf78e174f97b78b0991f76ac",
+      "after": "9668b23dbac34f3e835b59f339f9a40504153eb03cdd149f0a761cb99ed77b49",
+      "occurrences": 1
+    },
+    {
+      "before": "9353df3cb9db5aa0db6b47e627ee689023405e35334f5189d2b07b1eb6a34b44",
+      "after": "0866e4b8d76a4c89225b07124874587c29b0ecce8de7c6992eaa5f164a8615b8",
+      "occurrences": 1
+    },
+    {
+      "before": "9d6fd22252de089370ba104d39e15431283e8ed62a26514c66ff2af181e4a4e1",
+      "after": "3180f5b8a81d77cc2dab80cdeb31d6f0922c9fefb4b1ac8ee43c4ad1e70c5040",
+      "occurrences": 1
+    },
+    {
+      "before": "9995242",
+      "after": "10009523",
+      "occurrences": 5
+    },
+    {
+      "before": "for name in['NODE_COMPAT_ENTROPY_RUNTIME_ONLY','NODE_COMPAT_OOM_TESTING']:macro(words,name,False)",
+      "after": "macro(words,'NODE_COMPAT_ENTROPY_RUNTIME_ONLY',True);macro(words,'NODE_COMPAT_OOM_TESTING',False)",
+      "occurrences": 1
+    },
+    {
+      "before": "macro(words,'NODE_COMPAT_STREAM_CONSUMERS',False)",
+      "after": "macro(words,'NODE_COMPAT_STREAM_CONSUMERS',True)",
+      "occurrences": 1
+    },
+    {
+      "before": "assert root['rootObservedSessions']=={'build':99558,'freeze':3263,'readOnlyVerify':24291}",
+      "after": "assert root['rootObservedSessions']=={'build':7122,'freezeAndReadOnlyVerify':80421}",
+      "occurrences": 1
+    },
+    {
+      "before": "references=root['references'];assert len(references)==11",
+      "after": "references=root['references'];assert len(references)==12",
+      "occurrences": 1
+    },
+    {
+      "before": "for name in ['build','freeze','verify']:\n terminal=doc(WORK.parent/('consumers355-v2-normal-runtime-'+name+'-v1.terminal.json'));assert terminal['rawExitCode']==0",
+      "after": "LOGS=WORK.parent/'consumers355-v2-normal-runtime-build-root'\nfor name,pid in [('terminal.json',80946),('freeze.terminal.json',2217),('verify.terminal.json',2236)]:\n terminal=doc(LOGS/name);assert terminal['rawExitCode']==0 and terminal['pid']==pid and terminal['observedByRoot']is True\n for key in ['stdout','stderr']:read(Path(terminal[key]['path']),terminal[key]['sha256'],terminal[key]['bytes'],capture=False)\n assert read(Path(terminal['stderr']['path']))==b''",
+      "occurrences": 1
+    },
+    {
+      "before": "'entropyPolicy':'off'",
+      "after": "'entropyPolicy':'runtime-only'",
+      "occurrences": 2
+    },
+    {
+      "before": "m['entropyPolicy']=='off'",
+      "after": "m['entropyPolicy']=='runtime-only'",
+      "occurrences": 1
+    },
+    {
+      "before": "len(m['selectedModuleManifests'])==10",
+      "after": "len(m['selectedModuleManifests'])==11",
+      "occurrences": 1
+    },
+    {
+      "before": "assert m['downloadedArchives']==[]  # Actual optional per-project tar inventory is empty; never relabel normal six as newOFF records.",
+      "after": "assert len(m['downloadedArchives'])==1\nfor row in m['downloadedArchives']:read(Path(row['path']),row['sha256'],capture=False)\nassert m['downloadedArchives'][0]['sha256']==m['openssl']['completeSourceAudit']['archiveSha256']",
+      "occurrences": 1
+    },
+    {
+      "before": "audit_build_fields={'beforeReportPath','beforeReportSha256','buildDirectory','receiptSha256'}",
+      "after": "audit_build_fields={'beforeReportPath','beforeReportSha256','buildDirectory','sourceDirectory','receiptSha256'}",
+      "occurrences": 1
+    },
+    {
+      "before": "assert ssl['sourceDir']==normal_metadata['openssl']['sourceDir']",
+      "after": "assert ssl['sourceDir']!=normal_metadata['openssl']['sourceDir'] and ssl['sourceKey']!=normal_metadata['openssl']['sourceKey']\nassert ssl['entropy']=='RUNTIME_ONLY' and ssl['randSeed']=='none' and ssl['profile']=='ON'",
+      "occurrences": 1
+    },
+    {
+      "before": "assert m['streamConsumersEnabled']is f['streamConsumersEnabled']is False",
+      "after": "assert m['streamConsumersEnabled']is f['streamConsumersEnabled']is True",
+      "occurrences": 1
+    },
+    {
+      "before": "assert consumer['enabled']is False",
+      "after": "assert consumer['enabled']is True",
+      "occurrences": 1
+    },
+    {
+      "before": "cache['NODE_COMPAT_STREAM_CONSUMERS']=='OFF'",
+      "after": "cache['NODE_COMPAT_STREAM_CONSUMERS']=='ON'",
+      "occurrences": 1
+    },
+    {
+      "before": "admission['options']['streamConsumersEnabled']is False",
+      "after": "admission['options']['streamConsumersEnabled']is True",
+      "occurrences": 1
+    },
+    {
+      "before": "root['consumerEnabled']is False",
+      "after": "root['consumerEnabled']is True",
+      "occurrences": 1
+    },
+    {
+      "before": "consumer['moduleManifest']not in admission['selectedManifestPaths']",
+      "after": "consumer['moduleManifest']in admission['selectedManifestPaths']",
+      "occurrences": 1
+    },
+    {
+      "before": "len(admission['selectedManifestPaths'])==10",
+      "after": "len(admission['selectedManifestPaths'])==11",
+      "occurrences": 1
+    },
+    {
+      "before": "ssl_build_fields={'installDir','completeSourceAudit','receiptPath','receiptSha256','configureRecipe','configdata','library'}",
+      "after": "ssl_build_fields={'entropy','sourceKey','sourceDir','installDir','completeSourceAudit','receiptPath','receiptSha256','configureRecipe','configdata','library'}",
+      "occurrences": 1
+    },
+    {
+      "before": "configure_raw.replace(str(build),str(Path(normal_metadata['cmakeCachePath']).parent))",
+      "after": "configure_raw.replace(str(build),str(Path(normal_metadata['cmakeCachePath']).parent)).replace(ssl['sourceKey'],normal_metadata['openssl']['sourceKey'])",
+      "occurrences": 1
+    },
+    {
+      "before": "assert '.s0'in str(build)and '.s1'in normal_metadata['cmakeCachePath']",
+      "after": "assert '.RUNTIME_ONLY.'in str(build)and '.OFF.'in normal_metadata['cmakeCachePath']\nassert build!=Path(normal_metadata['cmakeCachePath']).parent",
+      "occurrences": 1
+    },
+    {
+      "before": "launch['explicitEnvironment']['NODE_COMPAT_STREAM_CONSUMERS']=='0'",
+      "after": "launch['explicitEnvironment']['NODE_COMPAT_STREAM_CONSUMERS']=='1'",
+      "occurrences": 1
+    },
+    {
+      "before": "assert not MUTABLE and not MUTABLE_READ_REQUESTS",
+      "after": "assert launch['explicitEnvironment']['NODE_COMPAT_ENTROPY_MODE']=='RUNTIME_ONLY'\nassert cache['NODE_COMPAT_ENTROPY_MODE']=='RUNTIME_ONLY'\nassert admission['options']['entropyPolicy']=='runtime-only'\nassert not MUTABLE and not MUTABLE_READ_REQUESTS",
+      "occurrences": 1
+    },
+    {
+      "before": "assert ssl['version']==normal_metadata['openssl']['version']",
+      "after": "assert ssl['version']==normal_metadata['openssl']['version']\n\nread(Path(audit['archivePath']),audit['archiveSha256'],capture=False)\nexpected_ssl={}\nwith tarfile.open(audit['archivePath'])as archive:\n for member in archive.getmembers():\n  if not member.isfile():assert member.isdir();continue\n  prefix,slash,name=member.name.partition('/');assert prefix=='openssl-3.0.17'and slash;relative(name)\n  assert name not in expected_ssl\n  expected_ssl[name]=audit['patchedSources'].get(name)or sha(archive.extractfile(member).read())\nactual_ssl={}\nfor path in sorted(Path(ssl['sourceDir']).rglob('*')):\n assert not path.is_symlink()\n if path.is_file():actual_ssl[str(path.relative_to(ssl['sourceDir']))]=read(path,capture=False)['sha256']\nassert actual_ssl==expected_ssl and len(actual_ssl)==4650\nassert sha(json.dumps([{'path':name,'sha256':h}for name,h in sorted(actual_ssl.items())],separators=(',',':')).encode())==audit['sourceManifestSha256']\n",
+      "occurrences": 1
+    },
+    {
+      "before": "universal=read(STAGED/'artifact-tools/artifact_common.py').decode()",
+      "after": "\ndisabled_peer=FAMILY/'independent-native-consumers-v2-disabled-off-review-v1'\nindexed(disabled_peer,'6b5414f6fe74948a4d0591e21c3b69d66fe3230ad88b3a9deab1411783f35908',16)\ndisabled_freeze=doc(FROZEN/'disabled-off-freeze-receipt.json','9d6fd22252de089370ba104d39e15431283e8ed62a26514c66ff2af181e4a4e1')\nfor row in disabled_freeze['copies']:read(Path(row['path']),row['sha256'],row['bytes'],FROZEN,capture=False)\nauthority=doc(FAMILY/'native-integration-v2-normal-runtime-build-root-review.json','decfa0d15271459936e69e26e9cfbedd9f414b3822c91f6e665682c2fd41505c')\nfor key in ['nativeProducerIndex','sourceInspectionTemplate','producerSourceReview','actualSourceStageReview','oldReviewedPins','oldThreeFrozenPrebuildCheckpoint']:\n row=authority[key];read(Path(row['path']),row['sha256'],row['bytes'],capture=False)\nassert authority['argv']==doc(LOGS/'terminal.json')['argv']\nassert authority['nativeCodeRecipeOrOldToolContextChangesAllowed']is False and authority['oldThreeFrozenChangesAllowed']is False\ncheckpoint=doc(Path(authority['oldThreeFrozenPrebuildCheckpoint']['path']),authority['oldThreeFrozenPrebuildCheckpoint']['sha256'])\nassert checkpoint['frozenRows']==len(checkpoint['files'])==3492\nassert checkpoint['normalTwoHistoricalMutableOriginalsNotRestored']is True\nold_sets={'normal-off':normal_freeze,'gc-off':gc_freeze,'disabled-off':disabled_freeze}\nexpected_checkpoint=[]\nfor label,old in old_sets.items():\n for row in old['copies']:expected_checkpoint.append({'label':label,**{k:row[k]for k in ['path','sha256','bytes']}})\nassert checkpoint['files']==expected_checkpoint\nfor row in checkpoint['files']:read(Path(row['path']),row['sha256'],row['bytes'],FROZEN,capture=False)\npost=doc(Path(root['oldThreePostfreezeCheckpoint']['path']),root['oldThreePostfreezeCheckpoint']['sha256'])\nassert post['rowsRehashed']==3492 and post['allMatched']is True and post['prebuildCheckpoint']==authority['oldThreeFrozenPrebuildCheckpoint']\noriginal_closure=doc(Path(root['originalInputClosure']['path']),root['originalInputClosure']['sha256'])\nassert original_closure['entries']==len(original_closure['files'])==1162\nexpected_originals=[{'path':row['original'],'sha256':row['sha256'],'bytes':row['bytes']}for row in f['copies']if row['original']is not None]\nassert original_closure['files']==expected_originals\nfor row in original_closure['files']:read(Path(row['path']),row['sha256'],row['bytes'],capture=False)\nassert doc(Path(authority['oldReviewedPins']['path']))['variants']['normal-runtime']is None\nassert root['checkedInRuntimePinStillNull']is True and root['guestOrComponentExecuted']is False and root['operationalAdmission']is False\nassert sha(read(HERE.parent/'release-host-plan-v1/runtime-only-build.template.json'))=='096ad77302cd8f0fcc0fd78a07e557af1dbad5b67d3b5a6e51f8f8dae8f680e1'\n\nuniversal=read(STAGED/'artifact-tools/artifact_common.py').decode()",
+      "occurrences": 1
+    }
+  ],
+  "newResultSummary": true,
+  "ownerCodeImportedOrExecuted": false
+}

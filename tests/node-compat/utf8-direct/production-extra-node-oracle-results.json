@@ -1,0 +1,245 @@
+{
+  "schemaVersion": 1,
+  "verifiedAtUtc": "2026-11-03T06:13:57.640Z",
+  "node": "v22.14.0",
+  "executable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+  "executableSha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+  "execArgv": [],
+  "nodeOptionsPresent": false,
+  "sharedCasesSha256": "55ef3f587289ebe17b17fd6461b0514725030cfffd79c486298490d328e58215",
+  "runnerSha256": "7b410cc6dc3c6ae65b1741f5d56b9e6978401d679722cf400b7b029ec5580f02",
+  "injectedImplementations": {
+    "TextEncoder": "actual Node global",
+    "Buffer": "actual node:buffer"
+  },
+  "sourcePolicy": {
+    "expectedPolicy": "node-strict-string",
+    "caseCount": 7,
+    "assertionCount": 12,
+    "cases": [
+      {
+        "name": "undefined",
+        "passed": true,
+        "observations": {
+          "threw": true,
+          "errorName": "TypeError",
+          "read": null,
+          "written": null
+        }
+      },
+      {
+        "name": "number",
+        "passed": true,
+        "observations": {
+          "threw": true,
+          "errorName": "TypeError",
+          "read": null,
+          "written": null
+        }
+      },
+      {
+        "name": "null",
+        "passed": true,
+        "observations": {
+          "threw": true,
+          "errorName": "TypeError",
+          "read": null,
+          "written": null
+        }
+      },
+      {
+        "name": "boxed-string",
+        "passed": true,
+        "observations": {
+          "threw": true,
+          "errorName": "TypeError",
+          "read": null,
+          "written": null
+        }
+      },
+      {
+        "name": "object-coercion",
+        "passed": true,
+        "observations": {
+          "calls": 0,
+          "threw": true
+        }
+      },
+      {
+        "name": "transfer-during-source-conversion",
+        "passed": true,
+        "observations": {
+          "coercions": 0,
+          "threw": true,
+          "viewByteLength": 3,
+          "transferExecuted": false
+        }
+      },
+      {
+        "name": "resize-during-source-conversion",
+        "passed": true,
+        "observations": {
+          "coercions": 0,
+          "threw": true,
+          "viewByteLength": 4
+        }
+      }
+    ],
+    "nodeCompatibility": "Existing deviation retained: Node22 encodeInto rejects non-string sources; Starling uses ToString. Shared differential cases use primitive strings. These policy-specific observations are not claimed equal."
+  },
+  "capabilities": {
+    "transfer": true,
+    "resizable": true
+  },
+  "cases": [
+    {
+      "name": "finite reentrant @@toPrimitive and toString encode calls",
+      "passed": true,
+      "skipped": false,
+      "assertionCount": 51,
+      "observations": [
+        {
+          "events": [
+            "primitive:string",
+            "inner-toString"
+          ],
+          "fallbackEvents": [
+            "toString",
+            "valueOf"
+          ],
+          "outerBytes": 12,
+          "nestedOffsetPreserved": true
+        }
+      ]
+    },
+    {
+      "name": "reentrant exceptions preserve identity and encoder remains usable",
+      "passed": true,
+      "skipped": false,
+      "assertionCount": 20,
+      "observations": [
+        {
+          "events": [
+            "outer",
+            "inner"
+          ],
+          "caughtSentinel": true,
+          "propagatedSentinel": true,
+          "symbolTypeError": true
+        }
+      ]
+    },
+    {
+      "name": "output ArrayBuffer transfer after encode returns",
+      "passed": true,
+      "skipped": false,
+      "assertionCount": 39,
+      "observations": [
+        {
+          "bytes": 8,
+          "oldViewDetached": true,
+          "movedBytesIntact": true,
+          "nextOutputIndependent": true,
+          "bufferSharedView": true
+        }
+      ]
+    },
+    {
+      "name": "reentrant conversion transfers an inner output only after inner return",
+      "passed": true,
+      "skipped": false,
+      "assertionCount": 20,
+      "observations": [
+        {
+          "coercions": 1,
+          "innerTransferredAfterReturn": true,
+          "outerBytes": 5
+        }
+      ]
+    },
+    {
+      "name": "encodeInto zero-length views preserve string source and validation",
+      "passed": true,
+      "skipped": false,
+      "assertionCount": 29,
+      "observations": [
+        {
+          "view": 0,
+          "stringSource": true,
+          "read": 0,
+          "written": 0
+        },
+        {
+          "view": 1,
+          "stringSource": true,
+          "read": 0,
+          "written": 0
+        },
+        {
+          "view": 2,
+          "stringSource": true,
+          "read": 0,
+          "written": 0
+        },
+        {
+          "symbolTypeError": true,
+          "invalidDestinationTypeError": true
+        }
+      ]
+    },
+    {
+      "name": "encodeInto detached views after ordinary transfer",
+      "passed": true,
+      "skipped": false,
+      "assertionCount": 17,
+      "observations": [
+        {
+          "stringSource": true,
+          "read": 0,
+          "written": 0,
+          "movedBytesUnchanged": true,
+          "symbolTypeError": true
+        }
+      ]
+    },
+    {
+      "name": "encodeInto fixed and tracking RAB views become out of bounds and recover",
+      "passed": true,
+      "skipped": false,
+      "assertionCount": 50,
+      "observations": [
+        {
+          "tracking": false,
+          "stringSource": true,
+          "outOfBounds": {
+            "read": 0,
+            "written": 0
+          },
+          "recovered": {
+            "read": 2,
+            "written": 3
+          },
+          "regrownLength": 4
+        },
+        {
+          "tracking": true,
+          "stringSource": true,
+          "outOfBounds": {
+            "read": 0,
+            "written": 0
+          },
+          "recovered": {
+            "read": 2,
+            "written": 3
+          },
+          "regrownLength": 8
+        }
+      ]
+    }
+  ],
+  "caseCount": 7,
+  "assertionCount": 226,
+  "observationCount": 11,
+  "skipped": [],
+  "scope": "Ordinary public APIs only: finite reentrant conversion, transfers after encode returns, and production-fixed encodeInto zero/detached/out-of-bounds guards. No native fault control, private metadata API, raw memory access or performance measurement."
+}

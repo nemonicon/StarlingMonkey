@@ -1,0 +1,1 @@
+let calls=0;export async function run(){let seen=0,handled=null;const t=new EventTarget();t.addEventListener('test',async()=>{seen++;try{throw new Error('caught')}catch(error){handled=error.message}});t.dispatchEvent(new Event('test'));await Promise.resolve();await Promise.resolve();return JSON.stringify({calls:++calls,seen,handled})}

@@ -1,0 +1,128 @@
+--- earlier-v1/compact.py
++++ current-release-corpus-v1/compact.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Lossless, journalled macOS filesystem compression of 92 explicitly whitelisted earlier accepted public component/core outputs.
++"""Lossless, journalled macOS filesystem compression of 20 exact newly passed ordinary Release corpus component/core outputs.
+ 
+ This changes filesystem representation only. It never edits WebAssembly bytes.
+ Run without --apply to inventory the deliberately narrow allowlist.
+@@ -23,19 +23,21 @@
+ 
+ BASE = Path('/tmp/starling-node-compat')
+ REPO = Path(__file__).resolve().parents[3]
+-AUDIT_PATH = REPO / 'tests/node-compat/storage-candidate-audit-earlier-v1/results.json'
+-AUDIT_SHA256 = '6a3664ff4ebe283910672090ed4481123ab3d634146781ff7a9321a1302378a8'
++AUDIT_PATH = REPO / 'tests/node-compat/storage-candidate-audit-current-release-corpus-v1/results.json'
++AUDIT_SHA256 = '6845fa7e5d16888c9d5c02182736490e107c7cbc753c9ea16217447463f1b271'
+ AUDIT_INDEX_PATH = AUDIT_PATH.with_name('index.json')
+-AUDIT_INDEX_SHA256 = 'e1dcf6ce4608741ab2becd39bf19f9bf81a40aae3371be60ffc8f8dde7dcaa54'
++AUDIT_INDEX_SHA256 = '02f6f560f9121ed93335ee9d72cacb3c84f81cbe490f9239332f12ca3ecf5007'
+ assert hashlib.sha256(AUDIT_PATH.read_bytes()).hexdigest() == AUDIT_SHA256
+ assert hashlib.sha256(AUDIT_INDEX_PATH.read_bytes()).hexdigest() == AUDIT_INDEX_SHA256
+ AUDIT = json.loads(AUDIT_PATH.read_text())
+-assert AUDIT['eligibleCount'] == len(AUDIT['files']) == 92
+-assert len({row['path'] for row in AUDIT['files']}) == 92
+-ROOTS = {f'accepted-{i:02d}': Path(row['root']) for i,row in enumerate(AUDIT['roots'])}
++assert AUDIT['artifactCount'] == AUDIT['coreDependencyCount'] == 10
++assert len(AUDIT['files']) == 20
++assert len({row['path'] for row in AUDIT['files']}) == 20
++CORPUS_ROOT = BASE / 'foundation-scheduler-v4/ordinary-release-components-v1'
++ROOTS = {'current-passed-ordinary-release-corpus':CORPUS_ROOT}
+ AUDITED = {row['path']:row for row in AUDIT['files']}
+-RECEIPTS = BASE / 'storage-compaction-earlier-v1'
+-EXPECTED_ELIGIBLE_COUNT = 92
++RECEIPTS = BASE / 'storage-compaction-current-release-corpus-v1'
++EXPECTED_ELIGIBLE_COUNT = 20
+ HEADROOM_RESERVE = 64 * 1024 * 1024
+ NAME = re.compile(r'.+\.(?:component|core\d*)\.wasm\Z')
+ EXCLUDED_DIRS = {'native-freeze', 'source', 'sources', 'componentize-source', 'harness',
+@@ -98,26 +100,53 @@
+ 
+ 
+ def verify_report_closure():
+-    # Audit/index authenticate the finite accepted file list and its provenance.
+-    # Re-read every consumed report/JS witness; no component is executed.
++    # Exact newly authorized passed ordinary Release corpus, not production
++    # compatibility or admission of any older/private/unsafe binary.
+     index = json.loads(AUDIT_INDEX_PATH.read_text())
+     for row in index['files']:
+         path = AUDIT_PATH.parent / row['path']
+         assert path.is_file() and not path.is_symlink()
+-        assert sha256(path) == row['sha256'], path
++        assert sha256(path) == row['sha256']
++    source = AUDIT['sourceReport']; verification = AUDIT['independentVerification']
++    assert source['path'] == str(CORPUS_ROOT/'results.json')
++    assert source['sha256'] == 'c865931b5e5573f036d9386517d8b3720224ab80baf27b521cda87860e056161'
+     checked = set()
++    def pinned(path,digest):
++        path = Path(path)
++        assert path.is_file() and not path.is_symlink()
++        assert sha256(path) == digest, path
++        checked.add((str(path),digest))
++    pinned(source['path'],source['sha256']); pinned(verification['path'],verification['sha256'])
++    report = json.loads(Path(source['path']).read_text())
++    independent = json.loads(Path(verification['path']).read_text())
++    assert report['state'] == 'private-diagnostic-ordinary-components-passed'
++    assert independent['state'] == 'INDEPENDENT_READ_ONLY_ORDINARY_RELEASE_DIAGNOSTIC_VERIFICATION_PASSED'
++    assert independent['sourceReportSha256'] == source['sha256']
++    assert independent['gcStress'] is False and independent['oomTesting'] is False
++    assert len(report['artifacts']) == len(independent['artifacts']) == 10
++    artifacts = {row['name']:row for row in report['artifacts']}
++    independently_checked = {row['name']:row for row in independent['artifacts']}
+     for row in AUDIT['files']:
+-        proof = row['completionProof']
+-        pairs = [(REPO/proof['milestoneSummary'], proof['milestoneSummarySha256']),
+-                 (REPO/proof['archivedReport'], proof['reportSha256']),
+-                 (Path(proof['currentOriginalReport']), proof['reportSha256'])]
+-        pairs += [(Path(w['path']),w['sha256']) for w in row.get('generatedJsReferences',[])]
+-        for path,digest in pairs:
+-            key = (str(path),digest)
+-            if key in checked: continue
+-            assert path.is_file() and not path.is_symlink(), path
+-            assert sha256(path) == digest, path
+-            checked.add(key)
++        binding = row['binding']; artifact = artifacts[binding['artifactName']]
++        component = Path(artifact['componentPath'])
++        assert component.parent == CORPUS_ROOT
++        assert artifact['interfaceAudit']['emittedImports'] == []
++        assert artifact['componentSha256'] == independently_checked[binding['artifactName']]['componentSha256']
++        assert hashlib.sha256(artifact['emittedWit'].encode()).hexdigest() == independently_checked[binding['artifactName']]['recordedWitSha256']
++        pinned(component,artifact['componentSha256'])
++        pinned(artifact['sourcePath'],artifact['sourceSha256'])
++        if binding['kind'] == 'passed reported component':
++            assert row['path'] == str(component) and row['sha256'] == artifact['componentSha256']
++        else:
++            assert binding['kind'] == 'transpiled core directly referenced by reported Jco module'
++            assert binding['componentPath'] == str(component) and binding['componentSha256'] == artifact['componentSha256']
++            assert binding['modulePath'] == artifact['modulePath']
++            pinned(binding['modulePath'],binding['moduleSha256'])
++            assert Path(binding['modulePath']).parent == CORPUS_ROOT
++            text = Path(binding['modulePath']).read_text()
++            references = re.findall(r"new URL\(['\"](\./[^'\"]+\.core\d*\.wasm)['\"],\s*import\.meta\.url\)",text)
++            assert len(references) == 1
++            assert row['path'] == str(CORPUS_ROOT/references[0][2:])
+     return len(checked)
+ 
+ 
+@@ -127,7 +156,7 @@
+     for row in sorted(AUDIT['files'], key=lambda row:row['path']):
+         path = Path(row['path'])
+         assert path.is_absolute() and path.is_relative_to(BASE)
+-        assert Path(row['root']) in roots and path.is_relative_to(Path(row['root']))
++        assert Path(row['root']) in roots and path.parent == CORPUS_ROOT
+         value = file_stat(path)
+         reason = None
+         if not NAME.fullmatch(path.name) or 'engine' in path.name.lower():
+@@ -189,8 +218,9 @@
+         'command': ['/usr/bin/ditto', '--hfsCompression', '--noclone', 'SOURCE', 'FRESH_SAME_DIRECTORY_TEMP'],
+         'platform': platform.platform(), 'python': sys.version,
+         'journal': str(journal_path), 'diskFreeBeforeBytes': shutil.disk_usage(BASE).free,
+-        'acceptedAudit':str(AUDIT_PATH), 'acceptedAuditSha256':AUDIT_SHA256,
+-        'acceptedAuditIndexSha256':AUDIT_INDEX_SHA256, 'reportClosureWitnessesVerified':closure_count,
++        'currentPassedCorpusAudit':str(AUDIT_PATH), 'currentPassedCorpusAuditSha256':AUDIT_SHA256,
++        'currentPassedCorpusAuditIndexSha256':AUDIT_INDEX_SHA256, 'reportClosureWitnessesVerified':closure_count,
++        'dataClass':'exact newly passed ordinary Release diagnostic corpus; no compatibility promotion',
+         'headroomPolicy':'Before each copy: free >= 2*logicalBytes + 64MiB; not a hidden-allocation guarantee',
+         'compressedFiles': 0, 'eligibleFiles': 0, 'skippedEntries': 0,
+         'logicalBytes': 0, 'oldAllocatedBytes': 0, 'newAllocatedBytes': 0,

@@ -1,0 +1,14 @@
+package root:component;
+
+world root {
+  import wasi:random/random@0.2.10;
+
+  export run: func() -> string;
+}
+package wasi:random@0.2.10 {
+  interface random {
+    get-random-bytes: func(len: u64) -> list<u8>;
+
+    get-random-u64: func() -> u64;
+  }
+}

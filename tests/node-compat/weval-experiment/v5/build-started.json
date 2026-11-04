@@ -1,0 +1,45 @@
+{
+  "namespace": "/tmp/starling-node-compat/weval-experiment/custom-release-v5-1",
+  "mode": "build",
+  "needs": [
+    "NODE_COMPAT_WEVAL_BASE_ENGINE: verified current OFF Release engine including lazy builtin import fix",
+    "NODE_COMPAT_WEVAL_SOURCE_FREEZE: root containing its exact sourceManifest paths",
+    "NODE_COMPAT_NODE: exact v22.14.0",
+    "NODE_COMPAT_WEVAL_CACHE_ROOT: existing pinned SDK/cbindgen/CPM cache (optional)"
+  ],
+  "requestedCMakeOptions": {
+    "CMAKE_BUILD_TYPE": "Release",
+    "WEVAL": "ON",
+    "USE_WASM_OPT": "OFF",
+    "NODE_COMPAT_GC_STRESS": "OFF",
+    "NODE_COMPAT_OOM_TESTING": "OFF",
+    "ENABLE_JS_DEBUGGER": "OFF",
+    "ENABLE_BUILTIN_WPT_SUPPORT": "OFF",
+    "NODE_COMPAT_LOCKED_RUST": "ON",
+    "NODE_COMPAT_ENTROPY_MODE": "OFF",
+    "NODE_COMPAT_PATH": "ON",
+    "NODE_COMPAT_EVENTS": "ON"
+  },
+  "packagingOptions": {
+    "enableAot": true,
+    "aotMinStackSizeBytes": 67108864,
+    "env": {
+      "RAYON_NUM_THREADS": "4"
+    },
+    "disableFeatures": [
+      "stdio",
+      "random",
+      "clocks",
+      "http",
+      "fetch-event"
+    ],
+    "selectedInterfaces": []
+  },
+  "nativeSources": "Copy and hash-check the explicit accepted native engine manifest, with no production code edits",
+  "cache": "Generate a new matching generic IC cache from the same custom raw engine; copy and hash-bind it to that engine",
+  "status": "Frozen production v5 native inputs; no application AOT/performance claim",
+  "baseEngine": "/tmp/starling-node-compat/foundations-v5/native-freeze/off-path-events.engine.wasm",
+  "baseEngineSha256": "165b59a1fac4f3bab14547a28063908193c2b98767bd5fa835ca00b9b6d8adfc",
+  "baseReceiptSha256": "60eda31144c0b7005eab4d25c65758978061d08ba91f761f9c820f1db69f0ffb",
+  "baseSourceManifestSha256": "2632a34f0d9fd229c583c62119221134dbd05ad2b62c3ab40a5b37391f88e700"
+}

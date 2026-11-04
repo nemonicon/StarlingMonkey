@@ -1,0 +1,143 @@
+{
+  "records": [
+    {
+      "origin": "tests/node-compat/foundation-classic-streams/trace-integration-candidate-v1/source-model-fixture.mjs",
+      "path": "source-model-fixture.mjs",
+      "beforeSha256": "4fe16347e06bf955a96ce3de9f019c5ab9420d8d9a60b86645c8d9784236aced",
+      "afterSha256": "b6c526f042d47d4510f3271735527c6ed6cfee357c5d8c2409048715f5777ff2",
+      "edits": [
+        {
+          "old": "classic=true,ticks=true",
+          "new": "zlib=true,classic=true,ticks=true",
+          "count": 1,
+          "afterOffsets": [
+            1211
+          ]
+        },
+        {
+          "old": "[classic,ticks,web,events,stringDecoder,gc]",
+          "new": "[zlib,classic,ticks,web,events,stringDecoder,gc]",
+          "count": 1,
+          "afterOffsets": [
+            1339
+          ]
+        },
+        {
+          "old": "length,342",
+          "new": "length,350",
+          "count": 1,
+          "afterOffsets": [
+            2535
+          ]
+        },
+        {
+          "old": "length,36",
+          "new": "length,44",
+          "count": 1,
+          "afterOffsets": [
+            2587
+          ]
+        },
+        {
+          "old": "policy.privateTargetCpp.length,5",
+          "new": "policy.privateTargetCpp.length,6",
+          "count": 1,
+          "afterOffsets": [
+            2614
+          ]
+        },
+        {
+          "old": "allCpp.length,61",
+          "new": "allCpp.length,62",
+          "count": 1,
+          "afterOffsets": [
+            3146
+          ]
+        },
+        {
+          "old": "&&(web||path!=='builtins/node-compat/stream-web-kernel.cpp')",
+          "new": "&&(web||path!=='builtins/node-compat/stream-web-kernel.cpp')&&(zlib||path!=='builtins/node-compat/zlib/kernel.cpp')",
+          "count": 1,
+          "afterOffsets": [
+            3248
+          ]
+        },
+        {
+          "old": "if(classic&&policy.privateTargetCpp.includes(path))",
+          "new": "if(zlib&&path.startsWith('builtins/node-compat/'))flags.push('-DNODE_COMPAT_ZLIB=1');\n    if(classic&&policy.privateTargetCpp.includes(path))",
+          "count": 1,
+          "afterOffsets": [
+            3730
+          ]
+        },
+        {
+          "old": "privateCommands.length,web?5:4",
+          "new": "privateCommands.length,(web?5:4)+Number(zlib)",
+          "count": 1,
+          "afterOffsets": [
+            4646
+          ]
+        },
+        {
+          "old": "NODE_COMPAT_CLASSIC_STREAMS:on(classic),",
+          "new": "NODE_COMPAT_CLASSIC_STREAMS:on(classic),NODE_COMPAT_ZLIB:on(zlib),",
+          "count": 1,
+          "afterOffsets": [
+            5462
+          ]
+        },
+        {
+          "old": "addedSourcePaths:copy(policy.addedSourcePaths)",
+          "new": "addedSourcePaths:copy(policy.classicAddedSourcePaths)",
+          "count": 1,
+          "afterOffsets": [
+            6958
+          ]
+        },
+        {
+          "old": "classicStreamsEnabled:classic,internalTicksEnabled:ticks",
+          "new": "zlibEnabled:zlib,classicStreamsEnabled:classic,internalTicksEnabled:ticks",
+          "count": 1,
+          "afterOffsets": [
+            8570
+          ]
+        },
+        {
+          "old": "import assert from 'node:assert/strict';",
+          "new": "import assert from 'node:assert/strict';\nimport {CODEC_HEADERS} from './compile-input.mjs';",
+          "count": 1,
+          "afterOffsets": [
+            394
+          ]
+        },
+        {
+          "old": "  function command(path){",
+          "new": "  const distribution='/synthetic/NO-BUILD/distribution';\n  const selected={version:'sm-selected-moz-z-compile-input-v1',selectedDistribution:distribution,\n    archive:{path:distribution+'/libspidermonkey.a',sha256:'298b85501657189dc66139242abf5aeb4e981b8db7c37cc5a69d1151ec40aacc',bytes:538170426},\n    headers:CODEC_HEADERS.map(([name,sha256,bytes])=>({path:distribution+'/include/'+name,sha256,bytes}))};selected.requiredForcedInclude=copy(selected.headers[3]);\n  function command(path){",
+          "count": 1,
+          "afterOffsets": [
+            3417
+          ]
+        },
+        {
+          "old": "const flags=['-O3'",
+          "new": "const flags=['-include',selected.requiredForcedInclude.path,'-O3'",
+          "count": 1,
+          "afterOffsets": [
+            3911
+          ]
+        },
+        {
+          "old": "  // No validator import/call here:",
+          "new": "  metadata.zlibSelectedCodecInput=copy(selected);\n  metadata.zlibSourcePolicy=copy(policy.zlibSourcePolicy);\n  metadata.zlibPolicy={version:'sm-bounded-zlib-install-v1',enabled:zlib,policyFileSha256:pins.policySha256,helperSha256:pins.helperSha256,\n    moduleManifest:policy.zlibManifest,moduleManifestSha256:policy.zlibManifestSha256,requiredHostInterfaces:[],\n    actualKernelCompileCommands:zlib?[layout.get('builtins/node-compat/zlib/kernel.cpp')]:[],runtimeBackendProof:{verified:false,version:null,vernum:null}};\n  // No validator import/call here:",
+          "count": 1,
+          "afterOffsets": [
+            10777
+          ]
+        }
+      ],
+      "reverseExact": true
+    }
+  ],
+  "syntheticOnly": true,
+  "engineIdentifiersPresent": false
+}

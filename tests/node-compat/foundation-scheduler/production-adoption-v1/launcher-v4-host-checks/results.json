@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "state": "BENIGN_HOST_PYTHON_LIFECYCLE_CHECKS_PASSED",
+  "launcherSha256": "0f17f33ba578a96adfdbb5a40165175a5b9b4dae42459533a697ac45cbfc129a",
+  "checkSourceSha256": "e32c8e439695c1701ca5cc42fb2b02b8e65de7d686feb84096f30720e962c81f",
+  "checks": [
+    {
+      "name": "capacity-and-output-collision",
+      "passed": true,
+      "directoryCreatedOnInsufficientCapacity": false
+    },
+    {
+      "name": "leader-exits-grandchild-survives-term",
+      "passed": true,
+      "leaderPid": 51515,
+      "grandchildPid": 51516,
+      "rawChildExitCode": 0,
+      "status": 0,
+      "stoppedForDiskSpace": true,
+      "stopReason": "disk-space-stop",
+      "ownedGroupCleanup": {
+        "pgid": 51515,
+        "complete": true,
+        "events": [
+          {
+            "signal": 15,
+            "result": "sent",
+            "pgid": 51515
+          },
+          {
+            "signal": 9,
+            "result": "sent",
+            "pgid": 51515
+          }
+        ],
+        "errors": [],
+        "rawChildExitCode": 0
+      },
+      "launcherErrors": [],
+      "childStarted": true,
+      "lifecycleComplete": true
+    },
+    {
+      "name": "already-exited-group-esrch",
+      "passed": true,
+      "cleanup": {
+        "pgid": 51528,
+        "complete": true,
+        "events": [
+          {
+            "signal": 15,
+            "result": "already-gone",
+            "pgid": 51528
+          }
+        ],
+        "errors": [],
+        "rawChildExitCode": 0
+      }
+    },
+    {
+      "name": "monitor-error-and-simulated-enospc-finalization",
+      "passed": true,
+      "published": {
+        "rawChildExitCode": -15,
+        "status": -15,
+        "stoppedForDiskSpace": false,
+        "stopReason": "launcher-or-monitor-error",
+        "ownedGroupCleanup": {
+          "pgid": 51529,
+          "complete": true,
+          "events": [
+            {
+              "signal": 15,
+              "result": "sent",
+              "pgid": 51529
+            }
+          ],
+          "errors": [
+            {
+              "stage": "group-cleanup",
+              "type": "PermissionError",
+              "message": "[Errno 1] Operation not permitted"
+            },
+            {
+              "stage": "group-escalation",
+              "type": "PermissionError",
+              "message": "[Errno 1] Operation not permitted"
+            }
+          ],
+          "rawChildExitCode": -15
+        },
+        "launcherErrors": [
+          {
+            "stage": "launch-or-monitor",
+            "type": "RuntimeError",
+            "message": "EXPECTED_BENIGN_MONITOR_ERROR"
+          },
+          {
+            "stage": "group-cleanup",
+            "type": "PermissionError",
+            "message": "[Errno 1] Operation not permitted"
+          },
+          {
+            "stage": "group-escalation",
+            "type": "PermissionError",
+            "message": "[Errno 1] Operation not permitted"
+          }
+        ],
+        "childStarted": true,
+        "lifecycleComplete": true,
+        "resultFileWriteError": {
+          "stage": "result-file-write",
+          "type": "OSError",
+          "message": "[Errno 28] EXPECTED_SIMULATED_RESULT_WRITE_ENOSPC"
+        }
+      }
+    }
+  ],
+  "ownNewSessionChildrenOnly": true,
+  "compilerOrNativeProducerOrGuestOrNetworkExecuted": false,
+  "diskFilled": false,
+  "enospcSimulatedOnly": true,
+  "notRuntimeCompatibilityOrBuildAcceptance": true
+}

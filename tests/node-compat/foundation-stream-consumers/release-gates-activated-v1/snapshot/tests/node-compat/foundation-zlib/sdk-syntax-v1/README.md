@@ -1,0 +1,1 @@
+Pinned Release SDK syntax/type checks pass for the proposed zlib kernel and registrar. No object, engine, link, runtime backend, guest, GC or performance proof. Conditional source and parents remain unchanged.

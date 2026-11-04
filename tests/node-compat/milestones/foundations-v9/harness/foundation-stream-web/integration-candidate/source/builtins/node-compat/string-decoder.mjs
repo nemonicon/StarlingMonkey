@@ -1,0 +1,180 @@
+// Bounded Node v22.14.0 UTF-8/hex StringDecoder facade; opt-in m0.4.
+// UTF-8 framing adapted from Node v22.14.0 src/string_decoder.cc and public
+// shape from lib/string_decoder.js; Copyright Node contributors, MIT.
+// See LICENSE.string-decoder for the Node license notice.
+// Bulk UTF-8/hex goes through captured Buffer methods, using the existing native
+// kernel/web decoder when supplied the profile Buffer. No decoder options from
+// application code are forwarded across the native boundary.
+const INPUT_LIMIT = 16 * 1024 * 1024;
+export function createStringDecoderModule(Buffer) {
+  const minimum = Math.min;
+  const ErrorCtor = Error, TypeErrorCtor = TypeError, RangeErrorCtor = RangeError;
+  const bufferAlloc = Buffer.alloc.bind(Buffer), bufferFrom = Buffer.from.bind(Buffer);
+  const bufferString = Function.prototype.call.bind(Buffer.prototype.toString);
+  const bufferSubarray = Function.prototype.call.bind(Buffer.prototype.subarray);
+  const U8 = Uint8Array, isView = ArrayBuffer.isView;
+  const typed = Object.getPrototypeOf(U8.prototype);
+  const get = (prototype, name) => Function.prototype.call.bind(Object.getOwnPropertyDescriptor(prototype, name).get);
+  const typedBuffer = get(typed, 'buffer'), typedOffset = get(typed, 'byteOffset'), typedLength = get(typed, 'byteLength');
+  const dataBuffer = get(DataView.prototype, 'buffer'), dataOffset = get(DataView.prototype, 'byteOffset'), dataLength = get(DataView.prototype, 'byteLength');
+  const arrayLength = get(ArrayBuffer.prototype, 'byteLength');
+  const resizableDescriptor = Object.getOwnPropertyDescriptor(ArrayBuffer.prototype, 'resizable');
+  const resizable = resizableDescriptor && Function.prototype.call.bind(resizableDescriptor.get);
+  const lower = Function.prototype.call.bind(String.prototype.toLowerCase);
+  const states = new WeakMap(), stateGet = states.get.bind(states), stateSet = states.set.bind(states);
+  const kNativeDecoder = Symbol('kNativeDecoder');
+  function fail(Ctor, code, message) { const error = new Ctor(message); if (code) error.code = code; throw error; }
+  function unsupported(operation) {
+    const error = new ErrorCtor('node:string_decoder.' + operation + ' is unavailable in sm-node-22.14.0-m0.4');
+    error.code = 'ERR_SM_NODE_UNSUPPORTED'; error.module = 'node:string_decoder'; error.operation = operation;
+    error.profile = 'sm-node-22.14.0-m0.4';
+    throw error;
+  }
+  function normalize(encoding) {
+    if (encoding == null || encoding === 'utf8' || encoding === 'utf-8') return 'utf8';
+    let normalized;
+    // Node checks the original .length before coercing through its captured
+    // String#toLowerCase. Preserve that observable order for boxed/custom labels.
+    switch (encoding.length) {
+      case 3: if (encoding === 'hex' || encoding === 'HEX' || lower(encoding) === 'hex') normalized = 'hex'; break;
+      case 4: {
+        if (encoding === 'UTF8') return 'utf8';
+        if (encoding === 'ucs2' || encoding === 'UCS2') normalized = 'utf16le';
+        else { const value = lower(encoding); if (value === 'utf8') return 'utf8'; if (value === 'ucs2') normalized = 'utf16le'; }
+        break;
+      }
+      case 5: {
+        if (encoding === 'UTF-8') return 'utf8';
+        if (encoding === 'ascii' || encoding === 'ASCII') normalized = 'ascii';
+        else if (encoding === 'ucs-2' || encoding === 'UCS-2') normalized = 'utf16le';
+        else { const value = lower(encoding); if (value === 'utf-8') return 'utf8'; if (value === 'ascii') normalized = 'ascii'; if (value === 'ucs-2') normalized = 'utf16le'; }
+        break;
+      }
+      case 6: {
+        const value = lower(encoding);
+        if (value === 'base64') normalized = value;
+        if (value === 'latin1' || value === 'binary') normalized = 'latin1';
+        break;
+      }
+      case 7: if (encoding === 'utf16le' || encoding === 'UTF16LE' || lower(encoding) === 'utf16le') normalized = 'utf16le'; break;
+      case 8: if (encoding === 'utf-16le' || encoding === 'UTF-16LE' || lower(encoding) === 'utf-16le') normalized = 'utf16le'; break;
+      case 9: if (encoding === 'base64url' || encoding === 'BASE64URL' || lower(encoding) === 'base64url') normalized = 'base64url'; break;
+      default: if (encoding === '') return 'utf8';
+    }
+    if (normalized === 'hex') return normalized;
+    if (normalized) unsupported('encoding ' + normalized);
+    fail(TypeErrorCtor, 'ERR_UNKNOWN_ENCODING', 'Unknown encoding');
+  }
+  function state(receiver, code) {
+    if (receiver === null || receiver === undefined) fail(TypeErrorCtor, undefined, 'Invalid StringDecoder receiver');
+    const value = stateGet(receiver);
+    if (!value) fail(TypeErrorCtor, code, 'Invalid StringDecoder receiver');
+    const b = value.bytes;
+    // Deliberate corruption of the exposed legacy backing buffer is excluded;
+    // reject it rather than forwarding invalid native decoder-state lengths.
+    if (typedLength(b) !== 7 || b[4] > 4 || b[5] > 4 || b[4] + b[5] > 4) {
+      fail(TypeErrorCtor, 'ERR_SM_NODE_DECODER_STATE', 'Invalid legacy decoder storage');
+    }
+    return value;
+  }
+  function raw(input) {
+    let buffer, offset, length;
+    try {
+      buffer = typedBuffer(input); offset = typedOffset(input); length = typedLength(input);
+    } catch {
+      try { buffer = dataBuffer(input); offset = dataOffset(input); length = dataLength(input); }
+      catch { unsupported('detached or unsupported view'); }
+    }
+    try { arrayLength(buffer); } catch { unsupported('shared backing store'); }
+    if (resizable && resizable(buffer)) unsupported('resizable backing store');
+    if (length > INPUT_LIMIT) fail(RangeErrorCtor, 'ERR_SM_NODE_LIMIT', 'StringDecoder input exceeds profile limit');
+    try { return new U8(buffer, offset, length); } catch { unsupported('detached backing store'); }
+  }
+  function decode(bytes, start, length, encoding) {
+    if (!length) return '';
+    // A branded view shares bytes only for this synchronous call; no input
+    // buffer is retained. Only up to three pending bytes enter owned state.
+    const view = bufferFrom(typedBuffer(bytes), typedOffset(bytes) + start, length);
+    return bufferString(view, encoding);
+  }
+  function utf8(value, input) {
+    const b = value.bytes;
+    let start = 0, remaining = typedLength(input), prepend = '';
+    if (b[4] > 0) {
+      for (let i = 0; i < remaining && i < b[4]; i++) {
+        if ((input[i] & 0xc0) !== 0x80) {
+          b[4] = 0;
+          for (let j = 0; j < i; j++) b[b[5] + j] = input[j];
+          b[5] += i; start += i; remaining -= i;
+          break;
+        }
+      }
+      const found = minimum(remaining, b[4]);
+      for (let i = 0; i < found; i++) b[b[5] + i] = input[start + i];
+      start += found; remaining -= found; b[4] -= found; b[5] += found;
+      if (b[4] === 0) { prepend = decode(b, 0, b[5], 'utf8'); b[5] = 0; }
+    }
+    if (!remaining) return prepend;
+    let buffered = 0, missing = 0;
+    if (input[start + remaining - 1] & 0x80) {
+      for (let i = start + remaining - 1; ; i--) {
+        buffered++;
+        if ((input[i] & 0xc0) === 0x80) {
+          if (buffered >= 4 || i === start) { buffered = 0; break; }
+        } else {
+          if ((input[i] & 0xe0) === 0xc0) missing = 2;
+          else if ((input[i] & 0xf0) === 0xe0) missing = 3;
+          else if ((input[i] & 0xf8) === 0xf0) missing = 4;
+          else { buffered = 0; break; }
+          if (buffered >= missing) { missing = 0; buffered = 0; }
+          missing -= buffered;
+          break;
+        }
+      }
+    }
+    if (buffered) {
+      remaining -= buffered;
+      for (let i = 0; i < buffered; i++) b[i] = input[start + remaining + i];
+    }
+    b[4] = missing; b[5] = buffered;
+    return prepend + decode(input, start, remaining, 'utf8');
+  }
+  function StringDecoder(encoding) {
+    const normalized = normalize(encoding);
+    if ((typeof this !== 'object' && typeof this !== 'function') || this === null) {
+      fail(TypeErrorCtor, undefined, 'StringDecoder requires an object receiver');
+    }
+    this.encoding = normalized;
+    const bytes = bufferAlloc(7);
+    bytes[6] = normalized === 'utf8' ? 1 : 5; // Exact pinned Node encoding enum.
+    this[kNativeDecoder] = bytes;
+    stateSet(this, { bytes, encoding: normalized });
+  }
+  StringDecoder.prototype.write = function write(input) {
+    if (typeof input === 'string') return input;
+    if (!isView(input)) fail(TypeErrorCtor, 'ERR_INVALID_ARG_TYPE', 'buf must be a Buffer, TypedArray or DataView');
+    const value = state(this, 'ERR_INVALID_THIS'), bytes = raw(input);
+    return value.encoding === 'hex' ? decode(bytes, 0, typedLength(bytes), 'hex') : utf8(value, bytes);
+  };
+  StringDecoder.prototype.end = function end(input) {
+    let output = input === undefined ? '' : this.write(input);
+    const value = state(this), b = value.bytes;
+    if (b[5] > 0) {
+      output += decode(b, 0, b[5], value.encoding);
+      b[4] = 0; b[5] = 0;
+    }
+    return output;
+  };
+  StringDecoder.prototype.text = function text(input, offset) {
+    const b = state(this).bytes;
+    b[4] = 0; b[5] = 0;
+    if (isView(input)) raw(input); // Reject over-limit views before slice copies.
+    return this.write(input.slice(offset)); // Node's observable legacy ordering.
+  };
+  Object.defineProperties(StringDecoder.prototype, {
+    lastChar: { enumerable: true, configurable: true, get() { return bufferSubarray(state(this).bytes, 0, 4); } },
+    lastNeed: { enumerable: true, configurable: true, get() { return state(this).bytes[4]; } },
+    lastTotal: { enumerable: true, configurable: true, get() { const b = state(this).bytes; return b[4] + b[5]; } },
+  });
+  return { StringDecoder, default: { StringDecoder } };
+}

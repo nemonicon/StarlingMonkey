@@ -1,0 +1,61 @@
+--- a/loading.mjs
++++ b/loading.mjs
+@@ -2,10 +2,10 @@
+ // until a future admitted worker explicitly calls loadReviewedSession.
+ import {dirname,join} from 'node:path';
+ import {pathToFileURL} from 'node:url';
+-import {descriptor,regular} from './authority.mjs';
+-import {need} from './transport.mjs';
+-import {NAMES,publicJSExports,parsePublicDts,parsePublicWit,checkTranspileMetadata} from './glue-policy.mjs';
+-import {PARSER} from './parser-tuple.mjs';
++import {descriptor,regular} from '../cost-jco-correctness-candidate-v2/authority.mjs';
++import {need} from '../cost-jco-correctness-candidate-v2/transport.mjs';
++import {NAMES,publicJSExports,parsePublicDts,parsePublicWit,checkTranspileMetadata} from '../cost-jco-correctness-candidate-v2/glue-policy.mjs';
++import {PARSER} from '../cost-jco-correctness-candidate-v2/parser-tuple.mjs';
+ export {PARSER};
+ export const ABI_NAMES=Object.freeze([...NAMES].sort());
+ function walk(v,visit){if(!v||typeof v!=='object')return;if(Array.isArray(v)){for(const item of v)walk(item,visit);return;}visit(v);for(const[k,item]of Object.entries(v))if(!['loc','range','parent'].includes(k))walk(item,visit);}
+@@ -28,15 +28,15 @@
+  return true;
+ }
+ export function scalarArguments(name,args){
+- need(ABI_NAMES.includes(name)&&Array.isArray(args),'Only seven ordinary public function names');const arity={identity:0,setup:1,observe:1,batch:2,checkpoint:0,stage:1,validate:1};need(args.length===arity[name],'Exact scalar arity');
++ need(['identity','setup','batch','checkpoint'].includes(name)&&Array.isArray(args),'Control-only session exposes identity/setup/control-batch/checkpoint; no observe/stage/validate');const arity={identity:0,setup:1,observe:1,batch:2,checkpoint:0,stage:1,validate:1};need(args.length===arity[name],'Exact scalar arity');
+  if(name==='stage'||name==='validate')need(typeof args[0]==='string'&&args[0].length<=2097152,'Whole bounded string argument; never clip');
+- else{for(const value of args)need(Number.isSafeInteger(value)&&value>=0&&value<=0xffffffff&&!Object.is(value,-0),'Exact u32 number argument; no coercion');if(args.length)need(args[0]<30,'This correctness cut has primary IDs0..29 only');if(name==='batch')need(args[1]===1,'Only untimed primary batchN1; controls/calibration/timing separate');}
++ else{for(const value of args)need(Number.isSafeInteger(value)&&value>=0&&value<=0xffffffff&&!Object.is(value,-0),'Exact u32 number argument; no coercion');if(name==='setup')need(args[0]<30,'Exactly30 setup primary IDs');if(name==='batch')need(args[0]>=30&&args[0]<120&&args[1]===1,'Only three control ranges30..119 atN1; no codec/calibration/timing');}
+ }
+ export function validatePackageBytes(bytes){need(new TextDecoder('utf-8',{fatal:true}).decode(bytes)==='{\"type\":\"module\"}\n','Exact cf31 source-written same-directory ESM package classification');return true;}
+ export function captureArtifactRows(artifact){
+  need(artifact?.parentAuditedActualComponent===true,'Parent actual-artifact admission required');return Object.freeze(Object.fromEntries(['component','glue','core','dts','wit','transpileMetadata','packageJson'].map(name=>[name,descriptor(artifact[name])])));
+ }
+-export async function loadReviewedSession(artifact){
++export async function loadControlSession(artifact){
+  // Capture descriptor primitives BEFORE the first await. Caller mutation cannot
+  // redirect this loader or its recheck. Actual parent proof admission is required.
+  const rows=captureArtifactRows(artifact);
+--- a/collector.mjs
++++ b/collector.mjs
+@@ -1,6 +1,6 @@
+ // Ordinary JSON/byte collectors only. No guest, provider or codec imports.
+-import {need,exactKeys,fullBytes,equalBytes,exact,hash} from './transport.mjs';
+-import {consumeFNV1a} from './fixtures.mjs';
++import {need,exactKeys,fullBytes,equalBytes,exact,hash} from '../cost-jco-correctness-candidate-v2/transport.mjs';
++import {consumeFNV1a} from '../cost-jco-correctness-candidate-v2/fixtures.mjs';
+ export const NAMES=Object.freeze(['identity','setup','observe','batch','checkpoint','stage','validate']);
+ const IDLE=Object.freeze({activeCaseId:null,inputSource:null,stagedValidation:null,prepared:false,retainedUntimedOutput:false});
+ const emptyCounts=()=>({publicFunctionEntries:0,perExportEntries:Object.fromEntries(NAMES.map(name=>[name,0])),codecCalls:0,controlOperations:0});
+@@ -65,6 +65,13 @@
+   }else need(own.previousComparable===false&&own.previousFullBytesUnchanged===null&&own.mutationProbe?.performed===false,'first observation makes no prior claim');
+   await this.counts(value.counters,wanted,name);this.#counts=wanted;this.#prior={bytes:new Uint8Array(bytes)};return bytes;
+  }
++ async control(value,index,name){
++  need(Number.isInteger(index)&&index>=30&&index<120,'exact three control ID ranges');const primary=index%30,row=this.row(primary);need(this.#active?.row.index===primary,'control requires same exact setup primary');
++  const control=index<60?'consumeInput':index<90?'copyInputAndConsume':'harnessNoCodec',input=this.#active.bytes,wanted=step(this.#counts,'batch');wanted.controlOperations++;
++  need(value.schemaVersion===1&&value.kind==='codec-cost-control-v1'&&value.caseId===index&&value.primaryCaseId===primary&&value.control===control&&value.operations===1&&value.logicalUncompressedBytes===row.logicalUncompressedBytesPerOperation,'exact actual control identity/N1/logical domain');
++  const expected=control==='harnessNoCodec'?{bytesConsumed:0,declaredInputBytes:input.length,tag:2166136261,copies:0,codecCalls:0}:{bytesConsumed:input.length,fnv:consumeFNV1a(input),copies:control==='copyInputAndConsume'?1:0,codecCalls:0};
++  await exact(this.#write,name+'-result',value.result,expected);this.#prior=null;await exact(this.#write,name+'-state',value.state,this.state());await this.counts(value.counters,wanted,name);this.#counts=wanted;
++ }
+  async batch(value,index,name,expectedOutput){
+   const row=this.row(index);need(this.#active?.row.index===index,'active untimed N1 batch');const wanted=step(this.#counts,'batch',1),fnv=consumeFNV1a(expectedOutput);
+   need(value.schemaVersion===1&&value.kind==='codec-cost-batch-v1'&&value.caseId===index&&value.caseName===row.id&&value.provider===(this.arm==='native-on'?'native':'fflate')&&value.operations===1,'untimed primary batchN1 only; never controls');

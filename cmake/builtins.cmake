@@ -126,3 +126,126 @@ add_builtin(
         OpenSSL::Crypto
     INCLUDE_DIRS
         runtime)
+
+# This bounded Node profile is deliberately opt-in. It adds no host imports;
+# the facade reuses the existing native TextEncoder/TextDecoder implementation.
+option(ENABLE_BUILTIN_NODE_COMPAT "Enable bounded Node v22.14.0 Buffer and child_process profile" OFF)
+if(ENABLE_BUILTIN_NODE_COMPAT AND NOT TARGET builtin_web_text_codec AND NOT CMAKE_SCRIPT_MODE_FILE)
+    message(FATAL_ERROR "ENABLE_BUILTIN_NODE_COMPAT requires ENABLE_BUILTIN_WEB_TEXT_CODEC=ON")
+endif()
+add_builtin(
+    builtins::node_compat
+    DISABLED_BY_DEFAULT
+    SRC
+        builtins/node-compat/buffer.cpp
+        builtins/node-compat/register.cpp
+        builtins/node-compat/entropy-policy.cpp
+        builtins/node-compat/entropy-bridge.cpp
+    DEPENDENCIES
+        builtin_web_text_codec)
+
+if(TARGET builtin_node_compat)
+    option(NODE_COMPAT_PATH "Enable optional pure node:path/posix/win32 modules" OFF)
+    if(NODE_COMPAT_PATH)
+        target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_PATH=1)
+    endif()
+    option(NODE_COMPAT_EVENTS "Enable optional bounded synchronous node:events module" OFF)
+    if(NODE_COMPAT_EVENTS)
+        foreach(NODE_COMPAT_EVENT_PREREQUISITE builtin_web_event builtin_web_abort builtin_web_queue_microtask)
+            if(NOT TARGET ${NODE_COMPAT_EVENT_PREREQUISITE})
+                message(FATAL_ERROR "NODE_COMPAT_EVENTS m0.10 requires ${NODE_COMPAT_EVENT_PREREQUISITE}")
+            endif()
+        endforeach()
+        target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_EVENTS=1)
+        # EventListener layout must agree in every translation unit. This is a
+        # derived guest feature, not an independently selectable cache option.
+        target_compile_definitions(extension_api INTERFACE NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER=1)
+        add_dependencies(builtin_node_compat builtin_web_event builtin_web_abort builtin_web_queue_microtask)
+        target_link_libraries(builtin_node_compat PRIVATE builtin_web_event builtin_web_abort builtin_web_queue_microtask)
+    endif()
+    option(NODE_COMPAT_STRING_DECODER "Enable optional bounded node:string_decoder module" OFF)
+    option(NODE_COMPAT_ASSERT "Enable optional bounded node:assert/strict modules" OFF)
+    option(NODE_COMPAT_QUERYSTRING "Enable optional bounded node:querystring module" OFF)
+    option(NODE_COMPAT_UTIL "Enable optional bounded node:util/types and sys modules" OFF)
+    foreach(NODE_COMPAT_FOUNDATION STRING_DECODER ASSERT QUERYSTRING UTIL)
+        if(NODE_COMPAT_${NODE_COMPAT_FOUNDATION})
+            target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_${NODE_COMPAT_FOUNDATION}=1)
+        endif()
+    endforeach()
+    # A selected compatibility profile must not snapshot an initializer whose
+    # queued work rejected without a handler. Propagate through the existing
+    # runtime interface target, including ComponentizeJS embedding builds.
+    target_compile_definitions(extension_api INTERFACE NODE_COMPAT_STRICT_INITIALIZATION=1)
+    option(NODE_COMPAT_OOM_TESTING "Enable test-only SpiderMonkey debug allocator faults in Buffer kernels" OFF)
+    if(NODE_COMPAT_OOM_TESTING)
+        target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_OOM_TESTING=1)
+    endif()
+    option(NODE_COMPAT_GC_STRESS "Collect between native Buffer kernel allocation boundaries (tests only)" OFF)
+    if(NODE_COMPAT_GC_STRESS)
+        target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_GC_STRESS=1)
+    endif()
+endif()
+
+if(NODE_COMPAT_PATH AND NOT TARGET builtin_node_compat AND NOT CMAKE_SCRIPT_MODE_FILE)
+    message(FATAL_ERROR "NODE_COMPAT_PATH requires ENABLE_BUILTIN_NODE_COMPAT=ON")
+endif()
+
+if(NODE_COMPAT_EVENTS AND NOT TARGET builtin_node_compat AND NOT CMAKE_SCRIPT_MODE_FILE)
+    message(FATAL_ERROR "NODE_COMPAT_EVENTS requires ENABLE_BUILTIN_NODE_COMPAT=ON")
+endif()
+
+foreach(NODE_COMPAT_FOUNDATION STRING_DECODER ASSERT QUERYSTRING UTIL)
+    if(NODE_COMPAT_${NODE_COMPAT_FOUNDATION} AND NOT TARGET builtin_node_compat AND NOT CMAKE_SCRIPT_MODE_FILE)
+        message(FATAL_ERROR "NODE_COMPAT_${NODE_COMPAT_FOUNDATION} requires ENABLE_BUILTIN_NODE_COMPAT=ON")
+    endif()
+endforeach()
+
+# Keep the entire stream/web factory and private native capture optional. The
+# existing web builtins must be explicitly available; add_dependencies is not
+# initializer topology. Their earlier add_builtin declarations install first.
+option(NODE_COMPAT_STREAM_WEB "Enable optional bounded node:stream/web module" OFF)
+if(NODE_COMPAT_STREAM_WEB AND NOT CMAKE_SCRIPT_MODE_FILE)
+    if(NOT TARGET builtin_node_compat)
+        message(FATAL_ERROR "NODE_COMPAT_STREAM_WEB requires ENABLE_BUILTIN_NODE_COMPAT=ON")
+    endif()
+    if(NOT TARGET builtin_web_streams)
+        message(FATAL_ERROR "NODE_COMPAT_STREAM_WEB requires ENABLE_BUILTIN_WEB_STREAMS=ON")
+    endif()
+    if(NOT TARGET builtin_web_text_codec)
+        message(FATAL_ERROR "NODE_COMPAT_STREAM_WEB requires ENABLE_BUILTIN_WEB_TEXT_CODEC=ON")
+    endif()
+    target_sources(builtin_node_compat PRIVATE builtins/node-compat/stream-web-kernel.cpp)
+    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_STREAM_WEB=1)
+    target_include_directories(builtin_node_compat PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+    add_dependencies(builtin_node_compat builtin_web_streams builtin_web_text_codec)
+    target_link_libraries(builtin_node_compat PRIVATE builtin_web_streams builtin_web_text_codec)
+endif()
+
+# Private scheduler proposal: no public process namespace or host capability.
+option(NODE_COMPAT_INTERNAL_TICKS "Enable private bounded guest nextTick queue" OFF)
+if(NODE_COMPAT_INTERNAL_TICKS AND NOT CMAKE_SCRIPT_MODE_FILE)
+    if(NOT TARGET builtin_node_compat)
+        message(FATAL_ERROR "NODE_COMPAT_INTERNAL_TICKS requires ENABLE_BUILTIN_NODE_COMPAT=ON")
+    endif()
+    target_compile_definitions(extension_api INTERFACE NODE_COMPAT_INTERNAL_TICKS=1)
+endif()
+
+# UNAPPLIED classic source candidate: pure JS state machines over existing guest
+# byte/event/decoder primitives and the private FIFO. No external host service.
+option(NODE_COMPAT_CLASSIC_STREAMS "Enable optional bounded node:stream classic core" OFF)
+if(NODE_COMPAT_CLASSIC_STREAMS AND NOT CMAKE_SCRIPT_MODE_FILE)
+    if(NOT TARGET builtin_node_compat)
+        message(FATAL_ERROR "NODE_COMPAT_CLASSIC_STREAMS requires ENABLE_BUILTIN_NODE_COMPAT=ON")
+    endif()
+    foreach(CLASSIC_PREREQUISITE EVENTS STRING_DECODER INTERNAL_TICKS)
+        if(NOT NODE_COMPAT_${CLASSIC_PREREQUISITE})
+            message(FATAL_ERROR "NODE_COMPAT_CLASSIC_STREAMS requires NODE_COMPAT_${CLASSIC_PREREQUISITE}=ON")
+        endif()
+    endforeach()
+    if(NOT TARGET builtin_web_abort)
+        message(FATAL_ERROR "NODE_COMPAT_CLASSIC_STREAMS requires existing native web AbortSignal/AbortController")
+    endif()
+    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_CLASSIC_STREAMS=1)
+    # The Events prerequisite already links/initializes web Event/Abort. This
+    # feature does not select web streams, clocks, stdio or new WASI imports.
+endif()

@@ -1,0 +1,88 @@
+--- a/release/runners/events.mjs
++++ b/release/runners/events.mjs
+@@ -17,7 +17,7 @@
+ const metadataBytes = await readFile(engine + '.build.json'), metadata = JSON.parse(metadataBytes);
+ const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+ assert.equal(hash(await readFile(engine)), metadata.engineSha256); assert.equal(metadata.eventsEnabled, true);
+-assert.equal(metadata.observedCMakeOptions.NODE_COMPAT_EVENTS, 'ON'); assert.equal(metadata.protectedAbortListenerEnabled, true); assert.equal(metadata.strictEventExceptionPolicy?.version, 'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1'); assert.equal(metadata.entropyPolicy, 'off');
++assert.equal(metadata.observedCMakeOptions.NODE_COMPAT_EVENTS, 'ON'); assert.equal(metadata.protectedAbortListenerEnabled, true); assert.equal(metadata.strictEventExceptionPolicy?.version, 'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1-classic-streams-source-v1'); assert.equal(metadata.entropyPolicy, 'off');
+ assert.equal(metadata.debuggerEnabled, false); assert.equal(metadata.gcStress, false);
+ for (const input of metadata.sourceManifest) assert.equal(hash(await readFile(join(sourceRoot, input.path))), input.sha256, input.path);
+ const builtinManifests = selectedManifestsForEngine(metadata, { sourceRoot });
+--- a/common/runners/allocator-gc.mjs
++++ b/common/runners/allocator-gc.mjs
+@@ -26,7 +26,7 @@
+ assert.equal(metadata.observedCMakeOptions.CMAKE_BUILD_TYPE,'Release');
+ assert.equal(metadata.observedCMakeOptions.NODE_COMPAT_GC_STRESS,'ON');
+ assert.equal(metadata.gcStress,true);assert.equal(metadata.oomTesting,false);
+-assert.equal(metadata.strictEventExceptionPolicy.version,'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1');
++assert.equal(metadata.strictEventExceptionPolicy.version,'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1-classic-streams-source-v1');
+ assert.equal(metadata.strictEventExceptionPolicy.embeddingBoundaryPatchSha256,
+   '84a91c1f74dbdcf653ef7ced5fa2876abffc32d5da591a1ca2df4a4908406ad2');
+ for(const item of metadata.sourceManifest)assert.equal(hash(await readFile(join(sourceRoot,item.path))),item.sha256,item.path);
+@@ -36,8 +36,9 @@
+ const admitted=await verifyProductionTicks({gcStress:true});
+ assert.equal(admitted.report.engineSha256,metadata.engineSha256);
+ assert.equal(admitted.sourceRoot,sourceRoot);
+-const pinsPath=admitted.pinsPath,pinBytes=admitted.pinBytes,pins=admitted.pin;
+-assert.equal(pins.state,'reviewed-real-production-freeze');
++const pins=admitted.pin;
++assert.equal(pins.state,'reviewed-real-classic-production-freeze');
++assert.equal(hash(await readFile(pins.freezeReceiptPath)),pins.freezeReceiptSha256);
+ assert.equal(metadata.engineSha256,pins.engineSha256);
+ assert.equal(hash(await readFile(engine+'.build.json')),pins.receiptSha256);
+ assert.equal(metadata.engineBytes,pins.engineBytes);
+@@ -45,7 +46,7 @@
+ assert.deepEqual(core.sourceHashes,pins.coreSources);
+ assert.equal(metadata.cmakeCacheSha256,pins.cmakeCacheSha256);
+ assert.equal(metadata.compileCommandsSha256,pins.compileCommandsSha256);
+-const commandsPath=admitted.report.commandsPath;
++const commandsPath=pins.commandsPath;
+ if(process.env.NODE_COMPAT_GC_COMPILE_COMMANDS)assert.equal(resolve(process.env.NODE_COMPAT_GC_COMPILE_COMMANDS),commandsPath,'Use frozen GC compile commands');
+ const commandBytes=await readFile(commandsPath);assert.equal(hash(commandBytes),metadata.compileCommandsSha256);
+ const command=JSON.parse(commandBytes).find(item=>item.file.endsWith('/builtins/node-compat/buffer.cpp'));
+@@ -92,9 +93,10 @@
+ const host=spawnSync(process.env.NODE_COMPAT_WASMTIME,['run','--invoke','run()',componentPath],{encoding:'utf8',timeout:120000,maxBuffer:2*1024*1024});
+ assert.equal(host.status,0,host.stderr);const observed=JSON.parse(decodeCliString(host.stdout.trim()));assert.deepEqual(observed,expected(1));
+ for(const item of metadata.sourceManifest)assert.equal(hash(await readFile(join(sourceRoot,item.path))),item.sha256,item.path);
++await admitted.recheck();
+ const report={schema:1,state:'installed-m0.11-ordinary-release-moving-gc-pass',engineSha256:metadata.engineSha256,
+   engineReceiptSha256:hash(await readFile(engine+'.build.json')),sourceFilesVerified:metadata.sourceManifest.length,
+-  sourceRoot,coreExpectations:core,productionTickAdmission:admitted.report,fixedGCAdmission:{path:pinsPath,sha256:hash(pinBytes),pins},runnerSha256:hash(await readFile(fileURLToPath(import.meta.url))),
++  sourceRoot,coreExpectations:core,productionTickAdmission:admitted.report,fixedGCAdmission:{variant:admitted.report.variant,pinState:pins.state,pins,freezeReceiptPath:pins.freezeReceiptPath,freezeReceiptSha256:pins.freezeReceiptSha256,scope:'Actual classic freeze pin; delegated classicPreflight/recheck owns the authority bytes. No old pin-schema projection.'},runnerSha256:hash(await readFile(fileURLToPath(import.meta.url))),
+   sourceSha256:hash(source),componentSha256:hash(component),componentBytes:component.length,interfaceAudit,
+   emittedWit:await componentWit(component),componentizerProvenance:selected.provenance,compileCommand:command.command,
+   calls,wasmtime:{observed,stderr:host.stderr},
+--- a/off/runners/sync.mjs
++++ b/off/runners/sync.mjs
+@@ -14,7 +14,7 @@
+ assert.equal(h.metadata.strictInitialization,true);assert.equal(h.metadata.oomTesting,false);
+ const patchSha256=hash(await readFile(join(here,'strict-event-v3.patch')));
+ assert.equal(h.metadata.strictEventExceptionPolicy?.patchSha256,patchSha256);
+-assert.equal(h.metadata.strictEventExceptionPolicy?.version,'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1');
++assert.equal(h.metadata.strictEventExceptionPolicy?.version,'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1-classic-streams-source-v1');
+ const prefix="import {spawn} from 'node:child_process';\n";
+ const vectors=[
+  ['direct','spawn();',true,/child_process\.spawn/],
+--- a/off/runners/runtime.mjs
++++ b/off/runners/runtime.mjs
+@@ -10,7 +10,7 @@
+ const productionPreflight=(await verifyProductionTicks({gcStress:false})).report;
+ const here=dirname(fileURLToPath(new URL('../../../../foundation-add-abort/run-production-v11-runtime.mjs',import.meta.url)));
+ const h=await nativeHarness({kind:'production-private-ticks-runtime',here,enabledField:'eventsEnabled',option:'NODE_COMPAT_EVENTS',outputVariable:'NODE_COMPAT_STRICT_EVENT_OUTPUT'});
+-assert.equal(h.metadata.strictEventExceptionPolicy?.version,'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1');
++assert.equal(h.metadata.strictEventExceptionPolicy?.version,'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1-classic-streams-source-v1');
+ assert.equal(h.metadata.strictEventExceptionPolicy.deployedUnhandledRejections,'fatal-after-drained-jobs-before-result-marshalling');
+ assert.equal(h.metadata.strictEventExceptionPolicy?.embeddingBoundaryPatchSha256,hash(await readFile(join(here,'componentize-strict-event-boundary-v2.patch'))));
+ const previous=JSON.parse(await readFile(join(here,'runtime-async-observation-results.json'))),fatal=[];
+--- a/off/runners/callbacks.mjs
++++ b/off/runners/callbacks.mjs
+@@ -9,7 +9,7 @@
+ const productionPreflight=(await verifyProductionTicks({gcStress:false})).report;
+ const here=dirname(fileURLToPath(new URL('../../../../foundation-add-abort/run-production-v11-callbacks.mjs',import.meta.url)));
+ const h=await nativeHarness({kind:'production-private-ticks-callbacks',here,enabledField:'eventsEnabled',option:'NODE_COMPAT_EVENTS',outputVariable:'NODE_COMPAT_STRICT_EVENT_OUTPUT'});
+-assert.equal(h.metadata.strictEventExceptionPolicy?.version,'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1');assert.equal(h.metadata.strictEventExceptionPolicy.patchSha256,hash(await readFile(join(here,'strict-event-v3.patch'))));
++assert.equal(h.metadata.strictEventExceptionPolicy?.version,'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1-classic-streams-source-v1');assert.equal(h.metadata.strictEventExceptionPolicy.patchSha256,hash(await readFile(join(here,'strict-event-v3.patch'))));
+ const initialization=[];
+ for(const[name,body,marker]of[
+  ['finalizer-unsupported',"import{spawn}from'node:child_process';const registry=new FinalizationRegistry(()=>spawn());function register(){registry.register({},0)}register();",/child_process\.spawn/],

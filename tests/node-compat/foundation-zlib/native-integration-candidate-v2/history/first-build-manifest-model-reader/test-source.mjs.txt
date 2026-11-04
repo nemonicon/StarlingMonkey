@@ -1,0 +1,81 @@
+// Synthetic source-parser and actual historical-JSON refusal tests only.
+// No compiler, engine bytes, componentizer, native preflight or guest runs.
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir,lstat} from 'node:fs/promises';
+import {dirname,join,resolve} from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+assert.equal(process.version,'v22.14.0');assert(!process.env.NODE_OPTIONS);
+assert.equal(process.argv.length,4);
+const here=dirname(fileURLToPath(import.meta.url)),fixtureRoot=resolve(process.argv[2]),output=resolve(process.argv[3]);
+assert(output.startsWith('/tmp/starling-node-compat/'));
+try{await lstat(output);assert.fail('Fresh source test output required');}catch(error){if(error.code!=='ENOENT')throw error;}
+await mkdir(output);
+const packet=join(fixtureRoot,'tests/node-compat/foundation-zlib/native-integration-candidate-v1');
+const {fixture}=await import(pathToFileURL(join(packet,'source-model-fixture.mjs')));
+const {validateZlibSourceModel,validateZlibSourceAdmission,validateZlibBuildSourceAdmission}=await import(pathToFileURL(join(fixtureRoot,'tests/node-compat/zlib-admission.mjs')));
+const {classify}=await import(pathToFileURL(join(packet,'artifact-tools/metadata-admission.mjs')));
+const checks=[],pass=name=>checks.push(name),clone=value=>JSON.parse(JSON.stringify(value));
+const model=await fixture({sourceRoot:fixtureRoot});
+const options={sourceRoot:fixtureRoot,parentProtectedSources:model.parentProtectedSources,parentProtectedPatch:model.parentProtectedPatch};
+for(const zlib of [false,true])for(const web of [false,true])for(const gc of [false,true]){
+ const value=await fixture({sourceRoot:fixtureRoot,zlib,web,gc});
+ const parsed=validateZlibSourceModel(value.metadata,options);
+ assert.equal(parsed.sourceInputs,350);assert.equal(parsed.zlibEnabled,zlib);
+ assert.equal(value.metadata.internalTickPolicy.actualLayoutCompileCommands.length,62-Number(!zlib)-Number(!web));
+ assert.equal(value.metadata.classicStreamsPolicy.actualPrivateTargetCompileCommands.length,(web?5:4)+Number(zlib));
+ assert(!('engineSha256'in value.metadata)&&!('enginePath'in value.metadata));
+ pass('synthetic350 conditional parser '+JSON.stringify({zlib,web,gc}));
+}
+const runtime=await fixture({sourceRoot:fixtureRoot,entropy:'runtime-only'});assert.equal(validateZlibSourceModel(runtime.metadata,options).sourceInputs,350);pass('synthetic RuntimeOnly source grammar');
+assert.throws(()=>validateZlibSourceAdmission(model.metadata,options),/CLOSED/);pass('synthetic source model never operationally-admitted');
+assert.throws(()=>validateZlibBuildSourceAdmission(model.metadata,options),/Synthetic/);pass('synthetic source model never actual-build-admitted');
+assert.throws(()=>classify(model.metadata,'normal-off'),/Synthetic/);pass('artifact classifier rejects synthetic before artifact use');
+for(const [name,change]of [
+ ['duplicate native path',m=>m.sourceManifest[1]=m.sourceManifest[0]],
+ ['missing native path',m=>m.sourceManifest.pop()],
+ ['wrong native checksum',m=>m.sourceManifest[0].sha256='0'.repeat(64)],
+ ['zlib flag must boolean',m=>m.zlibEnabled='true'],
+ ['zlib option ON/OFF observation',m=>m.observedCMakeOptions.NODE_COMPAT_ZLIB='OFF'],
+ ['zlib immutable source contract',m=>m.zlibSourcePolicy.parentTracePolicySha256='0'.repeat(64)],
+ ['module manifest fixed',m=>m.zlibPolicy.moduleManifest='invented.json'],
+ ['kernel command omission',m=>m.zlibPolicy.actualKernelCompileCommands=[]],
+ ['runtime version cannot be fabricated',m=>m.zlibPolicy.runtimeBackendProof={verified:true,version:'1.3.1',vernum:4880}],
+ ['wrong recipe',m=>m.buildRecipeSha256='0'.repeat(64)],
+ ['strict policy ancestry retained',m=>m.strictEventExceptionPolicy.version+='-invented'],
+ ['private macro leak on embedding',m=>m.internalTickPolicy.actualEmbeddingCompileCommands[0]+=' -DNODE_COMPAT_ZLIB=1'],
+ ['native ZLIB macro conflict',m=>m.internalTickPolicy.actualLayoutCompileCommands[0]+=' -DNODE_COMPAT_ZLIB=1'],
+ ['private macro undefinition',m=>m.internalTickPolicy.actualLayoutCompileCommands[0]+=' -UNODE_COMPAT_ZLIB'],
+ ['generic prefix definition',m=>m.internalTickPolicy.actualLayoutCompileCommands[0]+=' -DZ_PREFIX=1'],
+ ['generic prefix undefinition',m=>m.internalTickPolicy.actualLayoutCompileCommands[0]+=' -UZ_PREFIX_SET'],
+ ['forced header cannot bypass prefix',m=>m.internalTickPolicy.actualLayoutCompileCommands[0]+=' -include /synthetic/header.h'],
+ ['joined forced header refused',m=>m.internalTickPolicy.actualLayoutCompileCommands[0]+=' -include/synthetic/header.h'],
+ ['joined imacros header refused',m=>m.internalTickPolicy.actualLayoutCompileCommands[0]+=' -imacros/synthetic/header.h'],
+ ['RuntimeOnlyGC unsupported',m=>{m.gcStress=true;m.observedCMakeOptions.NODE_COMPAT_GC_STRESS='ON';m.requestedCMakeOptions.NODE_COMPAT_GC_STRESS='ON';m.entropyPolicy='runtime-only';m.observedCMakeOptions.NODE_COMPAT_ENTROPY_MODE='RUNTIME_ONLY';m.requestedCMakeOptions.NODE_COMPAT_ENTROPY_MODE='RUNTIME_ONLY';}],
+]){const value=clone(model.metadata);change(value);assert.throws(()=>validateZlibSourceModel(value,options));pass(name);}
+for(const label of ['normal-off','normal-runtime','gc-off','disabled-off'])assert.throws(()=>classify({...model.metadata,diagnosticOnly:true},label),/Diagnostic/);
+pass('all four labels refuse diagnostic receipts before artifacts');
+const historicalPaths=[
+ '/tmp/starling-node-compat/production-classic-trace-v1/native-freeze/normal-off.engine.wasm.build.json',
+ '/tmp/starling-node-compat/production-scheduler-artifacts-v1/native-freeze/normal-off.engine.wasm.build.json',
+];
+for(const path of historicalPaths){const metadata=JSON.parse(await readFile(path));
+ assert.throws(()=>classify(metadata,'normal-off'),/recipe/);
+ assert.equal(validateZlibSourceAdmission(metadata,options),null,'Unhinted historical branch remains delegated');
+ pass('actual historical metadata JSON refuses new350 artifact gate and leaves old branch unchanged: '+path);
+}
+for(const marker of [{zlibEnabled:false},{zlibPolicy:{}},{zlibSourcePolicy:{}},{observedCMakeOptions:{NODE_COMPAT_ZLIB:'OFF'}}]){
+ assert.throws(()=>validateZlibSourceAdmission(marker,options));pass('hinted malformed new350 lineage refused '+Object.keys(marker)[0]);
+}
+for(const enabled of [true,false]){
+ assert.throws(()=>validateZlibSourceAdmission({...model.metadata,zlibEnabled:enabled,syntheticMetadataOnly:false},options),/CLOSED/);pass('operational selector stays closed for new350 '+enabled);
+}
+const {selectedManifestsForEngine}=await import(pathToFileURL(join(fixtureRoot,'tests/node-compat/module-selection.mjs')));
+assert.throws(()=>selectedManifestsForEngine({...model.metadata,syntheticMetadataOnly:false},{sourceRoot:fixtureRoot}),/CLOSED/);pass('actual installed production selector never routes350 through old342');
+const {selectBuildManifests}=await import(pathToFileURL(join(packet,'artifact-tools/build-manifests.mjs')));
+const buildSelection=await selectBuildManifests(model.metadata,{sourceRoot:fixtureRoot,buildAdmission:validateZlibSourceModel(model.metadata,options)});
+assert.equal(buildSelection.operationalAdmission,false);assert.equal(buildSelection.validationBootstrapOnly,true);
+assert.equal(buildSelection.manifests.flatMap(value=>Object.keys(value.modules)).includes('node:zlib'),true);pass('pure model explicit manifest grammar without operational selector or engine');
+const pins=JSON.parse(await readFile(join(here,'runtime-pins.json')));assert(Object.values(pins.variants).every(value=>value===null));assert.equal(pins.reviewRequired,true);pass('all future four engine pins remain null and unreviewed');
+const result={schemaVersion:1,state:'PURE_SOURCE_PARSER_AND_REFUSAL_CHECKS_PASSED',count:checks.length,checks,
+ syntheticModelsOnly:true,historicalMetadataJSONReadOnly:true,engineBytesRead:false,nativeOrGuestOrBuildOrPreflightExecuted:false};
+await writeFile(join(output,'results.json'),JSON.stringify(result,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({checks:checks.length,output}));

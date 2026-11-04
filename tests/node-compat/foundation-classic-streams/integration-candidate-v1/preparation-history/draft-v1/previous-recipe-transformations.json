@@ -1,0 +1,92 @@
+{
+  "state": "SOURCE_ONLY_RECIPE_TRANSFORMATIONS",
+  "beforeSha256": "869d188de3843b5d527d236a9e5c9af6ba1193f118dc9ad786df6266e1606173",
+  "afterSha256": "de32c5ad30dc66145609abd9e7838d8fe51b4de1b76e36a1ec230f2656d76414",
+  "edits": [
+    {
+      "old": "ticks_enabled=\"${NODE_COMPAT_INTERNAL_TICKS:-0}\"",
+      "new": "ticks_enabled=\"${NODE_COMPAT_INTERNAL_TICKS:-0}\"\nclassic_enabled=\"${NODE_COMPAT_CLASSIC_STREAMS:-0}\"\nif [[ \"$classic_enabled\" != 0 && \"$classic_enabled\" != 1 ]]; then\n  echo 'NODE_COMPAT_CLASSIC_STREAMS must be 0 or 1' >&2; exit 1\nfi\nif [[ \"$classic_enabled\" == 1 && ( \"$ticks_enabled\" != 1 || \"$events_enabled\" != 1 || \"$string_decoder_enabled\" != 1 ) ]]; then\n  echo 'NODE_COMPAT_CLASSIC_STREAMS requires Events, StringDecoder and private ticks' >&2; exit 1\nfi",
+      "count": 1
+    },
+    {
+      "old": "layer_root=\"$repo_root/tests/node-compat/foundation-scheduler/integration-candidate-v1\"",
+      "new": "layer_root=\"$repo_root/tests/node-compat/foundation-classic-streams/integration-candidate-v1\"",
+      "count": 1
+    },
+    {
+      "old": "policy_suffix=\"$policy_suffix.private-ticks-v1-$ticks_enabled\"",
+      "new": "policy_suffix=\"$policy_suffix.private-ticks-v1-$ticks_enabled.classic-v1-$classic_enabled\"",
+      "count": 1
+    },
+    {
+      "old": "78521feeefe299360228e5db76bfde0b11e6eeee93bd2374cd39b2fe695b610c",
+      "new": "f5b296accdbdf480f2b8bb05de73d2b156361157678a82ce904c3ae3741a4941",
+      "count": 3
+    },
+    {
+      "old": "98e80d36b8eb9b7ac99de54832288bd8eec148fa1b9fe0b27b3bada4d12b2cd0",
+      "new": "137a35959131d5cb5125bb5fc97324dfa4ba2ce18441818dd95cf83d19c88d6f",
+      "count": 1
+    },
+    {
+      "old": "\"$node_bin\" \"$repo_root/builtins/node-compat/generate-factories.mjs\" --check",
+      "new": "\"$node_bin\" \"$repo_root/builtins/node-compat/generate-factories.mjs\" --check\n\"$node_bin\" \"$repo_root/builtins/node-compat/classic-streams/generate-classic-factory.mjs\" --repository \"$repo_root\" --check",
+      "count": 1
+    },
+    {
+      "old": "ticks_flag=OFF\nif [[ \"$ticks_enabled\" == 1 ]]; then ticks_flag=ON; fi",
+      "new": "ticks_flag=OFF\nif [[ \"$ticks_enabled\" == 1 ]]; then ticks_flag=ON; fi\nclassic_flag=OFF\nif [[ \"$classic_enabled\" == 1 ]]; then classic_flag=ON; fi",
+      "count": 1
+    },
+    {
+      "old": "import hashlib,json,pathlib,sys\nrepo=pathlib.Path(sys.argv[1]);entries=[]\nfor base in ['builtins','runtime','include','cmake','host-apis/wasi-0.2.0','host-apis/wasi-0.2.3','host-apis/wasi-0.2.10','crates','deps/patches']:\n for p in sorted((repo/base).rglob('*')):\n  if p.is_file() and p.suffix in ['.cpp','.h','.c','.cmake','.mjs','.rs','.toml','.lock','.o','.wasm','.json','.wit','.patch']:\n   entries.append({'path':str(p.relative_to(repo)),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})\nfor name in ['CMakeLists.txt','rust-toolchain.toml']:\n entries.append({'path':name,'sha256':hashlib.sha256((repo/name).read_bytes()).hexdigest()})\njson.dump(entries,open(sys.argv[2],'w'),indent=2)",
+      "new": "import importlib.util,json,pathlib,sys\nsys.dont_write_bytecode=True\nrepo=pathlib.Path(sys.argv[1])\nhelper=repo/'tests/node-compat/foundation-classic-streams/integration-candidate-v1/layer-policy.py'\nspec=importlib.util.spec_from_file_location('classic_source_capture',helper)\nlayer=importlib.util.module_from_spec(spec);spec.loader.exec_module(layer)\njson.dump(layer.source_manifest(repo),open(sys.argv[2],'w'),indent=2)",
+      "count": 1
+    },
+    {
+      "old": "-DNODE_COMPAT_INTERNAL_TICKS=\"$ticks_flag\" \\",
+      "new": "-DNODE_COMPAT_INTERNAL_TICKS=\"$ticks_flag\" -DNODE_COMPAT_CLASSIC_STREAMS=\"$classic_flag\" \\",
+      "count": 1
+    },
+    {
+      "old": "\"$stream_web_enabled\" \"$ticks_enabled\" <<'PY'",
+      "new": "\"$stream_web_enabled\" \"$ticks_enabled\" \"$classic_enabled\" <<'PY'",
+      "count": 1
+    },
+    {
+      "old": "stream_web_enabled, ticks_enabled = sys.argv[1:]",
+      "new": "stream_web_enabled, ticks_enabled, classic_enabled = sys.argv[1:]",
+      "count": 1
+    },
+    {
+      "old": "manifest = []\nfor base in ['builtins', 'runtime', 'include', 'cmake', 'host-apis/wasi-0.2.0', 'host-apis/wasi-0.2.3', 'host-apis/wasi-0.2.10', 'crates', 'deps/patches']:\n    for path in sorted((pathlib.Path(repo) / base).rglob('*')):\n        if path.is_file() and path.suffix in ['.cpp', '.h', '.c', '.cmake', '.mjs', '.rs', '.toml', '.lock', '.o', '.wasm', '.json', '.wit', '.patch']:\n            manifest.append({'path': str(path.relative_to(repo)), 'sha256': digest(path)})\nfor filename in ['CMakeLists.txt', 'rust-toolchain.toml']:\n    manifest.append({'path': filename, 'sha256': digest(pathlib.Path(repo) / filename)})\n",
+      "new": "import importlib.util\nsys.dont_write_bytecode = True\nlayer_file = pathlib.Path(repo) / 'tests/node-compat/foundation-classic-streams/integration-candidate-v1/layer-policy.py'\nassert digest(layer_file) == 'f5b296accdbdf480f2b8bb05de73d2b156361157678a82ce904c3ae3741a4941'\nlayer_spec = importlib.util.spec_from_file_location('reviewed_classic_layer',layer_file)\nlayer = importlib.util.module_from_spec(layer_spec); layer_spec.loader.exec_module(layer)\nmanifest = layer.source_manifest(repo)\n",
+      "count": 1
+    },
+    {
+      "old": "    'NODE_COMPAT_INTERNAL_TICKS': 'ON' if ticks_enabled == '1' else 'OFF',",
+      "new": "    'NODE_COMPAT_INTERNAL_TICKS': 'ON' if ticks_enabled == '1' else 'OFF',\n    'NODE_COMPAT_CLASSIC_STREAMS': 'ON' if classic_enabled == '1' else 'OFF',",
+      "count": 1
+    },
+    {
+      "old": "'NODE_COMPAT_UTIL', 'NODE_COMPAT_STREAM_WEB']:",
+      "new": "'NODE_COMPAT_UTIL', 'NODE_COMPAT_STREAM_WEB', 'NODE_COMPAT_CLASSIC_STREAMS']:",
+      "count": 1
+    },
+    {
+      "old": "import importlib.util\nsys.dont_write_bytecode = True\nlayer_file = pathlib.Path(repo) / 'tests/node-compat/foundation-scheduler/integration-candidate-v1/layer-policy.py'\nassert digest(layer_file) == 'f5b296accdbdf480f2b8bb05de73d2b156361157678a82ce904c3ae3741a4941', 'Private scheduler helper changed during compilation'\nlayer_spec = importlib.util.spec_from_file_location('reviewed_tick_layer',layer_file)\nlayer = importlib.util.module_from_spec(layer_spec); layer_spec.loader.exec_module(layer)\n",
+      "new": "assert digest(layer_file) == 'f5b296accdbdf480f2b8bb05de73d2b156361157678a82ce904c3ae3741a4941', 'Classic source helper changed during compilation'\n",
+      "count": 1
+    },
+    {
+      "old": "if stream_web_enabled == '1': manifest_paths.append('builtins/node-compat/export-manifest.stream-web.node-v22.14.0.json')",
+      "new": "if stream_web_enabled == '1': manifest_paths.append('builtins/node-compat/export-manifest.stream-web.node-v22.14.0.json')\nif classic_enabled == '1': manifest_paths.append('builtins/node-compat/classic-streams/export-manifest.classic-streams.node-v22.14.0.json')",
+      "count": 1
+    },
+    {
+      "old": "'streamWebEnabled': stream_web_enabled == '1',",
+      "new": "'streamWebEnabled': stream_web_enabled == '1', 'classicStreamsEnabled': classic_enabled == '1', 'internalTicksEnabled': ticks_enabled == '1',",
+      "count": 1
+    }
+  ]
+}

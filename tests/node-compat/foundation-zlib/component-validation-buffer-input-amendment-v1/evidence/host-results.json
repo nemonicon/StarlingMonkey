@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "state": "HOST_ONLY_PROFILE_BUFFER_FIXTURE_REGRESSION_PASSED",
+  "passed": 12,
+  "checks": [
+    "old Array rejected constructor-refusal",
+    "new Uint8Array accepted constructor-refusal",
+    "old Array rejected snapshot",
+    "new Uint8Array accepted snapshot",
+    "old Array rejected ordinary-gc",
+    "new Uint8Array accepted ordinary-gc",
+    "old six sync constructors wrongly caught Buffer error",
+    "actual old prefix rejects snapshot before any codec test-double call",
+    "actual fixed prefix snapshot small roundtrip",
+    "all68 actual fixed prefix refusal fields belong to zlib",
+    "actual fixed ordinaryGc uses eight accepted U8 inputs",
+    "sealed disabled fixture has no Buffer.from Array literal"
+  ],
+  "inputs": [
+    {
+      "path": "/tmp/starling-node-compat/production-zlib-v4/native-freeze/source/builtins/node-compat/buffer-facade.mjs",
+      "sha256": "8ebfa0253a85bc9b2e91b65391c9f85c26594d107ad0d016cd0351dad89dd235",
+      "bytes": 13582
+    },
+    {
+      "path": "/tmp/starling-node-compat/production-zlib-v4/native-freeze/source/builtins/node-compat/unsupported.mjs",
+      "sha256": "8681d64ddf74c42948e0cc99f9808b711618f603dccac09ca25939842731f2cb",
+      "bytes": 1339
+    },
+    {
+      "path": "/tmp/starling-node-compat/production-zlib-v4/native-freeze/source/builtins/node-compat/zlib/facade.mjs",
+      "sha256": "846b2b79da4d45c29833f7d60ce2cfa422b0b5b5a5e35316d2f19ddc6c27c903",
+      "bytes": 10783
+    },
+    {
+      "path": "/tmp/starling-node-compat/production-zlib-v4/native-freeze/source/builtins/node-compat/zlib/constant-data.generated.mjs",
+      "sha256": "3bea44ebc8ce9a2fd187acbb17e7aa0330caa4e2507b64b88986bb64ea2f9ab9",
+      "bytes": 4194
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/docs/node-compat/templates/reference-kernel.mjs",
+      "sha256": "ed04116feed90ae3827cbee6c45022a7c12ec5acdabb7cc5f850bfd04e8dd627",
+      "bytes": 633
+    }
+  ],
+  "codecCalls": [
+    {
+      "format": 1,
+      "encode": true,
+      "inputBytes": 6,
+      "limit": 16777216,
+      "testDouble": true
+    },
+    {
+      "format": 1,
+      "encode": false,
+      "inputBytes": 26,
+      "limit": 16777216,
+      "testDouble": true
+    },
+    {
+      "format": 1,
+      "encode": false,
+      "inputBytes": 40,
+      "limit": 16777216,
+      "testDouble": true
+    }
+  ],
+  "originalWrongConstructorModuleCount": 6,
+  "correctedRefusalRecords": 68,
+  "snapshot": {
+    "inputHex": "00010203feff",
+    "compressedHex": "1f8b080000000000001363606462fef71f007fddd08306000000",
+    "plainHex": "00010203feff"
+  },
+  "ordinaryGcOperations": [
+    "00",
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07"
+  ],
+  "profileBufferFactory": "actual frozen350 facade",
+  "hexKernel": "JS REFERENCE TEST DOUBLE",
+  "codecKernel": "PINNED HOST NODE CODEC TEST DOUBLE",
+  "nodeBackendObserved": "1.3.0.1-motley-82a5fec",
+  "noNativeBackendOrComponentProof": true,
+  "nativeOrGuestOrBootstrapOrComponentizerExecuted": false
+}

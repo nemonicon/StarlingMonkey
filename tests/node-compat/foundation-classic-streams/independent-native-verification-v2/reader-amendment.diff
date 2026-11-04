@@ -1,0 +1,29 @@
+--- independent-native-verification-v1/verify.py
++++ independent-native-verification-v2/verify.py
+@@ -83,13 +83,15 @@
+     assert '-U' + name not in words, name
+ 
+ 
+-def command_words(command, source, runtime, classic, gc):
++def command_words(command, source, runtime, classic, gc, require_thin_lto=True):
+     words = shlex.split(command)
+     assert words.count('-c') == 1 and words[words.index('-c') + 1] == source
+     assert words.count('-o') == 1 and '-fsyntax-only' not in words
+     assert '-O3' in words and '-DNDEBUG' in words and '-UNDEBUG' not in words
+     assert not any(word.startswith('-DDEBUG') for word in words)
+-    assert '-flto=thin' in words and '--target=wasm32-wasi' in words
++    assert '--target=wasm32-wasi' in words
++    if require_thin_lto:
++        assert '-flto=thin' in words
+     for name in ('NODE_COMPAT_INTERNAL_TICKS', 'NODE_COMPAT_STRICT_INITIALIZATION',
+                  'NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER', 'NODE_COMPAT_ENTROPY_POLICY'):
+         macro(words, name, True)
+@@ -347,7 +349,7 @@
+     assert len(embedding) == 1 and embedding == ev['compileCommands'] == metadata['actualEmbeddingCompileCommands']
+     assert embedding == ticks['actualEmbeddingCompileCommands'] == protected['actualEmbeddingCompileCommands']
+     assert not any(row['file'] == source for row in database)
+-    embedding_words = command_words(embedding[0], source, runtime, False, False)
++    embedding_words = command_words(embedding[0], source, runtime, False, False, require_thin_lto=False)
+     macro(embedding_words, 'NODE_COMPAT_STREAM_WEB', False)
+ 
+     assert rust['cargoBuildLocked'] is True and rust['manifestAndLockCheckedBeforeAndAfterBuild'] is True

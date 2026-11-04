@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "state": "DEPENDENCY_ORDERED_PROPOSAL_RUNTIME_GATES_PENDING",
+  "steps": [
+    {
+      "id": "R0",
+      "dependsOn": [],
+      "work": "Freeze explicit unsupported reset/reuse contract and source regressions",
+      "gate": "Preserve v11/current diagnostic gates; no oldreset/hazard execution; finite exportmanifests remain unchanged."
+    },
+    {
+      "id": "R1",
+      "dependsOn": [
+        "R0"
+      ],
+      "work": "Repair lifecycle state and fallible registration ownership",
+      "gate": "Guest-internal phase/reentry/closing guard; fallible taskenqueue with transactional resource/map/interest commit; per-task state; traced cancellation/running batches; copy constRefPtr aliases beforeerase into tracedowner."
+    },
+    {
+      "id": "R2",
+      "dependsOn": [
+        "R1"
+      ],
+      "work": "Make timers and pure immediate tasks idempotently cancellable",
+      "gate": "Fix rawtimer map lifetime beforequeueclear, own terminalization, no duplicateunsubscribe/requeue, staleID exhaustion/generation policy, no fakeinterestzero; handle all-invalid select withoutempty poll."
+    },
+    {
+      "id": "R3",
+      "dependsOn": [
+        "R1"
+      ],
+      "work": "Implement HTTP/stream task and subscription cancellation",
+      "gate": "BodyWriteAll/Append currentlycannotcancel; future/body TODOs andincoming subscription/close mustbecomplete; resource child/parent drop order, nonblockingabort and promised settlement; wire BufReader cancel to pendingtask."
+    },
+    {
+      "id": "R4",
+      "dependsOn": [
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "work": "Integrate bounded Promise/finalizer/strict-error lifecycle",
+      "gate": "Decide custom ownedjobqueue/earlylegacyqueue preference or keepreuse unavailable. StopDraining isnot discard; ShutdownAsyncTasks isnot per-request reset. Preserve pendingerrors/latches untilclassified; accountGC-createdcleanup and native dispatch."
+    },
+    {
+      "id": "R5",
+      "dependsOn": [
+        "R4"
+      ],
+      "work": "Install request-owner and correct ALS propagation",
+      "gate": "Fresh actualentry owners, task/job/timer/resource capture and RAIIrestore; preserve mutable resourcecell+registration/Promisecreation semantics and explicit emptycapture, following audited async-context findings. No productionALS claim beforeAPI/export/lifecycle gates."
+    },
+    {
+      "id": "R6",
+      "dependsOn": [
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "work": "Controlled same-instance sequential lifecycle gates",
+      "gate": "New patchedordinaryRelease andReleaseGC, source/config/actualmacro receipts, Jco retainedexports+freshWasmtime, realselectedI/O/timers cancellation, nestedreset/enqueue/refusal and errorstates; no DEBUG/fault/oldunsafeprobes."
+    },
+    {
+      "id": "R7",
+      "dependsOn": [
+        "R6"
+      ],
+      "work": "Target-host reuse and deployment/performance decisions",
+      "gate": "UnmodifiedWasmtime/wasmCloud exactselectedimports; obtainactual sameinstance witness orleaveHTTPreuseunproved. Measureminimalcomponent size/startup/RSS/linearmemory/cancellationthroughput andretainedstores; no priorperformance transfer."
+    }
+  ],
+  "validation": [
+    "Only afterhardenedsource: cancellation canallocate/queue rejection/attemptreentrantreset withoutinvalidatingbatchtracing; ordinaryReleaseGC keepsinlinecallback/object/symbol alive untilretirement; no OOMfaultscope inferred.",
+    "Timer pending/running/repeat/cleared/doublecancel states: no danglingmapentries, onehostdrop, no stale-ID collision, no repeatrequeue afterownerclosing; meaningfulpositiveandnegative guards beforehostcalls.",
+    "HTTP each BodyAppend state andwrite offset: cancelledtransfer cannotcallsuccesscallback; pollables/body/bytes closed once; future andincoming subscription ownership verified onrealstandardinterfaces with guestowned counters, notcustomhost services.",
+    "Allinvalidatedtasks bypasspoll(empty); mixedimmediate+realpollable fairness/explicitclockimport/cachedresource lifetime proved; no livehandle in snapshot.",
+    "Registration failure/capacity rejection commitsnothing; void legacyenqueue isnot usedwhere recoverablefalse ispromised; separate boundedfailure policies forC++allocatorpaths remainunproved.",
+    "Cancellation settlementwithlaterhandled/rejected promises, finalizer-createdjobs, limitsandthrowprimitiveidentity insideJS; genericfatalABI cases onlyboundary/discard pluspairedcontrols, notunobservablecauseclaims.",
+    "Two sequential controlledentryowners pluslateoldcompletion rejection undercorrectcontext; multipleALS run/enterWith/exit/disable/bind/snapshot/Promisecreation/await/native/timer scenarios againstNode22; appownedresource reuse vsfreshentry distinct.",
+    "Purefixtures zeroimports; eachI/Ovariant exactstandard0.2.10 allowlistanddenials; samebytesbothstockhosts; counters1/1/1notreuseproof. Retainedpureexports intentionalstate arenotrequestreset proof."
+  ],
+  "noProductionVersionReserved": true,
+  "noProductionImplementationOrUnsafeProbe": true
+}

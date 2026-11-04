@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "beforePath": "measurement-execution-candidate-v1/activate.py",
+  "beforeSha256": "038982bbdd587e37516f121a4a0eca5a0ce0b77a9036ffd5df1a6a799d5e917e",
+  "afterPath": "activate.py",
+  "afterSha256": "0915d7796ca63cac9e5cd063066503d53fa2150c48a4e0e66b9da5f8fc63c211",
+  "edits": [
+    {
+      "old": "OUTPUT=HERE.parent/'measurement-execution-activated-v1'",
+      "new": "BASE=HERE.parent/'measurement-execution-candidate-v1'\nBASE_INDEX='4b6fdfa51d41120865114b0e8558dbc6e97fdd63007e108a35c264d20bc0280d'\nOUTPUT=HERE.parent/'measurement-execution-activated-v2'",
+      "count": 1
+    },
+    {
+      "old": "own=indexed(HERE,own_sha);parents=[(HERE.parent/name,digest,indexed(HERE.parent/name,digest))for name,digest in PARENTS]",
+      "new": "own=indexed(HERE,own_sha);base_rows=indexed(BASE,BASE_INDEX);parents=[(BASE,BASE_INDEX,base_rows),*( (HERE.parent/name,digest,indexed(HERE.parent/name,digest))for name,digest in PARENTS)]",
+      "count": 1
+    },
+    {
+      "old": "payload={name:regular(HERE/name)for name in names};payload['reviewed-pair.json']=pin_raw;payload['root-pair-review.json']=review_raw",
+      "new": "payload={name:regular(BASE/name)for name in names}\n for name in['prepare-correctness.mjs','collect-worker.mjs','measure.mjs']:payload[name]=regular(HERE/'proposed'/name)\n for name in['deadline-policy.mjs','owned-host.mjs','audit-inputs.mjs']:payload[name]=regular(HERE/name)\n payload['reviewed-pair.json']=pin_raw;payload['root-pair-review.json']=review_raw",
+      "count": 1
+    },
+    {
+      "old": "'activationIndexSha256':own_sha,'pairPinsSha256':pin_sha",
+      "new": "'activationIndexSha256':own_sha,'parentSourceIndexSha256':BASE_INDEX,'mandatoryDeadlineAmendmentIndexSha256':own_sha,'hostPersistenceVersion':'owned-calls-pilot-deadlines-v1','pairPinsSha256':pin_sha",
+      "count": 1
+    },
+    {
+      "old": "('measurement-correctness-reporting-amendment-v1','0558b50589680f9e1b812c8a62210233a768385bfabeae2f07be47c2e1fe5350')]",
+      "new": "('measurement-correctness-reporting-amendment-v1','0558b50589680f9e1b812c8a62210233a768385bfabeae2f07be47c2e1fe5350'),('measurement-correctness-persistence-amendment-v1','60a8687e9b6bfff4c68df2a36e9dd47ad0f5cd327441f8cf32d63caa67518ba8'),('independent-measurement-execution-source-review-v1','96bc44a3c926b3ef4c1f99ba009629b88118162ff54d6358ef0ce29e4e0bd4e0')]",
+      "count": 1
+    }
+  ],
+  "rootFuturePairStillNull": true,
+  "noActionExecuted": true
+}

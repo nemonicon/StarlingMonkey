@@ -1,0 +1,27 @@
+--- a/tests/node-compat/foundation-classic-streams/integration-candidate-v1/artifact-tools/build-one.py
++++ b/artifact-tools/build-one.py
+@@ -232,8 +232,8 @@
+     sys.dont_write_bytecode = True
+     from artifact_common import OUTPUT, verify_frozen_variant, tool_dependencies
+     root = Path(__file__).resolve().parents[5]
+-    work = Path('/tmp/starling-node-compat/improved-build')
+-    output = Path('/tmp/starling-node-compat/production-classic-artifacts-v1/builds') / label
++    work = Path('/tmp/starling-node-compat/classic-trace-v1-build')
++    output = Path('/tmp/starling-node-compat/production-classic-trace-v1/builds') / label
+     recipe = root / 'tests/node-compat/build-engine.sh'
+     assert digest(recipe) == RECIPE_SHA256
+     # Source/dependency pins must agree before preparing output or launching a
+@@ -254,11 +254,11 @@
+         'NODE_COMPAT_CLASSIC_STREAMS': '0' if label == 'disabled-off' else '1',
+         'NODE_COMPAT_ENTROPY_MODE': 'RUNTIME_ONLY' if label == 'normal-runtime' else 'OFF',
+         'NODE_COMPAT_GC_STRESS': '1' if label == 'gc-off' else '0',
+-        'NODE_COMPAT_ARTIFACT_TAG': 'p342v1',
++        'NODE_COMPAT_ARTIFACT_TAG': 'tracev1',
+         **{'NODE_COMPAT_' + name: '1' for name in
+            ('PATH', 'EVENTS', 'STRING_DECODER', 'ASSERT', 'QUERYSTRING', 'UTIL', 'STREAM_WEB')},
+     }
+-    free = lambda: os.statvfs(work).f_bavail * os.statvfs(work).f_frsize
++    free = lambda: os.statvfs(work if work.exists() else work.parent).f_bavail * os.statvfs(work if work.exists() else work.parent).f_frsize
+     try:
+         free_before = prepare_output(output, free)
+     except BaseException as error:

@@ -1,0 +1,1 @@
+export function run(){const t=new EventTarget();t.addEventListener('test',()=>{throw new Error('DEPLOYED_EVENT_ERROR')});t.dispatchEvent(new Event('test'));return 'must-not-return';}

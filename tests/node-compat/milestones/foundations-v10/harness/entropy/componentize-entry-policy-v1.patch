@@ -1,0 +1,23 @@
+--- a/embedding/embedding.cpp
++++ b/embedding/embedding.cpp
+@@ -2,6 +2,9 @@
+ #include "debugger.h"
+ #include "builtins/web/performance.h"
+ #include "js/Conversions.h"
++#ifdef NODE_COMPAT_ENTROPY_POLICY
++#include "node-compat-entropy.h"
++#endif
+ 
+ namespace builtins::web::console {
+ 
+@@ -174,6 +177,10 @@
+ 
+ __attribute__((export_name("call"))) uint32_t call(uint32_t fn_idx,
+                                                    void *argptr) {
++#ifdef NODE_COMPAT_ENTROPY_POLICY
++  // This is an actual deployed export entry, never initialize/bindExports.
++  sm_node_enter_deployed_execution();
++#endif
+   if (Runtime.first_call) {
+     content_debugger::maybe_init_debugger(Runtime.engine, true);
+     js::ResetMathRandomSeed(Runtime.cx);

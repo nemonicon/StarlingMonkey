@@ -1,0 +1,433 @@
+"""DATA ONLY. Read and hash existing preservation bytes; never redirects paths."""
+import hashlib
+import importlib.util
+import json
+import os
+import stat
+from pathlib import Path, PurePosixPath
+
+HERE = Path(__file__).parent
+CLASSIC = HERE.parent
+ADOPTION = CLASSIC / 'production-adoption-v1'
+CANDIDATE = ADOPTION / 'artifact-preservation-candidate-v1'
+DECLARED = Path('/tmp/starling-node-compat/classic-artifact-preservation-pending-v1')
+ROOT = DECLARED.resolve(strict=True)
+ROOT_RESULT_SHA = '14451a5496c2384ffb2fab0e5ae2da0f141cbbbf9aef536cab5b79d03a1dfd73'
+SOURCE_SHA = 'fb9baef5e9886c17a4d335738497adeac96e2a003ced4f14dcd35b99a2456b73'
+PLAN_SHA = 'cf75517e937aa0f8c14977981435b387285b59c817c679f6565749db05e1dca8'
+INDEX_SHA = '1934c03e75e23a24e35e944502692a7cde774e5f49a132a63c1686cc5d7babde'
+RESULT_SHA = '306ae3e4516f13870f821d3ceb33cf2ee8206528abaa0abc7d7c8af2a4cbf86f'
+COMPLETION_SHA = '0177ec7f2c9daf2f2376af997dd7a798ebe7e96e8068ee3c68fc005a773b1b1b'
+checks, witnesses = [], {}
+
+
+def need(value, message):
+    if not value:
+        raise AssertionError(message)
+
+
+def digest(value):
+    return hashlib.sha256(value).hexdigest()
+
+
+def identity(info):
+    return (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns,
+            stat.S_IMODE(info.st_mode), info.st_nlink)
+
+
+def safe(name):
+    path = PurePosixPath(name)
+    need(type(name) is str and name and '\\' not in name and '\0' not in name and
+         not path.is_absolute() and str(path) == name and
+         all(p not in ('', '.', '..') for p in path.parts), 'Safe archive relative path')
+    return path.parts
+
+
+def absolute_fd(path):
+    path = Path(path)
+    need(path.is_absolute() and str(path) == os.path.normpath(path), 'Canonical absolute witness')
+    directory = os.open('/', os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        for part in path.parts[1:-1]:
+            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory)
+            os.close(directory)
+            directory = child
+        return os.open(path.name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=directory)
+    finally:
+        os.close(directory)
+
+
+def stream(fd, expected, size, collect=False):
+    before = os.fstat(fd)
+    need(stat.S_ISREG(before.st_mode) and before.st_size == size, 'Regular expected-size file')
+    h, parts = hashlib.sha256(), []
+    while True:
+        value = os.read(fd, 1024 * 1024)
+        if not value:
+            break
+        h.update(value)
+        if collect:
+            parts.append(value)
+    need(identity(before) == identity(os.fstat(fd)), 'File changed while hashing')
+    need(h.hexdigest() == expected, 'SHA mismatch')
+    return (b''.join(parts) if collect else None), before
+
+
+def external(path, expected=None, size=None, collect=True):
+    path = Path(path)
+    fd = absolute_fd(path)
+    try:
+        before = os.fstat(fd)
+        need(stat.S_ISREG(before.st_mode), 'External regular file')
+        if expected is None:
+            expected = hashlib.sha256(path.read_bytes()).hexdigest()
+        if size is None:
+            size = before.st_size
+        value, info = stream(fd, expected, size, collect)
+        witnesses[str(path)] = {'path': str(path), 'sha256': expected, 'bytes': size}
+        return value
+    finally:
+        os.close(fd)
+
+
+def load_external(path, expected=None, size=None):
+    return json.loads(external(path, expected, size))
+
+
+def passed(name, **fields):
+    checks.append({'check': name, 'passed': True, **fields})
+
+
+def closure(fd):
+    files, directories = {}, {}
+    def walk(directory, prefix):
+        for name in sorted(os.listdir(directory)):
+            info = os.stat(name, dir_fd=directory, follow_symlinks=False)
+            relative = prefix + name
+            safe(relative)
+            need(not stat.S_ISLNK(info.st_mode), 'No archive symlink')
+            if stat.S_ISDIR(info.st_mode):
+                need(stat.S_IMODE(info.st_mode) == 0o700, 'Private subdirectory mode')
+                child = os.open(name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory)
+                try:
+                    actual = os.fstat(child)
+                    need((actual.st_dev, actual.st_ino) == (info.st_dev, info.st_ino), 'Directory race')
+                    directories[relative] = (info.st_dev, info.st_ino, stat.S_IMODE(info.st_mode))
+                    walk(child, relative + '/')
+                finally:
+                    os.close(child)
+            else:
+                need(stat.S_ISREG(info.st_mode) and info.st_nlink == 1 and
+                     stat.S_IMODE(info.st_mode) == 0o600, 'Private regular unshared file')
+                files[relative] = identity(info)
+    walk(fd, '')
+    return files, directories
+
+
+root_fd = os.open(ROOT, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+root_before = os.fstat(root_fd)
+need(stat.S_IMODE(root_before.st_mode) == 0o700, 'Root0700')
+
+
+def root_identity():
+    current = ROOT.lstat()
+    held = os.fstat(root_fd)
+    need(stat.S_ISDIR(current.st_mode) and stat.S_IMODE(current.st_mode) == 0o700 and
+         (current.st_dev, current.st_ino) == (root_before.st_dev, root_before.st_ino) ==
+         (held.st_dev, held.st_ino), 'Held root identity changed')
+
+
+def archived(name, expected, size, collect=True):
+    parts = safe(name)
+    directory, fd = os.dup(root_fd), None
+    try:
+        for part in parts[:-1]:
+            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory)
+            os.close(directory)
+            directory = child
+        fd = os.open(parts[-1], os.O_RDONLY | os.O_NOFOLLOW, dir_fd=directory)
+        value, info = stream(fd, expected, size, collect)
+        need(info.st_nlink == 1 and stat.S_IMODE(info.st_mode) == 0o600, 'Owned copied file metadata')
+        root_identity()
+        return value
+    finally:
+        if fd is not None:
+            os.close(fd)
+        os.close(directory)
+
+
+root_receipt_path = ADOPTION / 'private-artifact-preservation-copy-root-results-v1.json'
+root_receipt = load_external(root_receipt_path, ROOT_RESULT_SHA)
+need(root_receipt['rawExitCode'] == 0 and root_receipt['rootObservedSession'] == 4241 and
+     root_receipt['publisherPid'] == 65406 and root_receipt['ownerRuntimeExecuted'] is False,
+     'Root observed raw0 copy only')
+for row in root_receipt['references']:
+    external(row['path'], row['sha256'], row['bytes'])
+terminal = load_external(root_receipt['references'][0]['path'], root_receipt['references'][0]['sha256'])
+need(terminal['rawExitCode'] == 0 and terminal['error'] is None and terminal['parentPid'] == 65406,
+     'Actual external terminal0')
+need(terminal['argv'] == ['python3', str(CANDIDATE / 'publisher.py'), SOURCE_SHA,
+     '--root-config', str(ADOPTION / 'reviewed-private-artifact-preservation-copy-v1.json'),
+     '--root-config-sha', '3663baf253af57d7681055818afd6746982bb980bf2678a9a6a43781d2ad3370'],
+     'Actual exact publisher command')
+need(external(root_receipt['references'][2]['path'], root_receipt['references'][2]['sha256']) == b'',
+     'Empty actual stderr')
+passed('rootExternalRawZeroAndExactConfigCommand', session=4241, publisherPid=65406,
+       elapsedSecondsOperationalOnly=59.861464833)
+
+actual_before, directory_before = closure(root_fd)
+need(len(actual_before) == 21682, 'Actual21682 regular files')
+completion_raw = archived('completion.json', COMPLETION_SHA, 704)
+completion = json.loads(completion_raw)
+index_raw = archived('index.json', INDEX_SHA, 4104298)
+index = json.loads(index_raw)
+result_raw = archived('results.json', RESULT_SHA, 5879180)
+result = json.loads(result_raw)
+need(completion['result'] == {'path': 'results.json', 'sha256': RESULT_SHA, 'bytes': 5879180} and
+     completion['index'] == {'path': 'index.json', 'sha256': INDEX_SHA, 'bytes': 4104298},
+     'Completion exact index/result')
+need(completion['state'] == result['state'] == 'PENDING_INDEPENDENT_REVIEW' and
+     completion['accepted'] is False and result['accepted'] is False and index['accepted'] is False,
+     'Pending remains pending')
+need(result['candidateIndexSha256'] == completion['candidateIndexSha256'] == SOURCE_SHA and
+     result['copyPlanSha256'] == completion['copyPlanSha256'] == PLAN_SHA,
+     'Actual source and plan tuple')
+need(result['rootIdentity'] == completion['rootIdentity'] ==
+     {'device': root_before.st_dev, 'inode': root_before.st_ino}, 'Completion held root identity')
+archive_rows = {r['path']: r for r in index['files']}
+need(len(archive_rows) == len(index['files']) == 21680 and
+     set(archive_rows) | {'index.json', 'completion.json'} == set(actual_before), 'Exact indexed/actual membership')
+hashed_bytes = 0
+for name, row in archive_rows.items():
+    archived(name, row['sha256'], row['bytes'], False)
+    hashed_bytes += row['bytes']
+passed('allActualArchiveBytesAndExclusiveMetadata', regularFiles=21682, indexedFiles=21680,
+       noSymlinks=True, everyFileNlink=1, fileMode='0600', directoryMode='0700',
+       indexedBytesHashed=hashed_bytes, heldRootIdentity=result['rootIdentity'])
+print(json.dumps({'stage': 'all21682ArchiveFilesVerified', 'indexedBytesHashed': hashed_bytes}), flush=True)
+
+
+def load_archived(name):
+    row = archive_rows[name]
+    return json.loads(archived(name, row['sha256'], row['bytes']))
+
+
+own_index = load_external(CANDIDATE / 'index.json', SOURCE_SHA)
+need(len(own_index['files']) == 23, 'Candidate23')
+for row in own_index['files']:
+    external(CANDIDATE / row['path'], row['sha256'], row['bytes'], False)
+plan_raw = external(CANDIDATE / 'copy-plan.json', PLAN_SHA)
+plan = json.loads(plan_raw)
+config_path = ADOPTION / 'reviewed-private-artifact-preservation-copy-v1.json'
+config_raw = external(config_path, '3663baf253af57d7681055818afd6746982bb980bf2678a9a6a43781d2ad3370', 2119)
+config = json.loads(config_raw)
+need(load_archived('metadata/root-copy-authorization.json') == config and
+     result['rootAuthorizationSha256'] == digest(config_raw), 'Captured exact actual Root authorization')
+need(config['copyAllowed'] is True and config['pendingOnly'] is True and
+     config['sourcePromotionAllowed'] is False and config['archiveAcceptanceAllowed'] is False and
+     config['candidateIndexSha256'] == SOURCE_SHA and config['copyPlanSha256'] == PLAN_SHA,
+     'Only private pending permission')
+need(archived('metadata/publisher-source/index.json', SOURCE_SHA, len((CANDIDATE / 'index.json').read_bytes())) ==
+     (CANDIDATE / 'index.json').read_bytes(), 'Copied candidate index')
+for row in own_index['files']:
+    archived('metadata/publisher-source/' + row['path'], row['sha256'], row['bytes'], False)
+passed('actualCopiedSource23AndRoot3663ConfigUnchanged', publisherSourceIndexSha256=SOURCE_SHA,
+       configSha256=digest(config_raw), acceptanceOrPromotionPermission=False)
+
+expected_objects = list(plan['objects'])
+capsule_records = []
+for config_key, destination in [('lateMemoryIndependentProof', 'evidence/late-memory-proof/'),
+                              ('sourceIndependentReview', 'evidence/publisher-source-review/')]:
+    proof = config[config_key]
+    need(proof['rootReviewedPassed'] is True, 'Root separately reviewed proof')
+    proof_index = load_external(proof['index']['path'], proof['index']['sha256'], proof['index']['bytes'])
+    index_record = {'source': proof['index']['path'], 'destination': destination + 'index.json',
+                    'sha256': proof['index']['sha256'], 'bytes': proof['index']['bytes'],
+                    'kind': 'late-proof-text' if config_key == 'lateMemoryIndependentProof' else 'source-review-text'}
+    expected_objects.append(index_record)
+    found = 0
+    for row in proof_index['files']:
+        safe(row['path'])
+        source = str(Path(proof['index']['path']).parent / row['path'])
+        expected_objects.append({'source': source, 'destination': destination + row['path'],
+                                 'sha256': row['sha256'], 'bytes': row['bytes'], 'kind': index_record['kind']})
+        capsule_records.append({'source': source, 'sha256': row['sha256'], 'bytes': row['bytes']})
+        if source == proof['result']['path']:
+            need((row['sha256'], row['bytes']) == (proof['result']['sha256'], proof['result']['bytes']),
+                 'Actual result indexed exactly')
+            found += 1
+    need(found == 1, 'Proof result once')
+    capsule_records.append({'source': proof['index']['path'], 'sha256': proof['index']['sha256'],
+                            'bytes': proof['index']['bytes']})
+expected_objects.append({'source': str(CANDIDATE / 'index.json'),
+                         'destination': 'metadata/publisher-source/index.json',
+                         'sha256': SOURCE_SHA, 'bytes': (CANDIDATE / 'index.json').stat().st_size})
+for row in own_index['files']:
+    expected_objects.append({'source': str(CANDIDATE / row['path']),
+                             'destination': 'metadata/publisher-source/' + row['path'],
+                             'sha256': row['sha256'], 'bytes': row['bytes']})
+decision = config['migrationDecision']
+need(decision == plan['migrationDecision'], 'Exact Root20a planned policy')
+expected_objects.append({'source': decision['path'], 'destination': 'metadata/root-context-migration-or-hold-decision.json',
+                         'sha256': decision['sha256'], 'bytes': decision['bytes'], 'kind': 'root-decision-text'})
+need(len(expected_objects) == len(result['copiedObjects']) == 10835, 'All10835 copies')
+need(result['copiedObjects'] == [{**r, 'original': r['source']} for r in expected_objects],
+     'Every copied object role/original/path/hash/size exact')
+need(len({r['destination'] for r in expected_objects}) == 10835, 'No target collisions')
+logical = sum(r['bytes'] for r in expected_objects)
+need(logical == 4275606222, 'Actual logical copy bytes including capsules')
+for position, row in enumerate(expected_objects, 1):
+    indexed = archive_rows[row['destination']]
+    need((indexed['sha256'], indexed['bytes']) == (row['sha256'], row['bytes']), 'Copy index row')
+    journal = load_archived('journal/' + str(position).zfill(6) + '.json')
+    need(journal == {'state': 'OBJECT_COPIED_PARTIAL_ONLY', 'path': row['destination'],
+                     'sha256': row['sha256'], 'bytes': row['bytes']}, 'Exact object journal sequence')
+start = load_archived('journal/000000-start.json')
+need(start['logicalCopyBytes'] == logical and start['initialRequiredFreeBytes'] == 2 * logical + 1024**3,
+     'Actual capacity operational guard recorded')
+need(result['externalReferences'] == [r for r in plan['originalInputs'] if r['kind'] == 'reference'] and
+     len(result['externalReferences']) == 55, '55 references not recategorized')
+passed('all10835CopiedObjectRolesOriginsCapsulesAnd10836Journals', copiedObjects=10835,
+       copiedLogicalBytes=logical, initialRequiredBytes=2 * logical + 1024**3,
+       hostSdkReferenceOccurrencesRemainReferences=55)
+
+original_map = load_archived('maps/original-paths.json')
+context_map = load_archived('maps/context-map.json')
+reference_rows = load_archived('maps/reference-context-rows.json')
+snapshots = load_archived('maps/separate-status-snapshots.json')
+links = load_archived('maps/link-provenance.json')
+omissions = load_archived('maps/unavailable-inspection-only.json')
+need(original_map == plan['originalMap'] and context_map == plan['contextMap'] and
+     reference_rows == plan['unmappedContextRows'] and snapshots == plan['separateStatusSnapshots'] and
+     links == plan['links'] and omissions == plan['omissions'], 'All exact generated preservation maps')
+need(len(original_map) == 17885 and len(omissions) == 1 and len(snapshots) == 7 and len(links) == 47,
+     'Original cardinalities')
+need(omissions[0]['expectedSha256'] == '24e4ac4e3edb505e7e1fd6acf342352f5088628f4b966856bf8cce16facfa5ab'
+     and omissions[0]['bytes'] == 37053 and omissions[0]['archivePath'] is None and
+     omissions[0]['oldBytesAvailable'] is False, 'Sole unavailable descriptor')
+protected = 0
+for mapped in original_map:
+    if mapped['storage']['kind'] == 'unavailable-inspection-only':
+        continue
+    protected += 1
+    descriptor, storage = mapped['descriptor'], mapped['storage']
+    if storage['archivePath'] is not None:
+        row = archive_rows[storage['archivePath']]
+        need((row['sha256'], row['bytes']) == (descriptor['sha256'], descriptor['bytes']), 'Protected exact mapped byte identity')
+    else:
+        need(storage['kind'] == 'reference', 'Only reference byte omission')
+need(protected == 17884, 'Strict17884')
+for snapshot in snapshots:
+    target = archive_rows[snapshot['archivePath']]
+    need((target['sha256'], target['bytes']) == (snapshot['sha256'], snapshot['bytes']) and
+         snapshot['historicalOldDescriptorReplacement'] is False, 'Seven distinct snapshots')
+license_rows = [r for r in original_map if r['descriptor']['sha256'] ==
+                '21a82bbee91262a076c2e34533d51d73475d55e889f1c42cf884c86b2a0d5773'
+                and r['descriptor']['path'].endswith('/LICENSE.node')]
+need(len(license_rows) == 14 and all(r['storage']['kind'] == 'reference' for r in license_rows),
+     'No reclassification of14 old license references')
+notice = archived('evidence/text/objects/21a82bbee91262a076c2e34533d51d73475d55e889f1c42cf884c86b2a0d5773.data',
+                  '21a82bbee91262a076c2e34533d51d73475d55e889f1c42cf884c86b2a0d5773', 1076)
+need(b'\0' not in notice, 'Known notice NUL-free')
+notice.decode('utf-8', 'strict')
+passed('strict17884OneUnavailableSevenSnapshotsAndKnownNodeMITOnly',
+       protectedDescriptors=17884, unavailable=1, snapshots=7, originalLicenseReferenceOccurrences=14)
+
+# Import only the hash-authenticated previously reviewed DATA-only archive reader.
+# Its constructor reads the actual map/manifests; all referenced payload files
+# were already independently streamed above, so repeated tuples use that exact
+# index/hash/size evidence instead of re-reading identical large payloads.
+reader_path = ADOPTION / 'artifact-closure-current-context-amendment-v1/archive-context-reader.py'
+external(reader_path, 'adb38b97aff2ddcd6fe7e5128e483efd1017405ca5ade34bb0e79e3865139800')
+spec = importlib.util.spec_from_file_location('independent_preservation_data_reader', reader_path)
+reader_module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(reader_module)
+map_row = archive_rows['maps/context-map.json']
+with reader_module.ArchiveContextReader(str(ROOT), 'maps/context-map.json', map_row['sha256']) as reader:
+    need(len(reader.contexts) == 20 and len(reader.entries) == 50894, 'Exact actual50894 tuple map')
+    need(all(v['coverage'] == 'selected-rows' for v in reader.contexts.values()), 'No all-rows copied claim')
+    for (context_id, original, expected), row in reader.entries.items():
+        indexed = archive_rows[row['archivePath']]
+        need((indexed['sha256'], indexed['bytes']) == (expected, row['bytes']), 'Every context maps to actual hashed archive bytes')
+    context_counts = {name: dict(value) for name, value in reader.contexts.items()}
+need(sum(v['mappedManifestRows'] for v in context_counts.values()) == 50894 and len(reference_rows) == 163,
+     'Selected row totals')
+for n in range(12):
+    need(context_counts['zlib-old-five-' + str(n)]['mappedManifestRows'] == 5, 'Exact zlib60 selected rows only')
+need(sum(v['manifestRows'] - v['mappedManifestRows'] for k, v in context_counts.items()
+         if k.startswith('classic-critical-')) == 163, 'Classic reference rows not all copied')
+for link in links:
+    path = Path(link['path'])
+    need(path.is_symlink() and os.readlink(path) == link['linkText'] and
+         str(path.resolve(strict=True)) == link['resolvedTarget'], 'Current47 original link facts')
+passed('all20OriginalManifestContextsAnd50894ExactMappedTuples', contexts=20, selectedTuples=50894,
+       selectedZlibRows=60, referenceRowOccurrences=163, originalLinksRechecked=47,
+       originalPathRedirected=False, contextPayloadChecks='Every tuple is joined to the exact independently hashed archive file; duplicate payloads are not re-hashed per tuple.')
+print(json.dumps({'stage': 'all50894ActualContextTuplesVerified', 'originalPathsNeverRedirected': True}), flush=True)
+
+# Authenticate current originals once independently. The publisher's actual
+# pre/post success follows the authenticated executed control flow plus raw0;
+# this extra read is independent current-byte confirmation, not fabricated logs.
+source_rows = {(r['source'], r['sha256'], r['bytes']): r for r in plan['originalInputs']}
+for row in expected_objects:
+    source_rows.setdefault((row['source'], row['sha256'], row['bytes']), row)
+config_source = {'source': str(config_path), 'sha256': digest(config_raw), 'bytes': len(config_raw)}
+source_rows[(config_source['source'], config_source['sha256'], config_source['bytes'])] = config_source
+source_logical = 0
+source_list_digest = hashlib.sha256()
+for (name, expected, size), row in sorted(source_rows.items()):
+    external(name, expected, size, False)
+    source_logical += size
+    source_list_digest.update(json.dumps([name, expected, size], separators=(',', ':')).encode() + b'\n')
+need(all((r['source'], r['sha256'], r['bytes']) in source_rows for r in plan['originalInputs']),
+     'All18751 original physical descriptors checked')
+passed('allOriginalPhysicalInputsAndAddedCapsuleSourcesCurrentHashes', physicalOriginalInputRecords=18751,
+       distinctSourceDescriptorsRehashed=len(source_rows), sourceLogicalBytesRehashed=source_logical,
+       descriptorListSha256=source_list_digest.hexdigest(),
+       publisherBeforeAfterChecks='Authenticated source control flow requires pre/post input rehashes before marker; actual external raw0 and exact marker observed. Independent current-byte checks are separate.')
+print(json.dumps({'stage': 'allOriginalAndAddedSourceHashesVerified', 'sources': len(source_rows)}), flush=True)
+
+policy = load_archived('metadata/root-context-migration-or-hold-decision.json')
+need(all(policy[k] == v for k, v in plan['expectedMigrationPolicyFields'].items()) and
+     len(policy['acceptedTypedHoldDecisions']) == 12 and
+     policy['sourcePromotionAllowed'] is False and policy['archiveAcceptanceAllowed'] is False,
+     'Formal20a hold policy retained')
+need(result['sourcePromotionPerformed'] is False and result['archiveAcceptanceIssued'] is False and
+     result['ownerRuntimeExecuted'] is False and result['fullZlib350OrConsumers355ArchiveClaim'] is False,
+     'No broadened claim')
+need(result['contextRowsVerified'] == 50894 and result['contextCoverage'] == 'selected-rows', 'Actual bounded context result')
+readme = load_archived('README.json')
+need(readme['accepted'] is False and readme['historicalProgramsRerunnableClaim'] is False and
+     readme['SDKHostBinariesCopied'] is False and readme['sourcePromotionAllowed'] is False,
+     'No rerun/promotion/full binary archive claim')
+actual_after, directory_after = closure(root_fd)
+need(actual_before == actual_after and directory_before == directory_after, 'Whole archive metadata/membership unchanged during review')
+root_identity()
+passed('pendingArchiveRemainsUnchangedAndAllMigrationHoldsRetained',
+       sourcePromotionIssued=False, archiveAcceptanceIssued=False,
+       fullZlib350OrConsumers355ArchiveClaim=False, historicalProgramsRerunnableClaim=False)
+os.close(root_fd)
+
+output = {
+    'schemaVersion': 1,
+    'state': 'INDEPENDENT_PRIVATE_CLASSIC_ARTIFACT_PRESERVATION_BYTES_VERIFIED_PENDING_ROOT_ACCEPTANCE',
+    'archiveRoot': str(DECLARED), 'canonicalArchiveRoot': str(ROOT),
+    'archiveIndexSha256': INDEX_SHA, 'archiveResultSha256': RESULT_SHA,
+    'archiveCompletionSha256': COMPLETION_SHA, 'rootCopyResultSha256': ROOT_RESULT_SHA,
+    'publisherSourceIndexSha256': SOURCE_SHA, 'copyPlanSha256': PLAN_SHA,
+    'regularFilesVerified': 21682, 'archiveSymlinks': 0, 'copiedObjectsVerified': 10835,
+    'actualCopiedLogicalObjectBytes': logical, 'indexedArchiveBytesVerified': hashed_bytes,
+    'checks': checks, 'checkCount': len(checks), 'verifiedPassed': True,
+    'sourcePromotionIssued': False, 'archiveAcceptanceIssued': False,
+    'runtimeAcceptanceClaim': False, 'publisherOrOwnerActionInvokedByReviewer': False,
+    'originalPathsRedirected': False, 'pendingArchiveModifiedByReviewer': False,
+    'historicalProgramsRerunnableClaim': False, 'fullZlib350OrConsumers355ArchiveClaim': False,
+}
+for name, value in [('results.json', output),
+                    ('context-summary.json', {'schemaVersion': 1, 'contexts': context_counts,
+                                              'referenceRowsNotCopied': 163, 'allRowsCopiedClaim': False}),
+                    ('byte-witnesses.json', {'schemaVersion': 1, 'files': list(witnesses.values()),
+                                             'fileCount': len(witnesses)})]:
+    with (HERE / name).open('x') as target:
+        json.dump(value, target, indent=2); target.write('\n')
+print(json.dumps({'state': output['state'], 'checks': len(checks), 'sourceWitnesses': len(witnesses)}))

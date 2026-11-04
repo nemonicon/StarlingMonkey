@@ -1,0 +1,560 @@
+{
+  "schema": 1,
+  "state": "READ_ONLY_PRODUCTION_REGRESSION_SOURCE_MAP_AND_FUTURE_PLAN",
+  "scope": {
+    "sourceInspectionOnly": true,
+    "runnerOrNativeEdits": false,
+    "testsExecuted": false,
+    "engineBuilt": false,
+    "componentOrHostExecuted": false,
+    "diagnosticProjection": false,
+    "futureEnginePinsExistInThisPacket": false,
+    "resetSafeReuse": "OPEN"
+  },
+  "newProductionContract": {
+    "sourceInputs": 306,
+    "parentSourceInputs": 304,
+    "recipeSha256": "869d188de3843b5d527d236a9e5c9af6ba1193f118dc9ad786df6266e1606173",
+    "policySha256": "98e80d36b8eb9b7ac99de54832288bd8eec148fa1b9fe0b27b3bada4d12b2cd0",
+    "helperSha256": "78521feeefe299360228e5db76bfde0b11e6eeee93bd2374cd39b2fe695b610c",
+    "admissionHelperSha256": "7680fa6b39bd9784c58bfb3d8af452e3b75beb6a23a3a841661d6777fdccd6f8",
+    "strictPolicyVersion": "sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1",
+    "protectedPolicyVersion": "sm-protected-abort-listener-v2-private-ticks-source-v1",
+    "embeddingAfterSha256": "9dcb63beaf55ff6af9ca4d2019316d4a167657c02ed76a1bf246012da0bcd205",
+    "fifthEmbeddingPatchSha256": "a6c3a34e06bc98ebc5a2f9ff943ceeb127e337d5b0bb349fc92d21cc123b576f",
+    "oldStrictPatchAndBoundaryHash": "Retain as separate authenticated ancestry, not replacements for current scheduler layer",
+    "actualSourcePolicyValidationRequired": true,
+    "actualEngineSidecarConfigurationAndCompileDatabasePinsRequired": true
+  },
+  "gates": [
+    {
+      "family": "core",
+      "status": "semantic_checks_unchanged",
+      "sources": [
+        "tests/node-compat/run.mjs",
+        "tests/node-compat/core-expectations.mjs",
+        "tests/node-compat/oracle.mjs",
+        "tests/node-compat/fixtures/component.mjs"
+      ],
+      "blockersOrCurrentContract": [
+        "Source-driven current manifest/native input checks; no old count/version gate"
+      ],
+      "finiteFutureAdaptation": [
+        "New fixed-engine preflight wrapper and fresh evidence only"
+      ]
+    },
+    {
+      "family": "allocator-normal",
+      "status": "new_versioned_wrapper_required",
+      "sources": [
+        "tests/node-compat/foundation-alloc-unsafe/installed/run-component-v11.mjs"
+      ],
+      "blockersOrCurrentContract": [
+        "verifyProductionV11 imported/called",
+        "m0.11/direct-U8 unchanged"
+      ],
+      "finiteFutureAdaptation": [
+        "New common preflight import/report namespace; preserve all assertions and actual old controls"
+      ]
+    },
+    {
+      "family": "allocator-gc",
+      "status": "new_fixed_gc_admission_required",
+      "sources": [
+        "tests/node-compat/foundation-alloc-unsafe/installed/run-gc-v11.mjs",
+        "tests/node-compat/foundation-alloc-unsafe/installed/production-v11-gc-pins.json"
+      ],
+      "blockersOrCurrentContract": [
+        "Old strict version",
+        "Old m0.10 protected preflight",
+        "Fixed GC engine/sidecar/recipe/config pins"
+      ],
+      "finiteFutureAdaptation": [
+        "New fixed actual Release-GC pins and layered common preflight; same valid public Buffer corpus"
+      ]
+    },
+    {
+      "family": "generic-native-harness",
+      "status": "semantic_checks_unchanged",
+      "sources": [
+        "tests/node-compat/foundations/native-scalar-harness.mjs"
+      ],
+      "blockersOrCurrentContract": [
+        "Requires normal Release/OFF entropy and gcStress:false by contract"
+      ],
+      "finiteFutureAdaptation": [
+        "Keep for normal OFF; do not treat it as a RuntimeOnly/GC runner"
+      ]
+    },
+    {
+      "family": "optional",
+      "status": "new_orchestration_and_one_version_gate_required",
+      "sources": [
+        "tests/node-compat/foundation-path/run.mjs",
+        "tests/node-compat/foundation-events/run-native-component.mjs",
+        "tests/node-compat/foundation-string-decoder/run-native-component.mjs",
+        "tests/node-compat/foundation-string-decoder/production-candidate-pins.json",
+        "tests/node-compat/foundation-assert/run-native-component.mjs",
+        "tests/node-compat/foundation-querystring/run-native-component.mjs",
+        "tests/node-compat/foundation-util/run-native-component.mjs",
+        "tests/node-compat/foundations/run-v11-optional-regressions.mjs"
+      ],
+      "blockersOrCurrentContract": [
+        "Events runner directly pins old strict version",
+        "Optional orchestrator imports fixed verifyProductionV11",
+        "Other semantic code source-driven"
+      ],
+      "finiteFutureAdaptation": [
+        "Finite new Events expected layer via common preflight; new orchestration/report outputs; preserve historical OFF identities"
+      ]
+    },
+    {
+      "family": "stream-web",
+      "status": "new_versioned_wrapper_required",
+      "sources": [
+        "tests/node-compat/foundation-stream-web/production-candidate/run-native-component-v11.mjs",
+        "tests/node-compat/foundation-stream-web/production-candidate/native-harness.mjs",
+        "tests/node-compat/foundation-stream-web/production-candidate/native-preflight.mjs",
+        "tests/node-compat/foundation-stream-web/production-candidate/native-preflight-contract.json",
+        "tests/node-compat/foundation-stream-web/production-candidate/run-native-off-admission.mjs",
+        "tests/node-compat/foundation-stream-web/production-candidate/run-native-controller-off.mjs"
+      ],
+      "blockersOrCurrentContract": [
+        "ON wrapper imports fixed verifyProductionV11",
+        "Native preflight pins unchanged controller/decoder/kernel/factory/manifest sources"
+      ],
+      "finiteFutureAdaptation": [
+        "New ON wrapper/report; retain exact native guard preflight before receiver corpus; OFF/controller controls remain source-pinned and separate"
+      ]
+    },
+    {
+      "family": "strict",
+      "status": "new_versioned_preflight_and_wrappers_required",
+      "sources": [
+        "tests/node-compat/foundation-add-abort/production-v11-preflight.mjs",
+        "tests/node-compat/foundation-add-abort/production-v11-pins.json",
+        "tests/node-compat/foundation-add-abort/run-production-v11-sync.mjs",
+        "tests/node-compat/foundation-add-abort/run-production-v11-runtime.mjs",
+        "tests/node-compat/foundation-add-abort/run-production-v11-late.mjs",
+        "tests/node-compat/foundation-add-abort/run-production-v11-callbacks.mjs"
+      ],
+      "blockersOrCurrentContract": [
+        "All four import fixed old preflight",
+        "sync/runtime/callbacks additionally old strict version",
+        "Fixed 304/recipe354/current source maps/embedding9a7c/strict3"
+      ],
+      "finiteFutureAdaptation": [
+        "New actual pins and exact source306 layer; preserve base v3 patch and embeddingBoundaryPatch ancestry separately; current strict TU count3+ticks"
+      ]
+    },
+    {
+      "family": "protected",
+      "status": "new_versioned_three_engine_preflight_required",
+      "sources": [
+        "tests/node-compat/foundation-add-abort/production-native-m0.11/preflight.mjs",
+        "tests/node-compat/foundation-add-abort/production-native-m0.11/engine-pins.json",
+        "tests/node-compat/foundation-add-abort/production-native-m0.11/run-component.mjs",
+        "tests/node-compat/foundation-add-abort/production-native-m0.11/run-gc.mjs",
+        "tests/node-compat/foundation-add-abort/production-native-m0.11/run-callback-return.mjs",
+        "tests/node-compat/foundation-add-abort/production-native-m0.11/run-off-control.mjs",
+        "tests/node-compat/foundation-add-abort/production-native-m0.10/preflight.mjs"
+      ],
+      "blockersOrCurrentContract": [
+        "Fixed OFF/Runtime/GC engine paths and SHAs",
+        "recipe354/source304/old strict and protected versions",
+        "Old current protected map and embedding9a7c"
+      ],
+      "finiteFutureAdaptation": [
+        "New actual normal OFF/Runtime/GC pins; exact policy current+ancestor maps and actual macro compilation; keep all29/known-gap/fatal/GC checks; EventsOFF admission only"
+      ]
+    },
+    {
+      "family": "release-orchestrator",
+      "status": "new_full_run_required",
+      "sources": [
+        "tests/node-compat/foundations/run-v11-release-gates-v3.mjs"
+      ],
+      "blockersOrCurrentContract": [
+        "Authenticates prior-v11 attempt then reuses five successful same-engine reports"
+      ],
+      "finiteFutureAdaptation": [
+        "Run all eight gates for new engine; no reuse of historical runtime/components; semantic sources may be reused"
+      ]
+    },
+    {
+      "family": "http",
+      "status": "new_versioned_http_seal_and_guards_required",
+      "sources": [
+        "tests/node-compat/foundations/prepare-http-v11.mjs",
+        "tests/node-compat/foundations/audit-http-v11.mjs",
+        "tests/node-compat/foundations/http-v11.mjs",
+        "tests/node-compat/wasmcloud/build-http.mjs",
+        "tests/node-compat/foundations/assert-http-report.mjs",
+        "tests/node-compat/foundations/assert-protected-abort-report.mjs",
+        "tests/node-compat/foundations/assert-stream-web-report.mjs",
+        "tests/node-compat/wasmcloud/http-stubbing.mjs",
+        "tests/node-compat/wasmcloud/type-audit.mjs",
+        "tests/node-compat/wasmcloud/test-wasmtime-http.mjs",
+        "tests/node-compat/wasmcloud/run-host.mjs"
+      ],
+      "blockersOrCurrentContract": [
+        "Prepare/audit fixed Runtime engine and sidecar",
+        "Builder/prepare/audit call old m0.10 protected preflight",
+        "Builder finite historical entry-name list",
+        "Existing input seal records old selector/guard source hashes"
+      ],
+      "finiteFutureAdaptation": [
+        "New entry/prepare/audit/preflight/seal/component pins/reports; additive finite builder recognition; preserve entire schema5/29 and fatal exclusion; same bytes on both hosts"
+      ]
+    },
+    {
+      "family": "supplementary",
+      "status": "finite_updates_if_replayed",
+      "sources": [
+        "tests/node-compat/foundations/cmake-policy-test.py",
+        "tests/node-compat/abi-fix/run-current.mjs",
+        "tests/node-compat/entropy/run-production.mjs",
+        "tests/node-compat/entropy/selection-policy.mjs",
+        "tests/node-compat/utf8-direct/run-production-codec.mjs",
+        "tests/node-compat/utf8-direct/production-codec-pins.json"
+      ],
+      "blockersOrCurrentContract": [
+        "CMake no-clobber suffix old at line68",
+        "ABI current runner embedding hash old at line84",
+        "Codec fixed engine/count receipts",
+        "Entropy ordinary runner source-driven"
+      ],
+      "finiteFutureAdaptation": [
+        "New finite ordinary source/config pins; no stopped DEBUG/OOM/raw branch; keep capabilities explicit"
+      ]
+    }
+  ],
+  "futurePreflightRequirements": [
+    "New real fixed normal OFF, normal RuntimeOnly and Release-GC engine/sidecar pins; actual selected tick setting",
+    "Exact source306/current+parent maps/recipe869/five reviewed patches and embedding9dcb",
+    "Immutable frozen CMake cache/compile database rehash and actual command comparison",
+    "Explicit requested/observed options; no metadata field fabrication or diagnostic308 projection",
+    "Exact active native61/60/60/59 depending queue/kernel selection; strict3+ticks; embedding1",
+    "Locked Rust/OpenSSL receipts and actual capability policy",
+    "All receiver negatives gated on new exact EventsON guarded source and actual layout macro; never EventsOFF",
+    "Fresh output namespace, full new eight-job replay, both-host same-byte HTTP and retained/fresh checks"
+  ],
+  "capabilityExpectations": {
+    "normalOffScalar": [],
+    "runtimeOnlyScalar": [
+      "wasi:random/random@0.2.10"
+    ],
+    "ordinaryGcOffScalar": [],
+    "runtimeHttp": [
+      "wasi:clocks/monotonic-clock@0.2.10",
+      "wasi:http/types@0.2.10",
+      "wasi:io/error@0.2.10",
+      "wasi:io/poll@0.2.10",
+      "wasi:io/streams@0.2.10",
+      "wasi:random/random@0.2.10"
+    ],
+    "httpMonotonicClock": "Nominal duration type only; callableImports[] and coreClockImports[]"
+  },
+  "retainedLimitations": [
+    "Fresh then-getter reads Node1/1/0 vs native0/0/0 remain counterexample",
+    "Symbol.dispose registry and registration getter timing differences remain",
+    "GC owner/closure co-ownership does not isolate prototype Symbol liveness",
+    "HTTP counters1 do not prove instance reuse",
+    "Reset/cancellation/ALS/public process remain open or absent",
+    "Public prior-feature replay does not itself exercise private tick enqueue/ordering",
+    "No performance/size/memory evidence transfer",
+    "Stopped DEBUG/OOM/raw-memory branch excluded"
+  ],
+  "sourceWitnesses": [
+    {
+      "path": "tests/node-compat/abi-fix/run-current.mjs",
+      "bytes": 13131,
+      "sha256": "b23b6f516fed3ee7037091c8054e14293195eddbf5c9aacc7cd841d0dfa2e81a"
+    },
+    {
+      "path": "tests/node-compat/core-expectations.mjs",
+      "bytes": 6471,
+      "sha256": "de0442c9b54d662111fc969a5aafc858fed6129314dc4dfb4bf70e16a13a580a"
+    },
+    {
+      "path": "tests/node-compat/entropy/run-production.mjs",
+      "bytes": 10490,
+      "sha256": "f4b9f4c85157193e2b99ed233989c936a4618ead8ac696cc79bc91acdec02c2f"
+    },
+    {
+      "path": "tests/node-compat/entropy/selection-policy.mjs",
+      "bytes": 1910,
+      "sha256": "5c16782fea5d3233845a95c0863798a2944adde322b29e391eefd0d23bbee41f"
+    },
+    {
+      "path": "tests/node-compat/fixtures/component.mjs",
+      "bytes": 14371,
+      "sha256": "719800847b2ac3a880511fb160dd857efbd97cf9a61c96d4a68eaf0c691cc4ad"
+    },
+    {
+      "path": "tests/node-compat/foundation-add-abort/production-native-m0.10/preflight.mjs",
+      "bytes": 6624,
+      "sha256": "f6f60f5fec57510507fd5b1d24f9888e5137f27b7a0848e00870101a41c71afe"
+    },
+    {
+      "path": "tests/node-compat/foundation-add-abort/production-native-m0.11/engine-pins.json",
+      "bytes": 1874,
+      "sha256": "a90122bd6c400219da11eb72f2da931248275cdc9e656cce0ef8c0f5cbc8a791"
+    },
+    {
+      "path": "tests/node-compat/foundation-add-abort/production-native-m0.11/preflight.mjs",
+      "bytes": 7722,
+      "sha256": "6c209a49a0a1329d88470c3249a31eeb189664522380c97490f7d8afb532651e"
+    },
+    {
+      "path": "tests/node-compat/foundation-add-abort/production-native-m0.11/run-callback-return.mjs",
+      "bytes": 2838,
+      "sha256": "9c9bcd2c8ea738123ea1303d5ae338eb996f13aa29e965259836f969ca70b971"
+    },
+    {
+      "path": "tests/node-compat/foundation-add-abort/production-native-m0.11/run-component.mjs",
+      "bytes": 9423,
+      "sha256": "2f82b4b8bc92b5e2826b918ab449de0306a233238cbd499ff04a611fb1bcdefc"
+    },
+    {
+      "path": "tests/node-compat/foundation-add-abort/production-native-m0.11/run-gc.mjs",
+      "bytes": 3482,
+      "sha256": "5a8a30f60009957b425bb704b23e95b8c45d7a3fa918aa9fbce1c049b1df2adb"
+    },
+    {
+      "path": "tests/node-compat/foundation-add-abort/production-native-m0.11/run-off-control.mjs",
+      "bytes": 5250,
+      "sha256": "c4e1e80dad3e640f81a219655f5ca4aaca1cfcc687447f2f1cf2b3d2cf412b91"
+    },
+    {
+      "path": "tests/node-compat/foundation-add-abort/production-v11-pins.json",
+      "bytes": 2459,
+      "sha256": "8d65a482047be91531295e4750f59dbd94799bb0f26fa107299fa2663998123a"
+    },
+    {
+      "path": "tests/node-compat/foundation-add-abort/production-v11-preflight.mjs",
+      "bytes": 6786,
+      "sha256": "0d68ca233d58e912ed39e7f96f7ade324a7079b38caa8df586ee9f413e3b0263"
+    },
+    {
+      "path": "tests/node-compat/foundation-add-abort/run-production-v11-callbacks.mjs",
+      "bytes": 8140,
+      "sha256": "68dd28d1661d9bc03aeb1efb0c73f5c4c822969d78aebc7851e461d752ea21a9"
+    },
+    {
+      "path": "tests/node-compat/foundation-add-abort/run-production-v11-late.mjs",
+      "bytes": 6141,
+      "sha256": "4a7526e09602170b6fccaa0e8f074df9b4aee47f9111eeafa7d0c4b8097a1049"
+    },
+    {
+      "path": "tests/node-compat/foundation-add-abort/run-production-v11-runtime.mjs",
+      "bytes": 6026,
+      "sha256": "5fa4903f853697aa34d3e58c49d4b27a32896c17da134bd94547c2f92534a1b1"
+    },
+    {
+      "path": "tests/node-compat/foundation-add-abort/run-production-v11-sync.mjs",
+      "bytes": 8996,
+      "sha256": "28066ddd312e841b87910c35f85b3e200081b412d9f572b327cc917cb7cbcf57"
+    },
+    {
+      "path": "tests/node-compat/foundation-alloc-unsafe/installed/production-v11-gc-pins.json",
+      "bytes": 1422,
+      "sha256": "67d935c5e5f3f72fe0cf23e615b4ec96fd256dcd0bf69a0f1d4fcd7b497ef4c8"
+    },
+    {
+      "path": "tests/node-compat/foundation-alloc-unsafe/installed/run-component-v11.mjs",
+      "bytes": 17462,
+      "sha256": "a7c3df6941fd9919d05c74a12a5fe8928c1b9a61c97b46ebaa768f7ff80ee37a"
+    },
+    {
+      "path": "tests/node-compat/foundation-alloc-unsafe/installed/run-gc-v11.mjs",
+      "bytes": 8531,
+      "sha256": "f2e73b73a2759c37ff0673fc129ed1f139002c2e0454f4b08e882be1427e43d3"
+    },
+    {
+      "path": "tests/node-compat/foundation-assert/run-native-component.mjs",
+      "bytes": 5106,
+      "sha256": "c183e8937a0b92e981af28bff84c4a93d032767233792f92178b62fa7a01f8a0"
+    },
+    {
+      "path": "tests/node-compat/foundation-events/run-native-component.mjs",
+      "bytes": 11283,
+      "sha256": "8c995f3b2812a3bb3613f64b404beb7ad2e7b2b007854015dabcd8e06fa583a3"
+    },
+    {
+      "path": "tests/node-compat/foundation-path/run.mjs",
+      "bytes": 9418,
+      "sha256": "fb04146712223ff5280d3a09b7bc5dc3c471cce4f490f135f0707dc4d97b74be"
+    },
+    {
+      "path": "tests/node-compat/foundation-querystring/run-native-component.mjs",
+      "bytes": 5215,
+      "sha256": "cd5b9206e80b499b5ee65b711b69531bff5c6067d5dbaaf6240e9fcbb0fba201"
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/admission-candidate-v2/index.json",
+      "bytes": 5357,
+      "sha256": "4cc7e6b818aaec5593c24c8cc8be0071fe15448bf172a5b48a9c255b7bd53df2"
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/integration-candidate-v1/layer-policy.py",
+      "bytes": 6720,
+      "sha256": "78521feeefe299360228e5db76bfde0b11e6eeee93bd2374cd39b2fe695b610c"
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/integration-candidate-v1/policy.json",
+      "bytes": 49199,
+      "sha256": "98e80d36b8eb9b7ac99de54832288bd8eec148fa1b9fe0b27b3bada4d12b2cd0"
+    },
+    {
+      "path": "tests/node-compat/foundation-stream-web/production-candidate/native-harness.mjs",
+      "bytes": 3693,
+      "sha256": "0f8d11b383e5452ace5915f706801c7354db7646905ac0a7950b7dcae71c6bf0"
+    },
+    {
+      "path": "tests/node-compat/foundation-stream-web/production-candidate/native-preflight-contract.json",
+      "bytes": 1619,
+      "sha256": "da6602ef53fabca22918853b5bcf0f9f263384d8f4b7c418ad9148e677a1e355"
+    },
+    {
+      "path": "tests/node-compat/foundation-stream-web/production-candidate/native-preflight.mjs",
+      "bytes": 4815,
+      "sha256": "ee83495efdd417c2283b8acfad6c57783ea355e803cf2e6fdca107cd9ee55699"
+    },
+    {
+      "path": "tests/node-compat/foundation-stream-web/production-candidate/run-native-component-v11.mjs",
+      "bytes": 7695,
+      "sha256": "0ecdc82f4e10905815e6a3863cee0af15a10097da9c7aa11a7c58c9c7a76c658"
+    },
+    {
+      "path": "tests/node-compat/foundation-stream-web/production-candidate/run-native-controller-off.mjs",
+      "bytes": 3368,
+      "sha256": "e92575a8e99e3542c495ba0ff7d45ad635b17bc81a4e15520b6f566ace7972ca"
+    },
+    {
+      "path": "tests/node-compat/foundation-stream-web/production-candidate/run-native-off-admission.mjs",
+      "bytes": 2110,
+      "sha256": "8b2edb4834d9c30f9500c9c86d04ed7f57c60a20086ef3c0b4b228c8c11f15f5"
+    },
+    {
+      "path": "tests/node-compat/foundation-string-decoder/production-candidate-pins.json",
+      "bytes": 1408,
+      "sha256": "468e3fef1c5873964b4b593adba6b650a065b47b9a291c28edac31f3e07c0341"
+    },
+    {
+      "path": "tests/node-compat/foundation-string-decoder/run-native-component.mjs",
+      "bytes": 10121,
+      "sha256": "92ed7a10003fb3aca7a40de9a45971bbafd3b3234e3b74f582637860b937c981"
+    },
+    {
+      "path": "tests/node-compat/foundation-util/run-native-component.mjs",
+      "bytes": 6785,
+      "sha256": "944f3519e9e61ce28845b9ba6f03d64fcafe51fa08aa99cd26ea7fd7d1870aa9"
+    },
+    {
+      "path": "tests/node-compat/foundations/assert-http-report.mjs",
+      "bytes": 8029,
+      "sha256": "cd8c3fbea4dcfd703a0e0594afd523d360d224305c0a74a70c54f0eb1063299c"
+    },
+    {
+      "path": "tests/node-compat/foundations/assert-protected-abort-report.mjs",
+      "bytes": 2904,
+      "sha256": "1b65b8d131a438203a42824915256eea98309cc07a74ba9970736f263d617753"
+    },
+    {
+      "path": "tests/node-compat/foundations/assert-stream-web-report.mjs",
+      "bytes": 1469,
+      "sha256": "e8d28c1edd15289cc57339bbefdb0ac069f5baf5793422d3a98596daa3377035"
+    },
+    {
+      "path": "tests/node-compat/foundations/audit-http-v11.mjs",
+      "bytes": 8170,
+      "sha256": "0de8c0275f845006fa2372a219d5bef7a3d389e05b530d5af785f543ef3208cf"
+    },
+    {
+      "path": "tests/node-compat/foundations/cmake-policy-test.py",
+      "bytes": 5296,
+      "sha256": "fea57f5ff2e28a5b7ec5080732116241432e9d268e676767df44071aea93302e"
+    },
+    {
+      "path": "tests/node-compat/foundations/http-v11.mjs",
+      "bytes": 7532,
+      "sha256": "f8a5aa42d6902d4f7a953f124849751f3a4b2b20dbf8df716c9002b7402fe2fa"
+    },
+    {
+      "path": "tests/node-compat/foundations/native-scalar-harness.mjs",
+      "bytes": 9361,
+      "sha256": "01a17006e04e7db3d644d63fe778d112abbc807a5612e9fd90ece1a914d57acd"
+    },
+    {
+      "path": "tests/node-compat/foundations/prepare-http-v11.mjs",
+      "bytes": 3106,
+      "sha256": "5c9b17c274d58c23e18924bcf3b1f7aabe0026593bc172abe1319038af6a88c5"
+    },
+    {
+      "path": "tests/node-compat/foundations/run-v11-optional-regressions.mjs",
+      "bytes": 8778,
+      "sha256": "35260f33b341486ac2ef777d08d9999baa004453352cb5d6cddaa061be44c51e"
+    },
+    {
+      "path": "tests/node-compat/foundations/run-v11-release-gates-v3.mjs",
+      "bytes": 7605,
+      "sha256": "a96c2c2927104e3fb0e26b24907ab85084cc48ec7ac0ab0cd557596896835cae"
+    },
+    {
+      "path": "tests/node-compat/module-selection.mjs",
+      "bytes": 11405,
+      "sha256": "ef46951437138aab4e7759b0a733495c5ef2259c23ed6187438b20611a1e5991"
+    },
+    {
+      "path": "tests/node-compat/oracle.mjs",
+      "bytes": 2192,
+      "sha256": "c96cf6f0480e9f5ecbb08ae5ca363223158f4b6d21a11dd8fd6a4e1667d7cedd"
+    },
+    {
+      "path": "tests/node-compat/private-ticks-admission.mjs",
+      "bytes": 15110,
+      "sha256": "7680fa6b39bd9784c58bfb3d8af452e3b75beb6a23a3a841661d6777fdccd6f8"
+    },
+    {
+      "path": "tests/node-compat/run.mjs",
+      "bytes": 11294,
+      "sha256": "15b2c8e76431b846ecc114b8cb1b9928c2d0bff13371d191d8d8712c00ba13a0"
+    },
+    {
+      "path": "tests/node-compat/utf8-direct/production-codec-pins.json",
+      "bytes": 1197,
+      "sha256": "7bde9de662d1a766fcfe1ccd3444e4ac76d77af7e4ea8c46c8fb6398d3b08e71"
+    },
+    {
+      "path": "tests/node-compat/utf8-direct/run-production-codec.mjs",
+      "bytes": 12944,
+      "sha256": "85450aac8cba5c70cc8805621287951441658c4c65378a49f38a0a052029d57c"
+    },
+    {
+      "path": "tests/node-compat/wasmcloud/build-http.mjs",
+      "bytes": 23263,
+      "sha256": "7958c63a8c14cd8ec56c371e7ee7b673b8cea86f5f0b4a264546938cb71b2cb7"
+    },
+    {
+      "path": "tests/node-compat/wasmcloud/http-stubbing.mjs",
+      "bytes": 5181,
+      "sha256": "4be1f090ce6d80bfc9043480eaee4f9a00774f7432645d10010f746b8001a57f"
+    },
+    {
+      "path": "tests/node-compat/wasmcloud/run-host.mjs",
+      "bytes": 15099,
+      "sha256": "bbb5e4c4dfa87d3f90a426f41902653f6338c9003a54e40b329fdb27d6ab4bac"
+    },
+    {
+      "path": "tests/node-compat/wasmcloud/test-wasmtime-http.mjs",
+      "bytes": 5577,
+      "sha256": "c7a821f9ca0d68bcfedacd354c00782818796119b5cf1a8a1136fed84fab272d"
+    },
+    {
+      "path": "tests/node-compat/wasmcloud/type-audit.mjs",
+      "bytes": 2477,
+      "sha256": "40eaccebb2c6d6b274b80b32213864a6d7a3c141489ca39a867d714682a49595"
+    }
+  ]
+}

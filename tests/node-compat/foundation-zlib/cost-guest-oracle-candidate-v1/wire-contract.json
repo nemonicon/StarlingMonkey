@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "state": "UNEXECUTED_CODEC_COST_GUEST_WIRE_CONTRACT_V1",
+  "proposalIndexSha256": "e29c596df3c809bab8fd3851b224a7ec4e84177d791c5d1f909072985f047ef8",
+  "protocolDecisionSha256": "0025c7a1083d9291effe0cf51bbfef4e154353db75d433dae07f296d46d61cc6",
+  "primaryCases": 30,
+  "controlRanges": {
+    "consumeInput": [
+      30,
+      59
+    ],
+    "copyInputAndConsume": [
+      60,
+      89
+    ],
+    "harnessNoCodec": [
+      90,
+      119
+    ]
+  },
+  "controlN": 1,
+  "controlsPerPrimaryWorker": 6,
+  "primaryTimingWorkers": 360,
+  "plannedOperationalControlCalls": 2160,
+  "allReturnTypes": "string",
+  "proposedOrdinaryExports": {
+    "identity": "() -> string",
+    "setup": "(caseId:u32) -> string",
+    "observe": "(caseId:u32) -> string",
+    "batch": "(caseId:u32,operations:u32) -> string",
+    "checkpoint": "() -> string",
+    "stage": "(record:string) -> string",
+    "validate": "(record:string) -> string"
+  },
+  "counters": {
+    "fields": [
+      "publicFunctionEntries",
+      "perExportEntries",
+      "codecCalls",
+      "controlOperations"
+    ],
+    "publicFunctionEntriesMeaning": "named-function entries including internal validate calls; not outer host invocations",
+    "freshValidatePrimaryNamedEntries": 4,
+    "freshValidateCrossdecodeNamedEntries": 5,
+    "freshValidateCodecCalls": 2,
+    "reset": false
+  },
+  "caps": {
+    "recordAndResponseUtf16CodeUnits": 2097152,
+    "decodedCompressedInputBytesBeforeCodec": 1048576,
+    "providerOutputBytesAfterAllocation": 16777216,
+    "trustedRawFixtureBytes": 524288,
+    "wireCapIsPeakMemoryCap": false
+  },
+  "stageRequiredKeys": [
+    "schemaVersion",
+    "kind",
+    "caseId",
+    "fixture",
+    "format",
+    "provider",
+    "streamId",
+    "encodedBytes",
+    "encodedFNV1aU32",
+    "encodedSha256",
+    "encodedBase64"
+  ],
+  "stageKind": "codec-cost-stage-v1",
+  "stageProviders": [
+    "node-22.14.0",
+    "native-on",
+    "fflate-on",
+    "fflate-off"
+  ],
+  "stageShaMeaning": "parent authenticates full byte equality/SHA; guest only length/FNV and reports parentDeclaredSha256",
+  "lifetime": {
+    "initialSnapshot": "no prepared/staged/output/resource/codec state",
+    "setup": "clears prior active/stage/output state and prepares own input",
+    "stage": "matching active decoder only; replaces owned input and clears prioroutput; no codec",
+    "observe": "one codec call; retain one publicoutput for untimed adjacentownership",
+    "batch": "clear retaineduntimedoutput before any work; no output arrays retained",
+    "checkpoint": "clear prepared/staged/prioroutput, never counters/GC/reset",
+    "validatePrimary": [
+      "setup",
+      "observe",
+      "observe"
+    ],
+    "validateCrossdecode": [
+      "setup",
+      "stage",
+      "observe",
+      "observe"
+    ]
+  },
+  "providerLevelPlannedCounts": {
+    "uniqueEncoderOutputs": 45,
+    "uniqueCrossDecoderEdges": 135,
+    "positiveOutputsCurrently": null
+  },
+  "ffOffAdditionalPlannedScope": {
+    "uniqueEncoderOutputs": 15,
+    "nodeDecodeOffOutputs": 15,
+    "offGuestStagedPrimaryProviderStreams": 45,
+    "fullByteDeterminismAndIndependentActualOffProofRequired": true,
+    "ffOnResultsTransferred": false
+  },
+  "futureGates": {
+    "actualNodeOracle": null,
+    "renderedInputs": null,
+    "actualComponents": null,
+    "actualEmittedWITAndTypes": null,
+    "actualWasmtimeStringArgAndWholeArgvEnvSizeProof": null,
+    "actualCorrectness": null,
+    "timing": null
+  },
+  "noTimingWorkerStageOrValidate": true,
+  "encodedProviderByteIdentityRequired": false,
+  "noOracleCodecBundleNativeGuestHostPilotTimingExecuted": true
+}

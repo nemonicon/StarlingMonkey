@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "parentIndexSha256": "0558b50589680f9e1b812c8a62210233a768385bfabeae2f07be47c2e1fe5350",
+  "beforeSha256": "c0e59c5c6b19751b0b0d9225b9569d0c3ff8e415142c555920b2fd408739d809",
+  "afterSha256": "5ae9790879586bf673cfc0faaf5b12591401b63649c7cacdd2c0302791574b1e",
+  "edits": [
+    {
+      "old": "import {spawnSync} from 'node:child_process';\n",
+      "new": "",
+      "count": 1,
+      "afterOffsets": [
+        225
+      ]
+    },
+    {
+      "old": "import {requireExactJSON,RecordedMismatch} from './bounded-comparison.mjs';",
+      "new": "import {requireExactJSON,RecordedMismatch} from './bounded-comparison.mjs';\nimport {persistFile,progressJournal,runOwnedCommand} from './durable-host.mjs';",
+      "count": 1,
+      "afterOffsets": [
+        451
+      ]
+    },
+    {
+      "old": " const tracked=trackedWriter(output),write=tracked.write;",
+      "new": " const tracked=trackedWriter(output),write=tracked.write;\n for(const name of ['progress','case-results','rotations','processes'])await mkdir(join(output,name));\n const progress=progressJournal({output,write});\n const persist=(name,data)=>persistFile({output,write,path:join(output,name),data});\n await progress('driver-started',{workloadCases:20,boundaryCases:14,resumeSupported:false,reusedResults:0});\n try {",
+      "count": 1,
+      "afterOffsets": [
+        2142
+      ]
+    },
+    {
+      "old": " const {component,interfaceAudit}=await selected.componentize",
+      "new": " await progress('componentize-before');\n const {component,interfaceAudit}=await selected.componentize",
+      "count": 1,
+      "afterOffsets": [
+        3060
+      ]
+    },
+    {
+      "old": " const modulePath=join(output,'classic_correctness.js'),instance=await import(pathToFileURL(modulePath));\n async function oneRotation(instance,startCall,label){const cases=[];\n  for(let index=0;index<20;index++){const value=JSON.parse(await instance.run(index));try{cases.push(await validateCase(value,index,startCall+index));}catch(error){if(error instanceof RecordedMismatch)throw error;await retainCounterexample(label+'/case'+index,value,expectedCase(index),error);}}\n  const boundaries=JSON.parse(await instance.boundaries());try{await validateBoundaries(boundaries,startCall+20);}catch(error){if(error instanceof RecordedMismatch)throw error;await retainCounterexample(label+'/boundaries',boundaries,encoding.expected,error);}return{cases,boundaries};}\n const retained=[];for(let round=0;round<3;round++)retained.push(await oneRotation(instance,round*21+1,'retained'+round));\n const fresh=await import(pathToFileURL(modulePath).href+'?fresh=1'),freshJco=await oneRotation(fresh,1,'freshJco');\n await requireExactJSON({label:'fresh-Jco-full-rotation',actual:freshJco,expected:retained[0],writeCounterexample});",
+      "new": " const modulePath=join(output,'classic_correctness.js'),instance=await import(pathToFileURL(modulePath));\n async function jcoCase(instance,startCall,label,index){\n  const name=label+'-'+(index<20?'case-'+String(index).padStart(2,'0'):'boundaries'),expression=index<20?'run('+index+')':'boundaries()';\n  await progress('jco-before',{label,index,expression,expectedCall:startCall});\n  let raw;\n  try{raw=index<20?await instance.run(index):await instance.boundaries();}\n  catch(error){await progress('jco-call-rejected',{label,index,expression,error:{name:error.name,code:error.code,message:String(error.message).slice(0,512)}});throw error;}\n  const rawFile=await persist('case-results/'+name+'.raw.txt',raw);\n  let value;\n  try{value=JSON.parse(raw);}catch(error){await retainCounterexample(name,{raw},index<20?expectedCase(index):encoding.expected,error);}\n  const observedFile=await persist('case-results/'+name+'.observed.json',JSON.stringify(value,null,2)+'\\n');\n  await progress('jco-returned',{label,index,expression,rawFile,observedFile,validationCompleted:false});\n  try{if(index<20)await validateCase(value,index,startCall,{rawFile});else await validateBoundaries(value,startCall,{rawFile});}\n  catch(error){if(error instanceof RecordedMismatch)throw error;await retainCounterexample(name,value,index<20?expectedCase(index):encoding.expected,error);}\n  await progress('jco-validated',{label,index,expression,rawFile,observedFile});return value;\n }\n async function oneRotation(instance,startCall,label){const cases=[];\n  for(let index=0;index<20;index++)cases.push(await jcoCase(instance,startCall+index,label,index));\n  const boundaries=await jcoCase(instance,startCall+20,label,20),rotation={cases,boundaries};\n  await persist('rotations/'+label+'.json',JSON.stringify(rotation,null,2)+'\\n');\n  await progress('jco-rotation-validated',{label,cases:20,boundaryCases:14});return rotation;\n }\n const retained=[];for(let round=0;round<3;round++)retained.push(await oneRotation(instance,round*21+1,'retained'+round));\n const fresh=await import(pathToFileURL(modulePath).href+'?fresh=1'),freshJco=await oneRotation(fresh,1,'freshJco');\n await requireExactJSON({label:'fresh-Jco-full-rotation',actual:freshJco,expected:retained[0],writeCounterexample});\n await progress('fresh-jco-full-rotation-exact');",
+      "count": 1,
+      "afterOffsets": [
+        5485
+      ]
+    },
+    {
+      "old": " const version=spawnSync(host,['--version'],{encoding:'utf8',timeout:55000});assert.equal(version.status,0);assert.match(version.stdout,/^wasmtime 42\\.0\\.1\\b/);\n const {decodeCliString}=await import(pathToFileURL(join(root,'tests/node-compat/foundations/native-scalar-harness.mjs')));\n const wasmtime=[];\n for(let index=0;index<=20;index++){\n  const expression=index<20?'run('+index+')':'boundaries()',actual=spawnSync(host,['run','--invoke',expression,componentPath],{encoding:'utf8',timeout:55000,maxBuffer:16*1024*1024});\n  assert.equal(actual.status,0,actual.error?.message??actual.stderr);const value=JSON.parse(decodeCliString(actual.stdout.trim()));\n  try{if(index<20)await validateCase(value,index,1,{stdout:actual.stdout,stderr:actual.stderr});else await validateBoundaries(value,1,{stdout:actual.stdout,stderr:actual.stderr});}catch(error){if(error instanceof RecordedMismatch)throw error;await retainCounterexample('freshWasmtime/'+expression,{value,stdout:actual.stdout,stderr:actual.stderr},index<20?expectedCase(index):encoding.expected,error);}\n  wasmtime.push({expression,status:actual.status,stdout:actual.stdout,stderr:actual.stderr,observed:value});\n }\n",
+      "new": " const invoke=(name,args,timeoutMs=600000,maxOutputBytes=16*1024*1024)=>runOwnedCommand({output,name,executable:host,args,write,register:path=>tracked.paths.add(path),timeoutMs,maxOutputBytes,\n  onProgress:detail=>console.log(JSON.stringify({event:'wasmtime-running',...detail}))});\n const version=await invoke('wasmtime-version',['--version'],55000,1024*1024);\n if(!version.terminalExitZeroObserved)throw new Error('Wasmtime version process failed; see '+version.terminalPath);\n assert.match(version.stdout,/^wasmtime 42\\.0\\.1\\b/);\n const {decodeCliString}=await import(pathToFileURL(join(root,'tests/node-compat/foundations/native-scalar-harness.mjs')));\n const wasmtime=[];\n for(let index=0;index<=20;index++){\n  const expression=index<20?'run('+index+')':'boundaries()',name='wasmtime-'+(index<20?'case-'+String(index).padStart(2,'0'):'boundaries');\n  await progress('wasmtime-before',{index,expression,deadlineMs:600000,freshProcess:true});\n  const actual=await invoke(name,['run','--invoke',expression,componentPath]);\n  await progress('wasmtime-process-returned',{index,expression,terminalPath:actual.terminalPath,status:actual.status,timedOut:actual.timedOut,\n   stdoutFile:actual.stdoutFile,stderrFile:actual.stderrFile,validationCompleted:false});\n  if(!actual.terminalExitZeroObserved)throw new Error('Wasmtime did not complete successfully for '+expression+'; see '+actual.terminalPath);\n  let value;\n  try{value=JSON.parse(decodeCliString(actual.stdout.trim()));}\n  catch(error){await retainCounterexample('freshWasmtime/'+expression,{stdout:actual.stdout,stderr:actual.stderr,terminalPath:actual.terminalPath},index<20?expectedCase(index):encoding.expected,error);}\n  const observedFile=await persist('case-results/'+name+'.observed.json',JSON.stringify(value,null,2)+'\\n');\n  try{if(index<20)await validateCase(value,index,1,{stdout:actual.stdout,stderr:actual.stderr,terminalPath:actual.terminalPath});else await validateBoundaries(value,1,{stdout:actual.stdout,stderr:actual.stderr,terminalPath:actual.terminalPath});}\n  catch(error){if(error instanceof RecordedMismatch)throw error;await retainCounterexample('freshWasmtime/'+expression,{value,stdout:actual.stdout,stderr:actual.stderr},index<20?expectedCase(index):encoding.expected,error);}\n  const record={expression,status:actual.status,stdout:actual.stdout,stderr:actual.stderr,observed:value,\n   terminalPath:actual.terminalPath,stdoutFile:actual.stdoutFile,stderrFile:actual.stderrFile,deadlineMs:600000};\n  await persist('case-results/'+name+'.validated.json',JSON.stringify(record,null,2)+'\\n');wasmtime.push(record);\n  await progress('wasmtime-validated',{index,expression,observedFile,terminalPath:actual.terminalPath});\n }\n",
+      "count": 1,
+      "afterOffsets": [
+        8029
+      ]
+    },
+    {
+      "old": "  timingPerformed:false,timingAllowed:false,requiresIndependentTerminalExitCodeZero:true,runtimeAcceptanceClaim:false,",
+      "new": "  timingPerformed:false,timingAllowed:false,requiresIndependentTerminalExitCodeZero:true,runtimeAcceptanceClaim:false,\n  durableObservationFiles:true,perCaseWasmtimeDeadlineMs:600000,resumeSupported:false,reusedResults:0,partialObservationsAreNotCompletePasses:true,",
+      "count": 1,
+      "afterOffsets": [
+        12056
+      ]
+    },
+    {
+      "old": " await publishCompletion({output,report,paths:tracked.paths});console.log(JSON.stringify({status:report.status,output,componentSha256:report.componentSha256,imports:[],workloadCases:20,boundaryCases:14}));\n}",
+      "new": " await publishCompletion({output,report,paths:tracked.paths});console.log(JSON.stringify({status:report.status,output,componentSha256:report.componentSha256,imports:[],workloadCases:20,boundaryCases:14}));\n } catch(error) {\n  try{await progress('driver-failed',{error:{name:error.name,code:error.code,message:String(error.message).slice(0,512)},completePass:false});}\n  catch(recordError){console.error(JSON.stringify({event:'failure-record-write-failed',name:recordError.name,code:recordError.code,message:String(recordError.message).slice(0,512),completePass:false}));}\n  throw error;\n }\n}",
+      "count": 1,
+      "afterOffsets": [
+        12531
+      ]
+    }
+  ],
+  "reverseExact": true,
+  "guestWorkloadBoundaryOracleProviderSchedulerBundleInputsChanged": false,
+  "semanticComparisonChanged": false,
+  "hostReportingAndDeadlineOnly": true
+}

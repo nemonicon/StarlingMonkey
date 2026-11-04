@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "beforePath": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-candidate-v1/runtime-preflight.template.mjs",
+  "beforeSha256": "5baf1278e7cad8558d0a25cdf66d3c2cd1e4423ef5716927cfcf9cd4bbae0aaa",
+  "afterSha256": "9f2420c43841c0bcb64792d19cfc1ae3a60ae38e5b9cf02981f7bea1dd2b9536",
+  "edits": [
+    {
+      "old": "import {dirname,join} from 'node:path';",
+      "new": "import {dirname,join,resolve} from 'node:path';",
+      "count": 1
+    },
+    {
+      "old": "import {verifyConsumedSeal} from './consumed.mjs';",
+      "new": "import {verifyConsumedSeal} from './consumed.mjs';\nimport {verifyComponentToolClosure} from './component-tools.mjs';",
+      "count": 1
+    },
+    {
+      "old": "assert.equal(config.operationalAdmission,false);",
+      "new": "assert.equal(config.operationalAdmission,false);assert.equal(config.nativeConfiguredSourceRoot,resolve(config.bootstrapRoot,'../../../..'));assert.equal(config.nativeConfiguredSourceRoot,'/private/tmp/starling-node-compat/zlib-source-v4');assert.notEqual(config.componentToolRoot,config.nativeConfiguredSourceRoot);",
+      "count": 1
+    },
+    {
+      "old": " await verifyConsumedSeal(here,INPUTS_SHA,{CONFIG_SHA,INPUTS_SHA});",
+      "new": " await verifyConsumedSeal(here,INPUTS_SHA,{CONFIG_SHA,INPUTS_SHA});\n const componentToolClosure=freeze(JSON.parse(await regular(join(here,'component-tool-closure.json'),config.componentToolClosureSha256)));assert.equal(componentToolClosure.componentToolRoot,config.componentToolRoot);await verifyComponentToolClosure(componentToolClosure);",
+      "count": 1
+    },
+    {
+      "old": "async function recheck(){await regular(join(here,'activation.json'),CONFIG_SHA);",
+      "new": "async function recheck(){await verifyComponentToolClosure(componentToolClosure);await regular(join(here,'activation.json'),CONFIG_SHA);",
+      "count": 1
+    },
+    {
+      "old": "toolSourceRoot:config.toolSourceRoot",
+      "new": "nativeConfiguredSourceRoot:config.nativeConfiguredSourceRoot,componentToolRoot:config.componentToolRoot,toolSourceRoot:config.componentToolRoot",
+      "count": 1
+    }
+  ],
+  "reverseExact": true
+}

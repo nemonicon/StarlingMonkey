@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "state": "INDEPENDENT_ZLIB_COST_COMPARISON_SOURCE_PROPOSAL_PASS_ACTIONS_HELD",
+  "sourceIndexSha256": "e29c596df3c809bab8fd3851b224a7ec4e84177d791c5d1f909072985f047ef8",
+  "sourceFiles": 83,
+  "inputManifestSha256": "4c02c8a86b5b3fdf83a4b49e9f8cf3b93626a600cb70e9de5318f296c17a58e4",
+  "originalInputRows": 401,
+  "hashExact": true,
+  "fixturesIndependentlyRecomputed": 5,
+  "primaryCaseRowsReconstructed": 30,
+  "operationMappings": [
+    {
+      "native": "deflateSync",
+      "fflateBrowser": "zlibSync",
+      "format": "zlib",
+      "direction": "encode"
+    },
+    {
+      "native": "inflateSync",
+      "fflateBrowser": "unzlibSync",
+      "format": "zlib",
+      "direction": "decode"
+    },
+    {
+      "native": "gzipSync",
+      "fflateBrowser": "gzipSync",
+      "format": "gzip",
+      "direction": "encode"
+    },
+    {
+      "native": "gunzipSync",
+      "fflateBrowser": "gunzipSync",
+      "format": "gzip",
+      "direction": "decode"
+    },
+    {
+      "native": "deflateRawSync",
+      "fflateBrowser": "deflateSync",
+      "format": "raw",
+      "direction": "encode"
+    },
+    {
+      "native": "inflateRawSync",
+      "fflateBrowser": "inflateSync",
+      "format": "raw",
+      "direction": "decode"
+    }
+  ],
+  "caps": {
+    "allCodecInputsBytes": 1048576,
+    "allCodecOutputsBytes": 16777216,
+    "rawFixtureBytesMax": 524288,
+    "everyActualEncodingMustFitDecodeInputCap": true
+  },
+  "validDomainOnly": true,
+  "ownership": {
+    "ordinaryFixedAttachedUnsharedWindowsRequiredByFutureCorrectness": true,
+    "nonemptyProviderOutputMustNotAliasInput": true,
+    "providerOutputBufferViewShared": true,
+    "emptyAddressableByteIsolationClaim": false,
+    "nativeInputStagingAndNativeOutputToJsCopyIncluded": true,
+    "fflatePostAllocationCapNotResourceParity": true,
+    "unavoidableMinimalCopyOrPerformanceWinClaim": false
+  },
+  "comparisons": [
+    {
+      "id": "same-engine-provider",
+      "A": "native-on",
+      "B": "fflate-on",
+      "sameActualEngineRequired": true
+    },
+    {
+      "id": "unused-profile",
+      "A": "fflate-on",
+      "B": "fflate-off",
+      "identicalGuestBundleRequired": true
+    }
+  ],
+  "samplingPlan": {
+    "repetitions": 3,
+    "order": "AB/BA/AB",
+    "warmups": 3,
+    "samplesPerTimedWorker": 7,
+    "timedWorkersIfAll30CasesAdmitted": 360,
+    "calibration": "Positive full-unit pilots; geometric N=1,2,4,... to case bound; choose the same smallest power of two meeting50ms for BOTH arms. If either cannot reach target within bounds, refuse entire timing phase; no omit, clipping or silently revised cap.",
+    "sampleTargetMs": 50,
+    "maxOperationN": 32768,
+    "largeCaseOperationNMax": 128,
+    "pilotsBeforeTimingRequired": true,
+    "pilotAndPublicCaseHardMs": 600000,
+    "workerHardMaxMs": 7200000,
+    "workerBudget": "ceil(2*pilotPerOperationMs*N*(3+7)+pilotPerOperationMs*N+120000+2*max(0,pilotWholeProcessMs-pilotPerOperationMs)); refuse if above ceiling; do not run old16-iteration budget helper with new N.",
+    "noDeadlineExtensionOrSampleOmission": true
+  },
+  "futureCorrectness": {
+    "encoderOutputs": 45,
+    "crossDecoderEdges": 135,
+    "encodedOraclesStillNull": true,
+    "threeRetainedRotationsFreshJcoFreshWasmtimeRequired": true,
+    "actualEncodedStreamsBeforeDecodeCapRequired": true
+  },
+  "browserComparand": {
+    "version": "0.8.3",
+    "browserEntrySha256": "b7ca4450b19559a1d50eb381adcee94b82449674be4cd17789d9beba7e6122a1",
+    "exactSixFunctionSegmentsChecked": true,
+    "MITLicenseExact": true,
+    "nativeOptions": null,
+    "fflateEncoderOptions": {
+      "level": 6
+    },
+    "fflateGzipOptions": {
+      "level": 6,
+      "mtime": 0
+    },
+    "selectedSyncTransitiveBundleAndWorkerExclusionNotYetProven": true,
+    "customJcoNodeZlibAdapterExcluded": true
+  },
+  "physicalSelectorSnapshot": {
+    "files": 27,
+    "literalEdges": 23,
+    "selectedManifests": 10,
+    "actualStaged350OriginsExact": true,
+    "oneDirectoryEdgeSeparatelyTyped": true,
+    "completePythonAncestryOrPackagingClosureClaim": false
+  },
+  "existingNativeFacts": {
+    "sourceFiles": 350,
+    "twoMetadataAndFreezeDescriptorsChecked": true,
+    "native1024CopyClosureNotRepeatedHere": true,
+    "newPairAuthority": null,
+    "backendBooleanPromoted": false,
+    "350To355Projection": false
+  },
+  "newAuthority": {
+    "schemaVersion": 1,
+    "state": "UNCONFIGURED_ZLIB_COST_SOURCE_PROPOSAL",
+    "rootReview": null,
+    "pairPins": null,
+    "correctnessProof": null,
+    "packagingPhysicalClosure": null,
+    "actualComponentTuples": null,
+    "actualEmittedABI": null,
+    "quietWindow": null,
+    "actionsAllowed": false,
+    "timingAllowed": false,
+    "operationalAdmissionAllowed": false
+  },
+  "cliEntries": {
+    "prepareAndSeal": null,
+    "untimedNodeOracleAndCrossDecode": null,
+    "buildComponents": null,
+    "guestCorrectness": null,
+    "pilots": null,
+    "measure": null,
+    "audit": null
+  },
+  "directLiveRootFiveRows": 0,
+  "storedOwnerChecksAuthenticatedNotRerun": {
+    "initialDataGroups": 5,
+    "finalSourceChecks": 9,
+    "nodeParseOnly": 4,
+    "pythonAst": 2
+  },
+  "sourceAuthorControlsClarification": "Construction/copy/consume means the combined Buffer.from(input)+consume control, plus separately observed setup construction. There is no standalone construction-only control.",
+  "findings": [],
+  "sourceDisposition": "PASS_BOUNDED_PROPOSAL_ONLY",
+  "actionDisposition": "HELD_NO_ACTIONS",
+  "execution": {
+    "readHashPythonRawFixtureComputationAndAstOnly": true,
+    "ownerFunctionsImported": false,
+    "codecOrFflateOrNodeOracleExecuted": false,
+    "bundleOrPreflightOrNativeOrGuestOrHostOrTimingExecuted": false
+  },
+  "citations": {
+    "nativeOptions": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-comparison-candidate-v1/providers.template.mjs",
+      "sha256": "b1d65c26a790825d4be18f28227b5246acb5d86793169c8d821d205630c5e043",
+      "line": 16,
+      "text": "Reflect.apply(selected[name],undefined,[input])"
+    },
+    "fflateSettings": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-comparison-candidate-v1/providers.template.mjs",
+      "sha256": "b1d65c26a790825d4be18f28227b5246acb5d86793169c8d821d205630c5e043",
+      "line": 22,
+      "text": "level:6,mtime:0"
+    },
+    "ownership": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-comparison-candidate-v1/providers.template.mjs",
+      "sha256": "b1d65c26a790825d4be18f28227b5246acb5d86793169c8d821d205630c5e043",
+      "line": 18,
+      "text": "output.byteLength===0||output.buffer!==input.buffer"
+    },
+    "sharedBufferView": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-comparison-candidate-v1/providers.template.mjs",
+      "sha256": "b1d65c26a790825d4be18f28227b5246acb5d86793169c8d821d205630c5e043",
+      "line": 34,
+      "text": "Buffer.from(output.buffer,output.byteOffset,output.byteLength)"
+    },
+    "postAllocationLimit": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-comparison-candidate-v1/providers.template.mjs",
+      "sha256": "b1d65c26a790825d4be18f28227b5246acb5d86793169c8d821d205630c5e043",
+      "line": 33,
+      "text": "POST-allocation check"
+    },
+    "browserEntry": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-comparison-candidate-v1/comparand-entry.template.mjs",
+      "sha256": "2f76b9137ccc2678fdd2e1f9ef0fcacd082ce81322862de8146c9f2b1f057fa7",
+      "line": 3,
+      "text": "@PINNED_FFLATE_BROWSER_ENTRY@"
+    },
+    "combinedCopyControl": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-comparison-candidate-v1/controls.template.mjs",
+      "sha256": "0da64d4a991b958d6374f131145b3372dcae4c05ccacc9c204fd584c07778f6b",
+      "line": 6,
+      "text": "const copied=Buffer.from(input)"
+    },
+    "futureGate": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-comparison-candidate-v1/packaging-context-plan.json",
+      "sha256": "fc5cbfe17fad7bcffd9b838da3f256df0ac7cc90c566f8e0302caa58a9deeff4",
+      "line": 3,
+      "text": "FRESH_CONTEXT_IMPLEMENTATION_REQUIRED_BEFORE_ANY_ACTION"
+    }
+  },
+  "limits": [
+    "This is an intentionally unwired design and templates, not an executable activation or readiness proof.",
+    "Actual packaging closure, context-aware diagnostic350 gate, real Node streams/oracles, emitted ABI, publisher/worker/collector and correctness remain prerequisites.",
+    "Fixed gzip mtime0 selects an untaken Date branch by source logic; actual bundle capability/import elimination is not yet proven.",
+    "The output cap in the FF wrapper is checked after allocation and gives no malformed-input/resource-limit/error parity.",
+    "No encoded-byte identity, speed advantage, statistical significance, cold-start, private heap, memory-grow or full Node compatibility claim.",
+    "Old held contexts are data references only and are not called or declared rerunnable."
+  ]
+}

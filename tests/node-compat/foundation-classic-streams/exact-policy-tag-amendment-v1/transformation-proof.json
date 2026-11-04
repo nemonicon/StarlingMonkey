@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "state": "FIVE_EXACT342_POLICY_GUARDS_AND_ACTUAL_GC_PIN_FIELDS",
+  "oldStrictPolicyVersion": "sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1",
+  "newStrictPolicyVersion": "sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1-classic-streams-source-v1",
+  "parentSourceIndexSha256": "81c55887dc5e767db27477ba28f0e7a26a948435c7ddc61c70da329d4bd7f029",
+  "registrarAmendmentStillRequired": "7462f1255f4fd5048e345a96d58908c8e6251158bf36e5ab4450dab97be193b4",
+  "records": [
+    {
+      "path": "release/runners/events.mjs",
+      "beforeSha256": "8ef07b8bb1ea0c6f6466fd651a57e8b7875cd2310f0ac01a64b40d0f7097a2f5",
+      "afterSha256": "e3a18a96b69e46f7ca25ef339610c2fbc4744e700c084014eee7c2e0da78c207",
+      "edits": [
+        {
+          "old": "'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1'",
+          "new": "'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1-classic-streams-source-v1'"
+        }
+      ],
+      "exactReverseProof": true
+    },
+    {
+      "path": "common/runners/allocator-gc.mjs",
+      "beforeSha256": "c31498e22ff8f6a03f89ed1969a63ddc61ba3e54aa6da3c75b80d52478d9130e",
+      "afterSha256": "a6b8006ae5cd59cff26b74a9e10ae23c8e29a538ea2c8b1f11651021afb47b7f",
+      "edits": [
+        {
+          "old": "'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1'",
+          "new": "'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1-classic-streams-source-v1'"
+        },
+        {
+          "old": "const pinsPath=admitted.pinsPath,pinBytes=admitted.pinBytes,pins=admitted.pin;",
+          "new": "const pins=admitted.pin;"
+        },
+        {
+          "old": "assert.equal(pins.state,'reviewed-real-production-freeze');",
+          "new": "assert.equal(pins.state,'reviewed-real-classic-production-freeze');\nassert.equal(hash(await readFile(pins.freezeReceiptPath)),pins.freezeReceiptSha256);"
+        },
+        {
+          "old": "const commandsPath=admitted.report.commandsPath;",
+          "new": "const commandsPath=pins.commandsPath;"
+        },
+        {
+          "old": "fixedGCAdmission:{path:pinsPath,sha256:hash(pinBytes),pins}",
+          "new": "fixedGCAdmission:{variant:admitted.report.variant,pinState:pins.state,pins,freezeReceiptPath:pins.freezeReceiptPath,freezeReceiptSha256:pins.freezeReceiptSha256,scope:'Actual classic freeze pin; delegated classicPreflight/recheck owns the authority bytes. No old pin-schema projection.'}"
+        },
+        {
+          "old": "const report={schema:1,state:",
+          "new": "await admitted.recheck();\nconst report={schema:1,state:"
+        }
+      ],
+      "exactReverseProof": true
+    },
+    {
+      "path": "off/runners/sync.mjs",
+      "beforeSha256": "75bced58c999bcb969c1fd7a40d3755916425858c60fc35a21ad3c466983de09",
+      "afterSha256": "87782d32422de1f98ae912d2300f3e71f9e195e772fe85c340c6ef7474d146a2",
+      "edits": [
+        {
+          "old": "'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1'",
+          "new": "'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1-classic-streams-source-v1'"
+        }
+      ],
+      "exactReverseProof": true
+    },
+    {
+      "path": "off/runners/runtime.mjs",
+      "beforeSha256": "08e927fd803f2874fd3abf6c2d55ab72112de4ad20412e289d2b6708b0a5aaac",
+      "afterSha256": "88243e31e11b823d5113aec04c96e4beb7a7b80a33440fe5e07c11e982e25771",
+      "edits": [
+        {
+          "old": "'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1'",
+          "new": "'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1-classic-streams-source-v1'"
+        }
+      ],
+      "exactReverseProof": true
+    },
+    {
+      "path": "off/runners/callbacks.mjs",
+      "beforeSha256": "603dc11b02125ba1a7361335718b1f09c883b0fc885f30a2d77fbc53992be0a0",
+      "afterSha256": "fc8927778953db9830c60c51a85d1b9109e7a9c5d25ccf5d72b07a388d2d1d61",
+      "edits": [
+        {
+          "old": "'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1'",
+          "new": "'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1-classic-streams-source-v1'"
+        }
+      ],
+      "exactReverseProof": true
+    }
+  ],
+  "previousChangedHostBodies": 2,
+  "additionalChangedHostBodies": 5,
+  "totalChangedHostBodies": 7,
+  "oldBodiesByteIdentical": 57,
+  "guestOrOracleBytesChanged": false,
+  "engineMetadataRewritten": false,
+  "nativeOrGuestExecuted": false
+}

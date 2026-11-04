@@ -1,0 +1,1 @@
+import * as a from "node:assert"; await Promise.resolve().then(()=>a.deepEqual({}, {})); export function run(){return '';}

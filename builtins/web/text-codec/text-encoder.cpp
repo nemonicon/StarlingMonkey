@@ -1,5 +1,7 @@
 #include "text-encoder.h"
-#include "encode.h"
+#include "js/CharacterEncoding.h"
+#include "js/GCAPI.h"
+#include "js/String.h"
 #include <tuple>
 
 #include "js/ArrayBuffer.h"
@@ -27,19 +29,35 @@ bool TextEncoder::encode(JSContext *cx, unsigned argc, JS::Value *vp) {
     return true;
   }
 
-  auto chars = core::encode(cx, args[0]);
-  JS::RootedObject buffer(
-      cx, JS::NewArrayBufferWithContents(cx, chars.len, chars.begin(),
-                                         JS::NewArrayBufferOutOfMemory::CallerMustFreeMemory));
-  if (!buffer) {
-    return false;
+  // Coercion can invoke application code; linearization and allocation can
+  // collect. Keep the string rooted and end its pointer scope before allocating.
+  JS::RootedString input(cx, JS::ToString(cx, args[0]));
+  if (!input) return false;
+  size_t length;
+  {
+    JSLinearString *linear = JS_EnsureLinearString(cx, input);
+    if (!linear) return false;
+    length = JS::GetDeflatedUTF8StringLength(linear);
   }
 
-  // `buffer` now owns `chars`
-  static_cast<void>(chars.ptr.release());
-
-  JS::RootedObject byte_array(cx, JS_NewUint8ArrayWithBuffer(cx, buffer, 0, chars.len));
-  if (!byte_array) {
+  // Short outputs can stay inline in the GC-owned typed array. No malloc-backed
+  // staging buffer or separate ArrayBuffer ownership transfer is necessary.
+  JS::RootedObject byte_array(cx, JS_NewUint8Array(cx, length));
+  if (!byte_array) return false;
+  size_t written = 0;
+  if (length != 0) {
+    JS::AutoCheckCannotGC nogc(cx);
+    bool shared = false;
+    uint8_t *data = JS_GetUint8ArrayData(byte_array, &shared, nogc);
+    MOZ_ASSERT(data && !shared);
+    // Reacquire both pointers after every MayGC operation. Deflation is
+    // infallible and does not allocate or invoke JavaScript.
+    written = JS::DeflateStringToUTF8Buffer(
+        JS_ASSERT_STRING_IS_LINEAR(input),
+        mozilla::Span(reinterpret_cast<char *>(data), length));
+  }
+  if (written != length) {
+    JS_ReportErrorASCII(cx, "TextEncoder UTF-8 length invariant failed");
     return false;
   }
 
@@ -55,7 +73,7 @@ bool TextEncoder::encodeInto(JSContext *cx, unsigned argc, JS::Value *vp) {
     return api::throw_error(cx, api::Errors::WrongReceiver, "encodeInto", "TextEncoder");
   }
 
-  auto *source = JS::ToString(cx, args.get(0));
+  JS::RootedString source(cx, JS::ToString(cx, args.get(0)));
   if (!source) {
     return false;
   }
@@ -76,14 +94,21 @@ bool TextEncoder::encodeInto(JSContext *cx, unsigned argc, JS::Value *vp) {
     return api::throw_error(cx, api::Errors::TypeError, "TextEncoder.encodeInto",
       "destination", "be a Uint8Array");
   }
-  auto span = AsWritableChars(mozilla::Span(data, len));
-  auto maybe = JS_EncodeStringToUTF8BufferPartial(cx, source, span);
-  if (!maybe) {
-    return false;
-  }
   size_t read = 0;
   size_t written = 0;
-  std::tie(read, written) = *maybe;
+  if (len != 0) {
+    // A detached/out-of-bounds or empty view can have null data. Do not pass
+    // that empty span to the underlying codec's non-null slice interface.
+    auto span = AsWritableChars(mozilla::Span(data, len));
+    auto maybe = JS_EncodeStringToUTF8BufferPartial(cx, source, span);
+    if (!maybe) {
+      // This public API explicitly returns Nothing on OOM without setting an
+      // exception. The JS native must report it before returning false.
+      JS_ReportOutOfMemory(cx);
+      return false;
+    }
+    std::tie(read, written) = *maybe;
+  }
 
   MOZ_ASSERT(written <= len);
 

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "state": "ACTIVATION_HOLD_LIVE_ADAPTER_ABSENT_FROM_THREE_UNCONFIGURED_PREPARATION_SEALS",
+  "packets": [
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-regression-candidate-v3",
+      "manifestSha256": "d3388709fd77b62e6df4b438136404754e48eefede19e97262b25cdfcbed7321",
+      "listedInputs": 665,
+      "liveAdapterListed": false,
+      "indexSha256": "3064605fbf043c26e3d1bc85378b91d68c98be4034f4b6c5cf0f30f964ac61a2",
+      "indexState": "sealed"
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-followon-off-v1",
+      "manifestSha256": "06c2c233818db375c53039fad113998ea096b22846cdfd1efe872cb2c0097ffc",
+      "listedInputs": 729,
+      "liveAdapterListed": false,
+      "indexSha256": "a4812fe2e5429562b11f3e7ce1dbaf8cb7cb498726998ad5b473b16f05c61bbe",
+      "indexState": "sealed"
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-release-runner-v1",
+      "manifestSha256": "cbfe7f1a1679fd2be0c042a50a8278219832364630b1f526e7a3594cb537979c",
+      "listedInputs": 1405,
+      "liveAdapterListed": false,
+      "indexSha256": "aa499593d97b718bd442e71d9325527a91ba38b199c9921aac6df834646512dc",
+      "indexState": "sealed"
+    }
+  ],
+  "missingLiveInput": {
+    "path": "host-apis/wasi-0.2.0/preview1-adapter-release/wasi_snapshot_preview1.wasm",
+    "sha256": "988224282d03fe0bd3c25b62344aef265b1a8e1f5804bdbc34d6442507fabcc0",
+    "bytes": 53512,
+    "role": "Repository Preview1 adapter read/prehashed then reopened by packager path",
+    "notCopiedIntoThisPacket": true
+  },
+  "readerSources": [
+    {
+      "path": "tests/node-compat/foundations/native-scalar-harness.mjs",
+      "sha256": "01a17006e04e7db3d644d63fe778d112abbc807a5612e9fd90ece1a914d57acd"
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-regression-candidate-v3/runners/allocator-gc.mjs",
+      "sha256": "ee75c85f27d125efb6454cf92da47efa53acb707114ea51487eb6ded1b8e4b76"
+    },
+    {
+      "path": "tests/node-compat/foundation-scheduler/production-followon-off-v1/runners/late.mjs",
+      "sha256": "2304a9d95d314e43e6bf76e712427f5b309b677306524d78b0bb2c22c03df8ff"
+    }
+  ],
+  "finding": "Reader bodies compare the live adapter bytes to the exact988224 digest before packaging, but their current pre/post manifests cover only frozen/control copies of that source asset. The physical live path is not rehashed by the completion seal.",
+  "activationDecision": "Root will choose a combined future actual-pin/freezer amendment; no broad new source revision is started here. Future readiness/activation must include the live path in the real pre/post seal or eliminate its reopen via an equivalently reviewed fixed-input path.",
+  "limits": [
+    "Every actual production pin remains null; the affected artifact/runtime success paths have not executed.",
+    "This is a preparation source-closure gap, not a demonstrated mutation, runtime incompatibility or invalidation of acceptedv11 artifacts.",
+    "Capability-v2 may fix its own eight live HTTP inputs independently; this note does not certify that pending revision.",
+    "Some entries use a package-provenance adapter instead; this note does not claim every body opens this local path."
+  ],
+  "reviewerActions": {
+    "readsAndHashesOnly": true,
+    "helperTestsBuildPackagerGuestHostOrAdapterExecuted": false,
+    "frozenPacketSourceOrArtifactMutated": false
+  }
+}

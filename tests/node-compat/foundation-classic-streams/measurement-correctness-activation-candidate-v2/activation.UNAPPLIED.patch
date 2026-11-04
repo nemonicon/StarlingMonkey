@@ -1,0 +1,61 @@
+--- a/activate.py
++++ b/activate.py
+@@ -10,7 +10,11 @@
+ BASE_INDEX='138a4e0bcfe22ef3b48375257a50958f595dcebb607fc9267a30080948d612da'
+ AMEND=HERE.parent/'measurement-correctness-reporting-amendment-v1'
+ AMEND_INDEX='0558b50589680f9e1b812c8a62210233a768385bfabeae2f07be47c2e1fe5350'
+-OUTPUT=HERE.parent/'measurement-correctness-activated-v1'
++PREVIOUS=HERE.parent/'measurement-correctness-activation-candidate-v1'
++PREVIOUS_INDEX='ce2f254f2cf27d44df5f0d23915ca4e09c98ac15b2f88f762d41f57fb8e6048e'
++PERSIST=HERE.parent/'measurement-correctness-persistence-amendment-v1'
++PERSIST_INDEX='60a8687e9b6bfff4c68df2a36e9dd47ad0f5cd327441f8cf32d63caa67518ba8'
++OUTPUT=HERE.parent/'measurement-correctness-activated-v2'
+ PRODUCER=CANONICAL/'tests/node-compat/foundation-classic-streams/measurement-producer-candidate-v3'
+ def sha(data):return hashlib.sha256(data).hexdigest()
+ def regular(path,digest=None,size=None):
+@@ -49,6 +53,7 @@
+     own_sha,pin_path,pin_sha,review_path,review_sha=sys.argv[1:]
+     pins,pin_raw,review,review_raw=load_authority(pin_path,pin_sha,review_path,review_sha)
+     own_rows=indexed(HERE,own_sha);base_rows=indexed(BASE,BASE_INDEX);amend_rows=indexed(AMEND,AMEND_INDEX)
++    previous_rows=indexed(PREVIOUS,PREVIOUS_INDEX);persist_rows=indexed(PERSIST,PERSIST_INDEX)
+     assert not OUTPUT.exists()and not OUTPUT.is_symlink()
+     stage=OUTPUT.with_name(OUTPUT.name+'.staging');assert not stage.exists()and not stage.is_symlink(),'Preserve any partial activation'
+     assert DECLARED.is_dir()and not DECLARED.is_symlink()and DECLARED.resolve(strict=True)==CANONICAL
+@@ -70,7 +75,8 @@
+     assert receipt['sourceIndexSha256']==PRODUCER_INDEX
+     names=['native-provider.mjs','guest.mjs','workload.mjs','encoding-cases.mjs','activation-contract.mjs','runtime-preflight.template.mjs','consumed.mjs','bundle-diagnostic.mjs','completion.mjs','run.UNEXECUTED.mjs','node-workload-oracle.json','node-encoding-oracle.json']
+     payload={name:regular(BASE/name)for name in names}
+-    payload['component-driver.mjs']=regular(AMEND/'proposed/component-driver.mjs');payload['bounded-comparison.mjs']=regular(AMEND/'bounded-comparison.mjs')
++    payload['component-driver.mjs']=regular(PERSIST/'proposed/component-driver.mjs');payload['bounded-comparison.mjs']=regular(AMEND/'bounded-comparison.mjs')
++    payload['durable-host.mjs']=regular(PERSIST/'durable-host.mjs')
+     payload['reviewed-pins.json']=pin_raw;payload['root-review-receipt.json']=review_raw
+     config={'schemaVersion':1,'state':'ROOT_REVIEWED_CLASSIC_DIAGNOSTIC_CORRECTNESS_ACTIVATION_V1','variant':LABEL,'producerIndexSha256':PRODUCER_INDEX,'recipeSha256':RECIPE,
+       'producerRoot':str(PRODUCER),'sourceRoot':str(CANONICAL),'declaredConfiguredSourceRoot':str(DECLARED),'canonicalDiagnosticSourceRoot':str(CANONICAL),
+@@ -78,7 +84,7 @@
+       'reviewedActualEngine':{**{k:pin[k]for k in ['engineSha256','engineBytes','metadataSha256','freezeReceiptSha256','sourceFiles','addonFiles']},'diagnosticOnly':True},
+       'runtimeAcceptanceClaim':False,'timingAllowed':False}
+     payload['activation-template.json']=(json.dumps(config,indent=2)+'\n').encode()
+-    payload['README.md']=b'Root-reviewed diagnostic correctness source family only;20/14 actual guest gates remain unexecuted. No timing authority.\n'
++    payload['README.md']=b'Fresh correctness-v2 source family with mandatory per-case persistence and finite600s Wasmtime cap; full20/14 guest gates unexecuted. No resume or timing authority.\n'
+     inputs={}
+     def add(path,digest=None,size=None,role='actual-consumed-input'):
+         path=Path(path);assert not path.is_symlink();path=path.resolve(strict=True);raw=regular(path,digest,size)
+@@ -86,7 +92,7 @@
+         if str(path)in inputs:
+             assert inputs[str(path)]['sha256']==row['sha256']and inputs[str(path)]['bytes']==row['bytes'];return
+         inputs[str(path)]=row
+-    for root,rows,digest in [(HERE,own_rows,own_sha),(BASE,base_rows,BASE_INDEX),(AMEND,amend_rows,AMEND_INDEX),(PRODUCER,producer_rows,PRODUCER_INDEX)]:
++    for root,rows,digest in [(HERE,own_rows,own_sha),(BASE,base_rows,BASE_INDEX),(AMEND,amend_rows,AMEND_INDEX),(PREVIOUS,previous_rows,PREVIOUS_INDEX),(PERSIST,persist_rows,PERSIST_INDEX),(PRODUCER,producer_rows,PRODUCER_INDEX)]:
+         add(root/'index.json',digest)
+         for row in rows:add(root/row['path'],row['sha256'],row['bytes'])
+     # The actual verifier reopens absolute preparation references in their
+@@ -111,7 +117,8 @@
+     for key,value in {'CONFIG_SHA':sha(payload['activation-template.json']),'INPUTS_SHA':sha(payload['input-freeze.json'])}.items():compiled=compiled.replace('@'+key+'@',value)
+     assert '@CONFIG_SHA@'not in compiled and '@INPUTS_SHA@'not in compiled;payload['runtime-preflight.mjs']=compiled.encode()
+     record={'schemaVersion':1,'state':'ROOT_REVIEWED_CORRECTNESS_ACTIVATION_CREATED_GUEST_UNEXECUTED','producerIndexSha256':PRODUCER_INDEX,'recipeSha256':RECIPE,
+-      'parentCorrectnessIndexSha256':BASE_INDEX,'mandatoryReportingIndexSha256':AMEND_INDEX,'activationProducerIndexSha256':own_sha,
++      'parentCorrectnessIndexSha256':BASE_INDEX,'mandatoryReportingIndexSha256':AMEND_INDEX,'mandatoryPersistenceIndexSha256':PERSIST_INDEX,'previousActivationProducerIndexSha256':PREVIOUS_INDEX,'activationProducerIndexSha256':own_sha,
++      'perCaseWasmtimeDeadlineMs':600000,'fullCorpusGuestProviderOracleBundleInputsChanged':False,'resumeSupported':False,'reusedResults':0,
+       'pinsSha256':pin_sha,'rootReviewSha256':review_sha,'actualON':observed,'frozenRowsConsumed':len(receipt['copies']),'consumedInputs':len(inputs),'toolLinks':len(tool_links),
+       'declaredConfiguredSourceRoot':str(DECLARED),'canonicalDiagnosticSourceRoot':str(CANONICAL),'metadataRewritten':False,'guestOrPackagerOrTargetHostExecuted':False,'runtimeAcceptanceClaim':False,'timingAllowed':False}
+     payload['source-receipt.json']=(json.dumps(record,indent=2)+'\n').encode()

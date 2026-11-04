@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "node": "v22.14.0",
+  "nodeExecutableSha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+  "sourceSha256": "b9b91490422121d043c5ef26df8cd1f0542e357f870cdcdb538e07b3e65a59e5",
+  "cases": [
+    {
+      "name": "selected node:stream/web ReadableStream text",
+      "result": "X€"
+    },
+    {
+      "name": "selected node:stream/web ReadableStream json",
+      "result": {
+        "x": 2
+      }
+    },
+    {
+      "name": "selected classic Readable text",
+      "result": "ABC"
+    },
+    {
+      "name": "selected classic Readable json",
+      "result": {
+        "x": 2
+      }
+    },
+    {
+      "name": "exact string/output cap accepts full content",
+      "result": {
+        "length": 1048576,
+        "fullContentEqual": true
+      }
+    },
+    {
+      "name": "exact4096 empty chunks accept",
+      "result": {
+        "value": "",
+        "chunks": 4096
+      }
+    },
+    {
+      "name": "native Buffer visible offset input is immutable",
+      "result": {
+        "value": "ABC!",
+        "before": "414243",
+        "after": "414243",
+        "offset": 2,
+        "backingBytes": 8,
+        "isBuffer": true
+      }
+    },
+    {
+      "name": "decoder/json state recovers between calls",
+      "result": {
+        "syntax": true,
+        "pendingFlush": "�",
+        "freshPartial": "��",
+        "json": {
+          "ok": true
+        }
+      }
+    }
+  ],
+  "publicNodeHostReferenceOnly": true,
+  "proposalFactoryOr355GuestExecuted": false
+}

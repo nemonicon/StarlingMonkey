@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "state": "UNIMPLEMENTED_WIRE_BODY_INTEGRATION_DECISION_REQUIRED",
+  "executableAdapterProvided": false,
+  "nativeGlobalRequestBodyAssumedAsyncIterable": false,
+  "selectedStreamWrapperSubstitutedForBody": false,
+  "handlerKindsMustNotBeConflated": [
+    "WASI incomingRequest resource",
+    "native Fetch Request with global ReadableStream body"
+  ],
+  "actualSelectedDispatchKind": null,
+  "futureReaderAdapterRequirements": [
+    "authenticate actual default reader read/cancel/releaseLock/closed methods and actual body getter/brand before use",
+    "no pending reader/Request/native host handles at snapshot",
+    "single consumer, one serialized pending read; no overlapping next/return/throw",
+    "bound full chunk/byte count before yield; ordinary Uint8Array exact window, no Blob/File",
+    "natural EOF releases lock; read/consumer failure/early return has explicit cancel and release policy; record primary and cleanup errors without clipping or silent semantic normalization",
+    "reader.closed rejection handling and pending-read-safe release must be observed with actual native body",
+    "actual cancellation/host resource cleanup must be proved; JS method return alone is insufficient",
+    "two independent request bodies or explicit body source split needed; one consumed body cannot be read twice by text then json",
+    "strict deadline/owned terminal/full error and output retention required outside guest"
+  ],
+  "observedNativeCleanupSourceGaps": [
+    "RequestOrResponse::body_source_cancel_algorithm is TODO/no-op",
+    "BodyFutureTask::cancel has TODO and only resets task handle"
+  ],
+  "cancellationOrResourceReleaseProved": false,
+  "newHostInterfaceAllowed": false,
+  "adapterActionAuthority": null
+}

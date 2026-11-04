@@ -1,0 +1,101 @@
+# StarlingMonkey integration audit
+
+Audited revision: `54b3329b3ce818fd1f244e871e9c259b63667cda`. All findings in the first sections are source observations, not execution results. Relative source links refer to this checkout. Recommendations are explicitly marked **Proposal**. No new embedding API is assumed here.
+
+## Native installation and build extension points
+
+- [`builtins/install_builtins.cpp:3`](../../builtins/install_builtins.cpp#L3) includes the CMake-generated `builtins.incl` twice: once to declare each namespace's `bool install(api::Engine*)`, then to call it. The first failed installation stops installation.
+- [`runtime/engine.cpp:436`](../../runtime/engine.cpp#L436), `api::Engine::Engine`, creates JS state, enters the content realm, initializes `core::EventLoop`, then calls `install_builtins(this)` at line 452. The optional initialization script runs afterward, at lines 464–468. Application evaluation follows both.
+- [`cmake/add_builtin.cmake:5`](../../cmake/add_builtin.cmake#L5), `add_builtin`, accepts a namespace plus `SRC`, `INCLUDE_DIRS`, `DEPENDENCIES`, and `DISABLED_BY_DEFAULT`. It generates `ENABLE_BUILTIN_…` options, creates a static library, links `spidermonkey` and `extension_api`, links the builtin into `builtins`, and appends `NS_DEF(namespace)` to the generated list. Use this instead of editing the generated file or adding a second installation registry.
+- [`cmake/add_as_subproject.cmake:1`](../../cmake/add_as_subproject.cmake#L1) is the existing importing-project mechanism. [`docs/src/developer/builtins-cpp.md`](../src/developer/builtins-cpp.md) documents `add_builtin(my_project::my_builtin SRC my-builtin.cpp)`.
+- [`cmake/build-crates.cmake:1`](../../cmake/build-crates.cmake#L1) deliberately synthesizes one Rust static library to avoid duplicate Rust symbols. `add_rust_lib(name, path)` at line 29 appends a path dependency and a `pub use` to that aggregate. Existing examples are `rust-url` and `multipart` at lines 48–49. [`runtime/crates/staticlib-template/Cargo.toml.in:13`](../../runtime/crates/staticlib-template/Cargo.toml.in#L13) enables LTO and `panic = 'abort'` in both profiles. The Rust builtins developer document is only a TODO; the CMake source is the reliable integration contract.
+- [`CMakeLists.txt:48`](../../CMakeLists.txt#L48) exports `extension_api` include paths and links `rust-url` plus SpiderMonkey; the raw runtime links `host_api`, `extension_api`, `builtins`, `spidermonkey`, and `rust-crates` at line 73. New guest-only codecs should not acquire a host-api dependency.
+
+**Proposal:** register `builtins::node::buffer` as an optional builtin using `add_builtin(... DISABLED_BY_DEFAULT SRC ...)`. Its `install` function creates the native Uint8Array-derived constructor/prototype and finite export object, then invokes the existing `Engine::define_builtin_module`. If Rust byte codecs become worthwhile, add them with `add_rust_lib`; use a narrow checked C ABI with explicit ownership, no JS pointers, and no retained borrowed spans. Build two otherwise identical components to measure the final LTO/component-size delta. A Rust crate's static library size is not the deployed-size delta.
+
+## Builtin module registration, resolution, and caching
+
+The public native registration method is [`include/extension-api.h:92`](../../include/extension-api.h#L92), `bool api::Engine::define_builtin_module(const char* id, HandleValue builtin)`. It delegates to [`runtime/script_loader.cpp:401`](../../runtime/script_loader.cpp#L401), `ScriptLoader::define_builtin_module`. The registered value must be an object when reached through the JS initializer wrapper; native callers must obey the same contract. Duplicate identifiers fail.
+
+Two `JS::PersistentRootedObject` maps hold builtin objects and compiled modules ([`runtime/script_loader.cpp:19`](../../runtime/script_loader.cpp#L19)); the constructor initializes both and installs SpiderMonkey's `SetModuleLoadHook` and `SetModuleMetadataHook` at lines 384–399.
+
+`module_load_hook` first looks up the **exact import specifier** in `builtinModules` ([`runtime/script_loader.cpp:310`](../../runtime/script_loader.cpp#L310)). A match calls `get_builtin_module`; only a miss falls through to filesystem-relative resolution. The fallback normalizes slash segments, tries the exact filename and `.js`, and loads with `fopen`. This is not a Node package resolver: it supplies no `node_modules`, package `exports`, Node extension priority, or CommonJS execution.
+
+`get_builtin_module` ([`runtime/script_loader.cpp:216`](../../runtime/script_loader.cpp#L216)) enumerates the registered object's own property keys and compiles an actual ESM wrapper approximately equivalent to:
+
+```js
+const { Buffer: e0, default: e1 } = import.meta.builtin;
+export { e0 as Buffer, e1 as default };
+```
+
+The real generator uses string-literal export names. `module_metadata_hook` supplies `import.meta.builtin` from the private module identifier ([`runtime/script_loader.cpp:364`](../../runtime/script_loader.cpp#L364)). Compiled modules are cached by identifier before reuse.
+
+Consequences:
+
+1. Export names must exist on the registration object **before first import**. A default export is not automatic: define the own `default` property explicitly. Use a finite, versioned export manifest to generate this object; never a blank object or universal Proxy.
+2. The wrapper creates real ESM bindings, but destructures properties once. Changing the default object's properties later does not update named exports. This cannot implement Node's `module.syncBuiltinESMExports` without further design. Do not promise Node's mutable-default synchronization contract.
+3. Getter execution is deferred until wrapper evaluation; avoid getters with incidental throws. For stubs, use ordinary data properties and callable throwing functions. `then` is absent unless it is an actual Node export. Namespace inspection and `Promise.resolve(namespace)` must remain safe.
+4. `buffer` and `node:buffer` are different cache keys. Either register both with the same constructor/default object or canonicalize the bare spelling to `node:buffer` in the bundler. Registering the same object under two keys shares exported object identities but yields separately cached module namespace objects. An explicit identity contract is required.
+5. Property names are interpolated into generated JS source without a general escaping layer. Trusted, validated identifier manifests are suitable; arbitrary user-supplied names are unsuitable. No new manifest should contain symbol keys or attacker-controlled export names.
+
+**Proposal, initial interoperability contract:** ESM is the runtime contract. Named exports and the own properties of the default object reference the same functions/constructors at installation and never get synchronized afterward. Applications cannot depend on rebinding named exports or on Node's builtin-default mutation synchronization. Static CommonJS `require('buffer')`/`require('child_process')` may be transformed by the selected bundler to the corresponding ESM default import; no ambient runtime `require`, dynamic require, or full CommonJS loader is provided. Prefix-only Node modules must remain prefix-only. Unknown exports fail linking and unknown builtin IDs fail resolution, rather than silently becoming empty modules.
+
+## Selecting native builtins through bundling
+
+**Proposal:** make a bundler plugin consult the checked-in profile manifest before any Node-polyfill/adapter plugin. For each admitted bare or `node:` specifier, canonicalize to a known `node:` identifier and mark that identifier external so the import survives in emitted ESM. Do not externalize all `node:*` blindly: the manifest distinguishes partial native modules, explicit import-only stubs, deferred modules, and unavailable modules. Disable or override adapter aliases for these exact identifiers, and reject builds whose metafile contains both an adapter and native implementation of the same module.
+
+A bundle-output test must prove that `import { Buffer } from 'buffer'` becomes a surviving `node:buffer` import, that the `node:buffer` import is not rewritten to an npm buffer package, and that static CJS transformations use the chosen default object. Inspect the actual emitted bundle and instantiate it in a component. A runtime registry cannot undo an adapter already inlined by a bundler.
+
+This plugin is a bundler integration proposal, not an existing StarlingMonkey API. Existing registration and resolution source above explains why preserving the specifier is sufficient once the native builtin is installed. ComponentizeJS's own bundling and adapter-selection path requires a separate toolchain audit.
+
+## Initialization, snapshot, and application-top-level failures
+
+[`runtime/engine.cpp:278`](../../runtime/engine.cpp#L278), `create_initializer_global`, creates a separate realm in the content compartment and injects `defineBuiltinModule`, read-only `contentGlobal`, and `print`. [`runtime/engine.cpp:564`](../../runtime/engine.cpp#L564), `run_initialization_script`, compiles the initializer as a classic script and executes it in that initializer global. It does not treat the initializer as ESM. Native installation occurs before it; applications run after it.
+
+[`runtime/js.cpp:60`](../../runtime/js.cpp#L60), `wizen`, parses the input configuration, sets `pre_initialize = true`, constructs the engine, calls `finish_pre_initialization`, updates the monotonic offset, and calls `__wasilibc_deinitialize_environ`. [`runtime/engine.cpp:526`](../../runtime/engine.cpp#L526), `finish_pre_initialization`, resets SpiderMonkey's Math.random seed and marks the engine initialized. Clearing libc's environment cache does not clear strings already copied into arbitrary JS objects or module closures.
+
+[`componentize.sh.in:114`](../../componentize.sh.in#L114) selects weval or Wasmtime Wizer. The Wizer path inherits environment and traps unknown imports; at line 130 `wasm-tools component new` composes the preview1 adapter. The raw runtime and final component are distinct artifacts; inspect the latter for the real import contract. A guest implementation must not add custom imports simply because they can be trapped while snapshotting.
+
+`Engine::eval_toplevel` ([`runtime/engine.cpp:588`](../../runtime/engine.cpp#L588)) evaluates the module, runs the event loop, checks rejected top-level await, reports other unhandled rejections, performs GC in preinitialization, drains FinalizationRegistry cleanup jobs, and checks top-level-await rejection again. A direct exception or rejected top-level await returns failure; the constructor aborts initial evaluation. The loader invokes `ModuleEvaluate` at [`runtime/script_loader.cpp:549`](../../runtime/script_loader.cpp#L549).
+
+Therefore unsupported operations must unconditionally throw their identifiable error when called or constructed, in **both** initialization and deployment. Never turn an unsupported operation into a no-op just because `EngineState::ScriptPreInitializing` is active. Importing a finite stub remains safe; application top-level `spawn(...)`, or `await` of a throwing stub, must fail componentization.
+
+Caveat: the source explicitly reports rather than aborts for some unhandled promise rejections not represented by the top-level-await promise ([`runtime/engine.cpp:622`](../../runtime/engine.cpp#L622)). A strict profile must define and test whether all such initialization rejections are fatal. Direct synchronous throws and awaited calls are not subject to that caveat.
+
+## Scheduling, rooting, and request lifetime
+
+[`runtime/engine.cpp:315`](../../runtime/engine.cpp#L315) enables SpiderMonkey's internal job queues. [`runtime/event_loop.cpp:101`](../../runtime/event_loop.cpp#L101), `EventLoop::run_event_loop`, drains `js::RunJobs`, then FinalizationRegistry cleanups, and returns when interest reaches zero; otherwise it selects and executes the oldest ready task. This is not libuv's phase ordering. In particular, no Node `process.nextTick` queue or Node `setImmediate`/check phase is present.
+
+[`include/extension-api.h:190`](../../include/extension-api.h#L190), `api::AsyncTask`, exposes `run`, `cancel`, `id`, `deadline`, and `trace`. [`runtime/event_loop.cpp:13`](../../runtime/event_loop.cpp#L13) roots its task queue and traces each queued task. [`host-apis/wasi-0.2.0/host_api.cpp:19`](../../host-apis/wasi-0.2.0/host_api.cpp#L19), `api::AsyncTask::select`, polls standard WASI pollables and uses monotonic-clock subscription for the immediate sentinel.
+
+[`builtins/web/timers.cpp:34`](../../builtins/web/timers.cpp#L34), `TimerTask`, is a concrete integration example: it stores JS callback/arguments in `JS::Heap`, traces them at line 112, subscribes and drops a pollable, and uses `Engine::queue_async_task`/`cancel_async_task`. New async APIs need an interest owner whose increments/decrements pair on success, failure, cancellation, and exceptions.
+
+The existing fetch implementation owns a persistent singleton `FetchEvent` and global `STREAMING_BODY` ([`builtins/web/fetch/fetch_event.cpp:31`](../../builtins/web/fetch/fetch_event.cpp#L31)). `handle_incoming_request` at line 495 initializes request slots, dispatches, and drives the event loop. Its normal return path does not invoke `Engine::reset` or recreate the singleton. [`runtime/engine.cpp:731`](../../runtime/engine.cpp#L731), `Engine::reset`, clears rejected-promise tracking, cancels queued tasks, resets timers, and collects garbage; it does not reconstruct JS globals or module caches. Multi-request reuse must not be claimed from this reset function alone.
+
+**Proposal, future AsyncLocalStorage:** represent the active context as a rooted persistent chain/map. Capture a context token at each promise reaction registration and each timer/native async callback registration. Restore the token immediately before invoking that job/callback and restore the previous token through RAII even when JS throws. `run` changes context for its synchronous dynamic extent; `enterWith` has its documented wider semantics; `exit`, `disable`, binding, and snapshot helpers require their own fixtures. Promise continuation propagation must integrate the actual SpiderMonkey job enqueue/execute hooks; wrapping timers alone is insufficient. Audit the pinned SpiderMonkey job-queue API before implementation, since the current internal queue gives the embedding no context field. Request entry installs a fresh root token, request cleanup cancels outstanding work or transfers it to an explicit lifetime owner, and reuse clears request roots. A single mutable global store leaks context between interleaved promises and requests.
+
+## Memory integration evidence
+
+The original audit found guest producers using ArrayBuffer adoption, including TextEncoder and `Blob::data_to_owned_array_buffer`. The subsequent production TextEncoder now allocates the exact JS-owned Uint8Array directly, as recorded in the [execution ledger](execution-status.md). Blob's separate allocation family still needs correction before reuse. An adoption call's presence is evidence to audit, not permission to transfer an arbitrary C++ or Rust allocation to SpiderMonkey.
+
+[`builtins/web/streams/compression-stream.cpp`](../../builtins/web/streams/compression-stream.cpp) and its decompression counterpart allocate each output Uint8Array before borrowing its destination under `JS::AutoCheckCannotGC`. **That output-copy pattern does not establish safety of the whole transform:** both retain `z_stream::next_in` from a JS byte view across those allocations and enqueue calls. A [separate source audit and bounded native candidate](../../tests/node-compat/foundation-zlib/README.md) records input ownership, cleanup, malformed-input and output-limit prerequisites. Compression reuse remains deferred.
+
+For Buffer kernels, allocate/coerce/root all objects first; acquire typed-data pointers only for the no-GC operation; execute no JS, allocation, or callbacks while borrowed; release the borrow before subsequent JSAPI operations. Never retain those pointers in module state or async tasks. Detached/shared/resizable backing stores require an explicit support policy. Observable `buffer`, `byteOffset`, `byteLength`, overlapping-copy behavior, and shared slice/subarray views prohibit replacing all operations with hidden copied vectors.
+
+## Host world and optional capability boundary
+
+The checkout default is `host-apis/wasi-0.2.10` ([`CMakeLists.txt:6`](../../CMakeLists.txt#L6)); `HOST_API` may select another supplied implementation. The shipped world [`host-apis/wasi-0.2.10/wit/main.wit`](../../host-apis/wasi-0.2.10/wit/main.wit) is `local:bindings/bindings`, including **both** `wasi:cli/command@0.2.10` and `wasi:http/proxy@0.2.10`. The CLI command world contains filesystem, TCP, UDP, DNS name lookup, terminals, clocks, and random interfaces ([`package.wit:186`](../../host-apis/wasi-0.2.10/wit/deps/wasi-cli-0.2.10/package.wit#L186)). The HTTP world imports HTTP types/outgoing-handler plus IO, clocks, entropy, and stdio ([`package.wit:707`](../../host-apis/wasi-0.2.10/wit/deps/wasi-http-0.2.10/package.wit#L707)). These are WIT declarations, not a measured final-component import list.
+
+The 0.2.10 host library reuses 0.2.0 host implementation and 0.2.3 sockets C++ source while linking 0.2.10 generated bindings ([`host_api.cmake:1`](../../host-apis/wasi-0.2.10/host_api.cmake#L1)). A directory name on a shared source does not pin the emitted interface version. The preview1 adapter can also contribute interface versions; inspect the final component.
+
+**Proposal:** keep the existing broad world as an audit baseline only. Produce selected standard-interface variants for guest-only command, HTTP proxy, filesystem, and sockets profiles, using the existing `HOST_API` build selection and generated WIT bindings. A local WIT package/world name is not a custom host service; its imported interfaces must all be explicitly selected standard WASI 0.2.x interfaces. Disable the optional JS debugger for the portable production profile so it cannot pull in a debugging socket requirement. Select fewer world imports and verify actual linking; merely avoiding JS imports of `node:fs` does not establish a lean component. Do not let the unsupported stub request any capability.
+
+## Existing tests inspected and extension points
+
+- [`tests/e2e/init-script/init.js`](../../tests/e2e/init-script/init.js) registers `builtinMod`; [`init-script.js`](../../tests/e2e/init-script/init-script.js) imports a named binding. This is an existing initializer-to-module integration test.
+- [`tests/e2e/tla-err/tla-err.js`](../../tests/e2e/tla-err/tla-err.js) exercises initialization rejection. [`tests/e2e/tla-runtime-resolve/tla-runtime-resolve.js`](../../tests/e2e/tla-runtime-resolve/tla-runtime-resolve.js) deliberately resumes pending top-level await during request execution.
+- [`tests/e2e/finalization-registry-snapshot/finalization-registry-snapshot.js`](../../tests/e2e/finalization-registry-snapshot/finalization-registry-snapshot.js) requires cleanup before snapshot; [`tests/e2e/finalization-registry-tla-err/finalization-registry-tla-err.js`](../../tests/e2e/finalization-registry-tla-err/finalization-registry-tla-err.js) requires a cleanup-induced TLA failure to reject componentization.
+- [`tests/tests.cmake:7`](../../tests/tests.cmake#L7), `test_e2e`, and `test_integration` at line 14 are existing CTest entry points. [`tests/test.sh:33`](../../tests/test.sh#L33) discovers `init.js`, runs componentization, checks Wizer failure expectations, then launches a real `wasmtime serve` at line 102 and checks HTTP response output. Add fixtures through these mechanisms rather than inventing a Node-only success check.
+- [`cmake/wasmtime.cmake:1`](../../cmake/wasmtime.cmake#L1) pins Wasmtime `v42.0.1` for this checkout's build. This is a source pin, not evidence that this version is installed or that a new profile instantiates there.
+
+No component was built or executed for this note. Required later evidence includes final WIT/import output, real-component Buffer and stub fixtures, rejection during componentization, resumed execution, and repeated invocation on each selected target host.

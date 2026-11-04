@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "state": "PROPOSED_NOT_EXECUTED",
+  "question": "Does explicit LLD/ThinLTO concurrency one change link-stage RSS, time, or filesystem peak for the unchanged ordinary Release engine inputs?",
+  "futureProducerRequired": true,
+  "currentRecipeMustRemainImmutable": "1e2f15d1aac2f86c3363390cc3c6261721a20c07fea8ca0825c68027154c0e19",
+  "proposedCMakeConfigureInput": {
+    "CMAKE_EXE_LINKER_FLAGS": "-Wl,--threads=1,--thinlto-jobs=1"
+  },
+  "expectedActualAdditionalLinkerArguments": ["--threads=1", "--thinlto-jobs=1"],
+  "preserved": [
+    "Release, -O3, -DNDEBUG, -flto=thin, current LLD LTO optimization defaults",
+    "current LTO codegen partition count and no added ThinLTO cache or save-temps",
+    "same native306 and diagnostic2 source bytes, compile flags and object/archive inputs",
+    "same WASI-SDK30 LLVM21.1.4, Rust lock, OpenSSL bytes and embedding patches",
+    "same WEVAL=OFF, USE_WASM_OPT=ON and post-link wasm-opt arguments",
+    "strict, protected-event layout and internal-tick compile definitions",
+    "ordinary public typed component ABI, full validation scope and exact WASI allowlist",
+    "prior artifacts, source/config freezes, policies and acceptance records"
+  ],
+  "preconditions": {
+    "minimumAvailableFilesystemBytes": 2147483648,
+    "stopBelowAvailableFilesystemBytes": 838860800,
+    "oneNativeBuildAtATime": true,
+    "taskProcessGroupOwnershipRequired": true,
+    "noOtherTaskGuestOrTimingWindow": true,
+    "newReviewedRecipePolicyAndReceiptRequired": true,
+    "exactNativeAndParentTargetCommandsBeforeAfterRequired": true,
+    "inputBytesAndInputMetadataBeforeAfterRequired": true,
+    "noAcceptedArtifactsOverwritten": true
+  },
+  "sequence": [
+    "Review a new finite producer/policy: existing recipe and metadata are not relabeled.",
+    "Capture exact tools, source/native306+diagnostic2, object/archive inputs, configuration, target commands, launcher and measurement-tool versions.",
+    "Verify the control and candidate driver print-only commands differ solely by the two LLD arguments, with unchanged wasm-opt invocation.",
+    "When original gates are satisfied, run isolated serial link-stage trials from the same inputs in opposite arm order; plan at least two complete pairs when capacity permits.",
+    "Measure resources independently for the linker, enclosing command and post-link wasm-opt; preserve raw observations and any threshold stop or failure as such.",
+    "Rehash inputs and original artifacts after every trial, record output SHA/size and compare outputs without presuming byte identity.",
+    "If adopted for a new full ordinary Release/Release-GC artifact, freeze actual commands/configs/source/licenses and rerun all applicable component and host gates before acceptance."
+  ],
+  "measurements": {
+    "elapsedSeconds": "monotonic host timer for each stage",
+    "processPeakRssBytes": "host per-process maximum, record platform units and method",
+    "sampledProcessGroupRssBytes": "bounded sampling with observed PID membership, sampling interval, lifetime limitations and no claim of an exact simultaneous peak",
+    "freeFilesystemBytes": "before, periodically during, minimum observed, and after; global observations are nonexclusive",
+    "temporaryAndOutputBytes": "exact owned paths and logical/allocated sizes, distinguish memory pressure from disk pressure",
+    "threadCount": "sample linker process threads to confirm the requested cap is operational, noting other threads/runtime infrastructure",
+    "artifact": "SHA256, logical bytes, emitted imports/exports, full ordinary correctness results"
+  },
+  "interpretation": {
+    "rssReductionProven": false,
+    "diskPeakReductionProven": false,
+    "semanticsOrByteIdentityInferredFromFlags": false,
+    "launchGateReductionProposed": false,
+    "thresholdStopIsNotACompletedTrial": true,
+    "aSingleObservationIsNotAGeneralResourceGuarantee": true
+  },
+  "explicitExclusions": [
+    "native build or guest execution by this packet",
+    "DEBUG, fault injection, stopped OOM branch or raw/malformed memory observation",
+    "SDK-content or filesystem-representation changes",
+    "weaker optimization, stripped diagnostic functionality or reduced test coverage",
+    "host modifications, custom capabilities or access-tier changes"
+  ]
+}

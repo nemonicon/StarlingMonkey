@@ -1,0 +1,1565 @@
+[
+  {
+    "calls": 1,
+    "publicCases": [
+      {
+        "name": "normalized disposable resource contract",
+        "observations": {
+          "nullPrototype": true,
+          "onlyDisposeKey": true,
+          "enumerable": true,
+          "writable": true,
+          "configurable": true,
+          "length": 0,
+          "noFunctionPrototype": true,
+          "then": "undefined"
+        }
+      },
+      {
+        "name": "signal validation precedes listener validation",
+        "observations": {
+          "rows": [
+            {
+              "label": "undefined",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "null",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "boolean",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "number",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "string",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "symbol",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "bigint",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "plain object",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "array",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "function with aborted property",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "listener undefined",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "listener null",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "listener number",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "listener object",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            }
+          ],
+          "handleEventReads": 0
+        }
+      },
+      {
+        "name": "aborted getter read follows listener validation and preserves thrown value",
+        "observations": {
+          "invalidListenerCheckedBeforeAbortedRead": true,
+          "getterExceptionIdentity": true,
+          "getterReads": [
+            "get aborted"
+          ],
+          "hasExceptionIdentity": true,
+          "hasCalls": 1
+        }
+      },
+      {
+        "name": "structural fake signal calls and disposer method lookup",
+        "observations": {
+          "calls": [
+            "has:aborted",
+            "get aborted",
+            "get addEventListener",
+            "call addEventListener:abort:once",
+            "replacement removal",
+            "replacement removal"
+          ],
+          "deferredRemovalReadsCurrentMethod": true,
+          "repeatedFakeDisposalRepeatsRemoval": true,
+          "missingAddEventListener": {
+            "name": "TypeError",
+            "code": null
+          },
+          "scope": "Public structural acceptance; no private option symbol or listener storage is inspected."
+        }
+      },
+      {
+        "name": "already-aborted structural object schedules without event methods",
+        "observations": {
+          "order": [
+            "before registration",
+            "get aborted",
+            "after dispose",
+            "listener",
+            "after microtask checkpoint"
+          ],
+          "receiver": [
+            {
+              "undefinedThis": true,
+              "argumentCount": 0
+            }
+          ],
+          "queuedCallbackUnaffectedByDisposal": true
+        }
+      },
+      {
+        "name": "fresh signal callback is synchronous with signal receiver and Event",
+        "observations": {
+          "order": [
+            "before abort",
+            "listener",
+            "after abort"
+          ],
+          "details": [
+            {
+              "signalThis": true,
+              "argumentCount": 1,
+              "eventInstance": true,
+              "type": "abort",
+              "targetIsSignal": true,
+              "currentTargetIsSignal": true,
+              "abortedDuringCallback": true,
+              "reasonDuringCallback": "first reason",
+              "isTrusted": true,
+              "cancelable": false
+            }
+          ],
+          "onceAcrossRepeatedAbortAndManualEvent": true
+        }
+      },
+      {
+        "name": "already-aborted signal callback is a zero-argument microtask despite disposal",
+        "observations": {
+          "order": [
+            "before registration",
+            "after registration/dispose",
+            "earlier queued microtask",
+            "listener",
+            "later queued microtask",
+            "await continuation"
+          ],
+          "details": [
+            {
+              "undefinedThis": true,
+              "argumentCount": 0
+            }
+          ],
+          "queuedCallbackUnaffectedByDisposal": true
+        }
+      },
+      {
+        "name": "stopImmediatePropagation skips ordinary listeners but not protected registrations",
+        "observations": {
+          "order": [
+            "ordinary stopper",
+            "protected one",
+            "protected two"
+          ]
+        }
+      },
+      {
+        "name": "fresh disposal is effect-idempotent and can remove a later listener during dispatch",
+        "observations": {
+          "disposedCalls": 0,
+          "order": [
+            "first listener"
+          ],
+          "realSignalRemovalEffectIdempotent": true
+        }
+      },
+      {
+        "name": "manual abort event consumes once registration without changing signal state",
+        "observations": {
+          "callbacks": [
+            {
+              "signalThis": true,
+              "type": "abort",
+              "aborted": false,
+              "isTrusted": false
+            }
+          ],
+          "beforeRealAbort": false,
+          "realAbortState": true,
+          "dispatchReturnValues": [
+            true,
+            true
+          ]
+        }
+      },
+      {
+        "name": "manual event after already-aborted registration does not replace queued callback",
+        "observations": {
+          "order": [
+            "after manual dispatch",
+            "queued listener:0"
+          ]
+        }
+      },
+      {
+        "name": "registration inside real abort callback observes already-aborted microtask path",
+        "observations": {
+          "order": [
+            "first listener",
+            "after abort",
+            "late listener:0",
+            "after checkpoint"
+          ]
+        }
+      },
+      {
+        "name": "duplicate protected registrations share one listener tuple and either disposer removes it",
+        "observations": {
+          "disposableObjectsDistinct": true,
+          "callsAfterOneDisposer": 0,
+          "undisposedDuplicateCalls": 1
+        }
+      },
+      {
+        "name": "ordinary callback registered first is not upgraded to protected or once",
+        "observations": {
+          "stoppedOrder": [
+            "stopper",
+            "different protected callback"
+          ],
+          "ordinaryFirstRemainsNonOnceCalls": 3,
+          "protectedDuplicateDoesNotReplaceExistingTupleFlags": true
+        }
+      },
+      {
+        "name": "protected callback registered first keeps its flags after an ordinary duplicate",
+        "observations": {
+          "order": [
+            "stopper",
+            "protected callback",
+            "stopper"
+          ],
+          "laterOrdinaryDuplicateDidNotRemoveProtectionOrOnce": true
+        }
+      },
+      {
+        "name": "queued callback return thenable is ignored",
+        "observations": {
+          "calls": 1,
+          "thenReads": 0
+        }
+      }
+    ],
+    "nestedOnceCases": [
+      {
+        "mode": "ordinary-once",
+        "log": [
+          "earlier:outer",
+          "earlier:nested",
+          "later:nested",
+          "later:readded",
+          "earlier:after-nested",
+          "earlier:second",
+          "later:second",
+          "earlier:third"
+        ],
+        "laterInvocations": 2,
+        "laterRanInOuter": false,
+        "syntheticDispatchOnly": true,
+        "actualControllerAbortCalled": false
+      },
+      {
+        "mode": "protected-once",
+        "log": [
+          "earlier:outer",
+          "earlier:nested",
+          "later:nested",
+          "later:readded",
+          "earlier:after-nested",
+          "earlier:second",
+          "later:second",
+          "earlier:third"
+        ],
+        "laterInvocations": 2,
+        "laterRanInOuter": false,
+        "syntheticDispatchOnly": true,
+        "actualControllerAbortCalled": false
+      },
+      {
+        "mode": "protected-after-stop",
+        "log": [
+          "earlier:outer",
+          "earlier:nested",
+          "later:nested",
+          "later:readded",
+          "earlier:after-nested",
+          "earlier:second",
+          "later:second",
+          "earlier:third"
+        ],
+        "laterInvocations": 2,
+        "laterRanInOuter": false,
+        "syntheticDispatchOnly": true,
+        "actualControllerAbortCalled": false
+      },
+      {
+        "mode": "ordinary-remove-and-readd-control",
+        "log": [
+          "earlier",
+          "earlier",
+          "later"
+        ]
+      }
+    ],
+    "receiverCases": [
+      {
+        "name": "EventTarget.prototype.addEventListener",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "EventTarget.prototype.removeEventListener",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "EventTarget.prototype.dispatchEvent",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "structural addAbortListener EventTarget.prototype",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "AbortSignal.prototype.addEventListener",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "AbortSignal.prototype.removeEventListener",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "AbortSignal.prototype.dispatchEvent",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "structural addAbortListener AbortSignal.prototype",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "initialized EventTarget and native-derived AbortSignal",
+        "calls": 2,
+        "correctReceiver": true
+      }
+    ],
+    "namespace": {
+      "names": [
+        "EventEmitter",
+        "EventEmitterAsyncResource",
+        "addAbortListener",
+        "captureRejectionSymbol",
+        "captureRejections",
+        "default",
+        "defaultMaxListeners",
+        "errorMonitor",
+        "getEventListeners",
+        "getMaxListeners",
+        "init",
+        "listenerCount",
+        "on",
+        "once",
+        "setMaxListeners",
+        "usingDomains"
+      ],
+      "defaultNamed": true,
+      "canonicalCached": true,
+      "aliasValues": true,
+      "defaultAlias": true,
+      "then": "undefined",
+      "errorMonitorType": "symbol",
+      "captureRejectionSymbol": true,
+      "defaultMaxListeners": 10,
+      "captureRejections": false,
+      "usingDomains": false
+    },
+    "commonJS": {
+      "same": true,
+      "constructorAlias": true,
+      "defaultProperty": "undefined",
+      "addAbortListenerType": "function",
+      "errorMonitorType": "symbol",
+      "rejectedCall": "ERR_SM_NODE_UNSUPPORTED",
+      "rejectedConstruction": "ERR_SM_NODE_UNSUPPORTED"
+    },
+    "profileErrors": {
+      "errors": [
+        {
+          "name": "once-call",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "once",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "once-new",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "once",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "on-call",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "on",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "on-new",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "on",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "async-resource-call",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "EventEmitterAsyncResource",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "async-resource-new",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "EventEmitterAsyncResource",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "invalid-signal",
+          "type": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE",
+          "module": "node:events",
+          "operation": "addAbortListener",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        }
+      ],
+      "hooks": 0,
+      "ambient": 0
+    },
+    "symbol": {
+      "description": "Symbol.dispose",
+      "registryKey": null,
+      "sameAsNodeRegistry": false,
+      "descriptor": {
+        "enumerable": false,
+        "writable": false,
+        "configurable": false
+      }
+    },
+    "snapshot": {
+      "before": 0,
+      "after": 1,
+      "signalThis": true,
+      "currentTarget": true,
+      "aborted": false
+    }
+  },
+  {
+    "calls": 2,
+    "publicCases": [
+      {
+        "name": "normalized disposable resource contract",
+        "observations": {
+          "nullPrototype": true,
+          "onlyDisposeKey": true,
+          "enumerable": true,
+          "writable": true,
+          "configurable": true,
+          "length": 0,
+          "noFunctionPrototype": true,
+          "then": "undefined"
+        }
+      },
+      {
+        "name": "signal validation precedes listener validation",
+        "observations": {
+          "rows": [
+            {
+              "label": "undefined",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "null",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "boolean",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "number",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "string",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "symbol",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "bigint",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "plain object",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "array",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "function with aborted property",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "listener undefined",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "listener null",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "listener number",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "listener object",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            }
+          ],
+          "handleEventReads": 0
+        }
+      },
+      {
+        "name": "aborted getter read follows listener validation and preserves thrown value",
+        "observations": {
+          "invalidListenerCheckedBeforeAbortedRead": true,
+          "getterExceptionIdentity": true,
+          "getterReads": [
+            "get aborted"
+          ],
+          "hasExceptionIdentity": true,
+          "hasCalls": 1
+        }
+      },
+      {
+        "name": "structural fake signal calls and disposer method lookup",
+        "observations": {
+          "calls": [
+            "has:aborted",
+            "get aborted",
+            "get addEventListener",
+            "call addEventListener:abort:once",
+            "replacement removal",
+            "replacement removal"
+          ],
+          "deferredRemovalReadsCurrentMethod": true,
+          "repeatedFakeDisposalRepeatsRemoval": true,
+          "missingAddEventListener": {
+            "name": "TypeError",
+            "code": null
+          },
+          "scope": "Public structural acceptance; no private option symbol or listener storage is inspected."
+        }
+      },
+      {
+        "name": "already-aborted structural object schedules without event methods",
+        "observations": {
+          "order": [
+            "before registration",
+            "get aborted",
+            "after dispose",
+            "listener",
+            "after microtask checkpoint"
+          ],
+          "receiver": [
+            {
+              "undefinedThis": true,
+              "argumentCount": 0
+            }
+          ],
+          "queuedCallbackUnaffectedByDisposal": true
+        }
+      },
+      {
+        "name": "fresh signal callback is synchronous with signal receiver and Event",
+        "observations": {
+          "order": [
+            "before abort",
+            "listener",
+            "after abort"
+          ],
+          "details": [
+            {
+              "signalThis": true,
+              "argumentCount": 1,
+              "eventInstance": true,
+              "type": "abort",
+              "targetIsSignal": true,
+              "currentTargetIsSignal": true,
+              "abortedDuringCallback": true,
+              "reasonDuringCallback": "first reason",
+              "isTrusted": true,
+              "cancelable": false
+            }
+          ],
+          "onceAcrossRepeatedAbortAndManualEvent": true
+        }
+      },
+      {
+        "name": "already-aborted signal callback is a zero-argument microtask despite disposal",
+        "observations": {
+          "order": [
+            "before registration",
+            "after registration/dispose",
+            "earlier queued microtask",
+            "listener",
+            "later queued microtask",
+            "await continuation"
+          ],
+          "details": [
+            {
+              "undefinedThis": true,
+              "argumentCount": 0
+            }
+          ],
+          "queuedCallbackUnaffectedByDisposal": true
+        }
+      },
+      {
+        "name": "stopImmediatePropagation skips ordinary listeners but not protected registrations",
+        "observations": {
+          "order": [
+            "ordinary stopper",
+            "protected one",
+            "protected two"
+          ]
+        }
+      },
+      {
+        "name": "fresh disposal is effect-idempotent and can remove a later listener during dispatch",
+        "observations": {
+          "disposedCalls": 0,
+          "order": [
+            "first listener"
+          ],
+          "realSignalRemovalEffectIdempotent": true
+        }
+      },
+      {
+        "name": "manual abort event consumes once registration without changing signal state",
+        "observations": {
+          "callbacks": [
+            {
+              "signalThis": true,
+              "type": "abort",
+              "aborted": false,
+              "isTrusted": false
+            }
+          ],
+          "beforeRealAbort": false,
+          "realAbortState": true,
+          "dispatchReturnValues": [
+            true,
+            true
+          ]
+        }
+      },
+      {
+        "name": "manual event after already-aborted registration does not replace queued callback",
+        "observations": {
+          "order": [
+            "after manual dispatch",
+            "queued listener:0"
+          ]
+        }
+      },
+      {
+        "name": "registration inside real abort callback observes already-aborted microtask path",
+        "observations": {
+          "order": [
+            "first listener",
+            "after abort",
+            "late listener:0",
+            "after checkpoint"
+          ]
+        }
+      },
+      {
+        "name": "duplicate protected registrations share one listener tuple and either disposer removes it",
+        "observations": {
+          "disposableObjectsDistinct": true,
+          "callsAfterOneDisposer": 0,
+          "undisposedDuplicateCalls": 1
+        }
+      },
+      {
+        "name": "ordinary callback registered first is not upgraded to protected or once",
+        "observations": {
+          "stoppedOrder": [
+            "stopper",
+            "different protected callback"
+          ],
+          "ordinaryFirstRemainsNonOnceCalls": 3,
+          "protectedDuplicateDoesNotReplaceExistingTupleFlags": true
+        }
+      },
+      {
+        "name": "protected callback registered first keeps its flags after an ordinary duplicate",
+        "observations": {
+          "order": [
+            "stopper",
+            "protected callback",
+            "stopper"
+          ],
+          "laterOrdinaryDuplicateDidNotRemoveProtectionOrOnce": true
+        }
+      },
+      {
+        "name": "queued callback return thenable is ignored",
+        "observations": {
+          "calls": 1,
+          "thenReads": 0
+        }
+      }
+    ],
+    "nestedOnceCases": [
+      {
+        "mode": "ordinary-once",
+        "log": [
+          "earlier:outer",
+          "earlier:nested",
+          "later:nested",
+          "later:readded",
+          "earlier:after-nested",
+          "earlier:second",
+          "later:second",
+          "earlier:third"
+        ],
+        "laterInvocations": 2,
+        "laterRanInOuter": false,
+        "syntheticDispatchOnly": true,
+        "actualControllerAbortCalled": false
+      },
+      {
+        "mode": "protected-once",
+        "log": [
+          "earlier:outer",
+          "earlier:nested",
+          "later:nested",
+          "later:readded",
+          "earlier:after-nested",
+          "earlier:second",
+          "later:second",
+          "earlier:third"
+        ],
+        "laterInvocations": 2,
+        "laterRanInOuter": false,
+        "syntheticDispatchOnly": true,
+        "actualControllerAbortCalled": false
+      },
+      {
+        "mode": "protected-after-stop",
+        "log": [
+          "earlier:outer",
+          "earlier:nested",
+          "later:nested",
+          "later:readded",
+          "earlier:after-nested",
+          "earlier:second",
+          "later:second",
+          "earlier:third"
+        ],
+        "laterInvocations": 2,
+        "laterRanInOuter": false,
+        "syntheticDispatchOnly": true,
+        "actualControllerAbortCalled": false
+      },
+      {
+        "mode": "ordinary-remove-and-readd-control",
+        "log": [
+          "earlier",
+          "earlier",
+          "later"
+        ]
+      }
+    ],
+    "receiverCases": [
+      {
+        "name": "EventTarget.prototype.addEventListener",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "EventTarget.prototype.removeEventListener",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "EventTarget.prototype.dispatchEvent",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "structural addAbortListener EventTarget.prototype",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "AbortSignal.prototype.addEventListener",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "AbortSignal.prototype.removeEventListener",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "AbortSignal.prototype.dispatchEvent",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "structural addAbortListener AbortSignal.prototype",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "initialized EventTarget and native-derived AbortSignal",
+        "calls": 2,
+        "correctReceiver": true
+      }
+    ],
+    "namespace": {
+      "names": [
+        "EventEmitter",
+        "EventEmitterAsyncResource",
+        "addAbortListener",
+        "captureRejectionSymbol",
+        "captureRejections",
+        "default",
+        "defaultMaxListeners",
+        "errorMonitor",
+        "getEventListeners",
+        "getMaxListeners",
+        "init",
+        "listenerCount",
+        "on",
+        "once",
+        "setMaxListeners",
+        "usingDomains"
+      ],
+      "defaultNamed": true,
+      "canonicalCached": true,
+      "aliasValues": true,
+      "defaultAlias": true,
+      "then": "undefined",
+      "errorMonitorType": "symbol",
+      "captureRejectionSymbol": true,
+      "defaultMaxListeners": 10,
+      "captureRejections": false,
+      "usingDomains": false
+    },
+    "commonJS": {
+      "same": true,
+      "constructorAlias": true,
+      "defaultProperty": "undefined",
+      "addAbortListenerType": "function",
+      "errorMonitorType": "symbol",
+      "rejectedCall": "ERR_SM_NODE_UNSUPPORTED",
+      "rejectedConstruction": "ERR_SM_NODE_UNSUPPORTED"
+    },
+    "profileErrors": {
+      "errors": [
+        {
+          "name": "once-call",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "once",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "once-new",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "once",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "on-call",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "on",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "on-new",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "on",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "async-resource-call",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "EventEmitterAsyncResource",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "async-resource-new",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "EventEmitterAsyncResource",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "invalid-signal",
+          "type": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE",
+          "module": "node:events",
+          "operation": "addAbortListener",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        }
+      ],
+      "hooks": 0,
+      "ambient": 0
+    },
+    "symbol": {
+      "description": "Symbol.dispose",
+      "registryKey": null,
+      "sameAsNodeRegistry": false,
+      "descriptor": {
+        "enumerable": false,
+        "writable": false,
+        "configurable": false
+      }
+    },
+    "snapshot": {
+      "before": 1,
+      "after": 1,
+      "signalThis": true,
+      "currentTarget": true,
+      "aborted": false
+    }
+  },
+  {
+    "calls": 3,
+    "publicCases": [
+      {
+        "name": "normalized disposable resource contract",
+        "observations": {
+          "nullPrototype": true,
+          "onlyDisposeKey": true,
+          "enumerable": true,
+          "writable": true,
+          "configurable": true,
+          "length": 0,
+          "noFunctionPrototype": true,
+          "then": "undefined"
+        }
+      },
+      {
+        "name": "signal validation precedes listener validation",
+        "observations": {
+          "rows": [
+            {
+              "label": "undefined",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "null",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "boolean",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "number",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "string",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "symbol",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "bigint",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "plain object",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "array",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "function with aborted property",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "listener undefined",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "listener null",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "listener number",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            },
+            {
+              "label": "listener object",
+              "name": "TypeError",
+              "code": "ERR_INVALID_ARG_TYPE"
+            }
+          ],
+          "handleEventReads": 0
+        }
+      },
+      {
+        "name": "aborted getter read follows listener validation and preserves thrown value",
+        "observations": {
+          "invalidListenerCheckedBeforeAbortedRead": true,
+          "getterExceptionIdentity": true,
+          "getterReads": [
+            "get aborted"
+          ],
+          "hasExceptionIdentity": true,
+          "hasCalls": 1
+        }
+      },
+      {
+        "name": "structural fake signal calls and disposer method lookup",
+        "observations": {
+          "calls": [
+            "has:aborted",
+            "get aborted",
+            "get addEventListener",
+            "call addEventListener:abort:once",
+            "replacement removal",
+            "replacement removal"
+          ],
+          "deferredRemovalReadsCurrentMethod": true,
+          "repeatedFakeDisposalRepeatsRemoval": true,
+          "missingAddEventListener": {
+            "name": "TypeError",
+            "code": null
+          },
+          "scope": "Public structural acceptance; no private option symbol or listener storage is inspected."
+        }
+      },
+      {
+        "name": "already-aborted structural object schedules without event methods",
+        "observations": {
+          "order": [
+            "before registration",
+            "get aborted",
+            "after dispose",
+            "listener",
+            "after microtask checkpoint"
+          ],
+          "receiver": [
+            {
+              "undefinedThis": true,
+              "argumentCount": 0
+            }
+          ],
+          "queuedCallbackUnaffectedByDisposal": true
+        }
+      },
+      {
+        "name": "fresh signal callback is synchronous with signal receiver and Event",
+        "observations": {
+          "order": [
+            "before abort",
+            "listener",
+            "after abort"
+          ],
+          "details": [
+            {
+              "signalThis": true,
+              "argumentCount": 1,
+              "eventInstance": true,
+              "type": "abort",
+              "targetIsSignal": true,
+              "currentTargetIsSignal": true,
+              "abortedDuringCallback": true,
+              "reasonDuringCallback": "first reason",
+              "isTrusted": true,
+              "cancelable": false
+            }
+          ],
+          "onceAcrossRepeatedAbortAndManualEvent": true
+        }
+      },
+      {
+        "name": "already-aborted signal callback is a zero-argument microtask despite disposal",
+        "observations": {
+          "order": [
+            "before registration",
+            "after registration/dispose",
+            "earlier queued microtask",
+            "listener",
+            "later queued microtask",
+            "await continuation"
+          ],
+          "details": [
+            {
+              "undefinedThis": true,
+              "argumentCount": 0
+            }
+          ],
+          "queuedCallbackUnaffectedByDisposal": true
+        }
+      },
+      {
+        "name": "stopImmediatePropagation skips ordinary listeners but not protected registrations",
+        "observations": {
+          "order": [
+            "ordinary stopper",
+            "protected one",
+            "protected two"
+          ]
+        }
+      },
+      {
+        "name": "fresh disposal is effect-idempotent and can remove a later listener during dispatch",
+        "observations": {
+          "disposedCalls": 0,
+          "order": [
+            "first listener"
+          ],
+          "realSignalRemovalEffectIdempotent": true
+        }
+      },
+      {
+        "name": "manual abort event consumes once registration without changing signal state",
+        "observations": {
+          "callbacks": [
+            {
+              "signalThis": true,
+              "type": "abort",
+              "aborted": false,
+              "isTrusted": false
+            }
+          ],
+          "beforeRealAbort": false,
+          "realAbortState": true,
+          "dispatchReturnValues": [
+            true,
+            true
+          ]
+        }
+      },
+      {
+        "name": "manual event after already-aborted registration does not replace queued callback",
+        "observations": {
+          "order": [
+            "after manual dispatch",
+            "queued listener:0"
+          ]
+        }
+      },
+      {
+        "name": "registration inside real abort callback observes already-aborted microtask path",
+        "observations": {
+          "order": [
+            "first listener",
+            "after abort",
+            "late listener:0",
+            "after checkpoint"
+          ]
+        }
+      },
+      {
+        "name": "duplicate protected registrations share one listener tuple and either disposer removes it",
+        "observations": {
+          "disposableObjectsDistinct": true,
+          "callsAfterOneDisposer": 0,
+          "undisposedDuplicateCalls": 1
+        }
+      },
+      {
+        "name": "ordinary callback registered first is not upgraded to protected or once",
+        "observations": {
+          "stoppedOrder": [
+            "stopper",
+            "different protected callback"
+          ],
+          "ordinaryFirstRemainsNonOnceCalls": 3,
+          "protectedDuplicateDoesNotReplaceExistingTupleFlags": true
+        }
+      },
+      {
+        "name": "protected callback registered first keeps its flags after an ordinary duplicate",
+        "observations": {
+          "order": [
+            "stopper",
+            "protected callback",
+            "stopper"
+          ],
+          "laterOrdinaryDuplicateDidNotRemoveProtectionOrOnce": true
+        }
+      },
+      {
+        "name": "queued callback return thenable is ignored",
+        "observations": {
+          "calls": 1,
+          "thenReads": 0
+        }
+      }
+    ],
+    "nestedOnceCases": [
+      {
+        "mode": "ordinary-once",
+        "log": [
+          "earlier:outer",
+          "earlier:nested",
+          "later:nested",
+          "later:readded",
+          "earlier:after-nested",
+          "earlier:second",
+          "later:second",
+          "earlier:third"
+        ],
+        "laterInvocations": 2,
+        "laterRanInOuter": false,
+        "syntheticDispatchOnly": true,
+        "actualControllerAbortCalled": false
+      },
+      {
+        "mode": "protected-once",
+        "log": [
+          "earlier:outer",
+          "earlier:nested",
+          "later:nested",
+          "later:readded",
+          "earlier:after-nested",
+          "earlier:second",
+          "later:second",
+          "earlier:third"
+        ],
+        "laterInvocations": 2,
+        "laterRanInOuter": false,
+        "syntheticDispatchOnly": true,
+        "actualControllerAbortCalled": false
+      },
+      {
+        "mode": "protected-after-stop",
+        "log": [
+          "earlier:outer",
+          "earlier:nested",
+          "later:nested",
+          "later:readded",
+          "earlier:after-nested",
+          "earlier:second",
+          "later:second",
+          "earlier:third"
+        ],
+        "laterInvocations": 2,
+        "laterRanInOuter": false,
+        "syntheticDispatchOnly": true,
+        "actualControllerAbortCalled": false
+      },
+      {
+        "mode": "ordinary-remove-and-readd-control",
+        "log": [
+          "earlier",
+          "earlier",
+          "later"
+        ]
+      }
+    ],
+    "receiverCases": [
+      {
+        "name": "EventTarget.prototype.addEventListener",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "EventTarget.prototype.removeEventListener",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "EventTarget.prototype.dispatchEvent",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "structural addAbortListener EventTarget.prototype",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "AbortSignal.prototype.addEventListener",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "AbortSignal.prototype.removeEventListener",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "AbortSignal.prototype.dispatchEvent",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "structural addAbortListener AbortSignal.prototype",
+        "nameOfError": "TypeError",
+        "code": null
+      },
+      {
+        "name": "initialized EventTarget and native-derived AbortSignal",
+        "calls": 2,
+        "correctReceiver": true
+      }
+    ],
+    "namespace": {
+      "names": [
+        "EventEmitter",
+        "EventEmitterAsyncResource",
+        "addAbortListener",
+        "captureRejectionSymbol",
+        "captureRejections",
+        "default",
+        "defaultMaxListeners",
+        "errorMonitor",
+        "getEventListeners",
+        "getMaxListeners",
+        "init",
+        "listenerCount",
+        "on",
+        "once",
+        "setMaxListeners",
+        "usingDomains"
+      ],
+      "defaultNamed": true,
+      "canonicalCached": true,
+      "aliasValues": true,
+      "defaultAlias": true,
+      "then": "undefined",
+      "errorMonitorType": "symbol",
+      "captureRejectionSymbol": true,
+      "defaultMaxListeners": 10,
+      "captureRejections": false,
+      "usingDomains": false
+    },
+    "commonJS": {
+      "same": true,
+      "constructorAlias": true,
+      "defaultProperty": "undefined",
+      "addAbortListenerType": "function",
+      "errorMonitorType": "symbol",
+      "rejectedCall": "ERR_SM_NODE_UNSUPPORTED",
+      "rejectedConstruction": "ERR_SM_NODE_UNSUPPORTED"
+    },
+    "profileErrors": {
+      "errors": [
+        {
+          "name": "once-call",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "once",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "once-new",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "once",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "on-call",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "on",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "on-new",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "on",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "async-resource-call",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "EventEmitterAsyncResource",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "async-resource-new",
+          "type": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "module": "node:events",
+          "operation": "EventEmitterAsyncResource",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        },
+        {
+          "name": "invalid-signal",
+          "type": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE",
+          "module": "node:events",
+          "operation": "addAbortListener",
+          "profile": "sm-node-22.14.0-m0.10",
+          "own": true
+        }
+      ],
+      "hooks": 0,
+      "ambient": 0
+    },
+    "symbol": {
+      "description": "Symbol.dispose",
+      "registryKey": null,
+      "sameAsNodeRegistry": false,
+      "descriptor": {
+        "enumerable": false,
+        "writable": false,
+        "configurable": false
+      }
+    },
+    "snapshot": {
+      "before": 1,
+      "after": 1,
+      "signalThis": true,
+      "currentTarget": true,
+      "aborted": false
+    }
+  }
+]

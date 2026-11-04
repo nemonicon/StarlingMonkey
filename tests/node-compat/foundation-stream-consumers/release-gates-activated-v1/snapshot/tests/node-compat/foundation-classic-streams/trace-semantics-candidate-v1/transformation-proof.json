@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "state": "ISOLATED_WRITABLE_NODE22_SEMANTICS_SOURCE_PROPOSAL",
+  "canonicalCoreBeforeSha256": "ba39701153094c6481464fa3f45a7afd87e6d41d673026e8008e12f2693802bf",
+  "candidateCoreSha256": "5c0241a73f4cdffc61d7c962bd4d1a1d2015f8fbadef59a4631b7551f9a767b9",
+  "writableBeforeSha256": "c219a49afb5c6b5d5c4126d796c8847a6b44d01de520b0589b970ad97ff17c69",
+  "writableAfterSha256": "18faa9f92e430e4aabb4b6349ea7bc481f20ecac61d9141c3db045e75f6f9ef4",
+  "edits": [
+    {
+      "old": "  if (typeof encoding === 'function') {\n    cb = encoding\n    encoding = state.defaultEncoding\n  } else {\n    if (!encoding) encoding = state.defaultEncoding\n    else if (encoding !== 'buffer' && !bufferIsEncoding(encoding)) throw new ERR_UNKNOWN_ENCODING(encoding)\n    if (typeof cb !== 'function') cb = nop\n  }",
+      "new": "  if (typeof cb !== 'function') cb = nop",
+      "count": 1,
+      "offset": 9531
+    },
+    {
+      "old": "  } else if (!state.objectMode) {\n    if (typeof chunk === 'string') {",
+      "new": "  } else if (!state.objectMode) {\n    if (!encoding) encoding = state.defaultEncoding\n    else if (encoding !== 'buffer' && !bufferIsEncoding(encoding)) throw new ERR_UNKNOWN_ENCODING(encoding)\n    if (typeof chunk === 'string') {",
+      "count": 1,
+      "offset": 9635
+    },
+    {
+      "old": "Writable.prototype.write = function (chunk, encoding, cb) {\n  return _write(this, chunk, encoding, cb) === true\n}",
+      "new": "Writable.prototype.write = function (chunk, encoding, cb) {\n  if (encoding != null && typeof encoding === 'function') {\n    cb = encoding\n    encoding = null\n  }\n  return _write(this, chunk, encoding, cb) === true\n}",
+      "count": 1,
+      "offset": 10734
+    },
+    {
+      "old": "  // stream._write resets state.length\n  const ret = state.length < state.highWaterMark\n  // We must ensure that previous needDrain will not be reset to false.\n  if (!ret) state.needDrain = true\n",
+      "new": "",
+      "count": 1,
+      "offset": 11878
+    },
+    {
+      "old": "  // Return false if errored or destroyed in order to break\n  // any synchronous while(stream.write(data)) loops.\n  return ret && !state.errored && !state.destroyed",
+      "new": "  // Node22 checks the remaining queue after a synchronous _write callback.\n  const ret = state.length < state.highWaterMark || state.length === 0\n  if (!ret) state.needDrain = true\n\n  // Return false if errored or destroyed in order to break\n  // any synchronous while(stream.write(data)) loops.\n  return ret && !state.errored && !state.destroyed",
+      "count": 1,
+      "offset": 12392
+    }
+  ],
+  "exactReverseProof": true,
+  "schedulerChanged": false,
+  "liveSourcesChanged": false,
+  "nativePinsChanged": false,
+  "compiledOrGuestExecuted": false
+}

@@ -1,0 +1,40 @@
+--- a/embedding/embedding.cpp
++++ b/embedding/embedding.cpp
+@@ -61,13 +61,27 @@
+ using componentize::embedding::ReportAndClearException;
+ using componentize::embedding::Runtime;
+ 
++// Canonical core i64 represents both signed and unsigned WIT integers. Preserve
++// the full bit domain: negative s64 BigInts and high u64 BigInts are both valid.
++static bool bigint_to_i64_bits(const JS::BigInt *value, uint64_t *bits) {
++  if (JS::detail::BigIntIsUint64(value, bits)) {
++    return true;
++  }
++  int64_t signed_value;
++  if (!JS::detail::BigIntIsInt64(value, &signed_value)) {
++    return false;
++  }
++  *bits = static_cast<uint64_t>(signed_value);
++  return true;
++}
++
+ // These functions are used both internally and also exported for use directly
+ // by the splicer codegen
+ __attribute__((noinline, export_name("coreabi_from_bigint64"))) int64_t
+ from_bigint64(JS::MutableHandleValue handle) {
+   JS::BigInt *arg0 = handle.toBigInt();
+   uint64_t arg0_uint64;
+-  if (!JS::detail::BigIntIsUint64(arg0, &arg0_uint64)) {
++  if (!bigint_to_i64_bits(arg0, &arg0_uint64)) {
+     Runtime.engine->abort(
+         "Internal bindgen error in coreabi_from_bigint64 validation");
+   }
+@@ -316,7 +330,7 @@
+       *((uint32_t *)retptr) = static_cast<uint32_t>(JS::ToInt32(ret.toNumber()));
+       break;
+     case CoreVal::I64:
+-      if (!JS::detail::BigIntIsUint64(ret.toBigInt(), (uint64_t *)retptr)) {
++      if (!bigint_to_i64_bits(ret.toBigInt(), (uint64_t *)retptr)) {
+         abort();
+       }
+       break;

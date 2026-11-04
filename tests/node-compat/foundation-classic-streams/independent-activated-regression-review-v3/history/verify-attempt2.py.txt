@@ -1,0 +1,365 @@
+#!/usr/bin/env python3
+"""Independent activated replay v2 stdlib reader; never imports project code."""
+from pathlib import Path
+import datetime
+import hashlib
+import json
+import os
+import re
+import stat
+HERE = Path(__file__).resolve().parent
+FAMILY = HERE.parent
+BASE = FAMILY/'production-regression-activated-v3'
+OLD = FAMILY/'independent-activated-regression-review-v2'
+TAG_AMENDMENT = FAMILY/'exact-policy-tag-amendment-v1'
+TAG_INDEX = 'fd0242e16c6d684b91a332ff00005bf2a25b25d133b4d819e8e16341cac6306c'
+PARENT = FAMILY/'production-regression-candidate-v1'
+PRODUCER = FAMILY/'replay-activation-candidate-v3'
+AMENDMENT = FAMILY/'registrar-ancestry-oracle-amendment-v1'
+RUNTIME = FAMILY/'production-runtime-activated-v3'
+INDEX = '577dbad5759ef06f075763c2a793ae278fddc15df8f4f61edc9a7d2de51ecb51'
+RUNTIME_INDEX = '7e9520e0859b939a8586e6d0cfa1fe376a3ace75a2624dd777d5825bbf91cf66'
+PRODUCER_INDEX = 'ab31496cd389a7c432e56ee398e812b7a94e882dc13e3ac5c0cb8436e191b07f'
+AMENDMENT_INDEX = '7462f1255f4fd5048e345a96d58908c8e6251158bf36e5ab4450dab97be193b4'
+PEER_INDEX = '748b592bd96fee48507ec4a004041401cae2909b3273b2544c1ea65e9cde3eb2'
+PARENT_INDEX = '81c55887dc5e767db27477ba28f0e7a26a948435c7ddc61c70da329d4bd7f029'
+PINS = 'c998dce40ff66a1764ad8c44f8a492b830d40bb6dce958aab711ecf3c5bcbf3e'
+ROOT = '1df0d5bcbb4792efa9fe7329b164aede3a2da7bc4dec6c90d011972cfb6d7f56'
+checks = {}
+
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def absolute(path):
+    return Path(os.path.abspath(path))
+
+
+def regular(path, expected=None, size=None):
+    path = absolute(path)
+    before = path.lstat()
+    assert stat.S_ISREG(before.st_mode), str(path)
+    if size is not None:
+        assert before.st_size == size, str(path)
+    h = hashlib.sha256()
+    with path.open('rb') as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+            h.update(chunk)
+    after = path.lstat()
+    assert (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) == (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns), str(path)
+    row = {'path': str(path), 'sha256': h.hexdigest(), 'bytes': before.st_size}
+    assert expected is None or expected == row['sha256'], str(path)
+    if str(path) in checks:
+        assert checks[str(path)] == row
+    checks[str(path)] = row
+    return row
+
+
+def document(path, expected=None, size=None):
+    row = regular(path, expected, size)
+    data = Path(path).read_bytes()
+    assert digest(data) == row['sha256']
+    return json.loads(data)
+
+
+def below(root, path):
+    root, path = absolute(root), absolute(path)
+    assert path != root and path.is_relative_to(root), (str(root), str(path))
+    assert root.is_dir() and not root.is_symlink(), str(root)
+    cursor = path
+    while cursor != root:
+        assert not cursor.is_symlink(), str(cursor)
+        cursor = cursor.parent
+
+
+def membership(root):
+    assert root.is_dir() and not root.is_symlink(), str(root)
+    rows = []
+    for directory, dirs, files in os.walk(root, followlinks=False):
+        for name in sorted(dirs + files):
+            path = Path(directory) / name
+            mode = path.lstat().st_mode
+            kind = ('symlink' if stat.S_ISLNK(mode) else 'directory' if stat.S_ISDIR(mode) else 'file' if stat.S_ISREG(mode) else None)
+            assert kind, str(path)
+            rows.append({'path': str(path.relative_to(root)), 'kind': kind})
+        dirs[:] = [name for name in dirs if not (Path(directory) / name).is_symlink()]
+    return sorted(rows, key=lambda row: row['path'])
+
+
+
+def indexed(root, expected, count=None, exact_membership=False):
+    value = document(root/'index.json', expected)
+    rows = {r['path']:r for r in value['files']}
+    assert len(rows) == len(value['files'])
+    assert count is None or count == len(rows)
+    for name, row in rows.items():
+        assert not Path(name).is_absolute() and '..' not in Path(name).parts and '\\' not in name
+        path = root/name
+        below(root,path)
+        regular(path,row['sha256'],row['bytes'])
+    if exact_membership:
+        observed=membership(root)
+        assert {r['path'] for r in observed if r['kind']=='file'} == set(rows)|{'index.json'}
+        assert not any(r['kind']=='symlink' for r in observed)
+    return value, rows
+
+
+def seal(path, expected, count):
+    value=document(path,expected)
+    rows={}
+    for row in value['inputs']:
+        target=absolute(path.parent/row['path'])
+        assert target not in rows
+        rows[target]=row
+        regular(target,row['sha256'],row['bytes'])
+    assert len(rows)==count
+    return value,rows
+
+
+def transform(before, edits):
+    after=before;applications=[]
+    for edit in edits:
+        assert edit['old'] and after.count(edit['old'])==edit.get('occurrences',1)
+        positions=[m.start() for m in re.finditer(re.escape(edit['old']),after)]
+        delta=len(edit['new'])-len(edit['old'])
+        applications.append((edit,[p+i*delta for i,p in enumerate(positions)],after))
+        after=after.replace(edit['old'],edit['new'])
+    reverse=after
+    for edit,positions,previous in reversed(applications):
+        for position in reversed(positions):
+            assert reverse[position:position+len(edit['new'])]==edit['new']
+            reverse=reverse[:position]+edit['old']+reverse[position+len(edit['new']):]
+        assert reverse==previous
+    assert reverse==before
+    return after
+
+
+def main():
+    indexed(OLD,'a69b83f233a68c201e4c824008cc54bee6dd0ebd79eb49d37e279a9ee5922c23',13,True)
+    source_review=document(OLD/'supplementary-source-results.json',
+        'be46edc1f016ab13de8803b2f0b1dff30b1675d4d4c8828329f5b37d6a6b483e')
+    regular(OLD/'supplementary-source-reader.py',
+        '8d598793c62376f9c8be71cb4bc0f8d7fd3e7492857d209b751a9a54b5acd592')
+    assert source_review['state']=='SUPPLEMENTARY_ACTIVATED_REGRESSION_V2_SOURCE_REVIEW_PASSED'
+    assert source_review['inheritedDerivationsReconstructedForwardAndReverse']==64
+    assert source_review['oldBodiesByteIdentical']==62 and source_review['producerEditsReconstructedForwardAndReverse']==12
+    assert source_review['nodeGuestHostBuildTranspilePreflightOrProducerExecuted'] is False
+    source_verified=source_review['verifiedFiles']
+    regular(OLD/source_verified['path'],source_verified['sha256'],source_verified['bytes'])
+    index, indexed_rows=indexed(BASE,INDEX,82,True)
+    assert index['state']=='ACTUAL_REVIEWED_CLASSIC_REPLAY_SOURCE_FAMILY_NOT_EXECUTED'
+    assert index['runtimeAcceptanceClaim'] is False
+    receipt=document(BASE/'source-receipt.json',indexed_rows['source-receipt.json']['sha256'])
+    assert receipt['state']=='ACTUAL_REVIEWED_CLASSIC_REPLAY_FAMILY_CREATED_NOT_EXECUTED'
+    assert receipt['guestOrHostExecuted'] is receipt['runtimeAcceptanceClaim'] is receipt['guestSemanticBodiesChanged'] is False
+    assert receipt['runtimeIndexSha256']==RUNTIME_INDEX and receipt['runtimeRoot']==str(RUNTIME)
+    assert receipt['producerIndexSha256']==PRODUCER_INDEX and receipt['parentIndexSha256']==PARENT_INDEX
+    assert receipt['registrarOracleAmendmentIndexSha256']==AMENDMENT_INDEX
+    assert receipt['exactPolicyTagAmendmentIndexSha256']==TAG_INDEX
+    assert receipt['inheritedBodies']==64 and receipt['oldBodiesByteIdentical']==57 and receipt['changedHostHarnessBodies']==7
+    root,root_rows=seal(BASE/'input-freeze.json',receipt['inputFreezeSha256'],2055)
+    cap,cap_rows=seal(BASE/'capability/input-freeze.json',receipt['capabilityFreezeSha256'],2054)
+    assert receipt['consumedRootRows']==2055 and receipt['consumedCapabilityRows']==2054
+    parent,parent_indexed=indexed(PARENT,PARENT_INDEX,174)
+    producer,producer_indexed=indexed(PRODUCER,PRODUCER_INDEX,13,True)
+    amendment,amendment_indexed=indexed(AMENDMENT,AMENDMENT_INDEX,18,True)
+    tag_amendment,tag_indexed=indexed(TAG_AMENDMENT,TAG_INDEX,22,True)
+    seal(TAG_AMENDMENT/'input-freeze.json',tag_indexed['input-freeze.json']['sha256'],99)
+    peer,peer_indexed=indexed(FAMILY/'independent-exact-policy-replay-v3-review-v1',PEER_INDEX,3,True)
+    runtime,runtime_indexed=indexed(RUNTIME,RUNTIME_INDEX,19,True)
+    for family,rows,count in [(PRODUCER,producer_indexed,298),(AMENDMENT,amendment_indexed,67)]:
+        seal(family/'input-freeze.json',rows['input-freeze.json']['sha256'],count)
+    peer_result=document(FAMILY/'independent-exact-policy-replay-v3-review-v1/results.json',peer_indexed['results.json']['sha256'])
+    assert peer_result['state']=='INDEPENDENT_SOURCE_REVIEW_NO_CONCRETE_BLOCKER_NOT_REPLAY_ACCEPTANCE'
+    assert peer_result['policyAmendmentIndexSha256']==TAG_INDEX and peer_result['producerIndexSha256']==PRODUCER_INDEX
+    assert peer_result['runtimeAcceptanceClaim'] is False
+    pins=document(BASE/'runtime-pins.json',PINS)
+    authority=document(BASE/'root-review-receipt.json',ROOT)
+    for path in [RUNTIME/'runtime-pins.json',FAMILY/'production-adoption-v1/reviewed-runtime-pins-v1.json']:
+        regular(path,PINS)
+    for path in [RUNTIME/'root-review-receipt.json',FAMILY/'production-adoption-v1/root-pin-review-receipt.json']:
+        regular(path,ROOT)
+    binding=document(BASE/'activation-reference.json',indexed_rows['activation-reference.json']['sha256'])
+    assert binding['state']=='ROOT_REVIEWED_CLASSIC342_REPLAY_AUTHORITY_BOUND_NOT_EXECUTED'
+    assert binding['runtimeRoot']==str(RUNTIME) and binding['runtimeIndexPath']==str(RUNTIME/'index.json')
+    assert binding['requiredEntry']==str(RUNTIME/'runtime-preflight.mjs') and binding['requiredExport']=='classicPreflight({variant})'
+    assert binding['runtimeIndexSha256']==RUNTIME_INDEX and binding['reviewedPinsSha256']==PINS and binding['rootReviewReceiptSha256']==ROOT
+    assert binding['sourcePreparationOnly'] is binding['sameFourTuplesRequired'] is binding['httpComponentPinRemainsNullAndSealed'] is True
+    assert binding['runtimeAcceptanceClaim'] is False
+    runtime_receipt=document(RUNTIME/'source-receipt.json',runtime_indexed['source-receipt.json']['sha256'])
+    assert set(pins['variants'])==set(authority['variants'])==set(runtime_receipt['actualArtifacts'])=={'normal-off','normal-runtime','gc-off','disabled-off'}
+    for label,pin in pins['variants'].items():
+        for field in ['engineSha256','engineBytes','receiptSha256','freezeReceiptSha256']:
+            assert pin[field]==authority['variants'][label][field]==runtime_receipt['actualArtifacts'][label][field]
+    template=(BASE/'native-preflight.template.mjs').read_text()
+    assert template==(PRODUCER/'native-preflight.template.mjs').read_text()
+    replacements={'AUTHORITY_SHA':regular(BASE/'activation-reference.json')['sha256'],
+        'INPUTS_SHA':receipt['inputFreezeSha256'],'RUNTIME_INDEX_SHA':RUNTIME_INDEX,'RUNTIME_FAMILY':RUNTIME.name}
+    for key,value in replacements.items():template=template.replace('@'+key+'@',value)
+    assert not re.search(r'@[A-Z_]+@',template)
+    assert template.encode()==(BASE/'native-preflight.mjs').read_bytes()
+    assert template.index('const index=await indexedRuntime(),pins=await authority(index);') < template.index('await import(')
+    assert 'const native=await preflight({variant});' in template
+    assert 'await nativeRecheck();const index=await indexedRuntime();await authority(index);await ownSeal();' in template
+    assert 'metadataProjection' not in template
+    http_path=BASE/'capability/http-component-pins.json'
+    http=document(http_path,indexed_rows['capability/http-component-pins.json']['sha256'])
+    assert http['component'] is http['actualComponentPins'] is None
+    assert http['requiresIndependentReviewAndNewActivationSibling'] is True
+    assert root_rows[http_path]['sha256']==cap_rows[http_path]['sha256']==regular(http_path)['sha256']
+    repo=FAMILY.parents[2]
+    live=root['liveComputedInputs'];assert len(live)==8 and live==cap['liveComputedInputs']
+    for name in live:
+        path=absolute(repo/name)
+        assert root_rows[path]['sha256']==cap_rows[path]['sha256']==regular(path)['sha256']
+    records=document(PARENT/'derivations.json',parent_indexed['derivations.json']['sha256'])['records']
+    proof=document(AMENDMENT/'transformation-proof.json',amendment_indexed['transformation-proof.json']['sha256'])
+    tag_proof=document(TAG_AMENDMENT/'transformation-proof.json',tag_indexed['transformation-proof.json']['sha256'])
+    afterimages={r['path']:r for r in proof['records']+tag_proof['records']}
+    assert len(records)==64 and len(afterimages)==7
+    unchanged=0
+    for row in records:
+        name=row['destinationPath'];current=regular(BASE/name)
+        original=regular(repo/row['sourcePath'],row['beforeSha256'])
+        inherited=transform(Path(original['path']).read_text(),row['edits'])
+        assert inherited.encode()==(PARENT/name).read_bytes()
+        assert digest(inherited.encode())==row['afterSha256']
+        assert receipt['inheritedBodyHashes'][name]==row['afterSha256']
+        expected=afterimages[name]['afterSha256'] if name in afterimages else row['afterSha256']
+        assert receipt['publishedBodyHashes'][name]==current['sha256']==expected
+        if name in afterimages:
+            assert (BASE/name).read_bytes()==((TAG_AMENDMENT if name in {x['path'] for x in tag_proof['records']} else AMENDMENT)/'proposed'/name).read_bytes()
+            amendment=afterimages[name]
+            assert amendment['beforeSha256']==row['afterSha256']
+            assert transform(inherited,amendment['edits']).encode()==(BASE/name).read_bytes()
+        else:
+            assert (BASE/name).read_bytes()==(PARENT/name).read_bytes();unchanged+=1
+        for rows in [root_rows,cap_rows]:assert rows[BASE/name]['sha256']==expected
+    assert unchanged==57
+    assert (BASE/'registrar-ancestry-proof.json').read_bytes()==(AMENDMENT/'transformation-proof.json').read_bytes()
+    assert (BASE/'exact-policy-tag-proof.json').read_bytes()==(TAG_AMENDMENT/'transformation-proof.json').read_bytes()
+    assert tag_proof['guestOrOracleBytesChanged'] is tag_proof['engineMetadataRewritten'] is False
+    version=tag_proof['newStrictPolicyVersion']
+    versions=[]
+    for label,pin in pins['variants'].items():
+        metadata=document(pin['enginePath']+'.build.json',pin['receiptSha256'])
+        assert metadata['strictEventExceptionPolicy']['version']==version
+        versions.append({'variant':label,'receiptSha256':pin['receiptSha256'],'version':version})
+    for row in tag_proof['records']:
+        assert (BASE/row['path']).read_text().count("assert.equal(metadata.strictEventExceptionPolicy.version,'"+version+"');")==1
+    gc=(BASE/'common/runners/allocator-gc.mjs').read_text()
+    assert "assert.equal(pins.state,'reviewed-real-classic-production-freeze');" in gc
+    assert "assert.equal(hash(await readFile(pins.freezeReceiptPath)),pins.freezeReceiptSha256);" in gc
+    assert 'const commandsPath=pins.commandsPath;' in gc
+    assert not any(token in gc for token in ['admitted.pinsPath','admitted.pinBytes','admitted.report.commandsPath'])
+    assert gc.index('await admitted.recheck();')<gc.index('const report={schema:1,state:')
+    producer_proof=document(PRODUCER/'derivation-proof.json',producer_indexed['derivation-proof.json']['sha256'])
+    previous=FAMILY/'replay-activation-candidate-v2'
+    indexed(previous,producer_proof['parentIndexSha256'],13,True)
+    before=document(previous/'index.json')
+    before_source=(previous/'activate.py').read_text();after_source=(PRODUCER/'activate.py').read_text()
+    assert digest(before_source.encode())==producer_proof['beforeProducerSha256']
+    assert digest(after_source.encode())==producer_proof['afterProducerSha256']
+    assert transform(before_source,producer_proof['edits'])==after_source
+    assert after_source.index('indexed(AMENDMENT,AMENDMENT_INDEX)')<after_source.index('payload, records = base_payload(')
+    assert after_source.index('indexed(POLICY_AMENDMENT,POLICY_AMENDMENT_INDEX)')<after_source.index('payload, records = base_payload(')
+    # Independently reconstruct both complete seal row maps, rather than trusting
+    # only declared rows. No producer or its helper is imported or executed.
+    excluded={'README.md','index.json','source-receipt.json','input-freeze.json','capability/input-freeze.json',
+        'native-preflight.mjs','runtime-pins.json','activation-reference.json','prepare.py','seal-inputs.py',
+        'check-paths.py','test-source.mjs','host-test-results.json','path-check-results.json','syntax-results.json'}
+    payload={name:(PARENT/name).read_bytes() for name in parent_indexed
+        if not name.startswith('history/') and name not in excluded}
+    for name in afterimages:payload[name]=((TAG_AMENDMENT if name in {x['path'] for x in tag_proof['records']} else AMENDMENT)/'proposed'/name).read_bytes()
+    payload.update({'registrar-ancestry-proof.json':(AMENDMENT/'transformation-proof.json').read_bytes(),
+        'exact-policy-tag-proof.json':(TAG_AMENDMENT/'transformation-proof.json').read_bytes(),
+        'runtime-pins.json':(BASE/'runtime-pins.json').read_bytes(),
+        'root-review-receipt.json':(BASE/'root-review-receipt.json').read_bytes(),
+        'native-preflight.template.mjs':(PRODUCER/'native-preflight.template.mjs').read_bytes(),
+        'activation-reference.json':(BASE/'activation-reference.json').read_bytes()})
+    assert set(payload)==set(indexed_rows)-{'README.md','source-receipt.json','input-freeze.json','capability/input-freeze.json','native-preflight.mjs'}
+    external={}
+    def add(path,expected=None):
+        row=regular(path,expected);external[absolute(path)]=(row['sha256'],row['bytes'])
+    for family,rows in [(RUNTIME,runtime_indexed),(PRODUCER,producer_indexed),(PARENT,parent_indexed),(AMENDMENT,amendment_indexed),(TAG_AMENDMENT,tag_indexed)]:
+        add(family/'index.json')
+        for name,row in rows.items():add(family/name,row['sha256'])
+    for family in [AMENDMENT,TAG_AMENDMENT]:
+        for row in json.loads((family/'input-freeze.json').read_bytes())['inputs']:add(row['path'],row['sha256'])
+    old_review=FAMILY/'independent-production-regression-review-v1/index.json'
+    add(old_review,receipt['independentSourceReviewIndexSha256'])
+    add(binding['reviewedPinsPath'],PINS);add(binding['rootReviewReceiptPath'],ROOT)
+    inherited={}
+    for name,count in [('capability/input-freeze.json',1776),('input-freeze.json',1777)]:
+        data=json.loads((PARENT/name).read_bytes());assert len(data['inputs'])==count
+        rows={}
+        for row in data['inputs']:
+            original=absolute(PARENT/Path(name).parent/row['path'])
+            rel=str(original.relative_to(PARENT)) if original.is_relative_to(PARENT) else None
+            if rel=='capability/input-freeze.json':continue
+            if rel in payload:
+                b=payload[rel];rows[BASE/rel]=(digest(b),len(b))
+            else:
+                add(original,row['sha256']);rows[original]=external[original]
+        inherited[name]=rows
+    reconstructed={}
+    for name in ['capability/input-freeze.json','input-freeze.json']:
+        rows=dict(inherited[name]);rows.update(external)
+        for rel,b in payload.items():rows[BASE/rel]=(digest(b),len(b))
+        if name=='input-freeze.json':
+            cap_file=regular(BASE/'capability/input-freeze.json')
+            rows[BASE/'capability/input-freeze.json']=(cap_file['sha256'],cap_file['bytes'])
+        actual=cap_rows if name.startswith('capability/') else root_rows
+        assert rows=={p:(r['sha256'],r['bytes']) for p,r in actual.items()}
+        reconstructed[name]=len(rows)
+    assert 'nodeCompatibilityPassed:false' in (BASE/'capability/focused/run-callback-return.mjs').read_text()
+    assert 'instanceReuseClaim:false' in (BASE/'capability/audit-http.mjs').read_text()
+    runtime_review=document(HERE/'runtime-native-results.json')
+    assert runtime_review['state']=='ACTIVATED_REGRESSION_V3_FULL_RUNTIME_NATIVE_REHASH_PASSED'
+    assert runtime_review['consumedFilesRehashed']==6000 and runtime_review['toolLinksRechecked']==22
+    assert len(runtime_review['native'])==4
+    for row in runtime_review['native'].values():assert row['frozenFilesRehashed']==405
+    verified=runtime_review['verifiedFiles'];regular(HERE/verified['path'],verified['sha256'],verified['bytes'])
+    regular(BASE/'index.json',INDEX)
+    result={'schemaVersion':1,'state':'INDEPENDENT_ACTIVATED_REGRESSION_V3_SOURCE_AND_CLOSURE_PASSED_NO_EXECUTION',
+        'verifiedAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        'activatedIndex':regular(BASE/'index.json',INDEX),'activatedFilesRehashed':82,
+        'rootConsumedRowsRehashed':2055,'capabilityConsumedRowsRehashed':2054,
+        'exactSealRowMapsIndependentlyReconstructed':reconstructed,'inheritedRootRowsPreserved':1777,'inheritedCapabilityRowsPreserved':1776,
+        'inheritedHostBodies':64,'unchangedHostBodiesByteExact':57,'exactAmendedHostBodies':list(afterimages),
+        'producerIndex':regular(PRODUCER/'index.json',PRODUCER_INDEX),'amendmentIndex':regular(AMENDMENT/'index.json',AMENDMENT_INDEX),
+        'exactPolicyTagAmendmentIndex':regular(TAG_AMENDMENT/'index.json',TAG_INDEX),
+        'freshInheritedDerivationsReconstructedForwardAndReverse':64,
+        'freshMandatoryAmendedBodiesReconstructedForwardAndReverse':7,
+        'freshProducerEditsReconstructedForwardAndReverse':len(producer_proof['edits']),
+        'actualNativeStrictPolicyVersions':versions,'gcUsesActualClassicFrozenPinFields':True,
+        'peerReviewIndex':regular(FAMILY/'independent-exact-policy-replay-v3-review-v1/index.json',PEER_INDEX),
+        'sourceNativeReview':regular(HERE/'runtime-native-results.json'),
+        'supplementaryGuardPathAndLineageReview':regular(OLD/'supplementary-source-results.json'),
+        'sourceFindings':[
+          'The exact finite guard authenticates three unchanged old Node oracle documents, complete 342 source rows and exact Tick/Classic policies and native patches before parsing their source records.',
+          'Registrar ancestry is real 19eef retained by Tick, then advanced to actual 2848 by the Classic patch; no metadataProjection is used and unknown kinds/native lineages are rejected.',
+          'Both Classic patch files and all seven Tick patch files round-trip exactly; all 20 oracle source/facade rows match frozen and live bytes.',
+          'Path uses the already sealed production-release-runner-v3/oracles semantic/glob copies with pinned hashes checked before/after, repository cwd and a fresh output environment.',
+          'The original three oracle documents and five historical Path output files remain byte-identical.'
+          ,'Five exact strict-version guards match actual native metadata rather than aliases. GC admission uses the real classic freeze pin state, frozen commands path and freeze receipt hash, followed by delegated recheck before report publication.'
+        ],
+        'runtimeIndexSha256':RUNTIME_INDEX,'runtimeInputRowsRehashed':6000,'runtimeToolLinksChecked':22,
+        'allFourNativeAuthorityTuplesMatch':True,'nativeFrozenRowsPerVariant':405,
+        'authorityPinsSha256':PINS,'rootReviewReceiptSha256':ROOT,
+        'nativeDelegationParametersReconstructed':4,'all8LiveInputsPreservedInBothSeals':True,
+        'httpPinNullAndSealedInBothManifests':True,'httpActivationRequiredBeforeExecution':True,
+        'guestFacadesAndOracleSemanticsChanged':False,'knownGetterParityStillFalse':True,'httpInstanceReuseClaimStillFalse':True,
+        'limitations':['Current bytes, full source/consumed closures, recorded authority and finite source control flow reviewed only.',
+          'No producer, JavaScript preflight, Node oracle, package, replay, guest, build, componentization, transpile or target host ran in this review.',
+          'The activated source receipt records producer success; this reader did not observe or rerun that producer.',
+          'No previous failed replay or passing subset is reused as corrected replay-v3 acceptance.',
+          'HTTP pins remain null. Full Node compatibility, ALS, reset/teardown, isolated VM rooting and performance are not established.'],
+        'reviewedProjectCodeExecuted':False,'runtimeAcceptanceClaim':False,'replayAcceptanceClaim':False,'overallRoadmapComplete':False}
+    (HERE/'results.json').write_text(json.dumps(result,indent=2)+'\n')
+    (HERE/'verified-files.json').write_text(json.dumps({'schemaVersion':1,'files':sorted(checks.values(),key=lambda r:r['path'])},indent=2)+'\n')
+    print(json.dumps({k:result[k] for k in ['state','activatedFilesRehashed','rootConsumedRowsRehashed','capabilityConsumedRowsRehashed','runtimeInputRowsRehashed','unchangedHostBodiesByteExact']}))
+
+
+if __name__=='__main__':main()

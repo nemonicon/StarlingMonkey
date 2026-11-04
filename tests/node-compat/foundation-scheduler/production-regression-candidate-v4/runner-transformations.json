@@ -1,0 +1,145 @@
+{
+  "state": "PACKET_ONLY_DECLARED_ADMISSION_PATH_AND_REPORT_EDITS",
+  "runners": [
+    {
+      "name": "allocator",
+      "original": "tests/node-compat/foundation-alloc-unsafe/installed/run-component-v11.mjs",
+      "originalSha256": "a7c3df6941fd9919d05c74a12a5fe8928c1b9a61c97b46ebaa768f7ff80ee37a",
+      "generated": "runners/allocator.mjs",
+      "generatedSha256": "e96b03ddf1c51073de935a6d2c443266e4a35eaa2b2395029ba81d47e34efa5c",
+      "changes": [
+        {
+          "before": "from '../../foundations/native-scalar-harness.mjs'",
+          "after": "from '../../../foundations/native-scalar-harness.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../../core-expectations.mjs'",
+          "after": "from '../../../core-expectations.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../../toolchain.mjs'",
+          "after": "from '../../../toolchain.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../../componentizer.mjs'",
+          "after": "from '../../../componentizer.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../../profile-bundler.mjs'",
+          "after": "from '../../../profile-bundler.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../checks.mjs'",
+          "after": "from '../../../foundation-alloc-unsafe/checks.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../demand-source.mjs'",
+          "after": "from '../../../foundation-alloc-unsafe/demand-source.mjs'",
+          "count": 1
+        },
+        {
+          "before": "import {verifyProductionV11} from '../../foundation-add-abort/production-v11-preflight.mjs';",
+          "after": "import {verifyProductionTicks} from '../preflight.mjs';",
+          "count": 1
+        },
+        {
+          "before": "const newEnginePreflight=await verifyProductionV11();",
+          "after": "const newEnginePreflight=await verifyProductionTicks({gcStress:false});",
+          "count": 1
+        },
+        {
+          "before": "const here=dirname(fileURLToPath(import.meta.url)),parent=dirname(here);",
+          "after": "const here=resolve(dirname(fileURLToPath(import.meta.url)),'../../../foundation-alloc-unsafe/installed'),parent=dirname(here);",
+          "count": 1
+        },
+        {
+          "before": "...h.evidence,coreExpectations:policy,",
+          "after": "...h.evidence,productionTickAdmission:newEnginePreflight.report,coreExpectations:policy,",
+          "count": 1
+        },
+        {
+          "before": "join(here,'native-component-v11-results.json')",
+          "after": "join(h.output,'allocator-summary.json')",
+          "count": 1
+        }
+      ],
+      "reverseDeclaredEditsRestoresOriginalBytes": true
+    },
+    {
+      "name": "allocator-gc",
+      "original": "tests/node-compat/foundation-alloc-unsafe/installed/run-gc-v11.mjs",
+      "originalSha256": "f2e73b73a2759c37ff0673fc129ed1f139002c2e0454f4b08e882be1427e43d3",
+      "generated": "runners/allocator-gc.mjs",
+      "generatedSha256": "ee75c85f27d125efb6454cf92da47efa53acb707114ea51487eb6ded1b8e4b76",
+      "changes": [
+        {
+          "before": "from '../../toolchain.mjs'",
+          "after": "from '../../../toolchain.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../../componentizer.mjs'",
+          "after": "from '../../../componentizer.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../../core-expectations.mjs'",
+          "after": "from '../../../core-expectations.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../../foundations/native-scalar-harness.mjs'",
+          "after": "from '../../../foundations/native-scalar-harness.mjs'",
+          "count": 1
+        },
+        {
+          "before": "import { preflight as protectedPreflight } from '../../foundation-add-abort/production-native-m0.10/preflight.mjs';",
+          "after": "import { verifyProductionTicks } from '../preflight.mjs';",
+          "count": 1
+        },
+        {
+          "before": "const here=dirname(fileURLToPath(import.meta.url)), repository=resolve(here,'../../../..');",
+          "after": "const here=resolve(dirname(fileURLToPath(import.meta.url)),'../../../foundation-alloc-unsafe/installed'), repository=resolve(here,'../../../..');",
+          "count": 1
+        },
+        {
+          "before": "'sm-uncaught-event-v3-protected-abort-v2'",
+          "after": "'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1'",
+          "count": 1
+        },
+        {
+          "before": "const admitted=await protectedPreflight({gcStress:true});",
+          "after": "const admitted=await verifyProductionTicks({gcStress:true});",
+          "count": 1
+        },
+        {
+          "before": "const pinsPath=join(here,'production-v11-gc-pins.json'),pinBytes=await readFile(pinsPath),pins=JSON.parse(pinBytes);",
+          "after": "const pinsPath=admitted.pinsPath,pinBytes=admitted.pinBytes,pins=admitted.pin;",
+          "count": 1
+        },
+        {
+          "before": "assert.equal(pins.state,'new-native-gc-build-reviewed');",
+          "after": "assert.equal(pins.state,'reviewed-real-production-freeze');",
+          "count": 1
+        },
+        {
+          "before": "protectedAdmission:admitted.report,",
+          "after": "productionTickAdmission:admitted.report,",
+          "count": 1
+        },
+        {
+          "before": "join(here,'gc-v11-results.json')",
+          "after": "join(output,'allocator-gc-summary.json')",
+          "count": 1
+        }
+      ],
+      "reverseDeclaredEditsRestoresOriginalBytes": true
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_ONLY_REVERSIBLE_COMPLETION_AMENDMENT",
+  "parentIndexSha256": "5826a3dfc8d79ebbbbd139665dd06f9f493af3aa6f48302f2865611591fcff6d",
+  "beforeSha256": "949a9c8ca9310341db2351fbad8e314d1c13101f82d5c08806237a5f8a2cc0c6",
+  "afterSha256": "8b5ef0af421fa7806a5a67f1140b7d49c0b605b19f42a3e7689bd12e523cf97f",
+  "helperSha256": "ecf4e83fc5fb21a59b01b214cba0a929eeaf32b81e3afb44b44f102e7008c4e5",
+  "patchSha256": "16704c20dc3195f221afbe76e1809596216e48b5c369ed5d5312c8cace11b8f9",
+  "edits": [
+    {
+      "old": "import { deployedFatal, deployedCleanControls } from './deployed-fixtures.mjs';",
+      "new": "import { deployedFatal, deployedCleanControls } from './deployed-fixtures.mjs';\nimport { trackedWriter, publishCompletion } from './completion.mjs';",
+      "count": 1
+    },
+    {
+      "old": "  await mkdir(output,{recursive:true});\n",
+      "new": "  await mkdir(output,{recursive:true});\n  const tracked=trackedWriter(output);\n  const writeOutput=tracked.write;\n",
+      "count": 1
+    },
+    {
+      "old": "await writeFile(",
+      "new": "await writeOutput(",
+      "count": 13
+    },
+    {
+      "old": "import { readFile, writeFile, mkdir, symlink } from 'node:fs/promises';",
+      "new": "import { readFile, mkdir, symlink } from 'node:fs/promises';",
+      "count": 1
+    },
+    {
+      "old": "  try {\n    if(variant==='disabled-off') {",
+      "new": "  let completedReport;\n  try {\n   execution: {\n    if(variant==='disabled-off') {",
+      "count": 1
+    },
+    {
+      "old": "      await writeOutput(join(output,'results.json'),JSON.stringify({schemaVersion:1,variant,\n        status:'FUTURE_CLASSIC_DISABLED_ADMISSION_GATE_PASSED',engineSha256:metadata.engineSha256,\n        pin,failures,componentizerInvoked:false,componentBuilt:false,hostExecuted:false},null,2)+'\\n',{flag:'wx'});\n      return;",
+      "new": "      completedReport={schemaVersion:1,variant,\n        status:'FUTURE_CLASSIC_DISABLED_ADMISSION_GATE_PASSED',engineSha256:metadata.engineSha256,\n        pin,failures,componentizerInvoked:false,componentBuilt:false,hostExecuted:false};\n      break execution;",
+      "count": 1
+    },
+    {
+      "old": "    assert.deepEqual(caught.interfaceAudit.emittedImports,selectedInterfaces);\n    await admission.recheck();\n    const report=",
+      "new": "    assert.deepEqual(caught.interfaceAudit.emittedImports,selectedInterfaces);\n    const caughtComponentPath=join(output,'initializer-caught-control.component.wasm');\n    await writeOutput(caughtComponentPath,caught.component,{flag:'wx'});\n    await admission.recheck();\n    const report=",
+      "count": 1
+    },
+    {
+      "old": "      caughtInitializerControl:{sourceSha256:",
+      "new": "      caughtInitializerControl:{componentPath:caughtComponentPath,sourceSha256:",
+      "count": 1
+    },
+    {
+      "old": "    await writeOutput(join(output,'results.json'),JSON.stringify(report,null,2)+'\\n',{flag:'wx'});\n  } finally { await admission.recheck(); }\n}",
+      "new": "    completedReport=report;\n   }\n  } finally { await admission.recheck(); }\n  assert(completedReport,'A completed semantic gate must provide its report');\n  await publishCompletion({output,report:completedReport,paths:tracked.paths});\n}",
+      "count": 1
+    }
+  ],
+  "reverseRestoresExactParent": true,
+  "oldWriteCallsTracked": 13,
+  "newCaughtControlArtifactPreserved": true,
+  "guestOrNativeExecuted": false
+}

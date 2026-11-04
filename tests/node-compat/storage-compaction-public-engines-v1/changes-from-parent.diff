@@ -1,0 +1,221 @@
+--- tests/node-compat/storage-compaction-current-release-corpus-v1/compact.py
++++ tests/node-compat/storage-compaction-public-engines-v1/compact.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Lossless, journalled macOS filesystem compression of 20 exact newly passed ordinary Release corpus component/core outputs.
++"""Lossless, journalled macOS filesystem compression of 72 exact accepted public ordinary Release embedding engine outputs.
+ 
+ This changes filesystem representation only. It never edits WebAssembly bytes.
+ Run without --apply to inventory the deliberately narrow allowlist.
+@@ -23,25 +23,20 @@
+ 
+ BASE = Path('/tmp/starling-node-compat')
+ REPO = Path(__file__).resolve().parents[3]
+-AUDIT_PATH = REPO / 'tests/node-compat/storage-candidate-audit-current-release-corpus-v1/results.json'
+-AUDIT_SHA256 = '6845fa7e5d16888c9d5c02182736490e107c7cbc753c9ea16217447463f1b271'
++AUDIT_PATH = REPO / 'tests/node-compat/storage-candidate-audit-public-engines-v1/results.json'
++AUDIT_SHA256 = '1dc393a9ba5658f37b69857b6d324251129e2e871f9172856e501c2578d76206'
+ AUDIT_INDEX_PATH = AUDIT_PATH.with_name('index.json')
+-AUDIT_INDEX_SHA256 = '02f6f560f9121ed93335ee9d72cacb3c84f81cbe490f9239332f12ca3ecf5007'
++AUDIT_INDEX_SHA256 = 'b6bee8327b7ef6428cf9fe324d5267bd94bbbafae42ea64795242407e77b1d6d'
+ assert hashlib.sha256(AUDIT_PATH.read_bytes()).hexdigest() == AUDIT_SHA256
+ assert hashlib.sha256(AUDIT_INDEX_PATH.read_bytes()).hexdigest() == AUDIT_INDEX_SHA256
+ AUDIT = json.loads(AUDIT_PATH.read_text())
+-assert AUDIT['artifactCount'] == AUDIT['coreDependencyCount'] == 10
+-assert len(AUDIT['files']) == 20
+-assert len({row['path'] for row in AUDIT['files']}) == 20
+-CORPUS_ROOT = BASE / 'foundation-scheduler-v4/ordinary-release-components-v1'
+-ROOTS = {'current-passed-ordinary-release-corpus':CORPUS_ROOT}
+-AUDITED = {row['path']:row for row in AUDIT['files']}
+-RECEIPTS = BASE / 'storage-compaction-current-release-corpus-v1'
+-EXPECTED_ELIGIBLE_COUNT = 20
++assert AUDIT['eligiblePaths'] == AUDIT['uniqueInodes'] == 72
++assert len(AUDIT['rows']) == len({row['path'] for row in AUDIT['rows']}) == 72
++ROOTS = {'parent-' + str(i): Path(name) for i,name in enumerate(sorted({str(Path(row['path']).parent) for row in AUDIT['rows']}))}
++AUDITED = {row['path']:row for row in AUDIT['rows']}
++RECEIPTS = BASE / 'storage-compaction-public-engines-v1'
++EXPECTED_ELIGIBLE_COUNT = 72
+ HEADROOM_RESERVE = 64 * 1024 * 1024
+-NAME = re.compile(r'.+\.(?:component|core\d*)\.wasm\Z')
+-EXCLUDED_DIRS = {'native-freeze', 'source', 'sources', 'componentize-source', 'harness',
+-                 'node_modules', 'project', 'build', 'inputs', 'input'}
+ COMPRESSED = 32  # UF_COMPRESSED on this macOS host.
+ 
+ 
+@@ -100,69 +95,54 @@
+ 
+ 
+ def verify_report_closure():
+-    # Exact newly authorized passed ordinary Release corpus, not production
+-    # compatibility or admission of any older/private/unsafe binary.
+-    index = json.loads(AUDIT_INDEX_PATH.read_text())
+-    for row in index['files']:
+-        path = AUDIT_PATH.parent / row['path']
+-        assert path.is_file() and not path.is_symlink()
+-        assert sha256(path) == row['sha256']
+-    source = AUDIT['sourceReport']; verification = AUDIT['independentVerification']
+-    assert source['path'] == str(CORPUS_ROOT/'results.json')
+-    assert source['sha256'] == 'c865931b5e5573f036d9386517d8b3720224ab80baf27b521cda87860e056161'
++    # Terminal accepted public ordinary Release only; no engine execution.
+     checked = set()
+     def pinned(path,digest):
+         path = Path(path)
+         assert path.is_file() and not path.is_symlink()
+         assert sha256(path) == digest, path
+         checked.add((str(path),digest))
+-    pinned(source['path'],source['sha256']); pinned(verification['path'],verification['sha256'])
+-    report = json.loads(Path(source['path']).read_text())
+-    independent = json.loads(Path(verification['path']).read_text())
+-    assert report['state'] == 'private-diagnostic-ordinary-components-passed'
+-    assert independent['state'] == 'INDEPENDENT_READ_ONLY_ORDINARY_RELEASE_DIAGNOSTIC_VERIFICATION_PASSED'
+-    assert independent['sourceReportSha256'] == source['sha256']
+-    assert independent['gcStress'] is False and independent['oomTesting'] is False
+-    assert len(report['artifacts']) == len(independent['artifacts']) == 10
+-    artifacts = {row['name']:row for row in report['artifacts']}
+-    independently_checked = {row['name']:row for row in independent['artifacts']}
+-    for row in AUDIT['files']:
+-        binding = row['binding']; artifact = artifacts[binding['artifactName']]
+-        component = Path(artifact['componentPath'])
+-        assert component.parent == CORPUS_ROOT
+-        assert artifact['interfaceAudit']['emittedImports'] == []
+-        assert artifact['componentSha256'] == independently_checked[binding['artifactName']]['componentSha256']
+-        assert hashlib.sha256(artifact['emittedWit'].encode()).hexdigest() == independently_checked[binding['artifactName']]['recordedWitSha256']
+-        pinned(component,artifact['componentSha256'])
+-        pinned(artifact['sourcePath'],artifact['sourceSha256'])
+-        if binding['kind'] == 'passed reported component':
+-            assert row['path'] == str(component) and row['sha256'] == artifact['componentSha256']
+-        else:
+-            assert binding['kind'] == 'transpiled core directly referenced by reported Jco module'
+-            assert binding['componentPath'] == str(component) and binding['componentSha256'] == artifact['componentSha256']
+-            assert binding['modulePath'] == artifact['modulePath']
+-            pinned(binding['modulePath'],binding['moduleSha256'])
+-            assert Path(binding['modulePath']).parent == CORPUS_ROOT
+-            text = Path(binding['modulePath']).read_text()
+-            references = re.findall(r"new URL\(['\"](\./[^'\"]+\.core\d*\.wasm)['\"],\s*import\.meta\.url\)",text)
+-            assert len(references) == 1
+-            assert row['path'] == str(CORPUS_ROOT/references[0][2:])
++    for row in json.loads(AUDIT_INDEX_PATH.read_text())['files']:
++        pinned(AUDIT_PATH.parent / row['path'],row['sha256'])
++    milestones = {}
++    for row in AUDIT['acceptedMilestoneWitnesses']:
++        pinned(row['path'],row['sha256'])
++        milestones[row['path']] = json.loads(Path(row['path']).read_text())
++    sidecars = {}
++    for row in AUDIT['terminalSidecars']:
++        pinned(row['path'],row['sha256'])
++        metadata = json.loads(Path(row['path']).read_text())
++        assert metadata['engineSha256'] == row['engineSha256']
++        assert metadata['gcStress'] is False and metadata['oomTesting'] is False
++        assert metadata.get('diagnosticOnly',False) is False
++        assert 'internalTickDiagnosticPolicy' not in metadata
++        options = metadata.get('observedCMakeOptions',metadata.get('requestedCMakeOptions',{}))
++        assert options['CMAKE_BUILD_TYPE'] == 'Release'
++        assert metadata.get('debuggerEnabled',False) is False
++        for ref in row['milestoneReferences']:
++            value = milestones[ref['path']]
++            for part in ref['key'].split('.'):
++                value = value[part]
++            assert value == row['engineSha256']
++        sidecars[row['path']] = metadata
++    assert len(sidecars) == 22
++    for row in AUDIT['rows']:
++        assert any(d['expectedSha256'] == row['sha256'] for d in row['derivations'])
++        for derivation in row['derivations']:
++            assert sidecars[derivation['sidecar']]['engineSha256'] == derivation['expectedSha256']
+     return len(checked)
+ 
+ 
+ def candidates(roots):
+-    # EXACT WHITELIST ONLY: no os.walk, glob or broad root rediscovery.
++    # Exact audit whitelist; never walk, glob or rediscover build outputs.
+     assert set(roots) == set(ROOTS.values())
+-    for row in sorted(AUDIT['files'], key=lambda row:row['path']):
++    for row in sorted(AUDIT['rows'],key=lambda row:row['path']):
+         path = Path(row['path'])
+-        assert path.is_absolute() and path.is_relative_to(BASE)
+-        assert Path(row['root']) in roots and path.parent == CORPUS_ROOT
++        assert path.is_absolute() and path.is_relative_to(BASE) and path.parent in roots
+         value = file_stat(path)
+         reason = None
+-        if not NAME.fullmatch(path.name) or 'engine' in path.name.lower():
+-            reason = 'not-an-explicit-generated-component-or-core-name'
+-        elif any(part in EXCLUDED_DIRS for part in path.parts):
+-            reason = 'excluded-source-build-or-input-path'
++        if not path.name.endswith('.wasm'):
++            reason = 'not-an-explicit-engine-wasm-file'
+         elif any(token in str(path).lower() for token in ('debug','oom','private','candidate','probe')):
+             reason = 'excluded-debug-oom-private-candidate-or-probe-path'
+         elif value['symlink'] or not value['regular']:
+@@ -173,16 +153,17 @@
+             reason = 'already-compressed'
+         elif value['flags'] != 0:
+             reason = 'other-file-flags-not-modified'
+-        yield path, reason
+-
+-
+-def match_audited_preimage(path, value):
++        yield path,reason
++
++
++def match_audited_preimage(path,value):
+     prior = AUDITED[str(path)]
+     for key in ['device','inode','logicalBytes','allocatedBytes','mode','uid','gid','mtimeNs','flags','nlink']:
+-        assert value['before'][key] == prior[key], (str(path),key)
+-    assert value['sha256'] == prior['sha256'], path
+-    expected = {key:prior[key] for key in ['logicalBytes','mode','uid','gid','mtimeNs','xattrDigests','acl']}
+-    assert value['metadata'] == expected, path
++        assert value['before'][key] == prior[key],(str(path),key)
++    assert value['sha256'] == prior['sha256'],path
++    expected = {key:prior[key] for key in ['logicalBytes','mode','uid','gid','mtimeNs']}
++    expected.update(xattrDigests=prior['xattrs'],acl=prior['aclLines'])
++    assert value['metadata'] == expected,path
+ 
+ 
+ def main():
+@@ -218,9 +199,9 @@
+         'command': ['/usr/bin/ditto', '--hfsCompression', '--noclone', 'SOURCE', 'FRESH_SAME_DIRECTORY_TEMP'],
+         'platform': platform.platform(), 'python': sys.version,
+         'journal': str(journal_path), 'diskFreeBeforeBytes': shutil.disk_usage(BASE).free,
+-        'currentPassedCorpusAudit':str(AUDIT_PATH), 'currentPassedCorpusAuditSha256':AUDIT_SHA256,
+-        'currentPassedCorpusAuditIndexSha256':AUDIT_INDEX_SHA256, 'reportClosureWitnessesVerified':closure_count,
+-        'dataClass':'exact newly passed ordinary Release diagnostic corpus; no compatibility promotion',
++        'acceptedPublicEngineAudit':str(AUDIT_PATH), 'acceptedPublicEngineAuditSha256':AUDIT_SHA256,
++        'acceptedPublicEngineAuditIndexSha256':AUDIT_INDEX_SHA256, 'reportClosureWitnessesVerified':closure_count,
++        'dataClass':'exact accepted public ordinary Release engine outputs; no binary execution or compatibility promotion',
+         'headroomPolicy':'Before each copy: free >= 2*logicalBytes + 64MiB; not a hidden-allocation guarantee',
+         'compressedFiles': 0, 'eligibleFiles': 0, 'skippedEntries': 0,
+         'logicalBytes': 0, 'oldAllocatedBytes': 0, 'newAllocatedBytes': 0,
+@@ -275,6 +256,7 @@
+             continue
+         temporary = None
+         backup = None
++        backup_owned = False
+         replaced = False
+         restored = False
+         try:
+@@ -331,6 +313,7 @@
+             # Only sources initially having nlink==1 were admitted.
+             backup = path.parent / ('.storage-original-' + uuid.uuid4().hex + '.rollback')
+             os.link(path, backup, follow_symlinks=False)
++            backup_owned = True
+             assert file_stat(backup)['inode'] == before['inode']
+             assert file_stat(path)['nlink'] == 2
+             record({'event': 'prepared', 'path': str(path), 'temporaryPath': str(temporary),
+@@ -364,7 +347,7 @@
+             print(json.dumps({'path': str(path), 'recoveredBytes': recovered,
+                               'totalRecoveredBytes': summary['physicalBytesRecovered']}), flush=True)
+         except Exception as error:
+-            if replaced and backup is not None:
++            if replaced and backup_owned and backup is not None:
+                 os.replace(backup, path)  # Restore the verified original inode.
+                 backup = None
+                 assert sha256(path) == digest
+@@ -382,7 +365,7 @@
+             # publish a failed summary instead of repeating copy attempts.
+             break
+         finally:
+-            if backup is not None and backup.exists():
++            if backup_owned and backup is not None and backup.exists():
+                 # Unadopted case: the accepted source still owns this inode.
+                 assert not replaced
+                 backup.unlink()

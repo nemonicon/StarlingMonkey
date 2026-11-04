@@ -1,0 +1,298 @@
+--- a/runtime/event_loop.h
++++ b/runtime/event_loop.h
+@@ -13,6 +13,17 @@
+    */
+   static void init(JSContext *cx);
+ 
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++  // Internal guest policy: retain the first uncaught event exception until a
++  // checkpoint. Capture failure leaves the current pending exception intact.
++  static bool record_pending_event_exception(JSContext *cx);
++  // False means an exception is pending (or capture failed). Existing pending
++  // exceptions take precedence; a retained event value is restored otherwise.
++  static bool take_pending_event_exception(JSContext *cx);
++  static void record_failed_event_invocation();
++  static bool event_exception_policy_failed();
++#endif
++
+   /**
+    * Check if there are any pending tasks (io requests or timers) to process.
+    */
+--- a/runtime/event_loop.cpp
++++ b/runtime/event_loop.cpp
+@@ -24,6 +24,15 @@
+ 
+ static PersistentRooted<TaskQueue> queue;
+ 
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++// EventLoop::init runs before builtin installation/application evaluation.
++// Keep a separate flag: undefined is a valid thrown value.
++static JS::PersistentRootedValue first_uncaught_event_exception;
++static bool has_uncaught_event_exception = false;
++static bool uncaught_event_exception_capture_failed = false;
++static bool uncaught_event_invocation_failed = false;
++#endif
++
+ // SpiderMonkey hands the embedding one cleanup function per FinalizationRegistry that has
+ // records of dead targets, and leaves calling it to the embedding (HTML's
+ // HostEnqueueFinalizationRegistryCleanupJob). The functions are queued here and run by the event
+@@ -59,6 +68,13 @@
+     JS::ExposeObjectToActiveJS(cleanup_obj);
+     JSAutoRealm ar(cx, cleanup_obj);
+     if (!JS_CallFunction(cx, nullptr, cleanup, JS::HandleValueArray::empty(), &rval)) {
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++      // A nested EventTarget callback failed to capture or invoke. Do not let
++      // this report-and-clear path discard the terminal policy failure.
++      if (core::EventLoop::event_exception_policy_failed()) {
++        break;
++      }
++#endif
+       api::Engine::dump_pending_exception("running a FinalizationRegistry callback");
+       JS_ClearPendingException(cx);
+     }
+@@ -68,6 +84,61 @@
+ 
+ namespace core {
+ 
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++bool EventLoop::record_pending_event_exception(JSContext *cx) {
++  MOZ_ASSERT(JS_IsExceptionPending(cx));
++  if (uncaught_event_exception_capture_failed || uncaught_event_invocation_failed) {
++    return false;
++  }
++  if (!has_uncaught_event_exception) {
++    JS::RootedValue exception(cx);
++    if (!JS_GetPendingException(cx, &exception)) {
++      uncaught_event_exception_capture_failed = true;
++      return false;
++    }
++    first_uncaught_event_exception = exception;
++    has_uncaught_event_exception = true;
++  }
++  JS_ClearPendingException(cx);
++  return true;
++}
++
++bool EventLoop::take_pending_event_exception(JSContext *cx) {
++  // Do not replace an existing direct failure with a previously latched event.
++  if (JS_IsExceptionPending(cx)) {
++    return false;
++  }
++  if (uncaught_event_exception_capture_failed) {
++    // Application code might have caught the capture failure while unwinding.
++    // It cannot make a failed policy capture silently successful.
++    JS_ReportErrorASCII(cx, "ERR_SM_NODE_EVENT_EXCEPTION_CAPTURE: unable to retain an uncaught event exception");
++    return false;
++  }
++  if (uncaught_event_invocation_failed) {
++    JS_ReportErrorASCII(cx, "ERR_SM_NODE_EVENT_INVOCATION: event callback failed without a pending exception");
++    return false;
++  }
++  if (!has_uncaught_event_exception) {
++    return true;
++  }
++  JS::RootedValue exception(cx, first_uncaught_event_exception);
++  first_uncaught_event_exception = JS::UndefinedValue();
++  has_uncaught_event_exception = false;
++  JS_SetPendingException(cx, exception, JS::ExceptionStackBehavior::DoNotCapture);
++  return false;
++}
++
++void EventLoop::record_failed_event_invocation() {
++  if (!has_uncaught_event_exception && !uncaught_event_exception_capture_failed) {
++    uncaught_event_invocation_failed = true;
++  }
++}
++
++bool EventLoop::event_exception_policy_failed() {
++  return uncaught_event_exception_capture_failed || uncaught_event_invocation_failed;
++}
++#endif
++
+ void EventLoop::queue_async_task(const RefPtr<api::AsyncTask>& task) {
+   MOZ_ASSERT(task);
+   queue.get().tasks.emplace_back(task);
+@@ -110,6 +181,12 @@
+     // Run a microtask checkpoint
+     js::RunJobs(cx);
+ 
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++    if (!take_pending_event_exception(cx)) {
++      exit_event_loop();
++      return false;
++    }
++#endif
+     if (JS_IsExceptionPending(cx)) {
+       exit_event_loop();
+       return false;
+@@ -117,7 +194,14 @@
+ 
+     // Once the microtasks are done, run the FinalizationRegistry cleanups that a collection
+     // queued, then go round again for the microtasks they queued.
+-    if (run_finalization_registry_cleanups(engine)) {
++    bool ran_cleanups = run_finalization_registry_cleanups(engine);
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++    if (!take_pending_event_exception(cx)) {
++      exit_event_loop();
++      return false;
++    }
++#endif
++    if (ran_cleanups) {
+       continue;
+     }
+ 
+@@ -150,20 +234,46 @@
+ 
+ bool EventLoop::drain_finalization_registry_cleanups(api::Engine *engine) {
+   JSContext *cx = engine->cx();
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++  if (!take_pending_event_exception(cx)) {
++    return false;
++  }
++#endif
+   for (unsigned round = 0; round < MAX_CLEANUP_DRAIN_ROUNDS; round++) {
+-    if (!run_finalization_registry_cleanups(engine)) {
++    bool ran_cleanups = run_finalization_registry_cleanups(engine);
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++    if (!take_pending_event_exception(cx)) {
++      return false;
++    }
++#endif
++    if (!ran_cleanups) {
+       return true;
+     }
+     js::RunJobs(cx);
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++    if (!take_pending_event_exception(cx)) {
++      return false;
++    }
++#endif
+     if (JS_IsExceptionPending(cx)) {
+       return false;
+     }
+   }
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++  return take_pending_event_exception(cx);
++#else
+   return true;
++#endif
+ }
+ 
+ void EventLoop::init(JSContext *cx) {
+   queue.init(cx);
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++  first_uncaught_event_exception.init(cx, JS::UndefinedValue());
++  has_uncaught_event_exception = false;
++  uncaught_event_exception_capture_failed = false;
++  uncaught_event_invocation_failed = false;
++#endif
+   finalization_registry_cleanups.init(cx);
+   JS::SetHostCleanupFinalizationRegistryCallback(cx, queue_finalization_registry_cleanup, nullptr);
+ }
+@@ -175,6 +285,13 @@
+   }
+   q.tasks.clear();
+   q.interest_cnt = 0;
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++  // Assignment keeps the PersistentRooted registered for subsequent entries.
++  first_uncaught_event_exception = JS::UndefinedValue();
++  has_uncaught_event_exception = false;
++  uncaught_event_exception_capture_failed = false;
++  uncaught_event_invocation_failed = false;
++#endif
+ }
+ 
+ } // namespace core
+--- a/runtime/engine.cpp
++++ b/runtime/engine.cpp
+@@ -545,6 +545,12 @@
+ 
+ void Engine::finish_pre_initialization() {
+   MOZ_ASSERT(state_ == EngineState::ScriptPreInitializing);
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++  // Initializer-only embeddings may have no content-script eval checkpoint.
++  if (!core::EventLoop::take_pending_event_exception(cx())) {
++    abort("finishing pre-initialization with an uncaught event exception");
++  }
++#endif
+   js::ResetMathRandomSeed(ENGINE->cx());
+   state_ = EngineState::Initialized;
+ }
+@@ -617,7 +623,13 @@
+   }
+ 
+   SCRIPT_VALUE = ns;
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++  if (!this->run_event_loop()) {
++    return false;
++  }
++#else
+   this->run_event_loop();
++#endif
+ 
+   // TLA rejections during pre-initialization are treated as top-level exceptions.
+   // TLA may remain unresolved, in which case it will continue tasks at runtime.
+@@ -686,6 +698,9 @@
+     }
+ 
+ #ifdef NODE_COMPAT_STRICT_INITIALIZATION
++    if (!core::EventLoop::take_pending_event_exception(cx())) {
++      return false;
++    }
+     // Do not reject at the Promise rejection tracker: a subsequent job in the
+     // same initialization turn can still handle the rejection. At this point
+     // jobs and GC-triggered finalizer jobs have drained. Existing abort()
+--- a/builtins/web/event/event-target.cpp
++++ b/builtins/web/event/event-target.cpp
+@@ -7,6 +7,9 @@
+ 
+ #include "js/GCPolicyAPI.h"
+ #include "mozilla/Assertions.h"
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++#include "event_loop.h"
++#endif
+ 
+ namespace {
+ 
+@@ -549,24 +552,39 @@
+     RootedValueArray<1> args(cx);
+     args[0].setObject(*event);
+ 
++    bool callback_ok;
+     if (JS::IsCallable(callback_obj)) {
+       auto global = engine->global();
+-      JS::Call(cx, global, callback_val, args, &rval);
++      callback_ok = JS::Call(cx, global, callback_val, args, &rval);
+     } else {
+       RootedValue handle_fn(cx);
+       if (!JS_GetProperty(cx, callback_obj, "handleEvent", &handle_fn)) {
+         return false;
+       }
+-      JS::Call(cx, callback_val, handle_fn, args, &rval);
++      callback_ok = JS::Call(cx, callback_val, handle_fn, args, &rval);
++    }
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++    if (!callback_ok && !JS_IsExceptionPending(cx)) {
++      core::EventLoop::record_failed_event_invocation();
++      return false;
+     }
++#else
++    (void)callback_ok;
++#endif
+ 
+     if (JS_IsExceptionPending(cx)) {
+       // TODO: report an exception as in spec:
+       // https://html.spec.whatwg.org/multipage/webappapis.html#report-an-exception
+       // https://github.com/bytecodealliance/StarlingMonkey/issues/239
++#ifdef NODE_COMPAT_STRICT_INITIALIZATION
++      if (!core::EventLoop::record_pending_event_exception(cx)) {
++        return false;
++      }
++#else
+       auto msg = "Exception in event listener for " + listener->type;
+       engine->dump_pending_exception(msg.c_str());
+       JS_ClearPendingException(cx);
++#endif
+     }
+ 
+     // 12. Unset event's in passive listener flag.

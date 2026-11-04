@@ -1,0 +1,421 @@
+{
+  "schemaVersion": 1,
+  "state": "verified-public-node22-addAbortListener-oracle",
+  "recordedAtUtc": "2026-11-03T08:53:29.816Z",
+  "nodePin": {
+    "release": "v22.14.0",
+    "tagObject": "ddf66aca0766567c70bf16a92610f03ce0cd2bcd",
+    "revision": "5d2feb257bcee090e57900eb51720171a6aa92f3"
+  },
+  "node": "v22.14.0",
+  "executable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+  "executableSha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+  "runnerSha256": "126a15ded03dda6efcfbd0f8abfbb57ab10dd71c819e45138aac49d7c4c15741",
+  "execArgv": [],
+  "nodeOptionsPresent": false,
+  "caseCount": 16,
+  "cases": [
+    {
+      "name": "Symbol.dispose and returned resource descriptors",
+      "passed": true,
+      "observations": {
+        "globalSymbol": {
+          "description": "nodejs.dispose",
+          "registryKey": "nodejs.dispose",
+          "sameAsNodeRegistrySymbol": true,
+          "descriptor": {
+            "enumerable": false,
+            "writable": false,
+            "configurable": false
+          }
+        },
+        "resource": {
+          "nullPrototype": true,
+          "onlyOwnKeyIsDispose": true,
+          "enumerable": true,
+          "writable": true,
+          "configurable": true,
+          "functionName": "[nodejs.dispose]",
+          "functionLength": 0,
+          "ownsFunctionPrototype": false,
+          "then": "<undefined>"
+        }
+      }
+    },
+    {
+      "name": "signal validation precedes listener validation",
+      "passed": true,
+      "observations": {
+        "rows": [
+          {
+            "label": "undefined",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE",
+            "message": "The \"signal\" argument must be an instance of AbortSignal. Received undefined"
+          },
+          {
+            "label": "null",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE",
+            "message": "The \"signal\" argument must be an instance of AbortSignal. Received null"
+          },
+          {
+            "label": "boolean",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE",
+            "message": "The \"signal\" argument must be an instance of AbortSignal. Received type boolean (true)"
+          },
+          {
+            "label": "number",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE",
+            "message": "The \"signal\" argument must be an instance of AbortSignal. Received type number (1)"
+          },
+          {
+            "label": "string",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE",
+            "message": "The \"signal\" argument must be an instance of AbortSignal. Received type string ('signal')"
+          },
+          {
+            "label": "symbol",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE",
+            "message": "The \"signal\" argument must be an instance of AbortSignal. Received type symbol (Symbol(signal))"
+          },
+          {
+            "label": "bigint",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE",
+            "message": "The \"signal\" argument must be an instance of AbortSignal. Received type bigint (1n)"
+          },
+          {
+            "label": "plain object",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE",
+            "message": "The \"signal\" argument must be an instance of AbortSignal. Received an instance of Object"
+          },
+          {
+            "label": "array",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE",
+            "message": "The \"signal\" argument must be an instance of AbortSignal. Received an instance of Array"
+          },
+          {
+            "label": "function with aborted property",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE",
+            "message": "The \"signal\" argument must be an instance of AbortSignal. Received function signal"
+          },
+          {
+            "label": "listener undefined",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE",
+            "message": "The \"listener\" argument must be of type function. Received undefined"
+          },
+          {
+            "label": "listener null",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE",
+            "message": "The \"listener\" argument must be of type function. Received null"
+          },
+          {
+            "label": "listener number",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE",
+            "message": "The \"listener\" argument must be of type function. Received type number (1)"
+          },
+          {
+            "label": "listener object",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE",
+            "message": "The \"listener\" argument must be of type function. Received an instance of Object"
+          }
+        ],
+        "handleEventReads": 0
+      }
+    },
+    {
+      "name": "aborted getter read follows listener validation and preserves thrown value",
+      "passed": true,
+      "observations": {
+        "invalidListenerCheckedBeforeAbortedRead": true,
+        "getterExceptionIdentity": true,
+        "getterReads": [
+          "get aborted"
+        ],
+        "hasExceptionIdentity": true,
+        "hasCalls": 1
+      }
+    },
+    {
+      "name": "structural fake signal calls and disposer method lookup",
+      "passed": true,
+      "observations": {
+        "calls": [
+          "has:aborted",
+          "get aborted",
+          "get addEventListener",
+          "call addEventListener:abort:once",
+          "replacement removal",
+          "replacement removal"
+        ],
+        "deferredRemovalReadsCurrentMethod": true,
+        "repeatedFakeDisposalRepeatsRemoval": true,
+        "missingAddEventListener": {
+          "name": "TypeError",
+          "code": null,
+          "message": "signal.addEventListener is not a function"
+        },
+        "scope": "Public structural acceptance; no private option symbol or listener storage is inspected."
+      }
+    },
+    {
+      "name": "already-aborted structural object schedules without event methods",
+      "passed": true,
+      "observations": {
+        "order": [
+          "before registration",
+          "get aborted",
+          "after dispose",
+          "listener",
+          "after microtask checkpoint"
+        ],
+        "receiver": [
+          {
+            "undefinedThis": true,
+            "argumentCount": 0
+          }
+        ],
+        "queuedCallbackUnaffectedByDisposal": true
+      }
+    },
+    {
+      "name": "fresh signal callback is synchronous with signal receiver and Event",
+      "passed": true,
+      "observations": {
+        "order": [
+          "before abort",
+          "listener",
+          "after abort"
+        ],
+        "details": [
+          {
+            "signalThis": true,
+            "argumentCount": 1,
+            "eventInstance": true,
+            "type": "abort",
+            "targetIsSignal": true,
+            "currentTargetIsSignal": true,
+            "abortedDuringCallback": true,
+            "reasonDuringCallback": "first reason",
+            "isTrusted": true,
+            "cancelable": false
+          }
+        ],
+        "onceAcrossRepeatedAbortAndManualEvent": true
+      }
+    },
+    {
+      "name": "already-aborted signal callback is a zero-argument microtask despite disposal",
+      "passed": true,
+      "observations": {
+        "order": [
+          "before registration",
+          "after registration/dispose",
+          "earlier queued microtask",
+          "listener",
+          "later queued microtask",
+          "await continuation"
+        ],
+        "details": [
+          {
+            "undefinedThis": true,
+            "argumentCount": 0
+          }
+        ],
+        "queuedCallbackUnaffectedByDisposal": true
+      }
+    },
+    {
+      "name": "stopImmediatePropagation skips ordinary listeners but not protected registrations",
+      "passed": true,
+      "observations": {
+        "order": [
+          "ordinary stopper",
+          "protected one",
+          "protected two"
+        ]
+      }
+    },
+    {
+      "name": "fresh disposal is effect-idempotent and can remove a later listener during dispatch",
+      "passed": true,
+      "observations": {
+        "disposedCalls": 0,
+        "order": [
+          "first listener"
+        ],
+        "realSignalRemovalEffectIdempotent": true
+      }
+    },
+    {
+      "name": "manual abort event consumes once registration without changing signal state",
+      "passed": true,
+      "observations": {
+        "callbacks": [
+          {
+            "signalThis": true,
+            "type": "abort",
+            "aborted": false,
+            "isTrusted": false
+          }
+        ],
+        "beforeRealAbort": false,
+        "realAbortState": true,
+        "dispatchReturnValues": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "name": "manual event after already-aborted registration does not replace queued callback",
+      "passed": true,
+      "observations": {
+        "order": [
+          "after manual dispatch",
+          "queued listener:0"
+        ]
+      }
+    },
+    {
+      "name": "registration inside real abort callback observes already-aborted microtask path",
+      "passed": true,
+      "observations": {
+        "order": [
+          "first listener",
+          "after abort",
+          "late listener:0",
+          "after checkpoint"
+        ]
+      }
+    },
+    {
+      "name": "duplicate protected registrations share one listener tuple and either disposer removes it",
+      "passed": true,
+      "observations": {
+        "disposableObjectsDistinct": true,
+        "callsAfterOneDisposer": 0,
+        "undisposedDuplicateCalls": 1
+      }
+    },
+    {
+      "name": "ordinary callback registered first is not upgraded to protected or once",
+      "passed": true,
+      "observations": {
+        "stoppedOrder": [
+          "stopper",
+          "different protected callback"
+        ],
+        "ordinaryFirstRemainsNonOnceCalls": 3,
+        "protectedDuplicateDoesNotReplaceExistingTupleFlags": true
+      }
+    },
+    {
+      "name": "protected callback registered first keeps its flags after an ordinary duplicate",
+      "passed": true,
+      "observations": {
+        "order": [
+          "stopper",
+          "protected callback",
+          "stopper"
+        ],
+        "laterOrdinaryDuplicateDidNotRemoveProtectionOrOnce": true
+      }
+    },
+    {
+      "name": "fresh and synthetic dispatch use dispatch ALS context; queued path uses registration ALS context",
+      "passed": true,
+      "observations": {
+        "observed": [
+          {
+            "label": "fresh listener",
+            "store": "FRESH_DISPATCH"
+          },
+          {
+            "label": "manual listener",
+            "store": "MANUAL_DISPATCH"
+          },
+          {
+            "label": "already-aborted listener",
+            "store": "QUEUED_REGISTER"
+          }
+        ],
+        "rootStoreRestored": true,
+        "implementation": "actual node:async_hooks AsyncLocalStorage"
+      }
+    }
+  ],
+  "warnings": [],
+  "isolatedListenerThrowCases": [
+    {
+      "mode": "fresh",
+      "order": [
+        "before abort",
+        "throwing listener",
+        "second listener",
+        "after abort",
+        "uncaughtException",
+        "after immediate"
+      ],
+      "callerCaught": false,
+      "exceptions": [
+        {
+          "name": "Error",
+          "code": null,
+          "message": "ADD_ABORT_LISTENER_SENTINEL",
+          "sameMarker": true,
+          "origin": "uncaughtException"
+        }
+      ],
+      "warnings": [],
+      "publicUncaughtExceptionHandlerInstalled": true,
+      "scope": "Synchronous listener throw observed through a public uncaughtException handler in an isolated fresh process; no crash or emitter replacement.",
+      "exitStatus": 0,
+      "stderr": ""
+    },
+    {
+      "mode": "already-aborted",
+      "order": [
+        "before registration",
+        "after registration",
+        "throwing listener",
+        "uncaughtException",
+        "after immediate"
+      ],
+      "callerCaught": false,
+      "exceptions": [
+        {
+          "name": "Error",
+          "code": null,
+          "message": "ADD_ABORT_LISTENER_SENTINEL",
+          "sameMarker": true,
+          "origin": "uncaughtException"
+        }
+      ],
+      "warnings": [],
+      "publicUncaughtExceptionHandlerInstalled": true,
+      "scope": "Synchronous listener throw observed through a public uncaughtException handler in an isolated fresh process; no crash or emitter replacement.",
+      "exitStatus": 0,
+      "stderr": ""
+    }
+  ],
+  "scope": "Valid public Node event/AbortSignal operations, structural input validation observations and isolated public uncaughtException reporting. No Node private binding or guest/native instrumentation is used.",
+  "limitations": [
+    "This is a Node reference oracle, not a StarlingMonkey implementation/component proof.",
+    "Structural fake acceptance and repeated fake remover side effects are recorded Node behavior; a bounded guest profile may deliberately reject fakes with an explicit deviation.",
+    "No GC/finalizer/resource-retention claim follows from ordinary disposal and callback counts.",
+    "Only synchronous listener throws are covered; async listener rejection/reporting semantics are not inferred."
+  ]
+}

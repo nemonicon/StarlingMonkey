@@ -1,0 +1,1 @@
+import{addAbortListener}from'node:events';import{spawn}from'node:child_process';const c=new AbortController();let seen=0;addAbortListener(c.signal,()=>{seen++;throw{toString(){return'PROTECTED_FIRST_AFTER_'+seen}}});addAbortListener(c.signal,()=>{seen++});c.abort();export function run(){return'must-not-return'}

@@ -1,0 +1,488 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "path": "artifact-tools/artifact_common.py",
+      "origin": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/native-integration-candidate-v4/artifact-tools/artifact_common.py",
+      "beforeSha256": "6504fc16b5bc870a73c7b6ef82b019f6f2fa13cf87781cc0f8a24b9563b78021",
+      "afterSha256": "6813b5e72c0a83a9bfb10e506a727692633aa4e089f4b11406c33eafff6c9dbe",
+      "edits": [
+        {
+          "old": "production-zlib-v4",
+          "new": "production-consumers-v1",
+          "count": 1,
+          "afterOffsets": [
+            387
+          ]
+        },
+        {
+          "old": "350",
+          "new": "355",
+          "count": 4,
+          "afterOffsets": [
+            2280,
+            3198,
+            10060,
+            11285
+          ]
+        },
+        {
+          "old": "assert metadata.get('zlibEnabled') is (label != 'disabled-off')",
+          "new": "assert metadata.get('zlibEnabled') is True\n    assert metadata.get('streamConsumersEnabled') is (label != 'disabled-off')\n    assert metadata.get('streamConsumersSourcePolicy') == json.loads((HERE.parent/'policy.json').read_bytes())['streamConsumersSourcePolicy']",
+          "count": 1,
+          "afterOffsets": [
+            3424
+          ]
+        },
+        {
+          "old": "def compile_command(command, runtime, source=None, classic=True, gc=False, zlib=True):",
+          "new": "def compile_command(command, runtime, source=None, classic=True, gc=False, zlib=True, consumers=True):",
+          "count": 1,
+          "afterOffsets": [
+            5629
+          ]
+        },
+        {
+          "old": "('NODE_COMPAT_ZLIB', zlib and source.startswith('builtins/node-compat/'))",
+          "new": "('NODE_COMPAT_STREAM_CONSUMERS', consumers and source.startswith('builtins/node-compat/')),\n                ('NODE_COMPAT_ZLIB', zlib and source.startswith('builtins/node-compat/'))",
+          "count": 1,
+          "afterOffsets": [
+            6807
+          ]
+        },
+        {
+          "old": "immutable-zlib-release-engine-frozen",
+          "new": "immutable-consumers-release-engine-frozen",
+          "count": 1,
+          "afterOffsets": [
+            10225
+          ]
+        },
+        {
+          "old": "receipt['actualLayoutCompileCommands'] == 61+int(label!='disabled-off')",
+          "new": "receipt['actualLayoutCompileCommands'] == 62",
+          "count": 1,
+          "afterOffsets": [
+            10456
+          ]
+        },
+        {
+          "old": "receipt['actualClassicPrivateCompileCommands'] == 5+int(label!='disabled-off')",
+          "new": "receipt['actualClassicPrivateCompileCommands'] == 6",
+          "count": 1,
+          "afterOffsets": [
+            10618
+          ]
+        },
+        {
+          "old": "HERE.parent/'codec-evidence.py'",
+          "new": "REPO/'tests/node-compat/foundation-zlib/native-integration-candidate-v4/codec-evidence.py'",
+          "count": 1,
+          "afterOffsets": [
+            15916
+          ]
+        },
+        {
+          "old": "    checked(receipt_path, receipt_digest)\n    if return_receipt_digest:",
+          "new": "    assert receipt['streamConsumersEnabled'] is metadata['streamConsumersEnabled']\n    assert receipt['streamConsumersSourcePolicy']==metadata['streamConsumersSourcePolicy']\n    install=metadata['streamConsumersPolicy']['installationOrder']\n    assert install['path']==witness['install']['path'] and install['sha256']==witness['install']['sha256']\n    checked(mapping[install['path']],install['sha256'])\n    install_text=mapping[install['path']].read_text()\n    assert install_text.count('NS_DEF(builtins::web::text_codec)')==install_text.count('NS_DEF(builtins::node_compat)')==1\n    assert install_text.index('NS_DEF(builtins::web::text_codec)')<install_text.index('NS_DEF(builtins::node_compat)')\n    assert cache['ENABLE_BUILTIN_WEB_TEXT_CODEC']=='ON'\n    checked(receipt_path, receipt_digest)\n    if return_receipt_digest:",
+          "count": 1,
+          "afterOffsets": [
+            17850
+          ]
+        },
+        {
+          "old": "211c2f10929ecaa04cc9dcd38bedc686faaf135ac950bc054e26b3004f38228a",
+          "new": "9c31e2d736fb0cd56258893125bab0e629cdd87fa74b3b5c6c6e3206acd59856",
+          "count": 1,
+          "afterOffsets": [
+            854
+          ]
+        },
+        {
+          "old": "def verify_frozen_variant(label, output=OUTPUT, return_receipt_digest=False):\n    assert label in LABELS\n",
+          "new": "def verify_frozen_variant(label, output=OUTPUT, return_receipt_digest=False):\n    assert label in LABELS\n    tool_dependencies(REPO)  # Authenticate every configured helper before any dynamic import.\n",
+          "count": 1,
+          "afterOffsets": [
+            9858
+          ]
+        },
+        {
+          "old": "9c31e2d736fb0cd56258893125bab0e629cdd87fa74b3b5c6c6e3206acd59856",
+          "new": "7ee0303e21e32da5b85bb7a6f2476a20f74a91c3cfef988274acc26f8fc5d9fe",
+          "count": 1,
+          "afterOffsets": [
+            854
+          ]
+        }
+      ]
+    },
+    {
+      "path": "artifact-tools/build-one.py",
+      "origin": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/native-integration-candidate-v4/artifact-tools/build-one.py",
+      "beforeSha256": "4cde592a699a445aaed23d2f53c81c86b8939d27a688e7625d6ee55834e27b20",
+      "afterSha256": "871ec51fef978148b167ba0222fec9b44f532d1d8110777dc3050791f850248a",
+      "edits": [
+        {
+          "old": "production350",
+          "new": "consumers355",
+          "count": 1,
+          "afterOffsets": [
+            11
+          ]
+        },
+        {
+          "old": "zlib-v4-build",
+          "new": "consumers-v2-build",
+          "count": 1,
+          "afterOffsets": [
+            9828
+          ]
+        },
+        {
+          "old": "production-zlib-v4",
+          "new": "production-consumers-v1",
+          "count": 1,
+          "afterOffsets": [
+            9894
+          ]
+        },
+        {
+          "old": "'NODE_COMPAT_ZLIB': '0' if label == 'disabled-off' else '1',",
+          "new": "'NODE_COMPAT_ZLIB': '1',\n        'NODE_COMPAT_STREAM_CONSUMERS': '0' if label == 'disabled-off' else '1',",
+          "count": 1,
+          "afterOffsets": [
+            11070
+          ]
+        },
+        {
+          "old": "'NODE_COMPAT_ARTIFACT_TAG': 'z350v1'",
+          "new": "'NODE_COMPAT_ARTIFACT_TAG': 'cs355v1'",
+          "count": 1,
+          "afterOffsets": [
+            11344
+          ]
+        }
+      ]
+    },
+    {
+      "path": "artifact-tools/freeze-engine.py",
+      "origin": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/native-integration-candidate-v4/artifact-tools/freeze-engine.py",
+      "beforeSha256": "870b8ea1911c45828c03da553ac0dd054a71260c0452ace8f70f7f656279e07a",
+      "afterSha256": "9927a7cd1e5ea9b63c41988fc941a5564f1691588907fe5337bcc6b9ac35a57c",
+      "edits": [
+        {
+          "old": "zlib350",
+          "new": "consumers355",
+          "count": 1,
+          "afterOffsets": [
+            24
+          ]
+        },
+        {
+          "old": "350",
+          "new": "355",
+          "count": 3,
+          "afterOffsets": [
+            1721,
+            2559,
+            14700
+          ]
+        },
+        {
+          "old": "immutable-zlib-release-engine-frozen",
+          "new": "immutable-consumers-release-engine-frozen",
+          "count": 1,
+          "afterOffsets": [
+            14241
+          ]
+        },
+        {
+          "old": "'NODE_COMPAT_ZLIB':'OFF'if label=='disabled-off'else'ON',",
+          "new": "'NODE_COMPAT_ZLIB':'ON',\n                'NODE_COMPAT_STREAM_CONSUMERS':'OFF'if label=='disabled-off'else'ON',\n                'ENABLE_BUILTIN_WEB_TEXT_CODEC':'ON',",
+          "count": 1,
+          "afterOffsets": [
+            3580
+          ]
+        },
+        {
+          "old": "compile_command(row['command'], runtime, source, True, gc, metadata['zlibEnabled'])",
+          "new": "compile_command(row['command'], runtime, source, True, gc, True, metadata['streamConsumersEnabled'])",
+          "count": 1,
+          "afterOffsets": [
+            6822
+          ]
+        },
+        {
+          "old": "compile_command(embedding[0], runtime, 'embedding/embedding.cpp', True, gc, metadata['zlibEnabled'])",
+          "new": "compile_command(embedding[0], runtime, 'embedding/embedding.cpp', True, gc, True, metadata['streamConsumersEnabled'])",
+          "count": 1,
+          "afterOffsets": [
+            6927
+          ]
+        },
+        {
+          "old": "HERE.parent/'codec-evidence.py'",
+          "new": "REPO/'tests/node-compat/foundation-zlib/native-integration-candidate-v4/codec-evidence.py'",
+          "count": 2,
+          "afterOffsets": [
+            10054,
+            10149
+          ]
+        },
+        {
+          "old": "    plan = []",
+          "new": "    install=metadata['streamConsumersPolicy']['installationOrder']\n    assert install['path']==cache['INSTALL_BUILTINS']==metadata['zlibPolicy']['codecWitness']['install']['path']\n    assert install['sha256']==sha(Path(install['path']))\n    install_text=Path(install['path']).read_text()\n    assert install_text.count('NS_DEF(builtins::web::text_codec)')==install_text.count('NS_DEF(builtins::node_compat)')==1\n    assert install_text.index('NS_DEF(builtins::web::text_codec)')<install_text.index('NS_DEF(builtins::node_compat)')\n    plan = []",
+          "count": 1,
+          "afterOffsets": [
+            10503
+          ]
+        },
+        {
+          "old": "'zlibEnabled':metadata['zlibEnabled'],'zlibSourcePolicy':metadata['zlibSourcePolicy'],",
+          "new": "'streamConsumersEnabled':metadata['streamConsumersEnabled'],'streamConsumersSourcePolicy':metadata['streamConsumersSourcePolicy'],\n        'zlibEnabled':metadata['zlibEnabled'],'zlibSourcePolicy':metadata['zlibSourcePolicy'],",
+          "count": 1,
+          "afterOffsets": [
+            15962
+          ]
+        },
+        {
+          "old": "ACTUAL_FINITE_ZLIB_BUILD_ONLY_SELECTOR_PASSED_NO_ENGINE_EXECUTION",
+          "new": "ACTUAL_FINITE_CONSUMERS_BUILD_ONLY_SELECTOR_PASSED_NO_ENGINE_EXECUTION",
+          "count": 1,
+          "afterOffsets": [
+            2453
+          ]
+        }
+      ]
+    },
+    {
+      "path": "artifact-tools/metadata-admission.mjs",
+      "origin": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/native-integration-candidate-v4/artifact-tools/metadata-admission.mjs",
+      "beforeSha256": "7cc22080db98c644c322b54371992f010d8b7e563ab14bdb29eaafd8e135d83f",
+      "afterSha256": "071c7a2ef16f4912c99e9d7e28f241c87977bd4ee0943037214d4ba6aa835370",
+      "edits": [
+        {
+          "old": "350",
+          "new": "355",
+          "count": 5,
+          "afterOffsets": [
+            1585,
+            3430,
+            4023,
+            4454,
+            5520
+          ]
+        },
+        {
+          "old": "classicStreamsEnabled:true,zlibEnabled:label!=='disabled-off'",
+          "new": "classicStreamsEnabled:true,zlibEnabled:true,streamConsumersEnabled:label!=='disabled-off'",
+          "count": 1,
+          "afterOffsets": [
+            1739
+          ]
+        },
+        {
+          "old": "validateZlibBuildSourceAdmission",
+          "new": "validateStreamConsumersBuildSourceAdmission",
+          "count": 2,
+          "afterOffsets": [
+            4075,
+            4221
+          ]
+        },
+        {
+          "old": "tests/node-compat/zlib-admission.mjs",
+          "new": "tests/node-compat/stream-consumers-admission.mjs",
+          "count": 1,
+          "afterOffsets": [
+            4164
+          ]
+        },
+        {
+          "old": "assert.equal(classic.zlibEnabled,options.zlibEnabled);",
+          "new": "assert.equal(classic.streamConsumersEnabled,options.streamConsumersEnabled);assert.equal(classic.zlibEnabled,options.zlibEnabled);",
+          "count": 1,
+          "afterOffsets": [
+            4428
+          ]
+        },
+        {
+          "old": "assert.equal(ids.includes('node:zlib'),options.zlibEnabled);",
+          "new": "assert.equal(ids.includes('node:zlib'),options.zlibEnabled);\n assert.equal(ids.includes('node:stream/consumers'),options.streamConsumersEnabled);",
+          "count": 1,
+          "afterOffsets": [
+            4905
+          ]
+        },
+        {
+          "old": "ACTUAL_FINITE_ZLIB_BUILD_ONLY_SELECTOR_PASSED_NO_ENGINE_EXECUTION",
+          "new": "ACTUAL_FINITE_CONSUMERS_BUILD_ONLY_SELECTOR_PASSED_NO_ENGINE_EXECUTION",
+          "count": 1,
+          "afterOffsets": [
+            5636
+          ]
+        },
+        {
+          "old": "211c2f10929ecaa04cc9dcd38bedc686faaf135ac950bc054e26b3004f38228a",
+          "new": "9c31e2d736fb0cd56258893125bab0e629cdd87fa74b3b5c6c6e3206acd59856",
+          "count": 1,
+          "afterOffsets": [
+            829
+          ]
+        },
+        {
+          "old": "9c31e2d736fb0cd56258893125bab0e629cdd87fa74b3b5c6c6e3206acd59856",
+          "new": "7ee0303e21e32da5b85bb7a6f2476a20f74a91c3cfef988274acc26f8fc5d9fe",
+          "count": 1,
+          "afterOffsets": [
+            829
+          ]
+        }
+      ]
+    },
+    {
+      "path": "artifact-tools/build-manifests.mjs",
+      "origin": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/native-integration-candidate-v4/artifact-tools/build-manifests.mjs",
+      "beforeSha256": "164783395ad35f6c4b7af2129e56df60a8234326384823fc06767cb01ac87dad",
+      "afterSha256": "76ea54c2aece2455881f4d953ae7e72a0a6724ca65ef1d5d6571a76bf3b369a1",
+      "edits": [
+        {
+          "old": "350",
+          "new": "355",
+          "count": 2,
+          "afterOffsets": [
+            480,
+            683
+          ]
+        },
+        {
+          "old": "['zlibEnabled','zlib']",
+          "new": "['zlibEnabled','zlib'],['streamConsumersEnabled','stream-consumers']",
+          "count": 1,
+          "afterOffsets": [
+            1049
+          ]
+        }
+      ]
+    },
+    {
+      "path": "artifact-tools/export-pin-candidate.py",
+      "origin": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/native-integration-candidate-v4/artifact-tools/export-pin-candidate.py",
+      "beforeSha256": "afed171bb83029bbde279ba64dc569e2a2994580acfd4409301e20f76bad36b5",
+      "afterSha256": "e6671d273835a9df2388cd660d603be34678662e2e29454e1c61caf91dcd3134",
+      "edits": [
+        {
+          "old": "zlib350",
+          "new": "consumers355",
+          "count": 1,
+          "afterOffsets": [
+            541
+          ]
+        },
+        {
+          "old": "ZLIB350",
+          "new": "STREAM_CONSUMERS355",
+          "count": 1,
+          "afterOffsets": [
+            2690
+          ]
+        },
+        {
+          "old": "sm-bounded-zlib-source-v1",
+          "new": "sm-stream-consumers-text-json-source-v1",
+          "count": 1,
+          "afterOffsets": [
+            810
+          ]
+        },
+        {
+          "old": "'sourceFiles': 350",
+          "new": "'streamConsumersEnabled':metadata['streamConsumersEnabled'],'streamConsumersSourcePolicy':metadata['streamConsumersSourcePolicy'],\n        'sourceFiles': 355",
+          "count": 1,
+          "afterOffsets": [
+            1091
+          ]
+        }
+      ]
+    },
+    {
+      "path": "artifact-tools/bootstrap-classifier.py",
+      "origin": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/native-integration-candidate-v4/artifact-tools/bootstrap-classifier.py",
+      "beforeSha256": "585ad938cc37ba01e2304d7c8e8d744ba315b3955941a913e97bd1f2a19667a1",
+      "afterSha256": "b2573c5fbca54be29a90c68810582370c0d3530557ca5027e032b15b9325fe53",
+      "edits": [
+        {
+          "old": "ZLIB350",
+          "new": "STREAM_CONSUMERS355",
+          "count": 3,
+          "afterOffsets": [
+            1000,
+            1953,
+            5922
+          ]
+        },
+        {
+          "old": "zlib350",
+          "new": "consumers355",
+          "count": 2,
+          "afterOffsets": [
+            1312,
+            3586
+          ]
+        },
+        {
+          "old": "350",
+          "new": "355",
+          "count": 3,
+          "afterOffsets": [
+            1423,
+            2090,
+            5642
+          ]
+        },
+        {
+          "old": "sm-bounded-zlib-source-v1",
+          "new": "sm-stream-consumers-text-json-source-v1",
+          "count": 1,
+          "afterOffsets": [
+            1534
+          ]
+        },
+        {
+          "old": "'gcStress','entropyPolicy','classicStreamsEnabled','zlibEnabled','classicTraceSourcePolicy','zlibSourcePolicy','cmakeCacheSha256','compileCommandsSha256'",
+          "new": "'gcStress','entropyPolicy','classicStreamsEnabled','zlibEnabled','streamConsumersEnabled','classicTraceSourcePolicy','zlibSourcePolicy','streamConsumersSourcePolicy','cmakeCacheSha256','compileCommandsSha256'",
+          "count": 1,
+          "afterOffsets": [
+            4622
+          ]
+        }
+      ]
+    },
+    {
+      "path": "artifact-tools/bootstrap-preflight.mjs",
+      "origin": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/native-integration-candidate-v4/artifact-tools/bootstrap-preflight.mjs",
+      "beforeSha256": "557f8bd2a4ff32defa84eb0098cc240b451753aeeb694ca78305952306b84dcb",
+      "afterSha256": "61e4f0d6df876247693598baca59e3623dfdd6c3bb30dfa7b7923aed7ce16c23",
+      "edits": [
+        {
+          "old": "zlibBootstrapPreflight",
+          "new": "consumersBootstrapPreflight",
+          "count": 1,
+          "afterOffsets": [
+            731
+          ]
+        },
+        {
+          "old": "ZLIB350",
+          "new": "STREAM_CONSUMERS355",
+          "count": 2,
+          "afterOffsets": [
+            1171,
+            2146
+          ]
+        }
+      ]
+    }
+  ],
+  "lifecycleFunctionsMustRemainByteIdentical": true
+}

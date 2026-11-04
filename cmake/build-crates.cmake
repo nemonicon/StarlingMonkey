@@ -19,7 +19,16 @@ configure_file("runtime/crates/staticlib-template/rust-staticlib.rs.in" "${RUST_
 configure_file("runtime/crates/staticlib-template/Cargo.toml.in" "${RUST_STATICLIB_TOML}")
 configure_file("runtime/crates/staticlib-template/Cargo.lock" "${RUST_STATICLIB_LOCK}" COPYONLY)
 
+# The audited compatibility recipe opts into Corrosion's existing lock mode.
+# Other embeddings retain their existing default configuration.
+option(NODE_COMPAT_LOCKED_RUST "Require the versioned aggregate Rust lockfile" OFF)
+set(RUST_STATICLIB_LOCK_MODE "")
+if(NODE_COMPAT_LOCKED_RUST)
+    set(RUST_STATICLIB_LOCK_MODE LOCKED)
+endif()
+
 corrosion_import_crate(
+        ${RUST_STATICLIB_LOCK_MODE}
         MANIFEST_PATH ${RUST_STATICLIB_TOML}
         CRATES "rust-staticlib"
         NO_LINKER_OVERRIDE

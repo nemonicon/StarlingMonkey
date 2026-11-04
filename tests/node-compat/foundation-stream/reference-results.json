@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "node": "v22.14.0",
+  "schedulerTraces": [
+    {
+      "mode": "node",
+      "boundary": "task",
+      "trace": [
+        "tick",
+        "nested-tick",
+        "promise-first",
+        "microtask"
+      ]
+    },
+    {
+      "mode": "jco-scheduler",
+      "boundary": "task",
+      "trace": [
+        "promise-first",
+        "tick",
+        "nested-tick",
+        "microtask"
+      ]
+    },
+    {
+      "mode": "node",
+      "boundary": "microtask",
+      "trace": [
+        "promise-first",
+        "microtask",
+        "tick",
+        "nested-tick"
+      ]
+    },
+    {
+      "mode": "jco-scheduler",
+      "boundary": "microtask",
+      "trace": [
+        "promise-first",
+        "tick",
+        "nested-tick",
+        "microtask"
+      ]
+    }
+  ],
+  "mutableChunkCollection": {
+    "nodeBytes": [
+      67,
+      67
+    ],
+    "jcoBytes": [
+      65,
+      66
+    ],
+    "matches": false,
+    "explanation": "Pinned Node collects Blob parts by reference until Blob construction; Jco collectParts/toArrayBuffer copies each byte chunk during consumption."
+  },
+  "sources": {
+    "jcoScheduler": {
+      "path": "/tmp/starling-node-compat/native-toolchain-lock/node_modules/@bytecodealliance/jco-std/dist/wasi/0.2.x/node/24.x.x/stream/scheduler.js",
+      "sha256": "1576f350f431c20a401529e4c1e988cbe17e69ff3e98cec8067632bcfdaa4514"
+    },
+    "jcoConsumers": {
+      "path": "/tmp/starling-node-compat/native-toolchain-lock/node_modules/@bytecodealliance/jco-std/dist/wasi/0.2.x/node/24.x.x/stream/consumers.js",
+      "sha256": "47d07c8e6c830cb0f20e015624a04b4b6b816d1167219c20ff5a5215b6a24dc3"
+    },
+    "jcoShared": {
+      "path": "/tmp/starling-node-compat/native-toolchain-lock/node_modules/@bytecodealliance/jco-std/dist/wasi/0.2.x/node/24.x.x/stream/shared.js",
+      "sha256": "4d9b4c639644db38a20115f6fdcaa6d89e6849568ef312ca1ffac3743cd7f716"
+    },
+    "probe": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream/scheduler-probe.cjs",
+      "sha256": "00250dc63269ba8b061e229fb1e784a551f31ea5fa434cf0ec14dc3c8a7c19e7"
+    },
+    "runner": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream/reference-oracles.mjs",
+      "sha256": "1629d7d84a617d5fbfd0c340b50837e95a753724b1419c36f169a1c7a9498057"
+    }
+  },
+  "scope": "Pinned Node host evidence versus the exact standalone installed scheduler/consumer source. This is not a bundled Jco graph, StarlingMonkey component, or Node stream compatibility test."
+}

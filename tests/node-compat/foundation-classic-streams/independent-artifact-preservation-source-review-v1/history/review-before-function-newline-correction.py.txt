@@ -1,0 +1,317 @@
+"""Independent finite source/data audit. Never invokes the publisher or owners."""
+import ast
+import collections
+import hashlib
+import json
+import os
+import stat
+from pathlib import Path, PurePosixPath
+
+REPO = Path('/Users/dan/dev/StarlingMonkey')
+CLASSIC = REPO / 'tests/node-compat/foundation-classic-streams'
+ADOPTION = CLASSIC / 'production-adoption-v1'
+CANDIDATE = ADOPTION / 'artifact-preservation-candidate-v1'
+HERE = Path(__file__).parent
+INDEX_SHA = 'fb9baef5e9886c17a4d335738497adeac96e2a003ced4f14dcd35b99a2456b73'
+PLAN_SHA = 'cf75517e937aa0f8c14977981435b387285b59c817c679f6565749db05e1dca8'
+checks = []
+witnesses = {}
+
+
+def need(value, message):
+    if not value:
+        raise AssertionError(message)
+
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def read(path, expected=None, size=None):
+    path = Path(path)
+    before = path.lstat()
+    need(stat.S_ISREG(before.st_mode), 'Regular byte witness: ' + str(path))
+    data = path.read_bytes()
+    after = path.lstat()
+    need((before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns, before.st_ctime_ns) ==
+         (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns, after.st_ctime_ns), 'Changed read')
+    digest = sha(data)
+    need(expected is None or digest == expected, 'Hash: ' + str(path))
+    need(size is None or len(data) == size, 'Size: ' + str(path))
+    witnesses[str(path)] = {'path': str(path), 'sha256': digest, 'bytes': len(data)}
+    return data
+
+
+def load(path, expected=None, size=None):
+    return json.loads(read(path, expected, size))
+
+
+def safe_name(name):
+    p = PurePosixPath(name)
+    need(type(name) is str and name and '\\' not in name and '\0' not in name and
+         not p.is_absolute() and str(p) == name and all(x not in ('', '.', '..') for x in p.parts),
+         'Finite relative name')
+
+
+def packet(root, expected):
+    index = load(root / 'index.json', expected)
+    names = set()
+    for row in index['files']:
+        safe_name(row['path'])
+        need(row['path'] not in names, 'Unique index member')
+        names.add(row['path'])
+        read(root / row['path'], row['sha256'], row['bytes'])
+    return index
+
+
+def passed(name, **details):
+    checks.append({'check': name, 'passed': True, **details})
+
+
+index = packet(CANDIDATE, INDEX_SHA)
+need(len(index['files']) == 23 and sum(r['bytes'] for r in index['files']) == 64351466,
+     'Exact candidate closure')
+plan = load(CANDIDATE / 'copy-plan.json', PLAN_SHA)
+passed('candidateExact23AndPlanBytes', indexedFiles=23, indexedBytes=64351466)
+
+base = ADOPTION / 'artifact-closure-plan-v1'
+amend = ADOPTION / 'artifact-closure-current-context-amendment-v1'
+packet(base, '96b4536ddb54484d665d93d64b6bc1af794dda977c189f50222238bad73a716e')
+packet(amend, '371132b364486a7b69a1cf9c0aa447959c93d332b54e3e6b07687895880353cb')
+packet(CLASSIC / 'independent-artifact-closure-current-context-review-v1',
+       '1c849e619725d1441ee0a716f5e5e71bfb956b25d3f5244b8ef7ea31f5f61c00')
+original = load(base / 'needed-files.json')
+need(len(original['files']) == 17885 and len(plan['originalMap']) == 17885, 'Original count')
+need([r['descriptor'] for r in plan['originalMap']] == original['files'], 'Original descriptors byte-equivalent data')
+omission = plan['omissions']
+need(len(omission) == 1, 'One omission')
+omission = omission[0]
+need(omission['expectedSha256'] == '24e4ac4e3edb505e7e1fd6acf342352f5088628f4b966856bf8cce16facfa5ab'
+     and omission['bytes'] == 37053 and omission['oldBytesAvailable'] is False
+     and omission['archivePath'] is None, 'Exact unavailable README')
+missing = [r for r in plan['originalMap'] if r['storage']['kind'] == 'unavailable-inspection-only']
+need(len(missing) == 1 and missing[0]['descriptor']['path'] == omission['originalPath']
+     and missing[0]['storage']['archivePath'] is None, 'Unavailable remains unmapped')
+passed('original17884StrictPlusOneUnavailable', protected=17884, unavailable=1)
+
+inputs = plan['originalInputs']
+need(len(inputs) == 18751, 'Physical inputs count')
+by_input = {(r['source'], r['sha256'], r['bytes']): r for r in inputs}
+need(len(by_input) == len(inputs), 'Unique physical descriptors')
+objects = {r['destination']: r for r in plan['objects']}
+need(len(objects) == len(plan['objects']) == 10781, 'Unique object destinations')
+need(sum(r['bytes'] for r in objects.values()) == 4210603396, 'Logical bytes')
+need(dict(collections.Counter(r['kind'] for r in objects.values())) ==
+     {'text': 10516, 'source-binary': 5, 'wasm': 260}, 'Object classes')
+references = [r for r in inputs if r['kind'] == 'reference']
+need(len(references) == 55 and all(r['destination'] is None for r in references), 'References not copied')
+for destination, row in objects.items():
+    safe_name(destination)
+    need((row['source'], row['sha256'], row['bytes']) in by_input or
+         (row['sha256'] == '21a82bbee91262a076c2e34533d51d73475d55e889f1c42cf884c86b2a0d5773'
+          and row['bytes'] == 1076), 'Every object has physical identity')
+    if row['kind'] == 'text':
+        need(destination == 'evidence/text/objects/' + row['sha256'] + '.data', 'Text address')
+    elif row['kind'] == 'wasm':
+        need(destination == 'external-wasm/objects/' + row['sha256'] + '.wasm', 'Wasm address')
+for mapped in plan['originalMap']:
+    if mapped['storage']['kind'] == 'unavailable-inspection-only':
+        continue
+    descriptor, storage = mapped['descriptor'], mapped['storage']
+    canonical = str(Path(descriptor['path']).resolve(strict=True))
+    key = (canonical, descriptor['sha256'], descriptor['bytes'])
+    need(key in by_input, 'Protected descriptor omitted')
+    identity = by_input[key]
+    need(descriptor['path'] in identity['declaredPaths'], 'Literal original path omitted')
+    need(set(descriptor.get('declaredPaths', [])).issubset(identity['declaredPaths']), 'Original lexical aliases omitted')
+    if storage['archivePath'] is not None:
+        target = objects[storage['archivePath']]
+        need((target['sha256'], target['bytes']) == (descriptor['sha256'], descriptor['bytes']),
+             'Unequal mapped replacement')
+    else:
+        need(storage['kind'] == identity['kind'] == 'reference', 'Uncopied non-reference')
+passed('exactPhysicalInputAndDeduplicatedObjectPlan', inputs=18751, objects=10781,
+       text=10516, centralSourceBinary=5, externalWasm=260, referenceOccurrences=55,
+       logicalObjectBytes=4210603396, initialRequiredBytesBeforeCapsules=9494948616)
+
+whitelist = load(base / 'source-binary-whitelist.json')['paths']
+source_binary = [r for r in objects.values() if r['kind'] == 'source-binary']
+need({r['destination']: r['sha256'] for r in source_binary} ==
+     {'evidence/source/' + p: h for p, h in whitelist.items()}, 'Only exact five binary source assets')
+license_rows = [r for r in plan['originalMap'] if
+                r['descriptor']['sha256'] == '21a82bbee91262a076c2e34533d51d73475d55e889f1c42cf884c86b2a0d5773'
+                and r['descriptor']['path'].endswith('/LICENSE.node')]
+need(len(license_rows) == 14 and all(r['storage']['kind'] == 'reference' for r in license_rows),
+     'Fourteen historical license classifications retained')
+notice = objects['evidence/text/objects/21a82bbee91262a076c2e34533d51d73475d55e889f1c42cf884c86b2a0d5773.data']
+notice_bytes = read(notice['source'], notice['sha256'], 1076)
+need(b'\0' not in notice_bytes, 'License is text')
+notice_bytes.decode('utf-8', 'strict')
+passed('binaryWhitelistAndSingleExactTextLicenseCopy', originalReferenceOccurrences=14)
+
+snapshots = load(amend / 'mutable-status-snapshot.json',
+                 '88fe4e4c63045f75034eb4b961a804173b84bca775d5bd9f9f7cd3fd4441f6f6')
+need(len(plan['separateStatusSnapshots']) == len(snapshots['files']) == 7, 'Seven snapshots')
+for declared, mapped in zip(snapshots['files'], plan['separateStatusSnapshots']):
+    need(all(mapped[k] == v for k, v in declared.items()), 'Snapshot identity changed')
+    need(mapped['historicalOldDescriptorReplacement'] is False, 'No snapshot replacement claim')
+    row = objects[mapped['archivePath']]
+    need((row['sha256'], row['bytes']) == (declared['sha256'], declared['bytes']), 'Snapshot copy')
+    read(amend / declared['snapshotPath'], declared['sha256'], declared['bytes'])
+passed('sevenStatusSnapshotsDistinctFromUnavailableReadme')
+
+contexts = plan['contextMap']['contexts']
+need(len(contexts) == 20 and len({r['contextId'] for r in contexts}) == 20, 'Exact contexts')
+need(sum(len(c['rows']) for c in contexts) == 50894 and len(plan['unmappedContextRows']) == 163,
+     'Selected/reference tuple counts')
+unmapped = collections.defaultdict(list)
+for row in plan['unmappedContextRows']:
+    need(row['mappedAsCopiedBytes'] is False, 'Reference semantics')
+    identity = by_input[(row['canonicalReferencePath'], row['sha256'], row['bytes'])]
+    need(identity['kind'] == 'reference', 'Only explicit input references')
+    unmapped[row['contextId']].append(row)
+zlib_frames = load(amend / 'current-context-migration-or-hold.json')['zlibFrames']
+covered_rows = 0
+for n, context in enumerate(contexts):
+    need(context['coverage'] == 'selected-rows' and context['format'] == 'input-freeze-v1', 'No all-rows claim')
+    manifest = context['manifest']
+    target = objects[manifest['archivePath']]
+    document = load(target['source'], manifest['sha256'], manifest['bytes'])
+    rows = document['inputs']
+    covered = set()
+    unique_tuples = set()
+    for mapped in context['rows']:
+        key = (mapped['originalPath'], mapped['expectedSha256'], mapped['bytes'])
+        need(key not in unique_tuples, 'Unique context tuple')
+        unique_tuples.add(key)
+        need(not (key[0] == omission['originalPath'] and key[1] == omission['expectedSha256']),
+             'Unavailable remains unmapped in contexts')
+        target = objects[mapped['archivePath']]
+        need((target['sha256'], target['bytes']) == key[1:], 'Context maps to exact copy')
+        for position in mapped['manifestRows']:
+            need(position not in covered and type(position) is int and 0 <= position < len(rows),
+                 'Context row position')
+            original_row = rows[position]
+            need((original_row['path'], original_row['sha256'], original_row['bytes']) == key,
+                 'Context original descriptor')
+            covered.add(position)
+    covered_rows += len(covered)
+    reference_positions = set()
+    for reference in unmapped[context['contextId']]:
+        position = reference['manifestRow']
+        need(position not in covered and position not in reference_positions, 'Reference/copy row disjoint')
+        r = rows[position]
+        need((r['path'], r['sha256'], r['bytes']) ==
+             (reference['originalPath'], reference['sha256'], reference['bytes']), 'Reference exact row')
+        reference_positions.add(position)
+    if n < 8:
+        need(context['contextId'] == 'classic-critical-' + str(n) and
+             covered | reference_positions == set(range(len(rows))), 'All classic rows accounted as copy OR reference')
+    else:
+        frame = zlib_frames[n - 8]
+        need(context['contextId'] == 'zlib-old-five-' + str(n - 8) and
+             covered == {r['row'] for r in frame['directOldRootRows']} and len(covered) == 5,
+             'Only exact selected five zlib rows')
+passed('all20ContextsAnd50894SelectedTuplesReconstructed', selectedTuples=50894,
+       coveredManifestRows=covered_rows, verifiedReferenceRowOccurrences=163,
+       selectedZlibRows=60, wholeZlibOrConsumersArchiveClaim=False)
+
+for link in plan['links']:
+    p = Path(link['path'])
+    need(p.is_symlink() and os.readlink(p) == link['linkText'] and
+         str(p.resolve(strict=True)) == link['resolvedTarget'], 'Link provenance')
+need(plan['links'] == original['links'] and len(plan['links']) == 47, 'Original links unchanged')
+passed('all47OriginalLinkDescriptorsCurrentAndUnchanged')
+
+memory_peer = CLASSIC / 'independent-process-rss-supplement-v2-results-review-v1'
+memory_index = packet(memory_peer, '14611521cb3f44d5ec0cea7ef61eb8821d8fe7f8d8a53aab197209467bca2fe5')
+need(len(memory_index['files']) == 16, 'Full memory proof')
+memory_root = load(ADOPTION / 'process-rss-supplement-v2-root-results.json',
+                   '203b7e6b7b1bee8675bc52280c7b30fb8b8da82461e4e5b9167535862fd08be5')
+closure = load(memory_root['outputClosure']['path'],
+               'db26f6492bf230dde6621d32c537faad5728f6f6da5253259ee098f2d7856d99')
+need(len(closure['files']) == 599 and closure['links'] == [], 'Actual memory outputs')
+for row in closure['files']:
+    need((str(Path(row['path']).resolve(strict=True)), row['sha256'], row['bytes']) in by_input,
+         'Actual memory output missing from physical closure')
+for row in memory_index['files'] + [{'path': 'index.json', 'sha256': plan['lateMemoryIndependentProof']['index']['sha256'],
+                                   'bytes': plan['lateMemoryIndependentProof']['index']['bytes']}]:
+    need((str(memory_peer / row['path']), row['sha256'], row['bytes']) in by_input,
+         'Memory independent proof member missing')
+need(plan['lateMemoryIndependentProof']['result'] ==
+     {'path': str(memory_peer / 'results.json'),
+      'sha256': '7c47de9da9a24da84731dbd97478ddd5567dcaece77a723acf6409aa30726e1d', 'bytes': 2070},
+     'Only actual memory result')
+passed('actualMemoryRoot599OutputDescriptorsAndFull16MemberProofIncluded', outputFiles=599,
+       repeatedMemoryOrNativeExecution=False)
+
+policy = load(plan['migrationDecision']['path'],
+              '20a32c37de8fc1fe3bcbdecaa751377918d921f79ba6bcef91eb8943895eecc6',
+              plan['migrationDecision']['bytes'])
+need(all(policy[k] == v for k, v in plan['expectedMigrationPolicyFields'].items()), 'Exact formal policy')
+need(len(policy['acceptedTypedHoldDecisions']) == 12 and
+     policy['sourcePromotionAllowed'] is False and policy['archiveAcceptanceAllowed'] is False,
+     'Separate permission policy')
+strategy = ADOPTION / 'classic-implementation-strategy-root-decision-v2.json'
+read(strategy, 'bac8c7c01f27460d8756389b1e024216381d20637bfa445310bf56d25e1ce4f4')
+need(any(r['source'] == str(strategy) for r in inputs), 'Strategy must be copied')
+future = load(CANDIDATE / 'future-root-config.json')
+need(future['candidateIndexSha256'] is None and future['copyPlanSha256'] is None and
+     future['copyAllowed'] is False and future['sourceIndependentReview'] is None and
+     future['lateMemoryIndependentProof'] is None and future['migrationDecision'] is None,
+     'Checked-in config remains closed')
+need(not Path(plan['privateDestination']).exists(), 'Real private archive still absent at review')
+passed('formalRootPolicyStrategyAndNullExecutionBoundary')
+
+ancestry = load(CANDIDATE / 'parent-archive-binding.json')
+for name in ('acceptedParentReceipt', 'acceptedParentIndex', 'producerSource', 'archivedProducerSource'):
+    r = ancestry[name]
+    read(REPO / r['path'], r['sha256'], r['bytes'])
+derivation = load(CANDIDATE / 'source-derivations.json')
+old_source = read(derivation['parentProducer']['path'], derivation['parentProducer']['sha256']).decode()
+op = derivation['copyOperation']
+need(old_source.count(op['preimage']) == 1 and sha(op['preimage'].encode()) == op['beforeSha256'] and
+     sha(op['afterimage'].encode()) == op['afterSha256'], 'Copy operation images')
+need(op['afterimage'] in (CANDIDATE / 'copy_primitives.py').read_text(), 'Actual active copy afterimage')
+forward = op['preimage']
+for edit in reversed(op['edits']):
+    offset = edit['beforeOffset']
+    need(forward[offset:offset + len(edit['old'])] == edit['old'], 'Forward offset')
+    forward = forward[:offset] + edit['new'] + forward[offset + len(edit['old']):]
+need(forward == op['afterimage'], 'Forward exact')
+reverse = op['afterimage']
+for edit in reversed(op['edits']):
+    offset = edit['afterOffset']
+    need(reverse[offset:offset + len(edit['new'])] == edit['new'], 'Reverse offset')
+    reverse = reverse[:offset] + edit['old'] + reverse[offset + len(edit['new']):]
+need(reverse == op['preimage'], 'Reverse exact')
+reader_source = derivation['dataReaderByteIdentical']
+need(read(reader_source['source'], reader_source['sha256']) ==
+     read(CANDIDATE / 'archive-context-reader.py'), 'Reviewed reader byte identity')
+reference = load(CANDIDATE / 'copy_ancestry.json')
+parts = []
+for fn in reference['unchangedFunctions']:
+    lines = old_source.splitlines(keepends=True)[fn['startLine'] - 1:fn['endLine']]
+    text = ''.join(lines)
+    need(sha(text.encode()) == fn['sha256'], 'Parent function exact')
+    parts.append(text)
+need('\n'.join(parts).encode() == read(CANDIDATE / 'v12-copy-primitives.py.txt'), 'Five retained ancestry functions')
+passed('acceptedV12AndOperationForwardReverseAndReaderAncestry', parentReceipt='9494e66c433346ee4c94e541b4dbd4844e6767e03a500dc9361c531a9747d769',
+       parentArchive='d841065dd1ce8337520d461f7e041aa33438c3df693a1c5ef6137af430e8cd6d')
+
+for path in sorted(CANDIDATE.glob('*.py')):
+    ast.parse(read(path).decode(), filename=str(path))
+need(len(list(CANDIDATE.glob('*.py'))) == 6, 'Six Python ASTs')
+passed('sixPythonSourceSyntaxOnly')
+
+output = {'schemaVersion': 1, 'state': 'INDEPENDENT_PRESERVATION_PLAN_DATA_CHECKS_PASSED',
+          'candidateIndexSha256': INDEX_SHA, 'copyPlanSha256': PLAN_SHA, 'checks': checks,
+          'protectedOriginalBytesRehashedHere': False,
+          'historicalNativeThroughputProofsBoundBySealedHashes': True,
+          'scope': 'Index/source/descriptor membership, all context row semantics and selected immutable proof bytes; future publisher independently rehashes all physical original inputs before and after copying.',
+          'publisherMainInvoked': False, 'realArchiveCreated': False}
+with (HERE / 'data-checks.json').open('x') as target:
+    json.dump(output, target, indent=2); target.write('\n')
+with (HERE / 'byte-witnesses.json').open('x') as target:
+    json.dump({'schemaVersion': 1, 'files': list(witnesses.values()), 'count': len(witnesses)}, target, indent=2); target.write('\n')
+print(json.dumps({'passed': len(checks), 'byteWitnesses': len(witnesses), 'ownerActions': False}))

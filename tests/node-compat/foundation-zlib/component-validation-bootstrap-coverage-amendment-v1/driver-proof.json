@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "beforePath": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-control-evidence-amendment-v1/proposed/run-validation.mjs",
+  "beforeSha256": "96012c5643fb880e04165c2dcee06264849926e398db54f79b3d789419999d78",
+  "afterSha256": "d1ae3531623a2b6306ff20cdcd0539ff26ffc9541a30320abcb225bb91074a51",
+  "edits": [
+    {
+      "old": "import {contract} from './profile-contract.mjs';",
+      "new": "import {contract} from './profile-contract.mjs';\nimport {assertRunCounter,assertErrorContract} from './coverage-checks.mjs';",
+      "count": 1
+    },
+    {
+      "old": "function namespace(value){assert.deepEqual",
+      "new": "function namespace(value,expectedCalls){assertRunCounter(value,expectedCalls);assert.deepEqual",
+      "count": 1
+    },
+    {
+      "old": "['sameAliases','defaultNamed'",
+      "new": "['aliasNamespaceCached','canonicalNamespaceCached','canonicalStaticNamespace','sameAliases','defaultNamed'",
+      "count": 1
+    },
+    {
+      "old": "namespace(moduleObservation.value);",
+      "new": "namespace(moduleObservation.value,0);",
+      "count": 1
+    },
+    {
+      "old": "function checkCase(index,value){const row=cases[index];",
+      "new": "function checkCase(index,value,expectedCalls){assertRunCounter(value,expectedCalls);const row=cases[index];",
+      "count": 1
+    },
+    {
+      "old": "for(const key of['code','module','profile']){assert.equal(value.error.fields[key].own,true);assert.equal(value.error.fields[key].type,'string');}assert.equal(value.error.fields.code.value,row.profileCode);assert.equal(value.error.fields.module.value,'node:zlib');assert.equal(value.error.fields.profile.value,contract.profileVersion);",
+      "new": "const errorContract=assertErrorContract(value.error,row,contract.profileVersion);",
+      "count": 1
+    },
+    {
+      "old": "return{outcome:'error',code:row.profileCode,node:",
+      "new": "return{outcome:'error',code:row.profileCode,errorContract,node:",
+      "count": 1
+    },
+    {
+      "old": "if(value.outputLength>1048576)assert.equal(value.roundtrip.error.fields.code.value,'ERR_OUT_OF_RANGE');",
+      "new": "if(value.outputLength>1048576)assertErrorContract(value.roundtrip.error,{operation:decoder,profileCode:'ERR_OUT_OF_RANGE'},contract.profileVersion);",
+      "count": 1
+    },
+    {
+      "old": "async function one(index,invoke,label){const observation=await observed(label+'-'+index,invoke),semantic=checkCase(index,observation.value);const record={index,id:cases[index].id,label,rawFile:",
+      "new": "async function one(index,invoke,label,expectedCalls){const observation=await observed(label+'-'+index,invoke),semantic=checkCase(index,observation.value,expectedCalls);const record={index,id:cases[index].id,label,guestCalls:observation.value.calls,expectedCalls,rawFile:",
+      "count": 1
+    },
+    {
+      "old": " for(let round=0;round<3;round++)for(let index=0;index<cases.length;index++)if(round===0||cases[index].phase==='ordinary')await one(index,()=>instance.run(index),'retained-'+round);\n const fresh=await import(pathToFileURL(modulePath).href+'?fresh=1');namespace((await observed('fresh-module',()=>fresh.moduleContract())).value);for(let index=0;index<cases.length;index++)await one(index,()=>fresh.run(index),'fresh-Jco');\n for(let index=0;index<cases.length;index++){await progress('wasmtime-before',{index,deadlineMs:600000});const result=await runOwnedCommand({output,name:'wasmtime-'+index,executable:host,args:['run','--invoke','run('+index+')',componentPath],write,register:path=>paths.add(path),timeoutMs:600000,maxOutputBytes:64*1024*1024,graceMs:5000,heartbeatMs:30000,onProgress:detail=>console.log(JSON.stringify({event:'wasmtime-heartbeat',index,...detail}))});await progress('wasmtime-terminal',{index,status:result.status,signal:result.signal,spawnError:result.spawnError,timedOut:result.timedOut,terminalPath:result.terminalPath});assert(result.terminalExitZeroObserved&&result.ownedGroupGone);await one(index,()=>decodeCliString(result.stdout.trim()),'fresh-Wasmtime');}\n",
+      "new": " let retainedCalls=0;\n for(let round=0;round<3;round++){\n  for(let index=0;index<cases.length;index++)if(round===0||cases[index].phase==='ordinary')await one(index,()=>instance.run(index),'retained-'+round,++retainedCalls);\n  const checkpoint=await observed('retained-module-'+round,()=>instance.moduleContract());namespace(checkpoint.value,retainedCalls);await save('retained-module-'+round+'.json',checkpoint);\n }\n assert.equal(retainedCalls,161);\n const fresh=await import(pathToFileURL(modulePath).href+'?fresh=1');namespace((await observed('fresh-module',()=>fresh.moduleContract())).value,0);let freshCalls=0;for(let index=0;index<cases.length;index++)await one(index,()=>fresh.run(index),'fresh-Jco',++freshCalls);\n assert.equal(freshCalls,61);const freshCheckpoint=await observed('fresh-module-after',()=>fresh.moduleContract());namespace(freshCheckpoint.value,freshCalls);await save('fresh-module-after.json',freshCheckpoint);\n for(let index=0;index<cases.length;index++){await progress('wasmtime-before',{index,deadlineMs:600000});const result=await runOwnedCommand({output,name:'wasmtime-'+index,executable:host,args:['run','--invoke','run('+index+')',componentPath],write,register:path=>paths.add(path),timeoutMs:600000,maxOutputBytes:64*1024*1024,graceMs:5000,heartbeatMs:30000,onProgress:detail=>console.log(JSON.stringify({event:'wasmtime-heartbeat',index,...detail}))});await progress('wasmtime-terminal',{index,status:result.status,signal:result.signal,spawnError:result.spawnError,timedOut:result.timedOut,terminalPath:result.terminalPath});assert(result.terminalExitZeroObserved&&result.ownedGroupGone);await one(index,()=>decodeCliString(result.stdout.trim()),'fresh-Wasmtime',1);}\n",
+      "count": 1
+    },
+    {
+      "old": "for(const id of['gzip-decode-binary','zlib-decode-binary','raw-decode-binary'])",
+      "new": "let gcCalls=0;for(const id of['gzip-decode-binary','zlib-decode-binary','raw-decode-binary'])",
+      "count": 1
+    },
+    {
+      "old": "await one(index,()=>instance.run(index),'ordinary-GC');}const result=",
+      "new": "await one(index,()=>instance.run(index),'ordinary-GC',++gcCalls);}assert.equal(gcCalls,3);const gcCheckpoint=await observed('ordinary-GC-module-after',()=>instance.moduleContract());namespace(gcCheckpoint.value,gcCalls);await save('ordinary-gc-module-after.json',gcCheckpoint);const result=",
+      "count": 1
+    },
+    {
+      "old": "const ownership=await observed('ownership'",
+      "new": "assert.equal(records.length,variant==='normal-off'?283:3,'Complete finite codec call corpus');\nconst ownership=await observed('ownership'",
+      "count": 1
+    },
+    {
+      "old": "noTiming:true},requiresIndependentTerminalExitZero",
+      "new": "noTiming:true,runLifecycleCountersChecked:true,repeatedNamespaceCachingChecked:true,nativeErrnoAndFacadeOperationChecked:true},requiresIndependentTerminalExitZero",
+      "count": 1
+    }
+  ],
+  "reverseExact": true
+}

@@ -1,0 +1,121 @@
+--- a/guard.mjs
++++ b/guard.mjs
+@@ -2,11 +2,11 @@
+ import {lstat,realpath} from 'node:fs/promises';
+ import {dirname,join} from 'node:path';
+ import {pathToFileURL,fileURLToPath} from 'node:url';
+-import {descriptor,regular,need,sha} from './authority.mjs';
+-import {local,indexed,deepFreeze} from './proofs.mjs';
+-import {loadPackaging,streamHash,packagingEnvironment} from './packaging.mjs';
++import {descriptor,regular,need,sha} from '../ownership-component-candidate-v1/authority.mjs';
++import {local,indexed,deepFreeze} from '../ownership-component-candidate-v1/proofs.mjs';
++import {loadPackaging,streamHash,packagingEnvironment} from '../ownership-component-candidate-v1/packaging.mjs';
+ const HERE=dirname(fileURLToPath(import.meta.url));
+-export const OUTPUT='/private/tmp/starling-node-compat/crypto-owner355-component-v1';
++export const OUTPUT='/private/tmp/starling-node-compat/crypto-owner355-component-v2';
+ export const ENGINE_SHA='36bd850895a11af8ffaefdb8296630222c4ad4652a0e58f45ce0ec23c1bebc05';
+ export async function sourceIndex(input){
+  const ix=descriptor(input),value=JSON.parse(await regular(ix));need(value.schemaVersion===1&&Array.isArray(value.files)&&value.files.length>0&&value.files.length<=1024,'Bounded immutable source index');const seen=new Set(),rows=[];
+@@ -14,7 +14,7 @@
+  return Object.freeze({rows:Object.freeze(rows),recheck:async()=>{await regular(ix);for(const row of rows)await regular(row,{maxBytes:64*1024*1024});}});
+ }
+ export function authorityModel(v,expectedSha){
+- sha(expectedSha);need(v&&v.schemaVersion===1&&v.state==='ROOT_REVIEWED_CRYPTO_OWNER355_COMPONENT_BUILD_V1'&&v.action==='component-build','New component-build Root authority only');
++ sha(expectedSha);need(v&&v.schemaVersion===1&&v.state==='ROOT_REVIEWED_CRYPTO_OWNER355_COMPONENT_BUILD_V2'&&v.action==='component-build','New component-build Root authority only');
+  need(v.componentSourceIndexSha256===expectedSha&&v.componentBuildAllowed===true&&v.componentInitializationAllowed===true,'Exact reviewed source/action');
+  need(v.variant==='normal-off'&&v.engineSha256===ENGINE_SHA&&v.sourceFiles===355&&v.sourceContractVersion==='sm-webcrypto-key-owner-and-prototype-guard-source-v1','Only actual new guarded normal355 engine');
+  need(v.outputRoot===OUTPUT&&v.workerTimeoutMs===600000&&v.maxComponentBytes===67108864,'Finite fresh output/worker/artifact limits');
+@@ -25,8 +25,9 @@
+  // Capture private primitives synchronously; NULL rejects before artifact/tool/bootstrap reads.
+  const configRow=descriptor(options.configDescriptor),config=deepFreeze(JSON.parse(await regular(configRow))),sourceSha=sha(config.componentSourceIndexSha256),rootRow=descriptor(config.rootAction),root=deepFreeze(JSON.parse(await regular(rootRow)));authorityModel(root,sourceSha);
+  const ownStat=await lstat(join(HERE,'index.json')),ownIx=descriptor({path:join(HERE,'index.json'),sha256:sourceSha,bytes:ownStat.size}),own=await sourceIndex(ownIx);
+- const prereqBytes=await regular(own.rows.find(r=>r.path===join(HERE,'prerequisites.json'))),p=deepFreeze(JSON.parse(prereqBytes));
+- const sourcePeer=await indexed(root.sourceIndependentReview,{state:'INDEPENDENT_CRYPTO_OWNER355_COMPONENT_SOURCE_REVIEW_PASSED_V1'});need(sourcePeer.data.componentSourceIndexSha256===sourceSha&&sourcePeer.data.sourceOnly===true&&sourcePeer.data.sourceReviewPassed===true&&sourcePeer.data.ownerActionsInvoked===false,'Exact source-only independent peer, not action approval');
++ const donor=await sourceIndex({path:join(HERE,'../ownership-component-candidate-v1/index.json'),sha256:'eb648e19274c055968557227221627e2ced5dd35a2c0fb17af941dbc9a8b5c30',bytes:4446});
++ const prereqBytes=await regular(donor.rows.find(r=>r.path===join(HERE,'../ownership-component-candidate-v1/prerequisites.json'))),p=deepFreeze(JSON.parse(prereqBytes));
++ const sourcePeer=await indexed(root.sourceIndependentReview,{state:'INDEPENDENT_CRYPTO_OWNER355_COMPONENT_SOURCE_REVIEW_PASSED_V2'});need(sourcePeer.data.componentSourceIndexSha256===sourceSha&&sourcePeer.data.sourceOnly===true&&sourcePeer.data.sourceReviewPassed===true&&sourcePeer.data.ownerActionsInvoked===false,'Exact source-only independent peer, not action approval');
+  const guest=await sourceIndex(p.guestIndex),nativeSource=await sourceIndex(p.nativeSourceIndex),guestPeer=await indexed(p.guestReview,{state:'INDEPENDENT_CRYPTO_OWNER355_OWNERSHIP_VALIDATION_SOURCE_REVIEW_PASSED_V1'}),nativePeer=await indexed(p.nativeReview,{state:'INDEPENDENT_CRYPTO_OWNER355_V2_NORMAL_OFF_NATIVE_ARTIFACT_REVIEW_PASSED_V1'});
+  need(guestPeer.data.sourceIndexSha256===p.guestIndex.sha256&&guestPeer.data.sourceOnly===true&&guestPeer.data.ownerActionsInvoked===false,'Exact unexecuted ownership guest source provenance');need(nativePeer.data.sourceFiles===355&&nativePeer.data.variant==='normal-off'&&nativePeer.data.ownerActionsInvoked===false,'Genuine reviewed normal355 native source');
+  for(const n of ['reviewedNativePins','nativeRootReview'])need(JSON.stringify(descriptor(root[n]))===JSON.stringify(descriptor(p[n])),'Actual reviewed native descriptor unchanged '+n);
+@@ -34,13 +35,13 @@
+  need(pins.state==='ROOT_REVIEWED_CRYPTO_OWNER355_VALIDATION_BOOTSTRAP_V2'&&pins.variants?.['normal-off']?.engineSha256===ENGINE_SHA&&['normal-runtime','gc-off','disabled-off'].every(n=>pins.variants[n]===null),'Normal-only reviewed native data; other variants NULL');
+  need(review.reviewedPinsSha256===p.reviewedNativePins.sha256&&review.independentNativeReview.index.sha256===p.nativeReview.index.sha256,'Root native review binds genuine independent proof');
+  const publicationPeer=await indexed(p.publicationReview,{state:'INDEPENDENT_FRESH_ZLIB_COST_SOURCE_PUBLICATION_VERIFIED'});need(publicationPeer.data.publicationIndexSha256==='4621f7e72b4fb0555a5df630b1aedd4d2a04743b0db9188fc50099779f07387b'&&publicationPeer.data.verifiedPassed===true&&publicationPeer.data.externalPublisherExitCode===0,'Actual SOURCE publication review, not its native/action authority');
+- const mapRow=own.rows.find(r=>r.path===join(HERE,'packaging-context.json')),packaging=await loadPackaging(mapRow);packagingEnvironment(packaging);
++ const mapRow=donor.rows.find(r=>r.path===join(HERE,'../ownership-component-candidate-v1/packaging-context.json')),packaging=await loadPackaging(mapRow);packagingEnvironment(packaging);
+  need(process.version==='v22.14.0'&&process.execArgv.length===0&&await realpath(process.execPath)===p.node.path,'Exact pinned plain Node22 process');await streamHash(p.node);
+  await regular(p.bootstrapEntry);const {cryptoOwnerBootstrapPreflight}=await import(pathToFileURL(p.bootstrapEntry.path));
+  const frame=await cryptoOwnerBootstrapPreflight({variant:'normal-off',reviewedPinsPath:p.reviewedNativePins.path,reviewedPinsSha256:p.reviewedNativePins.sha256,rootReviewPath:p.nativeRootReview.path,rootReviewSha256:p.nativeRootReview.sha256});
+  need(frame.validationBootstrapOnly===true&&frame.operationalAdmission===false&&frame.variant==='normal-off'&&frame.pin.engineSha256===ENGINE_SHA&&frame.pin.engineBytes===10002820&&Array.isArray(frame.metadata.sourceManifest)&&frame.metadata.sourceManifest.length===355&&frame.metadata.gcStress===false&&frame.metadata.cryptoKeyOwnershipPolicy?.version==='sm-webcrypto-key-owner-and-prototype-guard-source-v1','Genuine new normal-owner bootstrap; no metadata projection');
+  const engine=descriptor({path:frame.enginePath,sha256:frame.pin.engineSha256,bytes:frame.pin.engineBytes}),metaStat=await lstat(frame.enginePath+'.build.json'),metadata=descriptor({path:frame.enginePath+'.build.json',sha256:frame.pin.receiptSha256,bytes:metaStat.size});await streamHash(engine);await regular(metadata);
+  const code=descriptor(p.guest),wit=descriptor(p.wit);need(new TextDecoder().decode(await regular(code)).match(/^import\s/m)===null,'Single sealed no-import guest; no bundler/provider/facade');await regular(wit);
+- const recheck=async()=>{await regular(configRow);await regular(rootRow);await own.recheck();await sourcePeer.recheck();await guest.recheck();await guestPeer.recheck();await nativeSource.recheck();await nativePeer.recheck();await publicationPeer.recheck();await regular(p.reviewedNativePins);await regular(p.nativeRootReview);await frame.recheck();await packaging.recheck();await streamHash(p.node);await regular(code);await regular(wit);await streamHash(engine);await regular(metadata);};await recheck();
+- return Object.freeze({...packaging,node:descriptor(p.node),engine,metadata,code,wit,componentSourceIndexSha256:sourceSha,rootAction:rootRow,outputRoot:root.outputRoot,maxComponentBytes:root.maxComponentBytes,workerTimeoutMs:root.workerTimeoutMs,sourceRoot:frame.sourceRoot,configuredSourceRoot:frame.configuredSourceRoot,ownIndex:ownIx,criticalSourceFiles:Object.freeze(own.rows),mapRow,nativeReview:p.nativeReview,nativePins:descriptor(p.reviewedNativePins),nativeRootReview:descriptor(p.nativeRootReview),recheck});
++ const recheck=async()=>{await regular(configRow);await regular(rootRow);await own.recheck();await donor.recheck();await sourcePeer.recheck();await guest.recheck();await guestPeer.recheck();await nativeSource.recheck();await nativePeer.recheck();await publicationPeer.recheck();await regular(p.reviewedNativePins);await regular(p.nativeRootReview);await frame.recheck();await packaging.recheck();await streamHash(p.node);await regular(code);await regular(wit);await streamHash(engine);await regular(metadata);};await recheck();
++ return Object.freeze({...packaging,node:descriptor(p.node),engine,metadata,code,wit,componentSourceIndexSha256:sourceSha,rootAction:rootRow,outputRoot:root.outputRoot,maxComponentBytes:root.maxComponentBytes,workerTimeoutMs:root.workerTimeoutMs,sourceRoot:frame.sourceRoot,configuredSourceRoot:frame.configuredSourceRoot,ownIndex:ownIx,criticalSourceFiles:Object.freeze([...own.rows,...donor.rows]),mapRow,nativeReview:p.nativeReview,nativePins:descriptor(p.reviewedNativePins),nativeRootReview:descriptor(p.nativeRootReview),recheck});
+ }
+--- a/build-worker.mjs
++++ b/build-worker.mjs
+@@ -2,12 +2,13 @@
+ import {readFile,realpath} from 'node:fs/promises';
+ import {join,dirname,resolve} from 'node:path';
+ import {pathToFileURL,fileURLToPath} from 'node:url';
+-import {descriptor,regular,need,hash} from './authority.mjs';
+-import {DurableOutput} from './durable.mjs';
+-import {deepFreeze} from './proofs.mjs';
++import {descriptor,regular,need,hash} from '../ownership-component-candidate-v1/authority.mjs';
++import {DurableOutput} from '../ownership-component-candidate-v1/durable.mjs';
++import {deepFreeze} from '../ownership-component-candidate-v1/proofs.mjs';
+ import {sourceIndex,authorityModel,ENGINE_SHA} from './guard.mjs';
+-import {loadPackaging,streamHash,packagingEnvironment} from './packaging.mjs';
+-import {componentOptions,parsePublicWit,checkTranspileMetadata,publicJSExports,parsePublicDts} from './abi.mjs';
++import {loadPackaging,streamHash,packagingEnvironment} from '../ownership-component-candidate-v1/packaging.mjs';
++import {componentOptions,parsePublicWit,checkTranspileMetadata,publicJSExports,parsePublicDts} from '../ownership-component-candidate-v1/abi.mjs';
++export function workerOptions(d,packaging,wit){return componentOptions({engine:d.engine,adapter:packaging.adapter},wit);}
+ export async function buildWorker(input){
+  const inputRow=descriptor(input),d=deepFreeze(JSON.parse(await regular(inputRow,{maxBytes:65536})));need(d.schemaVersion===1&&d.state==='PARENT_AUDITED_CRYPTO_OWNER355_COMPONENT_WORKER_V1','Private parent-audited descriptor; no independent permission');
+  const root=deepFreeze(JSON.parse(await regular(d.rootAction)));authorityModel(root,d.componentSourceIndexSha256);need(d.outputRoot===root.outputRoot+'/worker'&&d.engine.sha256===ENGINE_SHA&&d.engine.bytes===10002820,'Exact bounded worker/native output');
+@@ -21,7 +22,7 @@
+   const {loadToolchain}=await import(pathToFileURL(join(packaging.packagingRoot,'tests/node-compat/toolchain.mjs'))),toolchain=await loadToolchain();need(await realpath(toolchain.directory)===packaging.toolchainRoot,'Exact authenticated physical tooltree');
+   const {loadComponentizer}=await import(pathToFileURL(join(packaging.packagingRoot,'tests/node-compat/componentizer.mjs'))),selected=await loadComponentizer(toolchain);
+   need(selected.provenance.selection==='patched-import-i32-clock-v2'&&selected.provenance.legacyEngineDiagnosticEnabled===false&&selected.provenance.debugScalarOOMDiagnostic===null,'Actual corrected selected packager; no diagnostic/old engine');
+-  const options=componentOptions(d,wit);await output.write('component-options.json',options,{json:true});
++  const options=workerOptions(d,packaging,wit);await output.write('component-options.json',options,{json:true});
+   const result=await selected.componentize(source,options);
+   // Trusted selected API result: retain typed transport/full bytes before ABI assertions.
+   await output.write('selected-return-transport.json',{type:typeof result,componentIsUint8Array:result?.component instanceof Uint8Array,componentBytes:result?.component instanceof Uint8Array?result.component.length:null},{json:true});
+@@ -35,7 +36,7 @@
+   const glue=new TextDecoder('utf-8',{fatal:true}).decode(generated.files['crypto_owner.js']),dts=new TextDecoder('utf-8',{fatal:true}).decode(generated.files['crypto_owner.d.ts']);const publicExports=publicJSExports(toolchain.parseAst(glue,{},'crypto_owner.js')),declarations=parsePublicDts(dts);
+   await output.write('generated-public-source-audit.json',{publicExports,declarations,glueSha256:hash(generated.files['crypto_owner.js']),dtsSha256:hash(generated.files['crypto_owner.d.ts']),generatedModuleImported:false,loadingProtocolReviewRequired:true,asyncGuestScalarExecutionProved:false},{json:true});await output.write('transpiled/package.json',Buffer.from('{"type":"module"}\n'));
+   await recheck();await output.recheck();
+-  const row=await output.write('results.json',{schemaVersion:1,state:'CRYPTO_OWNER355_COMPONENT_BUILT_UNREVIEWED_V1',sourceIndexSha256:d.componentSourceIndexSha256,nativeEngine:d.engine,metadata:d.metadata,guest:d.code,wit:d.wit,component:componentRow,emittedExports,emittedImports:[],transpiledPublicExports:generated.exports,publicSourceAudit:publicExports,componentizer:selected.provenance,guestInitializationExecutedByComponentization:true,generatedModuleImported:false,ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false,asyncScalarRuntimeProof:false,operationalAdmission:false,runtimeAcceptanceClaim:false},{json:true});
++  const row=await output.write('results.json',{schemaVersion:1,state:'CRYPTO_OWNER355_COMPONENT_BUILT_UNREVIEWED_V2',sourceIndexSha256:d.componentSourceIndexSha256,nativeEngine:d.engine,metadata:d.metadata,guest:d.code,wit:d.wit,component:componentRow,emittedExports,emittedImports:[],transpiledPublicExports:generated.exports,publicSourceAudit:publicExports,componentizer:selected.provenance,guestInitializationExecutedByComponentization:true,generatedModuleImported:false,ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false,asyncScalarRuntimeProof:false,operationalAdmission:false,runtimeAcceptanceClaim:false},{json:true});
+   const index=await output.write('index.json',{schemaVersion:1,state:'UNREVIEWED_CRYPTO_OWNER355_COMPONENT_FILES',files:[...output.rows.values()]},{json:true});const completion=await output.write('completion.json',{schemaVersion:1,state:'CRYPTO_COMPONENT_WORKER_COMPLETE_EXTERNAL_EXIT_ZERO_REQUIRED_V1',index,result:row,component:componentRow,ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false},{json:true});await output.recheck();return{root:output.root,index,completion};
+  }catch(error){try{await output.write('failure.json',{schemaVersion:1,state:'FAILED_CRYPTO_COMPONENT_CONSTRUCTION_NO_ACCEPTANCE',thrownType:typeof error,partialOwnedOutputsRetained:true,ordinaryGuestExportsInvoked:false},{json:true});}catch{}throw error;}finally{await output.close();}
+ }
+--- a/build.mjs
++++ b/build.mjs
+@@ -3,10 +3,10 @@
+ import {dirname,join,relative,resolve,isAbsolute} from 'node:path';
+ import {fileURLToPath} from 'node:url';
+ import {componentPreflight} from './guard.mjs';
+-import {descriptor,regular,need,hash} from './authority.mjs';
+-import {DurableOutput} from './durable.mjs';
+-import {runOwnedCommand} from './durable-host.mjs';
+-import {checkOwnedTerminal} from './abi.mjs';
++import {descriptor,regular,need,hash} from '../ownership-component-candidate-v1/authority.mjs';
++import {DurableOutput} from '../ownership-component-candidate-v1/durable.mjs';
++import {runOwnedCommand} from '../ownership-component-candidate-v1/durable-host.mjs';
++import {checkOwnedTerminal} from '../ownership-component-candidate-v1/abi.mjs';
+ const HERE=dirname(fileURLToPath(import.meta.url));
+ export function child(root,path){const name=relative(root,path);need(name&&!isAbsolute(name)&&!name.startsWith('../')&&!name.includes('\\')&&name.split('/').every(v=>v&&v!=='.'&&v!=='..'),'Exact owned descendant');return name;}
+ async function rowAt(path){const raw=await readFile(path);return descriptor({path,sha256:hash(raw),bytes:raw.length});}
+@@ -22,7 +22,7 @@
+   const ix=descriptor({path:join(root,'index.json'),sha256:completion.index.sha256,bytes:completion.index.bytes}),index=JSON.parse(await regular(ix));need(index.schemaVersion===1&&Array.isArray(index.files)&&index.files.length<=128,'Finite worker inventory');const seen=new Set();
+   for(const item of index.files){const path=join(root,item.path),name=child(root,path);need(item.path===name&&!seen.has(name),'Exact unique worker index paths');seen.add(name);await regular({path,sha256:item.sha256,bytes:item.bytes},{maxBytes:64*1024*1024});output.rows.set('worker/'+name,{path:'worker/'+name,sha256:item.sha256,bytes:item.bytes});}
+   for(const path of [ix.path,completionRow.path]){const r=await rowAt(path);output.rows.set(child(output.root,path),{path:child(output.root,path),sha256:r.sha256,bytes:r.bytes});}
+-  await frame.recheck();await output.recheck();const result=await output.write('results.json',{schemaVersion:1,state:'CRYPTO_OWNER355_COMPONENT_BUILD_COMPLETE_UNREVIEWED_V1',sourceIndexSha256:frame.componentSourceIndexSha256,rootAction:frame.rootAction,nativeEngine:frame.engine,metadata:frame.metadata,sourceRoot:frame.sourceRoot,configuredSourceRoot:frame.configuredSourceRoot,nativePins:frame.nativePins,nativeRootReview:frame.nativeRootReview,workerCompletion:completionRow,ownedWorkerTerminal:await rowAt(status.terminalPath),rawWorkerExitCode:0,ownedGroupGone:true,guestInitializationExecutedByComponentization:true,ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false,operationalAdmission:false,runtimeAcceptanceClaim:false},{json:true});
++  await frame.recheck();await output.recheck();const result=await output.write('results.json',{schemaVersion:1,state:'CRYPTO_OWNER355_COMPONENT_BUILD_COMPLETE_UNREVIEWED_V2',sourceIndexSha256:frame.componentSourceIndexSha256,rootAction:frame.rootAction,nativeEngine:frame.engine,metadata:frame.metadata,sourceRoot:frame.sourceRoot,configuredSourceRoot:frame.configuredSourceRoot,nativePins:frame.nativePins,nativeRootReview:frame.nativeRootReview,workerCompletion:completionRow,ownedWorkerTerminal:await rowAt(status.terminalPath),rawWorkerExitCode:0,ownedGroupGone:true,guestInitializationExecutedByComponentization:true,ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false,operationalAdmission:false,runtimeAcceptanceClaim:false},{json:true});
+   const indexRow=await output.write('index.json',{schemaVersion:1,state:'UNREVIEWED_CRYPTO_COMPONENT_BUILD_OUTPUT',files:[...output.rows.values()]},{json:true});const completed=await output.write('completion.json',{schemaVersion:1,state:'CRYPTO_COMPONENT_BUILD_COMPLETE_EXTERNAL_PARENT_ZERO_AND_INDEPENDENT_REVIEW_REQUIRED_V1',sourceIndexSha256:frame.componentSourceIndexSha256,index:indexRow,result,ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false},{json:true});await output.recheck();return{root:output.root,index:indexRow,completion:completed};
+  }catch(error){try{await output.write('failure.json',{schemaVersion:1,state:'FAILED_CRYPTO_COMPONENT_BUILD_NO_ACCEPTANCE',thrownType:typeof error,partialOwnedOutputsRetained:true},{json:true});}catch{}throw error;}finally{await output.close();}
+ }

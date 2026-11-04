@@ -1,0 +1,1 @@
+import{nextTick}from'starling:test-internal-ticks';export function run(){return new Promise(resolve=>nextTick(()=>{try{throw new Error('TICK_DEPLOYED_THROW')}catch(error){resolve(JSON.stringify({handled:error.message}))}}))}

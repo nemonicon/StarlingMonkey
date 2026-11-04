@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-component-candidate-v1/guard.mjs",
+        "sha256": "2cf887b7e6be7555b900b45c730a57d615a283cf6f17d30164b6d47a5e4100a3",
+        "bytes": 8222
+      },
+      "afterimage": "guard.mjs",
+      "afterSha256": "a232ebd6eb93516f19a6f071a1de5c4905197bcd6de78054a0542aa3221a6809",
+      "edits": [
+        {
+          "old": "from './authority.mjs'",
+          "new": "from '../ownership-component-candidate-v1/authority.mjs'",
+          "afterOffsetAtEdit": 267,
+          "count": 1
+        },
+        {
+          "old": "from './proofs.mjs'",
+          "new": "from '../ownership-component-candidate-v1/proofs.mjs'",
+          "afterOffsetAtEdit": 359,
+          "count": 1
+        },
+        {
+          "old": "from './packaging.mjs'",
+          "new": "from '../ownership-component-candidate-v1/packaging.mjs'",
+          "afterOffsetAtEdit": 469,
+          "count": 1
+        },
+        {
+          "old": "/crypto-owner355-component-v1'",
+          "new": "/crypto-owner355-component-v2'",
+          "afterOffsetAtEdit": 633,
+          "count": 1
+        },
+        {
+          "old": "ROOT_REVIEWED_CRYPTO_OWNER355_COMPONENT_BUILD_V1",
+          "new": "ROOT_REVIEWED_CRYPTO_OWNER355_COMPONENT_BUILD_V2",
+          "afterOffsetAtEdit": 1570,
+          "count": 1
+        },
+        {
+          "old": "INDEPENDENT_CRYPTO_OWNER355_COMPONENT_SOURCE_REVIEW_PASSED_V1",
+          "new": "INDEPENDENT_CRYPTO_OWNER355_COMPONENT_SOURCE_REVIEW_PASSED_V2",
+          "afterOffsetAtEdit": 3414,
+          "count": 1
+        },
+        {
+          "old": "const prereqBytes=await regular(own.rows.find(r=>r.path===join(HERE,'prerequisites.json')))",
+          "new": "const donor=await sourceIndex({path:join(HERE,'../ownership-component-candidate-v1/index.json'),sha256:'eb648e19274c055968557227221627e2ced5dd35a2c0fb17af941dbc9a8b5c30',bytes:4446});\n const prereqBytes=await regular(donor.rows.find(r=>r.path===join(HERE,'../ownership-component-candidate-v1/prerequisites.json')))",
+          "afterOffsetAtEdit": 3214,
+          "count": 1
+        },
+        {
+          "old": "own.rows.find(r=>r.path===join(HERE,'packaging-context.json'))",
+          "new": "donor.rows.find(r=>r.path===join(HERE,'../ownership-component-candidate-v1/packaging-context.json'))",
+          "afterOffsetAtEdit": 5835,
+          "count": 1
+        },
+        {
+          "old": "await own.recheck();await sourcePeer.recheck();",
+          "new": "await own.recheck();await donor.recheck();await sourcePeer.recheck();",
+          "afterOffsetAtEdit": 7631,
+          "count": 1
+        },
+        {
+          "old": "criticalSourceFiles:Object.freeze(own.rows)",
+          "new": "criticalSourceFiles:Object.freeze([...own.rows,...donor.rows])",
+          "afterOffsetAtEdit": 8423,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-component-candidate-v1/build-worker.mjs",
+        "sha256": "dfc507c9e494c9089ed8353fc1156bea2cd486819c813ff6783c1390e049c3d2",
+        "bytes": 7876
+      },
+      "afterimage": "build-worker.mjs",
+      "afterSha256": "65fdc964240b18488f8dfdfd6fc4455a62bce8963c3a7b3b313f2b641cb89621",
+      "edits": [
+        {
+          "old": "from './authority.mjs'",
+          "new": "from '../ownership-component-candidate-v1/authority.mjs'",
+          "afterOffsetAtEdit": 274,
+          "count": 1
+        },
+        {
+          "old": "from './proofs.mjs'",
+          "new": "from '../ownership-component-candidate-v1/proofs.mjs'",
+          "afterOffsetAtEdit": 397,
+          "count": 1
+        },
+        {
+          "old": "from './packaging.mjs'",
+          "new": "from '../ownership-component-candidate-v1/packaging.mjs'",
+          "afterOffsetAtEdit": 574,
+          "count": 1
+        },
+        {
+          "old": "from './abi.mjs'",
+          "new": "from '../ownership-component-candidate-v1/abi.mjs'",
+          "afterOffsetAtEdit": 727,
+          "count": 1
+        },
+        {
+          "old": "from './durable.mjs'",
+          "new": "from '../ownership-component-candidate-v1/durable.mjs'",
+          "afterOffsetAtEdit": 355,
+          "count": 1
+        },
+        {
+          "old": "export async function buildWorker(input){",
+          "new": "export function workerOptions(d,packaging,wit){return componentOptions({engine:d.engine,adapter:packaging.adapter},wit);}\nexport async function buildWorker(input){",
+          "afterOffsetAtEdit": 813,
+          "count": 1
+        },
+        {
+          "old": "const options=componentOptions(d,wit);",
+          "new": "const options=workerOptions(d,packaging,wit);",
+          "afterOffsetAtEdit": 3516,
+          "count": 1
+        },
+        {
+          "old": "CRYPTO_OWNER355_COMPONENT_BUILT_UNREVIEWED_V1",
+          "new": "CRYPTO_OWNER355_COMPONENT_BUILT_UNREVIEWED_V2",
+          "afterOffsetAtEdit": 6600,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-component-candidate-v1/build.mjs",
+        "sha256": "8ac31bbd34fa24065633429aed30c174fe14391a3faa397b789e1cd03c81adbf",
+        "bytes": 5656
+      },
+      "afterimage": "build.mjs",
+      "afterSha256": "cbfa8e6577f0277d31c05b9019e4f50a5cce74549be78b540dfa894b0b8d5403",
+      "edits": [
+        {
+          "old": "from './authority.mjs'",
+          "new": "from '../ownership-component-candidate-v1/authority.mjs'",
+          "afterOffsetAtEdit": 348,
+          "count": 1
+        },
+        {
+          "old": "from './abi.mjs'",
+          "new": "from '../ownership-component-candidate-v1/abi.mjs'",
+          "afterOffsetAtEdit": 531,
+          "count": 1
+        },
+        {
+          "old": "from './durable.mjs'",
+          "new": "from '../ownership-component-candidate-v1/durable.mjs'",
+          "afterOffsetAtEdit": 429,
+          "count": 1
+        },
+        {
+          "old": "from './durable-host.mjs'",
+          "new": "from '../ownership-component-candidate-v1/durable-host.mjs'",
+          "afterOffsetAtEdit": 510,
+          "count": 1
+        },
+        {
+          "old": "CRYPTO_OWNER355_COMPONENT_BUILD_COMPLETE_UNREVIEWED_V1",
+          "new": "CRYPTO_OWNER355_COMPONENT_BUILD_COMPLETE_UNREVIEWED_V2",
+          "afterOffsetAtEdit": 4074,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    }
+  ],
+  "nativeGuestWitToolPayloadChanged": false
+}

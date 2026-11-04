@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 1,
+  "state": "FOUR_FACTORY_AND_ALL_BORROWED_KEY_SOURCE_AUDIT_NOT_RUNTIME_PROOF",
+  "factories": [
+    {
+      "factory": "createHMAC",
+      "producer": "raw or JWK HMAC import",
+      "beforePublication": "SecretByteVectorPtr owns logical key bytes across all import/JS allocation error returns",
+      "publication": "KeyData PrivateValue holds vector owner, never only data()",
+      "afterPublication": "CryptoKey foreground finalizer wipes logical vector bytes then deletes vector",
+      "borrowedUse": "HMAC sign/verify use owner span synchronously while JS::HandleObject key is rooted"
+    },
+    {
+      "factory": "createECDSA",
+      "producer": "EC components from JWK/raw point/PKCS8/SPKI imports",
+      "beforePublication": "EvpPkeyPtr owns validated reconstructed key across all JS failures; component/BIGNUM temporaries remain their existing owners",
+      "publication": "Key PrivateValue receives pkey.release() after successful algorithm object work",
+      "afterPublication": "CryptoKey finalizer releases exactly one owned EVP reference",
+      "borrowedUse": "ECDSA sign/verify use key handle synchronously"
+    },
+    {
+      "factory": "createEd25519",
+      "producer": "raw public, JWK public/private, PKCS8 private or SPKI public import",
+      "beforePublication": "incoming EvpPkeyPtr remains an owner across algorithm/instance allocation failures",
+      "publication": "Key PrivateValue receives pkey.release()",
+      "afterPublication": "CryptoKey finalizer releases exactly one owned EVP reference",
+      "borrowedUse": "Ed25519 sign/verify use key handle synchronously"
+    },
+    {
+      "factory": "createRSA",
+      "producer": "RSA JWK/PKCS8/SPKI components",
+      "beforePublication": "reconstructed EvpPkeyPtr held across modulus/exponent JS property creation; JS_malloc/FreePolicy owns exponent until AB adoption; AB/view rooted, failed view checked",
+      "publication": "Key PrivateValue receives pkey.release() only after all fallible publicExponent work",
+      "afterPublication": "CryptoKey finalizer releases exactly one owned EVP reference",
+      "borrowedUse": "RSASSA-PKCS1-v1_5 sign/verify use key handle synchronously"
+    }
+  ],
+  "allOriginalFactoryDefinitionsCallsAndBorrowSites": [
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 803,
+      "symbol": "hmacKeyData",
+      "text": "std::span<uint8_t> keyData = CryptoKey::hmacKeyData(key);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 835,
+      "symbol": "hmacKeyData",
+      "text": "std::span<uint8_t> keyData = CryptoKey::hmacKeyData(key);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 879,
+      "symbol": "key",
+      "text": "EVP_PKEY *pkey = CryptoKey::key(key);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 1030,
+      "symbol": "key",
+      "text": "EVP_PKEY *pkey = CryptoKey::key(key);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 1064,
+      "symbol": "key",
+      "text": "if (!ctx || EVP_DigestSignInit(ctx.get(), nullptr, nullptr, nullptr, CryptoKey::key(key)) != 1) {"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 1121,
+      "symbol": "key",
+      "text": "if (!ctx || EVP_DigestVerifyInit(ctx.get(), nullptr, nullptr, nullptr, CryptoKey::key(key)) != 1) {"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 1167,
+      "symbol": "key",
+      "text": "EvpPkeyCtxPtr ctx(EVP_PKEY_CTX_new(CryptoKey::key(key), nullptr));"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 1238,
+      "symbol": "key",
+      "text": "EvpPkeyCtxPtr ctx(EVP_PKEY_CTX_new(CryptoKey::key(key), nullptr));"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 1520,
+      "symbol": "createHMAC",
+      "text": "return CryptoKey::createHMAC(cx, this, std::move(data), length, extractable, usages);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 1743,
+      "symbol": "createECDSA",
+      "text": "return CryptoKey::createECDSA(cx, this, std::move(key), extractable, usages);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 1839,
+      "symbol": "createECDSA",
+      "text": "return CryptoKey::createECDSA(cx, this, std::move(ecKey), extractable, usages);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 1929,
+      "symbol": "createECDSA",
+      "text": "return CryptoKey::createECDSA(cx, this, std::move(ecKey), extractable, usages);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 2132,
+      "symbol": "createEd25519",
+      "text": "return CryptoKey::createEd25519(cx, this, std::move(pkey), CryptoKeyType::Public, extractable, usages);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 2182,
+      "symbol": "createEd25519",
+      "text": "return CryptoKey::createEd25519(cx, this, std::move(pkey), CryptoKeyType::Private, extractable, usages);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 2271,
+      "symbol": "createEd25519",
+      "text": "return CryptoKey::createEd25519(cx, this, std::move(pkey), CryptoKeyType::Private, extractable, usages);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 2286,
+      "symbol": "createEd25519",
+      "text": "return CryptoKey::createEd25519(cx, this, std::move(pkey), CryptoKeyType::Public, extractable, usages);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 2310,
+      "symbol": "createEd25519",
+      "text": "return CryptoKey::createEd25519(cx, this, std::move(pkey), CryptoKeyType::Public, extractable, usages);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 2524,
+      "symbol": "createRSA",
+      "text": "return CryptoKey::createRSA(cx, this, std::move(key), extractable, usages);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 2599,
+      "symbol": "createRSA",
+      "text": "return CryptoKey::createRSA(cx, this, std::move(key), extractable, usages);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 2635,
+      "symbol": "createRSA",
+      "text": "return CryptoKey::createRSA(cx, this, std::move(rsa_key), extractable, usages);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "sha256": "89d905491ddc943ea31596c5f5e294ba0edf9890a487c14ca46fac9e0a03a0a8",
+      "line": 2689,
+      "symbol": "createRSA",
+      "text": "return CryptoKey::createRSA(cx, this, std::move(rsa_key), extractable, usages);"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-key.cpp",
+      "sha256": "4ceb7cd64049e23db83bdd4e7c71900cb70a114f68fa85a093cf94666c661a11",
+      "line": 633,
+      "symbol": "createHMAC",
+      "text": "JSObject *CryptoKey::createHMAC(JSContext *cx, CryptoAlgorithmHMAC_Import *algorithm,"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-key.cpp",
+      "sha256": "4ceb7cd64049e23db83bdd4e7c71900cb70a114f68fa85a093cf94666c661a11",
+      "line": 658,
+      "symbol": "createECDSA",
+      "text": "JSObject *CryptoKey::createECDSA(JSContext *cx, CryptoAlgorithmECDSA_Import *algorithm,"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-key.cpp",
+      "sha256": "4ceb7cd64049e23db83bdd4e7c71900cb70a114f68fa85a093cf94666c661a11",
+      "line": 718,
+      "symbol": "createEd25519",
+      "text": "JSObject *CryptoKey::createEd25519(JSContext *cx, CryptoAlgorithmEd25519_Import *algorithm,"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-key.cpp",
+      "sha256": "4ceb7cd64049e23db83bdd4e7c71900cb70a114f68fa85a093cf94666c661a11",
+      "line": 746,
+      "symbol": "createRSA",
+      "text": "JSObject *CryptoKey::createRSA(JSContext *cx, CryptoAlgorithmRSASSA_PKCS1_v1_5_Import *algorithm,"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-key.cpp",
+      "sha256": "4ceb7cd64049e23db83bdd4e7c71900cb70a114f68fa85a093cf94666c661a11",
+      "line": 882,
+      "symbol": "key",
+      "text": "EVP_PKEY *CryptoKey::key(JSObject *self) {"
+    },
+    {
+      "path": "builtins/web/crypto/crypto-key.cpp",
+      "sha256": "4ceb7cd64049e23db83bdd4e7c71900cb70a114f68fa85a093cf94666c661a11",
+      "line": 887,
+      "symbol": "hmacKeyData",
+      "text": "std::span<uint8_t> CryptoKey::hmacKeyData(JSObject *self) {"
+    }
+  ],
+  "rootedJsVersusNativeOwnership": "JS-valued reserved slots are traced; PrivateValue native allocations require recoverable owners and explicit deleters; vector/EVP private data contain no JS GC edges",
+  "partialObjectInitialization": "all owner slots initially undefined; finalizer handles each independently, clears before deleting, never depends on Type/Algorithm; failed factories retain local native RAII until publication",
+  "fromdataSourceConclusion": "3.0.17 initially-null output is freed and reset to null on failed provider import; immediate RAII reorder is defensive and preserves this behavior",
+  "requiredFollowons": [
+    {
+      "id": "CRYPTO-OWNER-FOLLOWON-BIGNUM",
+      "required": true,
+      "scope": "Multiple EC/RSA EVP_PKEY_get_bn_param calls write raw BIGNUM outputs before constructing BignumPtr owners. Short-circuit failures can leave earlier successful allocations unowned; RSA optional CRT extraction also returns before adoption. Move each produced output into RAII immediately in a separately reviewed cut.",
+      "nativeSourceUnchangedHere": true
+    },
+    {
+      "id": "CRYPTO-OWNER-FOLLOWON-COPIES",
+      "required": true,
+      "scope": "Decoded HMAC JWK std::string and JS strings; RSA/EC private component strings; BIGNUM and OpenSSL internal copies; vector intermediate construction/storage beyond logical size are not covered by SecretByteVectorDeleter. No all-copies erasure claim.",
+      "nativeSourceUnchangedHere": true
+    },
+    {
+      "id": "CRYPTO-OWNER-FOLLOWON-BOUNDS",
+      "required": true,
+      "scope": "Existing data->size()*8 can overflow and EVP_PKEY_new_mac_key accepts int length while keyData.size() is size_t. Existing vector/new under -fno-exceptions has no new recoverable allocation-failure guarantee; no new cap or error parity is asserted.",
+      "nativeSourceUnchangedHere": true
+    }
+  ],
+  "finalizerAndZeroizationRuntimeExecuted": false,
+  "allCopiesErased": false
+}

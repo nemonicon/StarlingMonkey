@@ -1,0 +1,544 @@
+{
+  "schema": 1,
+  "state": "host-native-template-ordinary-cases-pass",
+  "scope": "Host system zlib only; not guest engine, real component, final imports, GC, OOM, streaming or Node module support.",
+  "node": "v22.14.0",
+  "nodeZlib": "1.3.0.1-motley-82a5fec",
+  "sources": [
+    {
+      "path": "bounded-zlib.template.h",
+      "sha256": "f6b1893e6a5d1cd2e9f17d13be8113a570eeb2a5d16beeb7379212554240a135"
+    },
+    {
+      "path": "native-driver.cpp",
+      "sha256": "6920c05aa7d186725e09af60cfa84c094e2d08e60d447e9e07c50a1b5db62d04"
+    },
+    {
+      "path": "check-native-template.mjs",
+      "sha256": "217019850f791631782e5a6b59203ce4de0845db3cef403ad2be030a0191cd34"
+    }
+  ],
+  "compiler": "c++",
+  "compileArgs": [
+    "-std=c++20",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fno-exceptions",
+    "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/native-driver.cpp",
+    "-lz",
+    "-o",
+    "/tmp/starling-node-compat/zlib-template-v1/native-driver"
+  ],
+  "binarySha256": "91b837ddbf8f2b5edf649f4663304e821c16622f72ca388f1852e88bf85a8b9d",
+  "inputSha256": "6df742a3443273f2ba61270f952c22089557441821cdc4969aab288493b64f4f",
+  "stdoutSha256": "7707179be46e2cc0f41b5f3c1dc09a4807bd8616b697255bf23c34c778edfacc",
+  "nodeInventory": {
+    "BrotliCompress": "function",
+    "BrotliDecompress": "function",
+    "Deflate": "function",
+    "DeflateRaw": "function",
+    "Gunzip": "function",
+    "Gzip": "function",
+    "Inflate": "function",
+    "InflateRaw": "function",
+    "Unzip": "function",
+    "brotliCompress": "function",
+    "brotliCompressSync": "function",
+    "brotliDecompress": "function",
+    "brotliDecompressSync": "function",
+    "codes": "object",
+    "constants": "object",
+    "crc32": "function",
+    "createBrotliCompress": "function",
+    "createBrotliDecompress": "function",
+    "createDeflate": "function",
+    "createDeflateRaw": "function",
+    "createGunzip": "function",
+    "createGzip": "function",
+    "createInflate": "function",
+    "createInflateRaw": "function",
+    "createUnzip": "function",
+    "default": "object",
+    "deflate": "function",
+    "deflateRaw": "function",
+    "deflateRawSync": "function",
+    "deflateSync": "function",
+    "gunzip": "function",
+    "gunzipSync": "function",
+    "gzip": "function",
+    "gzipSync": "function",
+    "inflate": "function",
+    "inflateRaw": "function",
+    "inflateRawSync": "function",
+    "inflateSync": "function",
+    "unzip": "function",
+    "unzipSync": "function"
+  },
+  "checks": 66,
+  "results": [
+    {
+      "name": "zlib-encode-0",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 8,
+      "outputSha256": "aca503def43dc086a5aaa5c3d6f86bcbbc2aa6a80007ddea4a81bce2b376fceb"
+    },
+    {
+      "name": "zlib-decode-0",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "zlib-encode-1",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 9,
+      "outputSha256": "bfd38e0d4937d7dcdabca6cd1bd39052f1ec3de43a06922920053d44e6234cef"
+    },
+    {
+      "name": "zlib-decode-1",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 1,
+      "outputSha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d"
+    },
+    {
+      "name": "zlib-encode-31",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 42,
+      "outputSha256": "6f1f16528aef65b9735f7b7139c13099ba19df0d52a9257be54c68fe1310fc87"
+    },
+    {
+      "name": "zlib-decode-31",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 31,
+      "outputSha256": "6cb45404e41a5dd113f87561ab2d02711cbd381ac165d9efdd1bd1ad6abf7c82"
+    },
+    {
+      "name": "zlib-encode-16384",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 658,
+      "outputSha256": "e714f35ae329a0c40ea6413e4c8d95d96243bce3d9356a93e5355f651cec0d30"
+    },
+    {
+      "name": "zlib-decode-16384",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 16384,
+      "outputSha256": "1f26734ede69c16c7d49ea0d1cc8ce89f7d7323f12ba2c6ba628462a4a6eec8c"
+    },
+    {
+      "name": "zlib-encode-16385",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 655,
+      "outputSha256": "36a7170e39ef35e66b604664eb6377f6a00e946e8dd45ed6d65461bf001517c8"
+    },
+    {
+      "name": "zlib-decode-16385",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 16385,
+      "outputSha256": "114453552cfc19cea4542343a8c3d111464ef3eb23804078628b1d18bf1fc82d"
+    },
+    {
+      "name": "zlib-encode-65536",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 1475,
+      "outputSha256": "00513faae0f885743b37bd2ba2aa0f7dbaa82b0940ed0a293dccd8fd508a9967"
+    },
+    {
+      "name": "zlib-decode-65536",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 65536,
+      "outputSha256": "f59640aa3510f7b041aeb8a8b56a2df1feec65f31af1e4f33d04756551890f54"
+    },
+    {
+      "name": "zlib-encode-262144",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 4649,
+      "outputSha256": "6765030f3e8f074e7ffb7ab7a5af369663fc4aedfe79c47620467b867a3f463e"
+    },
+    {
+      "name": "zlib-decode-262144",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 262144,
+      "outputSha256": "cabfdebc87ca4baaf8703ffdfd2f4b116ef60029f640574a65fc00e4c9fbe85f"
+    },
+    {
+      "name": "zlib-encode-1048576",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 1040,
+      "outputSha256": "96d88276f17af58dd740c08a2871ea3ccf2260e0469b73b8966e9f7b41c73478"
+    },
+    {
+      "name": "zlib-decode-1048576",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 1048576,
+      "outputSha256": "9bc1b2a288b26af7257a36277ae3816a7d4f16e89c1e7e77d0a5c48bad62b360"
+    },
+    {
+      "name": "zlib-exact-limit",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 4096,
+      "outputSha256": "c93eee2d0db02f10acc7460d9576e122dcf8cd53c4bf8dfcae1b3e74ebcfff5a"
+    },
+    {
+      "name": "zlib-output-limit",
+      "status": 2,
+      "zlibStatus": 1,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "zlib-incomplete",
+      "status": 5,
+      "zlibStatus": -5,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "zlib-trailing",
+      "status": 7,
+      "zlibStatus": 1,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "zlib-empty-compressed-input",
+      "status": 5,
+      "zlibStatus": -5,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "gzip-encode-0",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 20,
+      "outputSha256": "abfbb86f9f5ddfbd9fc1a72c43ab384702ce8bae86b60f3324748485e235e61e"
+    },
+    {
+      "name": "gzip-decode-0",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "gzip-encode-1",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 21,
+      "outputSha256": "ba7fbc022be23209459b0058dcb8816d816c1181b51d49f81641817ad3bbc3a4"
+    },
+    {
+      "name": "gzip-decode-1",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 1,
+      "outputSha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d"
+    },
+    {
+      "name": "gzip-encode-31",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 54,
+      "outputSha256": "6ea9e6f46b1e43168f5573c65587556e5469a559be8dabea06dde3e4705d372b"
+    },
+    {
+      "name": "gzip-decode-31",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 31,
+      "outputSha256": "6cb45404e41a5dd113f87561ab2d02711cbd381ac165d9efdd1bd1ad6abf7c82"
+    },
+    {
+      "name": "gzip-encode-16384",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 670,
+      "outputSha256": "da82205c92330168f90e8df7b819d5821187e6f7857e86e7d7ba9ebdf4d28af7"
+    },
+    {
+      "name": "gzip-decode-16384",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 16384,
+      "outputSha256": "1f26734ede69c16c7d49ea0d1cc8ce89f7d7323f12ba2c6ba628462a4a6eec8c"
+    },
+    {
+      "name": "gzip-encode-16385",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 667,
+      "outputSha256": "acf2881f8c831e1aee0467f5a7a47543772dfc8e51423b10bf742a168a87609f"
+    },
+    {
+      "name": "gzip-decode-16385",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 16385,
+      "outputSha256": "114453552cfc19cea4542343a8c3d111464ef3eb23804078628b1d18bf1fc82d"
+    },
+    {
+      "name": "gzip-encode-65536",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 1487,
+      "outputSha256": "cb48cd8cefb9abd1cf2d6f1660cb374d66439f7aa7b2651021b94b00a3616844"
+    },
+    {
+      "name": "gzip-decode-65536",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 65536,
+      "outputSha256": "f59640aa3510f7b041aeb8a8b56a2df1feec65f31af1e4f33d04756551890f54"
+    },
+    {
+      "name": "gzip-encode-262144",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 4661,
+      "outputSha256": "820875d15b27f1c70508675bbeb6ec589113136de557394f5d6f42477281d825"
+    },
+    {
+      "name": "gzip-decode-262144",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 262144,
+      "outputSha256": "cabfdebc87ca4baaf8703ffdfd2f4b116ef60029f640574a65fc00e4c9fbe85f"
+    },
+    {
+      "name": "gzip-encode-1048576",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 1052,
+      "outputSha256": "4533da3e804eee551f7977e692be514c90c395807a1cb1ac5d045123da8334a1"
+    },
+    {
+      "name": "gzip-decode-1048576",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 1048576,
+      "outputSha256": "9bc1b2a288b26af7257a36277ae3816a7d4f16e89c1e7e77d0a5c48bad62b360"
+    },
+    {
+      "name": "gzip-exact-limit",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 4096,
+      "outputSha256": "c93eee2d0db02f10acc7460d9576e122dcf8cd53c4bf8dfcae1b3e74ebcfff5a"
+    },
+    {
+      "name": "gzip-output-limit",
+      "status": 2,
+      "zlibStatus": 1,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "gzip-incomplete",
+      "status": 5,
+      "zlibStatus": -5,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "gzip-trailing",
+      "status": 7,
+      "zlibStatus": 1,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "gzip-empty-compressed-input",
+      "status": 5,
+      "zlibStatus": -5,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "raw-encode-0",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 2,
+      "outputSha256": "9b4fb24edd6d1d8830e272398263cdbf026b97392cc35387b991dc0248a628f9"
+    },
+    {
+      "name": "raw-decode-0",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "raw-encode-1",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 3,
+      "outputSha256": "e9238ddb2b450e586127f0c74344099c6803b19375718f54f3f2056089002fc8"
+    },
+    {
+      "name": "raw-decode-1",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 1,
+      "outputSha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d"
+    },
+    {
+      "name": "raw-encode-31",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 36,
+      "outputSha256": "9805eaa8efa4bf77919a018b45ed9b1a4271e05fc9a3b56c0a1dda7fc529b6dd"
+    },
+    {
+      "name": "raw-decode-31",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 31,
+      "outputSha256": "6cb45404e41a5dd113f87561ab2d02711cbd381ac165d9efdd1bd1ad6abf7c82"
+    },
+    {
+      "name": "raw-encode-16384",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 652,
+      "outputSha256": "c5903d2abdfcff5b324ae133c5b7ed46e4218a287c95c76789ffa4b03d3dfc3e"
+    },
+    {
+      "name": "raw-decode-16384",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 16384,
+      "outputSha256": "1f26734ede69c16c7d49ea0d1cc8ce89f7d7323f12ba2c6ba628462a4a6eec8c"
+    },
+    {
+      "name": "raw-encode-16385",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 649,
+      "outputSha256": "3ea58109036626b8ff0963f04c183671385d8fd64d2f5969d3eb91c120b09e44"
+    },
+    {
+      "name": "raw-decode-16385",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 16385,
+      "outputSha256": "114453552cfc19cea4542343a8c3d111464ef3eb23804078628b1d18bf1fc82d"
+    },
+    {
+      "name": "raw-encode-65536",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 1469,
+      "outputSha256": "81ae659fc0c4d1f2f2ec735d2e00ff3ae2ee9fbf388709289eaaa2a9dd529e60"
+    },
+    {
+      "name": "raw-decode-65536",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 65536,
+      "outputSha256": "f59640aa3510f7b041aeb8a8b56a2df1feec65f31af1e4f33d04756551890f54"
+    },
+    {
+      "name": "raw-encode-262144",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 4643,
+      "outputSha256": "6c9d8c603ed9dbf592add96494124baa5edb1d693be91a173e294f8e6d5408b6"
+    },
+    {
+      "name": "raw-decode-262144",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 262144,
+      "outputSha256": "cabfdebc87ca4baaf8703ffdfd2f4b116ef60029f640574a65fc00e4c9fbe85f"
+    },
+    {
+      "name": "raw-encode-1048576",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 1034,
+      "outputSha256": "8da1346696c8b38790c87519a0dabfefee02343fee313d46e546a1631a727442"
+    },
+    {
+      "name": "raw-decode-1048576",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 1048576,
+      "outputSha256": "9bc1b2a288b26af7257a36277ae3816a7d4f16e89c1e7e77d0a5c48bad62b360"
+    },
+    {
+      "name": "raw-exact-limit",
+      "status": 0,
+      "zlibStatus": 1,
+      "outputBytes": 4096,
+      "outputSha256": "c93eee2d0db02f10acc7460d9576e122dcf8cd53c4bf8dfcae1b3e74ebcfff5a"
+    },
+    {
+      "name": "raw-output-limit",
+      "status": 2,
+      "zlibStatus": 1,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "raw-incomplete",
+      "status": 5,
+      "zlibStatus": -5,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "raw-trailing",
+      "status": 7,
+      "zlibStatus": 1,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "raw-empty-compressed-input",
+      "status": 5,
+      "zlibStatus": -5,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "input-limit",
+      "status": 1,
+      "zlibStatus": 0,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "dictionary-deferred",
+      "status": 6,
+      "zlibStatus": 2,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "checksum",
+      "status": 4,
+      "zlibStatus": -3,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

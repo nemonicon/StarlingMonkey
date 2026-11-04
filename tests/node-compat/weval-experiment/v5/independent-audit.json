@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "state": "independent-read-only-audit-passed",
+  "auditedAtUtc": "2026-11-03T07:07:51.510342+00:00",
+  "inputs": [
+    {
+      "path": "/tmp/starling-node-compat/weval-experiment/v5-components/build-results.json",
+      "sha256": "cd5103615cdc4f617e58f732cf7f1797e6f1f833411b72b27950a9cbec6790eb"
+    },
+    {
+      "path": "/tmp/starling-node-compat/weval-experiment/v5-components/compile-results.json",
+      "sha256": "f7008d1ef026aa01de3d52c917b36601580ffb4f758698b33b28559d312a7b7e"
+    },
+    {
+      "path": "/tmp/starling-node-compat/weval-experiment/v5-components/results.json",
+      "sha256": "983e89478347a4bc731267a0dc2d8e55badfd6a0d900b9eaafe0c7a25af18dc7"
+    }
+  ],
+  "reviewedSources": [
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/weval-experiment/v5/measure.mjs",
+      "sha256": "f08ad5f78276ecad2f4dee9aa68ab42ceb787d6fc30d1a0d6052c923f559287a"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/weval-experiment/v5/load-context.mjs",
+      "sha256": "f92ed05ec9e52116975e0c0d9490ee88c8d9b0e5af069d5ca9aed599f24e66fd"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/weval-experiment/v5/package-arms.mjs",
+      "sha256": "e382de8365f1c9890926ad8907db77c32a895739ce727c8a0a5f385f5322932b"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/weval-experiment/v5/pins.json",
+      "sha256": "91831c718f8192f5dc20e4a62a925a54875128259dbbe7ddc294ca75343a54d1"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/bench-clock-v2/workload.mjs",
+      "sha256": "a68dc397002011422d9674481e83c4d91821456c6014fd7f03802d5d995ab16b"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/bench-clock-v2/benchmark.wit",
+      "sha256": "fc28b09a7997b1e7846f4f1c390369d484bb0e52ee5764ce82c9865470d0d828"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/bench-clock-v2/host/Cargo.toml",
+      "sha256": "02a62c5e8371d43bcb961fae2a3ef0e641025cdb584903c8ecccfc3106820ba7"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/bench-clock-v2/host/Cargo.lock",
+      "sha256": "65546870a52f1e099ead8414ef8e5a7d6b122a4bc15fee3d3f82c54ade531f04"
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/bench-clock-v2/host/src/main.rs",
+      "sha256": "a7f8c96c6dfd1fb99c1330107361313a09075dadcb3c2441eb70e4d2a89ce540"
+    }
+  ],
+  "checks": 4190,
+  "observationRows": 80,
+  "componentInstances": 240,
+  "timedBatches": 1680,
+  "aggregateRows": 40,
+  "scenarios": 20,
+  "rounds": 2,
+  "freshInstancesPerArmScenarioRound": 3,
+  "timedBatchesPerInstance": 7,
+  "warmupsPerInstance": 3,
+  "engineSha256": "22b771cd36d5834f56059f831ecfbf8636ab925270973f35079b4bd5f7f72a4e",
+  "engineMetadataSha256": "35f93a4df464bb0bba99ea2ae7880c713baa4751ee9b0f2c248ab59b231a238e",
+  "genericCacheSha256": "f6fe62009691fe5ffc8535e58abd648d3006f4727b003f219b866de0270042ff",
+  "hostSha256": "f7fb77ff16ce765bc0d4f4ac0f095770ee6baee9bf03dbccb3568b1f93b1ca1f",
+  "selectedToolHashes": [
+    {
+      "name": "weval",
+      "sha256": "26b0942584a95ed17c2b54a85b1eff2c9285bf88d3c68dec764602e7579b156f"
+    },
+    {
+      "name": "wasmOpt",
+      "sha256": "4c674f02a820509828b9271665b50cd6d06b1e6696002818cdcc23314ab949e8"
+    },
+    {
+      "name": "libbinaryen",
+      "sha256": "672e18b2ba553c7960d71ef3db7c732772be1661d31119401af0b4f48e5d5e14"
+    }
+  ],
+  "verified": [
+    "Build/compile/measurement digest chain and actual engine, component, locally serialized component, host, cache, tool and captured source hashes",
+    "Ordinary Release WEVAL ON/wasm-opt OFF backend and explicit Buffer/Path/Events, entropy OFF, zero selected guest interfaces",
+    "Same engine, read-only generic cache, tool, splicer and application packaging options in both arms",
+    "All20 published ASCII setup/run checksums independently reconstructed with integer/data arithmetic and all240 reported instance checksums matched",
+    "All80 per-process and40 aggregate percentile/ns-per-operation/MiB-per-second/startup/RSS/linear-memory summaries recomputed",
+    "All aggregate and per-round native-over-JavaScript throughput ratios and comparison fields recomputed",
+    "Both opposite arm orders present for every scenario; compilation and measurement reports remain distinct"
+  ],
+  "units": {
+    "timing": "nanoseconds; milliseconds require division by1e6",
+    "throughput": "logical input bytes per batch / elapsed seconds /1048576",
+    "residentMemory": "process high-water bytes; MiB require division by1048576",
+    "linearMemory": "ResourceLimiter maximum desired bytes for one linear memory, not live heap or committed-page count"
+  },
+  "notExecuted": [
+    "No JavaScript workload or component execution",
+    "No build, componentization, compilation or timing",
+    "No fault/introspection investigation"
+  ],
+  "limitations": [
+    "This validates recorded arithmetic/provenance and current artifact bytes, not independent runtime reproduction or statistical significance.",
+    "Batches within an instance remain correlated; high-water RSS includes the whole process and accumulates across fresh instances in each measurement process.",
+    "The recorded generic-cache generation source/input binding is checked; no cache regeneration or partial-evaluator execution was performed.",
+    "Large SpiderMonkey distribution archive/static-library hashes were not rehashed by this small follow-up; their pinned build receipts were already source-reviewed."
+  ]
+}

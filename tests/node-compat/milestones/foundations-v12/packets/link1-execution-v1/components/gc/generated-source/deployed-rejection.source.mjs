@@ -1,0 +1,1 @@
+import{nextTick}from'starling:test-internal-ticks';export function run(){nextTick(async()=>{throw new Error('TICK_DEPLOYED_REJECTION')});return 'unexpected-success'}

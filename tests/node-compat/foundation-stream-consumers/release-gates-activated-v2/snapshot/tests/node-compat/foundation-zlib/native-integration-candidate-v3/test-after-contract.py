@@ -1,0 +1,66 @@
+"""Invoke genuine after() with owned fixtures and mocked external readers/tools.
+
+No archive/SDK/native bytes, commands, compiler or guest are used by this test.
+This is a dataflow regression, not native-build/codec evidence.
+"""
+import argparse,hashlib,importlib.util,json,types
+from pathlib import Path
+HERE=Path(__file__).resolve().parent
+def load(name,path):
+ spec=importlib.util.spec_from_file_location(name,path);module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+def exercise(module,root):
+ root.mkdir();dist=root/'mock-distribution';build=root/'build';build.mkdir();repo=root/'repo'
+ headers=[{'path':str(dist/'include'/name),'sha256':digest,'bytes':size}for name,(digest,size)in module.HEADERS.items()]
+ archive={'path':str(dist/'libspidermonkey.a'),'sha256':module.ARCHIVE_SHA,'bytes':module.ARCHIVE_BYTES}
+ selected={'version':'sm-selected-moz-z-compile-input-v1','selectedDistribution':str(dist),'archive':archive,'headers':headers,'requiredForcedInclude':headers[3]}
+ install_path=build/'builtins.incl';install_path.write_text('builtins::node_compat\n')
+ real_row=module.row;install=real_row(install_path)
+ before=root/'before.json';before.write_text(json.dumps({'schemaVersion':1,'state':'CODEC_INPUTS_AUTHENTICATED_BEFORE_NATIVE_BUILD','archive':archive,'headers':headers,'install':install}))
+ (build/'compile_commands.json').write_text(json.dumps([{'file':str(repo/'builtins/node-compat/zlib/kernel.cpp'),'command':'SOURCE-FIXTURE-NOT-A-COMPILER'}]))
+ raw_link=b'SOURCE-FIXTURE-NOT-A-LINK-COMMAND\n'
+ raw_symbols='\n'.join('/mock/archive.a[codec.o]: MOZ_Z_'+name+' T -------- 0'for name in module.SYMBOLS).encode()
+ expected_symbols=module.symbols(raw_symbols);calls=[]
+ known={row['path']:row for row in [archive,*headers]}
+ def row(path,expected=None,size=None):
+  path=Path(path)
+  if str(path)in known:return dict(known[str(path)])
+  if path.name=='llvm-nm':return{'path':str(path),'sha256':module.NM_SHA,'bytes':1}
+  return real_row(path,expected,size)
+ def check_output(command):calls.append({'kind':'mock-ninja','argv':command});return raw_link
+ def run(command,**kwargs):calls.append({'kind':'mock-nm','argv':command});return types.SimpleNamespace(stdout=raw_symbols,stderr=b'',returncode=0)
+ original={key:getattr(module,key)for key in ['row','distribution','cache_install','kernel_headers','link_commands','subprocess']}
+ module.row=row;module.distribution=lambda chosen:dict(archive=archive,headers=headers)
+ module.cache_install=lambda chosen:install;module.kernel_headers=lambda command,chosen,selection:[str(dist/'include')]
+ module.link_commands=lambda raw,chosen,archive_path,*args:{'commands':[{'rawCommand':raw.decode().strip(),'expandedArguments':[]}],'responseFiles':[]}
+ module.subprocess=types.SimpleNamespace(check_output=check_output,run=run,PIPE=-1)
+ try:
+  result=module.after(repo,dist,build,before,root/'evidence',{'zlibEnabled':True,'zlibSelectedCodecInput':selected},hashlib.sha256(before.read_bytes()).hexdigest())
+  return result,selected,expected_symbols,calls,lambda:module.validate_witness(result,build),original
+ except BaseException:
+  for key,value in original.items():setattr(module,key,value)
+  raise
+def main():
+ p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);a=p.parse_args();a.output.mkdir(exist_ok=False)
+ fixed=load('fixed_after_contract',HERE/'codec-evidence.py');old=load('held_after_contract',HERE.parent/'native-integration-candidate-v2/codec-evidence.py')
+ checks=[]
+ result,selected,symbols,calls,validate,restore=exercise(fixed,a.output/'fixed')
+ try:
+  assert result['selectedCompileInput']==selected;checks.append('actual fixed after() returns complete selected descriptor')
+  assert result['archiveSymbolEvidence']['selectedDefinitions']==symbols and len(symbols)==7;checks.append('actual fixed after() separately retains seven-symbol witness')
+  assert result['selectedCompileInput']!=symbols;checks.append('descriptor and symbol records cannot alias semantically')
+  assert validate();checks.append('actual fixed return passes genuine validate_witness shape with mocked external readers')
+  assert len(calls)==2 and[c['kind']for c in calls]==['mock-ninja','mock-nm'];checks.append('only mocked Ninja/nm entrypoints observed; no real subprocess')
+ finally:
+  for key,value in restore.items():setattr(fixed,key,value)
+ prior,prior_selected,prior_symbols,prior_calls,prior_validate,restore=exercise(old,a.output/'held-v2')
+ try:
+  assert prior['selectedCompileInput']==prior_symbols and prior['selectedCompileInput']!=prior_selected;checks.append('heldv2 genuine after() exhibits descriptor-shadow regression under same mock seam')
+  try:prior_validate()
+  except(KeyError,AssertionError):checks.append('heldv2 actual witness validation refuses shadowed descriptor')
+  else:raise AssertionError('Expected heldv2 shape failure')
+ finally:
+  for key,value in restore.items():setattr(old,key,value)
+ report={'schemaVersion':1,'state':'PURE_GENUINE_AFTER_RETURN_CONTRACT_REGRESSION_PASSED','count':len(checks),'checks':checks,
+  'mockedReadersAndSubprocessOnly':True,'actualFixedReturn':result,'actualHeldReturn':prior,'nativeOrCompilerOrGuestOrActualArchiveOrCommandExecuted':False,'runtimeAcceptanceClaim':False}
+ (a.output/'results.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps({'checks':len(checks),'output':str(a.output)}))
+if __name__=='__main__':main()

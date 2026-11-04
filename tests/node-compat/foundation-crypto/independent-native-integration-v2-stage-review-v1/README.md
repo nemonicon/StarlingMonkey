@@ -1,0 +1,17 @@
+This review verifies the actual isolated crypto-owner355 v2 source copy at `/tmp/starling-node-compat/crypto-owner-source-v2`. It passes source-stage integrity only. The source index remains `68b6f2a50174adbf30d8257f8107dd6c5b38beddf0db4b95ad972e3f47e25575`; Root stage result `a0654a8e…` and the prior independent source review `ebbfda80…` are authenticated inputs.
+
+The reader independently assembled the full declared union from original native/tool/own source contexts and checked its exact membership against the actual Root copy descriptors. All **1,311** paths match: 355 native sources, 922 tool-origin rows, 44 own indexed files and the index, with only equal-byte overlaps. Every original and destination file was rehashed; modes match and original/copy device-inode pairs differ. All five CryptoKey owner/prototype payloads match the complete new355 policy. The 1,323-row preparation manifest is preserved byte-for-byte as original-context data; it was not interpreted under the stage.
+
+Direct metadata reads establish an ordinary `.git` directory, detached HEAD `54b3329b3ce818fd1f244e871e9c259b63667cda`, and no alternates path/link. The three cloned Git object files have distinct inodes from original-repository objects. The authenticated journal records Root's `git clone --no-local --no-checkout` and detached checkout as raw0. The reviewer ran no Git command. These observations are scoped to the declared copied closure and clone metadata; scaffold files outside the declared union are not relabelled as newly audited native inputs.
+
+The retained Root terminal reports session91711/PID50423 raw0, no timeout, 1.3872635s. Both raw streams match their descriptors, stderr is empty, and decoded stdout equals the retained publication journal. The reader did not directly observe the process terminal. Its authenticated state is source-staged-not-built, metadata projection is false, and Root's copy authority explicitly denies native build/runtime. No native build/freeze namespace existed at this reader's observation.
+
+The unchanged existing normal-OFF entry is:
+
+```sh
+/usr/bin/python3 /tmp/starling-node-compat/crypto-owner-source-v2/tests/node-compat/foundation-crypto/native-integration-candidate-v2/artifact-tools/build-one.py normal-off
+```
+
+Run from the staged checkout only after a separate explicit Root native-build authorization. The exact source-derived argv, caller environment hygiene, launcher-managed child environment, source/CMake/artifact/output paths and citations are recorded in [normal-off-build-entry.json](normal-off-build-entry.json). The launcher selects ordinary Release, entropy OFF, GC0/OOM0, consumers/zlib/classic/private ticks and all existing foundations ON, jobs1, 2GiB start free and 800MiB stop. Its own guard checks the new recipe and complete configured tool dependency closure before output or compiler launch. The recipe's distinct `keyowner-v2` and `ko355v2` paths preserve prior families. No new producer or recipe edit is needed for this label.
+
+This review executed only its private Python read/hash/data reader. No owner publisher/helper, Git/SDK/compiler, build, key/crypto/GC, component, guest, host or timing action ran. Future checked-in pins remain null; backend proof is false/null/null, operational admission is closed, and BIGNUM/private-copy/allocation-bound followons remain open. The source stage proves no native build/link, finalizer, crypto behavior, zeroization, performance or acceptance result.

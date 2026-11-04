@@ -1,0 +1,37 @@
+import assert from'node:assert/strict';
+import{createHash}from'node:crypto';
+import{spawnSync}from'node:child_process';
+import{readFile,writeFile,mkdir}from'node:fs/promises';
+import{dirname,join,resolve}from'node:path';
+import{fileURLToPath,pathToFileURL}from'node:url';
+import{loadToolchain}from'../toolchain.mjs';
+import{loadComponentizer}from'../componentizer.mjs';
+const here=dirname(fileURLToPath(import.meta.url));const tc=await loadToolchain();const packaging=await loadComponentizer(tc);const{componentize}=packaging;
+const{componentWit,transpile}=await import(pathToFileURL(tc.require.resolve('@bytecodealliance/jco')));
+const output=resolve(process.env.NODE_COMPAT_I64_OUTPUT??'/tmp/starling-node-compat/i64-abi-regression');await mkdir(output,{recursive:true});await writeFile(join(output,'package.json'),'{"type":"module"}\n');
+const engine=resolve(process.env.NODE_COMPAT_ENGINE),control=resolve(process.env.NODE_COMPAT_I64_CONTROL_ENGINE??'/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.phase1.release.wasm');
+const tools=resolve(process.env.NODE_COMPAT_WASM_TOOLS??'/tmp/starling-node-compat/native-build/cache/wasm-tools/1448/wasm-tools'),wasmtime=resolve(process.env.NODE_COMPAT_WASMTIME??'/tmp/starling-node-compat/bin/wasmtime-v42.0.1-aarch64-macos/wasmtime');
+const sha=b=>createHash('sha256').update(b).digest('hex');const run=(bin,args)=>spawnSync(bin,args,{encoding:'utf8',timeout:120000});function exec(bin,args){const r=run(bin,args);assert.equal(r.status,0,r.error?.message??r.stderr);return r.stdout.trim();}
+const source=await readFile(join(here,'i64-v1-guest.mjs'),'utf8'),helperSource=await readFile(join(here,'i64-v1-helper.mjs'),'utf8'),wit=await readFile(join(here,'i64-v1.wit'),'utf8');
+function norm(v){if(ArrayBuffer.isView(v))return[...v];if(Array.isArray(v))return v.map(norm);return v;}
+const repr=v=>JSON.parse(JSON.stringify(v,(_,x)=>typeof x==='bigint'?x+'n':ArrayBuffer.isView(x)?[...x]:x));
+const signed=[-0x8000000000000000n,-0x7fffffffffffffffn,-0x100000000n,-1n,0n,1n,0x7fffffffffffffffn];const unsigned=[0n,1n,0x7fffffffffffffffn,0x8000000000000000n,0xfffffffffffffffen,0xffffffffffffffffn];
+let state=0x9e3779b97f4a7c15n;for(let i=0;i<64;i++){state=BigInt.asUintN(64,state*6364136223846793005n+1442695040888963407n);signed.push(BigInt.asIntN(64,state));unsigned.push(state);}
+const variants=[];
+for(const[name,selected,mustPass]of[['signed-i64-broken-control',control,false],['signed-i64-v1-fixed',engine,true]]){
+ const metadata=JSON.parse(await readFile(selected+'.build.json'));assert.equal(metadata.engineSha256,sha(await readFile(selected)));assert.equal(metadata.abiFixEnabled,true);if(mustPass){assert.equal(metadata.bigIntFixEnabled,true);assert(metadata.componentizeJsPatches.some(p=>p.sha256==='c75bd3062ac03fce743901db2cab502b6ac60979679f23ef9f6a869488574cf4'&&p.applied));}
+ const options={engine:selected,witWorld:wit,disableFeatures:['stdio','random','clocks','http','fetch-event']};const helper=await componentize(helperSource,{...options,worldName:'helper'});const helperPath=join(output,'helper.wasm');await writeFile(helperPath,helper.component);const app=await componentize(source,{...options,worldName:'profile'});const appPath=join(output,name+'.app.wasm');await writeFile(appPath,app.component);const componentPath=join(output,name+'.wasm');exec(tools,['compose','--no-imports','-d',helperPath,'-o',componentPath,appPath]);const component=await readFile(componentPath),emittedWit=await componentWit(component);assert.deepEqual(emittedWit.split('\n').filter(l=>/^\s*import /.test(l)),[]);
+ const checks=[],hostChecks=[];
+ if(mustPass){const{files}=await transpile(component,{name});for(const[n,b]of Object.entries(files)){const p=join(output,n);await mkdir(dirname(p),{recursive:true});await writeFile(p,b);}const guest=await import(pathToFileURL(join(output,name+'.js')));const check=(op,input,observed,expected)=>{assert.deepEqual(norm(observed),norm(expected),op);checks.push({op,input:repr(input),observed:repr(observed),expected:repr(expected),matches:true});};
+  for(const value of signed){check('localS64',value,guest.localS64(value),value);check('callbackS64',value,guest.callbackS64(value),value);check('computedS64',value,guest.computedS64(value),BigInt.asIntN(64,value-1n));}
+  for(const value of unsigned){check('localU64',value,guest.localU64(value),value);check('callbackU64',value,guest.callbackU64(value),value);}
+  check('constantMin',null,guest.constantMin(),-0x8000000000000000n);check('constantMax',null,guest.constantMax(),0xffffffffffffffffn);
+  for(const values of[[],signed.slice(0,7),signed])check('signedList',values,guest.signedList(new BigInt64Array(values)),values);
+  for(const values of[[],unsigned.slice(0,6),unsigned])check('unsignedList',values,guest.unsignedList(new BigUint64Array(values)),values);
+  for(const value of JSON.parse(guest.recordCheck()))check('recordCheck',value.input,value.observed,value.input);
+  for(const value of signed.slice(0,7)){check('resultS64-ok',value,guest.resultS64(true,value),value);let thrown;try{guest.resultS64(false,value);}catch(error){thrown=error.payload;}check('resultS64-err',value,thrown,value);}
+ }
+ for(const[call,expected]of[['local-s64(-9223372036854775808)','-9223372036854775808'],['local-s64(-1)','-1'],['local-s64(0)','0'],['local-s64(9223372036854775807)','9223372036854775807'],['callback-s64(-9223372036854775808)','-9223372036854775808'],['callback-s64(-1)','-1'],['local-u64(18446744073709551615)','18446744073709551615'],['callback-u64(9223372036854775808)','9223372036854775808'],['constant-min()','-9223372036854775808'],['constant-max()','18446744073709551615'],['signed-list([-9223372036854775808,-1,0,9223372036854775807])','[-9223372036854775808,-1,0,9223372036854775807]'],['result-s64(true,-1)','ok(-1)'],['result-s64(false,-9223372036854775808)','err(-9223372036854775808)']]){const r=run(wasmtime,['run','--invoke',call,componentPath]);const observed=r.stdout.trim().replace(/\s/g,'');const matches=r.status===0&&observed===expected;if(mustPass)assert(matches,r.stderr||`${call}: ${observed}`);else if(!call.includes('-')||call.startsWith('local-u64')||call.startsWith('callback-u64')||call.startsWith('constant-max'))assert(matches,r.stderr);hostChecks.push({call,expected,observed,status:r.status,stderr:r.status?r.stderr:undefined,matches});}
+ if(!mustPass)assert(hostChecks.some(c=>!c.matches));variants.push({name,engine:selected,engineSha256:metadata.engineSha256,metadata,componentPath,componentSha256:sha(component),componentBytes:component.length,emittedImports:[],emittedWit,checks,hostChecks});
+}
+const report={schemaVersion:1,atUtc:new Date().toISOString(),node:process.version,packaging:packaging.provenance,sourceSha256:sha(source),witSha256:sha(wit),helperSourceSha256:sha(helperSource),patchSha256:sha(await readFile(join(here,'componentize-i64-bigint-v1.patch'))),variants,scope:'Separate native embedding correction for full core-i64 bit domain; actual guest-to-guest components with zero external imports. s64 uses signed WIT/BigInts throughout, u64 uses unsigned WIT; no carrier workaround.'};await writeFile(join(here,packaging.provenance.selection==='patched-import-i32-clock-v2'?'i64-v2-results.json':'i64-v1-results.json'),JSON.stringify(report,null,2)+'\n');await writeFile(join(output,'results.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(variants.map(v=>({name:v.name,checks:v.checks.length,hostPassed:v.hostChecks.filter(c=>c.matches).length,hostTotal:v.hostChecks.length})),null,2));

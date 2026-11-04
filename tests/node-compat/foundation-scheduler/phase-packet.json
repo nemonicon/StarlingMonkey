@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "proposal": "private-guest-ticks-v1",
+  "status": "source-only-uncompiled-uninstalled",
+  "nodeCompatibilityRelease": "v22.14.0",
+  "selectedWasiInterfaces": [],
+  "hostChanges": [],
+  "publicNodeProcessModule": "deferred; no module, global, process facts, or CLI/environment implementation is introduced",
+  "privateContract": {
+    "call": "nextTick(callback, ...arguments) -> undefined",
+    "validation": "callable callback first; same execution realm; ordinary argument values retained by identity",
+    "callbackReceiver": "undefined before the callback's own strict/sloppy conversion",
+    "callbackReturn": "ignored; a returned rejecting Promise remains subject to the existing rejection tracker",
+    "construction": "not part of private contract; Node's public process.nextTick is constructible",
+    "queue": "FIFO, including callbacks appended by callbacks; no AsyncTask/pollable/clock adapter",
+    "injection": "single captured private callable passed directly to an audited classic-stream factory",
+    "initialAls": "absent; not advertised as AsyncLocalStorage-compatible"
+  },
+  "limits": {
+    "pendingCallbacks": 4096,
+    "argumentsPerCallback": 1024,
+    "pendingArgumentValues": 65536,
+    "executedCallbacksPerCheckpoint": 65536,
+    "overflow": "RangeError with own ERR_SM_NODE_SCHEDULER_LIMIT code; enqueue commits no partial entry; work-budget exhaustion fails the entire boundary rather than yielding",
+    "promiseJobs": "existing full SpiderMonkey checkpoint; these limits do not bound an independently infinite Promise chain"
+  },
+  "origins": {
+    "classicEvaluation": "ticks -> full Promise checkpoint -> ticks/full checkpoint until no ticks",
+    "moduleEvaluation": "full Promise checkpoint -> ticks/full checkpoint until no ticks",
+    "deployedExport": "ticks -> full Promise checkpoint -> ticks/full checkpoint until no ticks",
+    "nativeTask": "after the complete selected AsyncTask::run returns: ticks -> full Promise checkpoint -> repeat",
+    "promiseJob": "no nested checkpoint; the outer full checkpoint completes before any new ticks",
+    "initializerScript": "new explicit classic initializer checkpoint after successful JS_ExecuteScript and before content evaluation; separately validate private-realm access/semantics",
+    "snapshotBinding": "after all bindExports/export-getter execution: ticks/full checkpoint; reject leftovers/errors before snapshot",
+    "finalizerBatch": "preserve the existing batch, then ticks/full checkpoint; precise Node finalizer parity unverified"
+  },
+  "failurePolicy": {
+    "tickThrow": "preserve original pending thrown value; stop; release remaining tick roots; return false to existing fatal embedding path",
+    "noExceptionFailure": "return false to existing fatal embedding path; never convert to apparent success",
+    "reentry": "ERR_SM_NODE_SCHEDULER_REENTRY; no nested event loop/checkpoint or reset during callback execution",
+    "eventErrors": "check existing take_pending_event_exception after callbacks and full checkpoints",
+    "promiseErrors": "retain current SpiderMonkey job reporting and strict unhandled-rejection boundary; no new uncaughtException/unhandledRejection events"
+  },
+  "lifecycle": {
+    "installation": "EventLoop::init before builtin/application installation, optional flag only",
+    "snapshot": "drain at actual evaluation and final post-bindExports boundary; require tick FIFO empty; EngineState::Initialized alone is insufficient",
+    "entry": "require empty inactive FIFO before fresh deployed entry; no permanent entropy flag used as request/context identity",
+    "reuse": "no tick entry crosses a completed export; module/callback objects may remain application state",
+    "reset": "only outside callbacks; clear tick roots and storage; existing Engine::reset does not clear the separate Promise job queue",
+    "finalization": "existing 16-round FinalizationRegistry policy unchanged and explicitly separate"
+  },
+  "futureAls": {
+    "source": "../async-context/resource-model-v3.cpp and resource-model.md",
+    "tickCapture": "fallible new_resource(cx,current_token,true) once at enqueue, copying enabled bindings into a distinct mutable resource cell",
+    "trace": "new Heap<JSObject*> resource field in each Tick; trace it; root popped resource before clearing entry",
+    "dispatch": "resource-model-v3 Scope with rooted previous cell, actual callback realm, RAII restoration on every exit",
+    "promise": "separate reviewed JS::JobQueue/creation-metadata selection required; no then wrapping or context-bearing fake global",
+    "nativeTask": "capture once at actual registration and preserve on requeue; trace centrally and root active cell before removing queue entry",
+    "entryOwner": "fresh entry cell from explicit empty initialization template; request/handle owner and deliberate user AsyncResource lifetimes remain separate",
+    "blockedDecisions": [
+      "metadata-builder fatal OOM and coexistence",
+      "realm/wrapper/private PromiseReactionRecord ABI limits",
+      "void Engine::queue_async_task cannot propagate newly fallible capture without a reviewed API/caller change",
+      "actual timer/HTTP/stream-I/O capture and cancellation ownership, debugger saved queues",
+      "full async IDs/lifecycle hooks, resource expiry and memory/performance acceptance"
+    ]
+  },
+  "requiredBeforeIntegration": [
+    "review packet and exact ancestry; choose private flag/contract and error/limit policy",
+    "compile template and validate actual generated private factory injection without public module/global",
+    "new-engine differential Node traces at actual AsyncTask/export/module/initializer boundaries",
+    "rooting, collection, argument identity, callback throw/reentry/limit/recovery tests using ordinary APIs",
+    "top-level and post-bindExports failure, empty snapshot, repeated export/reset tests",
+    "emitted imports remain empty for scheduler-only component on Jco/Wasmtime and selected standard-host world",
+    "measure component size, queue memory/retention and throughput before choosing optimized storage",
+    "separate production ALS integration before advertising context propagation"
+  ]
+}

@@ -2,6 +2,7 @@
 #include "../dom-exception.h"
 #include "builtin.h"
 #include "encode.h"
+#include "buffer-source.h"
 
 namespace builtins::web::crypto {
 
@@ -21,12 +22,10 @@ bool SubtleCrypto::digest(JSContext *cx, unsigned argc, JS::Value *vp) {
   // 1. Let algorithm be the algorithm parameter passed to the digest() method.
   auto algorithm = args.get(0);
 
-  // 2 . Let data be the result of getting a copy of the bytes held by the data parameter
-  // passed to the digest() method.
-  auto data = value_to_buffer(cx, args.get(1), "SubtleCrypto.digest: data");
-  if (!data.has_value()) {
-    // value_to_buffer would have already created a JS exception so we don't need to create one
-    // ourselves.
+  // Preserve current observable order, matching pinned Node22: validate the
+  // BufferSource before getters, then take a fresh copy after normalization.
+  // This differs from the published WebCrypto copy-before-normalize algorithm.
+  if (!validate_crypto_buffer_source(cx, args.get(1), "SubtleCrypto.digest: data")) {
     return ReturnPromiseRejectedWithPendingError(cx, args);
   }
 
@@ -38,6 +37,9 @@ bool SubtleCrypto::digest(JSContext *cx, unsigned argc, JS::Value *vp) {
     // TODO Rename error to NotSupportedError
     return ReturnPromiseRejectedWithPendingError(cx, args);
   }
+
+  auto data = copy_crypto_buffer_source(cx, args.get(1), "SubtleCrypto.digest: data");
+  if (!data) return ReturnPromiseRejectedWithPendingError(cx, args);
 
   // 5. Let promise be a new Promise.
   JS::RootedObject promise(cx, JS::NewPromiseObject(cx, nullptr));
@@ -52,7 +54,7 @@ bool SubtleCrypto::digest(JSContext *cx, unsigned argc, JS::Value *vp) {
   // the returned error and then terminate the algorithm.
   // 8. Let result be the result of performing the digest operation specified by normalizedAlgorithm
   // using algorithm, with data as message.
-  auto *array_buffer = normalizedAlgorithm->digest(cx, data.value());
+  auto *array_buffer = normalizedAlgorithm->digest(cx, data->bytes());
   if (!array_buffer) {
     return RejectPromiseWithPendingError(cx, promise);
   }
@@ -190,16 +192,11 @@ bool SubtleCrypto::sign(JSContext *cx, unsigned argc, JS::Value *vp) {
   }
   JS::RootedObject key(cx, &key_arg.toObject());
 
-  // 2. Let data be the result of getting a copy of the bytes held by the data parameter passed to
-  // the sign() method.
-  std::optional<std::span<uint8_t>> dataOptional =
-      value_to_buffer(cx, args.get(2), "crypto.subtle.sign: data");
-  if (!dataOptional.has_value()) {
-    // value_to_buffer would have already created a JS exception so we don't need to create one
-    // ourselves.
+  // Validate before algorithm getters, then take an owned copy after normalization,
+  // matching pinned Node22 and the existing StarlingMonkey observable order.
+  if (!validate_crypto_buffer_source(cx, args.get(2), "crypto.subtle.sign: data")) {
     return ReturnPromiseRejectedWithPendingError(cx, args);
   }
-  std::span<uint8_t> data = dataOptional.value();
 
   // 3. Let normalizedAlgorithm be the result of normalizing an algorithm, with alg set to algorithm
   // and op set to "sign".
@@ -209,6 +206,9 @@ bool SubtleCrypto::sign(JSContext *cx, unsigned argc, JS::Value *vp) {
     // TODO Rename error to NotSupportedError
     return ReturnPromiseRejectedWithPendingError(cx, args);
   }
+
+  auto data = copy_crypto_buffer_source(cx, args.get(2), "crypto.subtle.sign: data");
+  if (!data) return ReturnPromiseRejectedWithPendingError(cx, args);
 
   // 5. Let promise be a new Promise.
   JS::RootedObject promise(cx, JS::NewPromiseObject(cx, nullptr));
@@ -244,7 +244,7 @@ bool SubtleCrypto::sign(JSContext *cx, unsigned argc, JS::Value *vp) {
 
   // 10. Let result be the result of performing the sign operation specified by normalizedAlgorithm
   // using key and algorithm and with data as message.
-  auto *signature = normalizedAlgorithm->sign(cx, key, data);
+  auto *signature = normalizedAlgorithm->sign(cx, key, data->bytes());
   if (!signature) {
     return RejectPromiseWithPendingError(cx, promise);
   }
@@ -283,19 +283,14 @@ bool SubtleCrypto::verify(JSContext *cx, unsigned argc, JS::Value *vp) {
   }
   JS::RootedObject key(cx, &key_arg.toObject());
 
-  // 2. Let signature be the result of getting a copy of the bytes held by the signature
-  // parameter passed to the verify() method.
-  std::optional<std::span<uint8_t>> signature =
-      value_to_buffer(cx, args.get(2), "SubtleCrypto.verify: signature (argument 3)");
-  if (!signature) {
+  // Validate both BufferSources before algorithm getters. Owned copies are taken
+  // after normalization, matching pinned Node22 and existing observable order.
+  if (!validate_crypto_buffer_source(cx, args.get(2), "SubtleCrypto.verify: signature (argument 3)")) {
     return ReturnPromiseRejectedWithPendingError(cx, args);
   }
 
-  // 3. Let data be the result of getting a copy of the bytes held by the data parameter passed
-  // to the verify() method.
-  std::optional<std::span<uint8_t>> data =
-      value_to_buffer(cx, args.get(3), "SubtleCrypto.verify: data (argument 4)");
-  if (!data) {
+  // No JS payload pointer survives the normalization below.
+  if (!validate_crypto_buffer_source(cx, args.get(3), "SubtleCrypto.verify: data (argument 4)")) {
     return ReturnPromiseRejectedWithPendingError(cx, args);
   }
 
@@ -307,6 +302,11 @@ bool SubtleCrypto::verify(JSContext *cx, unsigned argc, JS::Value *vp) {
     // TODO Rename error to NotSupportedError
     return ReturnPromiseRejectedWithPendingError(cx, args);
   }
+
+  auto signature = copy_crypto_buffer_source(cx, args.get(2), "SubtleCrypto.verify: signature (argument 3)");
+  if (!signature) return ReturnPromiseRejectedWithPendingError(cx, args);
+  auto data = copy_crypto_buffer_source(cx, args.get(3), "SubtleCrypto.verify: data (argument 4)");
+  if (!data) return ReturnPromiseRejectedWithPendingError(cx, args);
 
   // 6. Let promise be a new Promise.
   JS::RootedObject promise(cx, JS::NewPromiseObject(cx, nullptr));
@@ -336,7 +336,7 @@ bool SubtleCrypto::verify(JSContext *cx, unsigned argc, JS::Value *vp) {
   // 11. Let result be the result of performing the verify operation specified by
   // normalizedAlgorithm using key, algorithm and signature and with data as message.
 
-  auto matchResult = normalizedAlgorithm->verify(cx, key, signature.value(), data.value());
+  auto matchResult = normalizedAlgorithm->verify(cx, key, signature->bytes(), data->bytes());
   if (matchResult.isErr()) {
     return RejectPromiseWithPendingError(cx, promise);
   }

@@ -1,0 +1,185 @@
+{
+  "schema": 1,
+  "candidateVersion": "native-blob-owned-copy-v2",
+  "v1Preserved": true,
+  "v1IndexSha256": "4e79fb4abb69ea0d312b026c8ad2b668042068b0e0bb75353a7b148b33937a13",
+  "spiderMonkeyRevision": "9dab3d6f643e926a340c391ea30968e940390dec",
+  "proofSources": [
+    {
+      "path": "js/src/jsapi.cpp",
+      "sourcePath": "/tmp/starling-node-compat/async-context/source/jsapi.cpp",
+      "sha256": "413b1fa40cc321e0484710dff390ad465e9e625baa6ce6b0e3802aef15696a32",
+      "bytes": 165423,
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/js/src/jsapi.cpp"
+    },
+    {
+      "path": "js/src/vm/JSContext.h",
+      "sourcePath": "/tmp/starling-node-compat/async-context/source/JSContext.h",
+      "sha256": "b87301a81e66eb02a1b05222489c536216f4125d399d22f3b1587e7f750c5f25",
+      "bytes": 44064,
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/js/src/vm/JSContext.h"
+    },
+    {
+      "path": "js/src/vm/MallocProvider.h",
+      "url": "https://raw.githubusercontent.com/bytecodealliance/firefox/9dab3d6f643e926a340c391ea30968e940390dec/js/src/vm/MallocProvider.h",
+      "sha256": "f05b45eba25f95870754800a6ca14962a9204b8ca60dd143be23d5eca5562552",
+      "bytes": 8098
+    },
+    {
+      "path": "js/AllocPolicy.h",
+      "sourcePath": "/tmp/starling-node-compat/improved-build/spidermonkey-dist-release/include/js/AllocPolicy.h",
+      "sha256": "1789e202a3ac818435a642881736a499f393d85349578be596390ee727d42dc8",
+      "bytes": 9071
+    },
+    {
+      "path": "js/Utility.h",
+      "sourcePath": "/tmp/starling-node-compat/improved-build/spidermonkey-dist-release/include/js/Utility.h",
+      "sha256": "0a571e2e9fad1ffc1bbe646c9f81fef7766aa3cd4ef5ad91e235202bae1e15c9",
+      "bytes": 24464
+    },
+    {
+      "path": "mozilla/Vector.h",
+      "sourcePath": "/tmp/starling-node-compat/improved-build/spidermonkey-dist-release/include/mozilla/Vector.h",
+      "sha256": "45bca4b4baffbf4280922a45d7c2fdee094d45b3cbbe47f074a673f546471c69",
+      "bytes": 50667
+    },
+    {
+      "path": "js/MemoryFunctions.h",
+      "sourcePath": "/tmp/starling-node-compat/improved-build/spidermonkey-dist-release/include/js/MemoryFunctions.h",
+      "sha256": "4f4d66fdf6cd73df78dd74b8a036e5085b51c0f9e472a635bbb1398b26aa9b1b",
+      "bytes": 3148
+    },
+    {
+      "path": "rust-encoding.h",
+      "sourcePath": "/Users/dan/dev/StarlingMonkey/deps/include/rust-encoding.h",
+      "sha256": "7ff6cf6ee038ed8981b9923250c2e8898b04f1c792a52731958925d6b3936dd9",
+      "bytes": 47356
+    },
+    {
+      "path": "encoding_c-0.9.8/lib.rs",
+      "sourcePath": "/Users/dan/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/encoding_c-0.9.8/src/lib.rs",
+      "sha256": "98bed946e18cdb1993d46aeb644435ec0d850738fbceaba84742a83934d6c454",
+      "bytes": 43555
+    }
+  ],
+  "decoder": [
+    {
+      "path": "rust-encoding.h",
+      "line": 33,
+      "needle": "constexpr static const uint32_t INPUT_EMPTY = 0;",
+      "meaning": "Status0 is exactly INPUT_EMPTY."
+    },
+    {
+      "path": "rust-encoding.h",
+      "line": 92,
+      "needle": "UTF-16 code units (`u16`) of space.",
+      "meaning": "Output must have at least two writable UTF16 units; v2 enforces this."
+    },
+    {
+      "path": "rust-encoding.h",
+      "line": 822,
+      "needle": "size_t decoder_max_utf16_buffer_length",
+      "meaning": "Worst-case UTF16 capacity; SIZE_MAX signals size_t overflow and is rejected before multiplication."
+    },
+    {
+      "path": "rust-encoding.h",
+      "line": 118,
+      "needle": "the processing of the stream has ended.",
+      "meaning": "With last=true and InputEmpty, the decoder stream is complete."
+    },
+    {
+      "path": "encoding_c-0.9.8/lib.rs",
+      "line": 238,
+      "needle": "fn coder_result_to_u32",
+      "meaning": "Maps CoderResult::InputEmpty to INPUT_EMPTY and OutputFull to OUTPUT_FULL."
+    },
+    {
+      "path": "encoding_c-0.9.8/lib.rs",
+      "line": 857,
+      "needle": "pub unsafe extern \"C\" fn decoder_decode_to_utf16(",
+      "meaning": "The wrapper builds slices using input lengths, then overwrites src_len with bytes read and dst_len with UTF16 units written."
+    }
+  ],
+  "allocator": [
+    {
+      "path": "js/src/jsapi.cpp",
+      "line": 1220,
+      "needle": "JS_PUBLIC_API void* JS_malloc(JSContext* cx, size_t nbytes)",
+      "meaning": "Calls cx->maybe_pod_malloc<uint8_t>(nbytes)."
+    },
+    {
+      "path": "js/src/vm/JSContext.h",
+      "line": 222,
+      "needle": "public js::MallocProvider<JSContext>",
+      "meaning": "JSContext uses this exact allocator mixin."
+    },
+    {
+      "path": "js/src/vm/MallocProvider.h",
+      "line": 88,
+      "needle": "T* maybe_pod_malloc(size_t numElems)",
+      "meaning": "Selects js::MallocArena and calls maybe_pod_arena_malloc."
+    },
+    {
+      "path": "js/src/vm/MallocProvider.h",
+      "line": 56,
+      "needle": "T* maybe_pod_arena_malloc(arena_id_t arena, size_t numElems)",
+      "meaning": "Calls js_pod_arena_malloc<T> in that arena; updates GC allocation counter separately."
+    },
+    {
+      "path": "js/Utility.h",
+      "line": 595,
+      "needle": "static MOZ_ALWAYS_INLINE T* js_pod_arena_malloc",
+      "meaning": "Uses checked byte-size arithmetic, then js_arena_malloc for that arena."
+    },
+    {
+      "path": "js/AllocPolicy.h",
+      "line": 131,
+      "needle": "class SystemAllocPolicy : public AllocPolicyBase",
+      "meaning": "Vector policy inherits the same native allocator implementation, without JS exception reporting."
+    },
+    {
+      "path": "js/AllocPolicy.h",
+      "line": 74,
+      "needle": "T* pod_malloc(size_t numElems)",
+      "meaning": "AllocPolicyBase also selects js::MallocArena."
+    },
+    {
+      "path": "js/AllocPolicy.h",
+      "line": 82,
+      "needle": "T* pod_realloc(T* p, size_t oldSize, size_t newSize)",
+      "meaning": "Subsequent vector growth uses the same js::MallocArena realloc family."
+    },
+    {
+      "path": "js/AllocPolicy.h",
+      "line": 87,
+      "needle": "void free_(T* p, size_t numElems = 0)",
+      "meaning": "Vector destruction routes to js_free."
+    },
+    {
+      "path": "mozilla/Vector.h",
+      "line": 870,
+      "needle": "void replaceRawBuffer(T* aP, size_t aLength);",
+      "meaning": "Requires input allocated according to this Vector AllocPolicy; matching MallocArena allocation satisfies that contract for byte elements."
+    },
+    {
+      "path": "js/Utility.h",
+      "line": 657,
+      "needle": "struct FreePolicy {",
+      "meaning": "UniqueChars uses js_free until release; transfer leaves exactly one vector owner."
+    },
+    {
+      "path": "js/src/jsapi.cpp",
+      "line": 1236,
+      "needle": "JS_PUBLIC_API void* JS_string_malloc(JSContext* cx, size_t nbytes)",
+      "meaning": "String output deliberately uses StringBufferArena and the declared adopting string API, not the vector adoption path."
+    }
+  ],
+  "conclusion": {
+    "decoder": "Nonempty input/output pointers are valid; full checked writable capacity >=2 is passed; success requires INPUT_EMPTY, consumed==source_length and written<=capacity. Empty Blob returns before FFI.",
+    "allocation": "JS_malloc -> JSContext/MallocProvider -> MallocArena -> js_pod_arena_malloc. SystemAllocPolicy -> AllocPolicyBase -> same MallocArena allocation/reallocation and js_free; replaceRawBuffer adoption is within this explicit family, not merely free-compatible.",
+    "separateAccounting": "JSContext allocation-counter updates differ from SystemAllocPolicy. This proves allocator-family compatibility, not complete external-memory pressure/accounting; native-vector GC accounting still deserves a separate bounded-memory review."
+  },
+  "compiled": false,
+  "linked": false,
+  "nativeTestsRun": false
+}

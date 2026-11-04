@@ -1,0 +1,1 @@
+import {isFloat16Array} from 'node:util/types';export function run(){return String(isFloat16Array)}

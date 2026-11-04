@@ -1,5 +1,8 @@
 #include "uuid.h"
 #include "host_api.h"
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+#include "node-compat-entropy.h"
+#endif
 
 #include <fmt/format.h>
 
@@ -63,7 +66,12 @@ struct UUID {
 //   0     1     0     1        5    The name-based version
 //                                   specified in this document
 //                                   that uses SHA-1 hashing.
-std::optional<std::string> random_uuid_v4(JSContext *cx) {
+std::optional<std::string> random_uuid_v4(JSContext *cx, const char *operation) {
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+  if (!builtins::node_compat::entropy::require(cx, operation)) return std::nullopt;
+#else
+  (void)operation;
+#endif
   UUID id{};
 
   {
@@ -74,7 +82,19 @@ std::optional<std::string> random_uuid_v4(JSContext *cx) {
     }
 
     auto bytes = std::move(res.unwrap());
+    if (bytes.size() != sizeof(id) || !bytes.begin()) {
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+      if (bytes.begin()) builtins::node_compat::entropy::clear(bytes.begin(), bytes.size());
+      builtins::node_compat::entropy::invalid_result(cx, operation);
+#else
+      JS_ReportErrorASCII(cx, "crypto.randomUUID: invalid host entropy result");
+#endif
+      return std::nullopt;
+    }
     std::copy_n(bytes.begin(), sizeof(id), reinterpret_cast<uint8_t *>(&id));
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+    builtins::node_compat::entropy::clear(bytes.begin(), bytes.size());
+#endif
   }
 
   // Set the two most significant bits (bits 6 and 7) of the clock_seq_hi_and_reserved to zero and

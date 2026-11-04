@@ -1,0 +1,25 @@
+package starling:i64-abi@0.1.0;
+interface identity {
+  record payload { signed: s64, unsigned: u64, signed-values: list<s64>, unsigned-values: list<u64> }
+  echo-s64: func(value: s64) -> s64;
+  echo-u64: func(value: u64) -> u64;
+  echo-signed-list: func(value: list<s64>) -> list<s64>;
+  echo-unsigned-list: func(value: list<u64>) -> list<u64>;
+  echo-record: func(value: payload) -> payload;
+  echo-result: func(ok: bool, value: s64) -> result<s64, s64>;
+}
+world helper { export identity; }
+world profile {
+  import identity;
+  export local-s64: func(value: s64) -> s64;
+  export local-u64: func(value: u64) -> u64;
+  export constant-min: func() -> s64;
+  export constant-max: func() -> u64;
+  export computed-s64: func(value: s64) -> s64;
+  export callback-s64: func(value: s64) -> s64;
+  export callback-u64: func(value: u64) -> u64;
+  export signed-list: func(value: list<s64>) -> list<s64>;
+  export unsigned-list: func(value: list<u64>) -> list<u64>;
+  export record-check: func() -> string;
+  export result-s64: func(ok: bool, value: s64) -> result<s64, s64>;
+}

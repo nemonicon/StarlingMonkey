@@ -1,0 +1,28 @@
+{
+  "state": "READ_ONLY_ABI_SOURCE_REVIEW_NO_CLONE_CALL",
+  "installedHeader": {
+    "path": "/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk/usr/include/sys/clonefile.h",
+    "sha256": "1efe4ef4241c360905ecc40092245334725a9f1b208be8886ce87e2538b89cbd"
+  },
+  "ctypes": {
+    "function": "clonefile",
+    "argtypes": [
+      "c_char_p",
+      "c_char_p",
+      "c_uint32"
+    ],
+    "restype": "c_int",
+    "flags": 1,
+    "flagName": "CLONE_NOFOLLOW"
+  },
+  "primaryManual": "https://raw.githubusercontent.com/apple-oss-distributions/xnu/main/bsd/man/man2/clonefile.2",
+  "manualReadDate": "2026-11-03",
+  "sourceConclusions": [
+    "Return0 is success; otherwise-1 with errno",
+    "Destination must not exist",
+    "Clones share data blocks and have independent attributes, with documented ownership/mode/ACL exceptions",
+    "Subsequent writes use copy-on-write",
+    "This packet verifies required metadata and rejects mismatches; st_blocks does not prove unique extent recovery"
+  ],
+  "ctypesFunctionResolvedOrCalled": false
+}

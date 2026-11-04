@@ -1,0 +1,423 @@
+--- a/tests/node-compat/build-engine.sh
++++ b/tests/node-compat/build-engine.sh
+@@ -5,7 +5,7 @@
+ set -euo pipefail
+ 
+ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
+-work_root="${NODE_COMPAT_BUILD_ROOT:-/tmp/starling-node-compat/zlib-v4-build}"
++work_root="${NODE_COMPAT_BUILD_ROOT:-/tmp/starling-node-compat/consumers-v1-build}"
+ node_bin="${NODE_COMPAT_NODE:-node}"
+ build_jobs="${NODE_COMPAT_JOBS:-1}"
+ stress="${NODE_COMPAT_GC_STRESS:-0}"
+@@ -25,6 +25,8 @@
+ ticks_enabled="${NODE_COMPAT_INTERNAL_TICKS:-0}"
+ classic_enabled="${NODE_COMPAT_CLASSIC_STREAMS:-0}"
+ zlib_enabled="${NODE_COMPAT_ZLIB:-0}"
++consumers_enabled="${NODE_COMPAT_STREAM_CONSUMERS:-0}"
++if [[ "$consumers_enabled" != 0 && "$consumers_enabled" != 1 ]]; then echo "NODE_COMPAT_STREAM_CONSUMERS must be0or1" >&2; exit 1; fi
+ if [[ "$zlib_enabled" != 0 && "$zlib_enabled" != 1 ]]; then echo "NODE_COMPAT_ZLIB must be0or1" >&2; exit 1; fi
+ if [[ "$classic_enabled" != 0 && "$classic_enabled" != 1 ]]; then
+   echo 'NODE_COMPAT_CLASSIC_STREAMS must be 0 or 1' >&2; exit 1
+@@ -42,6 +44,7 @@
+   echo 'RuntimeOnly+GC is not a selected classic producer variant' >&2; exit 1
+ fi
+ layer_root="$repo_root/tests/node-compat/foundation-zlib/native-integration-candidate-v4"
++consumers_layer_root="$repo_root/tests/node-compat/foundation-stream-consumers/production-text-json-candidate-v1"
+ tick_patch="$repo_root/tests/node-compat/foundation-scheduler/taskqueue-owner-v2/componentize-taskqueue-ticks.UNAPPLIED.patch"
+ 
+ abi_patch="$repo_root/tests/node-compat/abi-fix/componentize-u32-result.patch"
+@@ -123,14 +126,14 @@
+ fi
+ # Preserve every pre-policy source tree, build directory and artifact. Each
+ # selected configuration gets its own embedding output directory as well.
+-policy_suffix="zlib-v4.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled.z$zlib_enabled"
++policy_suffix="consumers-v1.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled.z$zlib_enabled.s$consumers_enabled"
+ source_dir="$source_dir-$policy_suffix"
+ build_dir="$build_dir-$policy_suffix"
+ artifact_name=starlingmonkey_embedding.abi-i32-i64-v1
+ if [[ "$stress" == 1 ]]; then artifact_name="$artifact_name.gc-stress"; fi
+ if [[ "$oom" == 1 ]]; then artifact_name="$artifact_name.oom-testing"; fi
+ if [[ "$build_type" == Debug ]]; then artifact_name="$artifact_name.debug"; fi
+-artifact_name="$artifact_name.zlib-v4.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled.z$zlib_enabled"
++artifact_name="$artifact_name.consumers-v1.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled.z$zlib_enabled.s$consumers_enabled"
+ if [[ -n "$artifact_tag" ]]; then artifact_name="$artifact_name.$artifact_tag"; fi
+ artifact="$work_root/artifacts/$artifact_name.wasm"
+ for generated_name in "${source_dir##*/}" "${build_dir##*/}" "$artifact_name.wasm" "$artifact_name.wasm.build.json" "$artifact_name.raw.wasm" "$artifact_name.raw.wasm.build.json" "componentize-native-inputs-$artifact_name.json" "source-inputs-$artifact_name.json" "recipe-$artifact_name.sha256" "openssl-source-$artifact_name.before.json" "configure-$artifact_name.log" "build-$artifact_name.log"; do
+@@ -163,9 +166,9 @@
+   fi
+ }
+ # Authenticate actual corrected342 sources before any archive fetch.
+-[[ "$(sha256_file "$layer_root/layer-policy.py")" == 2c7ebd5841f50bebf4092275f64f698e909202b60db78e9f24b3725cdfae6747 ]] || exit 1
+-[[ "$(sha256_file "$layer_root/policy.json")" == 687298738c518e878cb17cf122b3979e2f58ea0ff14ac48f85146e8bf730fc8e ]] || exit 1
+-python3 "$layer_root/layer-policy.py" "$repo_root"
++[[ "$(sha256_file "$consumers_layer_root/layer-policy.py")" == 21f7be307c0fd2f34ce7dbd1cfdb433a7965a5f02c45c78290b4705fd0796448 ]] || exit 1
++[[ "$(sha256_file "$consumers_layer_root/policy.json")" == f174d2e38cfe5f9a3de268ff04468cdc57abcdfb33f7577962690cfcbe12df98 ]] || exit 1
++python3 "$consumers_layer_root/layer-policy.py" "$repo_root"
+ fetch_checked "https://codeload.github.com/bytecodealliance/ComponentizeJS/tar.gz/$componentize_revision" \
+   "$work_root/componentize-source.tar.gz" "$componentize_archive_sha"
+ if [[ ! -f "$source_dir/.source-archive-sha256" ]] || [[ "$(cat "$source_dir/.source-archive-sha256")" != "$componentize_archive_sha" ]]; then
+@@ -173,10 +176,10 @@
+   printf '%s\n' "$componentize_archive_sha" > "$source_dir/.source-archive-sha256"
+ fi
+ # New named source layer; original ABI/entry/strict guards below remain exact.
+-[[ "$(sha256_file "$layer_root/layer-policy.py")" == 2c7ebd5841f50bebf4092275f64f698e909202b60db78e9f24b3725cdfae6747 ]] || exit 1
+-[[ "$(sha256_file "$layer_root/policy.json")" == 687298738c518e878cb17cf122b3979e2f58ea0ff14ac48f85146e8bf730fc8e ]] || exit 1
++[[ "$(sha256_file "$consumers_layer_root/layer-policy.py")" == 21f7be307c0fd2f34ce7dbd1cfdb433a7965a5f02c45c78290b4705fd0796448 ]] || exit 1
++[[ "$(sha256_file "$consumers_layer_root/policy.json")" == f174d2e38cfe5f9a3de268ff04468cdc57abcdfb33f7577962690cfcbe12df98 ]] || exit 1
+ [[ "$(sha256_file "$tick_patch")" == a6c3a34e06bc98ebc5a2f9ff943ceeb127e337d5b0bb349fc92d21cc123b576f ]] || exit 1
+-python3 "$layer_root/layer-policy.py" "$repo_root"
++python3 "$consumers_layer_root/layer-policy.py" "$repo_root"
+ # Restore ONLY an exact previously layered embedding before replaying every
+ # original 354... baseline patch/hash guard. Never admit arbitrary source bytes.
+ if [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == 9dcb63beaf55ff6af9ca4d2019316d4a167657c02ed76a1bf246012da0bcd205 ]]; then
+@@ -264,6 +267,7 @@
+ oom_flag=OFF
+ if [[ "$oom" == 1 ]]; then oom_flag=ON; fi
+ zlib_flag=OFF; if [[ "$zlib_enabled" == 1 ]]; then zlib_flag=ON; fi
++consumers_flag=OFF; if [[ "$consumers_enabled" == 1 ]]; then consumers_flag=ON; fi
+ # Freeze the complete compiled-input inventory before Ninja begins. A mutation
+ # during compilation aborts provenance publication rather than recording mixed inputs.
+ input_manifest="$work_root/source-inputs-$artifact_name.json"
+@@ -274,7 +278,7 @@
+ import importlib.util,json,pathlib,sys
+ sys.dont_write_bytecode=True
+ repo=pathlib.Path(sys.argv[1])
+-helper=repo/'tests/node-compat/foundation-zlib/native-integration-candidate-v4/layer-policy.py'
++helper=repo/'tests/node-compat/foundation-stream-consumers/production-text-json-candidate-v1/layer-policy.py'
+ spec=importlib.util.spec_from_file_location('classic_source_capture',helper)
+ layer=importlib.util.module_from_spec(spec);spec.loader.exec_module(layer)
+ json.dump(layer.source_manifest(repo),open(sys.argv[2],'w'),indent=2)
+@@ -300,7 +304,7 @@
+ cmake -S "$source_dir" -B "$build_dir" -G Ninja \
+   -DCMAKE_BUILD_TYPE="$build_type" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DWEVAL=OFF -DUSE_WASM_OPT=ON \
+   -DENABLE_BUILTIN_NODE_COMPAT=ON -DNODE_COMPAT_GC_STRESS="$gc_flag" -DNODE_COMPAT_OOM_TESTING="$oom_flag" \
+-  -DNODE_COMPAT_INTERNAL_TICKS="$ticks_flag" -DNODE_COMPAT_CLASSIC_STREAMS="$classic_flag" -DNODE_COMPAT_ZLIB="$zlib_flag" \
++  -DNODE_COMPAT_INTERNAL_TICKS="$ticks_flag" -DNODE_COMPAT_CLASSIC_STREAMS="$classic_flag" -DNODE_COMPAT_ZLIB="$zlib_flag" -DNODE_COMPAT_STREAM_CONSUMERS="$consumers_flag" -DENABLE_BUILTIN_WEB_TEXT_CODEC=ON \
+   -DENABLE_JS_DEBUGGER=OFF -DENABLE_BUILTIN_WPT_SUPPORT=OFF -DNODE_COMPAT_LOCKED_RUST=ON \
+   -DNODE_COMPAT_ENTROPY_MODE="$entropy_mode" -DNODE_COMPAT_PATH="$path_flag" -DNODE_COMPAT_EVENTS="$events_flag" \
+   -DNODE_COMPAT_STRING_DECODER="$string_decoder_flag" -DNODE_COMPAT_ASSERT="$assert_flag" -DNODE_COMPAT_QUERYSTRING="$querystring_flag" -DNODE_COMPAT_UTIL="$util_flag" -DNODE_COMPAT_STREAM_WEB="$stream_web_flag" \
+@@ -328,9 +332,9 @@
+ if [[ "$build_type" == Debug ]]; then engine_output=starlingmonkey_embedding.debug.wasm; fi
+ cp "$source_dir/lib/$engine_output" "$artifact"
+ 
+-python3 - "$repo_root" "$work_root" "$artifact" "$stress" "$componentize_revision" "$componentize_archive_sha" "$spidermonkey_archive_sha" "$source_dir" "$build_dir" "$abi_fix" "$abi_patch" "$oom" "$build_type" "$input_manifest" "$bigint_fix" "$bigint_patch" "$entropy_mode" "$path_enabled" "$entry_patch" "$events_enabled" "$componentize_input_manifest" "$recipe_before" "$string_decoder_enabled" "$assert_enabled" "$querystring_enabled" "$util_enabled" "$stream_web_enabled" "$ticks_enabled" "$classic_enabled" "$zlib_enabled" "$spidermonkey_dir" "$codec_before_sha" <<'PY'
++python3 - "$repo_root" "$work_root" "$artifact" "$stress" "$componentize_revision" "$componentize_archive_sha" "$spidermonkey_archive_sha" "$source_dir" "$build_dir" "$abi_fix" "$abi_patch" "$oom" "$build_type" "$input_manifest" "$bigint_fix" "$bigint_patch" "$entropy_mode" "$path_enabled" "$entry_patch" "$events_enabled" "$componentize_input_manifest" "$recipe_before" "$string_decoder_enabled" "$assert_enabled" "$querystring_enabled" "$util_enabled" "$stream_web_enabled" "$ticks_enabled" "$classic_enabled" "$zlib_enabled" "$spidermonkey_dir" "$codec_before_sha" "$consumers_enabled" <<'PY'
+ import datetime, hashlib, json, os, pathlib, subprocess, sys
+-repo, work, artifact, stress, componentize, componentize_archive, sm_archive, source_dir, build_dir, abi_fix, abi_patch, oom, build_type, input_manifest, bigint_fix, bigint_patch, entropy_mode, path_enabled, entry_patch, events_enabled, componentize_input_manifest, recipe_before, string_decoder_enabled, assert_enabled, querystring_enabled, util_enabled, stream_web_enabled, ticks_enabled, classic_enabled, zlib_enabled, spidermonkey_dir, codec_before_sha = sys.argv[1:]
++repo, work, artifact, stress, componentize, componentize_archive, sm_archive, source_dir, build_dir, abi_fix, abi_patch, oom, build_type, input_manifest, bigint_fix, bigint_patch, entropy_mode, path_enabled, entry_patch, events_enabled, componentize_input_manifest, recipe_before, string_decoder_enabled, assert_enabled, querystring_enabled, util_enabled, stream_web_enabled, ticks_enabled, classic_enabled, zlib_enabled, spidermonkey_dir, codec_before_sha, consumers_enabled = sys.argv[1:]
+ def digest(path):
+     h = hashlib.sha256()
+     with open(path, 'rb') as source:
+@@ -340,8 +344,8 @@
+     return subprocess.check_output(args, cwd=repo, text=True).strip()
+ import importlib.util
+ sys.dont_write_bytecode = True
+-layer_file = pathlib.Path(repo) / 'tests/node-compat/foundation-zlib/native-integration-candidate-v4/layer-policy.py'
+-assert digest(layer_file) == '2c7ebd5841f50bebf4092275f64f698e909202b60db78e9f24b3725cdfae6747'
++layer_file = pathlib.Path(repo) / 'tests/node-compat/foundation-stream-consumers/production-text-json-candidate-v1/layer-policy.py'
++assert digest(layer_file) == '21f7be307c0fd2f34ce7dbd1cfdb433a7965a5f02c45c78290b4705fd0796448'
+ layer_spec = importlib.util.spec_from_file_location('reviewed_classic_layer',layer_file)
+ layer = importlib.util.module_from_spec(layer_spec); layer_spec.loader.exec_module(layer)
+ manifest = layer.source_manifest(repo)
+@@ -370,6 +374,8 @@
+     'NODE_COMPAT_INTERNAL_TICKS': 'ON' if ticks_enabled == '1' else 'OFF',
+     'NODE_COMPAT_CLASSIC_STREAMS': 'ON' if classic_enabled == '1' else 'OFF',
+     'NODE_COMPAT_ZLIB': 'ON' if zlib_enabled == '1' else 'OFF',
++    'NODE_COMPAT_STREAM_CONSUMERS': 'ON' if consumers_enabled == '1' else 'OFF',
++    'ENABLE_BUILTIN_WEB_TEXT_CODEC': 'ON',
+     'NODE_COMPAT_GC_STRESS': 'ON' if stress == '1' else 'OFF',
+     'NODE_COMPAT_OOM_TESTING': 'ON' if oom == '1' else 'OFF',
+ }
+@@ -390,7 +396,7 @@
+ assert strict_initialization, 'Opt-in profile must compile the strict initializer boundary'
+ registration_commands = [entry['command'] for entry in json.loads(compile_commands) if pathlib.Path(entry['file']).as_posix().endswith('/builtins/node-compat/register.cpp')]
+ assert registration_commands, 'Need actual native module registration compilation'
+-for option in ['NODE_COMPAT_PATH', 'NODE_COMPAT_EVENTS', 'NODE_COMPAT_STRING_DECODER', 'NODE_COMPAT_ASSERT', 'NODE_COMPAT_QUERYSTRING', 'NODE_COMPAT_UTIL', 'NODE_COMPAT_STREAM_WEB', 'NODE_COMPAT_CLASSIC_STREAMS', 'NODE_COMPAT_ZLIB']:
++for option in ['NODE_COMPAT_PATH', 'NODE_COMPAT_EVENTS', 'NODE_COMPAT_STRING_DECODER', 'NODE_COMPAT_ASSERT', 'NODE_COMPAT_QUERYSTRING', 'NODE_COMPAT_UTIL', 'NODE_COMPAT_STREAM_WEB', 'NODE_COMPAT_CLASSIC_STREAMS', 'NODE_COMPAT_ZLIB', 'NODE_COMPAT_STREAM_CONSUMERS']:
+     assert all((('-D' + option + '=1') in entry.split()) == (requested_cmake_options[option] == 'ON') for entry in registration_commands), 'Actual registration compile disagrees with ' + option
+ stream_web_commands = [entry['command'] for entry in json.loads(compile_commands) if pathlib.Path(entry['file']).as_posix().endswith('/builtins/node-compat/stream-web-kernel.cpp')]
+ assert bool(stream_web_commands) == (stream_web_enabled == '1'), 'Private stream/web capture source must compile only when selected'
+@@ -411,7 +417,7 @@
+ # Preserve the accepted v3 attestation verbatim. This is a separately named
+ # source extension; the old policy must never claim the new EventTarget bytes.
+ protected_abort_sources = {'builtins/web/event/event-target.h': '516f9c609d78576cf72897c4c5bbe1106a3d04ab4a197c50cedee3fa0c8fb96d', 'builtins/web/event/event-target.cpp': '1c0263f958d0f6221accf04ffa2ac12c6406e11914e1b2fab3c41c66c3038a1e', 'builtins/node-compat/register.cpp': '19eef9879c94e5232238f6df738d57057d384fa025849ee319fcf51eb06eda2b', 'builtins/node-compat/events.mjs': 'b58b0e0891145748e71139b8d08abb4187fe52e1aa12f9705beee3f6380b68f6', 'builtins/node-compat/events-add-abort-listener.mjs': '106be45fe33b0e35d97aad6ece3fb368210cb954bb652ea7bcdfa478b9c7083e', 'builtins/node-compat/events-factories.generated.h': '41b4c286e24089e0c223d0e80d4d0f587322afee8816811f2e754217f8103437', 'builtins/node-compat/generate-events-factory.mjs': '90a7ae6b887fce3bf92dc167090ea44c0bb8755400be2ff577658539f4a84354', 'builtins/node-compat/generate-factories.mjs': '46b0e0a40d3a50dae58e0d833c4861d1344df045eaf490f74060bbccc1a4561e', 'builtins/node-compat/export-manifest.events.node-v22.14.0.json': '90f7dc152b990dc8955c0801eab11b9410a10dc96a8019c1b7a81b69981eb561', 'cmake/builtins.cmake': '0155eae9e45f2d059663f1bcc54315e58e4f2cb0d8e5a9dfcb76cfa9a7f5f9ea'}
+-assert digest(layer_file) == '2c7ebd5841f50bebf4092275f64f698e909202b60db78e9f24b3725cdfae6747', 'Classic source helper changed during compilation'
++assert digest(layer_file) == '21f7be307c0fd2f34ce7dbd1cfdb433a7965a5f02c45c78290b4705fd0796448', 'Classic source helper changed during compilation'
+ layer.validate_sources(repo,manifest)
+ strict_callback_sources = dict(strict_callback_v3_sources)
+ strict_callback_sources['builtins/web/event/event-target.cpp'] = protected_abort_sources['builtins/web/event/event-target.cpp']
+@@ -468,6 +474,7 @@
+ if stream_web_enabled == '1': manifest_paths.append('builtins/node-compat/export-manifest.stream-web.node-v22.14.0.json')
+ if classic_enabled == '1': manifest_paths.append('builtins/node-compat/classic-streams/export-manifest.classic-streams.node-v22.14.0.json')
+ if zlib_enabled == '1': manifest_paths.append('builtins/node-compat/export-manifest.zlib.node-v22.14.0.json')
++if consumers_enabled == '1': manifest_paths.append('builtins/node-compat/export-manifest.stream-consumers.node-v22.14.0.json')
+ selected_manifests = [{'path':path,'sha256':digest(pathlib.Path(repo)/path),'profileVersion':json.loads((pathlib.Path(repo)/path).read_text())['profileVersion']} for path in manifest_paths]
+ 
+ packaging_module = os.environ.get('NODE_COMPAT_COMPONENTIZE_MODULE')
+@@ -493,7 +500,7 @@
+     'hostApi': 'wasi-0.2.10',
+     'profileEnabled': True, 'entropyPolicy': 'off' if entropy_mode == 'OFF' else 'runtime-only',
+     'entropyEntryPatchApplied': True, 'pathEnabled': path_enabled == '1', 'eventsEnabled': events_enabled == '1',
+-    'stringDecoderEnabled': string_decoder_enabled == '1', 'assertEnabled': assert_enabled == '1', 'querystringEnabled': querystring_enabled == '1', 'utilEnabled': util_enabled == '1', 'streamWebEnabled': stream_web_enabled == '1', 'classicStreamsEnabled': classic_enabled == '1', 'zlibEnabled': zlib_enabled == '1', 'internalTicksEnabled': ticks_enabled == '1', 'selectedModuleManifests': selected_manifests, 'openssl': openssl,
++    'stringDecoderEnabled': string_decoder_enabled == '1', 'assertEnabled': assert_enabled == '1', 'querystringEnabled': querystring_enabled == '1', 'utilEnabled': util_enabled == '1', 'streamWebEnabled': stream_web_enabled == '1', 'classicStreamsEnabled': classic_enabled == '1', 'zlibEnabled': zlib_enabled == '1', 'streamConsumersEnabled': consumers_enabled == '1', 'internalTicksEnabled': ticks_enabled == '1', 'selectedModuleManifests': selected_manifests, 'openssl': openssl,
+     'gcStress': stress == '1', 'oomTesting': oom == '1',
+     'strictInitialization': strict_initialization, 'packagingSplicer': packaging_selection,
+     'debuggerEnabled': False, 'wptSupportEnabled': False,
+@@ -575,7 +582,7 @@
+ codec=importlib.util.module_from_spec(codec_spec);codec_spec.loader.exec_module(codec)
+ metadata['zlibSelectedCodecInput']=codec.selected_compile_input(spidermonkey_dir)
+ metadata = layer.decorate(metadata,repo,source_dir,json.loads(compile_commands),embedding_commands,ticks_enabled == '1')
+-assert digest(layer_file) == '2c7ebd5841f50bebf4092275f64f698e909202b60db78e9f24b3725cdfae6747'
++assert digest(layer_file) == '21f7be307c0fd2f34ce7dbd1cfdb433a7965a5f02c45c78290b4705fd0796448'
+ assert digest(layer_file.parent / 'policy.json') == layer.POLICY_SHA256
+ 
+ codec_file=layer_file.parent/'codec-evidence.py'
+--- a/tests/node-compat/module-selection.mjs
++++ b/tests/node-compat/module-selection.mjs
+@@ -4,6 +4,7 @@
+ import {validatePrivateTickSourceAdmission} from './private-ticks-admission.mjs';
+ import {validateClassicSourceAdmission} from './classic-streams-admission.mjs';
+ import {validateZlibSourceAdmission} from './zlib-admission.mjs';
++import {validateStreamConsumersSourceAdmission} from './stream-consumers-admission.mjs';
+ import { builtinModules } from 'node:module';
+ import { createHash } from 'node:crypto';
+ import { readFileSync } from 'node:fs';
+@@ -20,6 +21,7 @@
+ export const UTIL_MANIFEST = 'builtins/node-compat/export-manifest.util.node-v22.14.0.json';
+ export const STREAM_WEB_MANIFEST = 'builtins/node-compat/export-manifest.stream-web.node-v22.14.0.json';
+ export const ZLIB_MANIFEST = 'builtins/node-compat/export-manifest.zlib.node-v22.14.0.json';
++export const STREAM_CONSUMERS_MANIFEST = 'builtins/node-compat/export-manifest.stream-consumers.node-v22.14.0.json';
+ export const CLASSIC_STREAMS_MANIFEST = 'builtins/node-compat/classic-streams/export-manifest.classic-streams.node-v22.14.0.json';
+ assert.equal(process.version, 'v22.14.0', 'Native module admission uses the pinned Node release inventory');
+ const repository = fileURLToPath(new URL('../../', import.meta.url));
+@@ -83,7 +85,8 @@
+ 
+ export function selectedManifestsForEngine(metadata, { sourceRoot = repository } = {}) {
+   assert.equal(metadata.profileEnabled, true);
+-  const zlib=validateZlibSourceAdmission(metadata,{sourceRoot,parentProtectedSources:protectedAbortV1Sources,parentProtectedPatch:protectedAbortV1Patch});
++  const consumers=validateStreamConsumersSourceAdmission(metadata);
++  const zlib=consumers??validateZlibSourceAdmission(metadata,{sourceRoot,parentProtectedSources:protectedAbortV1Sources,parentProtectedPatch:protectedAbortV1Patch});
+   const classic = zlib ?? validateClassicSourceAdmission(metadata, {sourceRoot,
+     parentProtectedSources:protectedAbortV1Sources,parentProtectedPatch:protectedAbortV1Patch});
+   const privateTicks = classic ?? validatePrivateTickSourceAdmission(metadata, {sourceRoot,
+@@ -109,6 +112,7 @@
+     ['streamWebEnabled', 'NODE_COMPAT_STREAM_WEB', STREAM_WEB_MANIFEST],
+     ['classicStreamsEnabled', 'NODE_COMPAT_CLASSIC_STREAMS', CLASSIC_STREAMS_MANIFEST],
+     ['zlibEnabled', 'NODE_COMPAT_ZLIB', ZLIB_MANIFEST],
++    ['streamConsumersEnabled', 'NODE_COMPAT_STREAM_CONSUMERS', STREAM_CONSUMERS_MANIFEST],
+   ]) {
+     assert(metadata[field] === undefined || typeof metadata[field] === 'boolean', `${field} must be a boolean`);
+     const enabled = metadata[field] === true;
+--- /dev/null
++++ b/tests/node-compat/stream-consumers-admission.mjs
+@@ -0,0 +1,210 @@
++//350-source build validation is separate from CLOSED operational admission.
++//Historical unhinted342/306 receipts retain their unchanged selectors.
++import assert from 'node:assert/strict';
++import {validateSelectedCompileInput,validateCompileForcedInclude} from './foundation-zlib/native-integration-candidate-v4/compile-input.mjs';
++import {createHash} from 'node:crypto';
++import {readFileSync,lstatSync} from 'node:fs';
++import {resolve,join} from 'node:path';
++const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
++const PINS_SHA='50969f1ec9864f9151a6868bd3515bba8b0616c97913012ba63a8497feeaa773';
++const RECIPE_SHA='f4d4d4c2732687516450f854961324f91e2f05d60a9a489e039a9a1444fbfe70';
++function entries(value) {
++  assert(Array.isArray(value), 'Need an explicit source inventory');
++  const seen = new Set();
++  return value.map(entry => {
++    assert(entry && Object.keys(entry).sort().join(',') === 'path,sha256');
++    assert(typeof entry.path === 'string' && !entry.path.includes('\\') && !entry.path.includes('\0'));
++    assert(!/^[A-Za-z]:/.test(entry.path) && !entry.path.startsWith('/'));
++    assert(entry.path.split('/').every(part => part && part !== '.' && part !== '..'));
++    assert(typeof entry.sha256 === 'string' && /^[0-9a-f]{64}$/.test(entry.sha256));
++    assert(!seen.has(entry.path), 'Duplicate source path'); seen.add(entry.path);
++    return {path:entry.path,sha256:entry.sha256};
++  }).sort((a,b)=>a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
++}
++function sourceDigest(value) { return hash(JSON.stringify(entries(value))); }
++
++// Parse captured POSIX CMake command text; never evaluate a shell command.
++function words(command) {
++  assert.equal(typeof command, 'string');
++  const result=[]; let word='', quote=null, started=false;
++  for(let i=0;i<command.length;i++) {
++    const c=command[i];
++    if(quote==='\'') { if(c==='\'')quote=null;else word+=c;started=true;continue; }
++    if(c==='\\') { assert(i+1<command.length);word+=command[++i];started=true;continue; }
++    if(quote==='"') { if(c==='"')quote=null;else word+=c;started=true;continue; }
++    if(c==='\''||c==='"') {quote=c;started=true;continue;}
++    if(/\s/.test(c)) {if(started){result.push(word);word='';started=false;}continue;}
++    assert(!';|&<>'.includes(c), 'Not a single captured compiler command');
++    word+=c;started=true;
++  }
++  assert.equal(quote,null,'Unclosed compiler-command quote');
++  if(started)result.push(word);
++  assert(result.length && result.filter(word=>word==='-c').length===1);
++  assert(!result.includes('-fsyntax-only'),'Syntax-only checks are not engine compilation');
++  assert(!result.includes('-D')&&!result.includes('-U'),'Need captured joined macro definitions');
++  return result;
++}
++function macro(tokens,name,enabled) {
++  const definitions=tokens.filter(word=>word==='-D'+name||word.startsWith('-D'+name+'='));
++  assert.deepEqual(definitions,enabled?['-D'+name+'=1']:[], 'Unexpected macro '+name);
++  assert(!tokens.includes('-U'+name),'Unexpected macro undefinition '+name);
++}
++function release(tokens) {
++  assert.deepEqual(tokens.filter(word=>word.startsWith('-O')),['-O3']);
++  assert.deepEqual(tokens.filter(word=>word==='-DNDEBUG'||word.startsWith('-DNDEBUG=')),['-DNDEBUG']);
++  assert(!tokens.includes('-UNDEBUG')&&!tokens.includes('-UDEBUG')&&!tokens.some(word=>word.startsWith('-DDEBUG')));
++  assert(!tokens.some(word=>word==='-DNODE_COMPAT_OOM_TESTING'||word.startsWith('-DNODE_COMPAT_OOM_TESTING=')));
++  assert(!tokens.includes('-UNODE_COMPAT_OOM_TESTING'));
++}
++function compiled(command, candidates, enabled, events, streamWeb) {
++  const tokens=words(command), input=tokens[tokens.indexOf('-c')+1];
++  assert(input && !input.startsWith('-'));
++  const paths=candidates.filter(path=>input.endsWith('/'+path));
++  assert.equal(paths.length,1,'Unknown/missing native compiler input');
++  macro(tokens,'NODE_COMPAT_INTERNAL_TICKS',enabled);
++  macro(tokens,'NODE_COMPAT_STRICT_INITIALIZATION',true);
++  macro(tokens,'NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER',events);
++  // CMake selects this PRIVATE definition only on builtin_node_compat.
++  macro(tokens,'NODE_COMPAT_STREAM_WEB',streamWeb&&paths[0].startsWith('builtins/node-compat/'));
++  return paths[0];
++}
++function resolveLayer(map,policy) {
++  return Object.fromEntries(Object.entries(map).map(([path,digest])=>{
++    const layer=policy.sourceLayer[path];
++    if(!layer)return[path,digest];
++    assert.equal(layer.beforeSha256,digest,'Source policy ancestry mismatch');
++    return[path,layer.afterSha256];
++  }));
++}
++function normalizedPatches(value) {
++  assert(Array.isArray(value));
++  return value.map(item=>Object.fromEntries(['name','sha256','baseRevision','applied','files'].map(key=>[key,item[key]])));
++}
++
++// Full source/metadata contract. This alone is never engine/runtime proof.
++function loadContract(){
++ const pinsBytes=readFileSync(new URL('./foundation-stream-consumers/production-text-json-candidate-v1/admission-pins.json',import.meta.url));
++ assert.equal(hash(pinsBytes),PINS_SHA,'Unreviewed classic admission contract');
++ const pins=JSON.parse(pinsBytes);
++ const policyBytes=readFileSync(new URL('./foundation-stream-consumers/production-text-json-candidate-v1/policy.json',import.meta.url));
++ assert.equal(hash(policyBytes),pins.policySha256);
++ assert.equal(hash(readFileSync(new URL('./foundation-stream-consumers/production-text-json-candidate-v1/layer-policy.py',import.meta.url))),pins.helperSha256);
++ const policy=JSON.parse(policyBytes);
++ const parentPinsBytes=readFileSync(new URL('./foundation-scheduler/admission-candidate-v1/pins.json',import.meta.url));
++ assert.equal(hash(parentPinsBytes),pins.parentAdmissionPinsSha256);
++ const parentPolicyBytes=readFileSync(new URL('./foundation-scheduler/integration-candidate-v1/policy.json',import.meta.url));
++ assert.equal(hash(parentPolicyBytes),pins.parentPolicySha256);
++ assert.equal(hash(readFileSync(new URL('./foundation-scheduler/integration-candidate-v1/layer-policy.py',import.meta.url))),pins.parentHelperSha256);
++ const parentPins=JSON.parse(parentPinsBytes),parent=JSON.parse(parentPolicyBytes);
++ assert.deepEqual(policy.parentExpectedNativeSourceManifest,parent.expectedNativeSourceManifest);
++ assert.equal(policy.parentRecipeSha256,pins.parentRecipeSha256);
++ assert.equal(policy.expectedNativeSourceManifest.length,355);
++ assert.equal(policy.addedSourcePaths.length,49);assert.equal(Object.keys(policy.sourceLayer).length,51);
++ return{pins,policy,parentPins,parent};
++}
++function compose(map,parent,policy){return resolveLayer(resolveLayer(map,parent),policy);}
++function hinted(metadata){return metadata.buildRecipeSha256===RECIPE_SHA||Object.hasOwn(metadata,'streamConsumersEnabled')||Object.hasOwn(metadata,'streamConsumersPolicy')||Object.hasOwn(metadata,'streamConsumersSourcePolicy')||Object.hasOwn(metadata.observedCMakeOptions??{},'NODE_COMPAT_STREAM_CONSUMERS')||Object.hasOwn(metadata.requestedCMakeOptions??{},'NODE_COMPAT_STREAM_CONSUMERS')||(Array.isArray(metadata.sourceManifest)&&metadata.sourceManifest.some(row=>typeof row?.path==='string'&&row.path.startsWith('builtins/node-compat/stream-consumers/')));}
++export function validateStreamConsumersSourceModel(metadata,{sourceRoot,parentProtectedSources,parentProtectedPatch}={}){
++ assert(metadata&&typeof metadata==='object'&&!Array.isArray(metadata));
++ assert((metadata.diagnosticOnly===undefined||metadata.diagnosticOnly===false)&&!Object.hasOwn(metadata,'internalTickDiagnosticPolicy'),'Diagnostic engines are never classic production');
++ const{pins,policy,parentPins,parent}=loadContract();
++ assert.equal(metadata.buildRecipeSha256,pins.productionRecipeSha256);
++ assert.equal(typeof metadata.classicStreamsEnabled,'boolean');const enabled=metadata.classicStreamsEnabled;
++ assert.equal(typeof metadata.internalTicksEnabled,'boolean');const ticksEnabled=metadata.internalTicksEnabled;
++ for(const field of['profileEnabled','strictInitialization','abiFixEnabled','bigIntFixEnabled'])assert.equal(metadata[field],true,field);
++ for(const field of['oomTesting','debuggerEnabled','wptSupportEnabled'])assert.equal(metadata[field],false,field);
++ for(const[field,option]of[['pathEnabled','NODE_COMPAT_PATH'],['eventsEnabled','NODE_COMPAT_EVENTS'],['stringDecoderEnabled','NODE_COMPAT_STRING_DECODER'],
++  ['assertEnabled','NODE_COMPAT_ASSERT'],['querystringEnabled','NODE_COMPAT_QUERYSTRING'],['utilEnabled','NODE_COMPAT_UTIL'],['streamWebEnabled','NODE_COMPAT_STREAM_WEB'],
++  ['gcStress','NODE_COMPAT_GC_STRESS'],['internalTicksEnabled','NODE_COMPAT_INTERNAL_TICKS'],['classicStreamsEnabled','NODE_COMPAT_CLASSIC_STREAMS'],['zlibEnabled','NODE_COMPAT_ZLIB'],['streamConsumersEnabled','NODE_COMPAT_STREAM_CONSUMERS']]){
++  assert.equal(typeof metadata[field],'boolean',field);for(const map of['requestedCMakeOptions','observedCMakeOptions'])assert.equal(metadata[map]?.[option],metadata[field]?'ON':'OFF');}
++ if(enabled)for(const field of['eventsEnabled','stringDecoderEnabled','internalTicksEnabled'])assert.equal(metadata[field],true,'Classic prerequisite '+field);
++ for(const[option,value]of Object.entries({CMAKE_BUILD_TYPE:'Release',WEVAL:'OFF',USE_WASM_OPT:'ON',ENABLE_BUILTIN_NODE_COMPAT:'ON',ENABLE_JS_DEBUGGER:'OFF',
++  ENABLE_BUILTIN_WPT_SUPPORT:'OFF',NODE_COMPAT_LOCKED_RUST:'ON',NODE_COMPAT_OOM_TESTING:'OFF'}))for(const field of['requestedCMakeOptions','observedCMakeOptions'])assert.equal(metadata[field]?.[option],value);
++ assert(['off','runtime-only'].includes(metadata.entropyPolicy));for(const field of['requestedCMakeOptions','observedCMakeOptions'])assert.equal(metadata[field].NODE_COMPAT_ENTROPY_MODE,metadata.entropyPolicy==='off'?'OFF':'RUNTIME_ONLY');
++ assert(!(metadata.gcStress&&metadata.entropyPolicy==='runtime-only'),'RuntimeOnly+GC is outside this finite producer');
++ assert.equal(metadata.hostApi,'wasi-0.2.10');assert.equal(metadata.generatedRustProject?.cargoBuildLocked,true);assert.equal(metadata.generatedRustProject?.manifestAndLockCheckedBeforeAndAfterBuild,true);
++ for(const field of['sourceInputsCapturedBeforeBuild','componentizeSourcesCapturedBeforeBuild','buildRecipeCheckedBeforeAndAfterBuild'])assert.equal(metadata[field],true);
++ assert.deepEqual(metadata.classicTraceSourcePolicy,policy.classicTraceSourcePolicy,'Exact corrected source provenance required');
++ const current=entries(metadata.sourceManifest);assert.equal(current.length,355);assert.deepEqual(current,entries(policy.expectedNativeSourceManifest));
++ const immediate=current.filter(row=>!policy.addedSourcePaths.includes(row.path)).map(row=>({path:row.path,sha256:policy.sourceLayer[row.path]?.beforeSha256??row.sha256}));
++ assert.equal(immediate.length,306);assert.deepEqual(immediate,entries(parent.expectedNativeSourceManifest));
++ assert.equal(sourceDigest(immediate),policy.parentNativeManifestCanonicalSha256);
++ const original=immediate.filter(row=>parent.sourceLayer[row.path]?.beforeSha256!==null).map(row=>({path:row.path,sha256:parent.sourceLayer[row.path]?.beforeSha256??row.sha256}));
++ assert.equal(original.length,304);assert.equal(sourceDigest(original),parent.parentNativeManifestCanonicalSha256);
++ const root=resolve(sourceRoot);assert(!lstatSync(root).isSymbolicLink());
++ for(const row of current){let path=root;for(const part of row.path.split('/')){path=join(path,part);assert(!lstatSync(path).isSymbolicLink());}assert.equal(hash(readFileSync(path)),row.sha256,'Actual342 source '+row.path);}
++ const strict=metadata.strictEventExceptionPolicy,protectedPolicy=metadata.protectedAbortListenerPolicy,ticks=metadata.internalTickPolicy,classic=metadata.classicStreamsPolicy;
++ assert.equal(strict?.version,policy.strictPolicyVersion);assert.equal(protectedPolicy?.version,policy.protectedPolicyVersion);
++ assert.deepEqual(strict.parentSourcePolicy,parentPins.parentStrict);assert.deepEqual(protectedPolicy.parentSourcePolicy,parentPins.parentProtected);
++ assert.deepEqual(parentProtectedSources,parentPins.parentProtected.sourceSha256);assert.equal(parentProtectedPatch,parentPins.parentProtected.patchSha256);
++ for(const key of['patchSha256','basePolicy','embeddingBoundaryPatchSha256'])assert.deepEqual(strict[key],parentPins.parentStrict[key]);
++ const strictSources=compose(parentPins.parentStrict.nativeSourceSha256,parent,policy);
++ for(const name of['runtime/node_tick_queue.cpp','runtime/node_tick_queue.h'])strictSources[name]=parent.sourceLayer[name].afterSha256;
++ assert.deepEqual(strict.nativeSourceSha256,strictSources);assert.deepEqual(protectedPolicy.sourceSha256,compose(parentPins.parentProtected.sourceSha256,parent,policy));
++ assert.equal(protectedPolicy.patchSha256,parentPins.parentProtected.patchSha256);assert.equal(protectedPolicy.strictPolicyVersion,strict.version);
++ assert.equal(protectedPolicy.enabled,metadata.eventsEnabled);assert.equal(metadata.protectedAbortListenerEnabled,metadata.eventsEnabled);
++ assert.deepEqual(protectedPolicy.prerequisiteCMakeOptions,parentPins.prerequisiteCMakeOptions);
++ const external=parentPins.parentExternalSourceManifest.map(row=>({...row,sha256:row.path==='embedding/embedding.cpp'?policy.embedding.afterSha256:row.sha256}));
++ assert.deepEqual(metadata.componentizeSourceManifest,external);assert.equal(metadata.componentizeJsRevision,parentPins.componentizeJsRevision);
++ const tickPatch={name:parent.version+'-boundary',sha256:parent.embedding.patchSha256,baseRevision:parentPins.componentizeJsRevision,applied:true,files:['embedding/embedding.cpp']};
++ assert.deepEqual(normalizedPatches(metadata.componentizeJsPatches),[...parentPins.parentPatchChain,tickPatch]);
++ assert.equal(ticks?.version,policy.version);assert.equal(ticks.enabled,ticksEnabled);assert.equal(ticks.sourcePolicyInstalled,true);
++ for(const[field,value]of Object.entries({parentRecipeSha256:policy.parentRecipeSha256,parentNativeManifestCanonicalSha256:policy.parentNativeManifestCanonicalSha256,
++  parentPrivateTickPolicyFileSha256:pins.parentPolicySha256,parentPrivateTickHelperSha256:pins.parentHelperSha256,nativePatchSha256:policy.nativePatchSha256,
++  embeddingPatchSha256:policy.embedding.patchSha256,embeddingBeforeSha256:policy.embedding.beforeSha256,embeddingAfterSha256:policy.embedding.afterSha256,
++  policyFileSha256:pins.policySha256,helperSha256:pins.helperSha256}))assert.equal(ticks[field],value,field);
++ assert.deepEqual(ticks.sourceLayer,policy.sourceLayer);assert.deepEqual(ticks.limits,parent.limits);assert.equal(ticks.addsExternalCapabilities,false);assert.equal(ticks.publicProcessModule,false);
++ assert.equal(ticks.resetSafeReuse,'OPEN; cancellation and teardown not established');assert.equal(ticks.requestedCMake,ticksEnabled?'ON':'OFF');assert.equal(ticks.observedCMake,ticks.requestedCMake);
++ assert.equal(classic?.version,policy.classicPolicyVersion);assert.equal(classic.enabled,enabled);assert.equal(classic.policyFileSha256,pins.policySha256);assert.equal(classic.helperSha256,pins.helperSha256);
++ assert.equal(classic.parentRecipeSha256,policy.parentRecipeSha256);assert.equal(classic.parentSourceManifestCanonicalSha256,policy.parentNativeManifestCanonicalSha256);
++ assert.equal(classic.nativePatchSha256,policy.nativePatchSha256);assert.deepEqual(classic.addedSourcePaths,policy.classicAddedSourcePaths);assert.equal(classic.moduleManifest,policy.classicManifest);
++ assert.equal(classic.requestedCMake,enabled?'ON':'OFF');assert.equal(classic.observedCMake,classic.requestedCMake);assert.equal(classic.addsExternalCapabilities,false);assert.equal(classic.publicProcessModule,false);
++ const cpp=current.filter(row=>row.path.endsWith('.cpp')&&/^(builtins|runtime)\//.test(row.path)).map(row=>row.path);assert.equal(cpp.length,62);
++ const active=cpp.filter(path=>(ticksEnabled||path!=='runtime/node_tick_queue.cpp')&&(metadata.streamWebEnabled||path!=='builtins/node-compat/stream-web-kernel.cpp')&&(metadata.zlibEnabled||path!=='builtins/node-compat/zlib/kernel.cpp'));
++ const layout=new Map();assert(Array.isArray(ticks.actualLayoutCompileCommands));
++ function command(source,candidates){const path=compiled(source,candidates,ticksEnabled,metadata.eventsEnabled,metadata.streamWebEnabled);const tokens=words(source);
++  release(tokens);
++  validateCompileForcedInclude(tokens,metadata.zlibSelectedCodecInput);
++  assert(!tokens.some(word=>['-DZ_PREFIX','-UZ_PREFIX','-Wl,-lz'].some(prefix=>word.startsWith(prefix))||['-lz','-lzlib'].includes(word)),'No second codec or prefix ABI');
++  macro(tokens,'NODE_COMPAT_CLASSIC_STREAMS',enabled&&policy.privateTargetCpp.includes(path));macro(tokens,'NODE_COMPAT_ENTROPY_RUNTIME_ONLY',metadata.entropyPolicy==='runtime-only');
++  macro(tokens,'NODE_COMPAT_STREAM_CONSUMERS',metadata.streamConsumersEnabled&&policy.privateTargetCpp.includes(path));macro(tokens,'NODE_COMPAT_ENTROPY_POLICY',true);macro(tokens,'NODE_COMPAT_ZLIB',metadata.zlibEnabled&&path.startsWith('builtins/node-compat/'));macro(tokens,'NODE_COMPAT_GC_STRESS',metadata.gcStress&&policy.privateTargetCpp.includes(path));return path;}
++ for(const row of ticks.actualLayoutCompileCommands){const path=command(row,cpp);assert(!layout.has(path));layout.set(path,row);}
++ assert.deepEqual([...layout.keys()].sort(),active.sort());assert.deepEqual(protectedPolicy.actualLayoutCompileCommands,ticks.actualLayoutCompileCommands);
++ const embedding=ticks.actualEmbeddingCompileCommands;assert(Array.isArray(embedding)&&embedding.length===1);command(embedding[0],['embedding/embedding.cpp']);
++ assert.deepEqual(metadata.actualEmbeddingCompileCommands,embedding);assert.deepEqual(protectedPolicy.actualEmbeddingCompileCommands,embedding);
++ assert.deepEqual(ticks.actualQueueCompileCommands,ticksEnabled?[layout.get('runtime/node_tick_queue.cpp')]:[]);
++ assert.deepEqual(metadata.actualStreamWebKernelCompileCommands,metadata.streamWebEnabled?[layout.get('builtins/node-compat/stream-web-kernel.cpp')]:[]);
++ const strictCpp=Object.keys(strictSources).filter(path=>path.endsWith('.cpp')&&(ticksEnabled||path!=='runtime/node_tick_queue.cpp'));
++ assert.deepEqual([...strict.actualNativeCompileCommands].sort(),strictCpp.map(path=>layout.get(path)).sort());
++ const privateCommands=policy.privateTargetCpp.filter(path=>layout.has(path)).map(path=>layout.get(path));assert.equal(privateCommands.length,(metadata.streamWebEnabled?5:4)+Number(metadata.zlibEnabled));
++ assert.deepEqual([...classic.actualPrivateTargetCompileCommands].sort(),privateCommands.sort());
++ assert.deepEqual(classic.actualRegistrationCompileCommands,[layout.get('builtins/node-compat/register.cpp')]);assert.deepEqual(metadata.actualRegistrationCompileCommands,classic.actualRegistrationCompileCommands);
++ validateSelectedCompileInput(metadata.zlibSelectedCodecInput);
++ assert.deepEqual(metadata.zlibSourcePolicy,policy.zlibSourcePolicy);
++ const zlib=metadata.zlibPolicy;assert.equal(zlib?.version,'sm-bounded-zlib-install-v1');assert.equal(zlib.enabled,metadata.zlibEnabled);
++ assert.equal(zlib.policyFileSha256,pins.policySha256);assert.equal(zlib.helperSha256,pins.helperSha256);
++ assert.equal(zlib.moduleManifest,policy.zlibManifest);assert.equal(zlib.moduleManifestSha256,policy.zlibManifestSha256);assert.deepEqual(zlib.requiredHostInterfaces,[]);
++ assert.deepEqual(zlib.actualKernelCompileCommands,metadata.zlibEnabled?[layout.get('builtins/node-compat/zlib/kernel.cpp')]:[]);
++ assert.deepEqual(zlib.runtimeBackendProof,{verified:false,version:null,vernum:null});
++ const consumers=metadata.streamConsumersPolicy;assert.equal(consumers?.version,'sm-stream-consumers-text-json-install-v1');assert.equal(consumers.enabled,metadata.streamConsumersEnabled);assert.equal(consumers.policyFileSha256,pins.policySha256);assert.equal(consumers.helperSha256,pins.helperSha256);assert.deepEqual(metadata.streamConsumersSourcePolicy,policy.streamConsumersSourcePolicy);assert.equal(consumers.moduleManifest,policy.streamConsumersSourcePolicy.moduleManifest);assert.equal(consumers.moduleManifestSha256,policy.streamConsumersSourcePolicy.moduleManifestSha256);assert.deepEqual(consumers.requiredHostInterfaces,[]);assert.deepEqual(consumers.nativeTextDecoderSource,policy.streamConsumersSourcePolicy.nativeTextDecoderSource);assert.deepEqual(consumers.prerequisiteCMakeOptions,{ENABLE_BUILTIN_WEB_TEXT_CODEC:'ON'});for(const field of['requestedCMakeOptions','observedCMakeOptions'])assert.equal(metadata[field].ENABLE_BUILTIN_WEB_TEXT_CODEC,'ON');assert.deepEqual(consumers.actualPrivateTargetCompileCommands,classic.actualPrivateTargetCompileCommands);assert.deepEqual(consumers.actualRegistrationCompileCommands,metadata.actualRegistrationCompileCommands);assert.equal(consumers.installationOrder.decoderNamespace,'NS_DEF(builtins::web::text_codec)');assert.equal(consumers.installationOrder.nodeNamespace,'NS_DEF(builtins::node_compat)');assert.equal(consumers.installationOrder.decoderBeforeNode,true);assert(/^[0-9a-f]{64}$/.test(consumers.installationOrder.sha256));assert.equal(consumers.aliasRegistrationTransactional,false);
++ return Object.freeze({streamConsumersEnabled:metadata.streamConsumersEnabled,zlibEnabled:metadata.zlibEnabled,branch:policy.version,classicStreamsEnabled:enabled,internalTicksEnabled:ticksEnabled,sourceInputs:355,
++  selectedClassicManifest:enabled?policy.classicManifest:null,runtimeOrGuestExecutionProof:false,resetSafeReuse:'OPEN'});
++}
++// Operational admission stays closed until a separately reviewed runtime-evidence
++// revision. Build/freezer/bootstrap consumers use the explicitly named raw gate.
++export function validateStreamConsumersSourceAdmission(metadata){
++ assert(metadata&&typeof metadata==='object');
++ if(!hinted(metadata))return null;
++ assert.fail('Consumers355 operational admission CLOSED: source/build validation is not registered text/json approval');
++}
++export function validateStreamConsumersBuildSourceAdmission(metadata,options){
++ assert(metadata&&typeof metadata==='object');
++ if(!hinted(metadata))return null;
++ assert(metadata.syntheticMetadataOnly===undefined||metadata.syntheticMetadataOnly===false,'Synthetic source models never enter production admission');
++ const result=validateStreamConsumersSourceModel(metadata,options);
++ const witness=metadata.zlibPolicy.codecWitness;assert.equal(witness?.version,'sm-selected-moz-z-codec-source-link-witness-v1');assert.equal(witness.sourceInputsCheckedBeforeAndAfterBuild,true);
++ assert.deepEqual(witness.selectedCompileInput,metadata.zlibSelectedCodecInput);assert.equal(witness.selectedDistribution,metadata.zlibSelectedCodecInput.selectedDistribution);assert.deepEqual(witness.headers,metadata.zlibSelectedCodecInput.headers);assert.deepEqual(witness.archive,metadata.zlibSelectedCodecInput.archive);
++ assert.equal(witness.archive.sha256,'298b85501657189dc66139242abf5aeb4e981b8db7c37cc5a69d1151ec40aacc');assert.equal(witness.archive.bytes,538170426);assert.deepEqual(witness.runtimeBackendProof,{verified:false,version:null,vernum:null});
++ assert.deepEqual(witness.actualKernelCompileCommands,metadata.zlibPolicy.actualKernelCompileCommands);assert.equal(witness.postBuildLinkEvidence.commands.length,1);
++ return result;
++}

@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "parentContextIndexSha256": "9080e48fbccaf74835bfb8c8ef54c91b8df54ff5eb6e4c2cdc1c83443ad79b70",
+  "parentBaseIndexSha256": "a74dc603f7e42384892c9f4b69a2ba131a87a80daa38da19e91bbc2c099e5372",
+  "publisherBeforeSha256": "9b570c4ec20112b18568826be8554a2474447608f8c9cd034b72e09bed1e86d0",
+  "publisherAfterSha256": "dfe7413a8eb3499578b938cab438d140880b2973bd0fa7760de1f2e31b52c2b4",
+  "publisherEdits": [
+    {
+      "label": "distinct full immutable context parent",
+      "before": "HERE=Path(__file__).parent.resolve();BASE=HERE.with_name('release-gates-candidate-v1');BASE_SHA='a74dc603f7e42384892c9f4b69a2ba131a87a80daa38da19e91bbc2c099e5372'",
+      "after": "HERE=Path(__file__).parent.resolve();BASE=HERE.with_name('release-gates-candidate-v1');BASE_SHA='a74dc603f7e42384892c9f4b69a2ba131a87a80daa38da19e91bbc2c099e5372';CONTEXT=HERE.with_name('release-gates-context-amendment-v1');CONTEXT_SHA='9080e48fbccaf74835bfb8c8ef54c91b8df54ff5eb6e4c2cdc1c83443ad79b70'"
+    },
+    {
+      "label": "authenticate all three source indices",
+      "before": "own=load(HERE/'index.json',args.index_sha256);base=load(BASE/'index.json',BASE_SHA)",
+      "after": "own=load(HERE/'index.json',args.index_sha256);base=load(BASE/'index.json',BASE_SHA);context_parent=load(CONTEXT/'index.json',CONTEXT_SHA)"
+    },
+    {
+      "label": "full parent members recheck",
+      "before": "for root,index in[(HERE,own),(BASE,base)]:",
+      "after": "for root,index in[(HERE,own),(BASE,base),(CONTEXT,context_parent)]:"
+    },
+    {
+      "label": "new original-context data provenance checked before outputs",
+      "before": "for row in load(BASE/'source-inputs.preparation.json')['files']:checked(row['path'],row['sha256'],row['bytes'],False)",
+      "after": "for row in load(BASE/'source-inputs.preparation.json')['files']:checked(row['path'],row['sha256'],row['bytes'],False)\n        for row in load(HERE/'source-inputs.json')['files']:checked(row['path'],row['sha256'],row['bytes'],False)"
+    },
+    {
+      "label": "fresh exact source Root authority",
+      "before": "source_review['state']=='ROOT_REVIEWED_CONSUMERS355_RELEASE_CONTEXT_AMENDMENT_V1'and source_review['proposalIndexSha256']==args.index_sha256 and source_review['parentProposalIndexSha256']==BASE_SHA",
+      "after": "source_review['state']=='ROOT_REVIEWED_CONSUMERS355_RELEASE_REPORT_DATA_AMENDMENT_V1'and source_review['proposalIndexSha256']==args.index_sha256 and source_review['parentProposalIndexSha256']==BASE_SHA and source_review['contextAmendmentIndexSha256']==CONTEXT_SHA"
+    },
+    {
+      "label": "new immutable source output",
+      "before": "output.name=='release-gates-activated-v2'",
+      "after": "output.name=='release-gates-activated-v3'"
+    },
+    {
+      "label": "one physical read-only datum and exact union/graph/origin data",
+      "before": "payload=load(BASE/'payload-files.json')['files'];overrides={'native-preflight.template.mjs':HERE/'native-preflight.template.after.mjs','run-gates.mjs':HERE/'run-gates.after.mjs','selected-closure.json':HERE/'selected-closure.after.json'}",
+      "after": "payload=load(BASE/'payload-files.json')['files']+['snapshot/tests/node-compat/foundation-util/run-native-node.mjs','report-data-closure.json'];overrides={'native-preflight.template.mjs':CONTEXT/'native-preflight.template.after.mjs','run-gates.mjs':HERE/'run-gates.after.mjs','selected-closure.json':HERE/'selected-closure.after.json','snapshot-origins.json':HERE/'snapshot-origins.after.json','snapshot/tests/node-compat/foundation-util/run-native-node.mjs':HERE/'data/run-native-node.mjs','report-data-closure.json':HERE/'report-data-closure.json'}"
+    },
+    {
+      "label": "unchanged context helper from authenticated parent",
+      "before": "('source-contexts.mjs',HERE/'source-contexts.mjs')",
+      "after": "('source-contexts.mjs',CONTEXT/'source-contexts.mjs')"
+    },
+    {
+      "label": "explicit context/data contract provenance in config",
+      "before": "'parentProposalIndexSha256':BASE_SHA,'sourceReviewSha256'",
+      "after": "'parentProposalIndexSha256':BASE_SHA,'contextAmendmentIndexSha256':CONTEXT_SHA,'reportDataClosureSha256':h(checked(HERE/'report-data-closure.json')),'sourceReviewSha256'"
+    },
+    {
+      "label": "full source union retains all original roots",
+      "before": "for root,index,digest in[(BASE,base,BASE_SHA),(HERE,own,args.index_sha256)]:",
+      "after": "for root,index,digest in[(BASE,base,BASE_SHA),(CONTEXT,context_parent,CONTEXT_SHA),(HERE,own,args.index_sha256)]:"
+    },
+    {
+      "label": "new finite original data rows in generated input freeze",
+      "before": "for r in load(BASE/'source-inputs.preparation.json')['files']:add(r['path'],r['sha256'],r['bytes'])",
+      "after": "for r in load(BASE/'source-inputs.preparation.json')['files']:add(r['path'],r['sha256'],r['bytes'])\n    for r in load(HERE/'source-inputs.json')['files']:add(r['path'],r['sha256'],r['bytes'])"
+    },
+    {
+      "label": "original contexts never rebased",
+      "before": "'sourceAmendmentRoot':str(HERE),'inputs'",
+      "after": "'sourceAmendmentRoot':str(HERE),'contextAmendmentRoot':str(CONTEXT),'inputs'"
+    },
+    {
+      "label": "compile unchanged reviewed parent bridge at new publication",
+      "before": "checked(HERE/'native-preflight.template.after.mjs').decode()",
+      "after": "checked(CONTEXT/'native-preflight.template.after.mjs').decode()"
+    },
+    {
+      "label": "source receipt context/data identity",
+      "before": "'sourceAmendmentContext':str(HERE),'admissionSourceRoot'",
+      "after": "'sourceAmendmentContext':str(HERE),'contextAmendmentRoot':str(CONTEXT),'reportDataClosureSha256':h(checked(HERE/'report-data-closure.json')),'admissionSourceRoot'"
+    }
+  ],
+  "publisherReverseExact": true,
+  "runGateBeforeSha256": "735ed586e3a3a36ea6806dd946489a3cdde7ae9c8fa3b202e4c47f104aabdc1a",
+  "runGateAfterSha256": "3df6154beb316c9b0c66b220f30de41f60e254600385f6d4f4cf80410472f1f2",
+  "runGateSingleNamespaceEdit": true,
+  "newSnapshotFiles": [
+    {
+      "path": "snapshot/tests/node-compat/foundation-util/run-native-node.mjs",
+      "sha256": "fe48fc8049fffbc7d60010f617369e498608db6e69cce05dbc4e06ed96a3c4ba",
+      "bytes": 2251
+    }
+  ],
+  "guestRunnerOracleCaseNativeBytesChanged": false,
+  "ownerActionsInvoked": false
+}

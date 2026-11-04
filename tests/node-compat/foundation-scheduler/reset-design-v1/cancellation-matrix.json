@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "state": "OBSERVED_TASKS_AND_REQUIRED_DESIGN_NOT_IMPLEMENTATION",
+  "tasks": [
+    {
+      "task": "TimerTask",
+      "file": "builtins/web/timers.cpp",
+      "roots": [
+        "callback Heap",
+        "argument Heap values",
+        "raw TimersMap pointer; queue RefPtr"
+      ],
+      "cancelNow": "unsubscribe id, setinvalid; mapentryremains; notidempotent against retainedmapentry/doubleunsubscribe",
+      "host": "selected monotonic-clock +io/poll@0.2.10",
+      "needed": "Strong owned retirement batch; unregister while alive; idempotent subscription lease; stop repeat requeue; preserve running-task owner; generation/stale-ID policy; no forcedinterest accounting"
+    },
+    {
+      "task": "BodyFutureTask",
+      "file": "builtins/web/fetch/request-response.cpp",
+      "roots": [
+        "body_source Heap",
+        "raw incoming_body pointer"
+      ],
+      "cancelNow": "TODO handle=-1 only",
+      "host": "selected http/types +io/streams/poll@0.2.10",
+      "needed": "Own/drop returned incoming subscription, close/abandon input under standardresource rules, settle/error stream once, audit raw body owner lifetime"
+    },
+    {
+      "task": "ResponseFutureTask",
+      "file": "builtins/web/fetch/request-response.cpp",
+      "roots": [
+        "request Heap",
+        "raw future pointer",
+        "AbortSignal Terminator WeakPtr"
+      ],
+      "cancelNow": "TODO handle=-1; separate abort_fetch+future.unsubscribe path",
+      "host": "selected http/types +io/poll@0.2.10",
+      "needed": "Unified idempotent normal/abort/cancel retirement; distinct failure settlement; remove associated abortregistration; own future/pollable lifespan"
+    },
+    {
+      "task": "StreamTask",
+      "file": "builtins/web/streams/buf-reader.cpp",
+      "roots": [
+        "reader Heap"
+      ],
+      "cancelNow": "invalidates immediatehandle; BufReader cancel algorithm returnsundefined without targeting queued task",
+      "host": "none for immediate scheduling itself; source readalgorithm may require separatelyselected capabilities",
+      "needed": "Associate pending pull with task/owner; settle cancelled stream/pull; trace detached/running task while allocations occur; no pointer borrow acrossJS"
+    },
+    {
+      "task": "BodyWriteAllTask",
+      "file": "host-apis/wasi-0.2.0/host_api.cpp",
+      "roots": [
+        "cb_receiver Heap",
+        "HostBytes owned payload",
+        "raw outgoing body pointer",
+        "outgoing subscription"
+      ],
+      "cancelNow": "MOZ_ASSERT_UNREACHABLE; returns true after assertion",
+      "host": "selected http/types +io/streams/poll@0.2.10",
+      "needed": "Abort/abandon semantics, drop subscription/ownedbytes once, own body lifetime, distinct rejected settlement; never call success completion on cancellation; no blockingflush"
+    },
+    {
+      "task": "BodyAppendTask",
+      "file": "host-apis/wasi-0.2.0/host_api.cpp",
+      "roots": [
+        "cb_receiver Heap",
+        "raw incoming andoutgoing pointers",
+        "two subscriptions"
+      ],
+      "cancelNow": "MOZ_ASSERT_UNREACHABLE; returns true after assertion",
+      "host": "selected http/types +io/streams/poll@0.2.10",
+      "needed": "Cancel each transfer state, release both subscriptions in correct order, prove both native owners, separateCancelled from Done successcallback"
+    },
+    {
+      "task": "BoundaryTask (diagnostic only)",
+      "file": "tests/node-compat/foundation-scheduler/diagnostic-candidate-v1/test-extension.cpp",
+      "roots": [
+        "callback Heap",
+        "arguments Heap",
+        "RefPtr queued/running"
+      ],
+      "cancelNow": "active guard, clearsroots/handle, decrementsinterest once; callback run roots before finish",
+      "host": "none for immediate-only controlledcases",
+      "needed": "Useful bounded control pattern only; does not validate realI/O/timers/cancellation or reusableHTTP lifecycle"
+    }
+  ],
+  "genericCancelSemanticsCurrentlyInsufficient": true,
+  "capabilityRule": "Only explicitly selected standardWASI0.2.10; nohostmod/customservice"
+}

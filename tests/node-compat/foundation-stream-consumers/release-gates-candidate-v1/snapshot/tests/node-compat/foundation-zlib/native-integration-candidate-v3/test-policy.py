@@ -1,0 +1,89 @@
+"""Pure compiler/source/link-parser negative tests. No action main/tools run."""
+import argparse,ast,copy,hashlib,importlib.util,json,os,shutil,tempfile
+from pathlib import Path
+HERE=Path(__file__).resolve().parent
+def load(name,path):
+ spec=importlib.util.spec_from_file_location(name,path);module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+def main():
+ parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True);args=parser.parse_args();args.output.mkdir(exist_ok=False)
+ layer=load('bounded_zlib_policy',HERE/'layer-policy.py');codec=load('bounded_zlib_codec',HERE/'codec-evidence.py');stage=load('bounded_zlib_stage',HERE/'stage-source.py')
+ fixture=args.output/'fixture';fixture.mkdir();plan=stage.source_plan()
+ for row in plan:
+  target=fixture/row['path'];target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(row['source'],target)
+ # Native/tool trees suffice for source parsers; no SDK, engine or compiled object
+ # is synthesized. Versioned binary source assets are copied only as source bytes.
+ for path in HERE.rglob('*'):
+  if path.is_file()and '__pycache__'not in path.parts:
+   target=fixture/'tests/node-compat/foundation-zlib/native-integration-candidate-v3'/path.relative_to(HERE);target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(path,target)
+ checks=[]
+ def passed(name):checks.append(name)
+ def rejects(name,fn):
+  try:fn()
+  except(AssertionError,KeyError,ValueError):passed(name);return
+  raise AssertionError('Expected rejection: '+name)
+ layer.validate_sources(fixture);passed('exact350 isolated native source fixture')
+ assert len(layer.POLICY['expectedNativeSourceManifest'])==350;passed('350 equals342 plus8 with340 unchanged')
+ bad=copy.deepcopy(layer.POLICY['expectedNativeSourceManifest']);bad[-1]=bad[0];rejects('duplicate or replaced source rows',lambda:layer.validate_sources(fixture,bad))
+ rejects('old original342 source root refused',lambda:layer.validate_sources(HERE.parents[3]))
+ repo=Path('/synthetic/NO-BUILD/source');cpp=[r['path']for r in layer.POLICY['expectedNativeSourceManifest']if r['path'].endswith('.cpp')and r['path'].startswith(('builtins/','runtime/'))]
+ assert len(cpp)==62
+ def commands(zlib=True,web=True,ticks=True,gc=False,runtime=False):
+  selected={'version':'sm-selected-moz-z-compile-input-v1','selectedDistribution':'/synthetic/NO-BUILD/distribution','archive':{'path':'/synthetic/NO-BUILD/distribution/libspidermonkey.a','sha256':codec.ARCHIVE_SHA,'bytes':codec.ARCHIVE_BYTES},'headers':[{'path':'/synthetic/NO-BUILD/distribution/include/'+name,'sha256':digest,'bytes':size}for name,(digest,size)in codec.HEADERS.items()]};selected['requiredForcedInclude']=copy.deepcopy(selected['headers'][3])
+  classic=ticks;metadata={'internalTicksEnabled':ticks,'classicStreamsEnabled':classic,'streamWebEnabled':web,'eventsEnabled':True,'stringDecoderEnabled':True,'gcStress':gc,'entropyPolicy':'runtime-only'if runtime else'off','zlibEnabled':zlib,'zlibSelectedCodecInput':selected}
+  def command(name):
+   flags=['-include',selected['requiredForcedInclude']['path'],'-O3','-DNDEBUG','-DNODE_COMPAT_STRICT_INITIALIZATION=1','-DNODE_COMPAT_EVENTS_ADD_ABORT_LISTENER=1','-DNODE_COMPAT_ENTROPY_POLICY=1']
+   if ticks:flags+=['-DNODE_COMPAT_INTERNAL_TICKS=1']
+   if runtime:flags+=['-DNODE_COMPAT_ENTROPY_RUNTIME_ONLY=1']
+   private=name.startswith('builtins/node-compat/')
+   for enabled,macro in [(classic and private,'CLASSIC_STREAMS'),(web and private,'STREAM_WEB'),(zlib and private,'ZLIB'),(gc and private,'GC_STRESS')]:
+    if enabled:flags+=['-DNODE_COMPAT_'+macro+'=1']
+   return '/synthetic/NOT-A-COMPILER/clang++ '+' '.join(flags)+' -c '+str(repo/name)+' -o /synthetic/out.o'
+  active=[name for name in cpp if(ticks or name!='runtime/node_tick_queue.cpp')and(web or name!='builtins/node-compat/stream-web-kernel.cpp')and(zlib or name!='builtins/node-compat/zlib/kernel.cpp')]
+  return[{'file':str(repo/name),'command':command(name)}for name in active],[command('embedding/embedding.cpp')],metadata
+ for zlib in [False,True]:
+  for web in [False,True]:
+   for ticks in [False,True]:
+    for gc,runtime in [(False,False),(True,False),(False,True)]:
+     rows,embedding,metadata=commands(zlib,web,ticks,gc,runtime);native,queue,private=layer.validate_classic_compilation(rows,embedding,repo,metadata)
+     assert len(native)==62-int(not zlib)-int(not web)-int(not ticks)
+     assert len(private)==(5 if web else 4)+int(zlib)
+     passed('synthetic conditional compiler layout '+str((zlib,web,ticks,gc,runtime)))
+ rows,embedding,metadata=commands()
+ for suffix in [' -O0',' -DNODE_COMPAT_OOM_TESTING=1',' -DDEBUG=1',' -DNDEBUG=1',' -UNDEBUG',' -UNODE_COMPAT_ZLIB',' -DZ_PREFIX=1',' -UZ_PREFIX_SET',' -include /synthetic/header.h',' -include/synthetic/header.h',' -imacros/synthetic/header.h',' -lz',' -Wl,-lz',' -D NODE_COMPAT_ZLIB=1']:
+  altered=copy.deepcopy(rows);altered[0]['command']+=suffix
+  rejects('native conflicting flags '+suffix,lambda:layer.validate_classic_compilation(altered,embedding,repo,metadata))
+ altered=copy.deepcopy(rows);altered[0]['command']+=' -DNODE_COMPAT_ZLIB=1';rejects('private ZLIB leaks to ordinary TU',lambda:layer.validate_classic_compilation(altered,embedding,repo,metadata))
+ rejects('embedding ZLIB definition refused',lambda:layer.validate_classic_compilation(rows,[embedding[0]+' -DNODE_COMPAT_ZLIB=1'],repo,metadata))
+ rejects('duplicate native translation unit',lambda:layer.validate_classic_compilation(rows+[rows[0]],embedding,repo,metadata))
+ rejects('missing zlib translation unit',lambda:layer.validate_classic_compilation([r for r in rows if not r['file'].endswith('/zlib/kernel.cpp')],embedding,repo,metadata))
+ incompatible=copy.deepcopy(metadata);incompatible.update(gcStress=True,entropyPolicy='runtime-only');rejects('RuntimeOnlyGC not selected',lambda:layer.validate_classic_compilation(rows,embedding,repo,incompatible))
+ lines='\n'.join('/synthetic/lib.a[codec.o]: MOZ_Z_'+name+' T -------- 0'for name in codec.SYMBOLS).encode();assert len(codec.symbols(lines))==7;passed('unique7 MOZ symbols parsed without llvm-nm execution')
+ rejects('generic second ABI definitions refused',lambda:codec.symbols(lines+b'\n/synthetic/lib.a[x.o]: deflate T -------- 0'))
+ rejects('duplicate MOZ definition refused',lambda:codec.symbols(lines+b'\n/synthetic/lib.a[x.o]: MOZ_Z_deflate T -------- 0'))
+ build=args.output/'link-fixture';build.mkdir();archive=build/'libspidermonkey.a';archive.write_bytes(b'SOURCE PARSER FIXTURE ONLY')
+ rsp=build/'link.rsp';rsp.write_text(str(archive)+' -o output.wasm')
+ link=('clang++ @'+str(rsp)+'\n').encode();assert len(codec.link_commands(link,build,archive)['responseFiles'])==1;passed('actual-path response-file grammar source fixture; no compiler run')
+ rejects('second codec linker argument',lambda:codec.link_commands(('clang++ '+str(archive)+' -lz -o output.wasm').encode(),build,archive))
+ rejects('missing archive link',lambda:codec.link_commands(b'clang++ -o output.wasm',build,archive))
+ rejects('duplicate archive link',lambda:codec.link_commands(link+link,build,archive))
+ rejects('archive copy is not final link',lambda:codec.link_commands(('cp '+str(archive)+' other.a').encode(),build,archive))
+ rejects('Wasm input is not Wasm output',lambda:codec.link_commands(('clang++ '+str(archive)+' input.wasm -o output.bin').encode(),build,archive))
+ for flag in ['-Wl,-lz','-Wl,-l,z','-Wl,--library=z','-l z','--library zlib','-include/synthetic/header.h','-imacros/synthetic/header.h']:
+  rejects('second codec/forced header link '+flag,lambda flag=flag:codec.link_commands(('clang++ '+str(archive)+' '+flag+' -o output.wasm').encode(),build,archive))
+ outside=args.output/'outside.rsp';outside.write_text(str(archive)+' -o output.wasm')
+ rejects('response dotdot cannot escape build',lambda:codec.link_commands(('clang++ @'+str(build/'../outside.rsp')).encode(),build,archive))
+ (build/'linked.rsp').symlink_to(outside)
+ rejects('response symlink cannot escape build',lambda:codec.link_commands(('clang++ @'+str(build/'linked.rsp')).encode(),build,archive))
+ witness={'archive':{'path':'/synthetic/not-an-archive'},'headers':[{'path':'/synthetic/'+name}for name in codec.HEADERS],'install':{'path':'/synthetic/install'}}
+ before={'schemaVersion':1,'state':'CODEC_INPUTS_AUTHENTICATED_BEFORE_NATIVE_BUILD',**copy.deepcopy(witness)}
+ assert codec.validate_before_manifest(witness,before);passed('before-manifest source grammar only, no archive or SDK read')
+ for name,change in [('schema',lambda value:value.update(schemaVersion=2)),('state',lambda value:value.update(state='UNAUTHENTICATED')),('archive',lambda value:value['archive'].update(path='/synthetic/other')),('header',lambda value:value['headers'][0].update(path='/synthetic/other.h')),('install',lambda value:value['install'].update(path='/synthetic/other'))]:
+  bad=copy.deepcopy(before);change(bad);rejects('before-manifest '+name+' mismatch',lambda bad=bad:codec.validate_before_manifest(witness,bad))
+ bad=copy.deepcopy(witness);bad['headers'][1]=bad['headers'][0];bad_before={**before,**copy.deepcopy(bad)}
+ rejects('four header slots cannot duplicate a pinned header',lambda:codec.validate_before_manifest(bad,bad_before))
+ for path in HERE.rglob('*.py'):
+  if 'history'not in path.parts:ast.parse(path.read_text(),filename=str(path))
+ passed('Python sources AST parsed; no action mains')
+ result={'schemaVersion':1,'state':'SOURCE_AND_SYNTHETIC_NEGATIVE_TESTS_PASSED','checks':checks,'count':len(checks),'fixture':str(fixture),'sourceRows':len(plan),'nativeOrGuestOrCompilerOrActionExecuted':False}
+ (args.output/'results.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({'checks':len(checks),'fixture':str(fixture),'result':str(args.output/'results.json')}))
+if __name__=='__main__':main()

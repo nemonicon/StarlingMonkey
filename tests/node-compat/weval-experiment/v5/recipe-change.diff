@@ -1,0 +1,68 @@
+--- /tmp/starling-node-compat/foundations-v5/native-freeze/build-engine.sh	2026-11-03 05:50:00
++++ /tmp/starling-node-compat/weval-experiment/custom-release-v5-1/source/tests/node-compat/build-engine.sh	2026-11-03 07:24:18
+@@ -30,7 +30,7 @@
+ componentize_revision=4d812f5a7b524cea5bcfd565cac55f3fab876a57
+ componentize_archive_sha=8178fb678ec1b8a33bbf3fa8db066bffe4dbf6a92c235150f56622b44ea27e10
+ spidermonkey_tag=FIREFOX_147_0_4_RELEASE_STARLING
+-spidermonkey_archive_sha=c57dc83d93dc04198882b44fea49cd3cb01e0b267bf99fae3b058cb158da684b
++spidermonkey_archive_sha=f108286a1b9c35aeee89a803b073175a077633ffea5bbe4c3b85fcc85230dba0
+ 
+ if [[ "$entropy_mode" != OFF && "$entropy_mode" != RUNTIME_ONLY ]]; then
+   echo 'NODE_COMPAT_ENTROPY_MODE must be OFF or RUNTIME_ONLY' >&2; exit 1
+@@ -144,14 +144,14 @@
+   patch -p1 -d "$source_dir" < "$entry_patch"
+ fi
+ [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$entry_embedding_sha" ]] || { echo 'Entry patched source mismatch' >&2; exit 1; }
+-sm_variant=release
++sm_variant=release_weval
+ if [[ "$build_type" == Debug ]]; then
+   sm_variant=debug
+   spidermonkey_archive_sha=49a5b610dace59331bc699ac53a99d9f4c3b4579441efa66147aa8e96b4ffcee
+ fi
+ fetch_checked "https://github.com/bytecodealliance/StarlingMonkey/releases/download/libspidermonkey_$spidermonkey_tag/spidermonkey-static-$sm_variant.tar.gz" \
+   "$work_root/spidermonkey-$sm_variant.tar.gz" "$spidermonkey_archive_sha"
+-spidermonkey_dir="$work_root/spidermonkey-dist-$sm_variant"
++spidermonkey_dir="$work_root/spidermonkey-dist-weval"
+ if [[ ! -f "$spidermonkey_dir/.source-archive-sha256" ]] || [[ "$(cat "$spidermonkey_dir/.source-archive-sha256")" != "$spidermonkey_archive_sha" ]]; then
+   tar -xzf "$work_root/spidermonkey-$sm_variant.tar.gz" -C "$work_root"
+   printf '%s\n' "$spidermonkey_archive_sha" > "$spidermonkey_dir/.source-archive-sha256"
+@@ -180,9 +180,9 @@
+ # cloning the WPT suite; its builtin is explicitly disabled below.
+ export WPT_ROOT="$work_root/wpt-unused"
+ gc_flag=OFF
+-artifact_name=starlingmonkey_embedding.abi-fixed
+-if [[ "$bigint_fix" == 1 ]]; then artifact_name=starlingmonkey_embedding.abi-i32-i64-v1; fi
+-if [[ "$abi_fix" == 0 ]]; then artifact_name=starlingmonkey_embedding.unpatched; fi
++artifact_name=starlingmonkey_embedding.weval.abi-fixed
++if [[ "$bigint_fix" == 1 ]]; then artifact_name=starlingmonkey_embedding.weval.abi-i32-i64-v1; fi
++if [[ "$abi_fix" == 0 ]]; then artifact_name=starlingmonkey_embedding.weval.unpatched; fi
+ if [[ "$stress" == 1 ]]; then gc_flag=ON; artifact_name="$artifact_name.gc-stress"; fi
+ oom_flag=OFF
+ if [[ "$oom" == 1 ]]; then oom_flag=ON; artifact_name="$artifact_name.oom-testing"; fi
+@@ -216,7 +216,7 @@
+ path_flag=OFF
+ if [[ "$path_enabled" == 1 ]]; then path_flag=ON; fi
+ cmake -S "$source_dir" -B "$build_dir" -G Ninja \
+-  -DCMAKE_BUILD_TYPE="$build_type" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DWEVAL=OFF -DUSE_WASM_OPT=ON \
++  -DCMAKE_BUILD_TYPE="$build_type" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DWEVAL=ON -DUSE_WASM_OPT=OFF -DWEVAL_BIN="$NODE_COMPAT_WEVAL_BIN" -DWASM_OPT="$NODE_COMPAT_WEVAL_WASM_OPT" \
+   -DENABLE_BUILTIN_NODE_COMPAT=ON -DNODE_COMPAT_GC_STRESS="$gc_flag" -DNODE_COMPAT_OOM_TESTING="$oom_flag" \
+   -DENABLE_JS_DEBUGGER=OFF -DENABLE_BUILTIN_WPT_SUPPORT=OFF -DNODE_COMPAT_LOCKED_RUST=ON \
+   -DNODE_COMPAT_ENTROPY_MODE="$entropy_mode" -DNODE_COMPAT_PATH="$path_flag" -DNODE_COMPAT_EVENTS="$events_flag" \
+@@ -239,7 +239,7 @@
+ [[ "$(sha256_file "$aggregate_manifest")" == "$aggregate_manifest_sha" ]] || { echo 'Aggregate Rust manifest changed during build' >&2; exit 1; }
+ artifact="$work_root/artifacts/$artifact_name.wasm"
+ if [[ "$oom" == 1 ]]; then artifact="$work_root/artifacts/$artifact_name.raw.wasm"; fi
+-engine_output=starlingmonkey_embedding.wasm
++engine_output=starlingmonkey_embedding_weval.wasm
+ if [[ "$build_type" == Debug ]]; then engine_output=starlingmonkey_embedding.debug.wasm; fi
+ cp "$source_dir/lib/$engine_output" "$artifact"
+ 
+@@ -272,7 +272,7 @@
+ # Capture the actual configured values at build completion, rather than
+ # treating an upstream default or a command-line request as measured provenance.
+ requested_cmake_options = {
+-    'CMAKE_BUILD_TYPE': build_type, 'WEVAL': 'OFF', 'USE_WASM_OPT': 'ON',
++    'CMAKE_BUILD_TYPE': build_type, 'WEVAL': 'ON', 'USE_WASM_OPT': 'OFF',
+     'ENABLE_BUILTIN_NODE_COMPAT': 'ON', 'ENABLE_JS_DEBUGGER': 'OFF',
+     'ENABLE_BUILTIN_WPT_SUPPORT': 'OFF', 'NODE_COMPAT_LOCKED_RUST': 'ON',
+     'NODE_COMPAT_ENTROPY_MODE': entropy_mode, 'NODE_COMPAT_PATH': 'ON' if path_enabled == '1' else 'OFF',

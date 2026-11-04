@@ -1,0 +1,125 @@
+--- a/tests/node-compat/build-engine.sh
++++ b/measurement-producer-candidate-v1/build-classic-benchmark-engine.sh
+@@ -4,7 +4,11 @@
+ # This script does not build SpiderMonkey from source or modify the host runtime.
+ set -euo pipefail
+ 
+-repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
++packet_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
++repo_root="$(cd "$packet_root/../../../.." && pwd -P)"
++[[ $# == 1 ]] || { echo "Need exact reviewed source packet index SHA" >&2; exit 1; }
++python3 "$packet_root/verify-packet.py" "$1"
++benchmark_root="$repo_root/tests/node-compat/foundation-classic-streams/measurement-extension-candidate-v1"
+ work_root="${NODE_COMPAT_BUILD_ROOT:-/tmp/starling-node-compat/improved-build}"
+ node_bin="${NODE_COMPAT_NODE:-node}"
+ build_jobs="${NODE_COMPAT_JOBS:-8}"
+@@ -39,6 +43,10 @@
+ if [[ "$entropy_mode" == RUNTIME_ONLY && "$stress" == 1 ]]; then
+   echo 'RuntimeOnly+GC is not a selected classic producer variant' >&2; exit 1
+ fi
++[[ "$build_type" == Release && "$stress" == 0 && "$oom" == 0 && "$entropy_mode" == OFF && "$build_jobs" == 1 && -z "$artifact_tag" ]] || { echo "Benchmark requires Release/OFF/no stress/one job/empty tag" >&2; exit 1; }
++for value in "$ticks_enabled" "$path_enabled" "$events_enabled" "$string_decoder_enabled" "$assert_enabled" "$querystring_enabled" "$util_enabled" "$stream_web_enabled"; do
++  [[ "$value" == 1 ]] || { echo "Benchmark requires every shared prerequisite" >&2; exit 1; }
++done
+ layer_root="$repo_root/tests/node-compat/foundation-classic-streams/integration-candidate-v1"
+ tick_patch="$repo_root/tests/node-compat/foundation-scheduler/taskqueue-owner-v2/componentize-taskqueue-ticks.UNAPPLIED.patch"
+ 
+@@ -122,14 +130,14 @@
+ # Preserve every pre-policy source tree, build directory and artifact. Each
+ # selected configuration gets its own embedding output directory as well.
+ policy_suffix="entropy-entry-v1-strict-callback-v3-protected-abort-v2.$entropy_mode.path-$path_enabled.events-$events_enabled.string-decoder-$string_decoder_enabled.assert-$assert_enabled.querystring-$querystring_enabled.util-$util_enabled.stream-web-$stream_web_enabled"
+-policy_suffix="$policy_suffix.private-ticks-v1-$ticks_enabled.classic-v1-$classic_enabled"
++policy_suffix="$policy_suffix.private-ticks-v1-$ticks_enabled.classic-v1-$classic_enabled.classic-bench-v1"
+ source_dir="$source_dir-$policy_suffix"
+ build_dir="$build_dir-$policy_suffix"
+ artifact_name=starlingmonkey_embedding.abi-i32-i64-v1
+ if [[ "$stress" == 1 ]]; then artifact_name="$artifact_name.gc-stress"; fi
+ if [[ "$oom" == 1 ]]; then artifact_name="$artifact_name.oom-testing"; fi
+ if [[ "$build_type" == Debug ]]; then artifact_name="$artifact_name.debug"; fi
+-artifact_name="$artifact_name.classic-v1.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled"
++artifact_name="sm-classic-bench-v1.c$classic_enabled"
+ if [[ -n "$artifact_tag" ]]; then artifact_name="$artifact_name.$artifact_tag"; fi
+ artifact="$work_root/artifacts/$artifact_name.wasm"
+ for generated_name in "$artifact_name.wasm.build.json" "componentize-native-inputs-$artifact_name.json" "source-inputs-$artifact_name.json" "openssl-source-$artifact_name.before.json" "configure-$artifact_name.log" "build-$artifact_name.log"; do
+@@ -263,7 +271,9 @@
+ input_manifest="$work_root/source-inputs-$artifact_name.json"
+ componentize_input_manifest="$work_root/componentize-native-inputs-$artifact_name.json"
+ recipe_before="$work_root/recipe-$artifact_name.sha256"
+-sha256_file "$repo_root/tests/node-compat/build-engine.sh" > "$recipe_before"
++sha256_file "$packet_root/build-classic-benchmark-engine.sh" > "$recipe_before"
++addon_manifest="$work_root/benchmark-inputs-$artifact_name.json"
++python3 "$packet_root/benchmark-policy.py" capture "$addon_manifest"
+ python3 - "$repo_root" "$input_manifest" <<'PYINPUT'
+ import importlib.util,json,pathlib,sys
+ sys.dont_write_bytecode=True
+@@ -290,6 +300,7 @@
+ if [[ "$path_enabled" == 1 ]]; then path_flag=ON; fi
+ cmake -S "$source_dir" -B "$build_dir" -G Ninja \
+   -DCMAKE_BUILD_TYPE="$build_type" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DWEVAL=OFF -DUSE_WASM_OPT=ON \
++  -DCMAKE_EXE_LINKER_FLAGS="" -DCMAKE_PROJECT_ComponentizeJS_INCLUDE="$benchmark_root/benchmark.cmake" -DENABLE_BUILTIN_DIAGNOSTICS_CLASSIC_BENCHMARK=ON \
+   -DENABLE_BUILTIN_NODE_COMPAT=ON -DNODE_COMPAT_GC_STRESS="$gc_flag" -DNODE_COMPAT_OOM_TESTING="$oom_flag" \
+   -DNODE_COMPAT_INTERNAL_TICKS="$ticks_flag" -DNODE_COMPAT_CLASSIC_STREAMS="$classic_flag" \
+   -DENABLE_JS_DEBUGGER=OFF -DENABLE_BUILTIN_WPT_SUPPORT=OFF -DNODE_COMPAT_LOCKED_RUST=ON \
+@@ -307,18 +318,20 @@
+ openssl_source_audit="$repo_root/tests/node-compat/provenance/openssl-source-audit.py"
+ openssl_audit_before="$work_root/openssl-source-$artifact_name.before.json"
+ python3 "$openssl_source_audit" "$build_dir" "$work_root/openssl-source.tar.gz" > "$openssl_audit_before"
++python3 "$packet_root/benchmark-policy.py" before "$build_dir" "$artifact" "$addon_manifest"
+ # Ninja does not provide Make's jobserver to the OpenSSL external project.
+ MAKEFLAGS="-j$build_jobs" cmake --build "$build_dir" --target starlingmonkey_embedding --parallel "$build_jobs" \
+   2>&1 | tee "$work_root/build-$artifact_name.log"
++python3 "$packet_root/verify-packet.py" "$1"
+ [[ "$(sha256_file "$aggregate_lock")" == "$(sha256_file "$aggregate_lock_pin")" ]] || { echo 'Aggregate Rust lock changed during build' >&2; exit 1; }
+ [[ "$(sha256_file "$aggregate_manifest")" == "$aggregate_manifest_sha" ]] || { echo 'Aggregate Rust manifest changed during build' >&2; exit 1; }
+ engine_output=starlingmonkey_embedding.wasm
+ if [[ "$build_type" == Debug ]]; then engine_output=starlingmonkey_embedding.debug.wasm; fi
+ cp "$source_dir/lib/$engine_output" "$artifact"
+ 
+-python3 - "$repo_root" "$work_root" "$artifact" "$stress" "$componentize_revision" "$componentize_archive_sha" "$spidermonkey_archive_sha" "$source_dir" "$build_dir" "$abi_fix" "$abi_patch" "$oom" "$build_type" "$input_manifest" "$bigint_fix" "$bigint_patch" "$entropy_mode" "$path_enabled" "$entry_patch" "$events_enabled" "$componentize_input_manifest" "$recipe_before" "$string_decoder_enabled" "$assert_enabled" "$querystring_enabled" "$util_enabled" "$stream_web_enabled" "$ticks_enabled" "$classic_enabled" <<'PY'
++python3 - "$repo_root" "$work_root" "$artifact" "$stress" "$componentize_revision" "$componentize_archive_sha" "$spidermonkey_archive_sha" "$source_dir" "$build_dir" "$abi_fix" "$abi_patch" "$oom" "$build_type" "$input_manifest" "$bigint_fix" "$bigint_patch" "$entropy_mode" "$path_enabled" "$entry_patch" "$events_enabled" "$componentize_input_manifest" "$recipe_before" "$string_decoder_enabled" "$assert_enabled" "$querystring_enabled" "$util_enabled" "$stream_web_enabled" "$ticks_enabled" "$classic_enabled" "$packet_root" <<'PY'
+ import datetime, hashlib, json, os, pathlib, subprocess, sys
+-repo, work, artifact, stress, componentize, componentize_archive, sm_archive, source_dir, build_dir, abi_fix, abi_patch, oom, build_type, input_manifest, bigint_fix, bigint_patch, entropy_mode, path_enabled, entry_patch, events_enabled, componentize_input_manifest, recipe_before, string_decoder_enabled, assert_enabled, querystring_enabled, util_enabled, stream_web_enabled, ticks_enabled, classic_enabled = sys.argv[1:]
++repo, work, artifact, stress, componentize, componentize_archive, sm_archive, source_dir, build_dir, abi_fix, abi_patch, oom, build_type, input_manifest, bigint_fix, bigint_patch, entropy_mode, path_enabled, entry_patch, events_enabled, componentize_input_manifest, recipe_before, string_decoder_enabled, assert_enabled, querystring_enabled, util_enabled, stream_web_enabled, ticks_enabled, classic_enabled, packet_root = sys.argv[1:]
+ def digest(path):
+     h = hashlib.sha256()
+     with open(path, 'rb') as source:
+@@ -336,7 +349,7 @@
+ assert manifest == json.loads(pathlib.Path(input_manifest).read_text()), 'Source inputs changed while Ninja compiled; refusing mixed build provenance'
+ componentize_inputs = [{'path':str(path.relative_to(pathlib.Path(source_dir))),'sha256':digest(path)} for path in sorted((pathlib.Path(source_dir)/'embedding').rglob('*')) if path.is_file() and path.suffix in ['.cpp','.h']] + [{'path':'CMakeLists.txt','sha256':digest(pathlib.Path(source_dir)/'CMakeLists.txt')}]
+ assert componentize_inputs == json.loads(pathlib.Path(componentize_input_manifest).read_text()), 'External embedding sources changed during compilation'
+-assert digest(pathlib.Path(repo)/'tests/node-compat/build-engine.sh') == pathlib.Path(recipe_before).read_text().strip(), 'Build recipe changed during compilation'
++assert digest(pathlib.Path(packet_root)/'build-classic-benchmark-engine.sh') == pathlib.Path(recipe_before).read_text().strip(), 'Build recipe changed during compilation'
+ assert digest(abi_patch) == 'c70c1b76ae9ddeba7cbaad2861f1ecc03710da7241ca6365d00c9ece8243324b'
+ assert digest(bigint_patch) == 'c75bd3062ac03fce743901db2cab502b6ac60979679f23ef9f6a869488574cf4'
+ assert digest(entry_patch) == 'a12c00a0913a2a03e4cea3ab0e525c5cec56d4e0101d33076d6a3687df824f99'
+@@ -369,7 +382,7 @@
+         if equals: observed_cmake_options[key] = value
+ assert observed_cmake_options == requested_cmake_options, (requested_cmake_options, observed_cmake_options)
+ for line in cache_path.read_text().splitlines():
+-    if line.startswith('CMAKE_PROJECT_ComponentizeJS_INCLUDE:'): assert line.partition('=')[2] == '', 'No diagnostic CMake extension'
++    if line.startswith('CMAKE_PROJECT_ComponentizeJS_INCLUDE:'): assert line.partition('=')[2] == str(pathlib.Path(repo)/'tests/node-compat/foundation-classic-streams/measurement-extension-candidate-v1/benchmark.cmake'), 'Exact benchmark include only'
+     if line.startswith('ENABLE_BUILTIN_DIAGNOSTICS_INTERNAL_TICKS:'): assert line.partition('=')[2] == 'OFF', 'No diagnostic builtin in production'
+ compile_commands_path = pathlib.Path(build_dir) / 'compile_commands.json'
+ compile_commands = compile_commands_path.read_text()
+@@ -501,7 +514,7 @@
+     'actualRegistrationCompileCommands': registration_commands,
+     'actualStreamWebKernelCompileCommands': stream_web_commands,
+     'streamWebPrerequisiteCMakeOptions': stream_web_prerequisites,
+-    'buildRecipeSha256': digest(pathlib.Path(repo) / 'tests/node-compat/build-engine.sh'),
++    'buildRecipeSha256': digest(pathlib.Path(packet_root) / 'build-classic-benchmark-engine.sh'),
+     'buildConfigurationCapture': 'Actual CMake cache and compile-command digests captured after this build completed; not a reconstruction of earlier builds.',
+     'generatedRustProject': {
+         'manifestPath': str(rust_project / 'Cargo.toml'), 'manifestSha256': digest(rust_project / 'Cargo.toml'),
+@@ -559,7 +572,11 @@
+ assert digest(layer_file) == 'f4a303250ac979206f0c2b358f4dd16d2a5e3a3e3007200901dedba8576b9a1e'
+ assert digest(layer_file.parent / 'policy.json') == layer.POLICY_SHA256
+ 
+-with open(artifact + '.build.json', 'w') as output:
++benchmark_spec = importlib.util.spec_from_file_location('classic_benchmark_build_policy',pathlib.Path(packet_root)/'benchmark-policy.py')
++benchmark = importlib.util.module_from_spec(benchmark_spec);benchmark_spec.loader.exec_module(benchmark)
++metadata = benchmark.decorate(metadata, pathlib.Path(artifact))
++
++with open(artifact + '.build.json', 'x') as output:
+     json.dump(metadata, output, indent=2); output.write('\n')
+ print(artifact)
+ print(artifact + '.build.json')

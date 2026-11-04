@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "readerFailures": [
+    {
+      "attempt": 1,
+      "exitCode": 1,
+      "failure": "AssertionError: Whole1302 original-context union mismatch, line229",
+      "firstSource": {
+        "path": "reader-first-attempt.py.txt",
+        "sha256": "646d5ceed1afa0cfb9601d3c2082897f5cabc6818013ea1d866b052d2a83b4d3"
+      },
+      "actualRows": 1302,
+      "reconstructedRows": 1302,
+      "aliasOnlyRowsEachSide": 6,
+      "differingCommonHashesOrSizes": 0,
+      "cause": "Completed test report output labels use /tmp; seal-source resolves the explicit completed-test-root argument to physical /private/tmp before constructing absolute evidence rows.",
+      "correction": "Resolve only that expected test-root argument. Do not reinterpret or relocate any captured input row."
+    },
+    {
+      "attempt": 2,
+      "exitCode": 1,
+      "failure": "AssertionError at parent recipe byte comparison, line232",
+      "firstSource": {
+        "path": "reader-second-attempt.py.txt",
+        "sha256": "c4b091bb8390755a11bf89cc533ac88dfadb30c07eb36e846c89dd548c1272cc"
+      },
+      "cause": "The reused independent regular() helper returns a hash record; reader compared that dict to source bytes. Exact parent hash had already passed.",
+      "correction": "Read the already-hash-verified recipe bytes separately, and compare derived bytes to the separately hash-verified afterimage bytes."
+    }
+  ],
+  "ownerCodeOrActionMainsExecuted": false
+}

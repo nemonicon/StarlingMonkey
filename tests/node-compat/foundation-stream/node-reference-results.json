@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "node": "v22.14.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "referenceCasesPassed": 11,
+  "cases": [
+    {
+      "name": "module and promise identity graph",
+      "result": {
+        "defaultIsStream": true,
+        "self": true,
+        "promises": true,
+        "defaultMethods": true
+      }
+    },
+    {
+      "name": "object pipeline and transform flush",
+      "result": {
+        "values": [
+          2,
+          4,
+          6,
+          "tail"
+        ],
+        "finished": true,
+        "readableEnded": true,
+        "destroyed": true
+      }
+    },
+    {
+      "name": "backpressure and drain",
+      "result": {
+        "trace": [
+          "write:1",
+          "return:false",
+          "drain",
+          "callback"
+        ],
+        "writableLength": 0,
+        "finished": true
+      }
+    },
+    {
+      "name": "cork writev callbacks and finish",
+      "result": [
+        "before-uncork",
+        "writev:1,2",
+        "callback1",
+        "callback2",
+        "finish",
+        "close"
+      ]
+    },
+    {
+      "name": "destroy identity and one error close",
+      "result": {
+        "trace": [
+          "after-destroy",
+          "first-error",
+          "close"
+        ],
+        "destroyed": true,
+        "firstErrorRetained": true
+      }
+    },
+    {
+      "name": "byte view shared backing offsets",
+      "result": {
+        "bytes": [
+          90,
+          89
+        ],
+        "input": [
+          90,
+          89
+        ],
+        "isBuffer": true,
+        "sharedBuffer": true,
+        "byteOffset": 1,
+        "length": 2
+      }
+    },
+    {
+      "name": "Node22 DataView byte write",
+      "result": {
+        "observed": {
+          "bytes": [
+            65,
+            66
+          ],
+          "isBuffer": true,
+          "shared": true,
+          "offset": 1,
+          "length": 2
+        },
+        "changedOriginal": true
+      }
+    },
+    {
+      "name": "consumer streaming UTF8 BOM and incomplete bytes",
+      "result": "€�"
+    },
+    {
+      "name": "consumer mutable Blob part timing",
+      "result": [
+        67,
+        67
+      ]
+    },
+    {
+      "name": "consumer JSON chunks",
+      "result": {
+        "value": 1
+      }
+    },
+    {
+      "name": "pipeline abort cleanup",
+      "result": {
+        "name": "AbortError",
+        "code": "ABORT_ERR",
+        "causeSame": true,
+        "sourceDestroyed": true,
+        "sinkDestroyed": true
+      }
+    }
+  ],
+  "sources": {
+    "valid-api-checks.mjs": "3b130401fa8a9607e672e0c200a0bc6230e3e8da9747d67a45834f55e7990ade",
+    "run-node.mjs": "dedb6ef8f89ca384c09494fd1ce934b8ec29bbf6c03928d1e6ca894101e22c71"
+  },
+  "candidateCompared": false,
+  "componentExecuted": false,
+  "scope": "Small ordinary valid-API Node22 reference vectors for future bounded implementations. No classic Node stream support is established in StarlingMonkey; no detachment/shared/GC/OOM fault probes."
+}

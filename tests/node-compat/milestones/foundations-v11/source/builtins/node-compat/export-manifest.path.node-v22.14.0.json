@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "profileVersion": "sm-node-22.14.0-m0.2",
+  "nodeVersion": "v22.14.0",
+  "status": "Optional Path foundation selected only by NODE_COMPAT_PATH=ON; core m0.1 manifest is unchanged.",
+  "moduleContract": "Explicit finite ESM export records. Root default equals posix; default and named functions initially share identity; all variants share the same posix/win32 object graph. Bare aliases select the same values, with module namespace records cached per registered specifier.",
+  "modules": {
+    "node:path": {
+      "aliases": [
+        "path"
+      ],
+      "status": "partial",
+      "exports": [
+        "_makeLong",
+        "basename",
+        "default",
+        "delimiter",
+        "dirname",
+        "extname",
+        "format",
+        "isAbsolute",
+        "join",
+        "matchesGlob",
+        "normalize",
+        "parse",
+        "posix",
+        "relative",
+        "resolve",
+        "sep",
+        "toNamespacedPath",
+        "win32"
+      ],
+      "callablePolicy": "All 13 callable exports implement lexical path operations; matchesGlob additionally enforces explicit profile budgets. No operation consults a host capability.",
+      "supportedStatic": [
+        "_makeLong",
+        "basename",
+        "dirname",
+        "extname",
+        "format",
+        "isAbsolute",
+        "join",
+        "matchesGlob",
+        "normalize",
+        "parse",
+        "relative",
+        "resolve",
+        "toNamespacedPath"
+      ],
+      "limits": {
+        "pathCodeUnits": 4096,
+        "patternCodeUnits": 1024,
+        "braceAlternatives": 128,
+        "braceOutputCodeUnits": 32768,
+        "braceDepth": 8,
+        "braceRewrites": 16,
+        "extglobDepth": 8,
+        "segments": 128,
+        "magicSegmentCodeUnits": 256,
+        "stateEstimate": 65536,
+        "workEstimate": 2000000,
+        "workUnits": 250000,
+        "stateKeyCodeUnits": 32768,
+        "globstarRecursion": 32,
+        "dfaCacheUnits": 262144
+      },
+      "deviations": [
+        "Default namespace is POSIX and virtual cwd is always '/'; no host cwd or drive-specific environment is queried.",
+        "matchesGlob uses fixed POSIX-host case sensitivity for both variants, suppresses Node's experimental warning and uses explicitly patched minimatch 11.0.1 rather than Node 22.14's vulnerable matcher.",
+        "matchesGlob rejects resource-budget exhaustion with RangeError code ERR_SM_NODE_PATH_BUDGET and a resource string instead of truncating expansions or returning a false result.",
+        "TypeError names and ERR_INVALID_ARG_TYPE codes match the supported invalid input domain; received-value message rendering differs from Node's internal inspector.",
+        "Default path objects remain mutable; ESM named bindings capture their initial members. syncBuiltinESMExports is unavailable."
+      ]
+    },
+    "node:path/posix": {
+      "aliases": [
+        "path/posix"
+      ],
+      "status": "partial",
+      "exports": [
+        "_makeLong",
+        "basename",
+        "default",
+        "delimiter",
+        "dirname",
+        "extname",
+        "format",
+        "isAbsolute",
+        "join",
+        "matchesGlob",
+        "normalize",
+        "parse",
+        "posix",
+        "relative",
+        "resolve",
+        "sep",
+        "toNamespacedPath",
+        "win32"
+      ],
+      "callablePolicy": "All 13 callable exports implement lexical path operations; matchesGlob additionally enforces explicit profile budgets. No operation consults a host capability.",
+      "supportedStatic": [
+        "_makeLong",
+        "basename",
+        "dirname",
+        "extname",
+        "format",
+        "isAbsolute",
+        "join",
+        "matchesGlob",
+        "normalize",
+        "parse",
+        "relative",
+        "resolve",
+        "toNamespacedPath"
+      ],
+      "limits": {
+        "pathCodeUnits": 4096,
+        "patternCodeUnits": 1024,
+        "braceAlternatives": 128,
+        "braceOutputCodeUnits": 32768,
+        "braceDepth": 8,
+        "braceRewrites": 16,
+        "extglobDepth": 8,
+        "segments": 128,
+        "magicSegmentCodeUnits": 256,
+        "stateEstimate": 65536,
+        "workEstimate": 2000000,
+        "workUnits": 250000,
+        "stateKeyCodeUnits": 32768,
+        "globstarRecursion": 32,
+        "dfaCacheUnits": 262144
+      },
+      "deviations": [
+        "Default namespace is POSIX and virtual cwd is always '/'; no host cwd or drive-specific environment is queried.",
+        "matchesGlob uses fixed POSIX-host case sensitivity for both variants, suppresses Node's experimental warning and uses explicitly patched minimatch 11.0.1 rather than Node 22.14's vulnerable matcher.",
+        "matchesGlob rejects resource-budget exhaustion with RangeError code ERR_SM_NODE_PATH_BUDGET and a resource string instead of truncating expansions or returning a false result.",
+        "TypeError names and ERR_INVALID_ARG_TYPE codes match the supported invalid input domain; received-value message rendering differs from Node's internal inspector.",
+        "Default path objects remain mutable; ESM named bindings capture their initial members. syncBuiltinESMExports is unavailable."
+      ]
+    },
+    "node:path/win32": {
+      "aliases": [
+        "path/win32"
+      ],
+      "status": "partial",
+      "exports": [
+        "_makeLong",
+        "basename",
+        "default",
+        "delimiter",
+        "dirname",
+        "extname",
+        "format",
+        "isAbsolute",
+        "join",
+        "matchesGlob",
+        "normalize",
+        "parse",
+        "posix",
+        "relative",
+        "resolve",
+        "sep",
+        "toNamespacedPath",
+        "win32"
+      ],
+      "callablePolicy": "All 13 callable exports implement lexical path operations; matchesGlob additionally enforces explicit profile budgets. No operation consults a host capability.",
+      "supportedStatic": [
+        "_makeLong",
+        "basename",
+        "dirname",
+        "extname",
+        "format",
+        "isAbsolute",
+        "join",
+        "matchesGlob",
+        "normalize",
+        "parse",
+        "relative",
+        "resolve",
+        "toNamespacedPath"
+      ],
+      "limits": {
+        "pathCodeUnits": 4096,
+        "patternCodeUnits": 1024,
+        "braceAlternatives": 128,
+        "braceOutputCodeUnits": 32768,
+        "braceDepth": 8,
+        "braceRewrites": 16,
+        "extglobDepth": 8,
+        "segments": 128,
+        "magicSegmentCodeUnits": 256,
+        "stateEstimate": 65536,
+        "workEstimate": 2000000,
+        "workUnits": 250000,
+        "stateKeyCodeUnits": 32768,
+        "globstarRecursion": 32,
+        "dfaCacheUnits": 262144
+      },
+      "deviations": [
+        "Default namespace is POSIX and virtual cwd is always '/'; no host cwd or drive-specific environment is queried.",
+        "matchesGlob uses fixed POSIX-host case sensitivity for both variants, suppresses Node's experimental warning and uses explicitly patched minimatch 11.0.1 rather than Node 22.14's vulnerable matcher.",
+        "matchesGlob rejects resource-budget exhaustion with RangeError code ERR_SM_NODE_PATH_BUDGET and a resource string instead of truncating expansions or returning a false result.",
+        "TypeError names and ERR_INVALID_ARG_TYPE codes match the supported invalid input domain; received-value message rendering differs from Node's internal inspector.",
+        "Default path objects remain mutable; ESM named bindings capture their initial members. syncBuiltinESMExports is unavailable."
+      ]
+    }
+  },
+  "requiredHostInterfaces": []
+}

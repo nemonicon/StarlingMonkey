@@ -1,0 +1,5 @@
+Read-only ACTUAL full inventory regression for sealed source bd66c16ce0525a23978e23e170a82cc755bdd313516e00d7e3246302f6730494.
+
+The shared finite inventory helper read all six actual publisher/base/control/coverage/peer/bootstrap families twice:8904 unique regular files. All five indexed peer files were required; no peer preparation manifest was read or invented. All known preparation manifests were required; bootstrap preparation2261 rows resolved only at the original repository root, while both original/staged85 indexed files were verified. Two controlled read-only negative cases refused: omitted indexed peer file and required preparation manifest. No real file was removed or changed.
+
+The caller authenticated the completed source index and all its indexed bytes before importing ONLY inventory.py. It invoked no publisher/bootstrap/native verifier/build/bundle/guest/target-host/timing main. sys.dont_write_bytecode prevents an import cache write. The fresh external report is copied byte-exactly here after the source seal; neither source nor prior packets changed. This evidence is not codec/runtime acceptance.

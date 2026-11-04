@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "state": "PINNED_SOURCE_INSPECTED_NOT_EXECUTED",
+  "packageVersion": "0.8.3",
+  "browserEntry": {
+    "path": "/tmp/starling-node-compat/native-toolchain-lock/node_modules/fflate/esm/browser.js",
+    "sha256": "b7ca4450b19559a1d50eb381adcee94b82449674be4cd17789d9beba7e6122a1",
+    "bytes": 90922
+  },
+  "functions": [
+    {
+      "symbol": "zlibSync",
+      "startLine": 1463,
+      "sha256": "3c33ffacbc8cc255a82edbc795c227da3bfd8acba6c2bf075af3f04e869d69f5",
+      "source": "export function zlibSync(data, opts) {\n    if (!opts)\n        opts = {};\n    var a = adler();\n    a.p(data);\n    var d = dopt(data, opts, opts.dictionary ? 6 : 2, 4);\n    return zlh(d, opts), wbytes(d, d.length - 4, a.d()), d;\n}"
+    },
+    {
+      "symbol": "unzlibSync",
+      "startLine": 1531,
+      "sha256": "f3edb23eabcd1fe550f783e7103323610b6deb2d7c263f0377d8531edee1bbd1",
+      "source": "export function unzlibSync(data, opts) {\n    return inflt(data.subarray(zls(data, opts && opts.dictionary), -4), { i: 2 }, opts && opts.out, opts && opts.dictionary);\n}"
+    },
+    {
+      "symbol": "gzipSync",
+      "startLine": 1300,
+      "sha256": "15b9851e2356a8e5d6e01b5465bf156c7206f0683afc65237311ebd41121c874",
+      "source": "export function gzipSync(data, opts) {\n    if (!opts)\n        opts = {};\n    var c = crc(), l = data.length;\n    c.p(data);\n    var d = dopt(data, opts, gzhl(opts), 8), s = d.length;\n    return gzh(d, opts), wbytes(d, s - 8, c.d()), wbytes(d, s - 4, l), d;\n}"
+    },
+    {
+      "symbol": "gunzipSync",
+      "startLine": 1384,
+      "sha256": "a4daa0b074025b644ab57aaf9f8ea8b72b6b971caecd6baeec9c82f6ae2cf7a5",
+      "source": "export function gunzipSync(data, opts) {\n    var st = gzs(data);\n    if (st + 8 > data.length)\n        err(6, 'invalid gzip data');\n    return inflt(data.subarray(st, -8), { i: 2 }, opts && opts.out || new u8(gzl(data)), opts && opts.dictionary);\n}"
+    },
+    {
+      "symbol": "deflateSync",
+      "startLine": 1146,
+      "sha256": "6c99649a5e56e0a9cb0ba3a1d43c8528bef0bdefb9a69dd6798a0cc5c766fb70",
+      "source": "export function deflateSync(data, opts) {\n    return dopt(data, opts || {}, 0, 0);\n}"
+    },
+    {
+      "symbol": "inflateSync",
+      "startLine": 1221,
+      "sha256": "77db453567520646eb0dc7ed3536780d3fd5925b7739a4c51a5dabba05f1add8",
+      "source": "export function inflateSync(data, opts) {\n    return inflt(data, { i: 2 }, opts && opts.out, opts && opts.dictionary);\n}"
+    }
+  ],
+  "gzipHeaderDateBranchUntakenByFixedMtime0": "Source conditional only; actual bundle and runtime proof pending",
+  "asyncWorkerBlobRoutes": "Present in unselected async source; not erased/proven guest-compatible",
+  "codecInvoked": false
+}

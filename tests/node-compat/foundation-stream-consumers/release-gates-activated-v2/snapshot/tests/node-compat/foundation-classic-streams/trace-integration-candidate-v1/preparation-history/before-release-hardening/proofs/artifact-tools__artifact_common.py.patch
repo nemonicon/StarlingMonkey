@@ -1,0 +1,37 @@
+--- a/tests/node-compat/foundation-classic-streams/integration-candidate-v1/artifact-tools/artifact_common.py
++++ b/artifact-tools/artifact_common.py
+@@ -12,7 +12,7 @@
+ 
+ HERE = Path(__file__).resolve().parent
+ REPO = HERE.parents[4]
+-OUTPUT = Path('/tmp/starling-node-compat/production-classic-artifacts-v1/native-freeze')
++OUTPUT = Path('/tmp/starling-node-compat/production-classic-trace-v1/native-freeze')
+ CONTRACT = json.loads((HERE.parent / 'admission-pins.json').read_bytes())
+ RECIPE = CONTRACT['productionRecipeSha256']
+ POLICY = CONTRACT['policySha256']
+@@ -20,7 +20,7 @@
+ EMBEDDING = '9dcb63beaf55ff6af9ca4d2019316d4a167657c02ed76a1bf246012da0bcd205'
+ ADAPTER = '988224282d03fe0bd3c25b62344aef265b1a8e1f5804bdbc34d6442507fabcc0'
+ LABELS = ('normal-off', 'normal-runtime', 'gc-off', 'disabled-off')
+-TOOL_PINS_SHA = 'f68267eff5126af83c099346d07e5befbf6261ed4ca245e14a68f292f32087e3'
++TOOL_PINS_SHA = '1646c52a05d81ec53c6cfeb3ca9347868e39944404e7c6d3dc88fa81672e29b6'
+ 
+ def sha(path):
+     value = hashlib.sha256()
+@@ -88,6 +88,7 @@
+     gc = label == 'gc-off'
+     entropy = 'runtime-only' if label == 'normal-runtime' else 'off'
+     assert metadata.get('gcStress') is gc and metadata.get('entropyPolicy') == entropy
++    assert metadata.get('classicTraceSourcePolicy') == json.loads((HERE.parent / 'policy.json').read_bytes())['classicTraceSourcePolicy'], 'Corrected source provenance required before engine use'
+     return gc, entropy
+ 
+ def manifest(rows, count):
+@@ -191,7 +192,7 @@
+     destination(receipt_path, output)
+     receipt_data, receipt_digest = capture_regular(receipt_path)
+     receipt = json.loads(receipt_data)
+-    assert receipt['schema'] == 1 and receipt['state'] == 'immutable-release-engine-frozen'
++    assert receipt['schema'] == 1 and receipt['state'] == 'immutable-trace-release-engine-frozen'
+     assert receipt['label'] == label and receipt['recipeSha256'] == RECIPE
+     assert receipt['nativeInputsVerified'] == 342 and receipt['externalEmbeddingInputsVerified'] == 3
+     assert receipt['actualLayoutCompileCommands'] == 61 and receipt['actualEmbeddingCompileCommands'] == 1

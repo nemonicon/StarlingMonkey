@@ -1,0 +1,1 @@
+import{nextTick}from'starling:test-internal-ticks';export function run(){function repeat(){nextTick(repeat)}nextTick(repeat);return 'unexpected-success'}

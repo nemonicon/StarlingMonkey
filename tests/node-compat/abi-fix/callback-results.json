@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "node": "v22.14.0",
+  "engine": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-control.wasm",
+  "engineSha256": "6daf1f03438aad3a14124b2dc09f95f09b91eac285233c2345cbd1a24b302748",
+  "componentizeJsRevision": "4d812f5a7b524cea5bcfd565cac55f3fab876a57",
+  "exportResultFixEnabled": true,
+  "tools": {
+    "version": "wasm-tools 1.235.0 (e26d5ebea 2025-06-13)",
+    "sha256": "b332dd79057dafdcc8a36ca933d0d499acea506b56b1ea28e28fbb036c9e713d"
+  },
+  "wasmtime": "wasmtime 42.0.1 (6844a83b5 2026-02-25)",
+  "source": "import { echo, constant } from 'starling:abi-helper/identity@0.1.0';\nexport function forward(value) { return echo(value); }\nexport function helperConstant() { return constant(); }\nexport function describeForward(value) { return JSON.stringify({ input: value, echo: echo(value), constant: constant() }); }",
+  "world": "package starling:abi-helper@0.1.0;\ninterface identity { echo: func(value: u32) -> u32; constant: func() -> u32; }\nworld profile {\n  import identity;\n  export forward: func(value: u32) -> u32;\n  export helper-constant: func() -> u32;\n  export describe-forward: func(value: u32) -> string;\n}",
+  "helperSourceSha256": "2593b17804b281bf75e8a085f2d3895d32d6d2c99c04cb31aab6f7c4e1a0cb2f",
+  "compositionCommand": [
+    "/tmp/starling-node-compat/native-build/cache/wasm-tools/1448/wasm-tools",
+    "compose",
+    "--no-imports",
+    "-d",
+    "/tmp/starling-node-compat/callback-diagnostic/helper.wasm",
+    "-o",
+    "/tmp/starling-node-compat/callback-diagnostic/composed.wasm",
+    "/tmp/starling-node-compat/callback-diagnostic/forwarding-guest.wasm"
+  ],
+  "finalPath": "/tmp/starling-node-compat/callback-diagnostic/composed.wasm",
+  "componentSha256": "202d4fc5b852575cb69cb395db57eb195e252dd97ed0e8e9c067839b61bf824a",
+  "emittedWit": "package root:component;\n\nworld root {\n  export forward: func(value: u32) -> u32;\n  export helper-constant: func() -> u32;\n  export describe-forward: func(value: u32) -> string;\n}\n",
+  "emittedImports": [],
+  "cases": [
+    {
+      "input": 0,
+      "expected": 0,
+      "observed": 0,
+      "matches": true,
+      "internal": {
+        "input": 0,
+        "echo": 0,
+        "constant": 4294967295
+      }
+    },
+    {
+      "input": 1,
+      "expected": 1,
+      "observed": 1,
+      "matches": true,
+      "internal": {
+        "input": 1,
+        "echo": 1,
+        "constant": 4294967295
+      }
+    },
+    {
+      "input": 2147483647,
+      "expected": 2147483647,
+      "observed": 2147483647,
+      "matches": true,
+      "internal": {
+        "input": 2147483647,
+        "echo": 2147483647,
+        "constant": 4294967295
+      }
+    },
+    {
+      "input": 2147483648,
+      "expected": 2147483648,
+      "observed": 0,
+      "matches": false,
+      "internal": {
+        "input": 2147483648,
+        "echo": 0,
+        "constant": 4294967295
+      }
+    },
+    {
+      "input": 2342402100,
+      "expected": 2342402100,
+      "observed": 109051904,
+      "matches": false,
+      "internal": {
+        "input": 2342402100,
+        "echo": 109051904,
+        "constant": 4294967295
+      }
+    },
+    {
+      "input": 4294967295,
+      "expected": 4294967295,
+      "observed": 4292870144,
+      "matches": false,
+      "internal": {
+        "input": 4294967295,
+        "echo": 4292870144,
+        "constant": 4294967295
+      }
+    }
+  ],
+  "wasmtimeCases": [
+    {
+      "call": "forward(2147483648)",
+      "expected": 2147483648,
+      "observed": 0,
+      "matches": false
+    },
+    {
+      "call": "helper-constant()",
+      "expected": 4294967295,
+      "observed": 4294967295,
+      "matches": true
+    }
+  ],
+  "conclusion": "The separate imported CoreTy::I32 argument reader still misreads boxed high-u32 Numbers. Guest-only composition reproduces it with no external host capability. Callback return values and the patched scalar export are controls that pass.",
+  "sourceLocation": "ComponentizeJS 4d812f5a7b524cea5bcfd565cac55f3fab876a57:crates/spidermonkey-embedding-splicer/src/splice.rs:598-606",
+  "scope": "Known limitation only; no imported-callback fix is applied by componentize-u32-result.patch."
+}

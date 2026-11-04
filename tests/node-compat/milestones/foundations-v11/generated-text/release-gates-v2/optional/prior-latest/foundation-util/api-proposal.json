@@ -1,0 +1,938 @@
+{
+  "schemaVersion": 1,
+  "state": "engineering-proposal-not-implemented",
+  "nodeRelease": "v22.14.0",
+  "inventorySha256": "fef5419859ab9ebb4305b248aa89786a854ce685863fa0b1ca6d9124fb3fa3cb",
+  "mainNamedExports": 47,
+  "typePredicates": 42,
+  "nativeOrIntrinsicPredicateCandidates": 36,
+  "predicateDeferred": [
+    "isAsyncFunction",
+    "isExternal",
+    "isGeneratorFunction",
+    "isGeneratorObject",
+    "isKeyObject",
+    "isModuleNamespaceObject"
+  ],
+  "aliases": [
+    "node:util",
+    "util",
+    "node:util/types",
+    "util/types",
+    "node:sys",
+    "sys"
+  ],
+  "sysContract": "Distinct sys ESM namespace; same47named values/default/CommonJS object as util. DEP0025 import warning needs explicit guest warning policy, not mandatory stdio.",
+  "moduleContract": "Explicit Node22 manifests and declarations only; same named/default function identities, shared types object, real symbol metadata, no universalProxy or accidentalthenable. Static bundler canonicalizes barealiases; computed runtime aliases need a loader-identity decision.",
+  "rows": [
+    {
+      "module": "node:util/types",
+      "export": "isAnyArrayBuffer",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "JS::IsArrayBufferObject and JS::IsSharedArrayBufferObject; union for Any.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Classify detached/resizable/shared values without reading byte data.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isArgumentsObject",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "Rooted JS::GetBuiltinClass classification against js::ESClass::Arguments.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Proxies classify Other; cross-compartment wrapper denial must follow explicit false/error policy and Node tests.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isArrayBuffer",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "JS::IsArrayBufferObject and JS::IsSharedArrayBufferObject; union for Any.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Classify detached/resizable/shared values without reading byte data.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isArrayBufferView",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-or-native-candidate",
+      "strategy": "Captured intrinsic or JS_IsArrayBufferViewObject / JS_IsTypedArrayObject / JS_GetArrayBufferViewType; classification only, no data borrow.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Detached/OOB/shared/subclass inputs remain branded; no Symbol.toStringTag or instanceof shortcut.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isAsyncFunction",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub initially; unsupported operations throw ERR_SM_NODE_UNSUPPORTED, including construction.",
+      "capability": "none",
+      "boundary": "Engine kind helper not established, or Node-only KeyObject/External not present.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isBigInt64Array",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-or-native-candidate",
+      "strategy": "Captured intrinsic or JS_IsArrayBufferViewObject / JS_IsTypedArrayObject / JS_GetArrayBufferViewType; classification only, no data borrow.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Detached/OOB/shared/subclass inputs remain branded; no Symbol.toStringTag or instanceof shortcut.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isBigIntObject",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "Rooted JS::GetBuiltinClass classification against js::ESClass::BigInt.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Proxies classify Other; cross-compartment wrapper denial must follow explicit false/error policy and Node tests.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isBigUint64Array",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-or-native-candidate",
+      "strategy": "Captured intrinsic or JS_IsArrayBufferViewObject / JS_IsTypedArrayObject / JS_GetArrayBufferViewType; classification only, no data borrow.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Detached/OOB/shared/subclass inputs remain branded; no Symbol.toStringTag or instanceof shortcut.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isBooleanObject",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "Rooted JS::GetBuiltinClass classification against js::ESClass::Boolean.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Proxies classify Other; cross-compartment wrapper denial must follow explicit false/error policy and Node tests.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isBoxedPrimitive",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "hybrid-candidate",
+      "strategy": "Private captured union of Number/String/Boolean/BigInt class checks plus Symbol-object brand.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Primitives must be false and mutable public predicate properties must not change this union.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isCryptoKey",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "optional-native-candidate",
+      "strategy": "Existing CryptoKey::is_instance from include/builtin.h + web/crypto-key class, conditionally on selected existing Web implementation.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Initial core binds explicit deferred callable unless existing builtin_web_crypto target is selected as an actual CMake dependency. No entropy call for brand check; guest retention/size/import differences must be measured.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isDataView",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-or-native-candidate",
+      "strategy": "Captured intrinsic or JS_IsArrayBufferViewObject / JS_IsTypedArrayObject / JS_GetArrayBufferViewType; classification only, no data borrow.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Detached/OOB/shared/subclass inputs remain branded; no Symbol.toStringTag or instanceof shortcut.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isDate",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "Rooted JS::GetBuiltinClass classification against js::ESClass::Date.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Proxies classify Other; cross-compartment wrapper denial must follow explicit false/error policy and Node tests.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isExternal",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub initially; unsupported operations throw ERR_SM_NODE_UNSUPPORTED, including construction.",
+      "capability": "none",
+      "boundary": "Engine kind helper not established, or Node-only KeyObject/External not present.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isFloat32Array",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-or-native-candidate",
+      "strategy": "Captured intrinsic or JS_IsArrayBufferViewObject / JS_IsTypedArrayObject / JS_GetArrayBufferViewType; classification only, no data borrow.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Detached/OOB/shared/subclass inputs remain branded; no Symbol.toStringTag or instanceof shortcut.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isFloat64Array",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-or-native-candidate",
+      "strategy": "Captured intrinsic or JS_IsArrayBufferViewObject / JS_IsTypedArrayObject / JS_GetArrayBufferViewType; classification only, no data borrow.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Detached/OOB/shared/subclass inputs remain branded; no Symbol.toStringTag or instanceof shortcut.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isGeneratorFunction",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub initially; unsupported operations throw ERR_SM_NODE_UNSUPPORTED, including construction.",
+      "capability": "none",
+      "boundary": "Engine kind helper not established, or Node-only KeyObject/External not present.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isGeneratorObject",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub initially; unsupported operations throw ERR_SM_NODE_UNSUPPORTED, including construction.",
+      "capability": "none",
+      "boundary": "Engine kind helper not established, or Node-only KeyObject/External not present.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isInt16Array",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-or-native-candidate",
+      "strategy": "Captured intrinsic or JS_IsArrayBufferViewObject / JS_IsTypedArrayObject / JS_GetArrayBufferViewType; classification only, no data borrow.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Detached/OOB/shared/subclass inputs remain branded; no Symbol.toStringTag or instanceof shortcut.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isInt32Array",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-or-native-candidate",
+      "strategy": "Captured intrinsic or JS_IsArrayBufferViewObject / JS_IsTypedArrayObject / JS_GetArrayBufferViewType; classification only, no data borrow.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Detached/OOB/shared/subclass inputs remain branded; no Symbol.toStringTag or instanceof shortcut.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isInt8Array",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-or-native-candidate",
+      "strategy": "Captured intrinsic or JS_IsArrayBufferViewObject / JS_IsTypedArrayObject / JS_GetArrayBufferViewType; classification only, no data borrow.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Detached/OOB/shared/subclass inputs remain branded; no Symbol.toStringTag or instanceof shortcut.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isKeyObject",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub initially; unsupported operations throw ERR_SM_NODE_UNSUPPORTED, including construction.",
+      "capability": "none",
+      "boundary": "Engine kind helper not established, or Node-only KeyObject/External not present.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isMap",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "Rooted JS::GetBuiltinClass classification against js::ESClass::Map.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Proxies classify Other; cross-compartment wrapper denial must follow explicit false/error policy and Node tests.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isMapIterator",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "Rooted JS::GetBuiltinClass classification against js::ESClass::MapIterator.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Proxies classify Other; cross-compartment wrapper denial must follow explicit false/error policy and Node tests.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isModuleNamespaceObject",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub initially; unsupported operations throw ERR_SM_NODE_UNSUPPORTED, including construction.",
+      "capability": "none",
+      "boundary": "Engine kind helper not established, or Node-only KeyObject/External not present.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isNativeError",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "Rooted JS::GetBuiltinClass classification against js::ESClass::Error.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Proxies classify Other; cross-compartment wrapper denial must follow explicit false/error policy and Node tests.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isNumberObject",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "Rooted JS::GetBuiltinClass classification against js::ESClass::Number.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Proxies classify Other; cross-compartment wrapper denial must follow explicit false/error policy and Node tests.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isPromise",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "Rooted JS::GetBuiltinClass classification against js::ESClass::Promise.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Proxies classify Other; cross-compartment wrapper denial must follow explicit false/error policy and Node tests.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isProxy",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "js::IsScriptedProxy from released js/Proxy.h; no proxy target inspection.",
+      "capability": "none",
+      "boundary": "Pinned friend API; distinguish scripted proxies from internal wrappers. Revoked proxies require differential tests.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isRegExp",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "Rooted JS::GetBuiltinClass classification against js::ESClass::RegExp.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Proxies classify Other; cross-compartment wrapper denial must follow explicit false/error policy and Node tests.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isSet",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "Rooted JS::GetBuiltinClass classification against js::ESClass::Set.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Proxies classify Other; cross-compartment wrapper denial must follow explicit false/error policy and Node tests.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isSetIterator",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "Rooted JS::GetBuiltinClass classification against js::ESClass::SetIterator.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Proxies classify Other; cross-compartment wrapper denial must follow explicit false/error policy and Node tests.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isSharedArrayBuffer",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "JS::IsArrayBufferObject and JS::IsSharedArrayBufferObject; union for Any.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Classify detached/resizable/shared values without reading byte data.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isStringObject",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "Rooted JS::GetBuiltinClass classification against js::ESClass::String.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Proxies classify Other; cross-compartment wrapper denial must follow explicit false/error policy and Node tests.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isSymbolObject",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-candidate",
+      "strategy": "Small facade using captured WeakSet.prototype.has / Symbol.prototype.valueOf and object guard, or a reviewed public-API class identity route.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Do not read application-controlled tags/prototypes; facade wrong-brand exception allocation needs separate native/OOM policy review.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isTypedArray",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-or-native-candidate",
+      "strategy": "Captured intrinsic or JS_IsArrayBufferViewObject / JS_IsTypedArrayObject / JS_GetArrayBufferViewType; classification only, no data borrow.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Detached/OOB/shared/subclass inputs remain branded; no Symbol.toStringTag or instanceof shortcut.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isUint16Array",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-or-native-candidate",
+      "strategy": "Captured intrinsic or JS_IsArrayBufferViewObject / JS_IsTypedArrayObject / JS_GetArrayBufferViewType; classification only, no data borrow.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Detached/OOB/shared/subclass inputs remain branded; no Symbol.toStringTag or instanceof shortcut.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isUint32Array",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-or-native-candidate",
+      "strategy": "Captured intrinsic or JS_IsArrayBufferViewObject / JS_IsTypedArrayObject / JS_GetArrayBufferViewType; classification only, no data borrow.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Detached/OOB/shared/subclass inputs remain branded; no Symbol.toStringTag or instanceof shortcut.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isUint8Array",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-or-native-candidate",
+      "strategy": "Captured intrinsic or JS_IsArrayBufferViewObject / JS_IsTypedArrayObject / JS_GetArrayBufferViewType; classification only, no data borrow.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Detached/OOB/shared/subclass inputs remain branded; no Symbol.toStringTag or instanceof shortcut.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isUint8ClampedArray",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-or-native-candidate",
+      "strategy": "Captured intrinsic or JS_IsArrayBufferViewObject / JS_IsTypedArrayObject / JS_GetArrayBufferViewType; classification only, no data borrow.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Detached/OOB/shared/subclass inputs remain branded; no Symbol.toStringTag or instanceof shortcut.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isWeakMap",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "native-candidate",
+      "strategy": "JS::IsWeakMapObject.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. No key enumeration or lifetime inspection.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util/types",
+      "export": "isWeakSet",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-candidate",
+      "strategy": "Small facade using captured WeakSet.prototype.has / Symbol.prototype.valueOf and object guard, or a reviewed public-API class identity route.",
+      "capability": "none",
+      "boundary": "Reject scripted proxies before native forwarding. Do not read application-controlled tags/prototypes; facade wrong-brand exception allocation needs separate native/OOM policy review.",
+      "validation": "Pinned Node differential over primitives/boxed prototypes/subclasses/cross-realm inputs/proxies/revoked proxies/spoofed tags/getter-trap counters/detached+resizable+shared views; actual component later."
+    },
+    {
+      "module": "node:util",
+      "export": "MIMEParams",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Pure guest candidates after Node22 grammar/mutation tests; existing web parse_mime_type only splits semicolons and is not an equivalent parser.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "MIMEType",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Pure guest candidates after Node22 grammar/mutation tests; existing web parse_mime_type only splits semicolons and is not an equivalent parser.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "TextDecoder",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "reuse-existing",
+      "strategy": "Exact installed global constructor identity; preserve existing label/fatal/BOM/stream scope and limitations.",
+      "capability": "none",
+      "boundary": "Exact installed global constructor identity; preserve existing label/fatal/BOM/stream scope and limitations.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "TextEncoder",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "reuse-existing",
+      "strategy": "Exact installed global constructor identity; full encoding scope is the existing Web implementation, not added Node encodings.",
+      "capability": "none",
+      "boundary": "Exact installed global constructor identity; full encoding scope is the existing Web implementation, not added Node encodings.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "_errnoException",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Node/libuv errno tables are OS-specific. Do not pretend WASI errno numbers or host strerror match without an explicit OS/profile policy.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "_exceptionWithHostPort",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Node/libuv errno tables are OS-specific. Do not pretend WASI errno numbers or host strerror match without an explicit OS/profile policy.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "_extend",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "aborted",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Future weak-resource listener lifecycle; existing FinalizationRegistry queue helps, but request/snapshot/cancellation/resource release require actual tests.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "callbackify",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Deferred until actual Node nextTick ordering/error/context policy; Promise.then plus queueMicrotask is not full equivalence.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "debug",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Environment/warning/PID/stdio semantics are unresolved; no implicit imported capability and no silent noop success.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "debuglog",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Environment/warning/PID/stdio semantics are unresolved; no implicit imported capability and no silent noop success.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "deprecate",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Environment/warning/PID/stdio semantics are unresolved; no implicit imported capability and no silent noop success.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "format",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Substantial semantic algorithms; Jco24 is a reference candidate, not a drop-in Node22 proof. Existing native assert deep comparison is also deferred.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "formatWithOptions",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Substantial semantic algorithms; Jco24 is a reference candidate, not a drop-in Node22 proof. Existing native assert deep comparison is also deferred.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "getCallSite",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Future JS::CaptureCurrentStack/SavedFrame public API investigation; V8 script IDs/source-map behavior not established; no Error.stack parser compatibility claim.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "getCallSites",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Future JS::CaptureCurrentStack/SavedFrame public API investigation; V8 script IDs/source-map behavior not established; no Error.stack parser compatibility claim.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "getSystemErrorMap",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Node/libuv errno tables are OS-specific. Do not pretend WASI errno numbers or host strerror match without an explicit OS/profile policy.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "getSystemErrorMessage",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Node/libuv errno tables are OS-specific. Do not pretend WASI errno numbers or host strerror match without an explicit OS/profile policy.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "getSystemErrorName",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Node/libuv errno tables are OS-specific. Do not pretend WASI errno numbers or host strerror match without an explicit OS/profile policy.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "inherits",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "javascript-candidate",
+      "strategy": "Adapt Node22 guards, super_ descriptor, and prototype mutation order with captured intrinsics.",
+      "capability": "none",
+      "boundary": "Adapt Node22 guards, super_ descriptor, and prototype mutation order with captured intrinsics.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "inspect",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Substantial semantic algorithms; Jco24 is a reference candidate, not a drop-in Node22 proof. Existing native assert deep comparison is also deferred.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isArray",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isBoolean",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isBuffer",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isDate",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isDeepStrictEqual",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Substantial semantic algorithms; Jco24 is a reference candidate, not a drop-in Node22 proof. Existing native assert deep comparison is also deferred.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isError",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isFunction",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isNull",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isNullOrUndefined",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isNumber",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isObject",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isPrimitive",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isRegExp",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isString",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isSymbol",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "isUndefined",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "log",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Environment/warning/PID/stdio semantics are unresolved; no implicit imported capability and no silent noop success.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "parseArgs",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Future explicit config.args parser is pure guest; omitted argv requires separately selected wasi:cli/environment@0.2.10 or predictable refusal.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "parseEnv",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Future string parser is pure guest; it must not import environment or mutate process.env simply because its name contains Env.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "promisify",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "partial-javascript-candidate",
+      "strategy": "Node22 err-first/custom-symbol path, two observable custom getter reads, this/descriptors/prototype identity; process warnings/internal customArgs integration remain explicit gaps.",
+      "capability": "none",
+      "boundary": "Node22 err-first/custom-symbol path, two observable custom getter reads, this/descriptors/prototype identity; process warnings/internal customArgs integration remain explicit gaps.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "stripVTControlCharacters",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Explicit versioned callable stub initially; no successful approximation or empty namespace.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "styleText",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Future validateStream:false path can remain pure; default stream/TTY/color policy and Node22 array-format behavior need exact tests.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "toUSVString",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "intrinsic-candidate",
+      "strategy": "Captured String.prototype.toWellFormed applied after template-string ToString; preserve Symbol/coercion exceptions.",
+      "capability": "none",
+      "boundary": "Captured String.prototype.toWellFormed applied after template-string ToString; preserve Symbol/coercion exceptions.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "transferableAbortController",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Node worker/transfer markers are not provided by current structured-clone callbacks; never substitute ordinary controllers silently.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "transferableAbortSignal",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "deferred",
+      "strategy": "Real explicit callable stub; future isolated implementation only after scope gates.",
+      "capability": "none",
+      "boundary": "Node worker/transfer markers are not provided by current structured-clone callbacks; never substitute ordinary controllers silently.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    },
+    {
+      "module": "node:util",
+      "export": "types",
+      "currentStatus": "unavailable-unselected",
+      "proposalStatus": "namespace-candidate",
+      "strategy": "One ordinary shared types object, same as util/types default; exact42 real bindings and two immutable key/Crypto property descriptors.",
+      "capability": "none",
+      "boundary": "One ordinary shared types object, same as util/types default; exact42 real bindings and two immutable key/Crypto property descriptors.",
+      "validation": "Exact Node22 namespace/data/symbol/default relationships, shared supported cases and explicit deferred call/new errors. No native component proof yet."
+    }
+  ],
+  "scope": "No production install, helper compilation, component execution or performance claim. Current util remains unselected until separately reviewed integration.",
+  "corePredicateCandidates": 35,
+  "optionalPredicateCandidates": [
+    "isCryptoKey"
+  ],
+  "nativeDependencyContract": {
+    "defaultCore": [
+      "builtin_web_text_codec for exact existing globalTextEncoder/TextDecoder"
+    ],
+    "optionalCryptoKey": "Do not reference CryptoKey::class_ unless explicit existing builtin_web_crypto target dependency is configured. If absent, isCryptoKey remains an identifiable deferred callable; do not silently import entropy or retain crypto code. Measure final guest bytes/imports for optional variant.",
+    "scriptedProxy": "Before GetBuiltinClass/typed-buffer/weak-map predicates, reject js::IsScriptedProxy for all non-proxy checks; revoked scripted proxies are true only for isProxy. No target/property/tag reads.",
+    "memory": "Classification only: no ArrayBuffer data borrow, ownership transfer or hidden live-resource read. Root JSObject across fallible helpers; do not put MayGC calls in a no-GC scope."
+  },
+  "futureCapabilities": {
+    "arguments": "Only separately selected wasi:cli/environment@0.2.10 get-arguments for omitted parseArgs args; explicit args is pure guest.",
+    "environment": "debuglog NODE_DEBUG selection requires explicit environment policy; parseEnv(content) itself requires none.",
+    "stdio": "Active warning/log output requires separately selected standard wasi:cli/stderr or stdout plus wasi:io/streams/error as emitted; log timestamp additionally wall-clock if promised. No process PID service is introduced.",
+    "initialProfile": "No external host interfaces for selected pure operations; deferred defaults do not grant capabilities."
+  }
+}

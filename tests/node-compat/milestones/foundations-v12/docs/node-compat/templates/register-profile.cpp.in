@@ -1,0 +1,49 @@
+// UNCOMPILED integration template. The generated header is produced by
+// generate-factories.mjs. No host API and no new embedding method is introduced.
+#include "builtin.h"
+#include "js/CompilationAndEvaluation.h"
+#include "js/SourceText.h"
+#include "node-profile-factories.generated.h"
+
+namespace builtins::node_compat {
+JSObject *create_kernel(JSContext *cx);
+
+static bool evaluate_factory(JSContext *cx, const char *source_text,
+                             JS::HandleValue argument, JS::MutableHandleValue result) {
+  JS::CompileOptions options(cx);
+  options.setFileAndLine("<node-profile-factory>", 1);
+  JS::SourceText<mozilla::Utf8Unit> source;
+  if (!source.init(cx, source_text, strlen(source_text), JS::SourceOwnership::Borrowed)) return false;
+  JS::RootedValue factory(cx);
+  if (!JS::Evaluate(cx, options, source, &factory)) return false;
+  JS::RootedValueArray<1> arguments(cx);
+  arguments[0].set(argument);
+  return JS::Call(cx, JS::UndefinedHandleValue, factory, arguments, result);
+}
+
+bool install(api::Engine *engine) {
+  auto *cx = engine->cx();
+  // Existing install_builtins() executes in the CONTENT realm before user code.
+  // Its ScriptLoader already exists. Avoid Engine::eval_toplevel() here, whose
+  // lifecycle assertion requires initialization to have finished.
+  JSAutoRealm realm(cx, engine->global());
+  JS::RootedObject kernel(cx, create_kernel(cx));
+  if (!kernel) return false;
+  JS::RootedValue kernel_value(cx, JS::ObjectValue(*kernel));
+  JS::RootedValue buffer_module(cx);
+  if (!evaluate_factory(cx, kBufferFactorySource, kernel_value, &buffer_module)) return false;
+  if (!engine->define_builtin_module("node:buffer", buffer_module) ||
+      !engine->define_builtin_module("buffer", buffer_module)) return false;
+  JS::RootedValue child_module(cx);
+  if (!evaluate_factory(cx, kChildProcessFactorySource, JS::UndefinedHandleValue, &child_module)) return false;
+  if (!engine->define_builtin_module("node:child_process", child_module) ||
+      !engine->define_builtin_module("child_process", child_module)) return false;
+  // Public Buffer is selected explicitly for this profile. Registering both
+  // specifiers preserves object/function identities; module namespace records
+  // themselves are per-specifier in the existing loader.
+  JS::RootedObject buffer_namespace(cx, &buffer_module.toObject());
+  JS::RootedValue buffer_constructor(cx);
+  if (!JS_GetProperty(cx, buffer_namespace, "Buffer", &buffer_constructor)) return false;
+  return JS_DefineProperty(cx, engine->global(), "Buffer", buffer_constructor, 0);
+}
+} // namespace builtins::node_compat

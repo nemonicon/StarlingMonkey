@@ -1,0 +1,202 @@
+--- a/builtins/node-compat/buffer-facade.mjs
++++ b/builtins/node-compat/buffer-facade.mjs
+@@ -125,6 +125,24 @@
+     fillBytes(value, fill);
+     return value;
+   };
++  // m0.8: retain the existing owned, zeroed allocator. Capture before app code.
++  const unsafeAlloc = Buffer.alloc, unsafeApply = Reflect.apply;
++  const unsafeTrunc = Math.trunc, unsafeFinite = Number.isFinite;
++  const UnsafeTypeError = TypeError, UnsafeRangeError = RangeError;
++  const unsafeDefine = Object.defineProperty;
++  function unsafeFailure(Ctor, code, message) {
++    const error = new Ctor(code + ': Buffer.allocUnsafe ' + message);
++    unsafeDefine(error, 'code', { __proto__: null, value: code, writable: true, enumerable: true, configurable: true });
++    unsafeDefine(error, 'module', { __proto__: null, value: 'node:buffer', writable: true, enumerable: true, configurable: true });
++    unsafeDefine(error, 'operation', { __proto__: null, value: 'Buffer.allocUnsafe', writable: true, enumerable: true, configurable: true });
++    throw error;
++  }
++  function allocUnsafe(length) {
++    if (typeof length !== 'number') unsafeFailure(UnsafeTypeError, 'ERR_INVALID_ARG_TYPE', 'size must be a number');
++    if (!unsafeFinite(length) || length < 0 || length > MAX_LENGTH)
++      unsafeFailure(UnsafeRangeError, 'ERR_OUT_OF_RANGE', 'size must be between 0 and ' + MAX_LENGTH);
++    return unsafeApply(unsafeAlloc, Buffer, [unsafeTrunc(length)]);
++  }
+   Buffer.from = function from(value, encodingOrOffset, length) {
+     if (typeof value === 'string') {
+       sourceLimit(value);
+@@ -188,7 +206,8 @@
+     offset: { get() { requireBuffer(this); return typedByteOffset.call(this); }, configurable: true },
+   });
+   for (const name of ['copyBytesFrom', 'of', 'allocUnsafe', 'allocUnsafeSlow', 'compare', 'concat']) {
+-    Buffer[name] = unavailable('node:buffer', `Buffer.${name}`);
++    // Keep constructor property order; promote only this existing slot.
++    Buffer[name] = name === 'allocUnsafe' ? allocUnsafe : unavailable('node:buffer', `Buffer.${name}`);
+   }
+   // Explicit list from Node v22.14.0's Buffer prototype; U8 methods with Node
+   // overloads must refuse invocation rather than silently use different rules.
+--- a/builtins/node-compat/export-manifest.node-v22.14.0.json
++++ b/builtins/node-compat/export-manifest.node-v22.14.0.json
+@@ -1,6 +1,6 @@
+ {
+   "schemaVersion": 1,
+-  "profileVersion": "sm-node-22.14.0-m0.1",
++  "profileVersion": "sm-node-22.14.0-m0.8",
+   "nodeVersion": "v22.14.0",
+   "status": "experimental-opt-in; bounded native byte-kernel implementation",
+   "moduleContract": "ESM with explicit named exports and default data-property object; no dynamic CommonJS require or syncBuiltinESMExports",
+@@ -56,7 +56,8 @@
+         "from(ArrayBuffer, integerOffset?, integerLength?): shared view",
+         "isBuffer",
+         "isEncoding: profile encodings only",
+-        "byteLength(string|Uint8Array|ArrayBuffer, encoding?)"
++        "byteLength(string|Uint8Array|ArrayBuffer, encoding?)",
++        "allocUnsafe(finite nonnegative number <=16777216): truncate length; fresh zeroed owned Buffer; no pool"
+       ],
+       "supportedPrototype": [
+         "toString(utf8|utf-8|hex, integerStart?, integerEnd?)",
+@@ -95,7 +96,6 @@
+       "unsupportedStatic": [
+         "copyBytesFrom",
+         "of",
+-        "allocUnsafe",
+         "allocUnsafeSlow",
+         "compare",
+         "concat"
+@@ -103,13 +103,16 @@
+       "unsupportedPrototypePolicy": "Every other own Node Buffer prototype function is explicitly installed as a throwing function; inventory checked against pinned Node at test time",
+       "deviations": [
+         "No deprecated Buffer or SlowBuffer constructor",
+-        "No slab allocator or unsafe allocation",
++        "No slab allocator or uninitialized storage; allocUnsafe guarantees fresh zeroed exact backing at offset 0 and ignores poolSize",
+         "No arrays, array-like inputs, DataView, non-Uint8 typed arrays, SharedArrayBuffer or resizable backing stores",
+         "No copying slice: Buffer.slice shares storage",
+         "Source strings limited to 1048576 UTF-16 code units",
+-        "Fractional sizes/index coercion outside specified overloads unsupported",
++        "Only allocUnsafe truncates finite nonnegative fractional sizes; other fractional sizes/index coercions remain outside the declared overloads",
+         "Default object and constants frozen; CJS mutation synchronization unsupported",
+-        "Detached/shared/resizable ArrayBuffers and views fail ERR_SM_NODE_UNSUPPORTED; inherited Uint8Array APIs keep engine behavior"
++        "Detached/shared/resizable ArrayBuffers and views fail ERR_SM_NODE_UNSUPPORTED; inherited Uint8Array APIs keep engine behavior",
++        "allocUnsafe validates the raw requested size before truncation; requests above 16777216 reject even if their truncated length would fit",
++        "allocUnsafe uses captured constructors and own data code/module/operation fields for validation; detailed Node error text and pooled backing semantics differ",
++        "allocUnsafeSlow remains explicitly deferred; no legacy Buffer constructor or other method support follows"
+       ]
+     }
+   },
+--- a/builtins/node-compat/factories.generated.h
++++ b/builtins/node-compat/factories.generated.h
+@@ -1,15 +1,20 @@
+ // Generated by generate-factories.mjs; do not edit.
+-// Canonical-source SHA-256: 8073335ed63ab9481d7df743c46acc7b29a37a3e6df6be08441f24e4d2f87564
++// Canonical-source SHA-256: b1369c809bd6d9f2cb89cd61c44605b202a346bc670d5a714af5174fa976fa87
+ static constexpr const char kBufferFactorySource[] = R"SM_NODE_PROFILE((() => {
+ // No host capability is consulted, including at snapshot time.
+-const PROFILE_VERSION = 'sm-node-22.14.0-m0.1';
++const PROFILE_VERSION = 'sm-node-22.14.0-m0.8';
+ 
++// Capture trusted installation-time constructors/intrinsics before application
++// code can replace them. Own data descriptors bypass inherited field hooks.
++const ProfileError = Error;
++const DefineErrorProperty = Object.defineProperty;
++
+ function unsupported(module, operation) {
+-  const error = new Error(`${module}.${operation} is unavailable in ${PROFILE_VERSION}`);
+-  error.code = 'ERR_SM_NODE_UNSUPPORTED';
+-  error.module = module;
+-  error.operation = operation;
+-  error.profile = PROFILE_VERSION;
++  const error = new ProfileError(`${module}.${operation} is unavailable in ${PROFILE_VERSION}`);
++  DefineErrorProperty(error, 'code', { __proto__: null, value: 'ERR_SM_NODE_UNSUPPORTED', writable: true, enumerable: true, configurable: true });
++  DefineErrorProperty(error, 'module', { __proto__: null, value: module, writable: true, enumerable: true, configurable: true });
++  DefineErrorProperty(error, 'operation', { __proto__: null, value: operation, writable: true, enumerable: true, configurable: true });
++  DefineErrorProperty(error, 'profile', { __proto__: null, value: PROFILE_VERSION, writable: true, enumerable: true, configurable: true });
+   throw error;
+ }
+ 
+@@ -145,6 +150,24 @@
+     fillBytes(value, fill);
+     return value;
+   };
++  // m0.8: retain the existing owned, zeroed allocator. Capture before app code.
++  const unsafeAlloc = Buffer.alloc, unsafeApply = Reflect.apply;
++  const unsafeTrunc = Math.trunc, unsafeFinite = Number.isFinite;
++  const UnsafeTypeError = TypeError, UnsafeRangeError = RangeError;
++  const unsafeDefine = Object.defineProperty;
++  function unsafeFailure(Ctor, code, message) {
++    const error = new Ctor(code + ': Buffer.allocUnsafe ' + message);
++    unsafeDefine(error, 'code', { __proto__: null, value: code, writable: true, enumerable: true, configurable: true });
++    unsafeDefine(error, 'module', { __proto__: null, value: 'node:buffer', writable: true, enumerable: true, configurable: true });
++    unsafeDefine(error, 'operation', { __proto__: null, value: 'Buffer.allocUnsafe', writable: true, enumerable: true, configurable: true });
++    throw error;
++  }
++  function allocUnsafe(length) {
++    if (typeof length !== 'number') unsafeFailure(UnsafeTypeError, 'ERR_INVALID_ARG_TYPE', 'size must be a number');
++    if (!unsafeFinite(length) || length < 0 || length > MAX_LENGTH)
++      unsafeFailure(UnsafeRangeError, 'ERR_OUT_OF_RANGE', 'size must be between 0 and ' + MAX_LENGTH);
++    return unsafeApply(unsafeAlloc, Buffer, [unsafeTrunc(length)]);
++  }
+   Buffer.from = function from(value, encodingOrOffset, length) {
+     if (typeof value === 'string') {
+       sourceLimit(value);
+@@ -208,7 +231,8 @@
+     offset: { get() { requireBuffer(this); return typedByteOffset.call(this); }, configurable: true },
+   });
+   for (const name of ['copyBytesFrom', 'of', 'allocUnsafe', 'allocUnsafeSlow', 'compare', 'concat']) {
+-    Buffer[name] = unavailable('node:buffer', `Buffer.${name}`);
++    // Keep constructor property order; promote only this existing slot.
++    Buffer[name] = name === 'allocUnsafe' ? allocUnsafe : unavailable('node:buffer', `Buffer.${name}`);
+   }
+   // Explicit list from Node v22.14.0's Buffer prototype; U8 methods with Node
+   // overloads must refuse invocation rather than silently use different rules.
+@@ -260,14 +284,19 @@
+ })())SM_NODE_PROFILE";
+ static constexpr const char kChildProcessFactorySource[] = R"SM_NODE_PROFILE((() => {
+ // No host capability is consulted, including at snapshot time.
+-const PROFILE_VERSION = 'sm-node-22.14.0-m0.1';
++const PROFILE_VERSION = 'sm-node-22.14.0-m0.8';
+ 
++// Capture trusted installation-time constructors/intrinsics before application
++// code can replace them. Own data descriptors bypass inherited field hooks.
++const ProfileError = Error;
++const DefineErrorProperty = Object.defineProperty;
++
+ function unsupported(module, operation) {
+-  const error = new Error(`${module}.${operation} is unavailable in ${PROFILE_VERSION}`);
+-  error.code = 'ERR_SM_NODE_UNSUPPORTED';
+-  error.module = module;
+-  error.operation = operation;
+-  error.profile = PROFILE_VERSION;
++  const error = new ProfileError(`${module}.${operation} is unavailable in ${PROFILE_VERSION}`);
++  DefineErrorProperty(error, 'code', { __proto__: null, value: 'ERR_SM_NODE_UNSUPPORTED', writable: true, enumerable: true, configurable: true });
++  DefineErrorProperty(error, 'module', { __proto__: null, value: module, writable: true, enumerable: true, configurable: true });
++  DefineErrorProperty(error, 'operation', { __proto__: null, value: operation, writable: true, enumerable: true, configurable: true });
++  DefineErrorProperty(error, 'profile', { __proto__: null, value: PROFILE_VERSION, writable: true, enumerable: true, configurable: true });
+   throw error;
+ }
+ 
+--- a/builtins/node-compat/unsupported.mjs
++++ b/builtins/node-compat/unsupported.mjs
+@@ -1,12 +1,17 @@
+ // No host capability is consulted, including at snapshot time.
+-export const PROFILE_VERSION = 'sm-node-22.14.0-m0.1';
++export const PROFILE_VERSION = 'sm-node-22.14.0-m0.8';
+ 
++// Capture trusted installation-time constructors/intrinsics before application
++// code can replace them. Own data descriptors bypass inherited field hooks.
++const ProfileError = Error;
++const DefineErrorProperty = Object.defineProperty;
++
+ export function unsupported(module, operation) {
+-  const error = new Error(`${module}.${operation} is unavailable in ${PROFILE_VERSION}`);
+-  error.code = 'ERR_SM_NODE_UNSUPPORTED';
+-  error.module = module;
+-  error.operation = operation;
+-  error.profile = PROFILE_VERSION;
++  const error = new ProfileError(`${module}.${operation} is unavailable in ${PROFILE_VERSION}`);
++  DefineErrorProperty(error, 'code', { __proto__: null, value: 'ERR_SM_NODE_UNSUPPORTED', writable: true, enumerable: true, configurable: true });
++  DefineErrorProperty(error, 'module', { __proto__: null, value: module, writable: true, enumerable: true, configurable: true });
++  DefineErrorProperty(error, 'operation', { __proto__: null, value: operation, writable: true, enumerable: true, configurable: true });
++  DefineErrorProperty(error, 'profile', { __proto__: null, value: PROFILE_VERSION, writable: true, enumerable: true, configurable: true });
+   throw error;
+ }
+ 

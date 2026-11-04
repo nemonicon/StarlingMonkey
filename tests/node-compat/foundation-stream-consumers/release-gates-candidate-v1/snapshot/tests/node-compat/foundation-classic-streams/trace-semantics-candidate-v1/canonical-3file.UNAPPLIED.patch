@@ -1,0 +1,183 @@
+--- a/builtins/node-compat/classic-streams/classic-core.generated.mjs
++++ b/builtins/node-compat/classic-streams/classic-core.generated.mjs
+@@ -4822,17 +4822,12 @@
+ }
+ function _write(stream, chunk, encoding, cb) {
+   const state = stream._writableState
+-  if (typeof encoding === 'function') {
+-    cb = encoding
+-    encoding = state.defaultEncoding
+-  } else {
+-    if (!encoding) encoding = state.defaultEncoding
+-    else if (encoding !== 'buffer' && !bufferIsEncoding(encoding)) throw new ERR_UNKNOWN_ENCODING(encoding)
+-    if (typeof cb !== 'function') cb = nop
+-  }
++  if (typeof cb !== 'function') cb = nop
+   if (chunk === null) {
+     throw new ERR_STREAM_NULL_VALUES()
+   } else if (!state.objectMode) {
++    if (!encoding) encoding = state.defaultEncoding
++    else if (encoding !== 'buffer' && !bufferIsEncoding(encoding)) throw new ERR_UNKNOWN_ENCODING(encoding)
+     if (typeof chunk === 'string') {
+       if (state.decodeStrings !== false) {
+         chunk = bufferFrom(chunk, encoding)
+@@ -4863,6 +4858,10 @@
+   return writeOrBuffer(stream, state, chunk, encoding, cb)
+ }
+ Writable.prototype.write = function (chunk, encoding, cb) {
++  if (encoding != null && typeof encoding === 'function') {
++    cb = encoding
++    encoding = null
++  }
+   return _write(this, chunk, encoding, cb) === true
+ }
+ Writable.prototype.cork = function () {
+@@ -4890,10 +4889,6 @@
+   const len = state.objectMode ? 1 : chunk.length
+   state.length += len
+ 
+-  // stream._write resets state.length
+-  const ret = state.length < state.highWaterMark
+-  // We must ensure that previous needDrain will not be reset to false.
+-  if (!ret) state.needDrain = true
+   if (state.writing || state.corked || state.errored || !state.constructed) {
+     state.buffered.push({
+       chunk,
+@@ -4914,6 +4909,10 @@
+     stream._write(chunk, encoding, state.onwrite)
+     state.sync = false
+   }
++
++  // Node22 checks the remaining queue after a synchronous _write callback.
++  const ret = state.length < state.highWaterMark || state.length === 0
++  if (!ret) state.needDrain = true
+ 
+   // Return false if errored or destroyed in order to break
+   // any synchronous while(stream.write(data)) loops.
+--- a/builtins/node-compat/classic-streams/transformation-receipt.json
++++ b/builtins/node-compat/classic-streams/transformation-receipt.json
+@@ -338,7 +338,7 @@
+     {
+       "path": "readable-stream/lib/internal/streams/writable.js",
+       "beforeSha256": "28b0cfad8e4d3528d72f6354cbf17b520c56023407cb6d92c1a3a9890af95647",
+-      "afterSha256": "c219a49afb5c6b5d5c4126d796c8847a6b44d01de520b0589b970ad97ff17c69",
++      "afterSha256": "18faa9f92e430e4aabb4b6349ea7bc481f20ecac61d9141c3db045e75f6f9ef4",
+       "edits": [
+         {
+           "old": "const process = require('process/')",
+@@ -369,6 +369,31 @@
+           "old": "Buffer.isEncoding",
+           "new": "bufferIsEncoding",
+           "count": 2
++        },
++        {
++          "old": "  if (typeof encoding === 'function') {\n    cb = encoding\n    encoding = state.defaultEncoding\n  } else {\n    if (!encoding) encoding = state.defaultEncoding\n    else if (encoding !== 'buffer' && !bufferIsEncoding(encoding)) throw new ERR_UNKNOWN_ENCODING(encoding)\n    if (typeof cb !== 'function') cb = nop\n  }",
++          "new": "  if (typeof cb !== 'function') cb = nop",
++          "count": 1
++        },
++        {
++          "old": "  } else if (!state.objectMode) {\n    if (typeof chunk === 'string') {",
++          "new": "  } else if (!state.objectMode) {\n    if (!encoding) encoding = state.defaultEncoding\n    else if (encoding !== 'buffer' && !bufferIsEncoding(encoding)) throw new ERR_UNKNOWN_ENCODING(encoding)\n    if (typeof chunk === 'string') {",
++          "count": 1
++        },
++        {
++          "old": "Writable.prototype.write = function (chunk, encoding, cb) {\n  return _write(this, chunk, encoding, cb) === true\n}",
++          "new": "Writable.prototype.write = function (chunk, encoding, cb) {\n  if (encoding != null && typeof encoding === 'function') {\n    cb = encoding\n    encoding = null\n  }\n  return _write(this, chunk, encoding, cb) === true\n}",
++          "count": 1
++        },
++        {
++          "old": "  // stream._write resets state.length\n  const ret = state.length < state.highWaterMark\n  // We must ensure that previous needDrain will not be reset to false.\n  if (!ret) state.needDrain = true\n",
++          "new": "",
++          "count": 1
++        },
++        {
++          "old": "  // Return false if errored or destroyed in order to break\n  // any synchronous while(stream.write(data)) loops.\n  return ret && !state.errored && !state.destroyed",
++          "new": "  // Node22 checks the remaining queue after a synchronous _write callback.\n  const ret = state.length < state.highWaterMark || state.length === 0\n  if (!ret) state.needDrain = true\n\n  // Return false if errored or destroyed in order to break\n  // any synchronous while(stream.write(data)) loops.\n  return ret && !state.errored && !state.destroyed",
++          "count": 1
+         }
+       ]
+     },
+@@ -456,8 +481,18 @@
+     }
+   ],
+   "licenseSha256": "ec62dc96da0099b87f4511736c87309335527fb7031639493e06c95728dc8c54",
+-  "generatedSha256": "ba39701153094c6481464fa3f45a7afd87e6d41d673026e8008e12f2693802bf",
++  "generatedSha256": "5c0241a73f4cdffc61d7c962bd4d1a1d2015f8fbadef59a4631b7551f9a767b9",
+   "sourceGraphFiles": 24,
+   "noPublicProcess": true,
+-  "componentOrNativeBuildExecuted": false
++  "componentOrNativeBuildExecuted": false,
++  "node22WritableSemanticDelta": {
++    "sourceOnly": true,
++    "primaryRelease": "v22.14.0",
++    "primaryPins": "primary-source-pins.json",
++    "changes": [
++      "post-_write highWaterMark result",
++      "object-mode encoding passthrough"
++    ],
++    "uncompiled": true
++  }
+ }
+--- a/builtins/node-compat/classic-streams/factories.generated.h
++++ b/builtins/node-compat/classic-streams/factories.generated.h
+@@ -1,5 +1,5 @@
+ // Generated source-only classic candidate; do not edit.
+-// Canonical-source SHA-256: ae1fca15a1f6f5076649f1194738065730e9f5e0b37dc34519710bb43dbba1b8
++// Canonical-source SHA-256: e7a22b558e5ed3559a001e8e0a272e6d23ecdfce05c28c245cfca15439252f3b
+ static constexpr const char kClassicStreamsFactorySource[] = R"SM_NODE_PROFILE((function(dependencies){
+ 'use strict';
+ // UNAPPLIED pure guest JS state machines. No public runtime require/process API.
+@@ -4826,17 +4826,12 @@
+ }
+ function _write(stream, chunk, encoding, cb) {
+   const state = stream._writableState
+-  if (typeof encoding === 'function') {
+-    cb = encoding
+-    encoding = state.defaultEncoding
+-  } else {
+-    if (!encoding) encoding = state.defaultEncoding
+-    else if (encoding !== 'buffer' && !bufferIsEncoding(encoding)) throw new ERR_UNKNOWN_ENCODING(encoding)
+-    if (typeof cb !== 'function') cb = nop
+-  }
++  if (typeof cb !== 'function') cb = nop
+   if (chunk === null) {
+     throw new ERR_STREAM_NULL_VALUES()
+   } else if (!state.objectMode) {
++    if (!encoding) encoding = state.defaultEncoding
++    else if (encoding !== 'buffer' && !bufferIsEncoding(encoding)) throw new ERR_UNKNOWN_ENCODING(encoding)
+     if (typeof chunk === 'string') {
+       if (state.decodeStrings !== false) {
+         chunk = bufferFrom(chunk, encoding)
+@@ -4867,6 +4862,10 @@
+   return writeOrBuffer(stream, state, chunk, encoding, cb)
+ }
+ Writable.prototype.write = function (chunk, encoding, cb) {
++  if (encoding != null && typeof encoding === 'function') {
++    cb = encoding
++    encoding = null
++  }
+   return _write(this, chunk, encoding, cb) === true
+ }
+ Writable.prototype.cork = function () {
+@@ -4894,10 +4893,6 @@
+   const len = state.objectMode ? 1 : chunk.length
+   state.length += len
+ 
+-  // stream._write resets state.length
+-  const ret = state.length < state.highWaterMark
+-  // We must ensure that previous needDrain will not be reset to false.
+-  if (!ret) state.needDrain = true
+   if (state.writing || state.corked || state.errored || !state.constructed) {
+     state.buffered.push({
+       chunk,
+@@ -4918,6 +4913,10 @@
+     stream._write(chunk, encoding, state.onwrite)
+     state.sync = false
+   }
++
++  // Node22 checks the remaining queue after a synchronous _write callback.
++  const ret = state.length < state.highWaterMark || state.length === 0
++  if (!ret) state.needDrain = true
+ 
+   // Return false if errored or destroyed in order to break
+   // any synchronous while(stream.write(data)) loops.

@@ -1,0 +1,15 @@
+{
+  "sameNameSyncFunctionArity": "node?.type==='FunctionDeclaration'&&node.id?.name===name&&!node.async&&!node.generator&&Array.isArray(node.params)&&node.params.length===ARITY[name]&&node.params.every(p=>p.type==='Identifier')",
+  "uniqueTopLevelBindings": "typeof name==='string'&&!allBindings.has(name)",
+  "noDefaultOrStar": "node.type!=='ExportDefaultDeclaration'&&node.type!=='ExportAllDeclaration'",
+  "noReexportOrAttributes": "!node.source&&!node.attributes?.length&&!node.assertions?.length",
+  "noSpecifierAlias": "item.exported.name===item.local.name&&NAMES.includes(item.exported.name)",
+  "singleConstHelper": "d.type==='VariableDeclaration'&&d.kind==='const'&&d.declarations?.length===1",
+  "exactEmptyObject": "!helper&&item.id?.type==='Identifier'&&item.id.name==='_util'&&item.init?.type==='ObjectExpression'&&item.init.properties?.length===0",
+  "terminalHelper": "node===ast.body.at(-1)",
+  "sevenFunctionsEightNames": "functions.size===7&&exported.length===8&&new Set(exported).size===8&&NAMES.every(name=>exported.includes(name))&&helper",
+  "noOtherUtilReference": "n.type==='Identifier'&&n.name==='_util'",
+  "assignmentAndUpdateTargetChecks": "n.type==='AssignmentExpression'||n.type==='UpdateExpression'",
+  "declarationCount": "parts.length===7",
+  "declarationScalarTypes": "types.length===ARITY[m[1]]&&types.every(t=>t===(['stage','validate'].includes(m[1])?'string':'number'))"
+}

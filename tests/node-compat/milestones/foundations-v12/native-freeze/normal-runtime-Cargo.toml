@@ -1,0 +1,26 @@
+[package]
+name = "rust-staticlib"
+edition = "2021"
+resolver = "2"
+
+[lib]
+crate-type = ["staticlib"]
+path = "rust-staticlib.rs"
+
+# Prevent inclusion in top-level workspace of the CMake src directory.
+[workspace]
+
+[profile.release]
+lto = true
+panic = 'abort'
+
+[profile.dev]
+lto = true
+panic = 'abort'
+
+[dependencies]
+# Dependencies appended by the CMake build system below here:
+rust-encoding = { path = "/Users/dan/dev/StarlingMonkey/crates/rust-encoding", features = [] }
+rust-hooks = { path = "/Users/dan/dev/StarlingMonkey/crates/rust-hooks", features = [] }
+rust-url = { path = "/Users/dan/dev/StarlingMonkey/crates/rust-url", features = [] }
+multipart = { path = "/Users/dan/dev/StarlingMonkey/crates/rust-multipart", features = ["capi", "simd"] }

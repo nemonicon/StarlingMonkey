@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "state": "ENGINEERING_PROPOSAL_ONLY",
+  "currentSupportedPolicy": "Discard fatalinstances; no Engine reset/reuse call from diagnostic/currentembedding. Retained pure exportcalls underexplicit appstate do not prove requestisolation.",
+  "newGuestInternalMechanismsNotExistingAPIs": [
+    "Lifecycle phase/reset-in-progress guard distinct from EngineState",
+    "Fallible transactional queue registration with owned resource rollback",
+    "TaskQueue traced cancellingbatch/running owner/settlement records",
+    "Idempotent per-task terminal states and owned subscription/interest leases",
+    "RequestOwner/epoch separate from ALS resource/contextcell",
+    "Bounded owner-aware job/finalizer dispatch or refuse reuse"
+  ],
+  "phases": [
+    {
+      "id": "P0",
+      "phase": "Entry admission",
+      "requirements": "Before any mutation reject running export/task/tick/job/cancel/reset or alreadyAborted/Poisoned state. Preserve original pendingexception/latch/rejection evidence; do not clear it to manufacture success.",
+      "failure": "Active/reentrant/poisoned -> refuse/discard; no partialreset"
+    },
+    {
+      "id": "P1",
+      "phase": "Close owner/admission",
+      "requirements": "Mark a separate lifecycle Closing/Resetting and retire the request epoch. Prevent newtasks/timers/ticks/I/O from that owner before invoking cancellation. Root phase/context/cancellationreason. Do not reuse entropy-entry flag or EngineState::Initialized as owner.",
+      "failure": "Enqueue attempts reject viafallible API without acquiring/leaking resources"
+    },
+    {
+      "id": "P2",
+      "phase": "Transfer owners",
+      "requirements": "Swap queued tasks into a TaskQueue-owned cancellingbatch traced by existing persistentroot; keep running/cancelling/settlement work traced. Batch must beempty beforetransition. Never detach to untraced localvector or iterate vector callbacks can mutate. Keep timerregistry task ownership untilretirement.",
+      "failure": "Insufficient preallocation/support -> refuse beforemutation or poison; never erase last traceedge early"
+    },
+    {
+      "id": "P3",
+      "phase": "Native cancellation",
+      "requirements": "Invoke each task terminal transition atmostonce. Stop future requeue, drop owned pollables beforeparentresources, release ownedpayloads, clearregistrations/IDs and close interesttokens exactlyonce. No normal successcallback or blocking outgoingbody flush. Continue safe native cleanup after firsterror without overwriting originalfailure.",
+      "failure": "Uncancellable task/failedclose/unknown owner -> Poisoned; never reusable"
+    },
+    {
+      "id": "P4",
+      "phase": "Settlement and jobs",
+      "requirements": "Apply explicitly typed cancellation settlements under the old Closing owner/context. User cleanup canqueue jobs; ordinary workregistration remains blocked. Drain via validated bounded job/tick/finalizer policy, preserve error tracking. Current internal RunJobs is not a bounded per-owner drain, so this phase isnot implemented.",
+      "failure": "Unhandled rejection/callback/worklimit -> Poisoned/discard"
+    },
+    {
+      "id": "P5",
+      "phase": "Quiescence barrier",
+      "requirements": "Check noactiveborrow/poll/dispatch/reset, activequeue/cancelbatch/settlements empty, request timers/leases/registrations/interests zero, jobs/ticks/finalizers settled, no deferred native completions. Audit deliberate engine-owned resources separately. GC/finalizers can creatework, so recheck afteranycollection.",
+      "failure": "Anything unknown/nonempty -> remain unsupported, no nextrequest"
+    },
+    {
+      "id": "P6",
+      "phase": "Commit reusable boundary",
+      "requirements": "Only after allgates drop runtime requestroots/context and mark Closed then Ready. Keep application module state only under explicit persistent-application contract; create a fresh owner and fresh rootcontext at nextentry. Never reset numericinterests orreuse stale timerIDs to hide state.",
+      "failure": "No guarantee arbitrary user globals/stores erased; isolation requiresnewinstance whenneeded"
+    }
+  ],
+  "errorPolicy": "Returnfail through a proposed fallible guestinternal resetentry; existingvoid Engine::reset wrapper cannot silentlyclaimsuccess. Existingabort isavailable for terminalfailure; a new API signature is a reviewed future change, not claimed to exist.",
+  "budgets": "Positive finite task/job/cleanup/settlement budgets mustbeversioned/demand-reviewed. Existing tick65536 and finalizer16-round limits do not independently bound all Promise job work. No extra clockimport requiredfor deterministic guestwork counters.",
+  "ownershipInvariant": "Every async resource has one terminalization protocol and traced JS ownership through queue/running/cancelling/settlement; nativeRefPtr alone isnot JSrooting. Registries cannotretain dangling nativepointers.",
+  "snapshotPolicy": "No requestowner/livepollable/hosthandle/cancelbatch/jobs in snapshot; initialization-only immutable contexttemplate distinctfrom deployedentries.",
+  "capabilities": "Use only existingselected standardWASI0.2.10 resource operations; cancel pureguest work mustnot widen imports; mixed asyncselect clockbranch needs explicitcapability/lifetime policy."
+}

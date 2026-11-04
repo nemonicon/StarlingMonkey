@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "state": "BENIGN_HOST_PYTHON_LIFECYCLE_CHECKS_PASSED",
+  "launcherSha256": "19de49b11f7fcef3d971f5264033dc5318a93294c92eb42a24ee26471a982d40",
+  "checkSourceSha256": "3c5df64b4e71da570eaac139bf4e1de4978a6e0b80acca6bdc5b00b4e519486f",
+  "checks": [
+    {
+      "name": "capacity-and-output-collision",
+      "passed": true,
+      "directoryCreatedOnInsufficientCapacity": false
+    },
+    {
+      "name": "leader-exits-grandchild-survives-term",
+      "passed": true,
+      "leaderPid": 53233,
+      "grandchildPid": 53234,
+      "rawChildExitCode": 0,
+      "status": 0,
+      "stoppedForDiskSpace": true,
+      "stopReason": "disk-space-stop",
+      "sigtermReceived": 0,
+      "temporarySigtermHandlerRestored": true,
+      "ownedGroupCleanup": {
+        "pgid": 53233,
+        "complete": true,
+        "events": [
+          {
+            "signal": 15,
+            "result": "sent",
+            "pgid": 53233
+          },
+          {
+            "signal": 9,
+            "result": "sent",
+            "pgid": 53233
+          }
+        ],
+        "errors": [],
+        "rawChildExitCode": 0
+      },
+      "launcherErrors": [],
+      "childStarted": true,
+      "lifecycleComplete": true
+    },
+    {
+      "name": "already-exited-group-esrch",
+      "passed": true,
+      "cleanup": {
+        "pgid": 53237,
+        "complete": true,
+        "events": [
+          {
+            "signal": 15,
+            "result": "already-gone",
+            "pgid": 53237
+          }
+        ],
+        "errors": [],
+        "rawChildExitCode": 0
+      }
+    },
+    {
+      "name": "monitor-error-and-simulated-enospc-finalization",
+      "passed": true,
+      "published": {
+        "rawChildExitCode": -15,
+        "status": -15,
+        "stoppedForDiskSpace": false,
+        "stopReason": "launcher-or-monitor-error",
+        "sigtermReceived": 0,
+        "temporarySigtermHandlerRestored": true,
+        "ownedGroupCleanup": {
+          "pgid": 53238,
+          "complete": true,
+          "events": [
+            {
+              "signal": 15,
+              "result": "sent",
+              "pgid": 53238
+            }
+          ],
+          "errors": [],
+          "rawChildExitCode": -15
+        },
+        "launcherErrors": [
+          {
+            "stage": "launch-or-monitor",
+            "type": "RuntimeError",
+            "message": "EXPECTED_BENIGN_MONITOR_ERROR"
+          }
+        ],
+        "childStarted": true,
+        "lifecycleComplete": true,
+        "resultFileWriteError": {
+          "stage": "result-file-write",
+          "type": "OSError",
+          "message": "[Errno 28] EXPECTED_SIMULATED_RESULT_WRITE_ENOSPC"
+        },
+        "evidenceComplete": false,
+        "launcherExitCode": 1,
+        "state": "native-build-failed-or-evidence-incomplete"
+      }
+    },
+    {
+      "name": "external-and-repeated-sigterm-finalization",
+      "passed": true,
+      "rawChildExitCode": -9,
+      "status": -9,
+      "stoppedForDiskSpace": false,
+      "stopReason": "external-signal-stop",
+      "sigtermReceived": 2,
+      "temporarySigtermHandlerRestored": true,
+      "ownedGroupCleanup": {
+        "pgid": 53240,
+        "complete": true,
+        "events": [
+          {
+            "signal": 15,
+            "result": "sent",
+            "pgid": 53240
+          },
+          {
+            "signal": 9,
+            "result": "sent",
+            "pgid": 53240
+          }
+        ],
+        "errors": [],
+        "rawChildExitCode": -9
+      },
+      "launcherErrors": [
+        {
+          "stage": "launch-or-monitor",
+          "type": "ExternalTermination",
+          "message": "launcher received SIGTERM"
+        }
+      ],
+      "childStarted": true,
+      "lifecycleComplete": true,
+      "handlerRestoredObserved": true
+    },
+    {
+      "name": "final-observation-error-classification",
+      "passed": true,
+      "observed": {
+        "rawChildExitCode": 0,
+        "lifecycleComplete": true,
+        "finalObservationErrors": [
+          {
+            "stage": "final-log-hash",
+            "message": "EXPECTED_MISSING_LOG"
+          }
+        ],
+        "state": "native-build-failed-or-incomplete",
+        "launcherExitCode": 1,
+        "evidenceComplete": false
+      }
+    }
+  ],
+  "ownNewSessionChildrenOnly": true,
+  "compilerOrNativeProducerOrGuestOrNetworkExecuted": false,
+  "diskFilled": false,
+  "enospcSimulatedOnly": true,
+  "notRuntimeCompatibilityOrBuildAcceptance": true
+}

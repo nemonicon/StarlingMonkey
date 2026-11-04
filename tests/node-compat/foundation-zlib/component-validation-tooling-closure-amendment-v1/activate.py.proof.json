@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "beforePath": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-indexed-peer-amendment-v1/activate.py",
+  "beforeSha256": "a606f98c8fa2a91df62d34414e694c523a1d9d4bce3d4305322f02778709acf0",
+  "afterSha256": "089d3c93c88b6e1930b42320197d7d2daec0e71d23edc6fcb85174506cce9303",
+  "edits": [
+    {
+      "old": "component-validation-activated-v6",
+      "new": "component-validation-activated-v7",
+      "count": 1
+    },
+    {
+      "old": "DECLARED=Path('/tmp/starling-node-compat/zlib-source-v4')",
+      "new": "DECLARED=Path('/tmp/starling-node-compat/zlib-source-v4')\nCOMPONENT_TOOL_ROOT=Path('/Users/dan/dev/StarlingMonkey')",
+      "count": 1
+    },
+    {
+      "old": " inventory_spec=importlib.util.spec_from_file_location",
+      "new": " component_closure_raw=regular(HERE/'component-tool-closure.json');component_closure=json.loads(component_closure_raw);assert component_closure['componentToolRoot']==str(COMPONENT_TOOL_ROOT)and component_closure['scope']['localModules']==9\n inventory_spec=importlib.util.spec_from_file_location",
+      "count": 1
+    },
+    {
+      "old": "payload['reviewed-pins.json']=pins_raw;",
+      "new": "payload['runtime-preflight.template.mjs']=regular(HERE/'runtime-preflight.template.mjs');payload['component-tools.mjs']=regular(HERE/'component-tools.mjs');payload['component-tool-closure.json']=component_closure_raw;payload['reviewed-pins.json']=pins_raw;",
+      "count": 1
+    },
+    {
+      "old": "'toolSourceRoot':str(tool_root)",
+      "new": "'nativeConfiguredSourceRoot':str(tool_root),'componentToolRoot':str(COMPONENT_TOOL_ROOT),'componentToolClosureSha256':sha(component_closure_raw)",
+      "count": 1
+    },
+    {
+      "old": " inventory_families=inventory.collect_validation_inventory(HERE,own_sha,bootstrap,bootstrap_sha,add)",
+      "new": " inventory_families=inventory.collect_validation_inventory(HERE,own_sha,bootstrap,bootstrap_sha,add)\n for group in ['files','packages','endpoints','packageData']:\n  for row in component_closure[group]:add(row['path'],row['sha256'],row['bytes'])",
+      "count": 1
+    },
+    {
+      "old": "'mandatoryIndexedPeerInventoryAmendmentIndexSha256':own_sha,",
+      "new": "'mandatoryIndexedPeerInventoryAmendmentIndexSha256':'bd66c16ce0525a23978e23e170a82cc755bdd313516e00d7e3246302f6730494','mandatoryComponentToolClosureAmendmentIndexSha256':own_sha,'componentToolRoot':str(COMPONENT_TOOL_ROOT),'nativeConfiguredSourceRoot':str(tool_root),'componentToolClosureSha256':sha(component_closure_raw),",
+      "count": 1
+    }
+  ],
+  "reverseExact": true
+}

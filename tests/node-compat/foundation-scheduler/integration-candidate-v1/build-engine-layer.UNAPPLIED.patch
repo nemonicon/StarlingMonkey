@@ -1,0 +1,140 @@
+--- a/tests/node-compat/build-engine.sh
++++ b/tests/node-compat/build-engine.sh
+@@ -22,6 +22,16 @@
+ querystring_enabled="${NODE_COMPAT_QUERYSTRING:-0}"
+ util_enabled="${NODE_COMPAT_UTIL:-0}"
+ stream_web_enabled="${NODE_COMPAT_STREAM_WEB:-0}"
++ticks_enabled="${NODE_COMPAT_INTERNAL_TICKS:-0}"
++if [[ "$ticks_enabled" != 0 && "$ticks_enabled" != 1 ]]; then
++  echo 'NODE_COMPAT_INTERNAL_TICKS must be 0 or 1' >&2; exit 1
++fi
++if [[ "$build_type" != Release || "$oom" != 0 ]]; then
++  echo 'Private scheduler source-policy recipe supports ordinary Release/Release-GC only' >&2; exit 1
++fi
++layer_root="$repo_root/tests/node-compat/foundation-scheduler/integration-candidate-v1"
++tick_patch="$repo_root/tests/node-compat/foundation-scheduler/taskqueue-owner-v2/componentize-taskqueue-ticks.UNAPPLIED.patch"
++
+ abi_patch="$repo_root/tests/node-compat/abi-fix/componentize-u32-result.patch"
+ abi_patch_sha=c70c1b76ae9ddeba7cbaad2861f1ecc03710da7241ca6365d00c9ece8243324b
+ base_embedding_sha=95652376ddeb46357c77b8aff2b7bb06bd1ca34ef34443128fc8e83583424831
+@@ -102,6 +112,7 @@
+ # Preserve every pre-policy source tree, build directory and artifact. Each
+ # selected configuration gets its own embedding output directory as well.
+ policy_suffix="entropy-entry-v1-strict-callback-v3-protected-abort-v2.$entropy_mode.path-$path_enabled.events-$events_enabled.string-decoder-$string_decoder_enabled.assert-$assert_enabled.querystring-$querystring_enabled.util-$util_enabled.stream-web-$stream_web_enabled"
++policy_suffix="$policy_suffix.private-ticks-v1-$ticks_enabled"
+ source_dir="$source_dir-$policy_suffix"
+ build_dir="$build_dir-$policy_suffix"
+ artifact_name=starlingmonkey_embedding.abi-i32-i64-v1
+@@ -141,6 +152,17 @@
+   tar -xzf "$work_root/componentize-source.tar.gz" -C "$source_dir" --strip-components=1
+   printf '%s\n' "$componentize_archive_sha" > "$source_dir/.source-archive-sha256"
+ fi
++# New named source layer; original ABI/entry/strict guards below remain exact.
++[[ "$(sha256_file "$layer_root/layer-policy.py")" == 78521feeefe299360228e5db76bfde0b11e6eeee93bd2374cd39b2fe695b610c ]] || exit 1
++[[ "$(sha256_file "$layer_root/policy.json")" == 98e80d36b8eb9b7ac99de54832288bd8eec148fa1b9fe0b27b3bada4d12b2cd0 ]] || exit 1
++[[ "$(sha256_file "$tick_patch")" == a6c3a34e06bc98ebc5a2f9ff943ceeb127e337d5b0bb349fc92d21cc123b576f ]] || exit 1
++python3 "$layer_root/layer-policy.py" "$repo_root"
++# Restore ONLY an exact previously layered embedding before replaying every
++# original 354... baseline patch/hash guard. Never admit arbitrary source bytes.
++if [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == 9dcb63beaf55ff6af9ca4d2019316d4a167657c02ed76a1bf246012da0bcd205 ]]; then
++  patch -R -p1 -d "$source_dir" < "$tick_patch"
++  [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == 9a7c30bad8b9e69257ed5a4c132d46b9c0ddc48924edb3dfe288e9b565766977 ]] || exit 1
++fi
+ # The patch applies to one exact upstream embedding source. Existing base build
+ # directories and artifacts are never overwritten by these separately named builds.
+ if [[ "$abi_fix" == 1 ]]; then
+@@ -173,6 +195,9 @@
+   patch -p1 -d "$source_dir" < "$strict_event_patch"
+ fi
+ [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$strict_event_embedding_sha" ]] || { echo 'Strict event boundary source mismatch' >&2; exit 1; }
++patch -p1 -d "$source_dir" < "$tick_patch"
++[[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == 9dcb63beaf55ff6af9ca4d2019316d4a167657c02ed76a1bf246012da0bcd205 ]] || { echo 'Private tick boundary source mismatch' >&2; exit 1; }
++
+ 
+ sm_variant=release
+ if [[ "$build_type" == Debug ]]; then
+@@ -209,6 +234,8 @@
+ # WPT is unrelated to this engine build. Its existing environment override avoids
+ # cloning the WPT suite; its builtin is explicitly disabled below.
+ export WPT_ROOT="$work_root/wpt-unused"
++ticks_flag=OFF
++if [[ "$ticks_enabled" == 1 ]]; then ticks_flag=ON; fi
+ gc_flag=OFF
+ if [[ "$stress" == 1 ]]; then gc_flag=ON; fi
+ oom_flag=OFF
+@@ -248,6 +275,7 @@
+ cmake -S "$source_dir" -B "$build_dir" -G Ninja \
+   -DCMAKE_BUILD_TYPE="$build_type" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DWEVAL=OFF -DUSE_WASM_OPT=ON \
+   -DENABLE_BUILTIN_NODE_COMPAT=ON -DNODE_COMPAT_GC_STRESS="$gc_flag" -DNODE_COMPAT_OOM_TESTING="$oom_flag" \
++  -DNODE_COMPAT_INTERNAL_TICKS="$ticks_flag" \
+   -DENABLE_JS_DEBUGGER=OFF -DENABLE_BUILTIN_WPT_SUPPORT=OFF -DNODE_COMPAT_LOCKED_RUST=ON \
+   -DNODE_COMPAT_ENTROPY_MODE="$entropy_mode" -DNODE_COMPAT_PATH="$path_flag" -DNODE_COMPAT_EVENTS="$events_flag" \
+   -DNODE_COMPAT_STRING_DECODER="$string_decoder_flag" -DNODE_COMPAT_ASSERT="$assert_flag" -DNODE_COMPAT_QUERYSTRING="$querystring_flag" -DNODE_COMPAT_UTIL="$util_flag" -DNODE_COMPAT_STREAM_WEB="$stream_web_flag" \
+@@ -272,9 +300,9 @@
+ if [[ "$build_type" == Debug ]]; then engine_output=starlingmonkey_embedding.debug.wasm; fi
+ cp "$source_dir/lib/$engine_output" "$artifact"
+ 
+-python3 - "$repo_root" "$work_root" "$artifact" "$stress" "$componentize_revision" "$componentize_archive_sha" "$spidermonkey_archive_sha" "$source_dir" "$build_dir" "$abi_fix" "$abi_patch" "$oom" "$build_type" "$input_manifest" "$bigint_fix" "$bigint_patch" "$entropy_mode" "$path_enabled" "$entry_patch" "$events_enabled" "$componentize_input_manifest" "$recipe_before" "$string_decoder_enabled" "$assert_enabled" "$querystring_enabled" "$util_enabled" "$stream_web_enabled" <<'PY'
++python3 - "$repo_root" "$work_root" "$artifact" "$stress" "$componentize_revision" "$componentize_archive_sha" "$spidermonkey_archive_sha" "$source_dir" "$build_dir" "$abi_fix" "$abi_patch" "$oom" "$build_type" "$input_manifest" "$bigint_fix" "$bigint_patch" "$entropy_mode" "$path_enabled" "$entry_patch" "$events_enabled" "$componentize_input_manifest" "$recipe_before" "$string_decoder_enabled" "$assert_enabled" "$querystring_enabled" "$util_enabled" "$stream_web_enabled" "$ticks_enabled" <<'PY'
+ import datetime, hashlib, json, os, pathlib, subprocess, sys
+-repo, work, artifact, stress, componentize, componentize_archive, sm_archive, source_dir, build_dir, abi_fix, abi_patch, oom, build_type, input_manifest, bigint_fix, bigint_patch, entropy_mode, path_enabled, entry_patch, events_enabled, componentize_input_manifest, recipe_before, string_decoder_enabled, assert_enabled, querystring_enabled, util_enabled, stream_web_enabled = sys.argv[1:]
++repo, work, artifact, stress, componentize, componentize_archive, sm_archive, source_dir, build_dir, abi_fix, abi_patch, oom, build_type, input_manifest, bigint_fix, bigint_patch, entropy_mode, path_enabled, entry_patch, events_enabled, componentize_input_manifest, recipe_before, string_decoder_enabled, assert_enabled, querystring_enabled, util_enabled, stream_web_enabled, ticks_enabled = sys.argv[1:]
+ def digest(path):
+     h = hashlib.sha256()
+     with open(path, 'rb') as source:
+@@ -311,6 +339,7 @@
+     'NODE_COMPAT_QUERYSTRING': 'ON' if querystring_enabled == '1' else 'OFF',
+     'NODE_COMPAT_UTIL': 'ON' if util_enabled == '1' else 'OFF',
+     'NODE_COMPAT_STREAM_WEB': 'ON' if stream_web_enabled == '1' else 'OFF',
++    'NODE_COMPAT_INTERNAL_TICKS': 'ON' if ticks_enabled == '1' else 'OFF',
+     'NODE_COMPAT_GC_STRESS': 'ON' if stress == '1' else 'OFF',
+     'NODE_COMPAT_OOM_TESTING': 'ON' if oom == '1' else 'OFF',
+ }
+@@ -349,10 +378,17 @@
+ # Preserve the accepted v3 attestation verbatim. This is a separately named
+ # source extension; the old policy must never claim the new EventTarget bytes.
+ protected_abort_sources = {'builtins/web/event/event-target.h': '516f9c609d78576cf72897c4c5bbe1106a3d04ab4a197c50cedee3fa0c8fb96d', 'builtins/web/event/event-target.cpp': '1c0263f958d0f6221accf04ffa2ac12c6406e11914e1b2fab3c41c66c3038a1e', 'builtins/node-compat/register.cpp': '19eef9879c94e5232238f6df738d57057d384fa025849ee319fcf51eb06eda2b', 'builtins/node-compat/events.mjs': 'b58b0e0891145748e71139b8d08abb4187fe52e1aa12f9705beee3f6380b68f6', 'builtins/node-compat/events-add-abort-listener.mjs': '106be45fe33b0e35d97aad6ece3fb368210cb954bb652ea7bcdfa478b9c7083e', 'builtins/node-compat/events-factories.generated.h': '41b4c286e24089e0c223d0e80d4d0f587322afee8816811f2e754217f8103437', 'builtins/node-compat/generate-events-factory.mjs': '90a7ae6b887fce3bf92dc167090ea44c0bb8755400be2ff577658539f4a84354', 'builtins/node-compat/generate-factories.mjs': '46b0e0a40d3a50dae58e0d833c4861d1344df045eaf490f74060bbccc1a4561e', 'builtins/node-compat/export-manifest.events.node-v22.14.0.json': '90f7dc152b990dc8955c0801eab11b9410a10dc96a8019c1b7a81b69981eb561', 'cmake/builtins.cmake': '0155eae9e45f2d059663f1bcc54315e58e4f2cb0d8e5a9dfcb76cfa9a7f5f9ea'}
++import importlib.util
++sys.dont_write_bytecode = True
++layer_file = pathlib.Path(repo) / 'tests/node-compat/foundation-scheduler/integration-candidate-v1/layer-policy.py'
++assert digest(layer_file) == '78521feeefe299360228e5db76bfde0b11e6eeee93bd2374cd39b2fe695b610c', 'Private scheduler helper changed during compilation'
++layer_spec = importlib.util.spec_from_file_location('reviewed_tick_layer',layer_file)
++layer = importlib.util.module_from_spec(layer_spec); layer_spec.loader.exec_module(layer)
++layer.validate_sources(repo,manifest)
+ strict_callback_sources = dict(strict_callback_v3_sources)
+ strict_callback_sources['builtins/web/event/event-target.cpp'] = protected_abort_sources['builtins/web/event/event-target.cpp']
+ for relative, expected in protected_abort_sources.items():
+-    assert digest(pathlib.Path(repo) / relative) == expected, 'Unreviewed protected abort source: ' + relative
++    assert digest(pathlib.Path(repo) / relative) == layer.expected(relative, expected), 'Unreviewed layered protected abort source: ' + relative
+ protected_abort_commands = [entry['command'] for entry in json.loads(compile_commands) if entry['file'].endswith('.cpp') and any(pathlib.Path(entry['file']).as_posix().startswith(str(pathlib.Path(repo) / directory) + '/') for directory in ['builtins', 'runtime'])]
+ assert protected_abort_commands, 'Need actual repository C++ layout compilation receipts'
+ for actual in protected_abort_commands + embedding_commands:
+@@ -366,7 +402,7 @@
+ if events_enabled == '1':
+     assert protected_abort_prerequisites == {'ENABLE_BUILTIN_WEB_EVENT':'ON', 'ENABLE_BUILTIN_WEB_ABORT':'ON', 'ENABLE_BUILTIN_WEB_QUEUE_MICROTASK':'ON'}, 'Selected protected abort listener must use its actual guest prerequisites'
+ for relative, expected in strict_callback_sources.items():
+-    assert digest(pathlib.Path(repo) / relative) == expected, 'Unreviewed strict callback source: ' + relative
++    assert digest(pathlib.Path(repo) / relative) == layer.expected(relative, expected), 'Unreviewed layered strict callback source: ' + relative
+ strict_callback_commands = [entry['command'] for entry in json.loads(compile_commands) if any(pathlib.Path(entry['file']).as_posix().endswith('/' + relative) for relative in strict_callback_sources if relative.endswith('.cpp'))]
+ assert len(strict_callback_commands) == 3 and all('-DNODE_COMPAT_STRICT_INITIALIZATION=1' in entry.split() for entry in strict_callback_commands), 'Actual callback translation units must all compile the selected strict policy'
+ 
+@@ -475,7 +511,7 @@
+ strict_boundary_patch = pathlib.Path(repo) / 'tests/node-compat/foundation-add-abort/componentize-strict-event-boundary-v2.patch'
+ assert digest(strict_callback_patch) == '9b2e54c9527a5c078221ad49f67f7354c9fb1df00eb99f0720b3d7874402603a'
+ assert digest(strict_boundary_patch) == '84a91c1f74dbdcf653ef7ced5fa2876abffc32d5da591a1ca2df4a4908406ad2'
+-assert digest(pathlib.Path(source_dir) / 'embedding/embedding.cpp') == '9a7c30bad8b9e69257ed5a4c132d46b9c0ddc48924edb3dfe288e9b565766977'
++assert digest(pathlib.Path(source_dir) / 'embedding/embedding.cpp') == layer.POLICY['embedding']['afterSha256']
+ metadata['componentizeJsPatches'].append({'name':'strict-post-binding-and-execution-checkpoints-v2','path':str(strict_boundary_patch),'sha256':digest(strict_boundary_patch),'baseRevision':componentize,'applied':True,'files':['embedding/embedding.cpp']})
+ metadata['strictEventExceptionPolicy'] = {
+     'version':'sm-uncaught-event-v3-protected-abort-v2', 'patchSha256':digest(strict_callback_patch),
+@@ -503,6 +539,10 @@
+     'scope':'Selected guest Events extension only; independent component acceptance required. No full Node EventTarget/ALS/process or request-teardown claim.',
+ }
+ 
++metadata = layer.decorate(metadata,repo,source_dir,json.loads(compile_commands),embedding_commands,ticks_enabled == '1')
++assert digest(layer_file) == '78521feeefe299360228e5db76bfde0b11e6eeee93bd2374cd39b2fe695b610c'
++assert digest(layer_file.parent / 'policy.json') == layer.POLICY_SHA256
++
+ with open(artifact + '.build.json', 'w') as output:
+     json.dump(metadata, output, indent=2); output.write('\n')
+ print(artifact)

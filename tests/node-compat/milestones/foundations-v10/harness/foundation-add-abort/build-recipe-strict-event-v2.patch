@@ -1,0 +1,46 @@
+--- a/build-engine.sh
++++ b/build-engine.sh
+@@ -31,6 +31,7 @@
+ entry_patch="$repo_root/tests/node-compat/entropy/componentize-entry-policy-v1.patch"
+ entry_patch_sha=a12c00a0913a2a03e4cea3ab0e525c5cec56d4e0101d33076d6a3687df824f99
+ entry_embedding_sha=78f4bef1a5e9172112cea64743c1e5f6d7ba7b942a40dafd0fc42bcbbb7c95c7
++strict_event_embedding_sha=9a7c30bad8b9e69257ed5a4c132d46b9c0ddc48924edb3dfe288e9b565766977
+ componentize_revision=4d812f5a7b524cea5bcfd565cac55f3fab876a57
+ componentize_archive_sha=8178fb678ec1b8a33bbf3fa8db066bffe4dbf6a92c235150f56622b44ea27e10
+ spidermonkey_tag=FIREFOX_147_0_4_RELEASE_STARLING
+@@ -146,10 +147,10 @@
+   embedding_sha="$(sha256_file "$source_dir/embedding/embedding.cpp")"
+   if [[ "$embedding_sha" == "$base_embedding_sha" ]]; then
+     patch -p1 -d "$source_dir" < "$abi_patch"
+-  elif [[ "$embedding_sha" != "$fixed_embedding_sha" && !( "$bigint_fix" == 1 && "$embedding_sha" == "$bigint_embedding_sha" ) && "$embedding_sha" != "$entry_embedding_sha" ]]; then
++  elif [[ "$embedding_sha" != "$fixed_embedding_sha" && !( "$bigint_fix" == 1 && "$embedding_sha" == "$bigint_embedding_sha" ) && "$embedding_sha" != "$entry_embedding_sha" && "$embedding_sha" != "$strict_event_embedding_sha" ]]; then
+     echo 'Unexpected ComponentizeJS embedding source; refusing an ambiguous ABI patch' >&2; exit 1
+   fi
+-  [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$fixed_embedding_sha" || ( "$bigint_fix" == 1 && "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$bigint_embedding_sha" ) || "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$entry_embedding_sha" ]] || { echo 'ABI patched source hash mismatch' >&2; exit 1; }
++  [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$fixed_embedding_sha" || ( "$bigint_fix" == 1 && "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$bigint_embedding_sha" ) || "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$entry_embedding_sha" || "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$strict_event_embedding_sha" ]] || { echo 'ABI patched source hash mismatch' >&2; exit 1; }
+ elif [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" != "$base_embedding_sha" ]]; then
+   echo 'Unpatched build requires the exact upstream embedding source' >&2; exit 1
+ fi
+@@ -158,13 +159,20 @@
+   if [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$fixed_embedding_sha" ]]; then
+     patch -p1 -d "$source_dir" < "$bigint_patch"
+   fi
+-  [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$bigint_embedding_sha" || "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$entry_embedding_sha" ]] || { echo 'BigInt patched source mismatch' >&2; exit 1; }
++  [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$bigint_embedding_sha" || "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$entry_embedding_sha" || "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$strict_event_embedding_sha" ]] || { echo 'BigInt patched source mismatch' >&2; exit 1; }
+ fi
+ [[ "$(sha256_file "$entry_patch")" == "$entry_patch_sha" ]] || { echo 'Entry patch hash mismatch' >&2; exit 1; }
+ if [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$bigint_embedding_sha" ]]; then
+   patch -p1 -d "$source_dir" < "$entry_patch"
+ fi
+-[[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$entry_embedding_sha" ]] || { echo 'Entry patched source mismatch' >&2; exit 1; }
++[[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$entry_embedding_sha" || "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$strict_event_embedding_sha" ]] || { echo 'Entry patched source mismatch' >&2; exit 1; }
++strict_event_patch="$repo_root/tests/node-compat/foundation-add-abort/componentize-strict-event-boundary-v2.patch"
++[[ "$(sha256_file "$strict_event_patch")" == 84a91c1f74dbdcf653ef7ced5fa2876abffc32d5da591a1ca2df4a4908406ad2 ]]
++if [[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$entry_embedding_sha" ]]; then
++  patch -p1 -d "$source_dir" < "$strict_event_patch"
++fi
++[[ "$(sha256_file "$source_dir/embedding/embedding.cpp")" == "$strict_event_embedding_sha" ]] || { echo 'Strict event boundary source mismatch' >&2; exit 1; }
++
+ sm_variant=release
+ if [[ "$build_type" == Debug ]]; then
+   sm_variant=debug

@@ -1,0 +1,22 @@
+package starling:abi-regression@0.1.0;
+world profile {
+  record payload {
+    first: u32,
+    last: u32,
+    signed: s32,
+    values: list<u32>,
+  }
+  export direct-u32: func(value: u32) -> u32;
+  export constant-high: func() -> u32;
+  export constant-max: func() -> u32;
+  export computed-u32: func(value: u32) -> u32;
+  export direct-s32: func(value: s32) -> s32;
+  export constant-negative: func() -> s32;
+  export computed-s32: func(value: s32) -> s32;
+  export direct-f32: func(value: f32) -> f32;
+  export direct-f64: func(value: f64) -> f64;
+  export list-u32: func(values: list<u32>) -> list<u32>;
+  export record-u32: func(value: payload) -> payload;
+  export result-u32: func(ok: bool, value: u32) -> result<u32, u32>;
+  export describe: func(value: u32) -> string;
+}

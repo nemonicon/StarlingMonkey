@@ -1,0 +1,88 @@
+#ifndef JS_COMPUTE_RUNTIME_EVENT_LOOP_H
+#define JS_COMPUTE_RUNTIME_EVENT_LOOP_H
+
+#include "extension-api.h"
+#include "jsapi.h"
+#ifdef NODE_COMPAT_INTERNAL_TICKS
+#include "node_tick_queue.h"
+#endif
+
+namespace core {
+
+class EventLoop {
+public:
+  /**
+   * Initialize the event loop
+   */
+  static void init(JSContext *cx);
+
+#ifdef NODE_COMPAT_STRICT_INITIALIZATION
+  // Internal guest policy: retain the first uncaught event exception until a
+  // checkpoint. Capture failure leaves the current pending exception intact.
+  static bool record_pending_event_exception(JSContext *cx);
+  // False means an exception is pending (or capture failed). Existing pending
+  // exceptions take precedence; a retained event value is restored otherwise.
+  static bool take_pending_event_exception(JSContext *cx);
+  static void record_failed_event_invocation();
+  static bool event_exception_policy_failed();
+#endif
+
+  /**
+   * Check if there are any pending tasks (io requests or timers) to process.
+   */
+  static bool has_pending_async_tasks();
+
+  /**
+   * Run the event loop until all interests are complete.
+   * See run_event_loop in extension-api.h for the complete description.
+   */
+  static bool run_event_loop(api::Engine *engine, double total_compute);
+#ifdef NODE_COMPAT_INTERNAL_TICKS
+  // Existing two-argument entry remains the TaskOrExport wrapper.
+  static bool run_event_loop(api::Engine *engine, double total_compute, TickCheckpointOrigin origin);
+  // Internal captured factory argument; no public process/module/global API.
+  static JSObject* create_internal_next_tick(JSContext* cx);
+  static bool require_internal_ticks_quiescent(JSContext* cx);
+  static bool internal_tick_checkpoint_active();
+  static bool require_internal_tick_reset_allowed(JSContext* cx);
+  static bool run_internal_tick_checkpoint(JSContext* cx, TickCheckpointOrigin origin);
+#endif
+
+  /**
+   * Run the FinalizationRegistry cleanups that collections have queued, and the microtasks they
+   * queue, until none are left. Used before a Wizer snapshot is taken, so that the snapshot holds
+   * an empty queue. A cleanup that triggers a collection that queues more is run in a further
+   * round, up to MAX_CLEANUP_DRAIN_ROUNDS; anything still queued then stays queued, and runs in
+   * the first event loop after the snapshot is resumed. Returns false if an exception is pending.
+   */
+  static bool drain_finalization_registry_cleanups(api::Engine *engine);
+
+  static constexpr unsigned MAX_CLEANUP_DRAIN_ROUNDS = 16;
+
+  static void incr_event_loop_interest();
+  static void decr_event_loop_interest();
+
+  /**
+   * Select on the next async tasks
+   */
+  static bool process_async_tasks(api::Engine *engine, double timeout);
+
+  /**
+   * Queue a new async task.
+   */
+  static void queue_async_task(const RefPtr<api::AsyncTask>& task);
+
+  /**
+   * Remove a queued async task.
+   */
+  static bool cancel_async_task(api::Engine *engine, const RefPtr<api::AsyncTask>& task);
+
+  /**
+   * Reset the event loop state, cancelling all pending tasks and clearing interest count.
+   */
+  static void reset(api::Engine *engine);
+};
+
+} // namespace core
+
+#endif

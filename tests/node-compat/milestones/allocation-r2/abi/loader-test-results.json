@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "atUtc": "2026-11-03T02:23:34.596Z",
+  "packagingManifestSha256": "95881f91364ecb8c41ca11cacb19a51c3ab9f74c8f85b0887db2e222a5128cc9",
+  "passed": 18,
+  "checks": [
+    {
+      "name": "stock requires explicit opt-in",
+      "status": 1,
+      "matchedError": "/stock packaging requires explicit legacyDiagnostic/"
+    },
+    {
+      "name": "manifest patch tamper",
+      "status": 1,
+      "matchedError": "/AssertionError/"
+    },
+    {
+      "name": "unknown additional patch in v1 manifest",
+      "status": 1,
+      "matchedError": "/Unknown additional patches in v1 manifest/"
+    },
+    {
+      "name": "JavaScript artifact tamper",
+      "status": 1,
+      "matchedError": "/AssertionError/"
+    },
+    {
+      "name": "platform source tamper with forged manifest digest",
+      "status": 1,
+      "matchedError": "/AssertionError/"
+    },
+    {
+      "name": "core artifact tamper with forged manifest digest",
+      "status": 1,
+      "matchedError": "/AssertionError/"
+    }
+  ],
+  "additionalChecks": [
+    "Normal calls reject missing metadata, historical unknown configuration and an unlabelled renamed DEBUG binary",
+    "DEBUG diagnostic rejects indirect return, imports, feature expansion and witPath before packaging",
+    "legacy diagnostic/environment flag cannot bypass DEBUG refusal",
+    "known unrebased DEBUG engine refused before packaging",
+    "patched loader accepts known actual artifacts",
+    "patched componentize rejects missing explicit engine",
+    "explicit legacy diagnostic accepts stock bytes and still rejects missing explicit engine"
+  ],
+  "scope": "Tampering occurs only in isolated external copies; audited package and shared npm installation remain unchanged."
+}

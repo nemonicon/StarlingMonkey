@@ -1,0 +1,15 @@
+This is a **native-artifact-only aggregate** for the completed production306 ordinary Release builds. All three launchers and freezes exited 0. It captures build/configuration/dependency provenance and actual pin review; it makes **no runtime compatibility acceptance claim**. Fresh application/component/host gates belong in the separate `production-runtime-v1` packet.
+
+| Frozen variant | Engine SHA-256 prefix | Bytes | Final recorded Ninja steps |
+|---|---|---:|---:|
+| normal OFF | `6e5bc2ca3b3e3f7d` | 9,759,293 | 107/107 |
+| normal RuntimeOnly | `479821f8eefbc6aa` | 9,766,342 | 107/107 |
+| Release-GC OFF | `502320aaed8c78ac` | 9,760,842 | 16/16 |
+
+[execution-summary.json](execution-summary.json) records the complete engine, metadata, freeze and independent-verification digests. Each freeze covers source306, separate embedding3, native compile layout61, strict subset4 and one separate embedding command. The embedding witness is an actual **after-build-only** Ninja capture; no before-build embedding witness is asserted. The GC launcher recorded and verified the normal-OFF freeze prerequisite before reconfiguring the shared build tree. Step counts and launcher wall/capacity records are operational provenance, not comparative performance measurements or a GC guest pass.
+
+[capture-inventory.json](capture-inventory.json) distinguishes 39 preexisting Root records preserved byte-exact, 124 new byte-exact text copies, and 1,005 rehashed external frozen-inventory references (335 per variant; 359 distinct external paths). Engine, adapter and other binary bytes are **not copied**. The source306 trees remain external references rather than another repository source-tree copy; selected licenses and the separate embedding sources are included as text. [log-inventory.json](log-inventory.json) lists all 43 preserved/copied full log/output/Ninja-text entries. Full launch results, build logs, freeze stdout/stderr, frozen CMake caches/databases, Cargo manifests/locks, OpenSSL receipt/configure/configdata/before-report, source policy/helper and exact exporter outputs remain inspectable.
+
+The three independent artifact-verification text packets are copied under `independent/`; their verifiers were not rerun by this capture. The exact artifact-tool and Root pin-review packets are under `artifact-tools/` and `pin-review/`. Both the partial normal-only and all-variant exporter documents remain **UNREVIEWED** and byte-identical; the separately reviewed actual pin documents retain their original review provenance. Earlier Root records with then-pending labels are historical observations, preserved without rewriting them to imply later acceptance.
+
+The OpenSSL 4,650-source audit is recorded build evidence; this capture did not independently repeat that audit or reread mutable linked-library paths. Actual GC flags are preserved but no component/GC execution follows from this aggregate. No new compiler, engine, guest, componentizer, verifier or host binary ran during capture. No component import audit, scheduler/reset/ALS parity, reusable-instance, startup/RSS/throughput or complete Node compatibility claim is made here.

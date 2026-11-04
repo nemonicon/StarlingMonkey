@@ -1,0 +1,42 @@
+// Future explicit read-only composition; publishes only a fresh evidence report.
+// This does not turn the original raw-1 parent into a pass or permit timing.
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir,lstat} from 'node:fs/promises';
+import {dirname,join,resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {hash,parentRoot,parentIndexSha256,pairSha256,failureRoot,failureSha256,readPinned,exact,verifyCollector,verifyThreeArmAuthority,validateArmRecord,verifyRecordFiles} from './provenance.mjs';
+import {priorStockModules} from './stock-graph.mjs';
+const here=dirname(fileURLToPath(import.meta.url));
+const [indexSha,authorityPath,authoritySha,stockRootPath,stockRootSha,outputArg]=process.argv.slice(2);
+await verifyCollector(here,indexSha);
+const reviewed=await verifyThreeArmAuthority(authorityPath,authoritySha);
+// A separate genuine Root receipt must bind a terminal raw-zero stock-only run.
+const stockRoot=JSON.parse(await readPinned(stockRootPath,stockRootSha));
+assert.equal(stockRoot.schemaVersion,1);assert.equal(stockRoot.state,'ROOT_STOCK_ONLY_COMMON_BYTE_CORRECTNESS_TERMINAL_ZERO_V1');
+assert.equal(stockRoot.rawOuterExit,0);assert.equal(stockRoot.collectorSourceIndexSha256,indexSha);assert.equal(stockRoot.guestSourceFamilyIndexSha256,parentIndexSha256);assert.equal(stockRoot.pairPinsSha256:pairSha256,pairSha256);
+assert.equal(stockRoot.runtimeAcceptanceClaim,false);assert.equal(stockRoot.timingAllowed,false);
+for(const key of ['stdout','stderr'])await readPinned(stockRoot[key].path,stockRoot[key].sha256,stockRoot[key].bytes);
+const terminal=JSON.parse(await readPinned(stockRoot.terminal.path,stockRoot.terminal.sha256,stockRoot.terminal.bytes));assert.equal(terminal.returncode,0);
+exact(terminal.command.slice(1),[join(here,'run-stock-only.mjs'),indexSha,authorityPath,authoritySha],'actual stock launcher command');
+const complete=JSON.parse(await readPinned(stockRoot.completion.path,stockRoot.completion.sha256,stockRoot.completion.bytes));
+assert.equal(complete.state,'STOCK_ONLY_OUTPUTS_SEALED_EXTERNAL_EXIT_ZERO_REQUIRED');assert.equal(complete.collectorSourceIndexSha256,indexSha);assert.equal(complete.guestSourceFamilyIndexSha256,parentIndexSha256);assert.equal(complete.pairPinsSha256:pairSha256,pairSha256);assert.equal(complete.requiresIndependentRawOuterExitZero,true);
+const witnessRows=new Map();for(const row of complete.outputs){assert(!witnessRows.has(row.path));witnessRows.set(row.path,row);await readPinned(row.path,row.sha256,row.bytes);}
+exact(stockRoot.result,complete.result,'Root result binding');assert(witnessRows.has(complete.result.path));
+const stockReport=JSON.parse(await readPinned(complete.result.path,complete.result.sha256));
+assert.equal(stockReport.state,'ACTUAL_COMMON_BYTE_STOCK_ONLY_CORRECTNESS_PASSED');assert.equal(stockReport.collectorSourceIndexSha256,indexSha);assert.equal(stockReport.guestSourceFamilyIndexSha256,parentIndexSha256);assert.equal(stockReport.pairPinsSha256:pairSha256,pairSha256);assert.equal(stockReport.records.length,1);
+exact(stockReport.reviewedThreeArmAuthority,{path:authorityPath,sha256:authoritySha},'reviewed three-arm authority');
+const stock=stockReport.records[0];validateArmRecord(stock,'stock-on',reviewed.oracle);await verifyRecordFiles(stock,witnessRows);
+assert.equal(stock.collectorSourceIndexSha256,indexSha);assert.equal(stock.guestSourceFamilyIndexSha256,parentIndexSha256);
+const native=reviewed.records[0].record;assert.equal(stock.engineSha256,native.engineSha256);assert.equal(stock.engineMetadataSha256,native.engineMetadataSha256);exact(stock.packager,native.packager,'unchanged packager');
+const previous=JSON.parse(await readFile(join(parentRoot,'stock-source-graph.json'))),own=['guest.mjs','capture-before.mjs','workload.mjs','control-workload.mjs','protocol.mjs','stock-provider.mjs'].map(name=>join(parentRoot,name));
+exact(stock.graph.modules,[...priorStockModules(previous),...own].sort(),'stock graph exact99 plus6 guest sources');
+exact([...stock.graph.virtualSources].sort((a,b)=>a.id.localeCompare(b.id)),[...previous.virtualSources].sort((a,b)=>a.id.localeCompare(b.id)),'stock virtual sources');
+const edges=stock.graph.resolutions.filter(row=>row.request==='process/'&&row.importer?.includes('/readable-stream/lib/'));assert.equal(edges.length,7);assert(edges.every(row=>row.result===previous.scheduler));exact(stock.graph.stockOptions,{},'stock default options');assert.equal(stock.graph.stockSchedulerOverride,false);
+// Revalidate all current old/new source, authority and actual record bytes before publication.
+await verifyCollector(here,indexSha);await verifyThreeArmAuthority(authorityPath,authoritySha);await readPinned(stockRootPath,stockRootSha);for(const key of ['stdout','stderr','terminal','completion'])await readPinned(stockRoot[key].path,stockRoot[key].sha256,stockRoot[key].bytes);for(const row of complete.outputs)await readPinned(row.path,row.sha256,row.bytes);
+const output=resolve(outputArg??'');assert(output.startsWith('/tmp/starling-node-compat/'));try{await lstat(output);assert.fail('Fresh composition output required');}catch(error){if(error.code!=='ENOENT')throw error;}
+const records=[...reviewed.records,{record:stock,origin:{recordPath:complete.result.path,recordSha256:complete.result.sha256,guestSourceFamilyIndexSha256:parentIndexSha256,collectorSourceIndexSha256:indexSha,rawOuterExit:0,stockRootReceipt:{path:stockRootPath,sha256:stockRootSha}}}];
+const report={schemaVersion:1,state:'COMPOSED_COMMON_BYTE_FOUR_ARM_CORRECTNESS_EVIDENCE',collectorSourceIndexSha256:indexSha,pairPinsSha256:pairSha256,records,failedParent:{receiptPath:failureRoot,receiptSha256:failureSha256,rawOuterExit:1,sourceFamilyIndexSha256:parentIndexSha256,wholeParentGatePassed:false},threeArmAuthority:{path:authorityPath,sha256:authoritySha},newStockRootReceipt:{path:stockRootPath,sha256:stockRootSha},commonCases:8,controlCases:6,controlsSubtracted:false,original28CounterexamplesPreserved:true,unaffectedThreeArmsRerun:false,timingAllowed:false,runtimeAcceptanceClaim:false,performanceClaim:false,queueEmptyProof:false,rootIsolationProof:false,cppStateMachineClaim:false};
+await mkdir(output,{recursive:false});const resultPath=join(output,'composition-results.json'),raw=JSON.stringify(report,null,2)+'\n';await writeFile(resultPath,raw,{flag:'wx'});
+await writeFile(join(output,'composition-completion.json'),JSON.stringify({schemaVersion:1,state:'COMPOSITION_REPORT_SEALED_EXTERNAL_EXIT_ZERO_REQUIRED',collectorSourceIndexSha256:indexSha,result:{path:resultPath,sha256:hash(raw),bytes:Buffer.byteLength(raw)},requiresIndependentRawOuterExitZero:true,oldParentRawExit:1,timingAllowed:false,runtimeAcceptanceClaim:false},null,2)+'\n',{flag:'wx'});
+console.log(JSON.stringify({state:report.state,output,arms:4,oldParentRawExit:1,timingAllowed:false}));

@@ -1,0 +1,246 @@
+#!/usr/bin/env python3
+"""Independent hash/data/source reader. Does not import or run reviewed code."""
+from pathlib import Path
+import ast
+import datetime
+import hashlib
+import json
+import os
+import stat
+
+HERE = Path(__file__).resolve().parent
+BASE = HERE.parent / 'stream-trace-regression-candidate-v1'
+RUNTIME = HERE.parent / 'production-runtime-activated-v3'
+REPOSITORY = HERE.parents[3]
+INDEX = '636dfc0561891ff23f028b19289693aa77452fc25e8c5b415f1bf4a191afe7ac'
+RUNTIME_INDEX = '7e9520e0859b939a8586e6d0cfa1fe376a3ace75a2624dd777d5825bbf91cf66'
+INPUTS = 'b6b4e79f4c13f2e844a8361618e2038d4aa176ad62dd1566a5c44b2f32ee6a3b'
+ENGINE = 'b8279ee1fedc4e26b7319b6777f6a413242cee0c36169a14195f5c24c44511e4'
+METADATA = '873c47f7d75776d836f642a971164b8751c6a53d56430c3a84f0cf3c161b8f58'
+ADAPTER = '988224282d03fe0bd3c25b62344aef265b1a8e1f5804bdbc34d6442507fabcc0'
+checks = {}
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+def absolute(path):
+    return Path(os.path.abspath(path))
+
+def regular(path, expected=None, size=None):
+    path = absolute(path)
+    before = path.lstat()
+    assert stat.S_ISREG(before.st_mode), str(path)
+    data = path.read_bytes()
+    after = path.lstat()
+    assert (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) == (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns), str(path)
+    row = {'path':str(path),'sha256':sha(data),'bytes':len(data)}
+    assert expected is None or row['sha256'] == expected, str(path)
+    assert size is None or len(data) == size, str(path)
+    if str(path) in checks:
+        assert checks[str(path)] == row, str(path)
+    checks[str(path)] = row
+    return data
+
+def document(path, expected=None):
+    return json.loads(regular(path, expected))
+
+def contains(text, *needles):
+    for needle in needles:
+        assert needle in text, needle
+
+def main():
+    index = document(BASE/'index.json',INDEX)
+    assert index['state'] == 'SEALED_PUBLIC_STREAM_TRACE_REGRESSION_SOURCE_NOT_COMPONENT_EXECUTED'
+    assert index['runtimeAcceptanceClaim'] is False
+    indexed = {row['path']:row for row in index['files']}
+    assert len(indexed) == len(index['files']) == 15
+    for name,row in indexed.items():
+        assert not Path(name).is_absolute() and all(value not in ('','.', '..') for value in name.split('/'))
+        regular(BASE/name,row['sha256'],row['bytes'])
+    actual = {str(path.relative_to(BASE)) for path in BASE.rglob('*') if path.is_file()}
+    assert actual == set(indexed)|{'index.json'}
+    assert not any(path.is_symlink() for path in BASE.rglob('*'))
+    inputs = document(BASE/'input-freeze.json',INPUTS)
+    source = document(BASE/'source-receipt.json')
+    assert source['sourceManifestSha256'] == INPUTS
+    assert len(inputs['inputs']) == source['sourceInputs'] == 6015
+    assert inputs['runtimeIndexSha256'] == source['runtimeIndexSha256'] == RUNTIME_INDEX
+    assert inputs['engineSha256'] == source['actualFutureEngine'] == ENGINE
+    assert inputs['delegatedActualVariant'] == 'normal-off'
+    assert source['actualFutureMetadataSha256'] == METADATA
+    assert inputs['componentOrGuestExecuted'] is source['componentizerOrBundlerOrGuestOrNativeBuildOrTargetHostExecuted'] is source['actualRuntimePreflightExecutedDuringPreparation'] is source['runtimeAcceptanceClaim'] is False
+    observed_inputs = {}
+    for row in inputs['inputs']:
+        path = absolute(BASE/row['path'])
+        assert path not in observed_inputs
+        observed_inputs[path] = (row['sha256'],row['bytes'])
+        regular(path,*observed_inputs[path])
+    ri = document(RUNTIME/'index.json',RUNTIME_INDEX)
+    runtime = document(RUNTIME/'input-freeze.json')
+    expected = {}
+    def add(path, digest, size):
+        # The producer resolves paths before sealing; macOS /tmp is /private/tmp.
+        path = Path(path).resolve(strict=True)
+        value = (digest,size)
+        if path in expected:
+            assert expected[path] == value
+        expected[path] = value
+    add(RUNTIME/'index.json',RUNTIME_INDEX,len((RUNTIME/'index.json').read_bytes()))
+    for row in ri['files']:
+        add(RUNTIME/row['path'],row['sha256'],row['bytes'])
+    for row in runtime['inputs']:
+        add(RUNTIME/row['path'],row['sha256'],row['bytes'])
+    external_oracle = Path('/tmp/starling-node-compat/stream-trace-regression-node-v1/results.json')
+    oracle_bytes = regular(BASE/'node-results.json')
+    assert regular(external_oracle) == oracle_bytes
+    add(external_oracle,sha(oracle_bytes),len(oracle_bytes))
+    local_sealed = ['README.md','cases.mjs','component-driver.mjs','guest.mjs','node-oracle.mjs','node-results.json','preflight.template.mjs','run-component.UNEXECUTED.mjs','seal.py','test-source.mjs']
+    for name in local_sealed:
+        row = indexed[name]
+        add(BASE/name,row['sha256'],row['bytes'])
+    assert expected == observed_inputs
+    assert len(runtime['inputs']) == inputs['runtimeInputFiles'] == 6000
+    assert len(runtime['toolTrees']) == inputs['runtimeToolTrees'] == 2
+    assert len(runtime['toolLinks']) == inputs['runtimeToolLinks'] == 22
+    template = regular(BASE/'preflight.template.mjs').decode()
+    compiled = regular(BASE/'preflight.mjs').decode()
+    assert template.count('@INPUTS_SHA@') == 1
+    assert compiled == template.replace('@INPUTS_SHA@',INPUTS)
+    ast.parse(regular(BASE/'seal.py').decode())
+    contains(template,"await sourceSeal();await runtimeIndex();", "classicPreflight({variant:'normal-off'})", ENGINE, METADATA,
+             'const nativeRecheck=native.recheck', 'await nativeRecheck();await runtimeIndex();await sourceSeal();',
+             "native.metadata.entropyPolicy,'off'", 'native.metadata.gcStress,false', 'native.metadata.debuggerEnabled,false',
+             'native.metadata.oomTesting,false', 'native.metadata.classicStreamsEnabled,true')
+    entry = regular(BASE/'run-component.UNEXECUTED.mjs').decode()
+    assert entry.index('await tracePreflight()') < entry.index("import('./component-driver.mjs')")
+    oracle = json.loads(oracle_bytes)
+    assert oracle['node'] == 'v22.14.0' and oracle['groups'] == 8
+    assert oracle['state'] == 'NODE22_PUBLIC_STREAM_TRACE_ORACLE_AND_LABELLED_HOST_MODEL_OBSERVED'
+    assert oracle['hostModel']['nativeGuestOrPrivateSchedulerProof'] is False
+    for name in ['componentizerInvoked','guestExecuted','componentBuilt','hostTargetExecuted']:
+        assert oracle[name] is False
+    assert oracle['nodeExecutable']['sha256'] == 'e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0'
+    regular(oracle['nodeExecutable']['path'],oracle['nodeExecutable']['sha256'])
+    for name,digest in oracle['sourcePins'].items():
+        regular(BASE/name,digest)
+    pins = document(RUNTIME/'runtime-pins.json')
+    pin = pins['variants']['normal-off']
+    metadata = document(pin['enginePath']+'.build.json',METADATA)
+    assert pin['engineSha256'] == ENGINE and metadata['engineSha256'] == ENGINE
+    manifest = {row['path']:row['sha256'] for row in metadata['sourceManifest']}
+    assert len(manifest) == 342
+    for name in ['classic-streams.mjs','classic-core.generated.mjs']:
+        assert manifest['builtins/node-compat/classic-streams/'+name] == oracle['sourcePins']['../../../../builtins/node-compat/classic-streams/'+name]
+    adapter_path = REPOSITORY/'host-apis/wasi-0.2.0/preview1-adapter-release/wasi_snapshot_preview1.wasm'
+    regular(adapter_path,ADAPTER,53512)
+    assert observed_inputs[absolute(adapter_path)] == (ADAPTER,53512)
+    cache = regular(pin['cachePath'],pin['cmakeCacheSha256']).decode()
+    assert 'ENABLE_BUILTIN_WEB_QUEUE_MICROTASK:BOOL=ON' in cache.splitlines()
+    assert 'builtins/web/queue-microtask.cpp' in manifest
+    fnv = 2166136261
+    for value in [(i*17+3)&255 for i in range(64)]:
+        fnv = ((fnv^value)*16777619)&0xffffffff
+    node,model = oracle['nodeObserved'],oracle['hostModelObserved']
+    assert len(node) == len(model) == 8
+    assert [row['accepted'] for row in node[:3]] == [True,True,True]
+    assert [row['accepted'] for row in model[:3]] == [True,False,False]
+    assert node[3:6] == model[3:6]
+    assert [row['accepted'] for row in node[3:6]] == [True,False,False]
+    differences = []
+    for i,(left,right) in enumerate(zip(node,model)):
+        assert left['id'] == right['id']
+        for row in [left,right]:
+            assert row['inputBytes'] == row['bytes'] == 64 and row['checksum'] == fnv
+            assert row['writeCalls'] == row['callbackCalls'] == 1
+            assert len(row['events']) < 128
+            assert all(type(cell) in (str,int,float,bool) for event in row['events'] for cell in event)
+            if i < 6:
+                assert row['finish'] == row['close'] == 1
+            else:
+                assert len(row['counts']) == 8 and set(row['counts'].values()) == {1}
+        if left != right:
+            differences.append({'id':left['id'],'node':left,'hostModel':right})
+    assert differences == oracle['differences']
+    assert [row['id'] for row in differences] == ['writable-sync-hwm64','writable-sync-hwm63','passthrough-pipeline-sync','passthrough-pipeline-microtask']
+    for i in [6,7]:
+        assert node[i]['events'].index(['source','end']) < node[i]['events'].index(['source','finish'])
+        assert model[i]['events'].index(['source','finish']) < model[i]['events'].index(['source','end'])
+    driver = regular(BASE/'component-driver.mjs').decode()
+    contains(driver,"assert.equal(admission.variant,'normal-off')", "NODE_COMPAT_STREAM_TRACE_OUTPUT", "await lstat(output)",
+             "mkdir(output,{recursive:false})", 'trackedWriter(output)', "flag:'wx'", 'loadToolchain()', 'loadComponentizer(toolchain)',
+             'selectedManifestsForEngine(admission.metadata,{sourceRoot:admission.sourceRoot})',
+             "bundleProfile({...toolchain,builtinManifests,input:join(here,'guest.mjs')})", "['node:buffer','node:stream']",
+             "value===join(here,'guest.mjs')||value===join(here,'cases.mjs')", ADAPTER,
+             "preview2Adapter:adapter", "worldName:'test'", "selectedInterfaces:[]",
+             "disableFeatures:['stdio','random','clocks','http','fetch-event']", 'selected.componentize(bundled.code,options)',
+             'assert.deepEqual(interfaceAudit.emittedImports,[])', 'package root:component; world root { export run: func() -> string; }',
+             "transpile(component,{name:'stream_trace',wasiShim:true})", "tracked.writeGenerated", "toolchain.directory,'node_modules'",
+             'for(let call=1;call<=3;call++)', "href+'?fresh=1'", 'assert.deepEqual(freshJco,retained[0])',
+             'assert.deepEqual(value.observed,retained[0].observed', "['run','--invoke','run()',componentPath]", 'timeout:55000',
+             'a85dec9fcbbad23d0e038e5a99604114dbe9aa77bc784e4bce0f33013eb33c1c',
+             'JSON.parse(decodeCliString(actual.stdout.trim()))', 'assert.deepEqual(freshWasmtime,retained[0])',
+             'nodeCompatibilityPassed:differences.length===0', 'hostModelEqualsActualGuest:', 'requiresIndependentTerminalExitCodeZero:true')
+    assert driver.rindex('await admission.recheck();') < driver.index('const report=') < driver.index('await publishCompletion(')
+    assert 'assert.deepEqual(retained[0].observed,oracle.nodeObserved)' not in driver
+    assert 'assert.deepEqual(retained[0].observed,oracle.hostModelObserved)' not in driver
+    componentizer = regular(REPOSITORY/'tests/node-compat/componentizer.mjs').decode()
+    contains(componentizer,'const { selectedInterfaces: _selected, finalizeComponent, ...publicOptions } = options', 'publicArgs[optionsIndex] = publicOptions',
+             'loaded.componentize(...publicArgs)', 'auditSelectedInterfaces(toolchain, result.component, interfacePolicy)')
+    componentize_path = runtime['invocation']['componentizeModule']
+    api = regular(componentize_path).decode()
+    contains(api, "if (typeof opts === 'string')", 'opts = _deprecatedWitWorldOrOpts', 'preview2Adapter = preview1AdapterReactorPath()',
+             'witWorld,', 'worldName,', 'disableFeatures = []', 'wasi_snapshot_preview1: await readFile(preview2Adapter)')
+    jco = Path(runtime['invocation']['toolchainRoot'])/'node_modules/@bytecodealliance/jco/dist'
+    contains(regular(jco/'api.js').decode(),'transpileComponent as transpile','componentWit')
+    contains(regular(jco/'cmd/transpile.js').decode(),'export async function transpileComponent(component, opts = {})','return transpileBytes(component, prepOpts(opts))')
+    decoder = regular(REPOSITORY/'tests/node-compat/foundations/native-scalar-harness.mjs').decode()
+    contains(decoder,'export function decodeCliString(source)', "else normalized += next === '0' ? '\\\\u0000' : '\\\\' + next", 'return JSON.parse(normalized)')
+    completion = regular(RUNTIME/'harness/completion.mjs').decode()
+    contains(completion,"CLASSIC_GATE_OUTPUTS_COMPLETE_REQUIRES_EXTERNAL_EXIT_ZERO", 'terminalExitCodeObservedByThisHelper: null',
+             'runtimeAcceptanceClaim: false', 'finalAdmissionRecheckCompletedBeforeReportPublication: true', "flag: 'wx'", 'hash(resultsBytes)')
+    source_checks = document(BASE/'evidence/source-test-results.json')
+    syntax = document(BASE/'evidence/syntax-results.json')
+    assert source_checks['passed'] == 13 and source_checks['componentizerOrGuestOrHostInvoked'] is False
+    assert source_checks['nodeOracleSha256'] == sha(oracle_bytes)
+    assert syntax['count'] == len(syntax['checks']) == 9
+    assert all(row['exitCode'] == 0 for row in syntax['checks'])
+    assert syntax['guestOrNativeOrHostExecuted'] is False
+    runtime_rehash = document(HERE/'runtime-native-results.json')
+    assert runtime_rehash['state'] == 'STREAM_TRACE_SOURCE_FULL_RUNTIME_NATIVE_REHASH_PASSED'
+    assert runtime_rehash['consumedFilesRehashed'] == 6000 and runtime_rehash['toolLinksRechecked'] == 22
+    regular(BASE/'index.json',INDEX)
+    for row in index['files']:
+        regular(BASE/row['path'],row['sha256'],row['bytes'])
+    result = {
+      'schemaVersion':1,'state':'INDEPENDENT_STREAM_TRACE_SOURCE_REVIEW_PASSED_NOT_GUEST_EXECUTED',
+      'reviewedAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+      'sourceIndexSha256':INDEX,'sourceFilesRehashed':15,'sourceInputsRehashed':6015,
+      'exactInputUnionReconstructed':True,'preflightExactlyFromSealedTemplate':True,
+      'runtimeIndexSha256':RUNTIME_INDEX,'runtimeFilesRehashed':19,'runtimeInputsRehashed':6000,
+      'toolTreesMembershipChecked':2,'toolLinksRechecked':22,
+      'actualEngineSha256':ENGINE,'actualEngineReceiptSha256':METADATA,'nativeSources':342,
+      'externalEmbeddingInputs':3,'normalOffFrozenFiles':405,'allFourNativeFreezesRehashed':True,
+      'repositoryAdapter':{'sha256':ADAPTER,'bytes':53512},
+      'oracle':{'sha256':sha(oracle_bytes),'groups':8,'checksum':fnv,'sourceFactoryMatchesFrozenNativeInputs':True,
+                'ordinaryNodeAndHostModelDifferenceIds':[row['id'] for row in differences],
+                'installedGuestReproductionObservedByThisReader':False,'pastNodeRawExitObservedByThisReader':False},
+      'apisReviewed':['exact classicPreflight normal-off and captured recheck','loadToolchain/loadComponentizer','selectedManifestsForEngine native externals','bundleProfile code/imports/moduleIds','componentize source/options and final interface audit','Jco transpile files/componentWit','retained3/freshJco/freshWasmtime run()->string','decodeCliString before second JSON parse','exclusive trackedWriter/publishCompletion after final recheck'],
+      'futureProtocol':{'onlyBundledModules':['guest.mjs','cases.mjs'],'nativeExternalImports':['node:buffer','node:stream'],
+                        'selectedHostInterfaces':[],'requiredFinalImports':[],'retainedJcoCalls':3,'freshJcoInstances':1,'freshWasmtimeInvocations':1,
+                        'nodeParityRequiredForObservationCompletion':False,'hostModelEqualsGuestForced':False,'externalRawExitZeroStillRequired':True},
+      'ownerEvidenceAuthenticatedNotRerun':{'sourceChecks':13,'syntaxChecks':9},
+      'reviewerPythonAstParsed':['seal.py'],'readerAssertionFailures':[{'attempt':1,'assertion':'exact input union','cause':'Reader reconstructed lexical /tmp paths while producer seals real /private/tmp paths. All overlapping byte/hash rows agreed.','correction':'Canonicalize reconstructed expected rows exactly as the source sealer does; retain first reader bytes and failure.'},{'attempt':2,'assertion':'queueMicrotask CMake configuration','cause':'Reader assumed the captured metadata option subset contained this web prerequisite; the exact captured CMake cache contains ENABLE_BUILTIN_WEB_QUEUE_MICROTASK:BOOL=ON.','correction':'Read the exact hash-verified cache and native source manifest; retain second reader bytes and failure.'}],
+      'reviewedCodeImportedOrExecuted':False,'nodePreflightBundlePackagerComponentizerGuestHostNativeBuildExecuted':False,
+      'limitations':['Source-only approval of the finite observation runner; no installed guest result, final component, emitted-interface result, or semantic fix acceptance is claimed.',
+                     'The saved Node/model data has four labelled trace gaps; the native guest outcome remains unobserved. Completion can truthfully report nodeCompatibilityPassed=false.',
+                     'No full Node streams, private scheduler exposure, cancellation/reset, GC ownership, memory, timing, performance, custom host, or live source change is covered.',
+                     'Current file and recorded provenance verification does not independently observe the past Node oracle or native build exits.']}
+    verified = {'schemaVersion':1,'files':sorted(checks.values(),key=lambda row:row['path'])}
+    data = (json.dumps(verified,indent=2)+'\n').encode()
+    (HERE/'verified-files.json').write_bytes(data)
+    result['verifiedFiles'] = {'path':'verified-files.json','sha256':sha(data),'bytes':len(data),'count':len(checks)}
+    (HERE/'results.json').write_text(json.dumps(result,indent=2)+'\n')
+    print(json.dumps({key:result[key] for key in ['state','sourceFilesRehashed','sourceInputsRehashed','readerAssertionFailures']}))
+
+if __name__ == '__main__':
+    main()

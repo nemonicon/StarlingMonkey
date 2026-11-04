@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "state": "INDEPENDENT_ZLIB350_V2_SOURCE_HOLD_MANDATORY_DESCRIPTOR_SHADOW_FIX",
+  "ownerIndexSha256": "c65ed2c400b49e63d716ba92b05d0b5f0f56680f6a89d94a9b2c813faec0aba1",
+  "mandatoryAmendmentIndexSha256": "1d0c8626665c06247f4240be359704a2c10851489cb77e203f14ae511343c58c",
+  "resultsSha256": "e39bec76e5648260b7f462e0e4c117ceb9b620efe5908241660f726fdedcd336",
+  "descriptorShapeInspectionSha256": "c3d491b81b55935df3fcf0a2f89affb0f91c26d2c0118cb665510e2049d7938b",
+  "ownerFiles": 77,
+  "preparationInputs": 2048,
+  "mandatoryAmendmentFiles": 11,
+  "mandatoryAfterimages": 6,
+  "exactForwardReverseDerivationRecords": 10,
+  "nativeSources": 350,
+  "nativePayloadMatchesConditional56a6": true,
+  "nativeAdds": 8,
+  "nativeParentChanges": 2,
+  "unchangedParentPaths": 340,
+  "mandatoryFindings": [
+    {
+      "id": "Z350-M2",
+      "severity": "must-fix-before-stage-or-build",
+      "issue": "codec.after overwrites the authenticated selected compile-input descriptor with the seven-symbol definitions map and returns that map as selectedCompileInput.",
+      "locations": [
+        {
+          "path": "codec-evidence.py",
+          "line": 152,
+          "role": "selected descriptor assigned"
+        },
+        {
+          "path": "codec-evidence.py",
+          "line": 166,
+          "role": "selected overwritten by symbols result"
+        },
+        {
+          "path": "codec-evidence.py",
+          "line": 169,
+          "role": "wrong binding returned as selectedCompileInput"
+        },
+        {
+          "path": "codec-evidence.py",
+          "line": 191,
+          "role": "frozen witness expects descriptor"
+        },
+        {
+          "path": "artifact-tools/artifact_common.py",
+          "line": 279,
+          "role": "descriptor equality required"
+        },
+        {
+          "path": "source/tests/node-compat/zlib-admission.mjs",
+          "line": 205,
+          "role": "descriptor equality required"
+        }
+      ],
+      "effect": "After successful native/link/symbol collection, build/freezer/JS admission would reject the malformed witness; source guard/data tests do not exercise this final witness shape.",
+      "requiredCorrection": "New immutable successor must keep selected compile-input descriptor and selected symbol definitions in separate bindings; selectedCompileInput must equal metadata.zlibSelectedCodecInput and archiveSymbolEvidence.selectedDefinitions must remain the seven-symbol map. Add a pure positive expected-witness-shape regression with no real native/tool calls."
+    }
+  ],
+  "stageOrBuildPermittedByThisReview": false,
+  "originalZ350M1CorrectionPresentButFinalWitnessMalformed": true,
+  "allOtherMechanismsApproved": false,
+  "toolInventory": {
+    "schemaVersion": 1,
+    "oldToolRows": 335,
+    "newToolRows": 428,
+    "addedRows": 93,
+    "removedRows": 0,
+    "addedBreakdown": {
+      "oldProducerV1": 66,
+      "mandatoryForcedIncludeAmendment": 12,
+      "oldIndependentHold": 7,
+      "currentV2HelpersContracts": 8
+    },
+    "nativeRows": 350,
+    "nativeToolOverlap": 3,
+    "futureStageUniquePlanRows": 775,
+    "stagePlanExecuted": false,
+    "sourceInventoryOnly": true
+  },
+  "pureExpectedDescriptorShapeInspectionExecuted": true,
+  "ownerFunctionOrActionOrNativeVerifierOrCompilerOrGuestOrTestExecuted": false,
+  "old3ffDafaffC65And1d0cUnchanged": true,
+  "runtimeBackendProof": {
+    "verified": false,
+    "version": null,
+    "vernum": null
+  },
+  "futurePinsAllFourNull": true,
+  "operationalAdmissionOpen": false,
+  "runtimeAcceptanceClaim": false,
+  "performanceClaim": false,
+  "scope": "Bounded critical source/data review and full index/preparation-byte authentication. Not final approval of every unexecuted linkage/stage/runtime path."
+}

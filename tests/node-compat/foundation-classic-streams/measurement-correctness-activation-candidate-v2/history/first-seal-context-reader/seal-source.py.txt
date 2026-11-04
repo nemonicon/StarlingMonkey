@@ -1,0 +1,38 @@
+"""Source seal only. No activation or genuine artifact/preflight action."""
+from pathlib import Path
+import ast,hashlib,json
+HERE=Path(__file__).resolve().parent
+PARENT=HERE.parent/'measurement-correctness-activation-candidate-v1'
+AMEND=HERE.parent/'measurement-correctness-persistence-amendment-v1'
+def sha(raw):return hashlib.sha256(raw).hexdigest()
+def checked(path,digest=None,size=None):
+ path=Path(path);assert path.is_file()and not path.is_symlink();raw=path.read_bytes()
+ assert digest is None or sha(raw)==digest,str(path)
+ assert size is None or len(raw)==size,str(path)
+ return{'path':str(path.resolve()),'sha256':sha(raw),'bytes':len(raw)}
+def main():
+ assert not(HERE/'index.json').exists()
+ evidence=HERE/'evidence';evidence.mkdir(exist_ok=False)
+ tests=Path('/tmp/starling-node-compat/classic-correctness-activation-v2-source-tests-v1/results.json')
+ report=json.loads(tests.read_bytes());assert report['passed']==30 and report['actionMainOrGenuineVerifierOrPreflightOrGuestOrNativeOrTargetHostInvoked']is False
+ (evidence/'source-tests.json').write_bytes(tests.read_bytes())
+ parent_manifest=json.loads((PARENT/'input-freeze.json').read_bytes());inputs={}
+ for row in parent_manifest['inputs']:
+  path=PARENT/row['path'];item=checked(path,row['sha256'],row['bytes']);inputs[item['path']]=item
+ for root,digest in [(PARENT,'ce2f254f2cf27d44df5f0d23915ca4e09c98ac15b2f88f762d41f57fb8e6048e'),(AMEND,'60a8687e9b6bfff4c68df2a36e9dd47ad0f5cd327441f8cf32d63caa67518ba8')]:
+  item=checked(root/'index.json',digest);inputs[item['path']]=item
+  for row in json.loads((root/'index.json').read_bytes())['files']:
+   item=checked(root/row['path'],row['sha256'],row['bytes']);inputs[item['path']]=item
+ for path in HERE.rglob('*'):
+  if path.is_file()and path.name not in ['index.json','input-freeze.json','source-receipt.json']:
+   item=checked(path);inputs[item['path']]=item
+ manifest={'schemaVersion':1,'state':'SOURCE_ONLY_CORRECTNESS_ACTIVATION_V2_PREPARATION_INPUTS','inputs':[inputs[key]for key in sorted(inputs)],'toolTrees':parent_manifest['toolTrees'],'toolLinks':parent_manifest['toolLinks'],'activationOutputCreated':False,'runtimeAcceptanceClaim':False}
+ (HERE/'input-freeze.json').write_text(json.dumps(manifest,indent=2)+'\n')
+ proof=json.loads((HERE/'transformation-proof.json').read_bytes());assert len(proof['edits'])==6 and proof['reverseExact']is True
+ receipt={'schemaVersion':1,'state':'SOURCE_ONLY_CONCRETE_CORRECTNESS_V2_ACTIVATOR_UNEXECUTED','previousActivationSourceIndexSha256':'ce2f254f2cf27d44df5f0d23915ca4e09c98ac15b2f88f762d41f57fb8e6048e','mandatoryPersistenceSourceIndexSha256':'60a8687e9b6bfff4c68df2a36e9dd47ad0f5cd327441f8cf32d63caa67518ba8','sourceEdits':6,'sourceChecks':30,'inputs':len(inputs),'toolTrees':len(manifest['toolTrees']),'toolLinks':len(manifest['toolLinks']),'nativeAuthorityBackendChanged':False,'futurePinsRemainNull':True,'outputCreated':False,'runtimeAcceptanceClaim':False}
+ (HERE/'source-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+ for path in HERE.glob('*.py'):ast.parse(path.read_text())
+ files=[{'path':str(path.relative_to(HERE)),'sha256':sha(path.read_bytes()),'bytes':path.stat().st_size}for path in sorted(HERE.rglob('*'))if path.is_file()and path.name!='index.json']
+ index={'schemaVersion':1,'state':'SEALED_SOURCE_ONLY_CORRECTNESS_V2_ACTIVATION_PRODUCER','files':files,'runtimeAcceptanceClaim':False}
+ (HERE/'index.json').write_text(json.dumps(index,indent=2)+'\n');print(json.dumps({'indexSha256':sha((HERE/'index.json').read_bytes()),'files':len(files),'inputs':len(inputs)}))
+if __name__=='__main__':main()

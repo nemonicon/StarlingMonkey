@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "state": "INDEPENDENT_CONSUMERS355_COMPONENT_VALIDATION_SOURCE_REVIEW_HOLD",
+  "reviewedIndexSha256": "5659c2885860e1e926e20e8c59a0fac48c2869b401a7e55c190783b2dad9bf79",
+  "reviewedFiles": 65,
+  "originalPreparationReferences": 5151,
+  "sourceFilesAndReferencesHashExact": true,
+  "nativeProducerOriginalAndStagedIndexedFiles": 59,
+  "nativeProducerIndexSha256": "9edf31c16af401ac688a4ab9bfe2a01f0338739a6554fc12caa3b2f8ba03a378",
+  "sourcePeerIndexedFiles": 8,
+  "physicalSnapshot": {
+    "modules": 12,
+    "localStaticEdges": 13,
+    "selectedDataAndAdapter": 8,
+    "relativeDataUrls": 24,
+    "explicitInactiveLazyReadsNotCalled": 12,
+    "packages": 4,
+    "resolverEndpointFiles": 5,
+    "packageProvenanceFiles": 27
+  },
+  "toolClosure": {
+    "trees": 2,
+    "links": 22,
+    "regularTreeFiles": 4890,
+    "toolInputsIncludingInvocationBinaries": 4892
+  },
+  "corpus": {
+    "nodeGroups": 18,
+    "boundedProfileGroups": 12,
+    "additionalPublicNodeGroups": 8,
+    "totalCases": 38,
+    "plannedNormalReturnedRecords": 190,
+    "initializerControls": 11,
+    "combinedOwnerGcReturnedRecords": 4,
+    "offDenials": 8,
+    "offSmokeReturnedRecords": 5,
+    "differentialAndProfileAfterimagesIndependentlyReconstructed": true,
+    "excludedNodeBlobVector": 1,
+    "old293RuntimeProofTransferred": false
+  },
+  "directLiveRootFiveRows": 0,
+  "liveRootFivePromotionChangesThisFiniteClosure": false,
+  "rootFiveScope": "Only direct consumed source rows and physical snapshot origins inspected; historical descriptor bytes are not followed or relabelled.",
+  "futureNativeTuples": {
+    "normal-off": null,
+    "normal-runtime": null,
+    "gc-off": null,
+    "disabled-off": null
+  },
+  "futureActivatedOutputAbsentAtReview": true,
+  "ownerStoredChecksAuthenticatedNotRerun": {
+    "source": 64,
+    "physical": 13,
+    "syntax": 31
+  },
+  "mandatoryFindings": [
+    "C355-COMP-M1"
+  ],
+  "retentionFindings": [
+    "C355-COMP-M2"
+  ],
+  "additionalDemonstratedFunctionalBlockers": [],
+  "disposition": "HOLD_NO_ACTIVATION",
+  "execution": {
+    "readerOnly": true,
+    "ownerModulesImported": false,
+    "ownerActionsOrTestsExecuted": false,
+    "bootstrapOrPreflightExecuted": false,
+    "compilerOrFactoryOrComponentizerExecuted": false,
+    "guestOrHostOrTimingExecuted": false
+  },
+  "limits": [
+    "No current guest or native correctness claim from synthetic/source checks.",
+    "Normal190, GC4 and OFF5 are plans, not observed runtime records.",
+    "GC ownership is combined only; no isolated VM rooting or reset claim.",
+    "No performance, full Node compatibility, acceptance or operational admission claim.",
+    "Pinned-source finite import/data regex closure is not a general JavaScript parser proof.",
+    "Resolver endpoint bytes, package JSON, and captured resolution paths were checked without invoking a Node resolver."
+  ],
+  "findings": [
+    {
+      "id": "C355-COMP-M1",
+      "severity": "mandatory-fix",
+      "disposition": "HOLD_BEFORE_ACTIVATION",
+      "title": "Correct CJS refusals are rejected by the OFF driver diagnostic assertion",
+      "detail": "Both literal-CJS fixtures take the pinned bundler CommonJS refusal branch. The driver accepts only the ESM diagnostic prefix, so a correct CJS refusal fails the source-defined OFF gate before componentization.",
+      "evidence": [
+        "oldDriverDenialMatcher",
+        "cjsDiagnostic",
+        "esmDiagnostic",
+        "literalCjsFixture"
+      ],
+      "fixtureRows": [
+        {
+          "specifier": "node:stream/consumers",
+          "kind": "literal-cjs",
+          "actualPinnedDiagnosticTemplateResult": "CommonJS require is not admitted: node:stream/consumers",
+          "oldDriverMatcherAccepts": false,
+          "pureTemplateEvaluationOnly": true
+        },
+        {
+          "specifier": "stream/consumers",
+          "kind": "literal-cjs",
+          "actualPinnedDiagnosticTemplateResult": "CommonJS require is not admitted: stream/consumers",
+          "oldDriverMatcherAccepts": false,
+          "pureTemplateEvaluationOnly": true
+        }
+      ],
+      "runtimeReproductionClaim": false
+    },
+    {
+      "id": "C355-COMP-M2",
+      "severity": "retention-gap",
+      "disposition": "FIX_IN_SUCCESSOR",
+      "title": "Nonstring Jco transport values would fail before raw retention",
+      "detail": "observed() checks typeof raw before saving raw.txt. The declared current exports return strings, so this is a failure-evidence retention gap, not a demonstrated guest ABI or semantic failure. A typed envelope before the type guard must avoid inspecting opaque values.",
+      "evidence": [
+        "rawTypeBeforeRetention"
+      ],
+      "runtimeReproductionClaim": false
+    }
+  ],
+  "citations": {
+    "oldDriverDenialMatcher": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/run-validation.mjs",
+      "line": 52,
+      "sha256": "ad00797e8fd2a60f7427b509fdc27866c2d45f66565fe47f30dfdb78c8bc8e45",
+      "needle": "assert(failure&&/Node builtin is not admitted by this profile:/.test(failure.message))"
+    },
+    "cjsDiagnostic": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/packaging-tools/tests/node-compat/profile-bundler.mjs",
+      "line": 86,
+      "sha256": "d1333e8c795098dbab12d1ad93b10fd5b27176541c9a053632531dabde36a4bc",
+      "needle": "CommonJS require is not admitted: ${specifier}"
+    },
+    "esmDiagnostic": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/packaging-tools/tests/node-compat/profile-bundler.mjs",
+      "line": 46,
+      "sha256": "d1333e8c795098dbab12d1ad93b10fd5b27176541c9a053632531dabde36a4bc",
+      "needle": "Node builtin is not admitted by this profile: ${source}"
+    },
+    "literalCjsFixture": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/disabled-fixtures.mjs",
+      "line": 6,
+      "sha256": "4e2ce1b7f43977a6f3caa0ebd1546bd0368535cfc7608dbe223689c0d7ebf4b2",
+      "needle": "kind:'literal-cjs'"
+    },
+    "rawTypeBeforeRetention": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/run-validation.mjs",
+      "line": 46,
+      "sha256": "ad00797e8fd2a60f7427b509fdc27866c2d45f66565fe47f30dfdb78c8bc8e45",
+      "needle": "assert.equal(typeof raw,'string')"
+    },
+    "genuineBootstrap": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/runtime-preflight.template.mjs",
+      "line": 22,
+      "sha256": "2da1f4f652a43ace849d5468176e9fbb31e8b38794793a8ead4b8808b9af4489",
+      "needle": "consumersBootstrapPreflight"
+    },
+    "providedManifestBundle": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/run-validation.mjs",
+      "line": 44,
+      "sha256": "ad00797e8fd2a60f7427b509fdc27866c2d45f66565fe47f30dfdb78c8bc8e45",
+      "needle": "builtinManifests:admission.selectedManifests"
+    },
+    "publicWit": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/run-validation.mjs",
+      "line": 42,
+      "sha256": "ad00797e8fd2a60f7427b509fdc27866c2d45f66565fe47f30dfdb78c8bc8e45",
+      "needle": "export run: func(index: u32) -> string"
+    }
+  }
+}

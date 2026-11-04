@@ -1,0 +1,1 @@
+import "/tmp/starling-node-compat/foundations-v11/release-gates-v2/optional/util/deferred-require.cjs";export function run(){return '';}

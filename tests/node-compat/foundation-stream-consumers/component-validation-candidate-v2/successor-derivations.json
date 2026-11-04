@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "state": "UNSEALED_OFF_DIAGNOSTIC_AND_RAW_RETURN_SOURCE_SUCCESSOR",
+  "oldIndexSha256": "5659c2885860e1e926e20e8c59a0fac48c2869b401a7e55c190783b2dad9bf79",
+  "edits": [
+    {
+      "path": "run-validation.mjs",
+      "old": "import {assertDisabledManifests,assertSmoke} from './disabled-checks.mjs';",
+      "new": "import {assertDisabledManifests,assertSmoke} from './disabled-checks.mjs';\nimport {assertDisabledDenial} from './denial-checks.mjs';\nimport {transportReturnEnvelope} from './transport-return.mjs';",
+      "count": 1,
+      "afterOffsets": [
+        688
+      ]
+    },
+    {
+      "path": "run-validation.mjs",
+      "old": "assert(failure&&/Node builtin is not admitted by this profile:/.test(failure.message));const record={index,id:row.id,kind:row.kind,error:failure,beforeAnyComponentization:componentizeCalls===0};",
+      "new": "const diagnostic=assertDisabledDenial(row,failure);const record={index,id:row.id,kind:row.kind,error:failure,diagnostic,beforeAnyComponentization:componentizeCalls===0};",
+      "count": 1,
+      "afterOffsets": [
+        9944
+      ]
+    },
+    {
+      "path": "run-validation.mjs",
+      "old": "const raw=await invoke();assert.equal(typeof raw,'string');const rawFile=await save('calls/'+id+'.raw.txt',raw);",
+      "new": "const raw=await invoke();const transportFile=await save('calls/'+id+'.transport.json',transportReturnEnvelope(raw));let rawFile=null;if(typeof raw==='string')rawFile=await save('calls/'+id+'.raw.txt',raw);assert.equal(typeof raw,'string');",
+      "count": 1,
+      "afterOffsets": [
+        8133
+      ]
+    },
+    {
+      "path": "run-validation.mjs",
+      "old": "return{id,value,rawFile};",
+      "new": "return{id,value,rawFile,transportFile};",
+      "count": 1,
+      "afterOffsets": [
+        8518
+      ]
+    },
+    {
+      "path": "activate.py",
+      "old": "DEST=HERE.with_name('component-validation-activated-v1')",
+      "new": "DEST=HERE.with_name('component-validation-activated-v2')",
+      "count": 1,
+      "afterOffsets": [
+        573
+      ]
+    },
+    {
+      "path": "activate.py",
+      "old": "'checks.mjs','disabled-fixtures.mjs'",
+      "new": "'checks.mjs','denial-checks.mjs','transport-return.mjs','disabled-fixtures.mjs'",
+      "count": 1,
+      "afterOffsets": [
+        878
+      ]
+    },
+    {
+      "path": "activate.py",
+      "old": "component-validation-candidate-v1').resolve()",
+      "new": "component-validation-candidate-v2').resolve()",
+      "count": 1,
+      "afterOffsets": [
+        1964
+      ]
+    },
+    {
+      "path": "test-closure.py",
+      "old": "'component-validation-activated-v1'in activation",
+      "new": "'component-validation-activated-v2'in activation",
+      "count": 1,
+      "afterOffsets": [
+        4493
+      ]
+    }
+  ],
+  "packagingSnapshotPathRebaseOnly": {
+    "from": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v1/packaging-tools",
+    "to": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-candidate-v2/packaging-tools"
+  },
+  "guestCorpusOrNativeAuthorityChanged": false,
+  "activationOrGuestExecuted": false
+}

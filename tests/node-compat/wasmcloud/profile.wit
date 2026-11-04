@@ -1,0 +1,14 @@
+package starling:node-compat-http-test@0.1.0;
+
+// Explicit HTTP handler world: no CLI, environment, filesystem, socket,
+// entropy, outgoing HTTP, timer or wall-clock capability is selected here.
+// wasi:clocks/monotonic-clock@0.2.10 is admitted only as the transitive
+// duration=u64 type dependency of HTTP types. Its function set must be empty
+// in the emitted component; build-http.mjs validates the actual type graph.
+world profile {
+  import wasi:io/error@0.2.10;
+  import wasi:io/poll@0.2.10;
+  import wasi:io/streams@0.2.10;
+  import wasi:http/types@0.2.10;
+  export wasi:http/incoming-handler@0.2.10;
+}

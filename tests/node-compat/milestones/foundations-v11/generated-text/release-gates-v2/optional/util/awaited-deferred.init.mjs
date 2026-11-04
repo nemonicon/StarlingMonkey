@@ -1,0 +1,1 @@
+import {callbackify} from 'node:util';await Promise.resolve().then(()=>callbackify(()=>{}));export function run(){return ''}

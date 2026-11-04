@@ -1,0 +1,106 @@
+--- a/builtins/node-compat/buffer-facade.mjs
++++ b/builtins/node-compat/buffer-facade.mjs
+@@ -20,15 +20,7 @@
+   const encoder = new web.TextEncoder();
+   // Node preserves a leading UTF-8 BOM in Buffer.toString().
+   const decoder = new web.TextDecoder('utf-8', { ignoreBOM: true });
+-  // Captured producers cannot be replaced by application prototype mutations
+-  // after their fresh, fixed Uint8Array results become trusted below.
+-  const encodeUTF8 = encoder.encode.bind(encoder);
+-  const decodeUTF8 = decoder.decode.bind(decoder);
+-  const fillBytes = Function.prototype.call.bind(U8.prototype.fill);
+-  const setPrototypeOf = Object.setPrototypeOf;
+   const instances = new WeakSet();
+-  const addInstance = instances.add.bind(instances);
+-  const hasInstance = instances.has.bind(instances);
+   const reject = operation => unsupported('node:buffer', operation);
+   function fail(Ctor, code, message) {
+     const error = new Ctor(message);
+@@ -83,30 +75,17 @@
+   function tag(view) {
+     backing(view);
+     size(typedByteLength.call(view));
+-    setPrototypeOf(view, Buffer.prototype);
+-    addInstance(view);
++    Object.setPrototypeOf(view, Buffer.prototype);
++    instances.add(view);
+     return view;
+   }
+-  function tagTrusted(view) {
+-    // Only fresh fixed U8 allocations from validated inputs, the private C++
+-    // hex kernel, or the captured native TextEncoder enter here. Reading
+-    // .buffer would materialize/copy inline storage for every small result.
+-    setPrototypeOf(view, Buffer.prototype);
+-    addInstance(view);
+-    return view;
+-  }
+   function requireBuffer(value) {
+-    if (!hasInstance(value)) fail(TypeError, 'ERR_INVALID_ARG_TYPE', 'receiver must be a profile Buffer');
++    if (!instances.has(value)) fail(TypeError, 'ERR_INVALID_ARG_TYPE', 'receiver must be a profile Buffer');
+     return backing(value);
+   }
+   // A genuine typed-array allocation, including for TypedArray species methods.
+   function FastBuffer(...args) {
+-    if (typeof args[0] === 'number') {
+-      size(args[0]);
+-      return tagTrusted(new U8(...args));
+-    }
+-    // Non-numeric species construction is observable and may supply external
+-    // storage. Keep its complete input/output checks.
++    if (typeof args[0] === 'number') size(args[0]);
+     return tag(new U8(...args));
+   }
+   function Buffer(arg, encodingOrOffset, length) {
+@@ -121,14 +100,14 @@
+   Buffer.alloc = function alloc(length, fill = 0) {
+     size(length);
+     if (typeof fill !== 'number') reject('alloc non-number fill');
+-    const value = tagTrusted(new U8(length));
+-    fillBytes(value, fill);
++    const value = tag(new U8(length));
++    U8.prototype.fill.call(value, fill);
+     return value;
+   };
+   Buffer.from = function from(value, encodingOrOffset, length) {
+     if (typeof value === 'string') {
+       sourceLimit(value);
+-      return tagTrusted(encoding(encodingOrOffset) === 'hex' ? kernel.hexDecode(value) : encodeUTF8(value));
++      return tag(encoding(encodingOrOffset) === 'hex' ? kernel.hexDecode(value) : encoder.encode(value));
+     }
+     if (value instanceof AB) {
+       const bufferLength = fixedBuffer(value);
+@@ -140,21 +119,21 @@
+       if (typeof count !== 'number' || !Number.isInteger(count) || count < 0) reject('ArrayBuffer length coercion');
+       size(count);
+       if (count > bufferLength - offset) fail(RangeError, 'ERR_BUFFER_OUT_OF_BOUNDS', 'length is outside buffer');
+-      return tagTrusted(new U8(value, offset, count));
++      return tag(new U8(value, offset, count));
+     }
+     if (value instanceof U8) {
+       backing(value);
+       size(typedByteLength.call(value));
+-      return tagTrusted(new U8(value)); // COPY the visible bytes, including nonzero offsets.
++      return tag(new U8(value)); // COPY the visible bytes, including nonzero offsets.
+     }
+     reject('from input kind');
+   };
+-  Buffer.isBuffer = value => hasInstance(value);
++  Buffer.isBuffer = value => instances.has(value);
+   Buffer.isEncoding = value => typeof value === 'string' && ['utf8', 'utf-8', 'hex'].includes(value.toLowerCase());
+   Buffer.byteLength = function byteLength(value, enc) {
+     if (typeof value === 'string') {
+       sourceLimit(value);
+-      return encoding(enc) === 'hex' ? Math.floor(value.length / 2) : encodeUTF8(value).length;
++      return encoding(enc) === 'hex' ? Math.floor(value.length / 2) : encoder.encode(value).length;
+     }
+     if (value instanceof AB) return fixedBuffer(value);
+     if (value instanceof U8) { backing(value); return typedByteLength.call(value); }
+@@ -170,7 +149,7 @@
+       const last = Math.max(first, Math.min(length, Math.max(end, 0)));
+       // Plain view: no copy and no allocation through user-overridden species.
+       const bytes = new U8(buffer, typedByteOffset.call(this) + first, last - first);
+-      return encoding(enc) === 'hex' ? kernel.hexEncode(bytes) : decodeUTF8(bytes);
++      return encoding(enc) === 'hex' ? kernel.hexEncode(bytes) : decoder.decode(bytes);
+     },
+     subarray(start, end) {
+       requireBuffer(this);

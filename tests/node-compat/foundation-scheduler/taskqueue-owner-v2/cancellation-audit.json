@@ -1,0 +1,53 @@
+{
+  "status": "source-only-current-six-cancel-bodies-not-a-safe-reset-proof",
+  "currentApplicationJSInvocationsInTheseSixCancelBodies": false,
+  "safeResetOrReuseEstablished": false,
+  "existingTaskIteration": "EventLoop::reset range-for on q.tasks; mutation/JS-capable cancellation remains open",
+  "requiredFollowup": [
+    "reset-in-progress enqueue/loop/reset rejection",
+    "void queue_async_task failure/ownership decision",
+    "traced cancellation owner and task mutation policy",
+    "two uncancellable native task contracts",
+    "Promise/finalizer state and reset boundaries"
+  ],
+  "tasks": [
+    {
+      "symbol": "TimerTask::cancel",
+      "path": "builtins/web/timers.cpp",
+      "sha256": "2995842e10417b53cb02ed6d48bfa49b8bc0c076637e928f8c457e47e9e91294",
+      "observation": "Unsubscribes via MonotonicClock; invalidates handle; no application JS call in this body."
+    },
+    {
+      "symbol": "BodyFutureTask::cancel",
+      "path": "builtins/web/fetch/request-response.cpp",
+      "sha256": "82c93feef45b8603ae1e6641ce9140d660cd8f8baf7334856e5aa17a55e7a7f7",
+      "observation": "Only invalidates handle; TODO implement cleanup; no application JS call in this body."
+    },
+    {
+      "symbol": "ResponseFutureTask::cancel",
+      "path": "builtins/web/fetch/request-response.cpp",
+      "sha256": "82c93feef45b8603ae1e6641ce9140d660cd8f8baf7334856e5aa17a55e7a7f7",
+      "observation": "Only invalidates handle; TODO implement cleanup; no application JS call in this body."
+    },
+    {
+      "symbol": "StreamTask::cancel",
+      "path": "builtins/web/streams/buf-reader.cpp",
+      "sha256": "022b6d9ee025ca52952d3a7195b78bf6a0115471a52483ba7054225efdd4d324",
+      "observation": "Only invalidates handle; no application JS call in this body."
+    },
+    {
+      "symbol": "BodyWriteAllTask::cancel",
+      "path": "host-apis/wasi-0.2.0/host_api.cpp",
+      "sha256": "10ccb1f84f659195eddc1dab5f8152cdfaa21da660345d07563fa867e87e0a4c",
+      "observation": "MOZ_ASSERT_UNREACHABLE: semantics do not allow cancellation."
+    },
+    {
+      "symbol": "BodyAppendTask::cancel",
+      "path": "host-apis/wasi-0.2.0/host_api.cpp",
+      "sha256": "10ccb1f84f659195eddc1dab5f8152cdfaa21da660345d07563fa867e87e0a4c",
+      "observation": "MOZ_ASSERT_UNREACHABLE: semantics do not allow cancellation."
+    }
+  ],
+  "guestExecuted": false,
+  "faultTesting": false
+}

@@ -1,0 +1,15 @@
+--- a/tests/node-compat/foundation-classic-streams/integration-candidate-v1/artifact-tools/freeze-engine.py
++++ b/artifact-tools/freeze-engine.py
+@@ -187,10 +187,11 @@
+     tool_dependencies(source_root)
+     validate_plan(plan, receipt_path)  # ALL inputs/destinations checked before any copy.
+     execute_plan(plan)
+-    receipt = {'schema': 1, 'state': 'immutable-release-engine-frozen', 'label': label,
++    receipt = {'schema': 1, 'state': 'immutable-trace-release-engine-frozen', 'label': label,
+         'engine': str(OUTPUT / (label + '.engine.wasm')), 'engineSha256': metadata['engineSha256'],
+         'engineBytes': metadata['engineBytes'], 'receiptSha256': digest(metadata_bytes),
+         'sourceRoot': str(OUTPUT / 'source'), 'componentizeSourceRoot': str(OUTPUT / 'componentize-source'),
++        'classicTraceSourcePolicy': metadata['classicTraceSourcePolicy'],
+         'nativeInputsVerified': 342, 'externalEmbeddingInputsVerified': 3, 'recipeSha256': RECIPE,
+         'actualLayoutCompileCommands': 61, 'actualStrictCompileCommands': 4, 'actualEmbeddingCompileCommands': 1,
+         'entropyPolicy': entropy, 'gcStress': gc, 'coreVersion': admission['coreExpectations']['coreVersion'],

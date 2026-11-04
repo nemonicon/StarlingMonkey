@@ -1,0 +1,1 @@
+import{run}from"/tmp/starling-node-compat/foundations-v10/release-gates-v1/strict-runtime/unsupported_async_event.js";try{await run();console.log('UNEXPECTED_SUCCESS');process.exitCode=2;}catch(error){console.log('EXPECTED_FATAL_EXPORT');}

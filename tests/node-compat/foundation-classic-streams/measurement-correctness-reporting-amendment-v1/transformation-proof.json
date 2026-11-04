@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "parentIndexSha256": "138a4e0bcfe22ef3b48375257a50958f595dcebb607fc9267a30080948d612da",
+  "beforeSha256": "1056804eceea4cacb1eb91c0520e963869f981e9e0bd4d3a0a13b0627e20fafd",
+  "afterSha256": "c0e59c5c6b19751b0b0d9225b9569d0c3ff8e415142c555920b2fd408739d809",
+  "edits": [
+    {
+      "old": "import {trackedWriter,publishCompletion} from './completion.mjs';",
+      "new": "import {trackedWriter,publishCompletion} from './completion.mjs';\nimport {requireExactJSON,RecordedMismatch} from './bounded-comparison.mjs';",
+      "count": 1
+    },
+    {
+      "old": " function validateCase(value,index,call){const expected=expectedCase(index);assert.equal(value.schemaVersion,1);assert.equal(value.calls,call);assert.equal(value.caseIndex,index);assert.equal(value.setup,expected.setup);assert.deepEqual(value.result,expected.oracle);return value;}",
+      "new": " async function validateCase(value,index,call,context=null){const row=expectedCase(index),expected={schemaVersion:1,calls:call,caseIndex:index,setup:row.setup,result:row.oracle};await requireExactJSON({label:'workload-'+index,actual:value,expected,context,writeCounterexample});return value;}",
+      "count": 1
+    },
+    {
+      "old": " function validateBoundaries(value,call){assert.equal(value.schemaVersion,1);assert.equal(value.calls,call);assert.deepEqual(value.observed,encoding.expected);return value;}",
+      "new": " async function validateBoundaries(value,call,context=null){await requireExactJSON({label:'boundaries',actual:value,expected:{schemaVersion:1,calls:call,observed:encoding.expected},context,writeCounterexample});return value;}",
+      "count": 1
+    },
+    {
+      "old": " async function retainCounterexample(label,actual,expected,error){",
+      "new": " async function writeCounterexample(record){await write(join(output,'correctness-counterexample.json'),JSON.stringify(record,null,2)+'\\n',{flag:'wx'});}\n async function retainCounterexample(label,actual,expected,error){",
+      "count": 1
+    },
+    {
+      "old": "cases.push(validateCase(value,index,startCall+index));",
+      "new": "cases.push(await validateCase(value,index,startCall+index));",
+      "count": 1
+    },
+    {
+      "old": "validateBoundaries(boundaries,startCall+20);",
+      "new": "await validateBoundaries(boundaries,startCall+20);",
+      "count": 1
+    },
+    {
+      "old": "catch(error){await retainCounterexample(",
+      "new": "catch(error){if(error instanceof RecordedMismatch)throw error;await retainCounterexample(",
+      "count": 3
+    },
+    {
+      "old": " assert.deepEqual(freshJco,retained[0]);",
+      "new": " await requireExactJSON({label:'fresh-Jco-full-rotation',actual:freshJco,expected:retained[0],writeCounterexample});",
+      "count": 1
+    },
+    {
+      "old": "if(index<20)validateCase(value,index,1);else validateBoundaries(value,1);",
+      "new": "if(index<20)await validateCase(value,index,1,{stdout:actual.stdout,stderr:actual.stderr});else await validateBoundaries(value,1,{stdout:actual.stdout,stderr:actual.stderr});",
+      "count": 1
+    }
+  ],
+  "reverseExact": true,
+  "guestWorkloadBoundaryOracleBytesChanged": false
+}

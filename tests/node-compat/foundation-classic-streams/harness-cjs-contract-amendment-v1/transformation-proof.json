@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "state": "REVERSIBLE_CJS_FIXTURE_PLACEMENT_ONLY",
+  "parentIndexSha256": "5826a3dfc8d79ebbbbd139665dd06f9f493af3aa6f48302f2865611591fcff6d",
+  "beforeGuestSha256": "383eb6725ddc4d8a2ce3d35e0ae1fdc851c6cf4b2c0cdaa5e09148a26d47003c",
+  "afterGuestSha256": "03dfedacb99ebc4361ee0a3c5328ff87e8fab13ae0379cbe696993e6c8090176",
+  "cjsSha256": "384e929702f074c95bdb9d8191d93c984a8822ea7238033535a300830846f34d",
+  "patchSha256": "7942336cdbebaf0cefd2b8943f6c81b04af99be82858121267f7669bd4f178b5",
+  "edits": [
+    {
+      "old": "import { checks } from './checks.mjs';",
+      "new": "import { checks } from './checks.mjs';\nimport cjsBindings from './cjs-bindings.cjs';"
+    },
+    {
+      "old": "// These four literal calls are the selected bundler's static CJS contract.\n// No public runtime require() is installed or used after bundling.\nconst cjs = require('node:stream');\nconst cjsAlias = require('stream');\nconst cjsPromises = require('node:stream/promises');\nconst cjsPromisesAlias = require('stream/promises');",
+      "new": "// Literal require calls live in the explicit .cjs fixture module.\n// No public runtime require() is installed or used after bundling.\nconst {cjs, cjsAlias, cjsPromises, cjsPromisesAlias} = cjsBindings;"
+    }
+  ],
+  "reverseRestoresExactGuest": true,
+  "ordinaryChecksOrIdentityAssertionsChanged": false,
+  "nativeOrGuestExecuted": false
+}

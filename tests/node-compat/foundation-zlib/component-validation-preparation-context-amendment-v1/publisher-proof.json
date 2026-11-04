@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "beforePath": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-v4-rebind-amendment-v1/activate.py",
+  "beforeSha256": "de0e23d76b6d3c82ba2934437d4a471a5869802aab4dc6b08b5d7b2f764ec512",
+  "afterSha256": "6a16098b7f0f06bec3c5aa3cfe8f41b2c2d10c69fd2bfdefb9cd2cb9e5332996",
+  "edits": [
+    {
+      "old": "OUTPUT=HERE.parent/'component-validation-activated-v4'",
+      "new": "ORIGINAL_BOOTSTRAP=Path('/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/native-integration-candidate-v4')\nOUTPUT=HERE.parent/'component-validation-activated-v5'",
+      "count": 1
+    },
+    {
+      "old": " boot_rows=indexed(bootstrap,bootstrap_sha)",
+      "new": " boot_rows=indexed(bootstrap,bootstrap_sha)\n original_boot_rows=indexed(ORIGINAL_BOOTSTRAP,bootstrap_sha);assert original_boot_rows==boot_rows,'Original and staged indexed bootstrap bytes must agree'",
+      "count": 1
+    },
+    {
+      "old": "  for row in json.loads(regular(root/'input-freeze.json'))['inputs']:add(root/row['path'],row['sha256'],row['bytes'])",
+      "new": "  preparation_root=ORIGINAL_BOOTSTRAP if root==bootstrap else root\n  if root==bootstrap:\n   add(ORIGINAL_BOOTSTRAP/'index.json',bootstrap_sha)\n   for row in original_boot_rows:add(ORIGINAL_BOOTSTRAP/row['path'],row['sha256'],row['bytes'])\n  for row in json.loads(regular(preparation_root/'input-freeze.json'))['inputs']:add(preparation_root/row['path'],row['sha256'],row['bytes'])",
+      "count": 1
+    },
+    {
+      "old": "'mandatoryV4BootstrapRebindIndexSha256':own_sha,",
+      "new": "'mandatoryV4BootstrapRebindIndexSha256':'cd45865813e06085dcd86065bf816dd18b8203d127df879b1b1e2ca876662a45','mandatoryPreparationContextAmendmentIndexSha256':own_sha,'bootstrapPreparationRoot':str(ORIGINAL_BOOTSTRAP),",
+      "count": 1
+    }
+  ],
+  "reverseExact": true,
+  "guestOrDriverOrCorpusOrNativeMetadataChanged": false
+}

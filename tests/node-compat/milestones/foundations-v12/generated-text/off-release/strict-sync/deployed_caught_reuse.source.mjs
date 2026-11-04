@@ -1,0 +1,1 @@
+let calls=0;export function run(){let seen=0,caught=false;const t=new EventTarget();t.addEventListener('test',()=>{seen++;try{throw undefined}catch(error){caught=error===undefined}});t.dispatchEvent(new Event('test'));return JSON.stringify({calls:++calls,seen,caught})}

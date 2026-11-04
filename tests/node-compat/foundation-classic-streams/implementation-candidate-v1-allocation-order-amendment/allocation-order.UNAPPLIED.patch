@@ -1,0 +1,13 @@
+--- a/builtins/node-compat/register.cpp
++++ b/builtins/node-compat/register.cpp
+@@ -166,8 +166,9 @@
+   // CONTENT realm is already entered by install(). Native prerequisite globals
+   // and the retained factory records precede this call; no module-loader getter.
+   JS::RootedObject argument(cx, JS_NewPlainObject(cx));
++  if (!argument) return false;
+   JS::RootedObject next_tick(cx, core::EventLoop::create_internal_next_tick(cx));
+-  if (!argument || !next_tick) return false;
++  if (!next_tick) return false;
+   JS::RootedValue tick_value(cx, JS::ObjectValue(*next_tick));
+   if (!JS_DefineProperty(cx, argument, "Buffer", buffer_constructor, 0) ||
+       !JS_DefineProperty(cx, argument, "events", events_module, 0) ||

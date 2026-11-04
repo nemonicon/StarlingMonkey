@@ -1,0 +1,277 @@
+{
+  "schemaVersion": 1,
+  "state": "INDEPENDENT_FINITE_PINNED_LATE_READ_CLOSURE_REVIEW_PASSED_V1",
+  "reviewerAgents": [
+    "/root/cost_component_results_review",
+    "/root/cost_component_results_review/late_read_closure_audit"
+  ],
+  "requiredReadRows": 69,
+  "distinctRequiredReadCallers": 11,
+  "callerReadCounts": {
+    "snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/runners/events.mjs": 6,
+    "snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/runners/assert.mjs": 4,
+    "snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/runners/querystring.mjs": 4,
+    "snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/runners/util.mjs": 7,
+    "snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/common/runners/allocator.mjs": 5,
+    "snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/off/runners/stream-web.mjs": 31,
+    "snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/off/runners/sync.mjs": 2,
+    "snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/off/runners/runtime.mjs": 3,
+    "snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/off/runners/late.mjs": 2,
+    "snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/off/runners/callbacks.mjs": 2,
+    "snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/focused/run-callback-return.mjs": 3
+  },
+  "newSourceDataEdges": 63,
+  "requiredReadsWithNewEdges": 63,
+  "requiredReadsCoveredByExistingEdges": 6,
+  "all69HavePhysicalGraphEdges": true,
+  "requiredBuiltinOracleKeys": {
+    "assert": 4,
+    "querystring": 3,
+    "util": 8
+  },
+  "oracleSourceKeysAreMetadataHashLookups": true,
+  "producerDataIsSeparateFinalSourceFilesRead": true,
+  "optionalCapturePaths": 11,
+  "optionalPathsPresent": 11,
+  "optionalEnoentContinuePolicyUnchanged": true,
+  "scope": "Exact finite pinned source list/generator expansions and metadata key comparisons; no general JavaScript semantic/path parser proof. Runtime outputs and generated guest strings are not source evidence.",
+  "sourceWitnesses": [
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/runners/events.mjs",
+        "sha256": "d0b9ca4fbbfba642a53dc737d0c2514606fd13d3d5fecf1e0a12d36ae2ab8f01",
+        "bytes": 11426
+      },
+      "line": 92,
+      "text": "  sourceFiles: await Promise.all(['native-component.mjs', 'native-checks.mjs', 'native-require.cjs', 'checks.mjs', 'prototype-checks.mjs', 'run-native-component.mjs'].map(async name => ({ name, sha256: hash(await readFile(join(here, name))) }))),"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/runners/assert.mjs",
+        "sha256": "6ba19418fdcedb109507be09af4efb731078d2e6cf1bb7bf71b0a086e0411a00",
+        "bytes": 5153
+      },
+      "line": 42,
+      "text": "const sourceFiles = await Promise.all(['native-component.mjs', 'native-require.cjs', 'run-native-component.mjs', 'checks.mjs'].map(async name => ({ name, sha256: hash(await readFile(join(here, name))) })));"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/runners/querystring.mjs",
+        "sha256": "fd82426563caafd899a5d2d69d903da6dacd5824aa74dc811ed9a4d80916f745",
+        "bytes": 5267
+      },
+      "line": 42,
+      "text": "const sourceFiles = await Promise.all(['native-component.mjs', 'native-require.cjs', 'run-native-component.mjs', 'checks.mjs'].map(async name => ({ name, sha256: hash(await readFile(join(here, name))) })));"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/runners/util.mjs",
+        "sha256": "c1ac172dd592750370595eea378f27584bd5a09848a2b94b451279f457cbea30",
+        "bytes": 6829
+      },
+      "line": 12,
+      "text": "const oracle=JSON.parse(await readFile(join(here,'native-node-results.json')));h.verifyOracleSources(oracle,Object.keys(oracle.sources).filter(name=>name!=='LICENSE.util'));assert.equal(hash(await readFile(join(here,'component-cases.mjs'))),oracle.checksSha256);assert.equal(hash(await readFile(join(here,'prototype-scope.mjs'))),oracle.scopeSha256);"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/runners/util.mjs",
+        "sha256": "c1ac172dd592750370595eea378f27584bd5a09848a2b94b451279f457cbea30",
+        "bytes": 6829
+      },
+      "line": 39,
+      "text": "const sourceFiles=await Promise.all(['run-native-component.mjs','run-native-node.mjs','native-component.mjs','native-dynamic.mjs','native-require.cjs','component-cases.mjs','prototype-scope.mjs'].map(async name=>({name,sha256:hash(await readFile(join(here,name)))})));"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/common/runners/allocator.mjs",
+        "sha256": "c1500f39be3daa9746c4227fd7d1b41a7ca225400c990f5d57d589cd5ab7f398",
+        "bytes": 17727
+      },
+      "line": 54,
+      "text": "const inputs=['checks.mjs','component-v11.mjs','numeric-hooks-v11.mjs','static-require.cjs','run-component-v11.mjs'];"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/common/runners/allocator.mjs",
+        "sha256": "c1500f39be3daa9746c4227fd7d1b41a7ca225400c990f5d57d589cd5ab7f398",
+        "bytes": 17727
+      },
+      "line": 55,
+      "text": "const sourceFiles=[];await mkdir(join(h.output,'source'),{recursive:true});"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/common/runners/allocator.mjs",
+        "sha256": "c1500f39be3daa9746c4227fd7d1b41a7ca225400c990f5d57d589cd5ab7f398",
+        "bytes": 17727
+      },
+      "line": 56,
+      "text": "for(const name of inputs){const bytes=await readFile(join(here,name));sourceFiles.push({name,sha256:hash(bytes)});await writeFile(join(h.output,'source',name),bytes);}"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/off/runners/stream-web.mjs",
+        "sha256": "38c3ec7e21afb425202180e7a8cbd29301750544db4ad53cc5e568bcbfa39192",
+        "bytes": 7903
+      },
+      "line": 50,
+      "text": "const fixturePaths=['native-component.mjs','native-checks.mjs','native-policies.mjs','native-require.cjs','native-aliases.mjs','native-preflight.mjs','native-preflight-contract.json',"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/off/runners/stream-web.mjs",
+        "sha256": "38c3ec7e21afb425202180e7a8cbd29301750544db4ad53cc5e568bcbfa39192",
+        "bytes": 7903
+      },
+      "line": 51,
+      "text": "  'native-harness.mjs','run-native-component-v11.mjs','native-top-level-encoding.mjs',"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/off/runners/stream-web.mjs",
+        "sha256": "38c3ec7e21afb425202180e7a8cbd29301750544db4ad53cc5e568bcbfa39192",
+        "bytes": 7903
+      },
+      "line": 52,
+      "text": "  ...['compressionstream','decompressionstream'].flatMap(ctor=>['call','construct'].map(action=>'native-top-level-'+ctor+'-'+action+'.mjs')),"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/off/runners/stream-web.mjs",
+        "sha256": "38c3ec7e21afb425202180e7a8cbd29301750544db4ad53cc5e568bcbfa39192",
+        "bytes": 7903
+      },
+      "line": 53,
+      "text": "  ...['canonical','bare'].map(alias=>'native-top-level-unknown-export-'+alias+'.mjs')];"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/off/runners/stream-web.mjs",
+        "sha256": "38c3ec7e21afb425202180e7a8cbd29301750544db4ad53cc5e568bcbfa39192",
+        "bytes": 7903
+      },
+      "line": 54,
+      "text": "const sources=[...fixturePaths,...['codec-cases.mjs','codec-node-results.json','guard-cases.mjs','byob-node-results.json','typed-view-cases.mjs','typed-view-node-results.json',"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/off/runners/stream-web.mjs",
+        "sha256": "38c3ec7e21afb425202180e7a8cbd29301750544db4ad53cc5e568bcbfa39192",
+        "bytes": 7903
+      },
+      "line": 55,
+      "text": "  'controller-cases.mjs','controller-node-results.json'].map(path=>'../candidate/'+path),"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/off/runners/stream-web.mjs",
+        "sha256": "38c3ec7e21afb425202180e7a8cbd29301750544db4ad53cc5e568bcbfa39192",
+        "bytes": 7903
+      },
+      "line": 56,
+      "text": "  '../iteration/cases.mjs','../iteration/node-results.json','../iteration/intrinsics.mjs','../dataview/cases.mjs','../dataview/node-results.json','../dataview/policy.mjs','../profile.wit'];"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/focused/run-callback-return.mjs",
+        "sha256": "5d11afd5fa94e3039085bc1e6166086a2fad7f75432b9f7539e07d62dbc849e1",
+        "bytes": 2920
+      },
+      "line": 11,
+      "text": "for(const name of ['callback-return-cases.mjs','callback-return-component.mjs','run-callback-return.mjs']){"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/focused/run-callback-return.mjs",
+        "sha256": "5d11afd5fa94e3039085bc1e6166086a2fad7f75432b9f7539e07d62dbc849e1",
+        "bytes": 2920
+      },
+      "line": 12,
+      "text": " const bytes=await readFile(join(h.here,name)),saved=join(h.output,'observation-source',name);await mkdir(join(h.output,'observation-source'),{recursive:true});await writeFile(saved,bytes);sourceFiles.push({name,sha256:hash(bytes),saved});"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/helpers/native-scalar-harness.mjs",
+        "sha256": "3bb0c8f5a6074a950cef35737a921698eb2f38b7d910d7a058d8e7ed9eaeb4fa",
+        "bytes": 10535
+      },
+      "line": 118,
+      "text": "  function verifyOracleSources(oracle, requiredNames) {"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/helpers/native-scalar-harness.mjs",
+        "sha256": "3bb0c8f5a6074a950cef35737a921698eb2f38b7d910d7a058d8e7ed9eaeb4fa",
+        "bytes": 10535
+      },
+      "line": 119,
+      "text": "    evidence.registrarOracleAncestry = verifyClassicRegistrarOracle({kind,oracle,requiredNames,registrar,metadata,proof:registrarProof});"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/helpers/native-scalar-harness.mjs",
+        "sha256": "3bb0c8f5a6074a950cef35737a921698eb2f38b7d910d7a058d8e7ed9eaeb4fa",
+        "bytes": 10535
+      },
+      "line": 120,
+      "text": "    for (const name of requiredNames) {"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/helpers/native-scalar-harness.mjs",
+        "sha256": "3bb0c8f5a6074a950cef35737a921698eb2f38b7d910d7a058d8e7ed9eaeb4fa",
+        "bytes": 10535
+      },
+      "line": 121,
+      "text": "      const expected = oracle.sources[name]; assert(expected, 'Missing source oracle '+name);"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/helpers/native-scalar-harness.mjs",
+        "sha256": "3bb0c8f5a6074a950cef35737a921698eb2f38b7d910d7a058d8e7ed9eaeb4fa",
+        "bytes": 10535
+      },
+      "line": 122,
+      "text": "      assert.equal(metadata.sourceManifest.find(item => item.path === 'builtins/node-compat/'+name)?.sha256, expected, name+' must match native engine inputs');"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/release/helpers/native-scalar-harness.mjs",
+        "sha256": "3bb0c8f5a6074a950cef35737a921698eb2f38b7d910d7a058d8e7ed9eaeb4fa",
+        "bytes": 10535
+      },
+      "line": 123,
+      "text": "    }"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/focused/harness.mjs",
+        "sha256": "7382bd8bca8268b86e29642a19ecca50e22e1fad6f9f1dec55d89ae8c6c0f855",
+        "bytes": 7139
+      },
+      "line": 21,
+      "text": " for(const name of ['public-cases.mjs','run-node.mjs','node-results.json','component.mjs','require.cjs','profile.wit','preflight.mjs','harness.mjs','run-component.mjs','gc-component.mjs','run-gc.mjs']){"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/focused/harness.mjs",
+        "sha256": "7382bd8bca8268b86e29642a19ecca50e22e1fad6f9f1dec55d89ae8c6c0f855",
+        "bytes": 7139
+      },
+      "line": 22,
+      "text": "  const original=join(here,name);let bytes;try{bytes=await readFile(original);}catch(error){if(error.code==='ENOENT')continue;throw error;}"
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/release-gates-candidate-v1/snapshot/tests/node-compat/foundation-classic-streams/production-trace-regression-activated-v1/capability/focused/harness.mjs",
+        "sha256": "7382bd8bca8268b86e29642a19ecca50e22e1fad6f9f1dec55d89ae8c6c0f855",
+        "bytes": 7139
+      },
+      "line": 23,
+      "text": "  const saved=join(output,'source',name);await mkdir(dirname(saved),{recursive:true});await writeFile(saved,bytes);sourceFiles.push({path:original,sha256:hash(bytes),saved});"
+    }
+  ],
+  "ownerParserNodeHelperPreflightRuntimeInvoked": false,
+  "operationalAdmission": false,
+  "timingAllowed": false
+}

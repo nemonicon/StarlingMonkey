@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_ONLY_PROPOSAL_NO_CLASSIC_MODULE_INSTALLED",
+  "nodeCompatibilityRelease": "v22.14.0",
+  "selectedWasiInterfaces": [],
+  "dependencies": [
+    {
+      "id": "private-next-tick",
+      "neededBy": ["Readable emission/resume/end", "Writable callbacks/drain/finish", "construct/destroy", "from/iterator", "pipeline/finished/duplexify"],
+      "source": ["readable-stream/lib/internal/streams/{readable,writable,destroy,from,pipeline,end-of-stream,duplexify}.js", "runtime/event_loop.cpp::EventLoop::create_internal_next_tick", "runtime/node_tick_queue.cpp::InternalTickQueue::{enqueue,checkpoint,drain_ticks}"],
+      "currentStatus": "Applied production source; no published diagnostic engine/runtime acceptance. Latest accepted v11 has no tick queue.",
+      "blocker": true,
+      "requiredGate": "Complete existing private Release/Release-GC diagnostic protocol, including ESM/task/INIT/subsequent-classic origins, queue-only roots, limits, fatal boundary/discard and postbind quiescence. Reset remains OPEN; no ALS follows.",
+      "proposal": "Capture the existing private native callable in a factory argument. Rewrite only internal process/ demand to nextTick; replace stdio sentinel comparisons by explicit no-host-stdio policy, without a public process object."
+    },
+    {
+      "id": "native-buffer",
+      "neededBy": ["BufferList.concat/_getBuffer", "byte push/write conversion", "_uint8ArrayToBuffer", "Readable.from(Buffer) special case"],
+      "directMethods": ["alloc", "allocUnsafe", "from", "isEncoding", "toString", "slice"],
+      "otherDemand": ["instanceof Buffer", "inherited Uint8Array byteLength/length/offset/backing", "captured TypedArray.prototype.set"],
+      "currentStatus": "Accepted v11 bounded implementation; 16MiB max Buffer, UTF8/hex, 1Mi source code units, fresh zeroed exact backing for allocUnsafe.",
+      "blocker": false,
+      "requiredGate": "Run actual factory against installed Buffer through multi-chunk reads/cork/encoding/from and identity vectors; native consumer component must not bundle npm buffer.",
+      "deviations": ["No pooling/uninitialized memory", "shared/resizable/detached/exotic source policies inherited", "unsupported Buffer.copy/concat/write/numeric methods do not become supported, and are not direct reachable core demands"],
+      "proposal": "Reuse captured installed constructor; do not expand the Buffer API just to match an unused package adapter. BufferList's explicit set loops are candidates for later measured native copy work, not an immediate rewrite."
+    },
+    {
+      "id": "events",
+      "neededBy": ["Stream base EE.call(this,options)", "all event state", "captureRejectionSymbol", "EE.listenerCount", "addAbortListener"],
+      "currentStatus": "Accepted v11 installed callable EventEmitter/protected abort-listener contracts.",
+      "blocker": false,
+      "requiredGate": "Shared constructor/prototype/listener identities, inherited listeners and reentrant removal, captureRejections and protected abort cleanup in the actual classic factory.",
+      "deviations": ["Node then-getter observation counterexample remains: Node1/1/0 versus native0/0/0", "Symbol.dispose registry identity differs; use the same actual captured dispose symbol across producer and cleanup, not a fresh fallback symbol"],
+      "proposal": "Inject the installed EventEmitter record directly. Do not apply Jco callableEmitter Proxy/prototype mutations, which adapt an unenv ES class rather than this already callable emitter."
+    },
+    {
+      "id": "string-decoder",
+      "neededBy": ["ReadableState(options.encoding)", "Readable.setEncoding", "incomplete UTF8 preservation"],
+      "currentStatus": "Accepted optional native-bulk UTF8/hex StringDecoder with bounded7/4 state contract.",
+      "blocker": false,
+      "requiredGate": "Actual dependency selection; split bytes/end/setEncoding plus public state/brand and failed unsupported encoding behavior.",
+      "deviations": ["Other recognized encodings explicitly unsupported", "No Node pool/backing parity or general detached internal state behavior"],
+      "proposal": "Require NODE_COMPAT_STRING_DECODER if byte text modes are admitted; no npm duplicate string_decoder/ and no automatic support for Buffer.isEncoding('base64')."
+    },
+    {
+      "id": "local-node22-state-machine-delta",
+      "neededBy": ["five constructors", "callback/promise lifecycle", "typed views", "duplexPair", "asyncDispose", "finite reflection"],
+      "currentStatus": "readable-stream4.7.0 is a Node18.19-derived MIT guest JS core; Jco-std0.10 adds Node24.20-derived changes.",
+      "blocker": true,
+      "requiredGate": "Review exact Node22 source changes instead of copying the Node24 layer wholesale. Node-host comparison shows DataView write rejection and16KiB default versus Node22 success and64KiB. Reflection shows extra asIndexedPairs, missing duplexPair/_isArrayBufferView and selected own-property differences.",
+      "proposal": "Vendor/license only the24-file reachable lib/stream.js graph with explicit dependency arguments; freeze primordials once in the strict content-realm factory. Preserve public constructor subclassing and the Stream/EventEmitter graph."
+    },
+    {
+      "id": "web-bridges",
+      "neededBy": ["Readable/Writable/Duplex.fromWeb/toWeb", "Web pipeline stages", "Web predicates/finished/addAbortSignal"],
+      "currentStatus": "Accepted bounded m0.9 stream/web exists; classic bridge is not installed. Core lazyWebStreams returns an empty object and cannot supply bridge functions.",
+      "blocker": true,
+      "requiredGate": "Independent reader/writer locking, cancel/abort/error/close/transfer, desired-size/HWM and options oracles; predicates/finished must not acquire locks just to inspect state.",
+      "deviations": ["m0.9 WritableStreamDefaultController.signal unavailable", "m0.9 min>1/proxy/shared/resizable policies remain explicit", "Compression bindings deferred; no zlib inference"],
+      "proposal": "First classic milestone explicitly refuses these finite operations. Implement bridge as a later capability-free adapter over real classic and selected native Web streams, not substitution of Web constructors for classic ones."
+    },
+    {
+      "id": "consumers-text-json",
+      "neededBy": ["stream/consumers.text", "stream/consumers.json"],
+      "currentStatus": "Existing isolated metadata-v2 text/json facade passed a v7 real component; it is not installed/admitted and has not been replayed against current tick-enabled source.",
+      "blocker": false,
+      "requiredGate": "Reuse frozen18Node/12policy groups plus actual new classic async iterator input, m0.9 Web iterator, iterator-close/error precedence, caps and installed aliases/CJS/top-level failure.",
+      "proposal": "Reuse this small audited native TextDecoder facade with captured JSON.parse and per-call decoder state; consumers can advance independently on plain iterables."
+    },
+    {
+      "id": "consumers-blob-arraybuffer-buffer",
+      "neededBy": ["stream/consumers.blob", "stream/consumers.arrayBuffer", "stream/consumers.buffer", "Duplex.from(Blob)"],
+      "currentStatus": "Not installed. Four-file native Blob/File ownership fix has SDK syntax-only evidence and remains unapplied/unlinked; NodeBuffer Blob/File exports still explicitly refuse call/new.",
+      "blocker": true,
+      "requiredGate": "Review Blob integration packet: ownership/finalization/GC-pressure, mutable part timing, MIME/endings/conversion, caps, File clock policy, native stream task lifetime and ordinary fixed-source new-engine corpus.",
+      "proposal": "Keep all three finite exports import-only with identifiable call/new refusal until exact ownership/semantic gate; do not use Jco's early-copy collectParts, which has recorded mutable-part mismatch."
+    },
+    {
+      "id": "async-context-and-reset",
+      "neededBy": ["future ALS propagation", "request-associated cancellation/reuse", "component/Engine reset"],
+      "currentStatus": "Existing resource-model-v3 is a separate private probe. Current tick entries trace callback/args but contain no captured resource cell. Reset cancellation/reentry is explicitly OPEN.",
+      "blocker": "For ALS/reset claims; not for explicitly context-free pure stream milestone",
+      "requiredGate": "Capture actual enqueue resource cell/owner and restore around callbacks using the audited hooks; never wrap then. Complete actual AsyncTask cancel/reset protocol before reset claims.",
+      "proposal": "Do not advertise node:async_hooks, cross-realm tick callbacks, host request ownership or successful Engine reset from pure retained-instance tests."
+    },
+    {
+      "id": "external-resource-adapters",
+      "neededBy": ["future fs/HTTP/socket/timer/stdio streams"],
+      "currentStatus": "Outside pure classic-stream milestone.",
+      "blocker": "For corresponding resource APIs only",
+      "requiredGate": "Select exact standard WASI0.2.10 interface/type closure and host/resource lifetimes for each adapter; no extra imports for pure streams.",
+      "proposal": "No implicit process.std* or environment; no fake OS/platform/process facts. Standard sockets do not provide TLS. No custom host service or Wasmtime/wasmCloud change."
+    }
+  ],
+  "importantNonImplications": [
+    "A visible inherited JavaScript method is not supported merely because the package bundles.",
+    "Successful Node-host tests using Node dependencies are oracle evidence, not guest adapter proof.",
+    "HighWaterMark is a backpressure threshold, not a hard memory limit; proposed queue/byte/work bounds need separate versioned validation.",
+    "Source and syntax acceptance of private ticks are not runtime scheduler acceptance.",
+    "No new node:process/global process or host capability is proposed."
+  ]
+}

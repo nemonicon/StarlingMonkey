@@ -1,0 +1,32 @@
+--- accepted-v12/copy-loop
++++ private-pending/PrivateRoot.copy
+@@ -1,8 +1,21 @@
+-    for row in ordered:
+-        source, target = Path(row['source']), STAGE / row['destination']
+-        check(source, row['sha256'], row['bytes'])
+-        target.parent.mkdir(parents=True, exist_ok=True)
+-        shutil.copy2(source, target, follow_symlinks=False)
+-        check(target, row['sha256'], row['bytes'])
+-        copied.append({'path': row['destination'], 'sha256': row['sha256'], 'bytes': row['bytes'],
+-                       'original': row['source'], 'role': row['role']})
++    def copy(self,row,after_copy=None):
++        check_source(row);parts=relative(row['destination']);directory=self.directory(parts[:-1]);source=None;target=None
++        try:
++            source=open_absolute(row['source'])
++            before=os.fstat(source);require(before.st_size==row['bytes'],'Source size drift before copy')
++            target=os.open(parts[-1],os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600,dir_fd=directory);h=hashlib.sha256()
++            while True:
++                data=os.read(source,1024*1024)
++                if not data:break
++                h.update(data);view=memoryview(data)
++                while view:
++                    count=os.write(target,view);require(count>0,'Short archive copy');view=view[count:]
++            os.fsync(target);require(identity(before)==identity(os.fstat(source))and h.hexdigest()==row['sha256'],'Source changed during copy')
++            require(os.fstat(target).st_nlink==1,'Owned copy must not be hardlinked')
++        finally:
++            if source is not None:os.close(source)
++            os.close(directory)
++            if target is not None:os.close(target)
++        if after_copy:after_copy()
++        check_source(row);self.check(row)
++        self.written[row['destination']]={'path':row['destination'],'sha256':row['sha256'],'bytes':row['bytes']}

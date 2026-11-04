@@ -1,4 +1,7 @@
 #include "form-data-encoder.h"
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+#include "node-compat-entropy.h"
+#endif
 #include "extension-api.h"
 #include "form-data.h"
 
@@ -652,13 +655,20 @@ JSObject *MultipartFormData::create(JSContext *cx, HandleObject form_data) {
   if (!self) {
     return nullptr;
   }
+  // Policy denial and allocation/host failures can leave this wrapper for GC.
+  // Its finalizer must see a valid null private slot until ownership transfers.
+  JS::SetReservedSlot(self, std::to_underlying(Slots::Inner), JS::PrivateValue(nullptr));
 
   if (!FormData::is_instance(form_data)) {
     return nullptr;
   }
 
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+  if (!builtins::node_compat::entropy::require(cx, "FormData multipart boundary")) return nullptr;
+#endif
   auto res = host_api::Random::get_bytes(12);
-  if (res.to_err()) {
+  if (const auto *err = res.to_err()) {
+    HANDLE_ERROR(cx, *err);
     return nullptr;
   }
 
@@ -678,16 +688,29 @@ JSObject *MultipartFormData::create(JSContext *cx, HandleObject form_data) {
   // WebKit: ----WebKitFormBoundaryhpShnP1JqrBTVTnC
   // Gecko:  ----geckoformboundary8c79e61efa53dc5d441481912ad86113
   auto bytes = std::move(res.unwrap());
+  if (bytes.size() != 12 || !bytes.begin()) {
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+    if (bytes.begin()) builtins::node_compat::entropy::clear(bytes.begin(), bytes.size());
+    builtins::node_compat::entropy::invalid_result(cx, "FormData multipart boundary");
+#else
+    JS_ReportErrorASCII(cx, "FormData multipart boundary: invalid host entropy result");
+#endif
+    return nullptr;
+  }
   auto bytes_str = std::string_view((char *)(bytes.ptr.get()), bytes.size());
 
   const char base64EncodeTableContentTypeSafe[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                       "abcdefghijklmnopqrstuvwxyz"
                       "0123456789AB";
   auto base64_str = base64::forgivingBase64Encode(bytes_str, base64EncodeTableContentTypeSafe);
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+  builtins::node_compat::entropy::clear(bytes.begin(), bytes.size());
+#endif
 
   auto boundary = fmt::format("--StarlingMonkeyFormBoundary{}", base64_str);
   auto impl = js::MakeUnique<MultipartFormDataImpl>(boundary);
   if (!impl) {
+    JS_ReportOutOfMemory(cx);
     return nullptr;
   }
 

@@ -1,0 +1,31 @@
+package starling:import-abi@0.1.0;
+interface identity {
+  record payload { unsigned: u32, signed: s32, float32: f32, float64: f64, large: u64, negative: s64 }
+  echo-u32: func(value: u32) -> u32;
+  constant-u32: func() -> u32;
+  echo-s32: func(value: s32) -> s32;
+  echo-f32: func(value: f32) -> f32;
+  echo-f64: func(value: f64) -> f64;
+  echo-u64: func(value: u64) -> u64;
+  echo-s64: func(value: s64) -> s64;
+  echo-list: func(value: list<u32>) -> list<u32>;
+  echo-payload: func(value: payload) -> payload;
+  echo-result: func(ok: bool, value: u32) -> result<u32, u32>;
+}
+world helper { export identity; }
+world profile {
+  import identity;
+  export direct-u32: func(value: u32) -> u32;
+  export constant-high: func() -> u32;
+  export constant-max: func() -> u32;
+  export computed-u32: func(value: u32) -> u32;
+  export helper-constant: func() -> u32;
+  export direct-s32: func(value: s32) -> s32;
+  export direct-f32: func(value: f32) -> f32;
+  export direct-f64: func(value: f64) -> f64;
+  export direct-u64: func(value: u64) -> u64;
+  export direct-s64: func(value: s64) -> s64;
+  export list-u32: func(value: list<u32>) -> list<u32>;
+  export record-check: func() -> string;
+  export result-u32: func(ok: bool, value: u32) -> result<u32, u32>;
+}

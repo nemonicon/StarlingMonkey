@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "state": "private-installed-harness-source-preflight-passed",
+  "records": [
+    {
+      "arm": "baseline",
+      "bundleSha256": "c9e1fb09f28c0a2c14440847aa9da27f020ec3a0d75f7bd49d04af906b0eb1ed",
+      "imports": [
+        "node:buffer",
+        "node:child_process"
+      ],
+      "moduleIds": [
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-alloc-unsafe/installed/static-require.cjs.native-profile.mjs",
+        "\u0000node-compat:installed-allocation-checks",
+        "\u0000node-compat:installed-core-contract",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-alloc-unsafe/installed/checks.mjs",
+        "\u0000node-compat:installed-buffer-list-demand",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-alloc-unsafe/demand-checks.mjs",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-alloc-unsafe/direct-candidate-m0.11/single-project-v2/numeric-hooks.mjs",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-alloc-unsafe/direct-candidate-m0.11/single-project-v2/private-component.mjs"
+      ],
+      "numericHostModelCases": [
+        {
+          "name": "isInteger",
+          "behavior": "throw-sentinel",
+          "hookCalls": 1,
+          "result": "same-sentinel"
+        },
+        {
+          "name": "isInteger",
+          "behavior": "return-false",
+          "hookCalls": 1,
+          "result": {
+            "name": "Error",
+            "code": "ERR_SM_NODE_UNSUPPORTED",
+            "operation": "fractional size",
+            "profile": "sm-node-22.14.0-m0.11"
+          }
+        },
+        {
+          "name": "isInteger",
+          "behavior": "return-true",
+          "hookCalls": 1,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isFinite",
+          "behavior": "throw-sentinel",
+          "hookCalls": 1,
+          "result": "same-sentinel"
+        },
+        {
+          "name": "isFinite",
+          "behavior": "return-false",
+          "hookCalls": 1,
+          "result": {
+            "name": "RangeError",
+            "code": "ERR_OUT_OF_RANGE",
+            "operation": null,
+            "profile": null
+          }
+        },
+        {
+          "name": "isFinite",
+          "behavior": "return-true",
+          "hookCalls": 1,
+          "result": "zeroed-length-3"
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "bundleSha256": "babb003e84c166bbba96ce389e3ce8c383158b877ed6fffcf3103d1ece39010d",
+      "imports": [
+        "node:buffer",
+        "node:child_process"
+      ],
+      "moduleIds": [
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-alloc-unsafe/installed/static-require.cjs.native-profile.mjs",
+        "\u0000node-compat:installed-allocation-checks",
+        "\u0000node-compat:installed-core-contract",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-alloc-unsafe/installed/checks.mjs",
+        "\u0000node-compat:installed-buffer-list-demand",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-alloc-unsafe/demand-checks.mjs",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-alloc-unsafe/direct-candidate-m0.11/single-project-v2/numeric-hooks.mjs",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-alloc-unsafe/direct-candidate-m0.11/single-project-v2/private-component.mjs"
+      ],
+      "numericHostModelCases": [
+        {
+          "name": "isInteger",
+          "behavior": "throw-sentinel",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isInteger",
+          "behavior": "return-false",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isInteger",
+          "behavior": "return-true",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isFinite",
+          "behavior": "throw-sentinel",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isFinite",
+          "behavior": "return-false",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        },
+        {
+          "name": "isFinite",
+          "behavior": "return-true",
+          "hookCalls": 0,
+          "result": "zeroed-length-3"
+        }
+      ]
+    }
+  ],
+  "privateComponentSha256": "cfa00218e36801f7a3a98a3b6f80507b5e61da28dc6c56096fbaa437753d654d",
+  "componentized": false,
+  "nativeEngineAdmitted": false,
+  "scope": "Native imports remain external in source-only bundle; numeric helper tested against explicit host ES module models/reference-kernel double. No fake engine metadata, Wizer/actual component or performance run."
+}

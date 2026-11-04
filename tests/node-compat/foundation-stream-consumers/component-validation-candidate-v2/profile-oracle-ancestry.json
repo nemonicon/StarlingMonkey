@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "oldNodeOnlyProfileReportSha256": "64c3b4613631b7dbc0c0ac673e58c949a703acf57858e1a385c8b61216f120af",
+  "oldProfileGroups": 12,
+  "oldRuntimeProofTransferred": false,
+  "changedGroups": {
+    "1": "Require actual registered Module Namespace, not lowered bundled factory shape",
+    "11": "Replace private factory construction with public installed finite-record/private-dependency absence"
+  },
+  "currentProfile": "sm-node-22.14.0-m0.14",
+  "oldProfiles": [
+    {
+      "name": "all Blob-dependent operations refuse call and construction",
+      "result": [
+        {
+          "name": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "operation": "arrayBuffer"
+        },
+        {
+          "name": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "operation": "arrayBuffer"
+        },
+        {
+          "name": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "operation": "blob"
+        },
+        {
+          "name": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "operation": "blob"
+        },
+        {
+          "name": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "operation": "buffer"
+        },
+        {
+          "name": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "operation": "buffer"
+        }
+      ]
+    },
+    {
+      "name": "real ESM inspection and default graph",
+      "result": {
+        "namespace": "[object Module]",
+        "keys": [
+          "arrayBuffer",
+          "blob",
+          "buffer",
+          "default",
+          "json",
+          "text"
+        ],
+        "defaultKeys": [
+          "arrayBuffer",
+          "blob",
+          "buffer",
+          "text",
+          "json"
+        ],
+        "then": "undefined"
+      }
+    },
+    {
+      "name": "supported function async shape matches pinned Node",
+      "result": {
+        "text": "AsyncFunction",
+        "json": "AsyncFunction"
+      }
+    },
+    {
+      "name": "default mutation does not rewrite named bindings or lexical json text",
+      "result": {
+        "namedRetained": true,
+        "jsonUsesLexicalText": true
+      }
+    },
+    {
+      "name": "captured decoder JSON parser and brand helpers",
+      "result": {
+        "replacementCalls": 0,
+        "output": {
+          "x": 1
+        }
+      }
+    },
+    {
+      "name": "string input cap closes ordinary iterator",
+      "result": {
+        "code": "ERR_SM_NODE_LIMIT",
+        "closed": true
+      }
+    },
+    {
+      "name": "byte input cap rejects before native decode and closes iterator",
+      "result": {
+        "code": "ERR_SM_NODE_LIMIT",
+        "closed": true
+      }
+    },
+    {
+      "name": "output cap spans mixed byte and string inputs",
+      "result": {
+        "code": "ERR_SM_NODE_LIMIT",
+        "closed": true
+      }
+    },
+    {
+      "name": "final decoder flush output cap occurs after source completion",
+      "result": {
+        "code": "ERR_SM_NODE_LIMIT",
+        "log": [
+          "complete"
+        ]
+      }
+    },
+    {
+      "name": "chunk cap also bounds empty chunks and closes exactly once",
+      "result": {
+        "nextCalls": 4097,
+        "returnCalls": 1
+      }
+    },
+    {
+      "name": "profile cap error wins over iterator-return rejection",
+      "result": {
+        "code": "ERR_SM_NODE_LIMIT",
+        "returns": 1
+      }
+    },
+    {
+      "name": "factory does not install globals or expose dependencies",
+      "result": {
+        "frozenRecord": true,
+        "globalMutation": false
+      }
+    }
+  ]
+}

@@ -5,6 +5,9 @@
 #include "event_loop.h"
 #include "../builtins/web/timers.h"
 #include "script_loader.h"
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+#include "node-compat-entropy.h"
+#endif
 
 #include "js/CompilationAndEvaluation.h"
 #include "js/Modules.h"
@@ -227,8 +230,16 @@ static void rejection_tracker(JSContext *cx, bool mutedErrors, JS::HandleObject 
 }
 
 bool math_random(JSContext *cx, unsigned argc, Value *vp) {
+#if defined(NODE_COMPAT_ENTROPY_POLICY) && defined(NODE_COMPAT_ENTROPY_RUNTIME_ONLY)
+  // Non-cryptographic Math.random remains a distinct policy. In the runtime
+  // variant it must not invoke P2 entropy while Wizer/bindExports is running.
+  if (!builtins::node_compat::entropy::require(cx, "Math.random")) return false;
+#endif
   auto res = host_api::Random::get_u32();
-  MOZ_ASSERT(!res.is_err());
+  if (const auto *err = res.to_err()) {
+    HANDLE_ERROR(cx, *err);
+    return false;
+  }
   double newvalue = static_cast<double>(res.unwrap()) / std::pow(2.0, 32.0);
 
   JS::CallArgs args = CallArgsFromVp(argc, vp);
@@ -293,10 +304,16 @@ bool create_initializer_global(Engine *engine) {
   JSAutoRealm ar(cx, global);
 
   if (!JS_DefineFunction(cx, global, "defineBuiltinModule", ::define_builtin_module, 2, 0) ||
-      !JS_DefineProperty(cx, global, "contentGlobal", ENGINE->global(), JSPROP_READONLY) ||
-      !JS_DefineFunction(cx, global, "print", content_debugger::dbg_print, 1, 0)) {
+      !JS_DefineProperty(cx, global, "contentGlobal", ENGINE->global(), JSPROP_READONLY)) {
     return false;
   }
+#ifdef ENABLE_JS_DEBUGGER
+  // The disabled debugger's dbg_print stub returns false without an exception.
+  // Keep this optional diagnostic absent when its implementation is disabled.
+  if (!JS_DefineFunction(cx, global, "print", content_debugger::dbg_print, 1, 0)) {
+    return false;
+  }
+#endif
 
   INIT_SCRIPT_GLOBAL.init(cx, global);
   return true;
@@ -438,6 +455,9 @@ Engine::Engine(std::unique_ptr<EngineConfig> config) {
   MOZ_ASSERT(!ENGINE);
   ENGINE = this;
   config_ = std::move(config);
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+  builtins::node_compat::entropy::begin_engine(config_->pre_initialize);
+#endif
 
   TRACE("StarlingMonkey engine initializing");
 
@@ -525,6 +545,17 @@ const mozilla::Maybe<std::string> &Engine::init_location() const {
 
 void Engine::finish_pre_initialization() {
   MOZ_ASSERT(state_ == EngineState::ScriptPreInitializing);
+#ifdef NODE_COMPAT_INTERNAL_TICKS
+  // EARLY boundary only: embedding must also check AFTER bindExports.
+  if (!core::EventLoop::require_internal_ticks_quiescent(cx()))
+    abort("finishing pre-initialization with pending internal ticks");
+#endif
+#ifdef NODE_COMPAT_STRICT_INITIALIZATION
+  // Initializer-only embeddings may have no content-script eval checkpoint.
+  if (!core::EventLoop::take_pending_event_exception(cx())) {
+    abort("finishing pre-initialization with an uncaught event exception");
+  }
+#endif
   js::ResetMathRandomSeed(ENGINE->cx());
   state_ = EngineState::Initialized;
 }
@@ -580,7 +611,13 @@ bool Engine::run_initialization_script() {
     return false;
   }
   RootedValue result(cx);
-  return JS_ExecuteScript(cx, script, &result);
+  if (!JS_ExecuteScript(cx, script, &result)) return false;
+#ifdef NODE_COMPAT_INTERNAL_TICKS
+  // Actual initializer is a classic script in INIT_SCRIPT_GLOBAL.
+  return core::EventLoop::run_internal_tick_checkpoint(cx, core::TickCheckpointOrigin::InitializerScript);
+#else
+  return true;
+#endif
 }
 
 HandleObject Engine::init_script_global() { return INIT_SCRIPT_GLOBAL; }
@@ -597,7 +634,18 @@ bool Engine::eval_toplevel(JS::SourceText<mozilla::Utf8Unit> &source, std::strin
   }
 
   SCRIPT_VALUE = ns;
+#ifdef NODE_COMPAT_INTERNAL_TICKS
+  // Classify using actual configuration; preserve Engine's public no-arg ABI.
+  if (!core::EventLoop::run_event_loop(this, 0, config_->module_mode
+          ? core::TickCheckpointOrigin::ModuleEvaluation
+          : core::TickCheckpointOrigin::ClassicEvaluation)) return false;
+#elif defined(NODE_COMPAT_STRICT_INITIALIZATION)
+  if (!this->run_event_loop()) {
+    return false;
+  }
+#else
   this->run_event_loop();
+#endif
 
   // TLA rejections during pre-initialization are treated as top-level exceptions.
   // TLA may remain unresolved, in which case it will continue tasks at runtime.
@@ -619,11 +667,17 @@ bool Engine::eval_toplevel(JS::SourceText<mozilla::Utf8Unit> &source, std::strin
     return false;
   }
 
-  // Report any promise rejections that weren't handled before snapshotting.
-  // TODO: decide whether we should abort in this case, instead of just
-  // reporting.
+  // Without the opt-in Node profile, retain the existing report-only policy.
+  // The profile checks after the final pre-snapshot cleanup checkpoint below,
+  // allowing a later initialization job or cleanup to attach a handler first.
   if (JS::SetSize(cx(), unhandledRejectedPromises) > 0) {
+#ifdef NODE_COMPAT_STRICT_INITIALIZATION
+    if (state() != EngineState::ScriptPreInitializing) {
+      report_unhandled_promise_rejections();
+    }
+#else
     report_unhandled_promise_rejections();
+#endif
   }
 
   // TODO(performance): check if it makes sense to increase the empty chunk
@@ -658,6 +712,20 @@ bool Engine::eval_toplevel(JS::SourceText<mozilla::Utf8Unit> &source, std::strin
     if (tla_rejected()) {
       return false;
     }
+
+#ifdef NODE_COMPAT_STRICT_INITIALIZATION
+    if (!core::EventLoop::take_pending_event_exception(cx())) {
+      return false;
+    }
+    // Do not reject at the Promise rejection tracker: a subsequent job in the
+    // same initialization turn can still handle the rejection. At this point
+    // jobs and GC-triggered finalizer jobs have drained. Existing abort()
+    // reports the original tracked reasons as well as this policy failure.
+    if (JS::SetSize(cx(), unhandledRejectedPromises) > 0) {
+      JS_ReportErrorASCII(cx(), "ERR_SM_NODE_INITIALIZATION_REJECTION: unhandled promise rejection before snapshot");
+      return false;
+    }
+#endif
   }
 
   // Ignore the first GC, but then print all others, because ideally GCs
@@ -729,6 +797,13 @@ void Engine::clear_unhandled_promise_rejections() {
   JS::SetClear(CONTEXT, unhandledRejectedPromises);
 }
 void Engine::reset() {
+#ifdef NODE_COMPAT_INTERNAL_TICKS
+  // Establish idle state BEFORE changing existing reset-owned state.
+  if (!core::EventLoop::require_internal_tick_reset_allowed(cx())) {
+    abort("resetting an active internal tick checkpoint");
+    return;
+  }
+#endif
   clear_unhandled_promise_rejections();
   core::EventLoop::reset(this);
   builtins::web::timers::reset();

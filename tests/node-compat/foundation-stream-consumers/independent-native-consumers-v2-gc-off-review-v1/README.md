@@ -1,0 +1,11 @@
+This is an **actual GC-OFF native build/freeze PASS**, with no guest execution. Root9b7267c5 records build60577, freeze57664 and read-only verification26486, all exit0. Engineb378dea3/10,003,832B, metadata675131c9 and freeze0268e073 match actual bytes. Root terminal events remain authenticated saved records, not events directly witnessed by this reader.
+
+All1,164 GC frozen copies and1,162 original-entry references were checked strictly. All1,164 normal frozen copies were also rehashed unchanged. The old normal mutable cache and database were not reopened or required to retain normal flags. Disabled-consumer work uses a separate.s0 project; this review addresses the completed GC.s1 evidence.
+
+The355-source/three-external/767-tool frame is unchanged. Its original3,420-row preparation proof and4,650-file OpenSSL source audit are retained through normal peerb80489f4/result e58bad5c and identical source/audit/Rust/archive descriptors. The OpenSSL audit differs only in its before-report pathname; frozen actual GC dependency witnesses and libcrypto are checked. Broad historical source audits were not rerun.
+
+The complete GC compile database and saved Ninja inventory agree:62 configured native commands, strict4/private6 and one separate no-LTO embedding command. GC_STRESS is exact on the six private Node commands; consumer and zlib are ON, entropy OFF, ordinary Release, DEBUG/OOM absent. The build completed17 incremental steps. This does not claim62 fresh compilations or a fresh Rust rebuild.
+
+The selected archive, four headers and singleton forced include are bound. Captured compiler/cd/in-place wasm-opt output paths, no second zlib library and seven selected MOZ_Z definitions are checked from raw data. The generated install text uniquely puts native TextCodec before Node. No Ninja, nm, compiler or genuine verifier ran during this review.
+
+Pins remain null, operational admission closed and runtime backend proof false/null/null. GC-instrumented compilation does not establish GC execution, rooting, owner isolation, consumer/codec behavior, Node parity, reset/reuse, ALS or performance. No350 or293 runtime result was transferred. Final review rehashes2,511 finite file references; full old runtime trees were not enumerated.

@@ -26,6 +26,9 @@ struct EventListener : public js::RefCounted<EventListener> {
   bool capture{};
   bool once{};
   bool removed{};
+#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+  bool resist_stop_propagation{};
+#endif
 
   // Define equality: only callback, type, and capture matter.
   bool operator==(const EventListener &other) const {
@@ -60,7 +63,13 @@ public:
   static const JSFunctionSpec methods[];
   static const JSPropertySpec properties[];
 
-  enum class Slots : uint8_t { Listeners, Count };
+  enum class Slots : uint8_t {
+    Listeners,
+#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+    NodeAbortResistKey,
+#endif
+    Count
+  };
 
   static bool add_listener(JSContext *cx, HandleObject self, HandleValue type, HandleValue callback,
                            HandleValue opts);
@@ -71,8 +80,15 @@ public:
 
   static JSObject *create(JSContext *cx);
 
+#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+  static bool check_receiver(JSContext *cx, HandleValue receiver, const char *method_name);
+#endif
   static bool init(JSContext *cx, HandleObject self);
   static bool init_class(JSContext *cx, HandleObject global);
+#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
+  // NEW internal guest bridge, declared/implemented by this proposal only.
+  static JS::Symbol *node_abort_resist_key();
+#endif
   static bool constructor(JSContext *cx, unsigned argc, Value *vp);
   static void finalize(JS::GCContext *gcx, JSObject *self);
   static void trace(JSTracer *trc, JSObject *self);

@@ -1,0 +1,103 @@
+{
+  "scope": "Node22 build-host source/header/namespace validation only; no guest engine or native stream entry",
+  "nodePath": "/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+  "nodeSha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+  "mainCommand": [
+    "/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+    "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-web/integration-candidate/source/builtins/node-compat/generate-factories.mjs",
+    "--check"
+  ],
+  "main": {
+    "exitCode": 0,
+    "stdout": "PASS checked-in Node profile factories match canonical sources\nPASS optional Path factories match canonical sources\nPASS optional Events factories match canonical sources\nPASS optional Util factory/schema/exports match canonical sources\nPASS optional Querystring factory/schema/exports match canonical sources\nPASS optional StringDecoder factory/schema/exports match canonical sources\nPASS optional Assert factory/schema/export graph matches canonical sources\nPASS optional stream/web exact Node22 inventory, strict factory graph and header\n",
+    "stderr": ""
+  },
+  "existingHeaderDigestsUnchanged": {
+    "events-factories.generated.h": "7542bbd1dd708b03d0b0f7d1a8467b0057de583b7a1e39bf02e96cc4b90962da",
+    "querystring-factories.generated.h": "8bd7c70107b0ae33ae09be100e122be97584c8a02da43a07297d6aa0be42c4c9",
+    "util-factories.generated.h": "81ae4ae2e0956c9a5ff9a991be00d5a4cc267b2545e10f956e26501cd0163b58",
+    "factories.generated.h": "cc04376c304ce2c4fe5a6f17eff54256123f02bdfe88555880e1e888babfc869",
+    "assert-factories.generated.h": "c5502d92ed2621271bcc339c6aaa078b487bb4cc4c17bf8bfa239a54d5c83d27",
+    "string-decoder-factories.generated.h": "7722cd08dc9399628d9c8077f3f11b49d7c62bdea75f67d727d467b6a4a909d4",
+    "path-factories.generated.h": "6e532ae164f9bffc53424a6e784b356d0f945c630b9d6d8110f5fef80b9bbf56"
+  },
+  "negativeCases": [
+    {
+      "name": "invented-export",
+      "command": [
+        "/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/tmp/starling-node-compat/stream-web-generator-k9zvdwka/invented-export/generate-stream-web-factory.mjs",
+        "--check"
+      ],
+      "exitCode": 1,
+      "expected": "exact pinned Node22",
+      "stderr": "file:///private/tmp/starling-node-compat/stream-web-generator-k9zvdwka/invented-export/generate-stream-web-factory.mjs:17\nif([...exports].sort().join()!==Object.keys(pinnedNodeWeb).sort().join())throw Error('Not the exact pinned Node22 stream/web namespace');\n                                                                               ^\n\nError: Not the exact pinned Node22 stream/web namespace\n    at file:///private/tmp/starling-node-compat/stream-web-generator-k9zvdwka/invented-export/generate-stream-web-factory.mjs:17:80\n\nNode.js v22.14.0\n",
+      "headerUnchanged": true
+    },
+    {
+      "name": "wrong-alias",
+      "command": [
+        "/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/tmp/starling-node-compat/stream-web-generator-k9zvdwka/wrong-alias/generate-stream-web-factory.mjs",
+        "--check"
+      ],
+      "exitCode": 1,
+      "expected": "Unexpected stream/web surface",
+      "stderr": "file:///private/tmp/starling-node-compat/stream-web-generator-k9zvdwka/wrong-alias/generate-stream-web-factory.mjs:18\nif(exports.length!==18||!exports.includes('default')||manifest.modules['node:stream/web'].aliases.join()!=='stream/web')throw Error('Unexpected stream/web surface');\n                                                                                                                              ^\n\nError: Unexpected stream/web surface\n    at file:///private/tmp/starling-node-compat/stream-web-generator-k9zvdwka/wrong-alias/generate-stream-web-factory.mjs:18:127\n\nNode.js v22.14.0\n",
+      "headerUnchanged": true
+    },
+    {
+      "name": "missing-esm-declaration",
+      "command": [
+        "/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/tmp/starling-node-compat/stream-web-generator-k9zvdwka/missing-esm-declaration/generate-stream-web-factory.mjs",
+        "--check"
+      ],
+      "exitCode": 1,
+      "expected": "Finite ESM bindings differ",
+      "stderr": "file:///private/tmp/starling-node-compat/stream-web-generator-k9zvdwka/missing-esm-declaration/generate-stream-web-factory.mjs:20\nif([...declarations,'default'].sort().join()!==[...exports].sort().join())throw Error('Finite ESM bindings differ from manifest');\n                                                                                ^\n\nError: Finite ESM bindings differ from manifest\n    at file:///private/tmp/starling-node-compat/stream-web-generator-k9zvdwka/missing-esm-declaration/generate-stream-web-factory.mjs:20:81\n\nNode.js v22.14.0\n",
+      "headerUnchanged": true
+    },
+    {
+      "name": "noncallable-record",
+      "command": [
+        "/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/tmp/starling-node-compat/stream-web-generator-k9zvdwka/noncallable-record/generate-stream-web-factory.mjs",
+        "--check"
+      ],
+      "exitCode": 1,
+      "expected": "Invalid named/default identity TextEncoderStream",
+      "stderr": "file:///private/tmp/starling-node-compat/stream-web-generator-k9zvdwka/noncallable-record/generate-stream-web-factory.mjs:50\n  for(const name of exports)if(name!=='default'&&(typeof module[name]!=='function'||module[name]!==module.default[name]))throw Error('Invalid named/default identity '+name);\n                                                                                                                               ^\n\nError: Invalid named/default identity TextEncoderStream\n    at file:///private/tmp/starling-node-compat/stream-web-generator-k9zvdwka/noncallable-record/generate-stream-web-factory.mjs:50:128\n\nNode.js v22.14.0\n",
+      "headerUnchanged": true
+    },
+    {
+      "name": "changed-default-identity",
+      "command": [
+        "/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/tmp/starling-node-compat/stream-web-generator-k9zvdwka/changed-default-identity/generate-stream-web-factory.mjs",
+        "--check"
+      ],
+      "exitCode": 1,
+      "expected": "Invalid named/default identity TextEncoderStream",
+      "stderr": "file:///private/tmp/starling-node-compat/stream-web-generator-k9zvdwka/changed-default-identity/generate-stream-web-factory.mjs:50\n  for(const name of exports)if(name!=='default'&&(typeof module[name]!=='function'||module[name]!==module.default[name]))throw Error('Invalid named/default identity '+name);\n                                                                                                                               ^\n\nError: Invalid named/default identity TextEncoderStream\n    at file:///private/tmp/starling-node-compat/stream-web-generator-k9zvdwka/changed-default-identity/generate-stream-web-factory.mjs:50:128\n\nNode.js v22.14.0\n",
+      "headerUnchanged": true
+    },
+    {
+      "name": "wrong-factory-arity",
+      "command": [
+        "/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/tmp/starling-node-compat/stream-web-generator-k9zvdwka/wrong-factory-arity/generate-stream-web-factory.mjs",
+        "--check"
+      ],
+      "exitCode": 1,
+      "expected": "exactly one private native-record argument",
+      "stderr": "file:///private/tmp/starling-node-compat/stream-web-generator-k9zvdwka/wrong-factory-arity/generate-stream-web-factory.mjs:45\n  if(typeof emitted!=='function'||emitted.length!==1)throw Error('Need exactly one private native-record argument');\n                                                           ^\n\nError: Need exactly one private native-record argument\n    at file:///private/tmp/starling-node-compat/stream-web-generator-k9zvdwka/wrong-factory-arity/generate-stream-web-factory.mjs:45:60\n\nNode.js v22.14.0\n",
+      "headerUnchanged": true
+    }
+  ],
+  "versionPinRejection": {
+    "exitCode": 1,
+    "stderr": "file:///Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-web/integration-candidate/source/builtins/node-compat/generate-stream-web-factory.mjs:9\nif(process.version!=='v22.14.0')throw Error('Stream/web generation requires exact Node v22.14.0');\n                                      ^\n\nError: Stream/web generation requires exact Node v22.14.0\n    at file:///Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-web/integration-candidate/source/builtins/node-compat/generate-stream-web-factory.mjs:9:39\n    at ModuleJob.run (node:internal/modules/esm/module_job:271:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:578:26)\n    at async file:///Users/dan/dev/StarlingMonkey/[eval1]:1:62\n\nNode.js v22.14.0\n"
+  },
+  "engineBuilt": false
+}

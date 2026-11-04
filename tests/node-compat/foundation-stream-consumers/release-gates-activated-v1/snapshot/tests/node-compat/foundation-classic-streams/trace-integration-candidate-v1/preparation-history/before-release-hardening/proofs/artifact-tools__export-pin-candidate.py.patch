@@ -1,0 +1,23 @@
+--- a/tests/node-compat/foundation-classic-streams/integration-candidate-v1/artifact-tools/export-pin-candidate.py
++++ b/artifact-tools/export-pin-candidate.py
+@@ -8,9 +8,10 @@
+ def candidate(label, output=OUTPUT):
+     receipt_path, receipt, metadata, receipt_digest = verify_frozen_variant(label, output, return_receipt_digest=True)
+     rows = [{'path': row['path'], 'sha256': row['sha256'], 'bytes': row['bytes']} for row in receipt['copies']]
+-    return {'state': 'unreviewed-classic-production-freeze-pin-candidate',
++    return {'state': 'unreviewed-classic-trace-production-freeze-pin-candidate',
+         'variant': label, 'label': label, 'gcStress': metadata['gcStress'], 'entropyPolicy': metadata['entropyPolicy'],
+         'classicStreamsEnabled': metadata['classicStreamsEnabled'],
++        'sourceContractVersion': 'sm-classic-trace-source-v1', 'classicTraceSourcePolicy': metadata['classicTraceSourcePolicy'],
+         'sourceFiles': 342, 'recipeSha256': RECIPE, 'engineBytes': receipt['engineBytes'],
+         'engineSha256': receipt['engineSha256'], 'receiptSha256': receipt['receiptSha256'],
+         'cmakeCacheSha256': metadata['cmakeCacheSha256'], 'compileCommandsSha256': metadata['compileCommandsSha256'],
+@@ -32,7 +33,7 @@
+     variants = {label: None for label in LABELS}
+     for label in labels:
+         variants[label] = candidate(label)
+-    document = {'schemaVersion': 1, 'state': 'UNREVIEWED_CLASSIC_PRODUCTION_PIN_CANDIDATES_V1',
++    document = {'schemaVersion': 1, 'state': 'UNREVIEWED_CLASSIC_TRACE_PRODUCTION_PIN_CANDIDATES_V1',
+         'variants': variants, 'requiresIndependentReviewAndNewAdmissionRevision': True,
+         'notAcceptedByReviewedClassicPinSelector': True, 'consumerPinsModified': False,
+         'guestExecutedByExporter': False}

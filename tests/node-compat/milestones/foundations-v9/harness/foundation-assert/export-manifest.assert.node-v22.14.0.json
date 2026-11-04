@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "profileVersion": "sm-node-22.14.0-assert-prototype-v1",
+  "nodeVersion": "v22.14.0",
+  "status": "Isolated source proposal. NOT installed or selected by production native registration.",
+  "moduleContract": "Both modules declare exactly22 pinned Node22 ESM exports. node:assert default===ok; named strict===node:assert/strict default; strict.strict===strict; strict.ok===root.ok. Strict equal/notEqual/deepEqual/notDeepEqual alias the root strict variants. Functions on each default initially share identity with named exports; later default-property reassignment does not rewrite named ESM cells. Future selected literal CommonJS lowering may return default; runtime require and syncBuiltinESMExports are excluded.",
+  "modules": {
+    "node:assert": {
+      "aliases": ["assert"],
+      "status": "partial",
+      "exports": ["AssertionError", "CallTracker", "deepEqual", "deepStrictEqual", "default", "doesNotMatch", "doesNotReject", "doesNotThrow", "equal", "fail", "ifError", "match", "notDeepEqual", "notDeepStrictEqual", "notEqual", "notStrictEqual", "ok", "partialDeepStrictEqual", "rejects", "strict", "strictEqual", "throws"],
+      "supported": ["ok/default", "strict", "equal", "notEqual", "strictEqual", "notStrictEqual", "fail zero/one argument", "ifError", "throws ordinary constructor/predicate/RegExp", "doesNotThrow ordinary constructor/predicate/RegExp", "match", "doesNotMatch", "AssertionError ordinary fields"],
+      "deferred": ["deepEqual", "notDeepEqual", "deepStrictEqual", "notDeepStrictEqual", "partialDeepStrictEqual", "rejects", "doesNotReject", "CallTracker", "fail deprecated multiargument overload", "validation-object exception matchers", "AssertionError.details"],
+      "callablePolicy": "Deferred functions synchronously throw TypeError ERR_SM_NODE_UNSUPPORTED with operation on call and construction, including application initialization. Supported throws/doesNotThrow execute the callback before applicable matcher handling. A successful doesNotThrow returns without consulting an unused matcher.",
+      "deviations": [
+        "Auto messages use bounded opaque-object rendering, without util.inspect, custom inspectors, V8 source-file expression lookup, rich diffs, color or exact Node stack framing. Successful assertions do not render diagnostic inputs.",
+        "AssertionError preserves tested code/name/operator/generatedMessage and actual/expected identity. stackStartFn/stackStartFunction are ignored; details is explicitly deferred. Native error stack layout, custom message diff decoration and prototype inspection helpers differ.",
+        "Ordinary same-realm Error messages are rethrown by identity for ok/equality/fail/match; throws matcher failure renders its supplied message, matching the pinned reference. Cross-realm native-error detection and proxies posing as errors/regexps are not claimed.",
+        "Complex exception validation objects and Error-instance matchers are deferred. Error constructors/classes, ordinary predicates returning exactly true and native RegExp matching are supported.",
+        "RegExp matching uses captured native exec and retains lastIndex behavior; regex algorithmic complexity remains the JavaScript engine's responsibility.",
+        "Async helpers are synchronous explicit unsupported operations rather than partial Promise implementations. No async scheduling or AsyncLocalStorage behavior is claimed.",
+        "Warning delivery for deprecated fail overload and CallTracker is deferred. No process/stdio/clock/random/filesystem capability is introduced.",
+        "Support is not complete Node Assert compatibility or a prerequisite proven by readable-stream4.7: that package uses a private local assertion helper."
+      ]
+    },
+    "node:assert/strict": {
+      "aliases": ["assert/strict"],
+      "status": "partial",
+      "exports": ["AssertionError", "CallTracker", "deepEqual", "deepStrictEqual", "default", "doesNotMatch", "doesNotReject", "doesNotThrow", "equal", "fail", "ifError", "match", "notDeepEqual", "notDeepStrictEqual", "notEqual", "notStrictEqual", "ok", "partialDeepStrictEqual", "rejects", "strict", "strictEqual", "throws"],
+      "defaultIdentity": "node:assert.strict",
+      "overrides": { "equal": "node:assert.strictEqual", "notEqual": "node:assert.notStrictEqual", "deepEqual": "node:assert.deepStrictEqual", "notDeepEqual": "node:assert.notDeepStrictEqual" },
+      "callablePolicy": "Shares the root implementation, references and deferred-operation policy. The four strict aliases do not wrap or duplicate functions."
+    }
+  },
+  "requiredHostInterfaces": []
+}

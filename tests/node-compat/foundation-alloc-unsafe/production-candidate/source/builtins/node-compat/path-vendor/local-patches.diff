@@ -1,0 +1,523 @@
+--- upstream/minimatch/dist/esm/assert-valid-pattern.js
++++ builtins/node-compat/path-vendor/minimatch/assert-valid-pattern.mjs
+@@ -7,4 +7,3 @@
+         throw new TypeError('pattern is too long');
+     }
+ };
+-//# sourceMappingURL=assert-valid-pattern.js.map
+\ No newline at end of file
+--- upstream/minimatch/dist/esm/escape.js
++++ builtins/node-compat/path-vendor/minimatch/escape.mjs
+@@ -23,4 +23,3 @@
+         s.replace(/[?*()[\]]/g, '[$&]')
+         : s.replace(/[?*()[\]\\]/g, '\\$&');
+ };
+-//# sourceMappingURL=escape.js.map
+\ No newline at end of file
+--- upstream/minimatch/dist/esm/index.js
++++ builtins/node-compat/path-vendor/minimatch/index.mjs
+@@ -1,8 +1,9 @@
+-import { expand } from 'brace-expansion';
+-import { Matcher } from '@isaacs/nonrecursive-glob-match';
+-import { assertValidPattern } from './assert-valid-pattern.js';
+-import { escape } from './escape.js';
+-import { unescape } from './unescape.js';
++import { tick, limits, limit } from '../resource-budget.mjs';
++import { expand } from '../brace-expansion/index.mjs';
++import { Matcher } from '../nonrecursive-glob-match/index.mjs';
++import { assertValidPattern } from './assert-valid-pattern.mjs';
++import { escape } from './escape.mjs';
++import { unescape } from './unescape.mjs';
+ export const minimatch = (p, pattern, options = {}) => {
+     assertValidPattern(pattern);
+     // shortcut: comments match nothing.
+@@ -12,9 +13,7 @@
+     return new Minimatch(pattern, options).match(p);
+ };
+ /* c8 ignore start */
+-const defaultPlatform = (typeof process === 'object' && process ?
+-    process.env?.__MINIMATCH_TESTING_PLATFORM__ || process.platform
+-    : 'posix');
++const defaultPlatform = 'posix';
+ const path = {
+     win32: { sep: '\\' },
+     posix: { sep: '/' },
+@@ -71,7 +70,7 @@
+         // shortcut. no need to expand.
+         return [pattern];
+     }
+-    return expand(pattern, { max: options.braceExpandMax });
++    return expand(pattern, { max: options.braceExpandMax, maxLength: limits.braceOutputCodeUnits, maxDepth: limits.braceDepth, maxRewrites: limits.braceRewrites });
+ };
+ minimatch.braceExpand = braceExpand;
+ export const match = (list, pattern, options = {}) => {
+@@ -131,7 +130,7 @@
+             let body = pattern.slice(i + 1, close);
+             if (body.startsWith('\\'))
+                 body = body.slice(1);
+-            if ([...body].length !== 1 || '!^'.includes(pattern.charAt(i + 1))) {
++            if (body.length !== 1 || '!^'.includes(pattern.charAt(i + 1))) {
+                 return undefined;
+             }
+             lit += body;
+@@ -198,7 +197,7 @@
+ // true if a pattern portion that is not ** matches a path portion.
+ // An empty path portion only matches an empty pattern portion. A path
+ // portion never has a `/`, so the Matcher does not need to check it.
+-const portionMatch = (p, f) => typeof p === 'string' ? f === p : f !== '' && p.testUnchecked(f);
++const portionMatch = (p, f) => typeof p === 'string' ? f === p : f === '' ? p.legacyNullable === true : p.testUnchecked(f);
+ // Where the last portion of a row matches in a path: the start of the
+ // last portion of the path, or of the one before a trailing `/`. -1 if
+ // it matches neither.
+@@ -915,10 +914,11 @@
+                         p === '..' ||
+                         !p2 ||
+                         p2 === '.' ||
+-                        p2 === '..' ||
+-                        globParts.length >= braceExpandMax) {
++                        p2 === '..') {
+                         continue;
+                     }
++                    if (globParts.length >= braceExpandMax) limit('glob-parts');
++                    tick(parts.length);
+                     didSomething = true;
+                     // edit parts in place, and push the new one
+                     parts.splice(gs, 1);
+@@ -1244,6 +1244,7 @@
+     // does the same no matter how it got there, and it only comes back
+     // if it found no match, so a walk that gets to one stops.
+     tried) {
++        tick(file.length + bodySegments.length + 1);
+         // take the first body segment, and walk from fileIndex to its "after"
+         // value at the end
+         // If it doesn't match at that position, we increment, until we hit
+@@ -1286,9 +1287,9 @@
+                 return false;
+             tried.add(key);
+             const m = this.#matchOne(file, body, partial, fileIndex, 0, fileIndex + body.length);
+-            // if limit exceeded, no match. intentional false negative,
+-            // acceptable break in correctness for security.
+-            if (m && globStarDepth < this.maxGlobstarRecursion) {
++            // Profile budget exhaustion is explicit, never a false result.
++            if (m && globStarDepth >= this.maxGlobstarRecursion) limit('globstar-depth');
++            if (m) {
+                 // match! see if the rest match. if so, we're done!
+                 const sub = this.#matchGlobStarBodySections(file, bodySegments, fileLength, fileIndex + body.length, bodyIndex + 1, partial, globStarDepth + 1, sawTail, tried);
+                 if (sub !== false) {
+@@ -1312,6 +1313,7 @@
+     #matchOne(file, pattern, partial, fileIndex, patternIndex, 
+     // only match the file portions before this index
+     fileEnd = file.length) {
++        tick(file.length + pattern.length + 1);
+         let fi;
+         let pi;
+         let pl;
+@@ -1392,7 +1394,7 @@
+         }
+         let m = this.#matchers.get(pattern);
+         if (!m) {
+-            m = new Matcher(pattern, { nocase, noext, dot, normalize });
++            m = new Matcher(pattern, { nocase, noext, dot, normalize, legacyNode22: true });
+             this.#matchers.set(pattern, m);
+         }
+         return m;
+@@ -1492,10 +1494,9 @@
+     }
+ }
+ /* c8 ignore start */
+-export { escape } from './escape.js';
+-export { unescape } from './unescape.js';
++export { escape } from './escape.mjs';
++export { unescape } from './unescape.mjs';
+ /* c8 ignore stop */
+ minimatch.Minimatch = Minimatch;
+ minimatch.escape = escape;
+ minimatch.unescape = unescape;
+-//# sourceMappingURL=index.js.map
+\ No newline at end of file
+--- upstream/minimatch/dist/esm/unescape.js
++++ builtins/node-compat/path-vendor/minimatch/unescape.mjs
+@@ -31,4 +31,3 @@
+             .replace(/((?!\\).|^)\[([^/\\{}])\]/g, '$1$2')
+             .replace(/\\([^/{}])/g, '$1');
+ };
+-//# sourceMappingURL=unescape.js.map
+\ No newline at end of file
+--- upstream/brace-expansion/dist/esm/index.js
++++ builtins/node-compat/path-vendor/brace-expansion/index.mjs
+@@ -1,14 +1,26 @@
+-import { balanced } from 'balanced-match';
+-const escSlash = '\0SLASH' + Math.random() + '\0';
+-const escOpen = '\0OPEN' + Math.random() + '\0';
+-const escClose = '\0CLOSE' + Math.random() + '\0';
+-const escComma = '\0COMMA' + Math.random() + '\0';
+-const escPeriod = '\0PERIOD' + Math.random() + '\0';
+-const escSlashPattern = new RegExp(escSlash, 'g');
+-const escOpenPattern = new RegExp(escOpen, 'g');
+-const escClosePattern = new RegExp(escClose, 'g');
+-const escCommaPattern = new RegExp(escComma, 'g');
+-const escPeriodPattern = new RegExp(escPeriod, 'g');
++import { tick, limit } from '../resource-budget.mjs';
++import { balanced } from '../balanced-match/index.mjs';
++// Internal escape tokens need uniqueness within this one bounded pattern,
++// not entropy. Keep them deterministic and absent from the original input.
++let escSlash, escOpen, escClose, escComma, escPeriod;
++let escSlashPattern, escOpenPattern, escClosePattern, escCommaPattern, escPeriodPattern;
++function resetEscapes(str) {
++    let marker = '\0SM_NODE_PATH\0';
++    while (str.includes(marker)) {
++        tick(str.length + marker.length);
++        marker += '\0';
++    }
++    escSlash = marker + 'SLASH\0';
++    escOpen = marker + 'OPEN\0';
++    escClose = marker + 'CLOSE\0';
++    escComma = marker + 'COMMA\0';
++    escPeriod = marker + 'PERIOD\0';
++    escSlashPattern = new RegExp(escSlash, 'g');
++    escOpenPattern = new RegExp(escOpen, 'g');
++    escClosePattern = new RegExp(escClose, 'g');
++    escCommaPattern = new RegExp(escComma, 'g');
++    escPeriodPattern = new RegExp(escPeriod, 'g');
++}
+ const slashPattern = /\\\\/g;
+ const openPattern = /\\{/g;
+ const closePattern = /\\}/g;
+@@ -105,6 +117,7 @@
+     }
+ }
+ export function expand(str, options = {}) {
++    resetEscapes(str);
+     if (!str) {
+         return [];
+     }
+@@ -142,15 +155,19 @@
+     let length = 0;
+     for (let a = 0; a < acc.length; a++) {
+         for (let v = 0; v < values.length; v++) {
++            tick();
+             if (out.length >= max)
+-                return out;
++                limit('brace-alternatives');
++            const size = acc[a].length + pre.length + values[v].length;
++            if (length + size > maxLength) limit('brace-output-code-units');
++            tick(size);
+             const expansion = acc[a] + pre + values[v];
+             // Bash drops empty results at the top level. Skip them before they count
+             // against `max`, so `max` bounds the number of *kept* results.
+             if (dropEmpties && !expansion)
+                 continue;
+             if (length + expansion.length > maxLength)
+-                return out;
++                limit('brace-output-code-units');
+             out.push(expansion);
+             length += expansion.length;
+         }
+@@ -183,7 +200,9 @@
+     }
+     const pad = n.some(isPadded);
+     let length = 0;
+-    for (let i = x; test(i, y) && N.length < max; i += incr) {
++    for (let i = x; test(i, y); i += incr) {
++        tick();
++        if (N.length >= max) limit('brace-alternatives');
+         let c;
+         if (isAlphaSequence) {
+             c = String.fromCharCode(i);
+@@ -207,7 +226,8 @@
+             }
+         }
+         if (length + c.length > maxLength)
+-            break;
++            limit('brace-output-code-units');
++        tick(c.length);
+         N.push(c);
+         length += c.length;
+     }
+@@ -217,8 +237,9 @@
+     // Too deeply nested to keep following: treat the rest as literal, the same
+     // way a group that cannot expand is already handled. Truncating rather than
+     // throwing keeps `expand` total, matching `max` and `maxLength`.
++    tick(str.length + 1);
+     if (depth > maxDepth) {
+-        return [str];
++        limit('brace-depth');
+     }
+     // Consume the string's top-level brace groups left to right, threading a
+     // running set of combined prefixes (`acc`). Expanding the tail iteratively -
+@@ -258,7 +279,8 @@
+         const isOptions = m.body.indexOf(',') >= 0;
+         if (!isSequence && !isOptions) {
+             // {a},b}
+-            if (rewrites < maxRewrites && m.post.match(/,(?!,).*\}/)) {
++            if (m.post.match(/,(?!,).*\}/)) {
++                if (rewrites >= maxRewrites) limit('brace-rewrites');
+                 rewrites++;
+                 str = m.pre + '{' + m.body + escClose + m.post;
+                 isTop = true;
+@@ -312,7 +334,7 @@
+                         continue;
+                     if (values.length >= max ||
+                         valuesLength + v.length > maxLength) {
+-                        break outer;
++                        limit(values.length >= max ? 'brace-alternatives' : 'brace-output-code-units');
+                     }
+                     values.push(v);
+                     valuesLength += v.length;
+@@ -326,4 +348,3 @@
+     }
+     return acc;
+ }
+-//# sourceMappingURL=index.js.map
+\ No newline at end of file
+--- upstream/balanced-match/dist/esm/index.js
++++ builtins/node-compat/path-vendor/balanced-match/index.mjs
+@@ -51,4 +51,3 @@
+     }
+     return result;
+ };
+-//# sourceMappingURL=index.js.map
+\ No newline at end of file
+--- upstream/@isaacs/nonrecursive-glob-match/dist/esm/index.js
++++ builtins/node-compat/path-vendor/nonrecursive-glob-match/index.mjs
+@@ -1,4 +1,5 @@
+-import { parseClass } from './parse-class.js';
++import { tick, limit, limits } from '../resource-budget.mjs';
++import { parseClass } from './parse-class.mjs';
+ // the end of the pattern, or of a negated sub-pattern
+ const MATCH = { t: 'match', id: 0 };
+ const extTypes = '!?+*@';
+@@ -32,20 +33,20 @@
+     ascii[code] ||= l.re.test(c) ? 1 : 2;
+     return ascii[code] === 1;
+ };
+-const tokenize = (p, nocase, noext, form) => {
++const tokenize = (p, nocase, noext, form, unicode = true, legacyNode22 = false) => {
+     const toks = [];
+     for (let i = 0; i < p.length;) {
+-        const c = String.fromCodePoint(p.codePointAt(i));
++        const c = unicode ? String.fromCodePoint(p.codePointAt(i)) : p[i];
+         if (c === '\\') {
+             // a trailing \ is a literal \
+-            const e = p.codePointAt(i + 1);
+-            const ch = e === undefined ? c : String.fromCodePoint(e);
++            const e = unicode ? p.codePointAt(i + 1) : p.charCodeAt(i + 1);
++            const ch = e === undefined || Number.isNaN(e) ? c : String.fromCodePoint(e);
+             toks.push(lit(ch));
+             i += 1 + ch.length;
+             continue;
+         }
+         if (c === '[') {
+-            const [re, consumed] = parseClass(p, i, nocase, form);
++            const [re, consumed] = parseClass(p, i, nocase, form, unicode, legacyNode22);
+             if (consumed) {
+                 toks.push({ t: 'class', re });
+                 i += consumed;
+@@ -82,6 +83,7 @@
+ // is not closed is never inside a closed extglob, so bar and close
+ // tokens are only literal at the top level.
+ const build = (toks, pairs, start, end, top) => {
++    tick(end - start + 1);
+     let seq = [];
+     const alts = [seq];
+     for (let i = start; i < end; i++) {
+@@ -135,6 +137,17 @@
+     flush();
+     return out;
+ };
++// Node22 permits empty matches only through non-empty nullable extglobs;
++// ordinary star tokens and empty alternative branches do not match empty.
++const legacyNullable = (items) => {
++    tick(items.length + 1);
++    return items.length > 0 && items.every(it => {
++        if (it.t !== 'ext' || !it.alts.some(alt => alt.length > 0)) return false;
++        if (it.type === '?' || it.type === '*') return true;
++        const body = it.alts.some(legacyNullable);
++        return it.type === '!' ? !body : body;
++    });
++};
+ // the start node, and the number of node ids. Ids are dense, from 0
+ // for the match node.
+ const compile = (items, nocase) => {
+@@ -142,6 +155,7 @@
+     const split = (out) => ({ t: 'split', id: id++, out });
+     const seq = (items, next) => items.reduceRight((next, it) => item(it, next), next);
+     const item = (it, next) => {
++        tick();
+         switch (it.t) {
+             case 'lit':
+                 const re = nocase ? foldRe(it.ch) : undefined;
+@@ -229,6 +243,7 @@
+ }
+ // true if the two states hold the same threads
+ const sameState = (a, b) => {
++    tick(a.ids.length + b.ids.length + a.runs.length * b.runs.length + 1);
+     if (a.ids.length !== b.ids.length)
+         return false;
+     if (a.runs.length !== b.runs.length)
+@@ -254,6 +269,7 @@
+         this.#marks = marks;
+     }
+     state() {
++        tick();
+         return new State(++this.#marks.gen);
+     }
+     // sort the ids of a state, once it has all of its threads
+@@ -287,6 +303,7 @@
+         return top && (this.dots || (this.dotStart && i === 0));
+     }
+     add(state, node, i, top) {
++        tick();
+         switch (node.t) {
+             case 'split':
+                 if (!this.#visit(state, node))
+@@ -316,6 +333,7 @@
+         }
+     }
+     addRun(state, run, i, top) {
++        tick(state.runs.length + 1);
+         for (const r of state.runs) {
+             if (r.neg === run.neg && sameState(r.state, run.state))
+                 return;
+@@ -327,6 +345,7 @@
+     }
+     // the threads after char `c`, at index `i`
+     step(state, c, i, top) {
++        tick(state.threads.length + state.runs.length + 1);
+         const next = this.state();
+         for (const th of state.threads) {
+             switch (th.t) {
+@@ -367,6 +386,7 @@
+ // A canonical key for the threads in a state. States with the same
+ // key hold the same threads, so they match the same strings.
+ const stateKey = (state) => {
++    tick(state.ids.length + state.runs.length + 1);
+     const ids = state.ids.join();
+     if (!state.runs.length)
+         return ids;
+@@ -376,7 +396,7 @@
+ // The cache can hold about this many chars of state keys and
+ // transitions. When it is full, it is cleared, so that a pattern
+ // can not use an unbounded amount of memory.
+-const DFA_BUDGET = 1 << 18;
++const DFA_BUDGET = limits.dfaCacheUnits;
+ // A cache of the states that the simulation reaches, built as the
+ // matcher is used. Each char of a string is then one Map lookup,
+ // once the states that it leads to are known.
+@@ -408,6 +428,8 @@
+     }
+     #intern(state) {
+         const key = stateKey(state);
++        if (key.length > limits.stateKeyCodeUnits) limit('state-key-code-units');
++        tick(key.length);
+         const found = this.#states.get(key);
+         if (found)
+             return found;
+@@ -591,19 +613,23 @@
+     #affix = false;
+     #dfa;
+     #form;
++    #legacyCodeUnits = false;
+     constructor(pattern, options = {}) {
+         if (pattern.includes('/')) {
+             throw new Error('can only match a single path portion, got pattern: ' + pattern);
+         }
+         this.pattern = pattern;
+         this.options = options;
+-        const { nocase = false, noext = false, normalize: n } = options;
++        const { nocase = false, noext = false, normalize: n, legacyNode22 = false } = options;
++        const unicode = !legacyNode22 || /\[:(?:alnum|alpha|blank|cntrl|digit|graph|lower|print|punct|space|upper|word):\]/.test(pattern);
++        this.#legacyCodeUnits = !unicode;
+         this.#form = n === true ? 'NFC' : n || undefined;
+         // a pattern that is only an empty extglob is a literal string,
+         // except for `!()`, which matches any non-empty string
+         const literal = /^[?*+@]\(\)$/.test(pattern);
+-        const toks = tokenize(pattern, nocase, noext || literal, this.#form);
++        const toks = tokenize(pattern, nocase, noext || literal, this.#form, unicode, legacyNode22);
+         let [items] = build(toks, pair(toks), 0, toks.length, true);
++        this.legacyNullable = legacyNode22 && legacyNullable(items);
+         if (this.#form)
+             items = normalize(items, this.#form);
+         const [start, size] = compile(items, nocase);
+@@ -642,6 +668,7 @@
+         }
+     }
+     test(s) {
++        if (this.#legacyCodeUnits) { noSlash(s); return this.#test(s, s); }
+         // The `/` check uses the string as given, so with normalization it
+         // is a separate step. Otherwise, one scan finds both a `/` and the
+         // surrogate pairs that stop the string being indexed by code point.
+@@ -664,6 +691,7 @@
+      * of the string.
+      */
+     testUnchecked(s) {
++        if (this.#legacyCodeUnits) return this.#test(s, s);
+         return this.#test(this.#form ? s.normalize(this.#form) : s);
+     }
+     // Test a string that has no `/`. `chars` indexes it by code point.
+@@ -755,4 +783,3 @@
+         return show(this.#start);
+     }
+ }
+-//# sourceMappingURL=index.js.map
+\ No newline at end of file
+--- upstream/@isaacs/nonrecursive-glob-match/dist/esm/parse-class.js
++++ builtins/node-compat/path-vendor/nonrecursive-glob-match/parse-class.mjs
+@@ -1,3 +1,14 @@
++import { tick } from '../resource-budget.mjs';
++import { unicodeCategoryRanges } from '../unicode-categories.mjs';
++// The pinned embedding has no Unicode property RegExp support. Expand only
++// these internal POSIX category fragments to exact pinned Unicode16 intervals.
++// Charge BEFORE appending/compiling the expanded class, including duplicates.
++const expandProperties = source => source.replace(/\\p\{([A-Za-z]+)\}/g, (_, name) => {
++    const ranges = unicodeCategoryRanges[name];
++    if (ranges === undefined) throw new Error('Unknown internal POSIX class category');
++    tick(ranges.length);
++    return ranges;
++});
+ // translate the various posix character classes into unicode properties
+ // this works across all unicode locales
+ // { <posix class>: [<translation>, negated]
+@@ -28,7 +39,7 @@
+ // Out of order ranges are removed. If nothing is left, the RegExp
+ // is `/$./`, and the rest of the glob is consumed, so that the
+ // whole glob cannot match.
+-export const parseClass = (glob, position, nocase = false, form) => {
++export const parseClass = (glob, position, nocase = false, form, unicode = true, legacyNode22 = false) => {
+     // normalize one class member, if it stays one code point
+     const norm = (c) => {
+         const n = form ? c.normalize(form) : c;
+@@ -49,7 +60,7 @@
+     let endPos = pos;
+     let rangeStart = '';
+     WHILE: while (i < glob.length) {
+-        const c = String.fromCodePoint(glob.codePointAt(i));
++        const c = unicode ? String.fromCodePoint(glob.codePointAt(i)) : glob[i];
+         if ((c === '!' || c === '^') && i === pos + 1) {
+             negate = true;
+             i++;
+@@ -77,10 +88,11 @@
+                         return [noMatch, glob.length - pos];
+                     }
+                     i += cls.length;
+-                    if (neg)
+-                        negs.push(unip);
+-                    else
+-                        ranges.push(unip);
++                    const expanded = expandProperties(legacyNode22 && cls === '[:punct:]' ? '\\p{P}' : unip);
++                    if (legacyNode22 && cls === '[:print:]') ranges.push(expanded);
++                    else if (legacyNode22 && cls === '[:punct:]') ranges.push(expanded);
++                    else if (neg) negs.push(expanded);
++                    else ranges.push(expanded);
+                     continue WHILE;
+                 }
+             }
+@@ -133,6 +145,5 @@
+         (ranges.length && negs.length ? '(' + sranges + '|' + snegs + ')'
+             : ranges.length ? sranges
+                 : snegs);
+-    return [new RegExp(comb, nocase ? 'iu' : 'u'), endPos - pos];
++    return [new RegExp(comb, (nocase ? 'i' : '') + (unicode ? 'u' : '')), endPos - pos];
+ };
+-//# sourceMappingURL=parse-class.js.map
+\ No newline at end of file

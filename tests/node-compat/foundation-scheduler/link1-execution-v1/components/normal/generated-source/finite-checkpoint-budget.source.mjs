@@ -1,0 +1,1 @@
+import{nextTick}from'starling:test-internal-ticks';export function run(){return new Promise(resolve=>{let callbacks=0;function repeat(){callbacks++;if(callbacks===65536)resolve(JSON.stringify({callbacks}));else nextTick(repeat)}nextTick(repeat)})}

@@ -1,0 +1,855 @@
+{
+  "schema": 1,
+  "meaning": "Proposed profile disposition, not a claim of implemented checkout support. Overrides describe bounded templates. All standard interfaces use 0.2.10 unless noted; none is assumed authorized solely by appearing here.",
+  "fallback": {
+    "status": "deferred",
+    "implementation": "No milestone-one implementation; assess explicit facade or unavailable manifest",
+    "capability": "none selected",
+    "deviation": "Import fails until a versioned manifest is explicitly installed",
+    "validation": "Inventory completeness and negative import tests"
+  },
+  "modules": {
+    "buffer": {
+      "status": "unavailable",
+      "implementation": "Explicit throwing binding outside bounded Buffer template",
+      "capability": "none",
+      "deviation": "Only documented baseline overloads implemented; no full Buffer claim",
+      "validation": "Node differential for supported cases; explicit failure checks for excluded members"
+    },
+    "child_process": {
+      "status": "unavailable",
+      "implementation": "Explicit callable stub; module itself import-only",
+      "capability": "No standard WASI 0.2 process-spawn capability",
+      "deviation": "Synchronous identifiable throw on call or construction",
+      "validation": "Exact namespace/default identities; call/new failures at top level and deployed runtime"
+    },
+    "assert": {
+      "status": "deferred",
+      "implementation": "Small guest JavaScript semantics facade",
+      "capability": "none",
+      "deviation": "Deep equality, error matching and inspection require Node tests",
+      "validation": "Pinned Node assert tests and cyclic/cross-realm cases"
+    },
+    "events": {
+      "status": "deferred",
+      "implementation": "Guest JavaScript EventEmitter; retain Node listener semantics",
+      "capability": "none; async iteration uses scheduler",
+      "deviation": "EventTarget does not implement EventEmitter semantics",
+      "validation": "Listener order, reentrancy, rejection capture, once/on abort and leak warnings"
+    },
+    "stream": {
+      "status": "deferred",
+      "implementation": "Audited Node stream state machines with native byte kernels",
+      "capability": "none for pure streams; poll/streams for I/O bridges",
+      "deviation": "WHATWG streams do not replace Node Readable/Writable/Duplex",
+      "validation": "Backpressure, destroy/end/error order, object mode, pipeline and cancellation"
+    },
+    "stream/web": {
+      "status": "deferred",
+      "implementation": "Re-export existing native web implementations after per-export parity gate",
+      "capability": "none for pure streams; monotonic-clock for timed operations",
+      "deviation": "Constructor identity, BYOB detachment and public controller exports need verification",
+      "validation": "Node differential plus existing WPT streams/compression/encoding suites"
+    },
+    "stream/consumers": {
+      "status": "deferred",
+      "implementation": "Small facade over web and Node readable adapters plus bounded Buffer",
+      "capability": "none",
+      "deviation": "Bounded Buffer may reject inputs accepted by full Node",
+      "validation": "Node/Web stream consumption, backpressure, abort and byte ownership"
+    },
+    "stream/promises": {
+      "status": "deferred",
+      "implementation": "Promise facade over Node stream lifecycle",
+      "capability": "none",
+      "deviation": "Cannot be replaced by web pipeTo without lifecycle mapping",
+      "validation": "pipeline/finished success, error, cleanup and AbortSignal"
+    },
+    "string_decoder": {
+      "status": "deferred",
+      "implementation": "Native codecs plus retained incremental state",
+      "capability": "none",
+      "deviation": "Node encoding aliases and incomplete-sequence flush differ from TextDecoder",
+      "validation": "Every split of UTF-8, UTF-16LE and base64 sequences"
+    },
+    "path": {
+      "status": "deferred",
+      "implementation": "Guest JS path algorithms; explicit posix and win32 variants",
+      "capability": "none",
+      "deviation": "Default platform policy must be pinned; no host path lookup",
+      "validation": "Pinned Node posix/win32 vector tests"
+    },
+    "url": {
+      "status": "deferred",
+      "implementation": "Reuse native WHATWG URL; JS legacy URL and conversion facade",
+      "capability": "none",
+      "deviation": "Legacy parse/format and file path policies require separate behavior",
+      "validation": "Node url tests plus WPT URL; file URL invalid bytes"
+    },
+    "querystring": {
+      "status": "deferred",
+      "implementation": "Small guest JS facade with native percent codec if justified",
+      "capability": "none",
+      "deviation": "URLSearchParams is not querystring-compatible",
+      "validation": "Duplicate keys, malformed escapes, limits and null-prototype output"
+    },
+    "util": {
+      "status": "deferred",
+      "implementation": "Mixed JS facade and SpiderMonkey native introspection",
+      "capability": "none for general utilities",
+      "deviation": "V8 and Node internal predicates/inspect formatting cannot be assumed",
+      "validation": "Per-export Node vectors, symbols, cycles and typed arrays"
+    },
+    "crypto": {
+      "status": "deferred",
+      "implementation": "Reuse native OpenSSL/WebCrypto primitives behind Node facade",
+      "capability": "random/random for randomness; other primitives guest-only",
+      "deviation": "Node algorithm inventory, KeyObject and stream APIs differ from WebCrypto",
+      "validation": "Known-answer vectors, Node differential, key lifetime and entropy resumption"
+    },
+    "zlib": {
+      "status": "deferred",
+      "implementation": "Native compression libraries with small JS facade",
+      "capability": "none",
+      "deviation": "CompressionStream does not implement Node sync APIs, options or all formats",
+      "validation": "Node vectors, malformed input, streaming boundaries, size/throughput"
+    },
+    "fs": {
+      "status": "deferred",
+      "implementation": "Native WASI descriptor adapter plus callback/promise facade",
+      "capability": "filesystem/types; filesystem/preopens; io/streams; io/poll",
+      "deviation": "Only preopened rights; no global root, watch, arbitrary ownership or POSIX signal assumptions",
+      "validation": "Preopen confinement, rights denial, symlinks, offsets and descriptor close"
+    },
+    "dns": {
+      "status": "deferred",
+      "implementation": "Restricted lookup facade; record APIs separately unavailable",
+      "capability": "sockets/ip-name-lookup; sockets/network; sockets/instance-network",
+      "deviation": "P2 resolves IP addresses; no portable MX/TXT/SRV or setServers contract",
+      "validation": "Host allow/deny, IPv4/IPv6, cancellation; unsupported record queries throw"
+    },
+    "net": {
+      "status": "deferred",
+      "implementation": "Native TCP resource adapter plus Node stream facade",
+      "capability": "sockets/tcp; sockets/tcp-create-socket; sockets/network; sockets/instance-network; io/poll; io/streams",
+      "deviation": "No Unix-domain sockets or OS fd injection; permission-dependent TCP only",
+      "validation": "Connect/listen policy, partial writes, half-close, backpressure and cancellation"
+    },
+    "dgram": {
+      "status": "deferred",
+      "implementation": "Native UDP resource adapter",
+      "capability": "sockets/udp; sockets/udp-create-socket; sockets/network; sockets/instance-network; io/poll",
+      "deviation": "Multicast and platform socket options cannot be assumed portable",
+      "validation": "Datagram boundaries, address families, limits and permission denial"
+    },
+    "http": {
+      "status": "deferred",
+      "implementation": "Native wasi:http mapping with limited Node HTTP facade",
+      "capability": "http/types; http/outgoing-handler; optional exported http/incoming-handler; io/streams; io/poll",
+      "deviation": "No raw socket ownership, arbitrary upgrade/CONNECT, custom Agent pooling or server.listen semantics",
+      "validation": "Streaming/trailers/cancellation; reject unsupported upgrade and socket APIs"
+    },
+    "https": {
+      "status": "deferred",
+      "implementation": "Restricted wasi:http HTTPS requests; Node TLS APIs unavailable",
+      "capability": "http/types; http/outgoing-handler",
+      "deviation": "Host-managed HTTPS does not expose TLSSocket, cert/key options, session or ALPN control",
+      "validation": "Host HTTPS policy and explicit rejection of unsupported TLS options"
+    },
+    "tls": {
+      "status": "unavailable",
+      "implementation": "Future guest TLS library only if selected; no draft or custom host TLS",
+      "capability": "No TLS interface in selected standard WASI 0.2.10 sockets",
+      "deviation": "P2 TCP is not TLS; wasi:tls draft excluded",
+      "validation": "All unsupported calls throw; future cert validation/SNI/ALPN vectors"
+    },
+    "http2": {
+      "status": "unavailable",
+      "implementation": "No Node HTTP/2 session API in milestone profile",
+      "capability": "wasi:http may use HTTP/2 internally but exposes no Node session controls",
+      "deviation": "No stream priorities, server push, raw sessions or settings API",
+      "validation": "Explicit unsupported exports and call failures if installed"
+    },
+    "process": {
+      "status": "deferred",
+      "implementation": "Explicit bounded JS facade; execution-time env/args cache",
+      "capability": "cli/environment; cli/exit; cli/stdin/stdout/stderr; clocks as selected",
+      "deviation": "No OS process, signals, uid/gid mutation, native dlopen, fork or kill",
+      "validation": "Init/runtime environment separation; exit, nextTick ordering and reuse policy"
+    },
+    "os": {
+      "status": "deferred",
+      "implementation": "Profile constants plus explicitly bounded guest data",
+      "capability": "none for declared guest constants; no host system introspection selected",
+      "deviation": "Do not fabricate host CPU, memory, network interfaces, hostname or load average",
+      "validation": "Stable declared values and explicit failures for unavailable host facts"
+    },
+    "timers": {
+      "status": "deferred",
+      "implementation": "Node timer facade over native event loop",
+      "capability": "clocks/monotonic-clock; io/poll",
+      "deviation": "Node Timeout/ref/unref/immediate/nextTick ordering require scheduler work",
+      "validation": "Ordering, cancellation, interval drift, promise timers and lifecycle"
+    },
+    "async_hooks": {
+      "status": "deferred",
+      "implementation": "Native job/reaction/I/O context capture plus JS AsyncLocalStorage facade",
+      "capability": "none beyond operation capabilities",
+      "deviation": "Promise wrapping alone cannot propagate async context correctly",
+      "validation": "Interleaved requests, await, rejection, timer/I/O propagation and cleanup"
+    },
+    "diagnostics_channel": {
+      "status": "deferred",
+      "implementation": "Small guest JS channels facade after async-context design",
+      "capability": "none",
+      "deviation": "Tracing and context propagation not implemented",
+      "validation": "Subscribe/unsubscribe, binding, exceptions and context lifetime"
+    },
+    "console": {
+      "status": "deferred",
+      "implementation": "Reuse native web console sink plus Node formatting facade",
+      "capability": "cli/stdout; cli/stderr; io/streams",
+      "deviation": "Web console does not imply Node Console/format/inspect parity",
+      "validation": "Formatting, output routing and byte count"
+    },
+    "perf_hooks": {
+      "status": "deferred",
+      "implementation": "Reuse monotonic timing; explicit Node performance facade",
+      "capability": "clocks/monotonic-clock; optional clocks/wall-clock",
+      "deviation": "Node process/V8/libuv metrics unavailable",
+      "validation": "Monotonicity, marks/measures, origin after resume and unavailable metrics"
+    },
+    "readline": {
+      "status": "deferred",
+      "implementation": "Guest line editing facade after streams; terminal-aware features gated",
+      "capability": "cli/stdin/stdout; io/streams; io/poll; optional cli/terminal-*",
+      "deviation": "TTY availability and terminal manipulation are not guaranteed",
+      "validation": "Non-TTY input, Unicode, cancellation and terminal absence"
+    },
+    "tty": {
+      "status": "unavailable",
+      "implementation": "Future narrow terminal detection facade",
+      "capability": "cli/terminal-input; cli/terminal-output; cli/terminal-stdin/stdout/stderr",
+      "deviation": "No portable Node fd/termios API",
+      "validation": "No terminal handles; explicit unsupported setters"
+    },
+    "worker_threads": {
+      "status": "unavailable",
+      "implementation": "Explicit unavailable API manifest in future",
+      "capability": "No standard P2 guest-worker service; guest threads not assumed",
+      "deviation": "No Worker, MessagePort or SharedArrayBuffer worker scheduling contract",
+      "validation": "Construction throws; inspection of constants/types remains safe"
+    },
+    "cluster": {
+      "status": "unavailable",
+      "implementation": "Explicit unavailable API manifest in future",
+      "capability": "No process-spawn/IPC service in selected P2",
+      "deviation": "No worker processes",
+      "validation": "Calls/constructors throw"
+    },
+    "v8": {
+      "status": "unavailable",
+      "implementation": "Explicit unavailable manifest in future",
+      "capability": "SpiderMonkey guest has no V8 engine",
+      "deviation": "No V8 serialization, heap snapshots or flags compatibility",
+      "validation": "Calls throw; no fabricated engine data"
+    },
+    "vm": {
+      "status": "unavailable",
+      "implementation": "Do not map to eval; future SpiderMonkey realms design required",
+      "capability": "none selected",
+      "deviation": "Node contexts, modules and timeout semantics unavailable",
+      "validation": "Calls/constructors throw; security boundary tests before future use"
+    },
+    "inspector": {
+      "status": "unavailable",
+      "implementation": "No Node Inspector protocol facade",
+      "capability": "No selected standard P2 inspector service",
+      "deviation": "Existing optional debugger sockets are not portable Node inspector",
+      "validation": "No debugger imports in selected profile"
+    },
+    "module": {
+      "status": "deferred",
+      "implementation": "Build-time bundler interoperability only",
+      "capability": "none; runtime filesystem loading not selected",
+      "deviation": "No runtime require/load hooks/createRequire/syncBuiltinESMExports contract",
+      "validation": "Bundle canonicalization, missing export link failure and singleton identity"
+    },
+    "wasi": {
+      "status": "unavailable",
+      "implementation": "No nested Node WASI launcher",
+      "capability": "Already executing as component; no custom instantiation host service",
+      "deviation": "Node WASI class does not describe the embedding host",
+      "validation": "Constructor throws if stub installed"
+    },
+    "sea": {
+      "status": "unavailable",
+      "implementation": "No Node single-executable application runtime",
+      "capability": "none",
+      "deviation": "Do not fabricate embedded asset access",
+      "validation": "Explicit unavailable operations"
+    },
+    "sqlite": {
+      "status": "deferred",
+      "implementation": "Optional native guest SQLite; independent size decision",
+      "capability": "none for memory DB; filesystem/types and preopens for disk",
+      "deviation": "No SQLite or extension loading in milestone one",
+      "validation": "Node SQL vectors; database lifetime and file confinement"
+    },
+    "test": {
+      "status": "deferred",
+      "implementation": "Guest test-runner library after scheduler and process decisions",
+      "capability": "none for assertions; stdio/filesystem only if selected",
+      "deviation": "Node runner isolation and CLI not provided",
+      "validation": "Explicit prefix-only imports; scheduler and reporter vectors"
+    },
+    "trace_events": {
+      "status": "unavailable",
+      "implementation": "Explicit unavailable manifest in future",
+      "capability": "No Node trace engine/host service selected",
+      "deviation": "No native trace emission",
+      "validation": "Calls throw with stable code"
+    },
+    "domain": {
+      "status": "unavailable",
+      "implementation": "Do not implement legacy domain exception interception",
+      "capability": "none",
+      "deviation": "Unavailable deprecated Node domain semantics",
+      "validation": "Explicit rejection if module installed"
+    },
+    "repl": {
+      "status": "unavailable",
+      "implementation": "No interactive Node runtime",
+      "capability": "none selected",
+      "deviation": "No REPL environment",
+      "validation": "Construction/calls throw"
+    },
+    "punycode": {
+      "status": "deferred",
+      "implementation": "Small guest JS algorithm or native URL codec after parity proof",
+      "capability": "none",
+      "deviation": "Deprecated Node API; WHATWG URL domain conversion may differ",
+      "validation": "Pinned Node Unicode and malformed input vectors"
+    },
+    "constants": {
+      "status": "deferred",
+      "implementation": "Explicit profile constants manifest after capability choices",
+      "capability": "none",
+      "deviation": "Do not copy Darwin errno/signal/crypto values as guest ABI",
+      "validation": "Typed numeric values; platform-specific inventory recorded"
+    },
+    "sys": {
+      "status": "deferred",
+      "implementation": "Alias of util once implemented",
+      "capability": "none",
+      "deviation": "Deprecated alias; must share same default identity",
+      "validation": "Alias and export manifest equality"
+    },
+    "@globals": {
+      "status": "deferred",
+      "implementation": "Per-global native web reuse or explicit Node facade",
+      "capability": "Depends on selected operation; see human matrix",
+      "deviation": "Per-global policies distinguish existing web implementation, ECMAScript engine global, Node facade and excluded CommonJS binding; no ambient process/global/require installed",
+      "validation": "Global descriptors/identity, Node differential and WPT"
+    }
+  },
+  "overrides": {
+    "buffer:default": {
+      "status": "import-only",
+      "implementation": "Explicit module object from versioned manifest",
+      "deviation": "Frozen profile namespace; no Node syncBuiltinESMExports"
+    },
+    "buffer:Buffer": {
+      "status": "partial",
+      "implementation": "Uint8Array subclass facade plus native hex kernel template",
+      "deviation": "No legacy constructor; only selected overloads and encodings"
+    },
+    "buffer:Buffer.alloc": {
+      "status": "partial",
+      "implementation": "Zero-initialized Uint8Array allocation",
+      "deviation": "Integer size and numeric fill only; string fill and encoding overload deferred"
+    },
+    "buffer:Buffer.from": {
+      "status": "partial",
+      "implementation": "UTF-8/hex string codecs; copy Uint8Array; share ArrayBuffer view",
+      "deviation": "No array-like/valueOf/JSON/SharedArrayBuffer overloads"
+    },
+    "buffer:Buffer.byteLength": {
+      "status": "partial",
+      "implementation": "Native TextEncoder UTF-8 or checked hex length",
+      "deviation": "UTF-8/hex strings, ArrayBuffer and Uint8Array only; other views deferred"
+    },
+    "buffer:Buffer.isBuffer": {
+      "status": "supported",
+      "implementation": "Private facade brand",
+      "deviation": "Template-only; cross-realm policy unresolved"
+    },
+    "buffer:Buffer.isEncoding": {
+      "status": "partial",
+      "implementation": "Explicit utf8/utf-8/hex allow-list",
+      "deviation": "Other Node encodings return false in this profile"
+    },
+    "buffer:Buffer.prototype.toString": {
+      "status": "partial",
+      "implementation": "UTF-8 TextDecoder or native hex kernel",
+      "deviation": "Only selected encodings and validated range subset"
+    },
+    "buffer:Buffer.prototype.slice": {
+      "status": "partial",
+      "implementation": "Shared ArrayBuffer view",
+      "deviation": "Template-only; species and full coercions require review"
+    },
+    "buffer:Buffer.prototype.subarray": {
+      "status": "partial",
+      "implementation": "Shared ArrayBuffer view",
+      "deviation": "Template-only; species and full coercions require review"
+    },
+    "child_process:default": {
+      "status": "import-only",
+      "implementation": "Explicit frozen module default with named binding identities",
+      "deviation": "Operations unavailable; module namespace inspection safe"
+    },
+    "buffer:INSPECT_MAX_BYTES": {
+      "status": "supported",
+      "implementation": "Explicit typed profile constant",
+      "deviation": "Profile allocation/string caps differ from Node platform maximum; no slab pool"
+    },
+    "buffer:kMaxLength": {
+      "status": "supported",
+      "implementation": "Explicit typed profile constant",
+      "deviation": "Profile allocation/string caps differ from Node platform maximum; no slab pool"
+    },
+    "buffer:kStringMaxLength": {
+      "status": "supported",
+      "implementation": "Explicit typed profile constant",
+      "deviation": "Profile allocation/string caps differ from Node platform maximum; no slab pool"
+    },
+    "buffer:constants": {
+      "status": "supported",
+      "implementation": "Explicit typed profile constant",
+      "deviation": "Profile allocation/string caps differ from Node platform maximum; no slab pool"
+    },
+    "buffer:constants.MAX_LENGTH": {
+      "status": "supported",
+      "implementation": "Explicit typed profile constant",
+      "deviation": "Profile allocation/string caps differ from Node platform maximum; no slab pool"
+    },
+    "buffer:constants.MAX_STRING_LENGTH": {
+      "status": "supported",
+      "implementation": "Explicit typed profile constant",
+      "deviation": "Profile allocation/string caps differ from Node platform maximum; no slab pool"
+    },
+    "buffer:Buffer.prototype.parent": {
+      "status": "partial",
+      "implementation": "Real Uint8Array relationships or inherited behavior; explicit profile getters",
+      "deviation": "Template only; poolSize 0, inherited semantics unless explicit Node overload stub"
+    },
+    "buffer:Buffer.prototype.offset": {
+      "status": "partial",
+      "implementation": "Real Uint8Array relationships or inherited behavior; explicit profile getters",
+      "deviation": "Template only; poolSize 0, inherited semantics unless explicit Node overload stub"
+    },
+    "buffer:Buffer.prototype.buffer": {
+      "status": "partial",
+      "implementation": "Real Uint8Array relationships or inherited behavior; explicit profile getters",
+      "deviation": "Template only; poolSize 0, inherited semantics unless explicit Node overload stub"
+    },
+    "buffer:Buffer.prototype.byteOffset": {
+      "status": "partial",
+      "implementation": "Real Uint8Array relationships or inherited behavior; explicit profile getters",
+      "deviation": "Template only; poolSize 0, inherited semantics unless explicit Node overload stub"
+    },
+    "buffer:Buffer.prototype.length": {
+      "status": "partial",
+      "implementation": "Real Uint8Array relationships or inherited behavior; explicit profile getters",
+      "deviation": "Template only; poolSize 0, inherited semantics unless explicit Node overload stub"
+    },
+    "buffer:Buffer.prototype.byteLength": {
+      "status": "partial",
+      "implementation": "Real Uint8Array relationships or inherited behavior; explicit profile getters",
+      "deviation": "Template only; poolSize 0, inherited semantics unless explicit Node overload stub"
+    },
+    "buffer:Buffer.prototype.entries": {
+      "status": "partial",
+      "implementation": "Real Uint8Array relationships or inherited behavior; explicit profile getters",
+      "deviation": "Template only; poolSize 0, inherited semantics unless explicit Node overload stub"
+    },
+    "buffer:Buffer.prototype.keys": {
+      "status": "partial",
+      "implementation": "Real Uint8Array relationships or inherited behavior; explicit profile getters",
+      "deviation": "Template only; poolSize 0, inherited semantics unless explicit Node overload stub"
+    },
+    "buffer:Buffer.prototype.values": {
+      "status": "partial",
+      "implementation": "Real Uint8Array relationships or inherited behavior; explicit profile getters",
+      "deviation": "Template only; poolSize 0, inherited semantics unless explicit Node overload stub"
+    },
+    "buffer:Buffer.poolSize": {
+      "status": "partial",
+      "implementation": "Real Uint8Array relationships or inherited behavior; explicit profile getters",
+      "deviation": "Template only; poolSize 0, inherited semantics unless explicit Node overload stub"
+    },
+    "@globals:AbortController": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:AbortSignal": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:Blob": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:File": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:CustomEvent": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:Event": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:EventTarget": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:queueMicrotask": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:structuredClone": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:DOMException": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:TextDecoder": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:TextEncoder": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:URL": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:URLSearchParams": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:ReadableStream": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:WritableStream": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:TransformStream": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:fetch": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:Headers": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:Request": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:Response": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:FormData": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:crypto": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:performance": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:console": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:setTimeout": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:setInterval": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:clearTimeout": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:clearInterval": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:atob": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:btoa": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:CompressionStream": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:DecompressionStream": {
+      "status": "partial",
+      "implementation": "Existing native web implementation; Node-facing descriptor/parity gate pending",
+      "capability": "none for pure web objects; optional HTTP/random/clocks/stdio by operation",
+      "deviation": "Source presence verified; no blanket Node global parity claim",
+      "validation": "Existing WPT plus pinned Node descriptor/identity/differential tests"
+    },
+    "@globals:Buffer": {
+      "status": "partial",
+      "implementation": "Explicit opt-in global from canonical node:buffer template",
+      "capability": "none",
+      "deviation": "Bounded facade only; not installed by this deliverable",
+      "validation": "Identity with module Buffer and differential bounded overloads"
+    },
+    "@globals:require": {
+      "status": "unavailable",
+      "implementation": "Build-time static CommonJS transform only",
+      "capability": "none",
+      "deviation": "No ambient runtime CommonJS loader globals; dirname/filename require explicit bundler rule",
+      "validation": "Dynamic require rejected; static lowering checked in bundle and component"
+    },
+    "@globals:module": {
+      "status": "unavailable",
+      "implementation": "Build-time static CommonJS transform only",
+      "capability": "none",
+      "deviation": "No ambient runtime CommonJS loader globals; dirname/filename require explicit bundler rule",
+      "validation": "Dynamic require rejected; static lowering checked in bundle and component"
+    },
+    "@globals:exports": {
+      "status": "unavailable",
+      "implementation": "Build-time static CommonJS transform only",
+      "capability": "none",
+      "deviation": "No ambient runtime CommonJS loader globals; dirname/filename require explicit bundler rule",
+      "validation": "Dynamic require rejected; static lowering checked in bundle and component"
+    },
+    "@globals:__dirname": {
+      "status": "unavailable",
+      "implementation": "Build-time static CommonJS transform only",
+      "capability": "none",
+      "deviation": "No ambient runtime CommonJS loader globals; dirname/filename require explicit bundler rule",
+      "validation": "Dynamic require rejected; static lowering checked in bundle and component"
+    },
+    "@globals:__filename": {
+      "status": "unavailable",
+      "implementation": "Build-time static CommonJS transform only",
+      "capability": "none",
+      "deviation": "No ambient runtime CommonJS loader globals; dirname/filename require explicit bundler rule",
+      "validation": "Dynamic require rejected; static lowering checked in bundle and component"
+    },
+    "path:resolve": {
+      "deviation": "Resolve relative paths against explicit virtual cwd /; optional cli/environment.initial-cwd requires separate selected capability"
+    }
+  },
+  "privateModules": {
+    "status": "unavailable",
+    "implementation": "Private underscore builtin excluded from public profile",
+    "capability": "none selected",
+    "deviation": "Present in Node runtime inventory; not an admitted public module",
+    "validation": "Import rejected explicitly; no implicit polyfill fallback"
+  },
+  "patternOverrides": [
+    {
+      "module": "^@globals$",
+      "api": "^(?:Object|Function|Array|Number|String|Boolean|BigInt|Symbol|Date|Math|JSON|RegExp|Error|EvalError|RangeError|ReferenceError|SyntaxError|TypeError|URIError|AggregateError|Promise|Map|Set|WeakMap|WeakSet|WeakRef|FinalizationRegistry|Reflect|Proxy|ArrayBuffer|DataView|Uint8Array|Uint8ClampedArray|Int8Array|Uint16Array|Int16Array|Uint32Array|Int32Array|BigInt64Array|BigUint64Array|Float32Array|Float64Array|Intl|globalThis|Infinity|NaN|undefined|eval|parseInt|parseFloat|isNaN|isFinite|decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|escape|unescape)$",
+      "plan": {
+        "status": "partial",
+        "implementation": "Existing SpiderMonkey ECMAScript intrinsic",
+        "capability": "none for pure computation; Date time and Math.random follow lifecycle policy",
+        "deviation": "Not Node-specific shim work; V8/SpiderMonkey descriptor, Intl data and edge parity not asserted",
+        "validation": "Engine/WPT baseline; profile-specific time/random resume tests"
+      }
+    },
+    {
+      "module": "^@globals$",
+      "api": "^(?:AbortController|AbortSignal|Blob|File|CustomEvent|Event|EventTarget|queueMicrotask|structuredClone|DOMException|TextDecoder|TextEncoder|URL|URLSearchParams|ReadableStream|WritableStream|TransformStream|fetch|Headers|Request|Response|FormData|crypto|performance|console|setTimeout|setInterval|clearTimeout|clearInterval|atob|btoa|CompressionStream|DecompressionStream)(?:$|[./])",
+      "plan": {
+        "status": "partial",
+        "implementation": "Existing native web implementation; Node-facing parity gate pending",
+        "capability": "Operation-dependent: none, HTTP, random, clocks or stdio",
+        "deviation": "Source presence is not complete Node behavior or global descriptor parity",
+        "validation": "Existing WPT and pinned Node descriptor/differential vectors"
+      }
+    },
+    {
+      "module": "^dns(?:/promises)?$",
+      "api": "(?:resolve(?:4|6|Any|Caa|Cname|Mx|Naptr|Ns|Ptr|Soa|Srv|Txt)?|reverse|setServers|getServers|setLocalAddress|Resolver)(?:$|[./])",
+      "plan": {
+        "status": "unavailable",
+        "implementation": "Explicit throwing API outside IP-name-lookup subset",
+        "capability": "No DNS record/server configuration capability in selected P2 lookup interface",
+        "deviation": "Only address lookup is a candidate; record query semantics unavailable",
+        "validation": "Every excluded API throws; no silent fallback to custom DNS host service"
+      }
+    },
+    {
+      "module": "^fs(?:/promises)?$",
+      "api": "(?:^|[./])(?:chown|fchown|lchown|chmod|fchmod|lchmod|watch|watchFile|unwatchFile)(?:$|[./])",
+      "plan": {
+        "status": "unavailable",
+        "implementation": "Unavailable operation in portable filesystem subset",
+        "capability": "No selected standard ownership/mode/watch host API",
+        "deviation": "Cannot promise these Node OS operations through P2 descriptors",
+        "validation": "Explicit failure tests; no successful no-ops"
+      }
+    },
+    {
+      "module": "^process$",
+      "api": "(?:^|[./])(?:kill|dlopen|setuid|seteuid|setgid|setegid|setgroups|initgroups|getuid|geteuid|getgid|getegid|getgroups|abort|binding|_linkedBinding)(?:$|[./])",
+      "plan": {
+        "status": "unavailable",
+        "implementation": "Unavailable Node OS/engine process operation",
+        "capability": "No corresponding selected standard P2 process service",
+        "deviation": "No fabricated process identity or native addon loading",
+        "validation": "Explicit callable failures and safe property inspection"
+      }
+    },
+    {
+      "module": "^@globals$",
+      "api": "^(?:MessageChannel|MessageEvent|MessagePort)(?:$|[./])",
+      "plan": {
+        "status": "unavailable",
+        "implementation": "No worker/message-channel profile selected",
+        "capability": "none selected",
+        "deviation": "Do not imply support from web stream availability",
+        "validation": "Explicit absence or versioned unavailable binding"
+      }
+    },
+    {
+      "module": "^@globals$",
+      "api": "^(?:setImmediate|clearImmediate|process|global)(?:$|[./])",
+      "plan": {
+        "status": "deferred",
+        "implementation": "Explicit Node scheduler/process/global facade required",
+        "capability": "operation dependent",
+        "deviation": "Web timers/globalThis do not establish these Node contracts",
+        "validation": "Global identity and scheduling differential"
+      }
+    }
+  ]
+}

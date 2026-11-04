@@ -1,0 +1,1 @@
+let calls=0;export async function run(){let seen=0,handled=null;const p=Promise.reject(new Error('handled-later'));queueMicrotask(()=>p.catch(error=>{seen++;handled=error.message}));await Promise.resolve();await Promise.resolve();return JSON.stringify({calls:++calls,seen,handled})}

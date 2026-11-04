@@ -1,0 +1,533 @@
+{
+  "schemaVersion": 1,
+  "state": "EXACT_SOURCE_TOOL_AFTERIMAGE_DERIVATIONS",
+  "files": [
+    {
+      "origin": "tests/node-compat/foundation-classic-streams/integration-candidate-v1/layer-policy.py",
+      "beforeSha256": "f4a303250ac979206f0c2b358f4dd16d2a5e3a3e3007200901dedba8576b9a1e",
+      "afterimage": "layer-policy.py",
+      "afterSha256": "f3b1f1383e6b01f9843e24fb92732a682e4a76d8fb99f5ba1bc11b4212e0fb71",
+      "edits": [
+        {
+          "old": "POLICY_SHA256='137a35959131d5cb5125bb5fc97324dfa4ba2ce18441818dd95cf83d19c88d6f'",
+          "new": "POLICY_SHA256='891a4c53dd4a7b7d776c21003acdd12c7944c6a3eca019a1d9b2be620ed8b11c'",
+          "count": 1,
+          "offsets": [
+            341
+          ],
+          "beforeOffsets": [
+            341
+          ],
+          "reason": "Require corrected exact342 policy"
+        },
+        {
+          "old": "PARENT_ROOT=HERE.parents[1]",
+          "new": "\n# Exact previous342 source ancestry is data, never an engine metadata adapter.\ndef verify_trace_ancestry():\n    previous=HERE.parent/'integration-candidate-v1'\n    assert digest(previous/'policy.json')==POLICY['classicTraceSourcePolicy']['previousPolicySha256']\n    assert digest(previous/'layer-policy.py')==POLICY['classicTraceSourcePolicy']['previousHelperSha256']\n    assert digest(previous/'source/tests/node-compat/build-engine.sh')==POLICY['classicTraceSourcePolicy']['previousRecipeSha256']\n    old=json.loads((previous/'policy.json').read_bytes())\n    before={row['path']:row['sha256']for row in old['expectedNativeSourceManifest']}\n    after={row['path']:row['sha256']for row in POLICY['expectedNativeSourceManifest']}\n    changes={row['path']:row for row in POLICY['classicTraceSourcePolicy']['changes']}\n    assert len(before)==len(after)==342 and set(before)==set(after)\n    assert len(changes)==3 and sum(before[path]==after[path]for path in before)==339\n    for path,row in changes.items():assert before[path]==row['beforeSha256']and after[path]==row['afterSha256']\n    assert POLICY['strictPolicyVersion']==old['strictPolicyVersion']\n    assert POLICY['protectedPolicyVersion']==old['protectedPolicyVersion']\n    assert POLICY['embedding']==old['embedding']and POLICY['nativePatchSha256']==old['nativePatchSha256']\n    fix=HERE.parent/'trace-semantics-candidate-v1'\n    assert digest(fix/'index.json')==POLICY['classicTraceSourcePolicy']['fixSourceIndexSha256']\n    for row in json.loads((fix/'index.json').read_bytes())['files']:\n        target=fix/row['path'];assert not target.is_symlink()and target.stat().st_size==row['bytes']and digest(target)==row['sha256']\n    assert digest(fix/'canonical-3file.UNAPPLIED.patch')==POLICY['classicTraceSourcePolicy']['sourceDeltaPatchSha256']\n    assert digest(fix/'transformation-proof.json')==POLICY['classicTraceSourcePolicy']['transformationProofSha256']\n    return True\nverify_trace_ancestry()\nPARENT_ROOT=HERE.parents[1]",
+          "count": 1,
+          "offsets": [
+            776
+          ],
+          "beforeOffsets": [
+            776
+          ],
+          "reason": "Authenticate339+3 source ancestry without old metadata projection"
+        },
+        {
+          "old": "    metadata['classicStreamsPolicy']={",
+          "new": "    metadata['classicTraceSourcePolicy']=copy.deepcopy(POLICY['classicTraceSourcePolicy'])\n    metadata['classicStreamsPolicy']={",
+          "count": 1,
+          "offsets": [
+            10785
+          ],
+          "beforeOffsets": [
+            10785
+          ],
+          "reason": "Write explicit source provenance from the new actual build"
+        }
+      ],
+      "exactReverseProved": true,
+      "patch": "proofs/layer-policy.py.patch",
+      "patchSha256": "8f9e03407c3639031cbb588ad49df81e0f31ad73377ff4b69d265040b9f1e2a9"
+    },
+    {
+      "origin": "tests/node-compat/build-engine.sh",
+      "beforeSha256": "71b48d2e70c5e003fcbcce7620366744c089dd55036036e52926224dfa2614f7",
+      "afterimage": "source/tests/node-compat/build-engine.sh",
+      "afterSha256": "f63fdaca5ee1d1f4795a54eb9175376ef1657a579b01ed3101d5593ffc3431e5",
+      "edits": [
+        {
+          "old": "/tmp/starling-node-compat/improved-build",
+          "new": "/tmp/starling-node-compat/classic-trace-v1-build",
+          "count": 1,
+          "offsets": [
+            378
+          ],
+          "beforeOffsets": [
+            378
+          ],
+          "reason": "Distinct production work root"
+        },
+        {
+          "old": "build_jobs=\"${NODE_COMPAT_JOBS:-8}\"",
+          "new": "build_jobs=\"${NODE_COMPAT_JOBS:-1}\"",
+          "count": 1,
+          "offsets": [
+            466
+          ],
+          "beforeOffsets": [
+            466
+          ],
+          "reason": "One-job default"
+        },
+        {
+          "old": "foundation-classic-streams/integration-candidate-v1",
+          "new": "foundation-classic-streams/trace-integration-candidate-v1",
+          "count": 3,
+          "offsets": [
+            2060,
+            16608,
+            21803
+          ],
+          "beforeOffsets": [
+            2060,
+            16602,
+            21791
+          ],
+          "reason": "New source helper at every capture/import"
+        },
+        {
+          "old": "f4a303250ac979206f0c2b358f4dd16d2a5e3a3e3007200901dedba8576b9a1e",
+          "new": "f3b1f1383e6b01f9843e24fb92732a682e4a76d8fb99f5ba1bc11b4212e0fb71",
+          "count": 4,
+          "offsets": [
+            9368,
+            21908,
+            29737,
+            44863
+          ],
+          "beforeOffsets": [
+            9368,
+            21908,
+            29737,
+            44863
+          ],
+          "reason": "Exact corrected helper before and after build at every capture/decorate guard"
+        },
+        {
+          "old": "137a35959131d5cb5125bb5fc97324dfa4ba2ce18441818dd95cf83d19c88d6f",
+          "new": "891a4c53dd4a7b7d776c21003acdd12c7944c6a3eca019a1d9b2be620ed8b11c",
+          "count": 1,
+          "offsets": [
+            9495
+          ],
+          "beforeOffsets": [
+            9495
+          ],
+          "reason": "Exact corrected source policy"
+        },
+        {
+          "old": "policy_suffix=\"entropy-entry-v1-strict-callback-v3-protected-abort-v2.$entropy_mode.path-$path_enabled.events-$events_enabled.string-decoder-$string_decoder_enabled.assert-$assert_enabled.querystring-$querystring_enabled.util-$util_enabled.stream-web-$stream_web_enabled\"\npolicy_suffix=\"$policy_suffix.private-ticks-v1-$ticks_enabled.classic-v1-$classic_enabled\"",
+          "new": "policy_suffix=\"trace-v1.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled\"",
+          "count": 1,
+          "offsets": [
+            6310
+          ],
+          "beforeOffsets": [
+            6310
+          ],
+          "reason": "Bounded distinct source/build namespace; semantic boundary tags remain exact"
+        },
+        {
+          "old": "artifact_name=\"$artifact_name.classic-v1.",
+          "new": "artifact_name=\"$artifact_name.trace-v1.",
+          "count": 1,
+          "offsets": [
+            6875
+          ],
+          "beforeOffsets": [
+            6875
+          ],
+          "reason": "Distinct actual artifact namespace"
+        },
+        {
+          "old": "for generated_name in \"$artifact_name.wasm.build.json\" \"componentize-native-inputs-$artifact_name.json\" \"source-inputs-$artifact_name.json\" \"openssl-source-$artifact_name.before.json\" \"configure-$artifact_name.log\" \"build-$artifact_name.log\"; do",
+          "new": "for generated_name in \"${source_dir##*/}\" \"${build_dir##*/}\" \"$artifact_name.wasm\" \"$artifact_name.wasm.build.json\" \"$artifact_name.raw.wasm\" \"$artifact_name.raw.wasm.build.json\" \"componentize-native-inputs-$artifact_name.json\" \"source-inputs-$artifact_name.json\" \"recipe-$artifact_name.sha256\" \"openssl-source-$artifact_name.before.json\" \"configure-$artifact_name.log\" \"build-$artifact_name.log\"; do",
+          "count": 1,
+          "offsets": [
+            7230
+          ],
+          "beforeOffsets": [
+            7230
+          ],
+          "reason": "Check every parameterized basename including recipe sidecar before fetch"
+        },
+        {
+          "old": "fetch_checked \"https://codeload.github.com/bytecodealliance/ComponentizeJS/tar.gz/$componentize_revision\"",
+          "new": "# Authenticate actual corrected342 sources before any archive fetch.\n[[ \"$(sha256_file \"$layer_root/layer-policy.py\")\" == f3b1f1383e6b01f9843e24fb92732a682e4a76d8fb99f5ba1bc11b4212e0fb71 ]] || exit 1\n[[ \"$(sha256_file \"$layer_root/policy.json\")\" == 891a4c53dd4a7b7d776c21003acdd12c7944c6a3eca019a1d9b2be620ed8b11c ]] || exit 1\npython3 \"$layer_root/layer-policy.py\" \"$repo_root\"\nfetch_checked \"https://codeload.github.com/bytecodealliance/ComponentizeJS/tar.gz/$componentize_revision\"",
+          "count": 1,
+          "offsets": [
+            8735
+          ],
+          "beforeOffsets": [
+            8735
+          ],
+          "reason": "New source bytes must never be accepted under the previous helper"
+        }
+      ],
+      "exactReverseProved": true,
+      "patch": "proofs/source__tests__node-compat__build-engine.sh.patch",
+      "patchSha256": "4d8ee913b457f90de7a44aeac950c9092ef2edceee01d2be900d35327d49808d"
+    },
+    {
+      "origin": "tests/node-compat/classic-streams-admission.mjs",
+      "beforeSha256": "1255f639375e5735374165e77e6044a5281e98ad28a69107652ff33c8f3c29dc",
+      "afterimage": "source/tests/node-compat/classic-streams-admission.mjs",
+      "afterSha256": "7070540e930569d267af9a31f2f430c1901623e4b3ac69080e0b394b2302815c",
+      "edits": [
+        {
+          "old": "9c8e3c209c97372b09cff55cd2d05d3491c143799a0820659c62ec94ba193248",
+          "new": "4f8eb9d457a83649276230f04b2e39a437b875aea6d944e1bccb4904a481ec05",
+          "count": 1,
+          "offsets": [
+            339
+          ],
+          "beforeOffsets": [
+            339
+          ],
+          "reason": "Fixed successor source contract"
+        },
+        {
+          "old": "71b48d2e70c5e003fcbcce7620366744c089dd55036036e52926224dfa2614f7",
+          "new": "f63fdaca5ee1d1f4795a54eb9175376ef1657a579b01ed3101d5593ffc3431e5",
+          "count": 1,
+          "offsets": [
+            424
+          ],
+          "beforeOffsets": [
+            424
+          ],
+          "reason": "Refuse previous recipe identity"
+        },
+        {
+          "old": "foundation-classic-streams/integration-candidate-v1/",
+          "new": "foundation-classic-streams/trace-integration-candidate-v1/",
+          "count": 3,
+          "offsets": [
+            4123,
+            4380,
+            4565
+          ],
+          "beforeOffsets": [
+            4123,
+            4374,
+            4553
+          ],
+          "reason": "Load exact successor policy/helper contract"
+        },
+        {
+          "old": " const current=entries(metadata.sourceManifest);",
+          "new": " assert.deepEqual(metadata.classicTraceSourcePolicy,policy.classicTraceSourcePolicy,'Exact corrected source provenance required');\n const current=entries(metadata.sourceManifest);",
+          "count": 1,
+          "offsets": [
+            9382
+          ],
+          "beforeOffsets": [
+            9382
+          ],
+          "reason": "Require explicit actual trace source provenance"
+        }
+      ],
+      "exactReverseProved": true,
+      "patch": "proofs/source__tests__node-compat__classic-streams-admission.mjs.patch",
+      "patchSha256": "31f1511ac09442991d05b077945813d2440fccab870f0f93216d2a4c7ca4762f"
+    },
+    {
+      "origin": "tests/node-compat/foundation-classic-streams/integration-candidate-v1/source-model-fixture.mjs",
+      "beforeSha256": "e33d2f98a24120ae992753ae8214acf1fa32c09ae7c3ae4bdbe7684b38cb4cc9",
+      "afterimage": "source-model-fixture.mjs",
+      "afterSha256": "4fe16347e06bf955a96ce3de9f019c5ab9420d8d9a60b86645c8d9784236aced",
+      "edits": [
+        {
+          "old": "    sourceManifest:copy(policy.expectedNativeSourceManifest),",
+          "new": "    classicTraceSourcePolicy:copy(policy.classicTraceSourcePolicy),\n    sourceManifest:copy(policy.expectedNativeSourceManifest),",
+          "count": 1,
+          "offsets": [
+            9129
+          ],
+          "beforeOffsets": [
+            9129
+          ],
+          "reason": "Explicit synthetic successor parser fixture; never an engine receipt"
+        }
+      ],
+      "exactReverseProved": true,
+      "patch": "proofs/source-model-fixture.mjs.patch",
+      "patchSha256": "2cb2394db7ede0e8a30c9eb9cdbd6a85568e213fac3cd2b9b265afd3ee2f716e"
+    },
+    {
+      "origin": "tests/node-compat/foundation-classic-streams/integration-candidate-v1/artifact-tools/build-one.py",
+      "beforeSha256": "ad4bc3d8c9fbf7589f6bfe235c30dc34b0bb1fcab2b009c24873b2fa1d0edb1e",
+      "afterimage": "artifact-tools/build-one.py",
+      "afterSha256": "a25d3891046354275cf5d6ccf0909da8dd3d0d5c57a5f6098ef72734a20850e7",
+      "edits": [
+        {
+          "old": "/tmp/starling-node-compat/production-classic-artifacts-v1",
+          "new": "/tmp/starling-node-compat/production-classic-trace-v1",
+          "count": 1,
+          "offsets": [
+            9865
+          ],
+          "beforeOffsets": [
+            9865
+          ],
+          "reason": "Exclusive new build/freeze namespace"
+        },
+        {
+          "old": "/tmp/starling-node-compat/improved-build",
+          "new": "/tmp/starling-node-compat/classic-trace-v1-build",
+          "count": 1,
+          "offsets": [
+            9803
+          ],
+          "beforeOffsets": [
+            9803
+          ],
+          "reason": "Distinct source/build cache root"
+        },
+        {
+          "old": "'p342v1'",
+          "new": "'tracev1'",
+          "count": 1,
+          "offsets": [
+            11303
+          ],
+          "beforeOffsets": [
+            11303
+          ],
+          "reason": "Distinct fresh launcher artifact tag"
+        },
+        {
+          "old": "free = lambda: os.statvfs(work).f_bavail * os.statvfs(work).f_frsize",
+          "new": "free = lambda: os.statvfs(work if work.exists() else work.parent).f_bavail * os.statvfs(work if work.exists() else work.parent).f_frsize",
+          "count": 1,
+          "offsets": [
+            11471
+          ],
+          "beforeOffsets": [
+            11471
+          ],
+          "reason": "Check2GiB before new work root exists; preserve lifecycle"
+        }
+      ],
+      "exactReverseProved": true,
+      "patch": "proofs/artifact-tools__build-one.py.patch",
+      "patchSha256": "709dc2c49403cc0c3545da217edc21187b8c0e6268796b311a2ac34ffa03ed1f"
+    },
+    {
+      "origin": "tests/node-compat/foundation-classic-streams/integration-candidate-v1/artifact-tools/freeze-engine.py",
+      "beforeSha256": "99b5f843ea232d9da51dd3047e2444a8765175265ddb6f08df7f42aee2218d88",
+      "afterimage": "artifact-tools/freeze-engine.py",
+      "afterSha256": "63e1cda7fe09541f082bd7b1ee186758eb9a21f10203ff81562cc30788c7f145",
+      "edits": [
+        {
+          "old": "immutable-release-engine-frozen",
+          "new": "immutable-trace-release-engine-frozen",
+          "count": 1,
+          "offsets": [
+            13411
+          ],
+          "beforeOffsets": [
+            13411
+          ],
+          "reason": "Distinct corrected-source freeze schema state"
+        },
+        {
+          "old": "        'nativeInputsVerified': 342,",
+          "new": "        'classicTraceSourcePolicy': metadata['classicTraceSourcePolicy'],\n        'nativeInputsVerified': 342,",
+          "count": 1,
+          "offsets": [
+            13765
+          ],
+          "beforeOffsets": [
+            13765
+          ],
+          "reason": "Preserve actual source provenance in frozen receipt"
+        }
+      ],
+      "exactReverseProved": true,
+      "patch": "proofs/artifact-tools__freeze-engine.py.patch",
+      "patchSha256": "e5776cc42a0b477fa13ca26e61b74566c4a6d68d313f78aaf8609a05409c5a20"
+    },
+    {
+      "origin": "tests/node-compat/foundation-classic-streams/integration-candidate-v1/artifact-tools/artifact_common.py",
+      "beforeSha256": "0375bf10b7b8d412c701f1d6f5a22b24f967546cb700505b61579d67a93b3cba",
+      "afterimage": "artifact-tools/artifact_common.py",
+      "afterSha256": "eccf25c9f709749e3157751444155ec7c27e7469cb66cd72c5dae11e4cf8fd77",
+      "edits": [
+        {
+          "old": "/tmp/starling-node-compat/production-classic-artifacts-v1",
+          "new": "/tmp/starling-node-compat/production-classic-trace-v1",
+          "count": 1,
+          "offsets": [
+            361
+          ],
+          "beforeOffsets": [
+            361
+          ],
+          "reason": "Exclusive new build/freeze namespace"
+        },
+        {
+          "old": "immutable-release-engine-frozen",
+          "new": "immutable-trace-release-engine-frozen",
+          "count": 1,
+          "offsets": [
+            9093
+          ],
+          "beforeOffsets": [
+            9093
+          ],
+          "reason": "Distinct corrected-source freeze schema state"
+        },
+        {
+          "old": "    return gc, entropy",
+          "new": "    assert metadata.get('classicTraceSourcePolicy') == json.loads((HERE.parent / 'policy.json').read_bytes())['classicTraceSourcePolicy'], 'Corrected source provenance required before engine use'\n    return gc, entropy",
+          "count": 1,
+          "offsets": [
+            4090
+          ],
+          "beforeOffsets": [
+            4090
+          ],
+          "reason": "Reject previous or projected provenance before engine bytes"
+        },
+        {
+          "old": "f68267eff5126af83c099346d07e5befbf6261ed4ca245e14a68f292f32087e3",
+          "new": "1646c52a05d81ec53c6cfeb3ca9347868e39944404e7c6d3dc88fa81672e29b6",
+          "count": 1,
+          "offsets": [
+            858
+          ],
+          "reason": "Fixed successor tool dependency graph"
+        }
+      ],
+      "exactReverseProved": true,
+      "patch": "proofs/artifact-tools__artifact_common.py.patch",
+      "patchSha256": "c9b42c3020eb28c8b931b48527b7902d2f2617e39064308200210553091649c9"
+    },
+    {
+      "origin": "tests/node-compat/foundation-classic-streams/integration-candidate-v1/artifact-tools/metadata-admission.mjs",
+      "beforeSha256": "6759d0fe070cf69e37679bf17f396fa8c3a5c191286b494965f85992951faa47",
+      "afterimage": "artifact-tools/metadata-admission.mjs",
+      "afterSha256": "2c1d2e120e3d3e4dc077854f39ec512246ebe999376f6d73db76740e852da950",
+      "edits": [
+        {
+          "old": "export const RECIPE=contract.productionRecipeSha256;",
+          "new": "export const RECIPE=contract.productionRecipeSha256;\nconst sourcePolicy=JSON.parse(await readFile(join(here,'../policy.json')));\nassert.equal(hash(await readFile(join(here,'../policy.json'))),contract.policySha256);",
+          "count": 1,
+          "offsets": [
+            592
+          ],
+          "beforeOffsets": [
+            592
+          ],
+          "reason": "Bind source policy before diagnostic/previous metadata classification"
+        },
+        {
+          "old": " return Object.freeze(options);",
+          "new": " assert.deepEqual(metadata.classicTraceSourcePolicy,sourcePolicy.classicTraceSourcePolicy,'Corrected source provenance required before engine use');\n return Object.freeze(options);",
+          "count": 1,
+          "offsets": [
+            2283
+          ],
+          "beforeOffsets": [
+            2283
+          ],
+          "reason": "No previous metadata source relabelling"
+        },
+        {
+          "old": "f68267eff5126af83c099346d07e5befbf6261ed4ca245e14a68f292f32087e3",
+          "new": "1646c52a05d81ec53c6cfeb3ca9347868e39944404e7c6d3dc88fa81672e29b6",
+          "count": 1,
+          "offsets": [
+            829
+          ],
+          "reason": "Fixed successor tool dependency graph"
+        }
+      ],
+      "exactReverseProved": true,
+      "patch": "proofs/artifact-tools__metadata-admission.mjs.patch",
+      "patchSha256": "f34a7baefa31480b4bacd507637dc0939ba786cd9939992722fb221c6e8fc004"
+    },
+    {
+      "origin": "tests/node-compat/foundation-classic-streams/integration-candidate-v1/artifact-tools/export-pin-candidate.py",
+      "beforeSha256": "9e0a12ea331adc660bae3ab5e9bda22c1023b3a439a422ae1fcfef532757cfc4",
+      "afterimage": "artifact-tools/export-pin-candidate.py",
+      "afterSha256": "7803e4678abdcaa0fdcca7e026b76d689cb62e7e0fd24f238cf917411f1f2c76",
+      "edits": [
+        {
+          "old": "unreviewed-classic-production-freeze-pin-candidate",
+          "new": "unreviewed-classic-trace-production-freeze-pin-candidate",
+          "count": 1,
+          "offsets": [
+            530
+          ],
+          "beforeOffsets": [
+            530
+          ],
+          "reason": "Never relabel previous pins"
+        },
+        {
+          "old": "UNREVIEWED_CLASSIC_PRODUCTION_PIN_CANDIDATES_V1",
+          "new": "UNREVIEWED_CLASSIC_TRACE_PRODUCTION_PIN_CANDIDATES_V1",
+          "count": 1,
+          "offsets": [
+            2387
+          ],
+          "beforeOffsets": [
+            2387
+          ],
+          "reason": "Unreviewed corrected-source pin data only"
+        },
+        {
+          "old": "        'sourceFiles': 342, 'recipeSha256': RECIPE,",
+          "new": "        'sourceContractVersion': 'sm-classic-trace-source-v1', 'classicTraceSourcePolicy': metadata['classicTraceSourcePolicy'],\n        'sourceFiles': 342, 'recipeSha256': RECIPE,",
+          "count": 1,
+          "offsets": [
+            777
+          ],
+          "beforeOffsets": [
+            777
+          ],
+          "reason": "Export source-version evidence without activating pins"
+        }
+      ],
+      "exactReverseProved": true,
+      "patch": "proofs/artifact-tools__export-pin-candidate.py.patch",
+      "patchSha256": "92b0f5e7008faf682b09519b132a9dc0a873c08e3173b622f664636c7bc7bbef"
+    }
+  ],
+  "nativeChanges": [
+    {
+      "path": "builtins/node-compat/classic-streams/classic-core.generated.mjs",
+      "beforeSha256": "ba39701153094c6481464fa3f45a7afd87e6d41d673026e8008e12f2693802bf",
+      "afterSha256": "5c0241a73f4cdffc61d7c962bd4d1a1d2015f8fbadef59a4631b7551f9a767b9",
+      "beforeBytes": 204998,
+      "afterBytes": 204976
+    },
+    {
+      "path": "builtins/node-compat/classic-streams/transformation-receipt.json",
+      "beforeSha256": "ce6d14d7f83d5326252d3e27c04b70f45c275a3279c37bd05d769df9b5818455",
+      "afterSha256": "9088363c031c631c2a4e1a9fb8234695d5fc01324b28e15951874eff46161c38",
+      "beforeBytes": 17096,
+      "afterBytes": 19508
+    },
+    {
+      "path": "builtins/node-compat/classic-streams/factories.generated.h",
+      "beforeSha256": "f8503c92d87d6ad0bb6f5961c3eac2c8e2eab2e76224867c6363dc9bbfc7404e",
+      "afterSha256": "2323271d0144a809a8d702913692cae24244220845a7219fd5bda1b9f9f2f9db",
+      "beforeBytes": 210770,
+      "afterBytes": 210748
+    }
+  ],
+  "compiledOrGuestExecuted": false
+}

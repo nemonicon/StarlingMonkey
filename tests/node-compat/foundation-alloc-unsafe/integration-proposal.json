@@ -1,0 +1,113 @@
+{
+  "schema": "source-integration-proposal-v1",
+  "proposalVersion": "buffer-allocunsafe-zeroed-v1",
+  "productionImplemented": false,
+  "productionUnchanged": [
+    {
+      "path": "builtins/node-compat/buffer-facade.mjs",
+      "sha256": "b1a8b671e4ebf71ed300b56afb1d60986ef37be1716f55bf00b35151a4a00f16"
+    },
+    {
+      "path": "builtins/node-compat/buffer.cpp",
+      "sha256": "7f73ce790e6b23195a9bfa583bacdbf45dfb9fa9aed00489f66952d93ca37cf8"
+    },
+    {
+      "path": "builtins/node-compat/factories.generated.h",
+      "sha256": "7de6c1e35dec100894bb7fe6f904b491ef5497df5ae8fe3ce6494742bc91b84e"
+    },
+    {
+      "path": "builtins/node-compat/unsupported.mjs",
+      "sha256": "412b869a321421f3930e25ba2c0d4bac4dac9effbbb1e4d84eaf636599d38ea8"
+    },
+    {
+      "path": "builtins/node-compat/export-manifest.node-v22.14.0.json",
+      "sha256": "fbc2f85596eab0cd9614fcd12281212fce55a3c925da731650a4cfa2927809e3"
+    }
+  ],
+  "baseManifest": {
+    "path": "builtins/node-compat/export-manifest.node-v22.14.0.json",
+    "profileVersion": "sm-node-22.14.0-m0.1",
+    "sha256": "fbc2f85596eab0cd9614fcd12281212fce55a3c925da731650a4cfa2927809e3"
+  },
+  "nextCoreProfileVersion": null,
+  "versionAssignment": "Coordinator must assign a new core profile version before integration; no global version reserved by this experiment",
+  "selectedManifestPolicy": "Replace the selected core revision coherently; do not overlay two manifests that both define node:buffer",
+  "semanticDelta": {
+    "addSupportedStatic": "allocUnsafe(size:number-finite-nonnegative<=16777216): floor length, fresh zeroed owned Buffer, no pool",
+    "removeUnsupportedStaticOnly": "allocUnsafe",
+    "keepDeferred": [
+      "allocUnsafeSlow",
+      "copyBytesFrom",
+      "of",
+      "compare",
+      "concat"
+    ],
+    "unchangedExports": [
+      "Blob",
+      "Buffer",
+      "File",
+      "INSPECT_MAX_BYTES",
+      "SlowBuffer",
+      "atob",
+      "btoa",
+      "constants",
+      "default",
+      "isAscii",
+      "isUtf8",
+      "kMaxLength",
+      "kStringMaxLength",
+      "resolveObjectURL",
+      "transcode"
+    ],
+    "unchangedPrototypeMethodGate": 91,
+    "unchangedLimits": {
+      "MAX_LENGTH": 16777216,
+      "MAX_STRING_LENGTH": 33554432,
+      "MAX_SOURCE_CODE_UNITS": 1048576,
+      "poolSize": 0
+    },
+    "requiredHostInterfaces": [],
+    "newDeviations": [
+      "All visible bytes are guaranteed zero; do not assert reference allocUnsafe initial contents",
+      "No slab/pool or shared backing between independent allocations, including positive fractions truncating to zero; byteOffset0 and backing length equals result length",
+      "Mutable Buffer.poolSize does not select a pool; current profile default remains0",
+      "Cap applies to raw requested numeric size before truncation, so16777216.25 rejects despite reference truncated length16777216",
+      "Only allocUnsafe admits positive fractional size truncation; existing alloc size policy remains unchanged",
+      "Detailed validation messages differ; TypeError/ERR_INVALID_ARG_TYPE and RangeError/ERR_OUT_OF_RANGE are tested",
+      "No allocUnsafeSlow or legacy Buffer constructor expansion follows from this dependency experiment"
+    ]
+  },
+  "implementationRoute": [
+    "Inside existing createBufferModule, capture the supported native Buffer.alloc value after its definition and before application code; use the candidate validation and Math.trunc contract",
+    "Assign a normal constructible function named allocUnsafe with arity1 to the existing constructor slot; remove only that name from the deferred-static installation list",
+    "Leave native kernel/allocator ownership and all91 prototype refusals intact; regenerate core factory header via the existing generator",
+    "Update the coordinated core version/selection receipt and build a new isolated engine; preserve all old v6 inputs/reports and old-version gates",
+    "Synchronize unsupported.mjs::PROFILE_VERSION with the assigned core version, since Buffer/child_process refused-operation errors carry it; version-select the old hardcoded fixture expectation while retaining all91 prototype checks"
+  ],
+  "evidence": {
+    "nodeReport": "node-results.json",
+    "nodeReportSha256": "904fc82fa084726dcb01e11b52f518de8b017cd0cbd938fdec6ca985184cea13",
+    "componentReport": "component-results.json",
+    "componentReportSha256": "a0dcd1dd0b80a5f380c0dbc1282f9ff959cf9804145072bc4e814e306070e646",
+    "differentialGroups": 10,
+    "candidateGroups": 5,
+    "componentSha256": "ffc59530b4230b7b5cbe3684de3e1ae7008b47c8832f687e6728f4f4af3ee899",
+    "engineSha256": "33b9cb248afbb4a3b3653c7b76bd656e51443e6823fa72d712758c742cd59516",
+    "hostImports": [],
+    "temporaryPatchRestored": true,
+    "classicStreamInstalled": false
+  },
+  "nextGates": [
+    "Coordinator source/contract review and version assignment",
+    "Actual production factory/schema/generator and new engine gates",
+    "Old-version unsupported gate plus next-version allocUnsafe tests selected by receipt",
+    "Joint host gate and final import audit",
+    "Performance/component-size measurements if any speed/memory claim is proposed"
+  ],
+  "remainingClassicStreamDependencies": [
+    "Node abort-listener semantics",
+    "Boundary-sensitive tick/resource scheduler",
+    "Declared encoding/backing/remaining Buffer demands"
+  ],
+  "scope": "Concrete source-based proposed manifest/facade delta only. This file is not a schema-valid selected production manifest and changes no production file."
+}

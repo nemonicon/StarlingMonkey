@@ -1,0 +1,9 @@
+The first host-only amended bundle completed lowering, then a test assertion
+expected the original .cjs path in moduleIds. Existing profile-bundler.mjs:54
+names the lowered module .cjs.native-profile.mjs. The assertion was corrected
+to that exact existing synthetic ID. This was a test expectation failure, not
+a componentization or guest execution. The failed scratch directory is
+/tmp/starling-node-compat/classic-cjs-bundle-v1-nUiyQR.
+
+AssertionError at test-bundle.mjs:37:
+assert(bundled.moduleIds.some(id=>id.endsWith('/cjs-bindings.cjs')))

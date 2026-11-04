@@ -1,0 +1,325 @@
+{
+  "state": "PACKET_ONLY_FINITE_ADMISSION_POLICY_PATH_AND_REPORT_EDITS",
+  "runners": [
+    {
+      "name": "sync",
+      "original": "tests/node-compat/foundation-add-abort/run-production-v11-sync.mjs",
+      "originalSha256": "28066ddd312e841b87910c35f85b3e200081b412d9f572b327cc917cb7cbcf57",
+      "generated": "runners/sync.mjs",
+      "generatedSha256": "41e5cededf1225877029fead15d83408f9afcae04e88637ce9f44dc3fe3ba5af",
+      "semanticBlockSha256": "c80e80b9eec859ae835bdfda2fa006ce0d41d775236946b24f9275aa2373f48b",
+      "semanticBlockStart": "const prefix=",
+      "semanticBlockEnd": "const report=",
+      "reverseDeclaredEditsRestoresOriginalBytes": true,
+      "changes": [
+        {
+          "before": "from './production-v11-preflight.mjs'",
+          "after": "from '../../production-regression-candidate-v3/preflight.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../foundations/native-scalar-harness.mjs'",
+          "after": "from '../../../foundations/native-scalar-harness.mjs'",
+          "count": 1
+        },
+        {
+          "before": "{verifyProductionV11}",
+          "after": "{verifyProductionTicks}",
+          "count": 1
+        },
+        {
+          "before": "const productionPreflight=await verifyProductionV11();",
+          "after": "const productionPreflight=(await verifyProductionTicks({gcStress:false})).report;",
+          "count": 1
+        },
+        {
+          "before": "here=dirname(fileURLToPath(import.meta.url))",
+          "after": "here=dirname(fileURLToPath(new URL('../../../foundation-add-abort/run-production-v11-sync.mjs',import.meta.url)))",
+          "count": 1
+        },
+        {
+          "before": "'sm-uncaught-event-v3-protected-abort-v2'",
+          "after": "'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1'",
+          "count": 1
+        },
+        {
+          "before": "join(here,'production-v11-sync-results.json')",
+          "after": "join(h.output,'private-ticks-sync-summary.json')",
+          "count": 1
+        },
+        {
+          "before": "'production-v11-sync-results.json'",
+          "after": "'private-ticks-sync-results.json'",
+          "count": 1
+        },
+        {
+          "before": "'production-v11-strict-sync-acceptance-passed'",
+          "after": "'production-private-ticks-strict-sync-acceptance-passed'",
+          "count": 1
+        },
+        {
+          "before": "kind:'production-v11-strict-event'",
+          "after": "kind:'production-private-ticks-strict-event'",
+          "count": 1
+        },
+        {
+          "before": "Actual combined production v11 stream/web ON, entropy OFF engine with core m0.11;",
+          "after": "Actual combined production private-ticks stream/web ON, entropy OFF engine with core m0.11;",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "name": "runtime",
+      "original": "tests/node-compat/foundation-add-abort/run-production-v11-runtime.mjs",
+      "originalSha256": "5fa4903f853697aa34d3e58c49d4b27a32896c17da134bd94547c2f92534a1b1",
+      "generated": "runners/runtime.mjs",
+      "generatedSha256": "db048409fe8aa52cbdfba87f2c1bf4627bfe3f36c9eb67fa8a1f01bceee1f728",
+      "semanticBlockSha256": "3ecf5af0fc4ccf0006aa676c1a02ce1757e425ea2750fe4769b9e831ba903515",
+      "semanticBlockStart": "const previous=",
+      "semanticBlockEnd": "const report=",
+      "reverseDeclaredEditsRestoresOriginalBytes": true,
+      "changes": [
+        {
+          "before": "from './production-v11-preflight.mjs'",
+          "after": "from '../../production-regression-candidate-v3/preflight.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../foundations/native-scalar-harness.mjs'",
+          "after": "from '../../../foundations/native-scalar-harness.mjs'",
+          "count": 1
+        },
+        {
+          "before": "{verifyProductionV11}",
+          "after": "{verifyProductionTicks}",
+          "count": 1
+        },
+        {
+          "before": "const productionPreflight=await verifyProductionV11();",
+          "after": "const productionPreflight=(await verifyProductionTicks({gcStress:false})).report;",
+          "count": 1
+        },
+        {
+          "before": "here=dirname(fileURLToPath(import.meta.url))",
+          "after": "here=dirname(fileURLToPath(new URL('../../../foundation-add-abort/run-production-v11-runtime.mjs',import.meta.url)))",
+          "count": 1
+        },
+        {
+          "before": "'sm-uncaught-event-v3-protected-abort-v2'",
+          "after": "'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1'",
+          "count": 1
+        },
+        {
+          "before": "join(here,'production-v11-runtime-results.json')",
+          "after": "join(h.output,'private-ticks-runtime-summary.json')",
+          "count": 1
+        },
+        {
+          "before": "'production-v11-runtime-results.json'",
+          "after": "'private-ticks-runtime-results.json'",
+          "count": 1
+        },
+        {
+          "before": "'production-v11-runtime-unhandled-boundary-acceptance-passed'",
+          "after": "'production-private-ticks-runtime-unhandled-boundary-acceptance-passed'",
+          "count": 1
+        },
+        {
+          "before": "kind:'production-v11-runtime'",
+          "after": "kind:'production-private-ticks-runtime'",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "name": "late",
+      "original": "tests/node-compat/foundation-add-abort/run-production-v11-late.mjs",
+      "originalSha256": "4a7526e09602170b6fccaa0e8f074df9b4aee47f9111eeafa7d0c4b8097a1049",
+      "generated": "runners/late.mjs",
+      "generatedSha256": "2304a9d95d314e43e6bf76e712427f5b309b677306524d78b0bb2c22c03df8ff",
+      "semanticBlockSha256": "7795b10e5af105e702d577a2b8a5e20ce8988ed94cdde12c965a34dba8e58969",
+      "semanticBlockStart": "const witWorld=",
+      "semanticBlockEnd": "const report=",
+      "reverseDeclaredEditsRestoresOriginalBytes": true,
+      "changes": [
+        {
+          "before": "from './production-v11-preflight.mjs'",
+          "after": "from '../../production-regression-candidate-v3/preflight.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../toolchain.mjs'",
+          "after": "from '../../../toolchain.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../componentizer.mjs'",
+          "after": "from '../../../componentizer.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../foundations/native-scalar-harness.mjs'",
+          "after": "from '../../../foundations/native-scalar-harness.mjs'",
+          "count": 1
+        },
+        {
+          "before": "{verifyProductionV11}",
+          "after": "{verifyProductionTicks}",
+          "count": 1
+        },
+        {
+          "before": "const productionPreflight=await verifyProductionV11();",
+          "after": "const productionPreflight=(await verifyProductionTicks({gcStress:false})).report;",
+          "count": 1
+        },
+        {
+          "before": "here=dirname(fileURLToPath(import.meta.url))",
+          "after": "here=dirname(fileURLToPath(new URL('../../../foundation-add-abort/run-production-v11-late.mjs',import.meta.url)))",
+          "count": 1
+        },
+        {
+          "before": "join(here,'production-v11-late-results.json')",
+          "after": "join(output,'private-ticks-late-summary.json')",
+          "count": 1
+        },
+        {
+          "before": "'production-v11-late-results.json'",
+          "after": "'private-ticks-late-results.json'",
+          "count": 1
+        },
+        {
+          "before": "'production-v11-post-binding-acceptance-passed'",
+          "after": "'production-private-ticks-post-binding-acceptance-passed'",
+          "count": 1
+        },
+        {
+          "before": "Actual production v11 guest embedding patch;",
+          "after": "Actual production private-ticks guest embedding layer;",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "name": "callbacks",
+      "original": "tests/node-compat/foundation-add-abort/run-production-v11-callbacks.mjs",
+      "originalSha256": "68dd28d1661d9bc03aeb1efb0c73f5c4c822969d78aebc7851e461d752ea21a9",
+      "generated": "runners/callbacks.mjs",
+      "generatedSha256": "fce700149b9848b0e97eb07dba1bac3c939625a01c258071735e96aef0df83f9",
+      "semanticBlockSha256": "2a0c1aa77847398fc4d6979a4c74128f2302e0508b36f13d0030368016649bbc",
+      "semanticBlockStart": "const initialization=[];",
+      "semanticBlockEnd": "const report=",
+      "reverseDeclaredEditsRestoresOriginalBytes": true,
+      "changes": [
+        {
+          "before": "from './production-v11-preflight.mjs'",
+          "after": "from '../../production-regression-candidate-v3/preflight.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from '../foundations/native-scalar-harness.mjs'",
+          "after": "from '../../../foundations/native-scalar-harness.mjs'",
+          "count": 1
+        },
+        {
+          "before": "{verifyProductionV11}",
+          "after": "{verifyProductionTicks}",
+          "count": 1
+        },
+        {
+          "before": "const productionPreflight=await verifyProductionV11();",
+          "after": "const productionPreflight=(await verifyProductionTicks({gcStress:false})).report;",
+          "count": 1
+        },
+        {
+          "before": "here=dirname(fileURLToPath(import.meta.url))",
+          "after": "here=dirname(fileURLToPath(new URL('../../../foundation-add-abort/run-production-v11-callbacks.mjs',import.meta.url)))",
+          "count": 1
+        },
+        {
+          "before": "'sm-uncaught-event-v3-protected-abort-v2'",
+          "after": "'sm-uncaught-event-v3-protected-abort-v2-private-ticks-v1'",
+          "count": 1
+        },
+        {
+          "before": "join(here,'production-v11-callback-results.json')",
+          "after": "join(h.output,'private-ticks-callback-summary.json')",
+          "count": 1
+        },
+        {
+          "before": "'production-v11-callback-results.json'",
+          "after": "'private-ticks-callback-results.json'",
+          "count": 1
+        },
+        {
+          "before": "'production-v11-finalizer-getter-cleanup-acceptance-passed'",
+          "after": "'production-private-ticks-finalizer-getter-cleanup-acceptance-passed'",
+          "count": 1
+        },
+        {
+          "before": "kind:'production-v11-callbacks'",
+          "after": "kind:'production-private-ticks-callbacks'",
+          "count": 1
+        },
+        {
+          "before": "Actual combined production v11 OFF engine;",
+          "after": "Actual combined production private-ticks OFF engine;",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "name": "stream-web",
+      "original": "tests/node-compat/foundation-stream-web/production-candidate/run-native-component-v11.mjs",
+      "originalSha256": "0ecdc82f4e10905815e6a3863cee0af15a10097da9c7aa11a7c58c9c7a76c658",
+      "generated": "runners/stream-web.mjs",
+      "generatedSha256": "70f93daa94da6ff71f3ce8339ea9187e671e2623a3753431cfa9585d28051508",
+      "semanticBlockSha256": "8dd70343d2e1b7047eabd08e880ace499f3e45f7bd6012d3ce4e723b67a67953",
+      "semanticBlockStart": "const expected=",
+      "semanticBlockEnd": "const fixturePaths=",
+      "reverseDeclaredEditsRestoresOriginalBytes": true,
+      "changes": [
+        {
+          "before": "from '../../foundation-add-abort/production-v11-preflight.mjs'",
+          "after": "from '../../production-regression-candidate-v3/preflight.mjs'",
+          "count": 1
+        },
+        {
+          "before": "from './native-harness.mjs'",
+          "after": "from '../../../foundation-stream-web/production-candidate/native-harness.mjs'",
+          "count": 1
+        },
+        {
+          "before": "{verifyProductionV11}",
+          "after": "{verifyProductionTicks}",
+          "count": 1
+        },
+        {
+          "before": "const releasePreflight=await verifyProductionV11();",
+          "after": "const releasePreflight=await verifyProductionTicks({gcStress:false});",
+          "count": 1
+        },
+        {
+          "before": "const result={schema:1,",
+          "after": "const result={schema:1,productionTickAdmission:releasePreflight.report,",
+          "count": 1
+        },
+        {
+          "before": "here=dirname(fileURLToPath(import.meta.url))",
+          "after": "here=dirname(fileURLToPath(new URL('../../../foundation-stream-web/production-candidate/run-native-component-v11.mjs',import.meta.url)))",
+          "count": 1
+        },
+        {
+          "before": "join(here,'native-component-v11-results.json')",
+          "after": "join(harness.output,'stream-web-summary.json')",
+          "count": 1
+        },
+        {
+          "before": "on new m0.11 core engine;",
+          "after": "on production private-ticks m0.11 core engine;",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "origin": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/measurement-execution-activated-v2/bundle-matched.mjs",
+  "beforeSha256": "5df8abbeb2f46abbd2de2005c85f003b8e3e885b8781a98b6b297d59fcb7ba37",
+  "afterSha256": "7502a402263166fcba8aa25df0df635ad269904e90f2305ef631dbdef08f1362",
+  "edits": [
+    {
+      "old": "import {fileURLToPath,pathToFileURL} from 'node:url';",
+      "new": "import {fileURLToPath,pathToFileURL} from 'node:url';\nimport {priorStockModules} from './stock-graph.mjs';",
+      "count": 1
+    },
+    {
+      "old": "  const previous=JSON.parse(await readFile(join(here,'stock-source-graph.json'))),oldOwn=['entry.mjs','workload.mjs','stock-provider.mjs'];\n  const prior=previous.modules.filter(id=>!oldOwn.some(name=>id===join(dirname(previous.provider),name)));",
+      "new": "  const previous=JSON.parse(await readFile(join(here,'stock-source-graph.json')));\n  const prior=priorStockModules(previous);",
+      "count": 1
+    }
+  ],
+  "reversalExact": true,
+  "guestProviderSchedulerWorkloadOracleAdapterChanged": false
+}

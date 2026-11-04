@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+"""Independent source/data/hash review only. Imports no reviewed code and starts no child."""
+from pathlib import Path
+import ast,hashlib,json,os,re,stat,datetime
+HERE=Path(__file__).resolve().parent
+BASE=HERE.parent
+SOURCE=BASE/'measurement-execution-candidate-v1'
+EXPECTED='4b6fdfa51d41120865114b0e8558dbc6e97fdd63007e108a35c264d20bc0280d'
+checked={}
+def digest(data):return hashlib.sha256(data).hexdigest()
+def regular(path,expected=None,size=None):
+ path=Path(path);before=path.lstat();assert stat.S_ISREG(before.st_mode) and not path.is_symlink(),str(path)
+ h=hashlib.sha256()
+ with path.open('rb') as stream:
+  for chunk in iter(lambda:stream.read(1024*1024),b''):h.update(chunk)
+ after=path.lstat();assert(before.st_dev,before.st_ino,before.st_size,before.st_mtime_ns)==(after.st_dev,after.st_ino,after.st_size,after.st_mtime_ns)
+ row={'path':str(path),'sha256':h.hexdigest(),'bytes':before.st_size};assert expected is None or row['sha256']==expected,str(path);assert size is None or row['bytes']==size,str(path)
+ if str(path)in checked:assert checked[str(path)]==row
+ checked[str(path)]=row;return row
+def document(path,sha=None):
+ row=regular(path,sha);raw=Path(path).read_bytes();assert digest(raw)==row['sha256'];return json.loads(raw)
+def indexed(root,sha):
+ value=document(root/'index.json',sha);names=set()
+ for row in value['files']:
+  name=row['path'];assert name not in names and not Path(name).is_absolute() and '..'not in Path(name).parts;names.add(name);regular(root/name,row['sha256'],row['bytes'])
+ return value
+def tree(root):
+ rows=[]
+ for directory,dirs,files in os.walk(root,followlinks=False):
+  for name in sorted(dirs+files):
+   path=Path(directory)/name;mode=path.lstat().st_mode;kind='symlink'if stat.S_ISLNK(mode)else'directory'if stat.S_ISDIR(mode)else'file'if stat.S_ISREG(mode)else None;assert kind
+   rows.append({'path':str(path.relative_to(root)),'kind':kind})
+  dirs[:]=[n for n in dirs if not(Path(directory)/n).is_symlink()]
+ return sorted(rows,key=lambda r:r['path'])
+def main():
+ index=indexed(SOURCE,EXPECTED);assert len(index['files'])==43
+ assert {str(p.relative_to(SOURCE))for p in SOURCE.rglob('*')if p.is_file()}=={r['path']for r in index['files']}|{'index.json'}
+ source_receipt=document(SOURCE/'source-receipt.json');inputs=document(SOURCE/'input-freeze.json',source_receipt['inputFreezeSha256']);assert len(inputs['inputs'])==source_receipt['preparationInputs']==7004
+ consumed={}
+ for row in inputs['inputs']:
+  path=Path(row['path']);assert path.is_absolute() and str(path) not in consumed;consumed[str(path)]=row;regular(path,row['sha256'],row['bytes'])
+ closure=document(BASE/'measurement-correctness-candidate-v1/input-freeze.json');assert len(closure['toolTrees'])==2 and len(closure['toolLinks'])==22
+ for item in closure['toolTrees']:
+  root=Path(item['path']);assert not root.is_symlink() and str(root.resolve())==item['realPath'];observed=tree(root);assert observed==item['entries']
+  for row in observed:
+   if row['kind']=='file':assert str((root/row['path']).resolve())in consumed
+ for row in closure['toolLinks']:
+  path=Path(row['path']);assert path.is_symlink() and os.readlink(path)==row['linkText'] and str(path.resolve())==row['resolvedTarget']
+  if row['targetKind']=='file':regular(row['resolvedTarget'],row['targetSha256'],row['targetBytes'])
+ for name,count in [('source-tests.json',39),('protocol-tests.json',53)]:
+  data=document(SOURCE/'evidence'/name);assert data['passed']==len(data['checks'])==count
+ syntax=document(SOURCE/'evidence/syntax-results.json');assert len(syntax['checks'])==25 and syntax['actionCodeEvaluated']is False
+ for row in syntax['checks']:
+  regular(SOURCE/row['path'],row['sha256'])
+  if row['kind']=='Node --check':assert row['status']==0 and row['stdout']==row['stderr']==''
+ python_files=[]
+ for path in SOURCE.glob('*.py'):ast.parse(path.read_text(),filename=str(path));python_files.append(path.name)
+ assert len(python_files)==4
+ common=BASE/'measurement-common-byte-domain-candidate-v1';old=BASE/'measurement-workload-candidate-v1'
+ for local,origin in [('workload.mjs',common/'workload.mjs'),('control-workload.mjs',old/'workload.mjs'),('stock-provider.mjs',common/'stock-provider.mjs'),('node-common-oracle.json',common/'evidence/node-results.json')]:assert(SOURCE/local).read_bytes()==origin.read_bytes()
+ core=(SOURCE/'classic-core.generated.mjs').read_text();facade=(SOURCE/'classic-streams.mjs').read_text();staged=Path('/private/tmp/starling-node-compat/classic-benchmark-trace-v2-source')
+ regular(SOURCE/'classic-core.generated.mjs','5c0241a73f4cdffc61d7c962bd4d1a1d2015f8fbadef59a4631b7551f9a767b9')
+ for name in ['classic-core.generated.mjs','classic-streams.mjs']:assert(SOURCE/name).read_bytes()==(staged/'builtins/node-compat/classic-streams'/name).read_bytes()
+ body=facade.replace("import {createClassicCore} from './classic-core.generated.mjs';\n",'');body=re.sub(r'^export function ','function ',body,flags=re.M)
+ factory="(function(dependencies){\n'use strict';\n"+re.sub(r'^export function ','function ',core,flags=re.M)+'\n'+body+'\nreturn createClassicStreams(dependencies);\n})'
+ header=(staged/'builtins/node-compat/classic-streams/factories.generated.h').read_text();assert header.split('R"SM_NODE_PROFILE(')[1].split(')SM_NODE_PROFILE";')[0]==factory
+ controls=document(SOURCE/'node-control-oracle.json');original=document(old/'evidence/node-results.json',controls['sourceOracleSha256']);assert controls['cases']==[{'id':r['id'],'iterations':r['iterations'],'setup':r['setup'],'expected':r['oracle']} for r in original['expected'] if r['id']in ['checksum-input-only','byte-input-and-copy-construction-only','stream-construction-and-clean-close-only']]
+ assert len(controls['cases'])==6 and len(document(SOURCE/'node-common-oracle.json')['cases'])==8
+ pair=document(SOURCE/'future-pair-authority.json');phase=document(SOURCE/'future-measurement-phase.json');assert pair['variants']=={'benchmark-classic-on':None,'benchmark-classic-off':None} and pair['rootPairReview']is None
+ assert phase['components']is phase['pairPinsSha256']is phase['freshFull20And14']is phase['actualCorrectness']is phase['freshReplay']is phase['freshHttpBothHosts']is None and phase['timingAllowed']is False
+ texts={name:(SOURCE/name).read_text()for name in ['authority.py','activate.py','runtime-preflight.template.mjs','prepare-correctness.mjs','bundle-matched.mjs','measure.mjs','protocol.mjs','phase.mjs','collect-worker.mjs','guest.mjs','instantiate.mjs','canonical-provider.mjs']}
+ authority=texts['authority.py'];assert "set(pins['variants'])==set(LABELS)"in authority and "'ROOT_REVIEWED_COMMON_BYTE_DIAGNOSTIC_PAIR_V1'"in authority
+ assert "review['timingAllowed']is False"in authority and 'document(pin_path,pin_sha)'in authority
+ on=document(BASE/'production-adoption-v1/reviewed-diagnostic-v3-on-pins.json','2e9811a54b03733d7d4dde0b42f66831a9b97da2c2f26313f078443dc329165c');assert on['variants']['benchmark-classic-off']is None
+ prepare=texts['prepare-correctness.mjs'];measure=texts['measure.mjs'];assert 'timeout:55000'in prepare and 'timeout:300000'in texts['collect-worker.mjs']
+ assert prepare.index('assert.equal(actual.status,0')<prepare.index('wt.push(')<prepare.index('records.push(record)')
+ assert "actual.signal"not in prepare and "wt-"in prepare and ".status.json"not in prepare
+ for token in ['actualCorrectness','freshFull20And14','freshReplay','freshHttpBothHosts']:assert token in texts['phase.mjs'] and token in measure
+ assert "ACTUAL_CLASSIC_DIAGNOSTIC_20_WORKLOAD_14_BOUNDARY_CORRECTNESS_PASSED"in measure and "ROOT_REVIEWED_COMMON_BYTE_PREREQUISITE_V1"in measure
+ assert 'NODE_COMPAT_COMMON_BYTE_TIMING_APPROVED'in measure and 'selectTimingPhase(JSON.parse(phaseRaw))'in measure
+ assert 'sameBytes,true'in texts['phase.mjs'] and 'requestsPerHost,[3,3]'in texts['phase.mjs'] and 'stopCodes,[0,0]'in texts['phase.mjs']
+ assert "nodeBuiltinPlugin({imports:[],exports:[]},{})"in texts['bundle-matched.mjs'] and 'processEdges.length,7'in texts['bundle-matched.mjs'] and 'prior.length,99'in texts['bundle-matched.mjs']
+ assert 'node:util'not in texts['canonical-provider.mjs'] and 'const {Buffer,events,StringDecoder,nextTick,'in core
+ assert "'./capture-before.mjs'"in texts['guest.mjs'] and 'globalChangedDuringProvider:'in texts['guest.mjs'] and 'terminalQueueEmptyObserved:false'in texts['guest.mjs']
+ assert 'capacityBytes:null'in measure and 'growCount:null'in measure and 'Memory'not in texts['instantiate.mjs']
+ assert 3*7*2==42 and 3*7*2*3==126 and 42+126==168
+ for name,sha in [('workload-timeout-attempt1-root-results.json','e816556489c1affb4c10b0d4dd19e87a5550e9b0db16bc92a97737c487649766'),('workload-public-case5-root-results.json','793a2f0de42b931fac12c55c570a888add9ced3c2e9b25b09e8bef70363ce45e')]:document(BASE/'production-adoption-v1'/name,sha)
+ timeout=document(BASE/'production-adoption-v1/workload-timeout-attempt1-root-results.json');assert timeout['originalTimedOutCaseUnknown'] and timeout['fullCorrectnessPassed']is False
+ finding={'id':'M1','severity':'mandatory-before-activation','file':'prepare-correctness.mjs','lines':[51,58,59,60,65],'issue':'Fixed55-second Wasmtime deadline and no per-call structured status/signal/error or progressive current-arm observation persistence before success assertion.','requiredChange':'A new independently reviewed amendment must make host deadline policy explicit and preserve bounded progress/terminal status/error/signal and completed observations before rejecting any timeout/nonzero/spawn/capture/semantic failure. Do not mutate4b6, project a missing pass or assume a larger deadline covers all finite cases.','failClosed':True}
+ result={'schemaVersion':1,'state':'INDEPENDENT_SOURCE_REVIEW_COMPLETE_MANDATORY_CAPTURE_DEADLINE_FIX_NO_ACTIVATION','sourceIndex':regular(SOURCE/'index.json',EXPECTED),'sourceFilesRehashed':43,'preparationInputsRehashed':7004,'toolTreesMembershipChecked':2,'toolLinksRechecked':22,'ownerEvidenceAuthenticatedNotRerun':{'sourceChecks':39,'protocolChecks':53,'syntaxChecks':25},'pythonAstParsedByThisReader':python_files,'canonicalCoreAndFullFactoryHeaderLiteralByteExact':True,'workloadAndStockProviderBytesPreserved':True,'controlOracleIsExactSixRowValueProjectionWithOracleKeyRenamedExpected':True,'fourArmsAndThreeComparisonsSourceReviewed':True,'noInventedPrivateUtilInjection':True,'stockDefaultOptionsAndSingleFifoGraphGuardsReviewed':True,'stockGlobalBufferContaminationGuardsReviewedNotExecuted':True,'beforeAfterProbeDoesNotClaimQueueEmpty':True,'pairAndPhaseNull':True,'onOnlyAuthorityCannotSatisfyPairSchema':True,'gatesFailClosedOnRead':True,'timingProtocol':{'families':7,'pilotWorkers':42,'timedWorkers':126,'totalWorkers':168,'processesPerArmFamilyComparison':3,'warmups':3,'correlatedSamples':7,'orders':['AB','BA','AB'],'sharedNBounds':[1,16],'pilot':'One public one-iteration first batch per arm; slower cost chooses floor25ms/cost bounded1..16 once','sampleClipping':False,'rssOnly':True,'capacityAndGrowUnavailable':True},'hostDeadlineLimits':{'correctnessWasmtimeMilliseconds':55000,'wholeTimingWorkerMilliseconds':300000,'allFiniteCaseAdequacyEstablished':False},'actualRootContext':{'originalFull20And14Attempt':regular(BASE/'production-adoption-v1/workload-timeout-attempt1-root-results.json'),'originalTimedOutCaseUnknown':True,'noFullPassOrSemanticMismatchPublished':True,'separateCase0Control':'Root-reported exact Node/Jco/Wasmtime small control, not full-suite proof','separateCase5Control':regular(BASE/'production-adoption-v1/workload-public-case5-root-results.json'),'rootReportedCase5LongDeadlineMilliseconds':600000,'rootReportedCase5ChildExit':0,'rootReportedCase5ElapsedSeconds':177.338,'rootReportedCase5WholeTraceSetupChecksumEqualNode':True,'meaning':'55 seconds is inadequate for that separate valid public case5 at the observed load. Original stop/cause and adequacy for every finite case remain unknown; full20+14 is unpassed.','pastRuntimeEventsObservedByThisReader':False},'mandatoryFindings':[finding],'disposition':'HOLD_SOURCE_ACTIVATION_PACKAGING_GUEST_AND_TIMING_PENDING_NEW_AMENDMENT_REVIEW_AND_SEPARATE_ROOT_AUTHORITY','projectHelpersImported':False,'nodeSyntaxOrProtocolTestsOrBundleOrProbeOrGuestOrNativeOrHostOrTimingExecuted':False,'runtimeAcceptanceClaim':False,'performanceClaim':False,'completeNodeStreamsClaim':False,'overallRoadmapComplete':False}
+ (HERE/'results.json').write_text(json.dumps(result,indent=2)+'\n');(HERE/'verified-files.json').write_text(json.dumps({'schemaVersion':1,'files':sorted(checked.values(),key=lambda r:r['path'])},indent=2)+'\n');print(json.dumps({'state':result['state'],'sourceFiles':43,'inputs':7004,'mandatoryFindings':1,'checkedPaths':len(checked)}))
+if __name__=='__main__':main()

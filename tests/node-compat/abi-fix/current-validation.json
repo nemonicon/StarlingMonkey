@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "atUtc": "2026-11-03T01:47:34.283098+00:00",
+  "scope": "Bounded independent guest ABI regressions; no claim of complete Component Model or Node compatibility.",
+  "sourceReports": [
+    {
+      "path": "results.current.json",
+      "sha256": "2658f4fcb5110d663ccb2e6407fe423cccae66e1b69d4d0347802af7c7f85cd3"
+    },
+    {
+      "path": "import-v2-results.json",
+      "sha256": "2b7bd27c1e9b394ce318c730caedf596b5989f4a04f19ff9ab191287413b0ba7"
+    },
+    {
+      "path": "raw-i32-reader-v2-results.json",
+      "sha256": "1ba11ea79272373f323d86687bfa9976ad15b07a0985ad82295a843fa95d5983"
+    },
+    {
+      "path": "i64-v2-results.json",
+      "sha256": "617069bf00bea28c6b7a4d4d701fc223d02d7b154e53104dc494590c92e114d0"
+    },
+    {
+      "path": "loader-test-results.json",
+      "sha256": "c22ac3cb2ff56960eec139c5a651d067d1c962dd796a99a9960c85987f240142"
+    },
+    {
+      "path": "splicer-source-audit-results.json",
+      "sha256": "bdb6eac263db8ebcc89f1482fde1ae000db265033a0bb98e58fae6818fa8b7df"
+    },
+    {
+      "path": "legacy-engine-guard-results.json",
+      "sha256": "c9c67eddcdcfb2e4d3ed24acda0578de0058ade4a2f7e00457b099c8d3892ca7"
+    }
+  ],
+  "packaging": {
+    "schemaVersion": 1,
+    "selection": "patched-import-i32-clock-v2",
+    "modulePath": "/private/tmp/starling-node-compat/import-abi-clock-v2-build/package/src/componentize.js",
+    "manifestPath": "/private/tmp/starling-node-compat/import-abi-clock-v2-build/package/splicer-build.json",
+    "manifestSha256": "95881f91364ecb8c41ca11cacb19a51c3ab9f74c8f85b0887db2e222a5128cc9",
+    "packagingVersion": "componentize-js-0.23.0+sm-import-i32.v1+sm-clock-errno.v1",
+    "patch": {
+      "id": "sm-import-i32.v1",
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/abi-fix/componentize-import-i32-v1.patch",
+      "sha256": "d300e345cb56a5bb1560f1f993c2cc763bca273e6bcf51e38aadc8e27d84782c",
+      "source": "crates/spidermonkey-embedding-splicer/src/splice.rs",
+      "baseSourceSha256": "abb62bc9580a9f8b8e8026950f6bb285f64373a905ae770718612508dafa301a",
+      "patchedSourceSha256": "f54d9d7562c525131def2a89d512883118d3c7a6af29a1e1021dfec76c31a048"
+    },
+    "additionalPatches": [
+      {
+        "id": "sm-clock-errno.v1",
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/oom/componentize-clock-errno-v2.patch",
+        "sha256": "57ace551f7d723cbf9faa41c42eda08feace9370f571175284e36c67d4c24da3",
+        "source": "crates/spidermonkey-embedding-splicer/src/stub_wasi.rs",
+        "baseSourceSha256": "8443685806c22b2308d33aba2871ab700dea3f9028de7dc475b235df1f2d6992",
+        "patchedSourceSha256": "a8bd26e5ab6edba7a83dcf8642e2c591c1465f92f0bf3f0c8eda15a99c3da2d8"
+      }
+    ],
+    "lock": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/abi-fix/splicer-Cargo.v1.lock",
+      "sha256": "6472e3cd45eeaacdd5f7133e8eaab8e4411ef77272812d97dd6ac729462f6ffd",
+      "baseSha256": "c8b5312c03dc69cb3b5747149ea2bf4820b0e8763fc73f6bd60e771a873c09f0",
+      "repair": "Only replace the inconsistent js-component-bindgen 2.10.1 local lock entry with the declared published 2.11.0 registry package and its checksum; all other lock entries are unchanged.",
+      "registryPackage": {
+        "name": "js-component-bindgen",
+        "version": "2.11.0",
+        "sha256": "d73b9c04f15dd549239f5302dd6a80be973d055b93c6ad60b7d8d0c9ab07f9b9"
+      }
+    },
+    "checkedFiles": [
+      {
+        "path": "src/componentize.js",
+        "sha256": "e58ef4f3b126f4a3fd07c61b368930bbf02dd0029f0f03e4c6928528e994e559"
+      },
+      {
+        "path": "src/platform.js",
+        "sha256": "7a510717aae2a99b24b95aa80f3f40288a9ca6b1bc77129d833ebd67f62e1370"
+      },
+      {
+        "path": "package.json",
+        "sha256": "62deec3b3c95aec1d87352f50022f1232823779f5e5fa45b01a380345f038559"
+      },
+      {
+        "path": "lib/spidermonkey-embedding-splicer.js",
+        "sha256": "a4aceb62d760ca39eb6c8abfb4e4e4cc0c2abafb302a162f8a08b8a71699ae37"
+      },
+      {
+        "path": "lib/spidermonkey-embedding-splicer.core.wasm",
+        "sha256": "edad4a6f77dfc307a42096bb90d2b7c8c37c893e7fb2325d785cf0d50fa52214"
+      },
+      {
+        "path": "lib/spidermonkey-embedding-splicer.core2.wasm",
+        "sha256": "30fff64b635b191d59e59b6b2aadf117f3e4c6326db35111f69a19ea1bd42a4e"
+      }
+    ],
+    "build": {
+      "rustc": "rustc 1.96.1 (31fca3adb 2026-06-26)",
+      "cargo": "cargo 1.96.1 (356927216 2026-06-26)",
+      "target": "wasm32-wasip1",
+      "profile": "release",
+      "locked": true,
+      "corePath": "/tmp/starling-node-compat/import-abi-clock-v2-build/target/wasm32-wasip1/release/splicer_component.wasm",
+      "coreSha256": "38a0c2cce5bc0b67272bad2885137517adbaa1f6b4b0e8ca036c44d429d79b12",
+      "componentPath": "/tmp/starling-node-compat/import-abi-clock-v2-build/obj/splicer.component.wasm",
+      "componentSha256": "ea261577ff717745ecd93a8c7b7ba169c56acb81686855ca21a7157c3ef1e8a6",
+      "jcoVersion": "1.40.0",
+      "commands": [
+        [
+          "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+          "/tmp/starling-node-compat/native-toolchain-lock/node_modules/@bytecodealliance/jco/dist/jco.js",
+          "new",
+          "/tmp/starling-node-compat/import-abi-clock-v2-build/target/wasm32-wasip1/release/splicer_component.wasm",
+          "-o",
+          "/tmp/starling-node-compat/import-abi-clock-v2-build/obj/splicer.component.wasm",
+          "--wasi-reactor"
+        ],
+        [
+          "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+          "/tmp/starling-node-compat/native-toolchain-lock/node_modules/@bytecodealliance/jco/dist/jco.js",
+          "transpile",
+          "-q",
+          "--name",
+          "spidermonkey-embedding-splicer",
+          "/tmp/starling-node-compat/import-abi-clock-v2-build/obj/splicer.component.wasm",
+          "-o",
+          "/tmp/starling-node-compat/import-abi-clock-v2-build/package/lib",
+          "--",
+          "-O1"
+        ]
+      ]
+    },
+    "scope": "Guest packaging only; native guest engine and host executable selected separately"
+  },
+  "checks": {
+    "scalarExports": {
+      "engineSha256": "99fdaa97c2fbdea67cb7e5463d3dd2ca10c6981615acb4483d442079f6aab65c",
+      "passed": 339,
+      "wasmtime": 20,
+      "imports": []
+    },
+    "importI32": {
+      "engineSha256": "3f5bf602ad2d1507db5c1bcd5b938984aba9ca65af4c5a840b5bf8fcd09d370f",
+      "passed": 333,
+      "wasmtime": 7,
+      "imports": [],
+      "note": "Native3f5 engine identical in both splicer arms to isolate imported-I32 correction; negative-s64 failures remain a separately recorded old-native control."
+    },
+    "rawActualI32Reader": {
+      "engineSha256": "99fdaa97c2fbdea67cb7e5463d3dd2ca10c6981615acb4483d442079f6aab65c",
+      "passed": 9,
+      "imports": [],
+      "note": "Forces actual raw Double carriers including negative s32, independent of SpiderMonkey boxing."
+    },
+    "signedUnsignedI64": {
+      "engineSha256": "99fdaa97c2fbdea67cb7e5463d3dd2ca10c6981615acb4483d442079f6aab65c",
+      "passed": 377,
+      "wasmtime": 13,
+      "imports": []
+    },
+    "loaderGates": 18,
+    "completeSourceAudit": {
+      "filesPerSourceTree": 270,
+      "profiles": 2,
+      "unrelatedSourceTamperRejected": true,
+      "capture": "Observed after original builds; original immutable package receipts are preserved."
+    },
+    "debugDiagnostic": {
+      "generalIndirectMemory": "unavailable: confirmed64byte displacement; defaultfailfast",
+      "safeDiagnosticWorldSha256": "2384f23573d9f9264940b5f2e574ca06d43ad3a43587beb53f2fc308cd3ebb84",
+      "safeDiagnostic": "Explicit no-import no-argument s32 allocator world only; all4realallocationfailure sites retained",
+      "sourceReport": "../oom/results.json"
+    },
+    "legacyEngineGuards": {
+      "normalMode": "byte-matching sidecar plus observed Release/Debug required",
+      "legacyMode": "missing sidecar only released6094; unknown historical configuration only knownRelease6094/3f5 with explicit legacyDiagnostic",
+      "actualComponentPositiveControls": 3,
+      "unknownRenamedDebugRejected": true
+    }
+  }
+}

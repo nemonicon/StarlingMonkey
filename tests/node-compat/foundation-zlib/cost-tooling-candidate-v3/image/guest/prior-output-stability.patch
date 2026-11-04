@@ -1,0 +1,69 @@
+--- a/runtime.mjs
++++ b/runtime.mjs
+@@ -3,6 +3,7 @@
+ import {createControls} from './controls.mjs';
+ import {cases,VERSION,EXPORTS,MAX_INPUT,MAX_OUTPUT,MAX_RAW,requireValue,primaryCase,operationCount,jsonRecord,wire,bytesEqual,base64,stageRecord,nodeInputs,exactKeys,aggregateStep} from './contract.mjs';
+ import {ownedWindow,windowMetadata,unchangedWindow} from './owned-window.mjs';
++import {captureUntimedOutput,requirePriorOutputUnchanged} from './output-stability.mjs';
+ export function createRuntime({provider,oracleInputs}){
+  requireValue(provider&&['native','fflate'].includes(provider.id),'finite source provider');
+  const Buffer=provider.Buffer,inputs=nodeInputs(oracleInputs),controls=createControls({Buffer});
+@@ -45,18 +46,19 @@
+   requireValue(unchangedWindow(active.window,inputBefore),'full input immutability');
+   const nonempty=output.length>0;requireValue(!nonempty||output.buffer!==active.window.input.buffer,'nonempty output/input independence');
+   const previousComparable=priorOutput!==null&&priorOutput.caseId===caseId;
+-  let independentBacking=null,mutationProbe={performed:false,reason:previousComparable?'empty output has no addressable mutation':'no previous comparable output',currentFullBytesUnchanged:null,inputFullBytesUnchanged:null,previousRestored:null};
++  let independentBacking=null,previousFullBytesUnchanged=null,mutationProbe={performed:false,reason:previousComparable?'empty output has no addressable mutation':'no previous comparable output',currentFullBytesUnchanged:null,inputFullBytesUnchanged:null,previousRestored:null};
+   if(previousComparable){
++   requirePriorOutputUnchanged(priorOutput);previousFullBytesUnchanged=true;
+    independentBacking=nonempty&&priorOutput.output.length>0?output.buffer!==priorOutput.output.buffer:null;
+    if(nonempty&&priorOutput.output.length>0){
+     requireValue(independentBacking,'successive nonempty output backing independence');const currentBefore=new Uint8Array(output),saved=priorOutput.output[0];
+     try{priorOutput.output[0]=saved^255;requireValue(bytesEqual(output,currentBefore)&&unchangedWindow(active.window,inputBefore),'previous mutation must not affect current/input');}
+-    finally{priorOutput.output[0]=saved;}
++    finally{priorOutput.output[0]=saved;requirePriorOutputUnchanged(priorOutput);}
+     mutationProbe={performed:true,reason:null,currentFullBytesUnchanged:true,inputFullBytesUnchanged:true,previousRestored:priorOutput.output[0]===saved};
+    }
+   }
+-  const result={schemaVersion:1,kind:'codec-cost-observation-v1',caseId,caseName:row.id,provider:provider.id,operation:row.operation,format:row.format,direction:row.direction,logicalUncompressedBytes:row.logicalUncompressedBytesPerOperation,inputSource:active.source,stage:active.stage,input:{...windowMetadata(active.window),fnv1aU32:consumeFNV1a(active.window.input),fullInputUnchanged:true},output:{bytes:output.length,fnv1aU32:consumeFNV1a(output),base64:base64(output),byteOffset:output.byteOffset,backingBytes:output.buffer.byteLength,isBuffer:true},ownership:{nonemptyOutputInputIndependent:nonempty?true:null,emptyBackingRelationRecorded:nonempty?null:{sharesInputBacking:output.buffer===active.window.input.buffer,isolationClaim:false},previousComparable,successiveIndependentBacking:independentBacking,mutationProbe},counters:counters()};
+-  priorOutput={caseId,output};return wire(result);
++  const result={schemaVersion:1,kind:'codec-cost-observation-v1',caseId,caseName:row.id,provider:provider.id,operation:row.operation,format:row.format,direction:row.direction,logicalUncompressedBytes:row.logicalUncompressedBytesPerOperation,inputSource:active.source,stage:active.stage,input:{...windowMetadata(active.window),fnv1aU32:consumeFNV1a(active.window.input),fullInputUnchanged:true},output:{bytes:output.length,fnv1aU32:consumeFNV1a(output),base64:base64(output),byteOffset:output.byteOffset,backingBytes:output.buffer.byteLength,isBuffer:true},ownership:{nonemptyOutputInputIndependent:nonempty?true:null,emptyBackingRelationRecorded:nonempty?null:{sharesInputBacking:output.buffer===active.window.input.buffer,isolationClaim:false},previousComparable,previousFullBytesUnchanged,successiveIndependentBacking:independentBacking,mutationProbe},counters:counters()};
++  priorOutput=captureUntimedOutput(caseId,output,result.output.base64);return wire(result);
+  }
+  function batch(caseId,operations){
+   enter('batch');priorOutput=null;const selected=operationCount(caseId,operations),row=needActive(selected.primary.index);
+--- a/test-pure.mjs
++++ b/test-pure.mjs
+@@ -10,6 +10,7 @@
+ import {renderNodeInputs} from './render-node-inputs.mjs';
+ import {adler32,crc32} from './framing.mjs';
+ import {transportValue} from './node-transport.mjs';
++import {captureUntimedOutput,requirePriorOutputUnchanged} from './output-stability.mjs';
+ const checks=[],hash=raw=>createHash('sha256').update(raw).digest('hex');
+ const check=(name,run)=>{run();checks.push(name);};
+ const root=new URL('./',import.meta.url),golden=JSON.parse(await readFile(new URL('raw-fixture-oracle.json',root)));
+@@ -52,6 +53,11 @@
+ for(const value of[undefined,null,true,false,17,-0,NaN,Infinity,-Infinity,12345678901234567890n,'full string'])check('typedNodeCarrier:'+checks.length,()=>{const result=transportValue(value);assert.equal(result.type,typeof value);assert.equal(result.fullPrimitiveValueCaptured,true);assert.doesNotThrow(()=>JSON.stringify(result));});
+ check('opaqueNodeCarrierDoesNotInspectProperties',()=>{let reads=0;const opaque={toJSON(){reads++;throw new Error('no serialization');}};Object.defineProperty(opaque,'buffer',{get(){reads++;throw new Error('no getter');}});for(const value of[opaque,()=>{},Symbol('opaque')]){const record=transportValue(value);assert.equal(record.kind,'opaque');assert.equal(record.propertiesRead,false);assert.doesNotThrow(()=>JSON.stringify(record));}assert.equal(reads,0);});
+ const authority=JSON.parse(await readFile(new URL('future-authority.json',root)));check('allPositiveAuthorityRemainsNull',()=>{assert.equal(authority.actionsAllowed,false);assert.equal(authority.operationalAdmission,false);for(const key of['rootActionAuthority','costToolingIndex','actualNodeOracle','renderedNodeInputs','actualEmittedABI','actualComponentTuples','actual45EncoderOutputs','actual135CrossDecodeEdges','additionalFfOffProof','timingPhaseAuthority'])assert.equal(authority[key],null);});
++check('priorFullBytesCounterexampleRejectsFreshCorrectNextOutput',()=>{const previous=Buffer.from(new Uint8Array([1,2]).buffer),held=captureUntimedOutput(0,previous,base64(previous)),fresh=Buffer.from(new Uint8Array([1,2]).buffer);previous[1]=99;assert(bytesEqual(fresh,new Uint8Array([1,2])));assert.notEqual(fresh.buffer,previous.buffer,'use distinct backing fixture');assert.throws(()=>requirePriorOutputUnchanged(held),/full prior output changed/);});
++check('priorFullLastByteLargeCounterexampleRejects',()=>{const previous=Buffer.alloc(524288,7),held=captureUntimedOutput(18,previous,base64(previous));previous[previous.length-1]=9;assert.equal(previous[0],7);assert.throws(()=>requirePriorOutputUnchanged(held),/full prior output changed/);});
++check('priorBaselineIsImmutableAndIndependentOfMutableBytes',()=>{const previous=Buffer.from(new Uint8Array([0,17,255]).buffer),held=captureUntimedOutput(0,previous,base64(previous));assert(Object.isFrozen(held));assert.throws(()=>{held.baseline=base64(new Uint8Array([1]));},TypeError);previous[1]=18;assert.throws(()=>requirePriorOutputUnchanged(held));previous[1]=17;assert.doesNotThrow(()=>requirePriorOutputUnchanged(held));});
++check('unchangedPriorEmptyAndNonemptyPassWithoutIsolationClaim',()=>{for(const raw of[new Uint8Array(),new Uint8Array([0]),new Uint8Array([1,2,3,255])]){const held=captureUntimedOutput(0,raw,base64(raw));assert.doesNotThrow(()=>requirePriorOutputUnchanged(held));}});
++check('wrongPriorBaselineCannotBeCaptured',()=>assert.throws(()=>captureUntimedOutput(0,new Uint8Array([1,2]),base64(new Uint8Array([1,3])))));
+ const path=process.env.CODEC_COST_PURE_RESULTS;assert(path,'Fresh explicit pure result path required');
+ await writeFile(path,JSON.stringify({schemaVersion:1,state:'PURE_CODEC_COST_SOURCE_DATA_AND_STAGING_CHECKED',passed:checks.length,checks,forbiddenProviderCalls,fixtureHashesOnly:true,structuralTransportBytesAreNotCodecFixtures:true,actualCodecOrFflateNodeZlibOracleBundleComponentGuestHostPilotOrTimingExecuted:false},null,2)+'\n',{flag:'wx'});
+ console.log(JSON.stringify({passed:checks.length,codecCalls:forbiddenProviderCalls,sourceOnly:true}));
+--- /dev/null
++++ b/output-stability.mjs
+@@ -0,0 +1,10 @@
++// Pure untimed byte-lifetime check. No provider/codec calls or extra guest exports.
++import {base64,requireValue} from './contract.mjs';
++export function captureUntimedOutput(caseId,output,baseline){
++ requireValue(typeof baseline==='string'&&base64(output)===baseline,'exact prior output baseline');
++ // The baseline is an immutable string, independent of the provider-owned bytes.
++ return Object.freeze({caseId,output,baseline});
++}
++export function requirePriorOutputUnchanged(prior){
++ requireValue(base64(prior.output)===prior.baseline,'full prior output changed after subsequent provider call');
++}

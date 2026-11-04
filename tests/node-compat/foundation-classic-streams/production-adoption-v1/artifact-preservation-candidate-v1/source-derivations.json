@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "parentProducer": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/milestone-v12-preparation/assemble-pending-v12.py",
+    "sha256": "981917e81e3d03d874faab79ca0e5f19e0fc86f66dfebcce9f2b62da15a322a8"
+  },
+  "copyOperation": {
+    "preimage": "    for row in ordered:\n        source, target = Path(row['source']), STAGE / row['destination']\n        check(source, row['sha256'], row['bytes'])\n        target.parent.mkdir(parents=True, exist_ok=True)\n        shutil.copy2(source, target, follow_symlinks=False)\n        check(target, row['sha256'], row['bytes'])\n        copied.append({'path': row['destination'], 'sha256': row['sha256'], 'bytes': row['bytes'],\n                       'original': row['source'], 'role': row['role']})\n",
+    "afterimage": "    def copy(self,row,after_copy=None):\n        check_source(row);parts=relative(row['destination']);directory=self.directory(parts[:-1]);source=None;target=None\n        try:\n            source=open_absolute(row['source'])\n            before=os.fstat(source);require(before.st_size==row['bytes'],'Source size drift before copy')\n            target=os.open(parts[-1],os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600,dir_fd=directory);h=hashlib.sha256()\n            while True:\n                data=os.read(source,1024*1024)\n                if not data:break\n                h.update(data);view=memoryview(data)\n                while view:\n                    count=os.write(target,view);require(count>0,'Short archive copy');view=view[count:]\n            os.fsync(target);require(identity(before)==identity(os.fstat(source))and h.hexdigest()==row['sha256'],'Source changed during copy')\n            require(os.fstat(target).st_nlink==1,'Owned copy must not be hardlinked')\n        finally:\n            if source is not None:os.close(source)\n            os.close(directory)\n            if target is not None:os.close(target)\n        if after_copy:after_copy()\n        check_source(row);self.check(row)\n        self.written[row['destination']]={'path':row['destination'],'sha256':row['sha256'],'bytes':row['bytes']}\n",
+    "beforeSha256": "f64820dbf9400ad922fbf36d307ed16b02bf95a796320db1b0eac85fdd5749a9",
+    "afterSha256": "e709cbe3a17bc1ee81b4db277b9701659a75d22cdbce8e177f4e8368c686ee5e",
+    "edits": [
+      {
+        "beforeOffset": 0,
+        "afterOffset": 0,
+        "old": "    for row in ordered:\n        source, target = Path(row['source']), STAGE / row['destination']\n        check(source, row['sha256'], row['bytes'])\n        target.parent.mkdir(parents=True, exist_ok=True)\n        shutil.copy2(source, target, follow_symlinks=False)\n        check(target, row['sha256'], row['bytes'])\n        copied.append({'path': row['destination'], 'sha256': row['sha256'], 'bytes': row['bytes'],\n                       'original': row['source'], 'role': row['role']})\n",
+        "new": "    def copy(self,row,after_copy=None):\n        check_source(row);parts=relative(row['destination']);directory=self.directory(parts[:-1]);source=None;target=None\n        try:\n            source=open_absolute(row['source'])\n            before=os.fstat(source);require(before.st_size==row['bytes'],'Source size drift before copy')\n            target=os.open(parts[-1],os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600,dir_fd=directory);h=hashlib.sha256()\n            while True:\n                data=os.read(source,1024*1024)\n                if not data:break\n                h.update(data);view=memoryview(data)\n                while view:\n                    count=os.write(target,view);require(count>0,'Short archive copy');view=view[count:]\n            os.fsync(target);require(identity(before)==identity(os.fstat(source))and h.hexdigest()==row['sha256'],'Source changed during copy')\n            require(os.fstat(target).st_nlink==1,'Owned copy must not be hardlinked')\n        finally:\n            if source is not None:os.close(source)\n            os.close(directory)\n            if target is not None:os.close(target)\n        if after_copy:after_copy()\n        check_source(row);self.check(row)\n        self.written[row['destination']]={'path':row['destination'],'sha256':row['sha256'],'bytes':row['bytes']}\n"
+      }
+    ],
+    "forwardAndOffsetReverseExact": true
+  },
+  "scope": "Finite FD successor of v12 before/copy/target-check/source-recheck loop. Strengthens opens/ownership/root identity and replaces copy2 with streamed exclusive writes; no old producer main was run.",
+  "dataReaderByteIdentical": {
+    "source": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/production-adoption-v1/artifact-closure-current-context-amendment-v1/archive-context-reader.py",
+    "sha256": "adb38b97aff2ddcd6fe7e5128e483efd1017405ca5ade34bb0e79e3865139800"
+  }
+}

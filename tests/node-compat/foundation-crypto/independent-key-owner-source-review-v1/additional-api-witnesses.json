@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "state": "EXACT_147_PRIMARY_SOURCE_READ_ONLY_ADDITIONAL_POLICY_WITNESSES",
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/bytecodealliance/firefox/FIREFOX_147_0_4_RELEASE_STARLING/js/src/vm/NativeObject-inl.h",
+      "symbols": [
+        "NativeObject::create",
+        "nobj->initSlots"
+      ],
+      "conclusion": "Creation invokes slot initialization before later allocation-metadata handling; no runtime result inferred."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/bytecodealliance/firefox/FIREFOX_147_0_4_RELEASE_STARLING/js/src/vm/NativeObject.h",
+      "symbols": [
+        "NativeObject::initSlots",
+        "initFixedSlots",
+        "initDynamicSlots",
+        "initAsUndefined"
+      ],
+      "conclusion": "Used fixed/dynamic slots initialize Undefined. CryptoKey retains8 reserved slots."
+    }
+  ],
+  "ownerCompilerDependencyClosureExpanded": false,
+  "sdkRerun": false,
+  "fullRemoteByteHashClaim": false
+}

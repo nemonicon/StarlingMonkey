@@ -1,0 +1,19 @@
+--- a/builtins/web/event/event-target.cpp
++++ b/builtins/web/event/event-target.cpp
+@@ -318,6 +318,16 @@
+     return type == listener->type && callback_val == listener->callback.get() &&
+            capture == listener->capture;
+   });
++
++#ifdef NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER
++  if (it != list->end() && (*it)->removed) {
++    // A dispatch clone can still own this removed once record. Never revive it:
++    // retire only the target-list reference, then append a fresh record below.
++    // Existing clones must keep seeing removed=true throughout their traversal.
++    list->erase(it);
++    it = list->end();
++  }
++#endif
+ 
+   if (it == list->end()) {
+     auto listener = mozilla::MakeRefPtr<EventListener>();

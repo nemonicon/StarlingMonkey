@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "state": "TWO_HOST_HARNESS_CORRECTIONS_NOT_GUEST_SEMANTICS",
+  "parentIndexSha256": "81c55887dc5e767db27477ba28f0e7a26a948435c7ddc61c70da329d4bd7f029",
+  "records": [
+    {
+      "path": "release/helpers/native-scalar-harness.mjs",
+      "beforeSha256": "414e63b673346915251853fbd13308b375c000f62ec20242b017e459650837f9",
+      "afterSha256": "31c1e81b0c2330663904efbe49f022f21b1ebf10d1fc2da06d27e663f3ee9b7d",
+      "edits": [
+        {
+          "old": "export const hash = value => createHash('sha256').update(value).digest('hex');\n",
+          "new": "export const hash = value => createHash('sha256').update(value).digest('hex');\n\n// BEGIN FINITE CLASSIC REGISTRAR ORACLE ANCESTRY\nexport function verifyClassicRegistrarOracle({kind, oracle, requiredNames, registrar, metadata, proof}) {\n  const path='builtins/node-compat/register.cpp';\n  const before='19eef9879c94e5232238f6df738d57057d384fa025849ee319fcf51eb06eda2b';\n  const after='2848f059fb5693aa37c54945bff685444c8431007ceaec59d3335d01f7aced4a';\n  const documents={\n    assert:{sha:'cbb3bcb3f6bc9e97b12b1a61167483ac0f949de199ae6bd0172926419f4c01a3',required:['assert.mjs','assert-strict.mjs','assert-factories.generated.h','export-manifest.assert.node-v22.14.0.json']},\n    querystring:{sha:'e59e05a7cb470970d9bcce230f359cf74bf62a00b094510a2df16d4ab3f901a4',required:['querystring.mjs','querystring-factories.generated.h','export-manifest.querystring.node-v22.14.0.json']},\n    util:{sha:'489cb9cf4fbe256201f70e385d4326ea32552d2f2a1f187211d9409e73838816',required:['util.mjs','util-types.mjs','util-core.mjs','util-metadata.mjs','util-unsupported.mjs','export-manifest.util.node-v22.14.0.json','generate-util-factories.mjs','util-factories.generated.h']}\n  };\n  assert(Object.hasOwn(documents,kind),'Only three pinned strict-script oracles have this registrar ancestry');\n  const expected=documents[kind];\n  assert.equal(hash(proof.oracleBytes),expected.sha,'Exact unchanged Node oracle document required');\n  assert.deepEqual(oracle,JSON.parse(proof.oracleBytes),'Caller oracle differs from captured bytes');\n  assert.deepEqual([...requiredNames].sort(),[...expected.required].sort(),'Exact facade-source check set required');\n  assert.equal(oracle.registrarSha256,before);\n  // Authenticate both policy documents and both exact native patches BEFORE\n  // parsing policy rows. The Tick patch never changes register.cpp.\n  assert.equal(hash(proof.tickPolicyBytes),'98e80d36b8eb9b7ac99de54832288bd8eec148fa1b9fe0b27b3bada4d12b2cd0');\n  assert.equal(hash(proof.tickPatchBytes),'e286ebeb3f09b438999422dbc2059fed565ef71b98d9f7f62b09291fb5eb5491');\n  assert.equal(hash(proof.classicPolicyBytes),'137a35959131d5cb5125bb5fc97324dfa4ba2ce18441818dd95cf83d19c88d6f');\n  assert.equal(hash(proof.classicPatchBytes),'0574b88e1126e616e4adaac2d7dea4435657c70e2d07a429531218aff24bd73c');\n  const tick=JSON.parse(proof.tickPolicyBytes),classic=JSON.parse(proof.classicPolicyBytes);\n  assert.equal(tick.version,'sm-private-ticks-source-v1');\n  assert.equal(tick.nativePatchSha256,hash(proof.tickPatchBytes));\n  assert(!Object.hasOwn(tick.sourceLayer,path),'Tick registrar must remain unchanged');\n  assert.equal(classic.parentPolicySha256,hash(proof.tickPolicyBytes));\n  assert.equal(classic.parentRecipeSha256,'869d188de3843b5d527d236a9e5c9af6ba1193f118dc9ad786df6266e1606173');\n  assert.deepEqual(classic.parentExpectedNativeSourceManifest,tick.expectedNativeSourceManifest);\n  assert.equal(tick.expectedNativeSourceManifest.length,306);\n  assert.equal(tick.expectedNativeSourceManifest.find(row=>row.path===path)?.sha256,before);\n  assert.deepEqual(classic.sourceLayer[path],{beforeSha256:before,afterSha256:after});\n  assert.equal(classic.nativePatchSha256,hash(proof.classicPatchBytes));\n  assert.equal(classic.expectedNativeSourceManifest.length,342);\n  assert.equal(classic.expectedNativeSourceManifest.find(row=>row.path===path)?.sha256,after);\n  assert.equal(metadata.buildRecipeSha256,'71b48d2e70c5e003fcbcce7620366744c089dd55036036e52926224dfa2614f7');\n  assert.notEqual(metadata.syntheticMetadataOnly,true);assert.notEqual(metadata.diagnosticOnly,true);\n  assert.equal(metadata.classicStreamsEnabled,true);assert.equal(metadata.internalTicksEnabled,true);\n  assert.equal(metadata.observedCMakeOptions.CMAKE_BUILD_TYPE,'Release');\n  assert.equal(metadata.classicStreamsPolicy.policyFileSha256,hash(proof.classicPolicyBytes));\n  assert.equal(metadata.classicStreamsPolicy.nativePatchSha256,hash(proof.classicPatchBytes));\n  assert.equal(metadata.internalTickPolicy.parentPrivateTickPolicyFileSha256,hash(proof.tickPolicyBytes));\n  assert.equal(metadata.internalTickPolicy.policyFileSha256,hash(proof.classicPolicyBytes));\n  assert.equal(metadata.sourceManifest.length,342);\n  const rows=metadata.sourceManifest.map(row=>({path:row.path,sha256:row.sha256}));\n  assert.equal(new Set(rows.map(row=>row.path)).size,342);\n  assert.deepEqual(rows,classic.expectedNativeSourceManifest,'Actual342 source manifest must match the pinned Classic afterimage');\n  assert.equal(hash(registrar),after,'Captured actual registrar must be the exact342 afterimage');\n  assert.match(registrar,/options\\.setForceStrictMode\\(\\)/,'Force-strict compilation must remain');\n  for(const name of requiredNames)\n    assert.equal(rows.find(row=>row.path==='builtins/node-compat/'+name)?.sha256,oracle.sources[name],'Unchanged oracle facade/source '+name);\n  return {version:'exact-classic342-registrar-oracle-ancestry-v1',kind,oracleSha256:expected.sha,\n    oracleRegistrarSha256:before,actualRegistrarSha256:after,tickRegistrarChanged:false,\n    classicPatchSha256:hash(proof.classicPatchBytes),oracleRewritten:false,metadataProjected:false};\n}\n// END FINITE CLASSIC REGISTRAR ORACLE ANCESTRY\n"
+        },
+        {
+          "old": "  const builtinManifests = selectedManifestsForEngine(metadata, { sourceRoot });\n",
+          "new": "  const builtinManifests = selectedManifestsForEngine(metadata, { sourceRoot });\n  const registrarProof = {\n    oracleBytes: await readFile(join(here,'native-node-results.json')),\n    tickPolicyBytes: await readFile(join(repository,'tests/node-compat/foundation-scheduler/integration-candidate-v1/policy.json')),\n    tickPatchBytes: await readFile(join(repository,'tests/node-compat/foundation-scheduler/taskqueue-owner-v2/starling-taskqueue-ticks.UNAPPLIED.patch')),\n    classicPolicyBytes: await readFile(join(repository,'tests/node-compat/foundation-classic-streams/integration-candidate-v1/policy.json')),\n    classicPatchBytes: await readFile(join(repository,'tests/node-compat/foundation-classic-streams/implementation-candidate-v1-allocation-order-amendment/native-integration.corrected.UNAPPLIED.patch'))\n  };\n"
+        },
+        {
+          "old": "    assert.equal(hash(registrar), oracle.registrarSha256, 'Native registrar must match strict-script oracle receipt');",
+          "new": "    evidence.registrarOracleAncestry = verifyClassicRegistrarOracle({kind,oracle,requiredNames,registrar,metadata,proof:registrarProof});"
+        }
+      ],
+      "exactReverseProof": true
+    },
+    {
+      "path": "release/runners/path.mjs",
+      "beforeSha256": "4ee9e60a8618c3fa2fd2c2ddb5e79a846f50a6a89a814ea005ea2c5687ef8d62",
+      "afterSha256": "40b5e14c0c72cee88989100138d77945edc035cab8f10adef61574d692d76d32",
+      "edits": [
+        {
+          "old": "const oracleScripts = resolve(dirname(fileURLToPath(import.meta.url)), '../oracles');",
+          "new": "const oracleScripts = resolve(here, '../foundation-scheduler/production-release-runner-v3/oracles');\nconst oracleSourcePins = { 'semantic.mjs': '23fe6d8eed334a3eae580655d9a859a048f0097bcd957259cf4218a230701cbf', 'glob.mjs': 'befc3e984b1b82e33ad008943e85a2461dca424e9f1d27561edfdeda455df619' };"
+        },
+        {
+          "old": "  const result = spawnSync(process.execPath, [...flags, join(oracleScripts, file)], { encoding: 'utf8', timeout: 30000, env: { ...process.env, NODE_COMPAT_PATH_ORACLE_OUTPUT: oracleOutput } });",
+          "new": "  assert.equal(hash(await readFile(join(oracleScripts,file))),oracleSourcePins[file],'Exact inherited Node oracle subprocess source');\n  const result = spawnSync(process.execPath, [...flags, join(oracleScripts, file)], { cwd: repository, encoding: 'utf8', timeout: 30000, env: { ...process.env, NODE_COMPAT_PATH_ORACLE_OUTPUT: oracleOutput } });\n  assert.equal(hash(await readFile(join(oracleScripts,file))),oracleSourcePins[file],'Node oracle source changed during subprocess');"
+        },
+        {
+          "old": "['lexical-vectors.json', 'glob-vectors.json'].includes(path) ? join(oracleOutput, path) : join(here, path)",
+          "new": "['lexical-vectors.json', 'glob-vectors.json'].includes(path) ? join(oracleOutput, path) : ['semantic.mjs', 'glob.mjs'].includes(path) ? join(oracleScripts, path) : join(here, path)",
+          "occurrences": 2
+        }
+      ],
+      "exactReverseProof": true
+    }
+  ],
+  "oldBodiesByteIdentical": 62,
+  "changedHostHarnessBodies": 2,
+  "guestSemanticBytesChanged": false,
+  "oracleDocumentsChanged": false
+}

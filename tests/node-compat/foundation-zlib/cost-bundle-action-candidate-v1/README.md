@@ -1,0 +1,7 @@
+This is an unexecuted Root source-bundle action wrapper around the independently reviewed ff208 costPreflight and bundleCost APIs. It runs only with a new action-specific Root document, an exact own source index, the actual reviewed4621 publication, a separately reviewed Node oracle/render capsule and the genuine350 native pair.
+
+The wrapper authenticates its own source, selected Node executable and the entire local guard import closure before imports. Existing guards authenticate the full publication, native and oracle data before package loading. It serially bundles native-on/fflate-on/fflate-off through Jco1.40/Rolldown using the existing finite provider/oracle/browser resolver and native-profile plugin. It runs no guest or codec provider.
+
+Only a new exclusive /private/tmp/starling-node-compat/zlib-cost-bundles-v1 output is allowed. Source/graph/start records are durable. All output states remain UNREVIEWED; no component action can use them until independent actual source/virtual-helper review produces a new finite proof. Exceptions retain partial owned files and external raw stderr/terminal are required.
+
+The source/module cap remains32MiB each. This cut changes no corpus, provider, native source, metadata, guest ABI or ff208 permission. Component/correctness/pilot/timing stay closed in that tooling. No performance or compatibility result is claimed. Only parser validation runs during preparation.

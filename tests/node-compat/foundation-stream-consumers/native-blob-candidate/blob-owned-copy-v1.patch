@@ -1,0 +1,604 @@
+--- a/builtins/web/blob.cpp
++++ b/builtins/web/blob.cpp
+@@ -8,11 +8,17 @@
+ 
+ #include "js/UniquePtr.h"
+ #include "js/ArrayBuffer.h"
++#include "js/ArrayBufferMaybeShared.h"
++#include "js/MemoryFunctions.h"
++#include "js/SharedArrayBuffer.h"
+ #include "js/Conversions.h"
+ #include "js/experimental/TypedData.h"
+ #include "js/TypeDecls.h"
+ #include "js/Value.h"
+ 
++#include <cstddef>
++#include <limits>
++
+ namespace {
+ 
+ template <typename T> bool validate_type(T *chars, size_t strlen) {
+@@ -130,6 +136,42 @@
+ using streams::BufReader;
+ using streams::NativeStreamSource;
+ 
++namespace {
++
++void report_oom_unless_pending(JSContext *cx) {
++  if (!JS_IsExceptionPending(cx)) {
++    JS_ReportOutOfMemory(cx);
++  }
++}
++
++// Keep every native pointer range representable. This is a native guest bound,
++// not an assertion of arbitrary-size Web/Node Blob compatibility.
++constexpr size_t MAX_NATIVE_BLOB_BYTES =
++    static_cast<size_t>(std::numeric_limits<std::ptrdiff_t>::max());
++
++bool reserve_append(JSContext *cx, Blob::ByteBuffer *target, size_t additional) {
++  if (target->length() > MAX_NATIVE_BLOB_BYTES ||
++      additional > MAX_NATIVE_BLOB_BYTES - target->length()) {
++    JS_ReportAllocationOverflow(cx);
++    return false;
++  }
++  if (additional != 0 && !target->reserve(target->length() + additional)) {
++    // SystemAllocPolicy performs no JS exception reporting.
++    report_oom_unless_pending(cx);
++    return false;
++  }
++  return true;
++}
++
++bool require_blob(JSContext *cx, HandleObject self, const char *operation) {
++  if (!Blob::is_instance(self)) {
++    return api::throw_error(cx, api::Errors::WrongReceiver, operation, "Blob");
++  }
++  return true;
++}
++
++} // namespace
++
+ #define DEFINE_BLOB_METHOD(name)                               \
+ bool Blob::name(JSContext *cx, unsigned argc, JS::Value *vp) { \
+   METHOD_HEADER(0)                                             \
+@@ -142,6 +184,16 @@
+   return name(cx, self, args, args.rval());                    \
+ }
+ 
++#define DEFINE_BLOB_PROMISE_METHOD(name)                        \
++bool Blob::name(JSContext *cx, unsigned argc, JS::Value *vp) {   \
++  TRACE_METHOD(#name)                                          \
++  CallArgs args = CallArgsFromVp(argc, vp);                     \
++  if (!check_receiver(cx, args.thisv(), #name))                 \
++    return ReturnPromiseRejectedWithPendingError(cx, args);     \
++  RootedObject self(cx, &args.thisv().toObject());              \
++  return name(cx, self, args.rval());                           \
++}
++
+ const JSFunctionSpec Blob::static_methods[] = {
+     JS_FS_END,
+ };
+@@ -167,26 +219,32 @@
+ };
+ 
+ JSObject *Blob::data_to_owned_array_buffer(JSContext *cx, HandleObject self) {
+-  auto *src = Blob::blob(self);
+-  auto size = src->length();
+-
+-  auto buf = mozilla::MakeUnique<uint8_t[]>(size);
+-  if (!buf) {
+-    JS_ReportOutOfMemory(cx);
++  if (!require_blob(cx, self, "arrayBuffer")) {
+     return nullptr;
+   }
+-
+-  std::copy_n(src->begin(), size, buf.get());
+-
+-  auto *array_buffer = JS::NewArrayBufferWithContents(
+-      cx, size, buf.get(), JS::NewArrayBufferOutOfMemory::CallerMustFreeMemory);
++  const size_t size = Blob::blob_size(self);
++  // Allocate owned JS storage before acquiring its data. Rooted self keeps its
++  // native vector alive through allocation/GC; that vector is not GC-movable.
++  RootedObject array_buffer(cx, JS::NewArrayBuffer(cx, size));
+   if (!array_buffer) {
+-    JS_ReportOutOfMemory(cx);
+     return nullptr;
+   }
+-
+-  // `array_buffer` now owns `buf`
+-  std::ignore = (buf.release());
++  bool invalid = false;
++  if (size != 0) {
++    JS::AutoCheckCannotGC nogc(cx);
++    bool shared = false;
++    auto *destination = JS::GetArrayBufferData(array_buffer, &shared, nogc);
++    auto *source = Blob::blob(self);
++    invalid = shared || !destination || source->length() != size;
++    if (!invalid) {
++      std::copy_n(source->begin(), size, destination);
++    }
++  }
++  if (invalid) {
++    api::throw_error(cx, api::Errors::TypeError, "Blob.arrayBuffer", "storage",
++                     "remain an owned unshared buffer");
++    return nullptr;
++  }
+   return array_buffer;
+ }
+ 
+@@ -209,13 +267,14 @@
+  return true;
+ }
+ 
+-DEFINE_BLOB_METHOD(arrayBuffer)
+-DEFINE_BLOB_METHOD(bytes)
++DEFINE_BLOB_PROMISE_METHOD(arrayBuffer)
++DEFINE_BLOB_PROMISE_METHOD(bytes)
+ DEFINE_BLOB_METHOD(stream)
+-DEFINE_BLOB_METHOD(text)
++DEFINE_BLOB_PROMISE_METHOD(text)
+ DEFINE_BLOB_METHOD_W_ARGS(slice)
+ 
+ bool Blob::arrayBuffer(JSContext *cx, HandleObject self, MutableHandleValue rval) {
++  if (!require_blob(cx, self, "arrayBuffer")) return false;
+   JS::RootedObject promise(cx, JS::NewPromiseObject(cx, nullptr));
+   if (!promise) {
+     return false;
+@@ -223,19 +282,18 @@
+ 
+   rval.setObject(*promise);
+ 
+-  auto *buffer = data_to_owned_array_buffer(cx, self);
++  JS::RootedObject buffer(cx, data_to_owned_array_buffer(cx, self));
+   if (!buffer) {
+     return RejectPromiseWithPendingError(cx, promise);
+   }
+ 
+   JS::RootedValue result(cx);
+   result.setObject(*buffer);
+-  JS::ResolvePromise(cx, promise, result);
+-
+-  return true;
++  return JS::ResolvePromise(cx, promise, result);
+ }
+ 
+ bool Blob::bytes(JSContext *cx, HandleObject self, MutableHandleValue rval) {
++  if (!require_blob(cx, self, "bytes")) return false;
+   JS::RootedObject promise(cx, JS::NewPromiseObject(cx, nullptr));
+   if (!promise) {
+     return false;
+@@ -256,14 +314,12 @@
+ 
+   JS::RootedValue result(cx);
+   result.setObject(*byte_array);
+-  JS::ResolvePromise(cx, promise, result);
+-
+-  return true;
++  return JS::ResolvePromise(cx, promise, result);
+ }
+ 
+ bool Blob::slice(JSContext *cx, HandleObject self, const CallArgs &args, MutableHandleValue rval) {
+-  auto *src = Blob::blob(self);
+-  int64_t size = src->length();
++  if (!require_blob(cx, self, "slice")) return false;
++  const int64_t size = Blob::blob_size(self);
+   int64_t start = 0;
+   int64_t end = size;
+ 
+@@ -294,11 +350,18 @@
+   start = (start < 0) ? std::max((size + start), 0LL) : std::min(start, size);
+   end = (end < 0) ? std::max((size + end), 0LL) : std::min(end, size);
+ 
+-  auto slice_len = std::max(end - start, 0LL);
+-  auto dst = (slice_len > 0) ? UniqueChars(js_pod_malloc<char>(slice_len)) : nullptr;
+-
+-  if (dst) {
+-    std::copy(src->begin() + start, src->begin() + end, dst.get());
++  const size_t slice_len = static_cast<size_t>(std::max(end - start, 0LL));
++  UniqueChars dst;
++  if (slice_len != 0) {
++    dst.reset(static_cast<char *>(JS_malloc(cx, slice_len)));
++    if (!dst) {
++      report_oom_unless_pending(cx);
++      return false;
++    }
++    // Reacquire after argument conversions and allocation. Source is immutable
++    // native storage owned by rooted self, not a borrowed JS byte span.
++    auto *src = Blob::blob(self);
++    std::copy_n(src->begin() + start, slice_len, dst.get());
+   }
+ 
+   JS::RootedObject new_blob(cx, create(cx, std::move(dst), slice_len, contentType));
+@@ -311,6 +374,7 @@
+ }
+ 
+ bool Blob::stream(JSContext *cx, HandleObject self, MutableHandleValue rval) {
++  if (!require_blob(cx, self, "stream")) return false;
+   RootedObject reader(cx, BufReader::create(cx, self, read_blob_slice));
+   if (!reader) {
+     return false;
+@@ -324,6 +388,7 @@
+ }
+ 
+ bool Blob::text(JSContext *cx, HandleObject self, MutableHandleValue rval) {
++  if (!require_blob(cx, self, "text")) return false;
+   JS::RootedObject promise(cx, JS::NewPromiseObject(cx, nullptr));
+   if (!promise) {
+     return false;
+@@ -331,7 +396,11 @@
+ 
+   rval.setObject(*promise);
+ 
+-  auto *src = Blob::blob(self);
++  const size_t source_length = Blob::blob_size(self);
++  if (source_length == 0) {
++    JS::RootedValue result(cx, JS_GetEmptyStringValue(cx));
++    return JS::ResolvePromise(cx, promise, result);
++  }
+ 
+   const char* utf8_label = "UTF-8";
+   const auto *encoding =
+@@ -341,33 +410,47 @@
+   std::unique_ptr<jsencoding::Decoder, decltype(deleter)> decoder(
+       jsencoding::encoding_new_decoder_with_bom_removal(encoding), deleter);
+ 
+-  MOZ_ASSERT(decoder);
+-
+-  auto src_len = src->length();
+-  auto dst_len = jsencoding::decoder_max_utf16_buffer_length(decoder.get(), src_len);
+-
+-  JS::UniqueTwoByteChars dst(static_cast<char16_t *>(js_pod_malloc<char16_t>(dst_len + 1)));
++  // The current Rust allocation API is not proven fallible. This null guard
++  // does not turn a Rust allocator abort into a catchable JS OOM.
++  if (!decoder) {
++    report_oom_unless_pending(cx);
++    return RejectPromiseWithPendingError(cx, promise);
++  }
++  const size_t maximum = jsencoding::decoder_max_utf16_buffer_length(decoder.get(), source_length);
++  const size_t capacity = std::max(maximum, size_t{1});
++  if (capacity > std::numeric_limits<size_t>::max() / sizeof(char16_t)) {
++    JS_ReportAllocationOverflow(cx);
++    return RejectPromiseWithPendingError(cx, promise);
++  }
++  // The pinned public allocator contract explicitly covers JS_NewUCString.
++  JS::UniqueTwoByteChars dst(static_cast<char16_t *>(
++      JS_string_malloc(cx, capacity * sizeof(char16_t))));
+   if (!dst) {
+-    JS_ReportOutOfMemory(cx);
+-    return false;
++    report_oom_unless_pending(cx);
++    return RejectPromiseWithPendingError(cx, promise);
+   }
+-
++  size_t consumed = source_length;
++  size_t written = maximum;
+   bool had_replacements = false;
+-  auto *dst_data = reinterpret_cast<uint16_t *>(dst.get());
+-
+-  jsencoding::decoder_decode_to_utf16(decoder.get(), src->begin(), &src_len, dst_data, &dst_len,
+-                                      true, &had_replacements);
+-
+-  JS::RootedString str(cx, JS_NewUCString(cx, std::move(dst), dst_len));
++  // Rooted Blob owns immutable native input; these are not GC-managed data
++  // pointers. The synchronous decoder consumes them before any JS allocation.
++  auto *src = Blob::blob(self);
++  const uint32_t status = jsencoding::decoder_decode_to_utf16(
++      decoder.get(), src->begin(), &consumed, reinterpret_cast<uint16_t *>(dst.get()),
++      &written, true, &had_replacements);
++  if (status != 0 || consumed != source_length || written > capacity) {
++    api::throw_error(cx, api::Errors::TypeError, "Blob.text", "UTF-8 data",
++                     "decode completely within the checked output allocation");
++    return RejectPromiseWithPendingError(cx, promise);
++  }
++  JS::RootedString str(cx, JS_NewUCString(cx, std::move(dst), written));
+   if (!str) {
+     return RejectPromiseWithPendingError(cx, promise);
+   }
+ 
+   JS::RootedValue result(cx);
+   result.setString(str);
+-  JS::ResolvePromise(cx, promise, result);
+-
+-  return true;
++  return JS::ResolvePromise(cx, promise, result);
+ }
+ 
+ bool Blob::size_get(JSContext *cx, unsigned argc, JS::Value *vp) {
+@@ -394,13 +477,21 @@
+   return true;
+ }
+ 
++bool Blob::is_instance(const JSObject *obj) {
++  if (!BuiltinImpl<Blob, FinalizableClassPolicy>::is_instance(obj)) {
++    return false;
++  }
++  return JS::GetMaybePtrFromReservedSlot<ByteBuffer>(
++      const_cast<JSObject *>(obj), std::to_underlying(Slots::Data)) != nullptr;
++}
++
++bool Blob::is_instance(Value value) {
++  return value.isObject() && is_instance(&value.toObject());
++}
++
+ Blob::ByteBuffer *Blob::blob(JSObject *self) {
+   MOZ_ASSERT(is_instance(self));
+-  auto *blob = static_cast<ByteBuffer *>(
+-      JS::GetReservedSlot(self, static_cast<size_t>(Blob::Slots::Data)).toPrivate());
+-
+-  MOZ_ASSERT(blob);
+-  return blob;
++  return JS::GetMaybePtrFromReservedSlot<ByteBuffer>(self, std::to_underlying(Slots::Data));
+ }
+ 
+ size_t Blob::blob_size(JSObject *self) {
+@@ -419,24 +510,66 @@
+ }
+ 
+ bool Blob::append_value(JSContext *cx, HandleObject self, HandleValue val) {
++  if (!require_blob(cx, self, "Blob constructor")) return false;
+   auto *blob = Blob::blob(self);
+ 
+   if (val.isObject()) {
+     RootedObject obj(cx, &val.toObject());
+ 
+     if (Blob::is_instance(obj)) {
+-      auto *src = Blob::blob(obj);
+-      return blob->append(src->begin(), src->end());
++      const size_t length = Blob::blob_size(obj);
++      if (!reserve_append(cx, blob, length)) return false;
++      if (length != 0) {
++        // Reserve may move target data, so reacquire even for a hypothetical
++        // internal self-append. Both vectors are native and rooted owners live.
++        auto *src = Blob::blob(obj);
++        blob->infallibleAppend(src->begin(), length);
++      }
++      return true;
+     }
+-
+-    if (JS_IsArrayBufferViewObject(obj) || JS::IsArrayBufferObject(obj)) {
+-      auto span = value_to_buffer(cx, val, "Blob Parts");
+-      if (span.has_value()) {
+-        auto *src = span->data();
+-        auto len = span->size();
+-        return blob->append(src, src + len);
++    if (JS::IsSharedArrayBufferObject(obj)) {
++      return api::throw_error(cx, api::Errors::TypeError, "Blob.constructor", "blobParts",
++                              "use unshared ArrayBuffer storage");
++    }
++    const bool is_view = JS_IsArrayBufferViewObject(obj);
++    if (is_view || JS::IsArrayBufferObject(obj)) {
++      // Materialize/root backing before any raw borrow. This API can allocate.
++      bool shared = false;
++      RootedObject backing(cx, is_view ? JS_GetArrayBufferViewBuffer(cx, obj, &shared)
++                                      : obj.get());
++      if (!backing) return false;
++      if (shared || !JS::IsArrayBufferObject(backing)) {
++        return api::throw_error(cx, api::Errors::TypeError, "Blob.constructor", "blobParts",
++                                "use unshared ArrayBuffer storage");
+       }
+-
++      // Explicit conservative policy; no atomic shared snapshot, resizable or
++      // detached overload is advertised by this candidate.
++      if (JS::IsResizableArrayBufferMaybeShared(backing) ||
++          JS::IsDetachedArrayBufferObject(backing)) {
++        return api::throw_error(cx, api::Errors::TypeError, "Blob.constructor", "blobParts",
++                                "use fixed attached ArrayBuffer storage");
++      }
++      const size_t length = is_view ? JS_GetArrayBufferViewByteLength(obj)
++                                    : JS::GetArrayBufferByteLength(obj);
++      if (!reserve_append(cx, blob, length)) return false;
++      bool invalid = false;
++      if (length != 0) {
++        JS::AutoCheckCannotGC nogc(cx);
++        const size_t current_length = is_view ? JS_GetArrayBufferViewByteLength(obj)
++                                              : JS::GetArrayBufferByteLength(obj);
++        const auto *data = is_view
++            ? static_cast<const uint8_t *>(JS_GetArrayBufferViewData(obj, &shared, nogc))
++            : JS::GetArrayBufferData(obj, &shared, nogc);
++        invalid = shared || !data || current_length != length;
++        if (!invalid) {
++          // Guaranteed no allocation: capacity was reserved before the borrow.
++          blob->infallibleAppend(data, length);
++        }
++      }
++      if (invalid) {
++        return api::throw_error(cx, api::Errors::TypeError, "Blob.constructor", "blobParts",
++                                "remain fixed attached unshared storage");
++      }
+       return true;
+     }
+   } else if (val.isString()) {
+@@ -449,14 +582,17 @@
+       auto converted = convert_line_endings_to_native(chars);
+       auto *src = converted.data();
+       auto len = converted.length();
+-      return blob->append(src, src + len);
++      if (!reserve_append(cx, blob, len)) return false;
++      if (len != 0) blob->infallibleAppend(src, len);
++      return true;
+     }
+-
+-    return blob->append(chars.ptr.get(), chars.ptr.get() + chars.len);
++    if (!reserve_append(cx, blob, chars.len)) return false;
++    if (chars.len != 0) blob->infallibleAppend(chars.ptr.get(), chars.len);
++    return true;
+   }
+ 
+   // FALLBACK: if we ever get here convert, to string and call append again
+-  auto *str = JS::ToString(cx, val);
++  RootedString str(cx, JS::ToString(cx, val));
+   if (!str) {
+     return false;
+   }
+@@ -487,6 +623,9 @@
+       }
+ 
+       if (!append_value(cx, self, item)) {
++        // Append/conversion failures happen in the loop body, not next(). The
++        // public closeThrow API preserves throw-completion error precedence.
++        it.closeThrow();
+         return false;
+       }
+     }
+@@ -529,7 +668,8 @@
+       return false;
+     }
+ 
+-    auto *endings_str = JS::ToString(cx, endings_val);
++    RootedString endings_str(cx, JS::ToString(cx, endings_val));
++    if (!endings_str) return false;
+     if (!JS_StringEqualsLiteral(cx, endings_str, "transparent", &is_transparent) ||
+         !JS_StringEqualsLiteral(cx, endings_str, "native", &is_native)) {
+       return false;
+@@ -558,44 +698,58 @@
+ }
+ 
+ JSObject *Blob::create(JSContext *cx, UniqueChars data, size_t data_len, HandleString type) {
+-  JSObject *self = JS_NewObjectWithGivenProto(cx, &class_, proto_obj);
++  if (data_len > MAX_NATIVE_BLOB_BYTES) {
++    JS_ReportAllocationOverflow(cx);
++    return nullptr;
++  }
++  if (data_len != 0 && !data) {
++    report_oom_unless_pending(cx);
++    return nullptr;
++  }
++  if (!type.get()) {
++    report_oom_unless_pending(cx);
++    return nullptr;
++  }
++  RootedObject self(cx, JS_NewObjectWithGivenProto(cx, &class_, proto_obj));
+   if (!self) {
+     return nullptr;
+   }
+ 
++  // Publish the pointer last. Data stays undefined on allocation failure, so
++  // prototype/partial-constructor finalizers never read an invalid private slot.
++  SetReservedSlot(self, std::to_underlying(Slots::Type), JS::StringValue(type));
++  SetReservedSlot(self, std::to_underlying(Slots::Endings), JS::Int32Value(std::to_underlying(LineEndings::Transparent)));
+   auto blob = js::MakeUnique<ByteBuffer>();
+   if (!blob) {
+     JS_ReportOutOfMemory(cx);
+     return nullptr;
+   }
+ 
+-  if (data != nullptr) {
+-    // Take the ownership of given data.
++  if (data_len != 0) {
++    // UniqueChars and SystemAllocPolicy both use JS-compatible free policy.
+     blob->replaceRawBuffer(reinterpret_cast<uint8_t *>(data.release()), data_len);
+   }
+ 
+   SetReservedSlot(self, std::to_underlying(Slots::Data), JS::PrivateValue(blob.release()));
+-  SetReservedSlot(self, std::to_underlying(Slots::Type), JS::StringValue(type));
+-  SetReservedSlot(self, std::to_underlying(Slots::Endings), JS::Int32Value(std::to_underlying(LineEndings::Transparent)));
+   return self;
+ }
+ 
+ bool Blob::init(JSContext *cx, HandleObject self, HandleValue blobParts, HandleValue opts) {
++  if (blobParts.isNull()) {
++    return api::throw_error(cx, api::Errors::TypeError, "Blob.constructor", "blobParts", "be an object");
++  }
++  MOZ_ASSERT(JS::GetReservedSlot(self, std::to_underlying(Slots::Data)).isUndefined());
++  SetReservedSlot(self, std::to_underlying(Slots::Type), JS_GetEmptyStringValue(cx));
++  SetReservedSlot(self, std::to_underlying(Slots::Endings), JS::Int32Value(std::to_underlying(LineEndings::Transparent)));
+   auto blob = js::MakeUnique<ByteBuffer>();
+   if (blob == nullptr) {
+     JS_ReportOutOfMemory(cx);
+     return false;
+   }
+ 
+-  SetReservedSlot(self, std::to_underlying(Slots::Type), JS_GetEmptyStringValue(cx));
+-  SetReservedSlot(self, std::to_underlying(Slots::Endings), JS::Int32Value(std::to_underlying(LineEndings::Transparent)));
+   SetReservedSlot(self, std::to_underlying(Slots::Data), JS::PrivateValue(blob.release()));
+ 
+   // Walk the blob parts and append them to the blob's buffer.
+-  if (blobParts.isNull()) {
+-    return api::throw_error(cx, api::Errors::TypeError, "Blob.constructor", "blobParts", "be an object");
+-  }
+-
+   if (!blobParts.isUndefined() && !init_blob_parts(cx, self, blobParts)) {
+     return false;
+   }
+@@ -631,8 +785,13 @@
+ }
+ 
+ void Blob::finalize(JS::GCContext *gcx, JSObject *self) {
+-  MOZ_ASSERT(is_instance(self));
+-  auto *blob = Blob::blob(self);
++  // Finalization can run off-thread. Do not consult the mutable subclass
++  // registry or invoke receiver guards/getters here; the JSClass hook selects
++  // this cleanup and both classes reserve at least the Blob slot prefix.
++  MOZ_ASSERT(JSCLASS_RESERVED_SLOTS(JS::GetClass(self)) >= std::to_underlying(Slots::Count));
++  // GetMaybePtr explicitly accepts undefined slots. File forwards here through
++  // its own JSClass finalizer; no second parent finalizer is invoked by the VM.
++  auto *blob = JS::GetMaybePtrFromReservedSlot<ByteBuffer>(self, std::to_underlying(Slots::Data));
+   if (blob) {
+     js_delete(blob);
+   }
+--- a/builtins/web/blob.h
++++ b/builtins/web/blob.h
+@@ -34,6 +34,12 @@
+ 
+   using ByteBuffer = js::Vector<uint8_t, 0, js::SystemAllocPolicy>;
+ 
++  // A registered JSClass alone is insufficient: prototypes and failed
++  // constructors can have undefined Data. Only initialized native storage is
++  // a Blob receiver/part. Both overloads preserve existing caller signatures.
++  static bool is_instance(const JSObject *obj);
++  static bool is_instance(Value value);
++
+   static bool arrayBuffer(JSContext *cx, HandleObject self, MutableHandleValue rval);
+   static bool bytes(JSContext *cx, HandleObject self, MutableHandleValue rval);
+   static bool stream(JSContext *cx, HandleObject self, MutableHandleValue rval);
+--- a/builtins/web/file.cpp
++++ b/builtins/web/file.cpp
+@@ -31,6 +31,26 @@
+ 
+ using blob::Blob;
+ 
++bool File::is_instance(const JSObject *obj) {
++  if (!BuiltinImpl<File, FinalizableClassPolicy>::is_instance(obj) ||
++      !Blob::is_instance(obj)) {
++    return false;
++  }
++  auto *self = const_cast<JSObject *>(obj);
++  return JS::GetReservedSlot(self, std::to_underlying(Slots::Name)).isString() &&
++         JS::GetReservedSlot(self, std::to_underlying(Slots::LastModified)).isNumber();
++}
++
++bool File::is_instance(Value value) {
++  return value.isObject() && is_instance(&value.toObject());
++}
++
++void File::finalize(JS::GCContext *gcx, JSObject *self) {
++  // JSClassOps are not inherited through the JS prototype chain. File owns
++  // the same native byte vector initialized by Blob::init; release it once.
++  Blob::finalize(gcx, self);
++}
++
+ const JSFunctionSpec File::static_methods[] = {
+     JS_FS_END,
+ };
+--- a/builtins/web/file.h
++++ b/builtins/web/file.h
+@@ -7,7 +7,7 @@
+ 
+ 
+ namespace builtins::web::file {
+-class File : public BuiltinImpl<File> {
++class File : public BuiltinImpl<File, FinalizableClassPolicy> {
+   static bool name_get(JSContext *cx, unsigned argc, JS::Value *vp);
+   static bool lastModified_get(JSContext *cx, unsigned argc, JS::Value *vp);
+ 
+@@ -23,6 +23,10 @@
+   static const JSFunctionSpec methods[];
+   static const JSPropertySpec properties[];
+ 
++  static bool is_instance(const JSObject *obj);
++  static bool is_instance(Value value);
++  static void finalize(JS::GCContext *gcx, JSObject *self);
++
+   static JSString *name(JSObject *self);
+ 
+   static JSObject *create(JSContext *cx, HandleValue fileBits, HandleValue fileName, HandleValue opts);

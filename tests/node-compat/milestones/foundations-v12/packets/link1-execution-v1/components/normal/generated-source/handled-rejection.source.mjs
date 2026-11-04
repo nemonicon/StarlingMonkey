@@ -1,0 +1,1 @@
+import{nextTick}from'starling:test-internal-ticks';export function run(){return new Promise(resolve=>nextTick(()=>{const p=(async()=>{throw new Error('TICK_DEPLOYED_REJECTION')})();queueMicrotask(()=>p.catch(error=>resolve(JSON.stringify({handled:error.message}))));return p;}))}

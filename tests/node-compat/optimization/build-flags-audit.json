@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "observedAtUtc": "2026-11-03T00:40:39.129570+00:00",
+  "evidenceClass": "Read-only observation after the candidate compacting-GC stress build, not a historical cache capture",
+  "currentCMakeCache": {
+    "path": "/tmp/starling-node-compat/improved-build/engine-abi-fixed/CMakeCache.txt",
+    "sha256": "914ba6025cd965ff7a7f0335a48741bfed40cf35c15a9980ffa195a63ee314e4",
+    "bytes": 28513
+  },
+  "currentCompileCommands": {
+    "path": "/tmp/starling-node-compat/improved-build/engine-abi-fixed/compile_commands.json",
+    "sha256": "5ff08182b3bc56315b03706951a77e43b0bd3351d224bac717701021cd602c45",
+    "bytes": 81314
+  },
+  "observedAfterStressOptions": {
+    "CMAKE_BUILD_TYPE": "Release",
+    "ENABLE_BUILTIN_NODE_COMPAT": "ON",
+    "ENABLE_BUILTIN_WPT_SUPPORT": "OFF",
+    "ENABLE_JS_DEBUGGER": "OFF",
+    "NODE_COMPAT_GC_STRESS": "ON",
+    "USE_WASM_OPT": "ON",
+    "WEVAL": "OFF"
+  },
+  "historicalEngines": [
+    {
+      "arm": "ABI-fixed original native control",
+      "engineSha256": "6daf1f03438aad3a14124b2dc09f95f09b91eac285233c2345cbd1a24b302748",
+      "metadataPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.abi-control.wasm.build.json"
+    },
+    {
+      "arm": "ABI-fixed candidate release",
+      "engineSha256": "3f5bf602ad2d1507db5c1bcd5b938984aba9ca65af4c5a840b5bf8fcd09d370f",
+      "metadataPath": "/tmp/starling-node-compat/improved-build/artifacts/starlingmonkey_embedding.candidate.release.wasm.build.json"
+    }
+  ],
+  "historicalBuildLogs": [
+    {
+      "role": "ABI-only control",
+      "path": "/tmp/starling-node-compat/improved-build/abi-only-build.log",
+      "sha256": "2b728383e249d2fef0e849abe1783c55aa4426f5f2d754804ec3ae97f07c363c",
+      "bytes": 1214544
+    },
+    {
+      "role": "candidate release",
+      "path": "/tmp/starling-node-compat/improved-build/abi-candidate-build.log",
+      "sha256": "3bd58a9b65128069de06cee8198211496e61d20495ac33ffa6681d1642b9719d",
+      "bytes": 5723
+    },
+    {
+      "role": "candidate GC stress",
+      "path": "/tmp/starling-node-compat/improved-build/abi-candidate-stress-build.log",
+      "sha256": "90b4b003efc0805cf566bf533b8e622d4441d49c0a3b85d2494d85203cfe9426",
+      "bytes": 5744
+    }
+  ],
+  "historicalEvidenceAndLimits": [
+    "The used recipe explicitly requested Release, native profile ON, debugger/WPT OFF, and the requested GC-stress setting. It relied on upstream WEVAL=OFF and USE_WASM_OPT=ON defaults plus the reused CMake project cache.",
+    "The recorded control and candidate metadata agree on their exposed flags, source/compiler/toolchain hashes and guest ABI patch. Their 188 source paths match; only the facade and generated header content differ.",
+    "The historical release metadata did not capture actual CMake cache options, cache digest or compile-command digest at the respective build times.",
+    "The current cache is from a subsequent GC-stress build and has NODE_COMPAT_GC_STRESS=ON. It must not be represented as the control or release candidate cache at measurement time.",
+    "No prior engine, metadata, artifact manifest or timing result was rewritten, and no rebuild was performed for this audit."
+  ],
+  "futureRecipeStrengthening": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/build-engine.sh",
+    "sha256": "1d39533077f6f77c1eaba53d71166301e492b8d67a99bab677e6695a62a32918",
+    "bytes": 11812,
+    "changes": [
+      "Explicit -DWEVAL=OFF and -DUSE_WASM_OPT=ON, alongside the existing -DCMAKE_BUILD_TYPE=Release request",
+      "Parse actual post-build CMake cache options and require exact agreement with requested settings",
+      "Record requestedCMakeOptions, observedCMakeOptions, cmakeCacheSha256, compileCommandsSha256, and buildRecipeSha256 in future build metadata"
+    ],
+    "validation": "bash -n passed; option parser checked against the observed current stress cache. New capture code has not yet been exercised by a subsequent engine build."
+  }
+}

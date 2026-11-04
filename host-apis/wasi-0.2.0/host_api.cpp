@@ -1,6 +1,9 @@
 #include "host_api.h"
 #include "bindings/bindings.h"
 #include "handles.h"
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+#include "node-compat-entropy.h"
+#endif
 
 static std::optional<wasi_clocks_monotonic_clock_own_pollable_t> immediately_ready;
 
@@ -1045,6 +1048,12 @@ void exports_wasi_http_incoming_handler(exports_wasi_http_incoming_request reque
     init_from_environment();
   }
   MOZ_ASSERT(REQUEST_HANDLER);
+
+#ifdef NODE_COMPAT_ENTROPY_POLICY
+  // Native fetch-event dispatch can bypass ComponentizeJS's call trampoline.
+  // Enter only here, after any non-preinitialized engine has been constructed.
+  sm_node_enter_deployed_execution();
+#endif
 
   RESPONSE_OUT = response_out;
   auto state = new WASIHandle<host_api::HttpIncomingRequest>(request_handle);

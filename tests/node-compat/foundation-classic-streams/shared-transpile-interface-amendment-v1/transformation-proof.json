@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "state": "GENERATED_DECLARATION_REUSE_ONLY_REVERSIBLE_SOURCE",
+  "completionAmendmentIndexSha256": "76e735336884634ab4811963586738da6c70fdcda722a74706e917a07c615489",
+  "files": [
+    {
+      "path": "completion.mjs",
+      "beforeSha256": "ecf4e83fc5fb21a59b01b214cba0a929eeaf32b81e3afb44b44f102e7008c4e5",
+      "afterSha256": "2fe341cc0e0e505d3a7e6ba55f2c425ce089e864af0d9523795c59fe10a4c503",
+      "edits": [
+        {
+          "old": "  const paths = new Set();",
+          "new": "  const paths = new Set();\n  const written = new Map();",
+          "occurrences": 1
+        },
+        {
+          "old": "    paths.add(target);",
+          "new": "    paths.add(target);\n    const bytes = typeof data === 'string' ? Buffer.from(data, options.encoding ?? 'utf8') : Buffer.from(data);\n    written.set(target, { sha256: hash(bytes), bytes: bytes.length });",
+          "occurrences": 1
+        },
+        {
+          "old": "  return Object.freeze({ write, paths });",
+          "new": "  // Jco may emit a shared interface declaration for multiple components.\n  // Only exact declarations created by this writer may be reused. All other\n  // outputs retain exclusive creation; an old directory is never repaired.\n  async function writeGenerated(path, data, options) {\n    const { target, name } = below(output, path);\n    assert(options?.flag === 'wx', 'Generated outputs require exclusive creation');\n    if (!paths.has(target)) return write(target, data, options);\n    assert(/^interfaces\\/[A-Za-z0-9][A-Za-z0-9._-]*\\.d\\.ts$/.test(name),\n      'Only already-tracked interface declarations may repeat');\n    await ordinaryParent(output, target);\n    const previous = await ordinaryFile(output, target);\n    const bytes = typeof data === 'string' ? Buffer.from(data, options.encoding ?? 'utf8') : Buffer.from(data);\n    const original = written.get(target);\n    assert(original && original.sha256 === previous.sha256 && original.bytes === previous.bytes,\n      'Tracked declaration changed after creation');\n    assert.equal(hash(bytes), original.sha256, 'Repeated declaration differs');\n    assert.equal(bytes.length, original.bytes, 'Repeated declaration length differs');\n    assert((await readFile(target)).equals(bytes), 'Repeated declaration bytes differ');\n  }\n  return Object.freeze({ write, writeGenerated, paths });",
+          "occurrences": 1
+        }
+      ],
+      "exactReverseProof": true
+    },
+    {
+      "path": "component-driver.mjs",
+      "beforeSha256": "8b5ef0af421fa7806a5a67f1140b7d49c0b605b19f42a3e7689bd12e523cf97f",
+      "afterSha256": "c8000335e25fb8bf4d8b7260abefc8f96a4a89f34d0e2856c00e79e1fef2a288",
+      "edits": [
+        {
+          "old": "await writeOutput(join(output,name),bytes,{flag:'wx'});",
+          "new": "await tracked.writeGenerated(join(output,name),bytes,{flag:'wx'});",
+          "occurrences": 2
+        }
+      ],
+      "exactReverseProof": true
+    }
+  ],
+  "guestSemanticBytesChanged": false,
+  "producerOrGuestInvoked": false
+}

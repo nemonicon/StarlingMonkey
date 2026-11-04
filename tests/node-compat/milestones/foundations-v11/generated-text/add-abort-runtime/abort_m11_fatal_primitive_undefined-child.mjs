@@ -1,0 +1,1 @@
+import{run}from"/tmp/starling-node-compat/foundations-v11/add-abort-runtime/abort_m11_fatal_primitive_undefined.js";try{await run();console.log('UNEXPECTED_RETURN');process.exitCode=2;}catch(error){console.log('EXPECTED_FATAL_DISCARD');}

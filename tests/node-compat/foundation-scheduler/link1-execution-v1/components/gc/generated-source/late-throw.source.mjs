@@ -1,0 +1,1 @@
+import{nextTick}from'starling:test-internal-ticks';export function inspectResult(){return ''}export const api={get run(){nextTick(()=>{throw new Error('TICK_LATE_THROW')});return inspectResult}}

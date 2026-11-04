@@ -1,0 +1,103 @@
+"""Derive source files only. Never invoke staging/artifact/build/bootstrap code."""
+from pathlib import Path
+import ast,hashlib,json
+HERE=Path(__file__).resolve().parent
+REPO=HERE.parents[3]
+PARENT=REPO/'tests/node-compat/foundation-zlib/native-integration-candidate-v4'
+CONSUMERS=HERE.parent/'production-text-json-candidate-v2'
+PEER=HERE.parent/'independent-production-text-json-v2-source-review-v1'
+SDK=HERE.parent/'sdk-registration-syntax-v1'
+STAGE=Path('/tmp/starling-node-compat/zlib-source-v4')
+REL=str(HERE.relative_to(REPO))
+CODEC="REPO/'tests/node-compat/foundation-zlib/native-integration-candidate-v4/codec-evidence.py'"
+records=[]
+def sha(value):return hashlib.sha256(value).hexdigest()
+def raw(path):return Path(path).read_bytes()
+def doc(path):return json.loads(raw(path))
+def put(name,value):
+    path=HERE/name;path.parent.mkdir(parents=True,exist_ok=True)
+    with path.open('x')as output:output.write(value if isinstance(value,str)else json.dumps(value,indent=2)+'\n')
+def transform(name,edits):
+    original=raw(PARENT/'artifact-tools'/name).decode();value=original;rows=[]
+    for old,new in edits:
+        count=value.count(old);assert count,(name,old)
+        value=value.replace(old,new);rows.append({'old':old,'new':new,'count':count})
+    put('artifact-tools/'+name,value)
+    records.append({'path':'artifact-tools/'+name,'origin':str(PARENT/'artifact-tools'/name),'beforeSha256':sha(original.encode()),'afterSha256':sha(value.encode()),'edits':rows})
+def main():
+    assert not(HERE/'artifact-tools').exists()
+    for root,digest in [(PARENT,'d384af814a95fa873afdca5bf31b61197463279b487064b6366ceaf6aad71172'),(CONSUMERS,'eedeef581d961030b9aac3bf87c43e0f58cfe5516c5b04d997eb095c6df7ef7a'),(PEER,'01f432678d2408d7645d35afea5abd73f192206c6dd3d4197f4ad7a83a0ad9d1'),(SDK,'5d0f51bd3325fc3ec36743e10b5da55980a9f956469b7f76c902f5ab8c037117')]:
+        assert sha(raw(root/'index.json'))==digest
+        for row in doc(root/'index.json')['files']:assert sha(raw(root/row['path']))==row['sha256']
+    for name in ['policy.json','layer-policy.py','admission-pins.json']:put(name,raw(CONSUMERS/name).decode())
+    common=[('production-zlib-v4','production-consumers-v1'),('350','355'),
+      ("assert metadata.get('zlibEnabled') is (label != 'disabled-off')","assert metadata.get('zlibEnabled') is True\n    assert metadata.get('streamConsumersEnabled') is (label != 'disabled-off')\n    assert metadata.get('streamConsumersSourcePolicy') == json.loads((HERE.parent/'policy.json').read_bytes())['streamConsumersSourcePolicy']"),
+      ('def compile_command(command, runtime, source=None, classic=True, gc=False, zlib=True):','def compile_command(command, runtime, source=None, classic=True, gc=False, zlib=True, consumers=True):'),
+      ("('NODE_COMPAT_ZLIB', zlib and source.startswith('builtins/node-compat/'))","('NODE_COMPAT_STREAM_CONSUMERS', consumers and source.startswith('builtins/node-compat/')),\n                ('NODE_COMPAT_ZLIB', zlib and source.startswith('builtins/node-compat/'))"),
+      ('immutable-zlib-release-engine-frozen','immutable-consumers-release-engine-frozen'),
+      ("receipt['actualLayoutCompileCommands'] == 61+int(label!='disabled-off')","receipt['actualLayoutCompileCommands'] == 62"),
+      ("receipt['actualClassicPrivateCompileCommands'] == 5+int(label!='disabled-off')","receipt['actualClassicPrivateCompileCommands'] == 6"),
+      ("HERE.parent/'codec-evidence.py'",CODEC),
+      ("    checked(receipt_path, receipt_digest)\n    if return_receipt_digest:","    assert receipt['streamConsumersEnabled'] is metadata['streamConsumersEnabled']\n    assert receipt['streamConsumersSourcePolicy']==metadata['streamConsumersSourcePolicy']\n    install=metadata['streamConsumersPolicy']['installationOrder']\n    assert install['path']==witness['install']['path'] and install['sha256']==witness['install']['sha256']\n    checked(mapping[install['path']],install['sha256'])\n    install_text=mapping[install['path']].read_text()\n    assert install_text.count('NS_DEF(builtins::web::text_codec)')==install_text.count('NS_DEF(builtins::node_compat)')==1\n    assert install_text.index('NS_DEF(builtins::web::text_codec)')<install_text.index('NS_DEF(builtins::node_compat)')\n    assert cache['ENABLE_BUILTIN_WEB_TEXT_CODEC']=='ON'\n    checked(receipt_path, receipt_digest)\n    if return_receipt_digest:")]
+    transform('artifact_common.py',common)
+    transform('build-one.py',[('production350','consumers355'),('zlib-v4-build','consumers-v2-build'),('production-zlib-v4','production-consumers-v1'),("'NODE_COMPAT_ZLIB': '0' if label == 'disabled-off' else '1',","'NODE_COMPAT_ZLIB': '1',\n        'NODE_COMPAT_STREAM_CONSUMERS': '0' if label == 'disabled-off' else '1',"),("'NODE_COMPAT_ARTIFACT_TAG': 'z350v1'","'NODE_COMPAT_ARTIFACT_TAG': 'cs355v1'")])
+    transform('freeze-engine.py',[('zlib350','consumers355'),('350','355'),('immutable-zlib-release-engine-frozen','immutable-consumers-release-engine-frozen'),
+      ("'NODE_COMPAT_ZLIB':'OFF'if label=='disabled-off'else'ON',","'NODE_COMPAT_ZLIB':'ON',\n                'NODE_COMPAT_STREAM_CONSUMERS':'OFF'if label=='disabled-off'else'ON',\n                'ENABLE_BUILTIN_WEB_TEXT_CODEC':'ON',"),
+      ("compile_command(row['command'], runtime, source, True, gc, metadata['zlibEnabled'])","compile_command(row['command'], runtime, source, True, gc, True, metadata['streamConsumersEnabled'])"),
+      ("compile_command(embedding[0], runtime, 'embedding/embedding.cpp', True, gc, metadata['zlibEnabled'])","compile_command(embedding[0], runtime, 'embedding/embedding.cpp', True, gc, True, metadata['streamConsumersEnabled'])"),
+      ("HERE.parent/'codec-evidence.py'",CODEC),
+      ("    plan = []","    install=metadata['streamConsumersPolicy']['installationOrder']\n    assert install['path']==cache['INSTALL_BUILTINS']==metadata['zlibPolicy']['codecWitness']['install']['path']\n    assert install['sha256']==sha(Path(install['path']))\n    install_text=Path(install['path']).read_text()\n    assert install_text.count('NS_DEF(builtins::web::text_codec)')==install_text.count('NS_DEF(builtins::node_compat)')==1\n    assert install_text.index('NS_DEF(builtins::web::text_codec)')<install_text.index('NS_DEF(builtins::node_compat)')\n    plan = []"),
+      ("'zlibEnabled':metadata['zlibEnabled'],'zlibSourcePolicy':metadata['zlibSourcePolicy'],","'streamConsumersEnabled':metadata['streamConsumersEnabled'],'streamConsumersSourcePolicy':metadata['streamConsumersSourcePolicy'],\n        'zlibEnabled':metadata['zlibEnabled'],'zlibSourcePolicy':metadata['zlibSourcePolicy'],"),
+      ('ACTUAL_FINITE_ZLIB_BUILD_ONLY_SELECTOR_PASSED_NO_ENGINE_EXECUTION','ACTUAL_FINITE_CONSUMERS_BUILD_ONLY_SELECTOR_PASSED_NO_ENGINE_EXECUTION')])
+    transform('metadata-admission.mjs',[
+      ('350','355'),("classicStreamsEnabled:true,zlibEnabled:label!=='disabled-off'","classicStreamsEnabled:true,zlibEnabled:true,streamConsumersEnabled:label!=='disabled-off'"),
+      ('validateZlibBuildSourceAdmission','validateStreamConsumersBuildSourceAdmission'),('tests/node-compat/zlib-admission.mjs','tests/node-compat/stream-consumers-admission.mjs'),
+      ('assert.equal(classic.zlibEnabled,options.zlibEnabled);','assert.equal(classic.streamConsumersEnabled,options.streamConsumersEnabled);assert.equal(classic.zlibEnabled,options.zlibEnabled);'),
+      ("assert.equal(ids.includes('node:zlib'),options.zlibEnabled);","assert.equal(ids.includes('node:zlib'),options.zlibEnabled);\n assert.equal(ids.includes('node:stream/consumers'),options.streamConsumersEnabled);"),
+      ('ACTUAL_FINITE_ZLIB_BUILD_ONLY_SELECTOR_PASSED_NO_ENGINE_EXECUTION','ACTUAL_FINITE_CONSUMERS_BUILD_ONLY_SELECTOR_PASSED_NO_ENGINE_EXECUTION')])
+    transform('build-manifests.mjs',[('350','355'),("['zlibEnabled','zlib']","['zlibEnabled','zlib'],['streamConsumersEnabled','stream-consumers']")])
+    transform('export-pin-candidate.py',[('zlib350','consumers355'),('ZLIB350','STREAM_CONSUMERS355'),('sm-bounded-zlib-source-v1','sm-stream-consumers-text-json-source-v1'),("'sourceFiles': 350","'streamConsumersEnabled':metadata['streamConsumersEnabled'],'streamConsumersSourcePolicy':metadata['streamConsumersSourcePolicy'],\n        'sourceFiles': 355")])
+    transform('bootstrap-classifier.py',[('ZLIB350','STREAM_CONSUMERS355'),('zlib350','consumers355'),('350','355'),('sm-bounded-zlib-source-v1','sm-stream-consumers-text-json-source-v1'),
+      ("'gcStress','entropyPolicy','classicStreamsEnabled','zlibEnabled','classicTraceSourcePolicy','zlibSourcePolicy','cmakeCacheSha256','compileCommandsSha256'","'gcStress','entropyPolicy','classicStreamsEnabled','zlibEnabled','streamConsumersEnabled','classicTraceSourcePolicy','zlibSourcePolicy','streamConsumersSourcePolicy','cmakeCacheSha256','compileCommandsSha256'")])
+    transform('bootstrap-preflight.mjs',[('zlibBootstrapPreflight','consumersBootstrapPreflight'),('ZLIB350','STREAM_CONSUMERS355')])
+    put('artifact-tools/parent-inputs.json',raw(PARENT/'artifact-tools/parent-inputs.json').decode())
+    for path in sorted((PARENT/'artifact-tools/ancestry').rglob('*')):
+        if path.is_file():put('artifact-tools/ancestry/'+str(path.relative_to(PARENT/'artifact-tools/ancestry')),raw(path).decode())
+    # Resolve source origins now as data. The stage later copies these exact
+    # rows; runtime artifact tools consume only the staged paths and own pins.
+    by_path={r['path']:dict(r) for r in doc(PARENT/'artifact-tools/tool-pins.json')['toolDependencies']}
+    origins={}
+    def add(relative,path):
+        value=raw(path);by_path[relative]={'path':relative,'sha256':sha(value),'bytes':len(value)};origins[relative]=str(path)
+    for root in [PARENT,CONSUMERS,PEER,SDK]:
+        prefix=str(root.relative_to(REPO));add(prefix+'/index.json',root/'index.json')
+        for row in doc(root/'index.json')['files']:add(prefix+'/'+row['path'],root/row['path'])
+    for name in ['build-engine.sh','module-selection.mjs','stream-consumers-admission.mjs']:add('tests/node-compat/'+name,CONSUMERS/'proposed/tests/node-compat'/name)
+    for name in ['policy.json','layer-policy.py','admission-pins.json']:add(REL+'/'+name,HERE/name)
+    for name in ['build-manifests.mjs','bootstrap-classifier.py','bootstrap-preflight.mjs']:add(REL+'/artifact-tools/'+name,HERE/'artifact-tools'/name)
+    for relative,row in by_path.items():
+        if relative in origins:continue
+        candidates=[REPO/relative,STAGE/relative,PARENT/'source'/relative]
+        valid=[p for p in candidates if p.is_file() and sha(raw(p))==row['sha256']]
+        assert valid,relative;origins[relative]=str(valid[0])
+    tools=doc(PARENT/'artifact-tools/tool-pins.json')
+    contract=doc(HERE/'admission-pins.json')
+    tools.update(state='SOURCE_ONLY_CONSUMERS355_ARTIFACT_TOOL_CONTRACT',recipeSha256=contract['productionRecipeSha256'],sourcePolicySha256=contract['policySha256'],sourceHelperSha256=contract['helperSha256'],nativeSources=355,actualNativeCommands={'consumerON':62,'consumerOFF':62},actualClassicPrivateCommands={'consumerON':6,'consumerOFF':6},freezeRoot='/tmp/starling-node-compat/production-consumers-v1/native-freeze',toolDependencies=[by_path[p]for p in sorted(by_path)],reviewedEnginePins=None,sourceContractVersion='sm-stream-consumers-text-json-source-v1')
+    put('artifact-tools/tool-pins.json',tools);toolsha=sha(raw(HERE/'artifact-tools/tool-pins.json'))
+    for name in ['artifact_common.py','metadata-admission.mjs']:
+        path=HERE/'artifact-tools'/name;value=raw(path).decode();old='211c2f10929ecaa04cc9dcd38bedc686faaf135ac950bc054e26b3004f38228a'
+        assert value.count(old)==1;value=value.replace(old,toolsha);path.write_text(value)
+        record=next(r for r in records if r['path']=='artifact-tools/'+name);record['edits'].append({'old':old,'new':toolsha,'count':1});record['afterSha256']=sha(value.encode())
+    for record in records:
+        value=raw(record['origin']).decode();old=value
+        for edit in record['edits']:assert value.count(edit['old'])==edit['count'];value=value.replace(edit['old'],edit['new'])
+        assert value==raw(HERE/record['path']).decode()
+        for edit in reversed(record['edits']):assert value.count(edit['new'])==edit['count'];value=value.replace(edit['new'],edit['old'])
+        assert value==old
+    put('tool-transformations.json',{'schemaVersion':1,'records':records,'lifecycleFunctionsMustRemainByteIdentical':True})
+    put('tool-origins.json',{'schemaVersion':1,'state':'EXACT_ORIGINAL_SOURCE_ORIGINS_FOR_FUTURE_STAGE_ONLY','files':[{'path':p,'original':origins[p],**{k:by_path[p][k]for k in['sha256','bytes']}}for p in sorted(by_path)],'originalPreparationManifestsNeverReinterpretedInStage':True})
+    for name in ['runtime-pins.json','bootstrap-pins.json']:
+        put(name,{'schemaVersion':1,'state':'UNCONFIGURED_CONSUMERS355_'+name.split('-')[0].upper()+'_PINS','variants':{label:None for label in ['normal-off','normal-runtime','gc-off','disabled-off']},'operationalAdmission':False,'runtimeAcceptanceClaim':False})
+    for file in (HERE/'artifact-tools').rglob('*.py'):ast.parse(raw(file))
+    print(json.dumps({'derivedArtifactFiles':8,'toolDependencies':len(by_path),'toolPinsSha256':toolsha,'sourceOnly':True}))
+if __name__=='__main__':main()

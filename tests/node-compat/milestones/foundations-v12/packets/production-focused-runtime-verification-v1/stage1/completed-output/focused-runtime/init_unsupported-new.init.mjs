@@ -1,0 +1,1 @@
+import{addAbortListener}from'node:events';import{spawn}from'node:child_process';import{once}from'node:events';new once();export function run(){return'must-not-return'}

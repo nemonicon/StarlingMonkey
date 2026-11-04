@@ -1,0 +1,11 @@
+# Independent correctness activator-v2 source review
+
+No concrete source blocker was found. The independent reader rehashed all15 indexed files and6960 preparation inputs, immutable ce2/138a4/0558/60a parents, and reconstructed the six activation edits in both directions and the exact patch. authority.py and the null future-authority template are byte-identical to ce2. Actual2e98/9681 ON-only Root authority was hashed and compared as data; the genuine frozen verifier was not invoked.
+
+The successor authenticates mandatory60a before the genuine backend import, selects its persistence driver and durable-host helper, and retains the0558 bounded comparison. The original twelve guest/provider/workload/encoding/oracle/bundler/completion/runtime payload names and sources remain unchanged. No queue-budget or guest/provider/scheduler substitution is introduced.
+
+The genuine source342+addon2/external3/frozen525 backend is still called directly only after authority/source hashes. Declared and canonical source roots, complete actual native/addon/tool/frozen inputs, LIVE988224 adapter, two tool trees and22 verified tool links remain bound in the new consumed seal. Original preparation references retain their original context. The two-parameter compiled preflight and private recheck mechanism remain unchanged. Authority/source/tool checks before and after exclusive staging publication are preserved.
+
+Only a fresh measurement-correctness-activated-v2 family is created by the future action. Both it and its staging path were absent during review. No resume, old4728 output, partial prior observation or historical control can be adopted as a pass. Full20 workloads/14 boundaries/three retained rotations/fresh Jco/21fresh Wasmtime calls, final source/native recheck, completion and external exit0 remain mandatory.
+
+Stored31 pure source checks were authenticated and five Python files were AST-parsed; owner tests/action mains/backends/preflights/compiler/native/guest/componentizer/target hosts were not run. A fresh activation and actual full correctness execution remain Root actions. This review provides no runtime acceptance, all-case600-second adequacy, timing, performance, memory, reset/ALS/reuse or general failure-durability guarantee. The source350 producer is separate and untouched.

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_ONLY_PROPOSED_CLASSIC_REAL_COMPONENT_PROTOCOL",
+  "workloadsImplemented": false,
+  "nodeOracleExecuted": false,
+  "benchmarkExecuted": false,
+  "sameEnginePrimary": {
+    "engine": "future reviewed benchmark-classic-on diagnostic Release artifact",
+    "arms": ["installed-node-stream", "canonical-bounded-js-factory"],
+    "sameNativeDependencies": ["Buffer", "Events.EventEmitter", "Events.addAbortListener", "StringDecoder", "AbortSignal", "AbortController"],
+    "sameQueue": "existing TaskQueue-owned InternalTickQueue via create_internal_next_tick",
+    "callableIdentityMayDiffer": true,
+    "factoryRootExports": 24,
+    "factoryPromiseExports": 3,
+    "semanticFactorySourceMustMatchInstalledHeader": true,
+    "measureMeaning": "binding/packaging/registration path; installed profile and diagnostic extension cost common"
+  },
+  "wholeComponentCost": {
+    "arms": ["installed-node-stream on benchmark-classic-on", "canonical-bounded-js-factory on benchmark-classic-off"],
+    "extensionCommon": true,
+    "native342SourceBytesCommon": true,
+    "classicFlagDiffers": true,
+    "bundleAndSnapshotDiffer": true,
+    "measureMeaning": "combined profile/bundle/snapshot deployment tradeoff, not a single native state-machine causal claim"
+  },
+  "separateStockJcoComparator": {
+    "version": "1.40.0",
+    "jcoStdVersion": "0.10.0",
+    "readableStreamVersion": "4.7.0",
+    "scheduler": "unmodified private queueMicrotask FIFO",
+    "providerAndDependenciesMayDiffer": true,
+    "sameQueueComparison": false,
+    "overrideStreamSchedulerModule": false,
+    "normalDomainCorrectnessRequiredBeforeTiming": true,
+    "counterexamplesMustBeRetained": true
+  },
+  "scenarios": [
+    {"id":"pipeline-view-64","chunkBytes":64,"chunksPerPipeline":128,"input":"reused fixed attached unshared Uint8Array windows"},
+    {"id":"pipeline-copy-64","chunkBytes":64,"chunksPerPipeline":128,"input":"Buffer.from existing Buffer copy per write"},
+    {"id":"pipeline-view-524288","chunkBytes":524288,"chunksPerPipeline":8,"input":"reused fixed attached unshared Uint8Array windows"},
+    {"id":"pipeline-copy-524288","chunkBytes":524288,"chunksPerPipeline":8,"input":"Buffer.from existing Buffer copy per write"},
+    {"id":"fragmented-utf8","fragments":64,"input":"fixed ASCII plus split valid 2/3/4-byte sequences; StringDecoder Transform and final flush"},
+    {"id":"object-backpressure","objects":64,"highWaterMark":2,"input":"plain finite number/record values; delayed write callback through selected scheduler"},
+    {"id":"handled-cancellation","objects":16,"cancelAfterWrites":4,"input":"ordinary AbortController signal; handled pipeline rejection, bounded close/error cleanup"}
+  ],
+  "controls": ["checksum-input-only", "byte-input-and-copy-construction-only", "stream-construction-and-clean-close-only"],
+  "runBounds": {
+    "iterationsMinimum":1,
+    "iterationsMaximum":16,
+    "sequentialPipelinesOnly":true,
+    "maxPendingChunks":128,
+    "maxPayloadBytesPerPipeline":4194304,
+    "privateQueuePendingLimit":4096,
+    "privateQueuePerTickArgumentLimit":1024,
+    "privateQueuePendingArgumentLimit":65536,
+    "privateQueueCheckpointWorkLimit":65536,
+    "note":"One complete run export shares one native checkpoint budget across awaits. No claim that awaiting Promise.resolve resets that budget. Validate exact counts/workloads at maximum iterations before timing; reduce and record batches if needed, never raise queue limits."
+  },
+  "oracleAndCorrectness": {
+    "nodeVersion":"22.14.0",
+    "expectedChecksums":null,
+    "expectedTraces":null,
+    "mustPrecedeTiming":true,
+    "traceFields":["output bytes/values","event order","finish/end/error/close counts","callback receiver/arguments","write return/backpressure","EOF","settled Promise boundary","abort cleanup"],
+    "fixtures":"ordinary inputs only; no custom thenables, Proxies, shared/detached/resizable data, fatal/fault/DEBUG/raw-memory paths",
+    "snapshot":"setup input only; no queued callbacks/streams at snapshot; correctness runs exercise fresh and retained exports separately",
+    "failurePolicy":"stop and preserve counterexample; discard failed instance; no error-origin inference from generic host trap"
+  },
+  "hostSampling": {
+    "freshWorkersPerArm":3,
+    "warmupBatchesPerWorker":3,
+    "timedBatchesPerWorker":7,
+    "alternatingOrders":true,
+    "withinWorkerSamplesCorrelated":true,
+    "guestClockImports":[],
+    "hostTimingOnly":true,
+    "signed32ChecksumCarrier":true,
+    "expectedInterfaceImports":[],
+    "requiredCorrectnessAndQuietWindowBeforeTiming":true
+  },
+  "metrics": ["component logical bytes","componentization/snapshot wall time separately","cold instantiate/setup/first call separately","warm batch ns and payload MiB/s","public whole-process current/peak RSS","public exported memory capacity if available, otherwise unavailable","all samples/raw exits/arm order"],
+  "memoryLimits": "No raw/private memory or inferred ownership/store counts. Exported WebAssembly.Memory.buffer.byteLength is capacity only; JavaScript grow wrapping is not guest memory.grow counting. A public Wasmtime limiter observer, if reused, reports requested bytes, not unique retained memory. CLI RSS includes compile/runtime unless those phases are separated.",
+  "claimGates": "No advantage, minimal-deployment, full Node/Web stream, ALS/process/reset/reuse claim. Same-engine binding effects and whole-profile costs are separate; preserve size/RSS regressions and counterexamples."
+}

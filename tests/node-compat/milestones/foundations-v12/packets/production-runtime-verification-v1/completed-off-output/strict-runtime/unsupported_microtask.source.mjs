@@ -1,0 +1,1 @@
+import{spawn}from'node:child_process';export async function run(){queueMicrotask(()=>spawn());await Promise.resolve();return'unexpected'}

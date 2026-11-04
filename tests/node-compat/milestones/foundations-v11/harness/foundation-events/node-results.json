@@ -1,0 +1,433 @@
+{
+  "schema": 1,
+  "node": "v22.14.0",
+  "prototypeInstalledAsBuiltin": false,
+  "prototypeSha256": "d4e40238ce28213b7dce96873000fba7295b3c6ef1f70ecae8c641c8b17ee24d",
+  "checksSha256": "83970e95894fca323b6aa1d20b90a5bcfb628bbebe0f5547e027948aab896494",
+  "nodeEmbeddedSourceSha256": "ce56cf6f167106eab5a97486b494e73e2939e291769128dc3d0dd5d179c4bbe7",
+  "exports": [
+    {
+      "name": "EventEmitter",
+      "type": "function"
+    },
+    {
+      "name": "EventEmitterAsyncResource",
+      "type": "function"
+    },
+    {
+      "name": "addAbortListener",
+      "type": "function"
+    },
+    {
+      "name": "captureRejectionSymbol",
+      "type": "symbol"
+    },
+    {
+      "name": "captureRejections",
+      "type": "boolean"
+    },
+    {
+      "name": "default",
+      "type": "function"
+    },
+    {
+      "name": "defaultMaxListeners",
+      "type": "number"
+    },
+    {
+      "name": "errorMonitor",
+      "type": "symbol"
+    },
+    {
+      "name": "getEventListeners",
+      "type": "function"
+    },
+    {
+      "name": "getMaxListeners",
+      "type": "function"
+    },
+    {
+      "name": "init",
+      "type": "function"
+    },
+    {
+      "name": "listenerCount",
+      "type": "function"
+    },
+    {
+      "name": "on",
+      "type": "function"
+    },
+    {
+      "name": "once",
+      "type": "function"
+    },
+    {
+      "name": "setMaxListeners",
+      "type": "function"
+    },
+    {
+      "name": "usingDomains",
+      "type": "boolean"
+    }
+  ],
+  "cases": [
+    {
+      "name": "namespace",
+      "result": {
+        "names": [
+          "EventEmitter",
+          "EventEmitterAsyncResource",
+          "addAbortListener",
+          "captureRejectionSymbol",
+          "captureRejections",
+          "default",
+          "defaultMaxListeners",
+          "errorMonitor",
+          "getEventListeners",
+          "getMaxListeners",
+          "init",
+          "listenerCount",
+          "on",
+          "once",
+          "setMaxListeners",
+          "usingDomains"
+        ],
+        "defaultIdentity": true,
+        "staticIdentity": true,
+        "types": [
+          "symbol",
+          "symbol",
+          "number",
+          "boolean",
+          "boolean"
+        ],
+        "errorMonitorKey": null,
+        "rejectionKey": "nodejs.rejection",
+        "eventTargetSymbolTypes": [
+          "symbol",
+          "symbol"
+        ],
+        "eventTargetSymbolDescriptions": [
+          "events.maxEventTargetListeners",
+          "events.maxEventTargetListenersWarned"
+        ],
+        "eventTargetSymbolKeys": [
+          null,
+          null
+        ],
+        "defaultThen": null,
+        "namespaceThen": null
+      }
+    },
+    {
+      "name": "listener-aliases",
+      "result": {
+        "on": true,
+        "off": true
+      }
+    },
+    {
+      "name": "emit-receiver-arguments-return",
+      "result": [
+        false,
+        true,
+        [
+          true,
+          true,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      ]
+    },
+    {
+      "name": "prepend-once-order",
+      "result": [
+        "c",
+        "b",
+        "a",
+        "b",
+        "a"
+      ]
+    },
+    {
+      "name": "mutation-during-emit",
+      "result": [
+        "a",
+        "b",
+        "a",
+        "c"
+      ]
+    },
+    {
+      "name": "new-listener-before-insert",
+      "result": [
+        "new:true",
+        "new:false",
+        "nested",
+        "original"
+      ]
+    },
+    {
+      "name": "remove-latest-duplicate",
+      "result": [
+        "f",
+        "g"
+      ]
+    },
+    {
+      "name": "remove-once-original-and-wrapper",
+      "result": {
+        "identities": [
+          true,
+          true
+        ],
+        "trace": [
+          [
+            "x",
+            true
+          ],
+          [
+            "x",
+            true
+          ]
+        ],
+        "count": 0
+      }
+    },
+    {
+      "name": "once-wrapper-manual-call",
+      "result": {
+        "trace": [
+          [
+            true,
+            "manual"
+          ]
+        ],
+        "first": 42,
+        "second": null,
+        "count": 0
+      }
+    },
+    {
+      "name": "once-reentrant-emit",
+      "result": [
+        "once",
+        "regular",
+        "regular"
+      ]
+    },
+    {
+      "name": "remove-all-lifo-and-symbols",
+      "result": {
+        "trace": [
+          [
+            "x",
+            "b"
+          ],
+          [
+            "x",
+            "a"
+          ],
+          [
+            "s",
+            "a"
+          ]
+        ],
+        "names": [],
+        "count": 0
+      }
+    },
+    {
+      "name": "event-key-order-special-names",
+      "result": {
+        "names": [
+          "2",
+          "10",
+          "__proto__",
+          "constructor",
+          "z",
+          "symbol:a",
+          "symbol:b"
+        ],
+        "nullPrototype": true,
+        "count": 7
+      }
+    },
+    {
+      "name": "error-monitor-is-not-handler",
+      "result": {
+        "same": true,
+        "trace": [
+          true,
+          true,
+          [
+            "handled",
+            true
+          ]
+        ]
+      }
+    },
+    {
+      "name": "unhandled-non-error-context",
+      "result": {
+        "name": "Error",
+        "code": "ERR_UNHANDLED_ERROR",
+        "context": true
+      }
+    },
+    {
+      "name": "listener-throw-stops-dispatch",
+      "result": {
+        "trace": [
+          1
+        ],
+        "same": true
+      }
+    },
+    {
+      "name": "listener-inspection-copies-and-filter",
+      "result": [
+        3,
+        2,
+        1,
+        3,
+        0,
+        3
+      ]
+    },
+    {
+      "name": "numeric-listener-thresholds",
+      "result": [
+        7,
+        7,
+        0,
+        "Infinity"
+      ]
+    },
+    {
+      "name": "default-threshold-esm-snapshot",
+      "result": [
+        25,
+        25,
+        10
+      ]
+    },
+    {
+      "name": "mutable-default-static-named-snapshot",
+      "result": [
+        77,
+        10,
+        true,
+        false
+      ]
+    },
+    {
+      "name": "legacy-subclass-mixin",
+      "result": [
+        true,
+        false,
+        1,
+        true
+      ]
+    },
+    {
+      "name": "modern-subclass",
+      "result": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "name": "invalid-listener-and-limits",
+      "result": [
+        {
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "name": "RangeError",
+          "code": "ERR_OUT_OF_RANGE"
+        },
+        {
+          "name": "RangeError",
+          "code": "ERR_OUT_OF_RANGE"
+        },
+        {
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        }
+      ]
+    },
+    {
+      "name": "capture-disabled-normal-listener-return",
+      "result": [
+        true,
+        0,
+        false
+      ]
+    }
+  ],
+  "differentialCasesPassed": 23,
+  "deferredCallAndConstructCases": [
+    {
+      "name": "on",
+      "construct": false,
+      "code": "ERR_SM_NODE_UNSUPPORTED"
+    },
+    {
+      "name": "on",
+      "construct": true,
+      "code": "ERR_SM_NODE_UNSUPPORTED"
+    },
+    {
+      "name": "once",
+      "construct": false,
+      "code": "ERR_SM_NODE_UNSUPPORTED"
+    },
+    {
+      "name": "once",
+      "construct": true,
+      "code": "ERR_SM_NODE_UNSUPPORTED"
+    },
+    {
+      "name": "addAbortListener",
+      "construct": false,
+      "code": "ERR_SM_NODE_UNSUPPORTED"
+    },
+    {
+      "name": "addAbortListener",
+      "construct": true,
+      "code": "ERR_SM_NODE_UNSUPPORTED"
+    },
+    {
+      "name": "EventEmitterAsyncResource",
+      "construct": false,
+      "code": "ERR_SM_NODE_UNSUPPORTED"
+    },
+    {
+      "name": "EventEmitterAsyncResource",
+      "construct": true,
+      "code": "ERR_SM_NODE_UNSUPPORTED"
+    }
+  ],
+  "additionalDeferredCasesPassed": 5,
+  "resourceLimitsPassed": [
+    "65536 listeners/event",
+    "4096 event names",
+    "64 nested emit entries with unwind recovery"
+  ],
+  "scope": "Pinned Node host oracle versus isolated JS prototype; no native builtin registration or real component execution established by this report"
+}

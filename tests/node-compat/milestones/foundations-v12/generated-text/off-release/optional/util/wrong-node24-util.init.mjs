@@ -1,0 +1,1 @@
+import {diff} from 'node:util';export function run(){return String(diff)}

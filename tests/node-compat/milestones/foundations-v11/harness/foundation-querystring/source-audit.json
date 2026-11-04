@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "node": "v22.14.0",
+  "toolchain": "/tmp/starling-node-compat/native-toolchain-lock",
+  "versions": {
+    "@bytecodealliance/jco": "1.40.0",
+    "unenv": "2.0.0-rc.24",
+    "readable-stream": "4.7.0"
+  },
+  "sourceFiles": [
+    {
+      "origin": "toolchain",
+      "path": "@bytecodealliance/jco/dist/node-builtins/querystring.js",
+      "sha256": "0feb405f1aa1224c34847fb9440437435fa9e8f79f41db6a9ea027cbded6a11b",
+      "bytes": 670
+    },
+    {
+      "origin": "toolchain",
+      "path": "unenv/dist/runtime/node/querystring.mjs",
+      "sha256": "2916fec8e3bb2dd7dcc6a47f83d594e61d5facede994c3ff07b136c7dfa5a571",
+      "bytes": 13557
+    },
+    {
+      "origin": "toolchain",
+      "path": "unenv/dist/runtime/node/internal/querystring/querystring.mjs",
+      "sha256": "dabbf5d741dc7712d0c5a15c082cd4f709c18b4741156b7f83800acb9e8c41f8",
+      "bytes": 3118
+    },
+    {
+      "origin": "repository",
+      "path": "runtime/engine.cpp",
+      "sha256": "6c4a750e1f71b7cf3e0f60eafa6a071481982fa6e6861d4249abda777f081120",
+      "bytes": 24725
+    },
+    {
+      "origin": "repository",
+      "path": "runtime/encode.cpp",
+      "sha256": "6ed989ed6f94814c1c1af7bd17ed0608b1d6acdf965cee21de29efef242528e2",
+      "bytes": 1930
+    },
+    {
+      "origin": "repository",
+      "path": "crates/rust-url/src/lib.rs",
+      "sha256": "636538d53710dd506d3cba59a3157cc8f728d7e20ffe2d49dce690441405b380",
+      "bytes": 13911
+    },
+    {
+      "origin": "repository",
+      "path": "builtins/web/url.cpp",
+      "sha256": "7b0d79d0394f19ae554b29ee0f374d09d575d9c59d781178b69d2797176f8f8b",
+      "bytes": 27617
+    },
+    {
+      "origin": "repository",
+      "path": "builtins/web/text-codec/text-decoder.cpp",
+      "sha256": "1f476905546afff685a8c24189dd567509084547192b8a5d0bc731047a325f12",
+      "bytes": 10183
+    },
+    {
+      "origin": "repository",
+      "path": "builtins/node-compat/buffer-facade.mjs",
+      "sha256": "b1a8b671e4ebf71ed300b56afb1d60986ef37be1716f55bf00b35151a4a00f16",
+      "bytes": 12233
+    },
+    {
+      "origin": "repository",
+      "path": "tests/integration/urlsearchparams/urlsearchparams.js",
+      "sha256": "2e5671414af40f5be697d9a34e59563e63e5d85d56056d1706b4e1e5250d4104",
+      "bytes": 1426
+    },
+    {
+      "origin": "repository",
+      "path": "tests/integration/textdecoder/textdecoder.js",
+      "sha256": "1f1f4ae6e064869c8e604d079d2c85fb5a3a9d8b0e8eb1d66b473dbf13e4072f",
+      "bytes": 1233
+    }
+  ],
+  "nodeEmbeddedSourceSha256": {
+    "querystring": "4035dd8989e502f3c69eeba0eaeb9851c7609d749674a6bcbb043a1a0a65b507",
+    "internal/querystring": "92d0cbd561d7cce93936b083d56d2a41063d177f3aa6772ae2c1871f160163d1"
+  },
+  "observations": [
+    "Jco querystringAdapter imports UNENV_BUFFER_CORE and reexports unenv; it is a JS adapter, not a native module",
+    "Unenv percent scanner and encodeStr derive from Node22.7; its default hook reads differ from pinned22 mutable QueryString.escape/unescape/unescapeBuffer semantics",
+    "runtime/engine.cpp::Engine::init uses JS::InitRealmStandardClasses: native URI intrinsics need no host capabilities",
+    "rust-url::params_init strips leading question mark and calls form_urlencoded::parse; URLSearchParams is not a compatible replacement",
+    "Querystring malformed percent fallback truncates raw UTF16 units modulo256, then performs replacement UTF8 decode preserving BOM",
+    "Native Buffer facade captures TextDecoder(ignoreBOM:true); profile allocUnsafe is deferred, so this scanner uses supported captured alloc and shared slice",
+    "Node internal/querystring::encodeStr pairs ANY surrogate with a following code unit; only terminal surrogate throws URIError ERR_INVALID_URI",
+    "Node maxKeys defaults1000 segments; empty segments count; fractional/nonpositive/NaN/Infinity behavior is not ordinary positive-integer validation",
+    "No readable-stream4.7 lib Querystring module demand was found in inspected tree",
+    "Published locked adapter trees do not contain a dedicated Querystring conformance suite; existing native URL/TextDecoder tests do not establish Querystring compatibility"
+  ],
+  "primaryReferences": [
+    "https://github.com/nodejs/node/blob/v22.14.0/lib/querystring.js",
+    "https://github.com/nodejs/node/blob/v22.14.0/lib/internal/querystring.js",
+    "https://github.com/nodejs/node/blob/v22.14.0/test/parallel/test-querystring.js"
+  ],
+  "testReview": "Pinned Node test-querystring source inspected for null-prototype/prototype-name keys, arrays, empty segments, custom delimiters, URI escaping, malformed escapes and primitive stringify behavior. Full upstream suite not executed.",
+  "scope": "Read-only source inventory plus pinned runtime reflection; Node oracle results and future component proof are separate"
+}

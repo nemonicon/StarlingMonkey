@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "finding": "ZLIB-JCO-CORRECTNESS-V2-M1",
+  "severity": "BLOCKER",
+  "state": "SOURCE_CONTROL_FLOW_FINDING_NOT_AN_ACTUAL_RUNTIME_FAILURE",
+  "sourceFiles": {
+    "guestContract": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-guest-oracle-candidate-v2/contract.mjs",
+      "sha256": "6f23fa219ae02cd8f1395a3c796cd8727032f67e1ccebc8f87935a70d4ecd0be",
+      "bytes": 5743
+    },
+    "guestNodeApi": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-guest-oracle-candidate-v2/node-oracle.mjs",
+      "sha256": "e9e504750320a23e10f8425b99a0e887de70df7c2c367f1918845e903d78dc3e",
+      "bytes": 7824
+    },
+    "retainer": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-jco-correctness-candidate-v2/node-edges.mjs",
+      "sha256": "c4cc3d08bd567341e035ee4436e8e69253ccb5c463611b6192d4da0b29881d99",
+      "bytes": 3399
+    },
+    "writer": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-jco-correctness-candidate-v2/durable.mjs",
+      "sha256": "1e4a01898d0c31a7595152fb28a50c9dcd1646ced07cf2f4e7c0b9f00afdf402",
+      "bytes": 4185
+    },
+    "entry": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-jco-correctness-candidate-v2/run.mjs",
+      "sha256": "a2f3c193cdfa07257628cbfa86183009d685e9f45cb3fb5f0bda3a268d382430",
+      "bytes": 12107
+    }
+  },
+  "chain": [
+    "guest-v2 contract.unbase64 allocates ordinary Uint8Array; stageRecord returns it as checked.bytes.",
+    "decodeNodeStream first invokes retain(cross-input\u2026, checked.bytes), before auditNodeDecode.",
+    "node-edges.mjs:19 binary=Buffer.isBuffer(value) is false for that Uint8Array, so invokes JSON write.",
+    "run.mjs write sets json:true; durable.plainJSON rejects the nonplain typed-array prototype."
+  ],
+  "scope": "First new Node main matrix edge cannot complete, after all93 primary jobs, before that edge invokes its Node codec. No action was run to reproduce this source conclusion.",
+  "inheritedSource": "node-edges.mjs is one of13 exact parent610 copies; identity alone did not validate its API carrier.",
+  "requiredCorrection": "New immutable successor; finite Uint8Array and Buffer binary retention preserving exact byteOffset/byteLength, empty views and subarray sentinels; zero-codec tests and unknown-object refusal. No old packet edits or action authority."
+}

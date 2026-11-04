@@ -1,0 +1,181 @@
+--- mature-v5-v7/compact.py
++++ earlier-v1/compact.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Lossless, journalled macOS filesystem compression of twenty completed mature v5-v7 output directories.
++"""Lossless, journalled macOS filesystem compression of 92 explicitly whitelisted earlier accepted public component/core outputs.
+ 
+ This changes filesystem representation only. It never edits WebAssembly bytes.
+ Run without --apply to inventory the deliberately narrow allowlist.
+@@ -22,14 +22,21 @@
+ 
+ 
+ BASE = Path('/tmp/starling-node-compat')
+-ROOTS = {f'v{version}-{name}': BASE / f'foundations-v{version}' / name
+-         for version, names in (
+-             (7, 'add-abort-initialization add-abort-late-binding assert buffer events http-joint path querystring util'.split()),
+-             (6, 'assert buffer events http-joint path querystring string-decoder'.split()),
+-             (5, 'codec http-joint native runtime-codec'.split()))
+-         for name in names}
+-RECEIPTS = BASE / 'storage-compaction-mature-v5-v7'
+-EXPECTED_ELIGIBLE_COUNT = 59
++REPO = Path(__file__).resolve().parents[3]
++AUDIT_PATH = REPO / 'tests/node-compat/storage-candidate-audit-earlier-v1/results.json'
++AUDIT_SHA256 = '6a3664ff4ebe283910672090ed4481123ab3d634146781ff7a9321a1302378a8'
++AUDIT_INDEX_PATH = AUDIT_PATH.with_name('index.json')
++AUDIT_INDEX_SHA256 = 'e1dcf6ce4608741ab2becd39bf19f9bf81a40aae3371be60ffc8f8dde7dcaa54'
++assert hashlib.sha256(AUDIT_PATH.read_bytes()).hexdigest() == AUDIT_SHA256
++assert hashlib.sha256(AUDIT_INDEX_PATH.read_bytes()).hexdigest() == AUDIT_INDEX_SHA256
++AUDIT = json.loads(AUDIT_PATH.read_text())
++assert AUDIT['eligibleCount'] == len(AUDIT['files']) == 92
++assert len({row['path'] for row in AUDIT['files']}) == 92
++ROOTS = {f'accepted-{i:02d}': Path(row['root']) for i,row in enumerate(AUDIT['roots'])}
++AUDITED = {row['path']:row for row in AUDIT['files']}
++RECEIPTS = BASE / 'storage-compaction-earlier-v1'
++EXPECTED_ELIGIBLE_COUNT = 92
++HEADROOM_RESERVE = 64 * 1024 * 1024
+ NAME = re.compile(r'.+\.(?:component|core\d*)\.wasm\Z')
+ EXCLUDED_DIRS = {'native-freeze', 'source', 'sources', 'componentize-source', 'harness',
+                  'node_modules', 'project', 'build', 'inputs', 'input'}
+@@ -90,43 +97,63 @@
+     )}
+ 
+ 
++def verify_report_closure():
++    # Audit/index authenticate the finite accepted file list and its provenance.
++    # Re-read every consumed report/JS witness; no component is executed.
++    index = json.loads(AUDIT_INDEX_PATH.read_text())
++    for row in index['files']:
++        path = AUDIT_PATH.parent / row['path']
++        assert path.is_file() and not path.is_symlink()
++        assert sha256(path) == row['sha256'], path
++    checked = set()
++    for row in AUDIT['files']:
++        proof = row['completionProof']
++        pairs = [(REPO/proof['milestoneSummary'], proof['milestoneSummarySha256']),
++                 (REPO/proof['archivedReport'], proof['reportSha256']),
++                 (Path(proof['currentOriginalReport']), proof['reportSha256'])]
++        pairs += [(Path(w['path']),w['sha256']) for w in row.get('generatedJsReferences',[])]
++        for path,digest in pairs:
++            key = (str(path),digest)
++            if key in checked: continue
++            assert path.is_file() and not path.is_symlink(), path
++            assert sha256(path) == digest, path
++            checked.add(key)
++    return len(checked)
++
++
+ def candidates(roots):
+-    for root in roots:
+-        if root.is_symlink() or not root.is_dir():
+-            yield root, 'excluded-root'
+-            continue
+-        for directory, directories, files in os.walk(root, followlinks=False):
+-            directories.sort()
+-            retained = []
+-            for name in directories:
+-                path = Path(directory) / name
+-                reason = ('excluded-directory' if name in EXCLUDED_DIRS or
+-                          any(token in name.lower() for token in ('debug', 'oom', 'private', 'candidate', 'probe'))
+-                          else 'symlink-directory' if path.is_symlink() else None)
+-                if reason:
+-                    yield path, reason
+-                else:
+-                    retained.append(name)
+-            directories[:] = retained
+-            for name in sorted(files):
+-                if not name.endswith('.wasm'):
+-                    continue
+-                path = Path(directory) / name
+-                value = file_stat(path)
+-                reason = None
+-                if not NAME.fullmatch(name) or 'engine' in name.lower():
+-                    reason = 'not-an-explicit-generated-component-or-core-name'
+-                elif any(token in str(path).lower() for token in ('debug', 'oom', 'private', 'candidate', 'probe')):
+-                    reason = 'excluded-debug-oom-private-candidate-or-probe-path'
+-                elif value['symlink'] or not value['regular']:
+-                    reason = 'not-a-regular-nonsymlink-file'
+-                elif value['nlink'] != 1:
+-                    reason = 'multiple-hardlinks'
+-                elif value['flags'] & COMPRESSED:
+-                    reason = 'already-compressed'
+-                elif value['flags'] != 0:
+-                    reason = 'other-file-flags-not-modified'
+-                yield path, reason
++    # EXACT WHITELIST ONLY: no os.walk, glob or broad root rediscovery.
++    assert set(roots) == set(ROOTS.values())
++    for row in sorted(AUDIT['files'], key=lambda row:row['path']):
++        path = Path(row['path'])
++        assert path.is_absolute() and path.is_relative_to(BASE)
++        assert Path(row['root']) in roots and path.is_relative_to(Path(row['root']))
++        value = file_stat(path)
++        reason = None
++        if not NAME.fullmatch(path.name) or 'engine' in path.name.lower():
++            reason = 'not-an-explicit-generated-component-or-core-name'
++        elif any(part in EXCLUDED_DIRS for part in path.parts):
++            reason = 'excluded-source-build-or-input-path'
++        elif any(token in str(path).lower() for token in ('debug','oom','private','candidate','probe')):
++            reason = 'excluded-debug-oom-private-candidate-or-probe-path'
++        elif value['symlink'] or not value['regular']:
++            reason = 'not-a-regular-nonsymlink-file'
++        elif value['nlink'] != 1:
++            reason = 'multiple-hardlinks'
++        elif value['flags'] & COMPRESSED:
++            reason = 'already-compressed'
++        elif value['flags'] != 0:
++            reason = 'other-file-flags-not-modified'
++        yield path, reason
++
++
++def match_audited_preimage(path, value):
++    prior = AUDITED[str(path)]
++    for key in ['device','inode','logicalBytes','allocatedBytes','mode','uid','gid','mtimeNs','flags','nlink']:
++        assert value['before'][key] == prior[key], (str(path),key)
++    assert value['sha256'] == prior['sha256'], path
++    expected = {key:prior[key] for key in ['logicalBytes','mode','uid','gid','mtimeNs','xattrDigests','acl']}
++    assert value['metadata'] == expected, path
+ 
+ 
+ def main():
+@@ -139,7 +166,10 @@
+         raise SystemExit('Apply requires all exact roots and --expected-inventory from the frozen dry run.')
+     if sys.platform != 'darwin':
+         raise SystemExit('This helper requires macOS transparent HFS/APFS compression.')
+-    roots = [ROOTS[key] for key in (args.root or tuple(ROOTS))]
++    if args.root:
++        raise SystemExit('This finite whitelist has no subset mode.')
++    roots = list(ROOTS.values())
++    closure_count = verify_report_closure()
+     RECEIPTS.mkdir(exist_ok=True)
+     run = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ') + '-' + uuid.uuid4().hex[:8]
+     journal_path = RECEIPTS / f'{run}.journal.jsonl'
+@@ -159,6 +189,9 @@
+         'command': ['/usr/bin/ditto', '--hfsCompression', '--noclone', 'SOURCE', 'FRESH_SAME_DIRECTORY_TEMP'],
+         'platform': platform.platform(), 'python': sys.version,
+         'journal': str(journal_path), 'diskFreeBeforeBytes': shutil.disk_usage(BASE).free,
++        'acceptedAudit':str(AUDIT_PATH), 'acceptedAuditSha256':AUDIT_SHA256,
++        'acceptedAuditIndexSha256':AUDIT_INDEX_SHA256, 'reportClosureWitnessesVerified':closure_count,
++        'headroomPolicy':'Before each copy: free >= 2*logicalBytes + 64MiB; not a hidden-allocation guarantee',
+         'compressedFiles': 0, 'eligibleFiles': 0, 'skippedEntries': 0,
+         'logicalBytes': 0, 'oldAllocatedBytes': 0, 'newAllocatedBytes': 0,
+         'physicalBytesRecovered': 0, 'failures': [],
+@@ -174,6 +207,7 @@
+             value = {'path': str(path), 'before': file_stat(path),
+                      'metadata': preserved_metadata(path), 'sha256': sha256(path)}
+             assert stable_identity(file_stat(path)) == stable_identity(value['before'])
++            match_audited_preimage(path,value)
+             frozen[str(path)] = value
+     assert len(frozen) == EXPECTED_ELIGIBLE_COUNT, len(frozen)
+     if args.apply:
+@@ -222,6 +256,11 @@
+                 raise RuntimeError('source changed while preparing its digest')
+             record({'event': 'before', 'path': str(path), 'sha256': digest,
+                     'before': before, 'preservedMetadata': original_metadata})
++            free_bytes = shutil.disk_usage(BASE).free
++            required_bytes = 2 * before['logicalBytes'] + HEADROOM_RESERVE
++            record({'event':'headroom-check','path':str(path),'freeBytes':free_bytes,'requiredBytes':required_bytes})
++            if free_bytes < required_bytes:
++                raise RuntimeError('insufficient per-file headroom before creating a temporary copy')
+             fd, temporary_name = tempfile.mkstemp(prefix='.storage-compression-', suffix='.wasm', dir=path.parent)
+             os.close(fd)
+             os.unlink(temporary_name)  # Only this newly created empty reservation.

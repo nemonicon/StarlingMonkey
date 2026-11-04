@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "state": "BENIGN_HOST_PYTHON_LIFECYCLE_CHECKS_PASSED",
+  "launcherSha256": "3b06aa83176d7e5cf9f6bb4cf4df0af057b6568baf606cec97e3e7531f4ebdd8",
+  "checkSourceSha256": "0c42bdfa8a8ee3708d6e22d969289ef8ea85c08dcddce6954814f1eb5155104d",
+  "checks": [
+    {
+      "name": "capacity-and-output-collision",
+      "passed": true,
+      "directoryCreatedOnInsufficientCapacity": false
+    },
+    {
+      "name": "leader-exits-grandchild-survives-term",
+      "passed": true,
+      "leaderPid": 52764,
+      "grandchildPid": 52765,
+      "rawChildExitCode": 0,
+      "status": 0,
+      "stoppedForDiskSpace": true,
+      "stopReason": "disk-space-stop",
+      "sigtermReceived": 0,
+      "temporarySigtermHandlerRestored": true,
+      "ownedGroupCleanup": {
+        "pgid": 52764,
+        "complete": true,
+        "events": [
+          {
+            "signal": 15,
+            "result": "sent",
+            "pgid": 52764
+          },
+          {
+            "signal": 9,
+            "result": "sent",
+            "pgid": 52764
+          }
+        ],
+        "errors": [],
+        "rawChildExitCode": 0
+      },
+      "launcherErrors": [],
+      "childStarted": true,
+      "lifecycleComplete": true
+    },
+    {
+      "name": "already-exited-group-esrch",
+      "passed": true,
+      "cleanup": {
+        "pgid": 52766,
+        "complete": true,
+        "events": [
+          {
+            "signal": 15,
+            "result": "already-gone",
+            "pgid": 52766
+          }
+        ],
+        "errors": [],
+        "rawChildExitCode": 0
+      }
+    },
+    {
+      "name": "monitor-error-and-simulated-enospc-finalization",
+      "passed": true,
+      "published": {
+        "rawChildExitCode": -15,
+        "status": -15,
+        "stoppedForDiskSpace": false,
+        "stopReason": "launcher-or-monitor-error",
+        "sigtermReceived": 0,
+        "temporarySigtermHandlerRestored": true,
+        "ownedGroupCleanup": {
+          "pgid": 52767,
+          "complete": true,
+          "events": [
+            {
+              "signal": 15,
+              "result": "sent",
+              "pgid": 52767
+            }
+          ],
+          "errors": [
+            {
+              "stage": "group-cleanup",
+              "type": "PermissionError",
+              "message": "[Errno 1] Operation not permitted"
+            },
+            {
+              "stage": "group-escalation",
+              "type": "PermissionError",
+              "message": "[Errno 1] Operation not permitted"
+            }
+          ],
+          "rawChildExitCode": -15
+        },
+        "launcherErrors": [
+          {
+            "stage": "launch-or-monitor",
+            "type": "RuntimeError",
+            "message": "EXPECTED_BENIGN_MONITOR_ERROR"
+          },
+          {
+            "stage": "group-cleanup",
+            "type": "PermissionError",
+            "message": "[Errno 1] Operation not permitted"
+          },
+          {
+            "stage": "group-escalation",
+            "type": "PermissionError",
+            "message": "[Errno 1] Operation not permitted"
+          }
+        ],
+        "childStarted": true,
+        "lifecycleComplete": true,
+        "resultFileWriteError": {
+          "stage": "result-file-write",
+          "type": "OSError",
+          "message": "[Errno 28] EXPECTED_SIMULATED_RESULT_WRITE_ENOSPC"
+        },
+        "evidenceComplete": false,
+        "launcherExitCode": 1,
+        "state": "native-build-failed-or-evidence-incomplete"
+      }
+    },
+    {
+      "name": "external-and-repeated-sigterm-finalization",
+      "passed": true,
+      "rawChildExitCode": -9,
+      "status": -9,
+      "stoppedForDiskSpace": false,
+      "stopReason": "external-signal-stop",
+      "sigtermReceived": 2,
+      "temporarySigtermHandlerRestored": true,
+      "ownedGroupCleanup": {
+        "pgid": 52770,
+        "complete": true,
+        "events": [
+          {
+            "signal": 15,
+            "result": "sent",
+            "pgid": 52770
+          },
+          {
+            "signal": 9,
+            "result": "sent",
+            "pgid": 52770
+          }
+        ],
+        "errors": [
+          {
+            "stage": "group-cleanup",
+            "type": "PermissionError",
+            "message": "[Errno 1] Operation not permitted"
+          },
+          {
+            "stage": "group-escalation",
+            "type": "PermissionError",
+            "message": "[Errno 1] Operation not permitted"
+          }
+        ],
+        "rawChildExitCode": -9
+      },
+      "launcherErrors": [
+        {
+          "stage": "launch-or-monitor",
+          "type": "ExternalTermination",
+          "message": "launcher received SIGTERM"
+        },
+        {
+          "stage": "group-cleanup",
+          "type": "PermissionError",
+          "message": "[Errno 1] Operation not permitted"
+        },
+        {
+          "stage": "group-escalation",
+          "type": "PermissionError",
+          "message": "[Errno 1] Operation not permitted"
+        }
+      ],
+      "childStarted": true,
+      "lifecycleComplete": true,
+      "handlerRestoredObserved": true
+    },
+    {
+      "name": "final-observation-error-classification",
+      "passed": true,
+      "observed": {
+        "rawChildExitCode": 0,
+        "lifecycleComplete": true,
+        "finalObservationErrors": [
+          {
+            "stage": "final-log-hash",
+            "message": "EXPECTED_MISSING_LOG"
+          }
+        ],
+        "state": "native-build-failed-or-incomplete",
+        "launcherExitCode": 1,
+        "evidenceComplete": false
+      }
+    }
+  ],
+  "ownNewSessionChildrenOnly": true,
+  "compilerOrNativeProducerOrGuestOrNetworkExecuted": false,
+  "diskFilled": false,
+  "enospcSimulatedOnly": true,
+  "notRuntimeCompatibilityOrBuildAcceptance": true
+}

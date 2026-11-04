@@ -1,0 +1,99 @@
+--- a/builtins/web/text-codec/text-encoder.cpp
++++ b/builtins/web/text-codec/text-encoder.cpp
+@@ -1,5 +1,11 @@
+ #include "text-encoder.h"
+-#include "encode.h"
++#include "js/CharacterEncoding.h"
++#include "js/GCAPI.h"
++#include "js/String.h"
++
++#ifdef STARLING_UTF8_DIRECT_OOM_TESTING
++#include "text-encoder-direct-testing.h"
++#endif
+ #include <tuple>
+ 
+ #include "js/ArrayBuffer.h"
+@@ -7,6 +13,21 @@
+ #include "mozilla/Span.h"
+ 
+ namespace builtins::web::text_codec {
++
++static void direct_stress_gc(JSContext *cx) {
++#ifdef STARLING_UTF8_DIRECT_GC_STRESS
++  // Only rooted boundaries; never while borrowing string or array bytes.
++  JS::PrepareForFullGC(cx);
++  JS::NonIncrementalGC(cx, JS::GCOptions::Shrink, JS::GCReason::API);
++#endif
++}
++
++#ifdef STARLING_UTF8_DIRECT_OOM_TESTING
++#define DIRECT_UTF8_ALLOC(cx, point, expression) \
++  direct_testing::allocate<direct_testing::Point::point>(cx, [&] { return (expression); })
++#else
++#define DIRECT_UTF8_ALLOC(cx, point, expression) (expression)
++#endif
+ 
+ bool TextEncoder::encode(JSContext *cx, unsigned argc, JS::Value *vp) {
+   METHOD_HEADER(0);
+@@ -27,21 +48,46 @@
+     return true;
+   }
+ 
+-  auto chars = core::encode(cx, args[0]);
+-  JS::RootedObject buffer(
+-      cx, JS::NewArrayBufferWithContents(cx, chars.len, chars.begin(),
+-                                         JS::NewArrayBufferOutOfMemory::CallerMustFreeMemory));
+-  if (!buffer) {
+-    return false;
+-  }
+-
+-  // `buffer` now owns `chars`
+-  static_cast<void>(chars.ptr.release());
+-
+-  JS::RootedObject byte_array(cx, JS_NewUint8ArrayWithBuffer(cx, buffer, 0, chars.len));
+-  if (!byte_array) {
+-    return false;
+-  }
++  // Coercion can invoke application code/GC. Keep the resulting immutable
++  // string rooted across linearization and the output allocation.
++  JS::RootedString input(cx, JS::ToString(cx, args[0]));
++  if (!input) return false;
++  direct_stress_gc(cx);
++
++  // Do not retain this raw linear pointer across the following allocations.
++  // A rope is flattened here, before any output-data pointer is borrowed.
++  size_t length = 0;
++  {
++    JSLinearString *linear = JS_StringIsLinear(input)
++        ? JS_ASSERT_STRING_IS_LINEAR(input)
++        : DIRECT_UTF8_ALLOC(cx, Linearize, JS_EnsureLinearString(cx, input));
++    if (!linear) return false;
++    length = JS::GetDeflatedUTF8StringLength(linear);
++  }
++  direct_stress_gc(cx);
++
++  JS::RootedObject byte_array(
++      cx, DIRECT_UTF8_ALLOC(cx, Array, JS_NewUint8Array(cx, length)));
++  if (!byte_array) return false;
++  direct_stress_gc(cx);
++
++  size_t written = 0;
++  if (length != 0) {
++    JS::AutoCheckCannotGC nogc(cx);
++    bool shared = false;
++    uint8_t *data = JS_GetUint8ArrayData(byte_array, &shared, nogc);
++    MOZ_ASSERT(data && !shared);
++    // Re-derive from the updated root AFTER every MayGC operation. Both
++    // DeflateStringToUTF8Buffer and its converters are infallible/no-GC.
++    written = JS::DeflateStringToUTF8Buffer(
++        JS_ASSERT_STRING_IS_LINEAR(input),
++        mozilla::Span(reinterpret_cast<char *>(data), length));
++  }
++  if (written != length) {
++    JS_ReportErrorASCII(cx, "TextEncoder UTF-8 length invariant failed");
++    return false;
++  }
++  direct_stress_gc(cx);
+ 
+   args.rval().setObject(*byte_array);
+   return true;

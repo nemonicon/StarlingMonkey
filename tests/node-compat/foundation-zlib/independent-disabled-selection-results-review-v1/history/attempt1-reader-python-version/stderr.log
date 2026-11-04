@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/independent-disabled-selection-results-review-v1/verify.py", line 153, in <module>
+    if __name__=='__main__':main()
+  File "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/independent-disabled-selection-results-review-v1/verify.py", line 73, in main
+    root=document(ROOT,ROOTSHA);check('Root actual outer exit0 and exact source/family',root['rawExitCode']==0 and root['sourceIndexSha256']==SOURCESHA and root['validationFamilyIndexSha256']==FAMILYSHA)
+  File "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/independent-disabled-selection-results-review-v1/verify.py", line 34, in document
+    def document(path,digest=None,size=None):return json.loads(data(path,digest,size))
+  File "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/independent-disabled-selection-results-review-v1/verify.py", line 33, in data
+    row=pinned(path,digest,size);raw=Path(path).read_bytes();assert sha(raw)==row['sha256']and len(raw)==row['bytes'];return raw
+  File "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/independent-disabled-selection-results-review-v1/verify.py", line 28, in pinned
+    with p.open('rb')as stream:value=hashlib.file_digest(stream,'sha256').hexdigest()
+AttributeError: module 'hashlib' has no attribute 'file_digest'

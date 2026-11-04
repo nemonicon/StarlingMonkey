@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "state": "ACTUAL_PRODUCTION_SAFE_GETTER_COUNTEREXAMPLE_CONFIRMED",
+  "toolExitCode": 0,
+  "engineSha256": "6e5bc2ca3b3e3f7dccaa887003bc292e8a7abfbc5260691d1cda0114640dae84",
+  "reportSha256": "94f622f6e992364275c9c9f3edc40d09bed81d34d9cf319a561b7ec0a055fd33",
+  "completionSha256": "7689a3371cb2b4aa79d68a9389717c42f3a9e4afeab384f4ea3389d8d888d279",
+  "nodeCompatibilityPassed": false,
+  "node": {
+    "ordinary": 1,
+    "protectedSignal": 1,
+    "alreadyAborted": 0
+  },
+  "native": {
+    "ordinary": 0,
+    "protectedSignal": 0,
+    "alreadyAborted": 0
+  },
+  "emittedImports": [],
+  "scope": "Safe ordinary returned objects only; get then increments a counter and returns undefined. No throwing/rejecting thenable, asynchronous listener Promise, Error poisoning, fault, raw/private memory or old engine path. Production306 is newly source/config pinned; inherited callback-return semantics unchanged; fix belongs to future scheduler/callback-result routing work.",
+  "limitation": "Pinned Node22 reads .then on a fresh ordinary EventTarget or protected AbortSignal callback return. Selected native EventTarget currently ignores rval, so those getter effects are absent. Already-aborted queued callback return is correctly discarded on both.",
+  "checkpointAcceptanceClaim": false
+}

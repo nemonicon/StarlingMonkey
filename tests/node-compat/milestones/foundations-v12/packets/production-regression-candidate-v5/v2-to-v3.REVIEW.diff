@@ -1,0 +1,161 @@
+--- v2/preflight.mjs
++++ v3/preflight.mjs
+@@ -14,18 +14,29 @@
+   let cursor=path;while(cursor!==root){assert(!(await lstat(cursor)).isSymbolicLink(),cursor);cursor=dirname(cursor);}
+   assert((await lstat(path)).isFile());const data=await bytes(path,expected);if(size!==undefined)assert.equal(data.length,size);return data;
+ }
+-export async function verifyInputClosure(){
+-  const document=JSON.parse(await readFile(join(here,'input-freeze.json')));assert.equal(document.schemaVersion,1);
++export async function verifyInputClosure({manifestPath=join(here,'input-freeze.json'),expectedSha256}={}){
++  manifestPath=resolve(manifestPath);assert((await lstat(manifestPath)).isFile()&&!(await lstat(manifestPath)).isSymbolicLink());
++  const manifestBytes=await readFile(manifestPath),manifestSha256=hash(manifestBytes);
++  if(expectedSha256!==undefined)assert.equal(manifestSha256,expectedSha256,'Runtime input manifest changed during run');
++  // Check the exact bytes above before parsing or following any supplied rows.
++  const document=JSON.parse(manifestBytes);assert.equal(document.schemaVersion,1);
+   const seen=new Set();for(const row of document.inputs){assert(!seen.has(row.path));seen.add(row.path);
+-    const path=resolve(here,row.path);assert((await lstat(path)).isFile()&&!(await lstat(path)).isSymbolicLink());
+-    assert.equal(hash(await readFile(path)),row.sha256,row.path);}
+-  return{path:join(here,'input-freeze.json'),sha256:hash(await readFile(join(here,'input-freeze.json'))),files:seen.size};
++    const path=resolve(dirname(manifestPath),row.path);assert((await lstat(path)).isFile()&&!(await lstat(path)).isSymbolicLink());
++    const data=await readFile(path);assert.equal(hash(data),row.sha256,row.path);assert.equal(data.length,row.bytes,row.path);}
++  return{path:manifestPath,sha256:manifestSha256,files:seen.size};
++}
++export async function recheckInputSeal({pinsPath,expectedPinsSha256,manifestPath,expectedManifestSha256}){
++  assert.equal(hash(await readFile(pinsPath)),expectedPinsSha256,'Production pins changed during run');
++  return verifyInputClosure({manifestPath,expectedSha256:expectedManifestSha256});
+ }
+ export async function verifyProductionTicks({gcStress=false}={}){
+   assert.equal(process.version,'v22.14.0');assert.deepEqual(process.execArgv,[]);assert(!process.env.NODE_OPTIONS);
+-  const pinsPath=join(here,'pins.json'),pinBytes=await readFile(pinsPath);
++  const pinsPath=join(here,'pins.json'),pinBytes=await readFile(pinsPath),expectedPinsSha256=hash(pinBytes);
+   const pin=selectActualPin(JSON.parse(pinBytes),{gcStress}); // FIRST gate; null cannot reach a loader.
+   const inputClosure=await verifyInputClosure();
++  const manifestPath=inputClosure.path,expectedManifestSha256=inputClosure.sha256;
++  // Private copies keep later rechecks independent of returned report objects.
++  const frozenFileChecks=pin.frozenFiles.map(row=>({...row}));
+   assert((await lstat(pin.freezeRoot)).isDirectory()&&!(await lstat(pin.freezeRoot)).isSymbolicLink());
+   assert(process.env.NODE_COMPAT_ENGINE&&process.env.NODE_COMPAT_ENGINE_SOURCE_ROOT&&process.env.NODE_COMPAT_WASMTIME);
+   const engine=resolve(process.env.NODE_COMPAT_ENGINE),sourceRoot=resolve(process.env.NODE_COMPAT_ENGINE_SOURCE_ROOT);
+@@ -41,7 +52,7 @@
+   validateProductionMetadata(metadata,{gcStress,expectedSources:policy.expectedNativeSourceManifest,expectedExternal:external});
+   assert.equal(metadata.engineSha256,pin.engineSha256);assert.equal(metadata.engineBytes,pin.engineBytes);
+   await below(pin.freezeRoot,engine,pin.engineSha256,pin.engineBytes);
+-  const copies=new Map();for(const row of pin.frozenFiles){await below(pin.freezeRoot,row.path,row.sha256,row.bytes);copies.set(row.path,row.sha256);}
++  const copies=new Map();for(const row of frozenFileChecks){await below(pin.freezeRoot,row.path,row.sha256,row.bytes);copies.set(row.path,row.sha256);}
+   for(const row of metadata.sourceManifest){const path=join(sourceRoot,row.path);assert.equal(copies.get(path),row.sha256,'Source absent from frozen copy inventory');await below(pin.freezeRoot,path,row.sha256);}
+   for(const row of metadata.componentizeSourceManifest){const path=join(pin.componentizeSourceRoot,row.path);assert.equal(copies.get(path),row.sha256);await below(pin.freezeRoot,path,row.sha256);}
+   await below(pin.freezeRoot,pin.recipePath,RECIPE);
+@@ -81,8 +92,9 @@
+   const {selectCoreExpectations}=await import('../../core-expectations.mjs');const core=selectCoreExpectations(metadata,{sourceRoot});
+   assert.equal(core.coreVersion,'sm-node-22.14.0-m0.11');assert.equal(core.allocUnsafePolicy,'zeroed-no-pool-direct-u8-v1');assert.deepEqual(pin.coreSources,core.sourceHashes);
+   const host=resolve(process.env.NODE_COMPAT_WASMTIME);assert.equal(hash(await readFile(host)),'a85dec9fcbbad23d0e038e5a99604114dbe9aa77bc784e4bce0f33013eb33c1c');
+-  async function recheck(){await verifyInputClosure();await below(pin.freezeRoot,engine,pin.engineSha256,pin.engineBytes);await below(pin.freezeRoot,engine+'.build.json',pin.receiptSha256);
+-    for(const row of pin.frozenFiles)await below(pin.freezeRoot,row.path,row.sha256,row.bytes);}
++  async function recheck(){await recheckInputSeal({pinsPath,expectedPinsSha256,manifestPath,expectedManifestSha256});
++    await below(pin.freezeRoot,engine,pin.engineSha256,pin.engineBytes);await below(pin.freezeRoot,engine+'.build.json',pin.receiptSha256);
++    for(const row of frozenFileChecks)await below(pin.freezeRoot,row.path,row.sha256,row.bytes);}
+   return{engine,sourceRoot,metadata,pin,pinsPath,pinBytes,sourceFilesVerified:306,engineSha256:pin.engineSha256,recheck,
+     report:{state:'fixed-production-private-ticks-preflight-passed',engineSha256:pin.engineSha256,commandsPath:pin.commandsPath,sourceFilesVerified:306,recipeSha256:RECIPE,freezeReceiptSha256:pin.freezeReceiptSha256,inputClosure,gcStress,scope:'Read-only admission; no runtime/scheduler/reset/ALS proof'}};
+ }
+--- v2/test-host.mjs
++++ v3/test-host.mjs
+@@ -7,6 +7,7 @@
+ import {fileURLToPath} from 'node:url';
+ import {spawnSync} from 'node:child_process';
+ import {selectActualPin,validateProductionMetadata,RECIPE,EMBEDDING} from './admission.mjs';
++import {verifyInputClosure,recheckInputSeal} from './preflight.mjs';
+ assert.equal(process.version,'v22.14.0');
+ const here=dirname(fileURLToPath(import.meta.url)),repo=resolve(here,'../../../..');
+ assert(process.env.NODE_COMPAT_REGRESSION_HOST_TEST_OUTPUT,'Set a fresh host-only JSON output path');
+@@ -17,6 +18,7 @@
+ const external=[{path:'embedding/embedding.cpp',sha256:EMBEDDING},{path:'embedding/embedding.h',sha256:'de2c1ae6c7f881902675d79e4bedaeece6953e70e1eac8291165ad0d5cd0eb0e'},{path:'CMakeLists.txt',sha256:'4bd9bb94f5b79a2c9eb8ef7d98bc4b712e7b9cc2702467436a87e1845240c5e8'}];
+ const options={gcStress:false,expectedSources:policy.expectedNativeSourceManifest,expectedExternal:external},results=[];
+ function test(name,run){run();results.push({name,passed:true});}
++async function asyncTest(name,run){await run();results.push({name,passed:true});}
+ function shape(gc=false){
+   // Constructed FROM SCRATCH; no engine path/hash or diagnostic receipt is projected.
+   const flags={CMAKE_BUILD_TYPE:'Release',WEVAL:'OFF',USE_WASM_OPT:'ON',ENABLE_BUILTIN_NODE_COMPAT:'ON',ENABLE_JS_DEBUGGER:'OFF',ENABLE_BUILTIN_WPT_SUPPORT:'OFF',NODE_COMPAT_LOCKED_RUST:'ON',NODE_COMPAT_OOM_TESTING:'OFF',NODE_COMPAT_ENTROPY_MODE:'OFF',NODE_COMPAT_INTERNAL_TICKS:'ON',NODE_COMPAT_PATH:'ON',NODE_COMPAT_EVENTS:'ON',NODE_COMPAT_STRING_DECODER:'ON',NODE_COMPAT_ASSERT:'ON',NODE_COMPAT_QUERYSTRING:'ON',NODE_COMPAT_UTIL:'ON',NODE_COMPAT_STREAM_WEB:'ON',NODE_COMPAT_GC_STRESS:gc?'ON':'OFF'};
+@@ -51,6 +53,31 @@
+   try{await lstat(output);assert.fail('Entry created output despite null pins');}catch(error){assert.equal(error.code,'ENOENT');}
+  }
+ }finally{await rm(temporary,{recursive:true});}
++// Exercise only owned scratch data. No real pin, engine or packet file changes.
++const scratch=await mkdtemp(join(tmpdir(),'starling-production-seal-check-'));
++try{
++ const manifestPath=join(scratch,'inputs.json'),pinsPath=join(scratch,'pins.json'),dataPath=join(scratch,'data.txt');
++ const pinBytes=Buffer.from('{"fixtureOnly":true}\n'),originalData=Buffer.from('original');
++ const originalManifest=Buffer.from(JSON.stringify({schemaVersion:1,inputs:[{path:'data.txt',sha256:hash(originalData),bytes:originalData.length}]}));
++ await writeFile(pinsPath,pinBytes);await writeFile(dataPath,originalData);await writeFile(manifestPath,originalManifest);
++ const originalSeal=await verifyInputClosure({manifestPath}),expectedManifestSha256=originalSeal.sha256,expectedPinsSha256=hash(pinBytes);
++ const captured={pinsPath,manifestPath,expectedManifestSha256,expectedPinsSha256};
++ await asyncTest('owned scratch seal succeeds without artifact admission',async()=>assert.deepEqual(await recheckInputSeal(captured),originalSeal));
++ await writeFile(dataPath,'replaced');
++ await asyncTest('listed bytes changed while manifest fixed rejects',async()=>assert.rejects(recheckInputSeal(captured),/data.txt/));
++ const replacement=Buffer.from('replaced');
++ await writeFile(manifestPath,JSON.stringify({schemaVersion:1,inputs:[{path:'data.txt',sha256:hash(replacement),bytes:replacement.length}]}));
++ await asyncTest('replacement manifest and matching listed bytes rejects',async()=>assert.rejects(recheckInputSeal(captured),/Runtime input manifest changed/));
++ await writeFile(manifestPath,'NOT JSON; expected digest must fail first');
++ await asyncTest('manifest digest checked before parsing',async()=>assert.rejects(recheckInputSeal(captured),/Runtime input manifest changed/));
++ await writeFile(manifestPath,JSON.stringify({schemaVersion:1,inputs:[{path:'NEVER_FOLLOW_THIS_MISSING_PATH',sha256:hash(replacement),bytes:replacement.length}]}));
++ await asyncTest('manifest digest checked before following new rows',async()=>assert.rejects(recheckInputSeal(captured),/Runtime input manifest changed/));
++ await writeFile(pinsPath,'replacement pins');
++ await asyncTest('pins tamper rejects before changed manifest',async()=>assert.rejects(recheckInputSeal(captured),/Production pins changed/));
++ await writeFile(pinsPath,pinBytes);await writeFile(manifestPath,originalManifest);await writeFile(dataPath,originalData);
++ pinBytes.fill(0);originalSeal.sha256='mutated report object';originalSeal.path='mutated report path';
++ await asyncTest('captured primitive pins and manifest digests survive returned-object mutation',async()=>assert.equal((await recheckInputSeal(captured)).sha256,expectedManifestSha256));
++}finally{await rm(scratch,{recursive:true});}
+ const transformations=JSON.parse(await readFile(join(here,'runner-transformations.json')));
+ for(const row of transformations.runners){let restored=await readFile(join(here,row.generated),'utf8');assert.equal(hash(restored),row.generatedSha256);
+  for(const change of [...row.changes].reverse()){assert.equal(restored.split(change.after).length-1,change.count);restored=restored.split(change.after).join(change.before);}
+@@ -62,6 +89,6 @@
+ test('allocator GC guest template byte-identical',()=>assert.equal(guest(newGC),guest(oldGC)));
+ const report={schemaVersion:1,state:'HOST_ONLY_PREPARATION_CHECKS_PASSED',tests:results.length,passed:results.length,results,
+  syntheticShapeOnly:true,fixedArtifactSuccessExecuted:false,actualProductionPinsExist:false,diagnosticReceiptModifiedOrProjected:false,
+- entryNegativeChildren:3,componentizerToolchainOrHostRun:false,nativeBuild:false,guestExecuted:false,oldV11FilesModified:false};
++ entryNegativeChildren:3,scratchSealCases:7,componentizerToolchainOrHostRun:false,nativeBuild:false,guestExecuted:false,oldV11FilesModified:false};
+ await writeFile(reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx'});
+ console.log(JSON.stringify({state:report.state,tests:report.tests,passed:report.passed}));
+--- v2/README.md
++++ v3/README.md
+@@ -9,7 +9,13 @@
+ policy/inputs and is rejected unchanged; it cannot supply production pins.
+ Latest accepted remains foundations-v11.
+ 
+-[test-results.json](test-results.json) records **34 host-only checks passed**.
++This v3 supersedes the preserved [v2 packet](../production-regression-candidate-v2/README.md),
++index705e0823. Final self-review found that v2 rehashed listed files without
++binding the manifest itself to its pre-run digest. No runtime reached that
++branch because its pins are null. V2 and its initial no-blocker review remain
++historical; they are not the readiness approval for this correction.
++
++[test-results.json](test-results.json) records **41 host-only checks passed**.
+ [source-checks.json](source-checks.json) records 12 syntax checks, all29 ancestry
+ inputs unchanged, all306 current native-policy inputs matching, and665 sealed
+ local runtime inputs. No native compiler, componentizer, Wasmtime invocation,
+@@ -80,6 +86,17 @@
+ new pass. Existing Node22/toolchain/clock-v2 componentizer/Wasmtime42 checks and
+ zero selected interfaces/import audits remain in the unchanged harnesses.
+ 
++V3 captures immutable primitive pin/manifest digests at initial admission. Its
++post-run check rejects changed pin bytes first, then reads the manifest once
++and checks that same buffer against the captured digest **before** parsing or
++following any rows. It does not take expected digests from the returned mutable
++report or pin buffer. Frozen-file checks use a private copy of the row list.
++Seven additional tests use only owned scratch files: unchanged seal, changed
++listed bytes, a replacement manifest plus matching replacement file, changed
++invalid JSON, changed missing-path rows, pin tamper precedence, and mutation of
++returned report/pin buffers. They establish this seal behavior without a real
++artifact-admission success or any packet/engine mutation.
++
+ ## Input closure and reproducible host checks
+ 
+ [input-freeze.json](input-freeze.json) is a665-file pre/post byte seal, not a
+@@ -105,7 +122,7 @@
+ ```sh
+ NODE_COMPAT_REGRESSION_HOST_TEST_OUTPUT=/tmp/scheduler-production-host-check-NEW.json \
+   /tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node \
+-  tests/node-compat/foundation-scheduler/production-regression-candidate-v2/test-host.mjs
++  tests/node-compat/foundation-scheduler/production-regression-candidate-v3/test-host.mjs
+ ```
+ 
+ This executes only host assertions and three negative child Node entries;

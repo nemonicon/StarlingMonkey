@@ -1,0 +1,48 @@
+// Benign host-child/source reporting checks only. No Wasmtime/guest/native/tool.
+import assert from 'node:assert/strict';
+import {mkdir,readFile,writeFile,lstat,symlink} from 'node:fs/promises';
+import {dirname,join,resolve} from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+import {runOwnedCommand,persistFile,progressJournal} from './durable-host.mjs';
+assert.equal(process.version,'v22.14.0');assert(!process.env.NODE_OPTIONS);assert.equal(process.argv.length,3);
+const here=dirname(fileURLToPath(import.meta.url)),output=resolve(process.argv[2]);assert(output.startsWith('/tmp/starling-node-compat/'));
+try{await lstat(output);assert.fail('Fresh host-test output required');}catch(error){if(error.code!=='ENOENT')throw error;}
+await mkdir(output);await mkdir(join(output,'processes'));await mkdir(join(output,'progress'));
+const parent=join(here,'../measurement-correctness-candidate-v1/completion.mjs'),hash=data=>createHash('sha256').update(data).digest('hex');
+assert.equal(hash(await readFile(parent)),'2fe341cc0e0e505d3a7e6ba55f2c425ce089e864af0d9523795c59fe10a4c503');
+const {trackedWriter}=await import(pathToFileURL(parent)),tracked=trackedWriter(output),checks=[],pass=name=>checks.push(name);
+const run=(name,code,options={})=>runOwnedCommand({output,name,executable:process.execPath,args:['-e',code],write:tracked.write,register:path=>tracked.paths.add(path),timeoutMs:2000,graceMs:100,heartbeatMs:50,...options});
+const priorSignals={SIGTERM:process.listeners('SIGTERM'),SIGINT:process.listeners('SIGINT')};
+const success=await run('success',"process.stdout.write('full é output\\n');process.stderr.write('stderr preserved\\n');");
+assert.equal(success.terminalExitZeroObserved,true);assert.equal(success.stdout,'full é output\n');assert.equal(success.stderr,'stderr preserved\n');
+assert.equal(success.stdoutFile.sha256,hash(await readFile(success.stdoutFile.path)));assert.equal(success.ownedGroupGone,true);pass('complete stdout/stderr bytes persisted and hashed before successful host return');
+const stored=JSON.parse(await readFile(success.terminalPath));assert.equal(stored.validationCompleted,false);assert.equal(stored.runtimeAcceptanceClaim,false);pass('terminal process success remains unvalidated partial evidence');
+const failed=await run('nonzero',"process.stdout.write('raw failure output');process.stderr.write('actual stderr');process.exitCode=7;");
+assert.equal(failed.status,7);assert.equal(failed.terminalExitZeroObserved,false);assert.equal(await readFile(failed.stderrFile.path,'utf8'),'actual stderr');pass('nonzero child retains complete outputs without semantic/pass claim');
+const timed=await run('timeout',"process.stdout.write('before timeout');setInterval(()=>{},1000);",{timeoutMs:120});
+assert.equal(timed.timedOut,true);assert.equal(timed.terminalExitZeroObserved,false);assert.equal(timed.ownedGroupGone,true);assert.equal(timed.stdout,'before timeout');assert(timed.signals.some(row=>row.signal==='SIGTERM'));pass('finite deadline terminates only fresh owned session and preserves returned prefix');
+const overflow=await run('overflow',"process.stdout.write('x'.repeat(50000));",{maxOutputBytes:1024});
+assert.equal(overflow.outputLimitExceeded,true);assert.equal(overflow.terminalExitZeroObserved,false);assert(overflow.stdoutFile.bytes>1024);assert.equal(overflow.stdout,null);assert.equal((await readFile(overflow.stdoutFile.path)).length,overflow.stdoutFile.bytes);pass('output-limit failure preserves raw disk bytes without truncating a successful comparison');
+const missing=await runOwnedCommand({output,name:'missing',executable:'/synthetic/DOES-NOT-EXIST',args:[],write:tracked.write,register:path=>tracked.paths.add(path),timeoutMs:2000,graceMs:100});
+assert.equal(missing.spawnError.code,'ENOENT');assert.equal(missing.terminalExitZeroObserved,false);assert.equal(missing.pid,null);pass('spawn failure produces durable terminal record without signalling any group');
+const before=await readFile(success.stdoutFile.path);
+await assert.rejects(()=>run('success',"process.stdout.write('must not execute');"),{code:'EEXIST'});assert((await readFile(success.stdoutFile.path)).equals(before));pass('reused output name refuses before a child can overwrite previous observations');
+await assert.rejects(()=>run('../escape',"process.exitCode=99;"));pass('process output names reject traversal before spawn');
+const external=join(output,'elsewhere');await mkdir(external);await symlink(external,join(output,'linked-parent'));
+await assert.rejects(()=>persistFile({output,write:tracked.write,path:join(output,'linked-parent/file.json'),data:'no'}));pass('parent symlink refuses before persistence');
+await assert.rejects(()=>persistFile({output,write:tracked.write,path:join(output,'../escape.json'),data:'no'}));pass('output-root escape refuses before persistence');
+const journal=progressJournal({output,write:tracked.write});await journal('before',{caseIndex:5});await journal('returned',{caseIndex:5,rawFile:success.stdoutFile});
+const first=JSON.parse(await readFile(join(output,'progress/00001.json'))),second=JSON.parse(await readFile(join(output,'progress/00002.json')));
+assert.equal(first.partialObservationOnly,true);assert.equal(second.requiresFinalCompletionAndExternalExitZero,true);assert.equal(second.rawFile.sha256,success.stdoutFile.sha256);pass('exclusive sequential progress distinguishes partial returns from final gates');
+const repeated=progressJournal({output,write:tracked.write});await assert.rejects(()=>repeated('not-resume'),{code:'EEXIST'});pass('a new journal cannot resume or repair prior output');
+assert.deepEqual(process.listeners('SIGTERM'),priorSignals.SIGTERM);assert.deepEqual(process.listeners('SIGINT'),priorSignals.SIGINT);pass('temporary signal listeners restored after every child');
+const source=await readFile(join(here,'proposed/component-driver.mjs'),'utf8');
+assert(!source.includes('spawnSync'));assert(source.includes('deadlineMs:600000'));assert(source.includes('for(let index=0;index<20;index++)'));assert(source.includes('round<3'));assert(source.includes('freshJco'));assert(source.includes('index<=20'));pass('driver retains full3retained/freshJco/21freshWT scope with600s cap and no synchronous wait');
+assert(source.index("persist('case-results/'+name+'.observed.json'")<source.index("await validateCase(value,index,startCall"));
+assert(source.includes("await persist('rotations/'+label+'.json'"));assert(source.includes("await progress('driver-failed'"));pass('full Jco results and completed rotations persisted before validation/final report');
+assert(source.index("await admission.recheck();\n const report=")<source.index('await publishCompletion'));pass('final completion still follows complete native/source recheck');
+for(const path of tracked.paths)assert((await lstat(path)).isFile());pass('all tracked own artifacts remain ordinary files for unchanged completion hashing');
+const report={schemaVersion:1,state:'PURE_HOST_REPORTING_AND_OWNED_CHILD_TESTS_PASSED',passed:checks.length,checks,
+ sourceOnly:true,children:'benign Node host programs only; no Wasmtime/native/guest',actualWorkloadOrBenchmarkExecuted:false};
+await writeFile(join(output,'results.json'),JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({passed:checks.length,output}));

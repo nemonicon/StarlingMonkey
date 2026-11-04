@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "profileVersion": "sm-node-22.14.0-m0.3",
+  "nodeVersion": "v22.14.0",
+  "status": "Optional bounded Events foundation selected only by NODE_COMPAT_EVENTS=ON; core and Path manifests remain unchanged.",
+  "moduleContract": "Exactly the16 pinned Node22 ESM names. Default is the callable EventEmitter constructor and equals named EventEmitter and default.EventEmitter. Exported functions share initial identity with default static members. errorMonitor is a unique symbol, captureRejectionSymbol is Symbol.for(nodejs.rejection); captureRejections/usingDomains are false and defaultMaxListeners is10. Static defaultMaxListeners is a mutable accessor while its named ESM export captures10. Selected literal CommonJS lowering will return default; runtime require and syncBuiltinESMExports remain excluded.",
+  "modules": {
+    "node:events": {
+      "aliases": [
+        "events"
+      ],
+      "status": "partial",
+      "exports": [
+        "EventEmitter",
+        "EventEmitterAsyncResource",
+        "addAbortListener",
+        "captureRejectionSymbol",
+        "captureRejections",
+        "default",
+        "defaultMaxListeners",
+        "errorMonitor",
+        "getEventListeners",
+        "getMaxListeners",
+        "init",
+        "listenerCount",
+        "on",
+        "once",
+        "setMaxListeners",
+        "usingDomains"
+      ],
+      "callablePolicy": "Listed synchronous methods accept string/symbol event names and ordinary initialized EventEmitter/mixin receivers. Deferred callable exports throw ERR_SM_NODE_UNSUPPORTED on call or construction, including during initialization. No Proxy or fabricated host operation.",
+      "supportedStatic": [
+        "EventEmitter",
+        "init",
+        "getEventListeners",
+        "getMaxListeners",
+        "listenerCount",
+        "setMaxListeners"
+      ],
+      "supportedPrototype": [
+        "setMaxListeners",
+        "getMaxListeners",
+        "emit",
+        "addListener",
+        "on",
+        "prependListener",
+        "once",
+        "prependOnceListener",
+        "removeListener",
+        "off",
+        "removeAllListeners",
+        "listeners",
+        "rawListeners",
+        "listenerCount",
+        "eventNames"
+      ],
+      "unsupportedStatic": [
+        "EventEmitterAsyncResource",
+        "addAbortListener",
+        "on",
+        "once"
+      ],
+      "unsupportedPrototypePolicy": "Only the15 listed EventEmitter prototype methods are claimed. AsyncResource instances cannot be constructed.",
+      "numericExports": {
+        "defaultMaxListeners": 10
+      },
+      "limits": {
+        "listenersPerEvent": 65536,
+        "eventNamesPerEmitter": 4096,
+        "nestedEmitEntries": 64
+      },
+      "deviations": [
+        "Event-name coercion beyond strings/symbols is explicitly deferred even though Node accepts other property-key values.",
+        "Resource caps throw RangeError ERR_SM_NODE_LIMIT while preserving already-registered state; Node has no corresponding fixed caps.",
+        "Listener warning thresholds retain advisory behavior and warned markers, but process warning delivery is deferred; no console/stdio import is introduced.",
+        "captureRejections=true and its global setter are deferred until correct scheduler/error propagation; false remains supported.",
+        "Static once promises, on async iteration, addAbortListener and EventEmitterAsyncResource are explicit throwing stubs.",
+        "getEventListeners/getMaxListeners/setMaxListeners support EventEmitter-compatible targets; native EventTarget integration is deferred.",
+        "Invalid argument names/codes are matched for tested supported cases; detailed received-value messages and non-Error error-event rendering differ.",
+        "Private internal symbol layout, arbitrary external mutation of _events, cross-realm receivers, runtime CommonJS loading and mutable ESM synchronization are not claimed."
+      ]
+    }
+  },
+  "requiredHostInterfaces": []
+}

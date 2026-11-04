@@ -1,0 +1,1 @@
+import {Buffer} from 'node:buffer';Buffer.allocUnsafeSlow(1);export function run(){return '';}

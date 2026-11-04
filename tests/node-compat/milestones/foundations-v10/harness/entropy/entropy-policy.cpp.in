@@ -1,0 +1,45 @@
+// UNCOMPILED PROPOSAL. New private guest symbols, not an existing embedding API.
+#include "entropy-policy.h"
+#include "js/Exception.h"
+
+static bool deployed_execution_entered = false;
+
+void sm_node_enter_deployed_execution() {
+  // Trusted native entries call this; no JS property exposes the setter.
+  auto *cx = api::Engine::cx();
+  auto *engine = cx ? api::Engine::get(cx) : nullptr;
+  if (engine && engine->state() == api::EngineState::Initialized) {
+    deployed_execution_entered = true;
+  }
+}
+
+SmNodeEntropyStatus sm_node_entropy_status() {
+#ifndef NODE_COMPAT_ENTROPY_RUNTIME_ONLY
+  return SmNodeEntropyStatus::Disabled;
+#else
+  auto *cx = api::Engine::cx();
+  auto *engine = cx ? api::Engine::get(cx) : nullptr;
+  if (!deployed_execution_entered || !engine || engine->state() != api::EngineState::Initialized) {
+    return SmNodeEntropyStatus::BeforeRuntime;
+  }
+  return SmNodeEntropyStatus::Ready;
+#endif
+}
+
+bool sm_node_require_secure_entropy(JSContext *cx, const char *operation) {
+  const auto status = sm_node_entropy_status();
+  if (status == SmNodeEntropyStatus::Ready) return true;
+  const char *code = status == SmNodeEntropyStatus::Disabled
+      ? "ERR_SM_ENTROPY_DISABLED" : "ERR_SM_ENTROPY_INITIALIZATION";
+  JS_ReportErrorUTF8(cx, "%s: %s requires selected entropy during deployed execution", code, operation);
+  JS::RootedValue error(cx);
+  if (!JS_GetPendingException(cx, &error) || !error.isObject()) return false;
+  JS_ClearPendingException(cx);
+  JS::RootedObject object(cx, &error.toObject());
+  JS::RootedString code_string(cx, JS_NewStringCopyZ(cx, code));
+  if (!code_string) return false; // Keep the new OOM exception.
+  JS::RootedValue code_value(cx, JS::StringValue(code_string));
+  if (!JS_DefineProperty(cx, object, "code", code_value, JSPROP_ENUMERATE)) return false;
+  JS_SetPendingException(cx, error);
+  return false;
+}

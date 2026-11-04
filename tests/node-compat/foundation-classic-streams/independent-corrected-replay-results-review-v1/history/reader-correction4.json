@@ -1,0 +1,12 @@
+{
+  "issue": "An extra final text-only audit assumed all40 components export only root run().",
+  "observation": "Exactly three accepted strict-late fixtures use the source-declared inspect-result() plus api.run() interface world. Their imports are still empty.",
+  "rejectedAssumption": "all root exports == [run: func() -> string]",
+  "actualStrictLateFixtures": [
+    "late-caught-event",
+    "late-clean",
+    "late-handled-promise"
+  ],
+  "correction": "Compare37 ordinary run-string worlds and3 exact declared post-binding interface worlds separately. Original result reader required exact empty imports and did not make this extra export assumption.",
+  "projectOrEvidenceChanged": false
+}

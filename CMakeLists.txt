@@ -38,6 +38,7 @@ include("wasmtime")
 include("cbindgen")
 
 include("spidermonkey")
+include("node-compat-policy")
 include("openssl")
 include("${HOST_API}/host_api.cmake")
 include("build-crates")
@@ -46,6 +47,13 @@ include("lint")
 option(ENABLE_JS_DEBUGGER "Enable support for debugging content via a socket connection" ON)
 
 add_library(extension_api INTERFACE include/extension-api.h runtime/encode.h runtime/decode.h)
+if(ENABLE_BUILTIN_NODE_COMPAT)
+    target_compile_definitions(extension_api INTERFACE NODE_COMPAT_ENTROPY_POLICY=1)
+    target_compile_definitions(host_api PRIVATE NODE_COMPAT_ENTROPY_POLICY=1)
+    if(NODE_COMPAT_ENTROPY_MODE STREQUAL "RUNTIME_ONLY")
+        target_compile_definitions(extension_api INTERFACE NODE_COMPAT_ENTROPY_RUNTIME_ONLY=1)
+    endif()
+endif()
 if (ENABLE_JS_DEBUGGER)
     target_compile_definitions(extension_api INTERFACE ENABLE_JS_DEBUGGER)
 endif()
@@ -69,6 +77,9 @@ set(SOURCES
 )
 
 add_executable(starling-raw.wasm ${SOURCES})
+if(NODE_COMPAT_INTERNAL_TICKS)
+    target_sources(starling-raw.wasm PRIVATE runtime/node_tick_queue.cpp)
+endif()
 
 target_link_libraries(starling-raw.wasm PRIVATE host_api extension_api builtins spidermonkey rust-crates)
 

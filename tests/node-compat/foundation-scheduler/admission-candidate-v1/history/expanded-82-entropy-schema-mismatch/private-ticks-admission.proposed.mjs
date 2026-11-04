@@ -1,0 +1,201 @@
+// UNAPPLIED host-side admission only. Metadata acceptance is NOT execution proof.
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {readFileSync, lstatSync} from 'node:fs';
+import {resolve, join} from 'node:path';
+
+const PINS_SHA = 'c285a99fab9c9319d1311ed3b762ce255e73809bdabfa59ea3932ccd8d8ea4ef';
+const SOURCE_HINTS = Object.freeze({
+  'runtime/event_loop.h':'e86cb8dfc703af27f70a9c4ec4644a1f6b3a46043474af1e108fa95e038baa86',
+  'runtime/event_loop.cpp':'2230e3fe751ee323e7e60a0e609aaa652006f2f6fd26e965766b9f09700d3182',
+  'runtime/engine.cpp':'bb96b3e0cfa681c59e7d4dfbb0fe6d4a213a76b868dda4d296845cfa5e90633b',
+  'CMakeLists.txt':'880dbef157355efd97802fc630e5d61ffd97940ea9b7dbba42f1f0d077454df9',
+  'cmake/builtins.cmake':'1ad350b7ff41a29d9104b9962e1532f25c31f9815e175dbc7d6387ae081e182d'
+});
+const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+let contract;
+function loadContract() {
+  if (contract) return contract;
+  const pinsBytes = readFileSync(new URL('./foundation-scheduler/admission-candidate-v1/pins.json', import.meta.url));
+  assert.equal(hash(pinsBytes), PINS_SHA, 'Unreviewed tick admission pins');
+  const pins = JSON.parse(pinsBytes);
+  const policyBytes = readFileSync(new URL('./foundation-scheduler/integration-candidate-v1/policy.json', import.meta.url));
+  assert.equal(hash(policyBytes), pins.policySha256, 'Unreviewed tick source policy');
+  assert.equal(hash(readFileSync(new URL('./foundation-scheduler/integration-candidate-v1/layer-policy.py', import.meta.url))), pins.helperSha256);
+  const policy = JSON.parse(policyBytes);
+  assert.equal(policy.version, 'sm-private-ticks-source-v1');
+  assert.equal(policy.parentRecipeSha256, pins.parentRecipeSha256);
+  contract = {pins, policy};
+  return contract;
+}
+
+function entries(value) {
+  assert(Array.isArray(value), 'Need an explicit source inventory');
+  const seen = new Set();
+  return value.map(entry => {
+    assert(entry && Object.keys(entry).sort().join(',') === 'path,sha256');
+    assert(typeof entry.path === 'string' && !entry.path.includes('\\') && !entry.path.includes('\0'));
+    assert(!/^[A-Za-z]:/.test(entry.path) && !entry.path.startsWith('/'));
+    assert(entry.path.split('/').every(part => part && part !== '.' && part !== '..'));
+    assert(typeof entry.sha256 === 'string' && /^[0-9a-f]{64}$/.test(entry.sha256));
+    assert(!seen.has(entry.path), 'Duplicate source path'); seen.add(entry.path);
+    return {path:entry.path,sha256:entry.sha256};
+  }).sort((a,b)=>a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
+}
+function sourceDigest(value) { return hash(JSON.stringify(entries(value))); }
+
+// Parse captured POSIX CMake command text; never evaluate a shell command.
+function words(command) {
+  assert.equal(typeof command, 'string');
+  const result=[]; let word='', quote=null, started=false;
+  for(let i=0;i<command.length;i++) {
+    const c=command[i];
+    if(quote==='\'') { if(c==='\'')quote=null;else word+=c;started=true;continue; }
+    if(c==='\\') { assert(i+1<command.length);word+=command[++i];started=true;continue; }
+    if(quote==='"') { if(c==='"')quote=null;else word+=c;started=true;continue; }
+    if(c==='\''||c==='"') {quote=c;started=true;continue;}
+    if(/\s/.test(c)) {if(started){result.push(word);word='';started=false;}continue;}
+    assert(!';|&<>'.includes(c), 'Not a single captured compiler command');
+    word+=c;started=true;
+  }
+  assert.equal(quote,null,'Unclosed compiler-command quote');
+  if(started)result.push(word);
+  assert(result.length && result.filter(word=>word==='-c').length===1);
+  assert(!result.includes('-fsyntax-only'),'Syntax-only checks are not engine compilation');
+  assert(!result.includes('-D')&&!result.includes('-U'),'Need captured joined macro definitions');
+  return result;
+}
+function macro(tokens,name,enabled) {
+  const definitions=tokens.filter(word=>word==='-D'+name||word.startsWith('-D'+name+'='));
+  assert.deepEqual(definitions,enabled?['-D'+name+'=1']:[], 'Unexpected macro '+name);
+  assert(!tokens.includes('-U'+name),'Unexpected macro undefinition '+name);
+}
+function compiled(command, candidates, enabled, events) {
+  const tokens=words(command), input=tokens[tokens.indexOf('-c')+1];
+  assert(input && !input.startsWith('-'));
+  const paths=candidates.filter(path=>input.endsWith('/'+path));
+  assert.equal(paths.length,1,'Unknown/missing native compiler input');
+  macro(tokens,'NODE_COMPAT_INTERNAL_TICKS',enabled);
+  macro(tokens,'NODE_COMPAT_STRICT_INITIALIZATION',true);
+  macro(tokens,'NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER',events);
+  return paths[0];
+}
+function resolveLayer(map,policy) {
+  return Object.fromEntries(Object.entries(map).map(([path,digest])=>{
+    const layer=policy.sourceLayer[path];
+    if(!layer)return[path,digest];
+    assert.equal(layer.beforeSha256,digest,'Source policy ancestry mismatch');
+    return[path,layer.afterSha256];
+  }));
+}
+function normalizedPatches(value) {
+  assert(Array.isArray(value));
+  return value.map(item=>Object.fromEntries(['name','sha256','baseRevision','applied','files'].map(key=>[key,item[key]])));
+}
+
+export function validatePrivateTickSourceAdmission(metadata,{sourceRoot,parentProtectedSources,parentProtectedPatch}) {
+  // A diagnostic recipe never falls through into the production selector.
+  assert((metadata.diagnosticOnly===undefined||metadata.diagnosticOnly===false) && !Object.hasOwn(metadata,'internalTickDiagnosticPolicy'),
+    'Private diagnostic engines require their separate preflight, not production admission');
+  const sourceHint=Array.isArray(metadata.sourceManifest)&&metadata.sourceManifest.some(item=>
+    item?.path==='runtime/node_tick_queue.cpp'||item?.path==='runtime/node_tick_queue.h'||
+    (Object.hasOwn(SOURCE_HINTS,item?.path??'')&&SOURCE_HINTS[item.path]===item.sha256));
+  const hinted=sourceHint||Object.hasOwn(metadata,'internalTicksEnabled')||Object.hasOwn(metadata,'internalTickPolicy')||
+    Object.hasOwn(metadata.observedCMakeOptions??{},'NODE_COMPAT_INTERNAL_TICKS')||
+    Object.hasOwn(metadata.requestedCMakeOptions??{},'NODE_COMPAT_INTERNAL_TICKS')||
+    metadata.buildRecipeSha256==='869d188de3843b5d527d236a9e5c9af6ba1193f118dc9ad786df6266e1606173'||
+    String(metadata.strictEventExceptionPolicy?.version).includes('private-ticks')||
+    String(metadata.protectedAbortListenerPolicy?.version).includes('private-ticks');
+  if(!hinted)return null; // The existing historical branch is unchanged.
+  const {pins,policy}=loadContract();
+  assert.equal(metadata.buildRecipeSha256,pins.productionRecipeSha256);
+  assert.equal(typeof metadata.internalTicksEnabled,'boolean','New receipts require an explicit tick boolean');
+  const enabled=metadata.internalTicksEnabled,ticks=metadata.internalTickPolicy;
+  assert(ticks&&typeof ticks==='object');
+  assert.equal(ticks.version,policy.version);assert.equal(ticks.enabled,enabled);assert.equal(ticks.sourcePolicyInstalled,true);
+  for(const[field,value]of Object.entries({parentRecipeSha256:policy.parentRecipeSha256,
+    parentNativeManifestCanonicalSha256:policy.parentNativeManifestCanonicalSha256,
+    nativePatchSha256:policy.nativePatchSha256,embeddingPatchSha256:policy.embedding.patchSha256,
+    embeddingBeforeSha256:policy.embedding.beforeSha256,embeddingAfterSha256:policy.embedding.afterSha256,
+    policyFileSha256:pins.policySha256,helperSha256:pins.helperSha256}))assert.equal(ticks[field],value,field);
+  assert.deepEqual(ticks.sourceLayer,policy.sourceLayer);assert.deepEqual(ticks.limits,policy.limits);
+  assert.equal(ticks.addsExternalCapabilities,false);assert.equal(ticks.publicProcessModule,false);
+  assert.equal(ticks.resetSafeReuse,'OPEN; cancellation and teardown not established');
+  const choice=enabled?'ON':'OFF';
+  assert.equal(metadata.requestedCMakeOptions?.NODE_COMPAT_INTERNAL_TICKS,choice);
+  assert.equal(metadata.observedCMakeOptions?.NODE_COMPAT_INTERNAL_TICKS,choice);
+  assert.equal(ticks.requestedCMake,choice);assert.equal(ticks.observedCMake,choice);
+  for(const [option,value] of Object.entries({CMAKE_BUILD_TYPE:'Release',WEVAL:'OFF',USE_WASM_OPT:'ON',
+    ENABLE_BUILTIN_NODE_COMPAT:'ON',ENABLE_JS_DEBUGGER:'OFF',ENABLE_BUILTIN_WPT_SUPPORT:'OFF',
+    NODE_COMPAT_LOCKED_RUST:'ON',NODE_COMPAT_OOM_TESTING:'OFF'})){
+    assert.equal(metadata.requestedCMakeOptions?.[option],value,'Unreviewed requested '+option);
+    assert.equal(metadata.observedCMakeOptions?.[option],value,'Unreviewed observed '+option);
+  }
+  for(const [field,option] of [['pathEnabled','NODE_COMPAT_PATH'],['eventsEnabled','NODE_COMPAT_EVENTS'],
+    ['stringDecoderEnabled','NODE_COMPAT_STRING_DECODER'],['assertEnabled','NODE_COMPAT_ASSERT'],
+    ['querystringEnabled','NODE_COMPAT_QUERYSTRING'],['utilEnabled','NODE_COMPAT_UTIL'],
+    ['streamWebEnabled','NODE_COMPAT_STREAM_WEB'],['gcStress','NODE_COMPAT_GC_STRESS']]){
+    assert.equal(typeof metadata[field],'boolean',field+' must be explicit for the new recipe');
+    for(const map of ['requestedCMakeOptions','observedCMakeOptions'])assert.equal(metadata[map]?.[option],metadata[field]?'ON':'OFF');
+  }
+  assert(['OFF','RUNTIME_ONLY'].includes(metadata.entropyPolicy));
+  for(const map of ['requestedCMakeOptions','observedCMakeOptions'])assert.equal(metadata[map]?.NODE_COMPAT_ENTROPY_MODE,metadata.entropyPolicy);
+  assert.equal(metadata.hostApi,'wasi-0.2.10');
+  for(const field of ['strictInitialization','abiFixEnabled','bigIntFixEnabled'])assert.equal(metadata[field],true);
+  assert.equal(metadata.generatedRustProject?.cargoBuildLocked,true);
+  assert.equal(metadata.generatedRustProject?.manifestAndLockCheckedBeforeAndAfterBuild,true);
+  assert.equal(metadata.oomTesting,false);assert.equal(metadata.debuggerEnabled,false);assert.equal(metadata.wptSupportEnabled,false);
+  assert.equal(typeof metadata.gcStress,'boolean');
+  assert.equal(metadata.observedCMakeOptions.NODE_COMPAT_GC_STRESS,metadata.gcStress?'ON':'OFF');
+  assert.equal(metadata.sourceInputsCapturedBeforeBuild,true);assert.equal(metadata.componentizeSourcesCapturedBeforeBuild,true);
+  assert.equal(metadata.buildRecipeCheckedBeforeAndAfterBuild,true);
+  const current=entries(metadata.sourceManifest),expected=entries(policy.expectedNativeSourceManifest);
+  assert.equal(current.length,306);assert.deepEqual(current,expected,'Unreviewed private tick source set');
+  const parent=current.filter(item=>policy.sourceLayer[item.path]?.beforeSha256!==null).map(item=>({
+    path:item.path,sha256:policy.sourceLayer[item.path]?.beforeSha256??item.sha256}));
+  assert.equal(parent.length,304);assert.equal(sourceDigest(parent),policy.parentNativeManifestCanonicalSha256);
+  const root=resolve(sourceRoot);
+  assert(!lstatSync(root).isSymbolicLink());
+  for(const item of current){let path=root;for(const part of item.path.split('/')){path=join(path,part);assert(!lstatSync(path).isSymbolicLink());}
+    assert.equal(hash(readFileSync(path)),item.sha256,'Actual source differs: '+item.path);}
+  const strict=metadata.strictEventExceptionPolicy,protectedPolicy=metadata.protectedAbortListenerPolicy;
+  assert.equal(strict.version,policy.strictPolicyVersion);assert.equal(protectedPolicy.version,policy.protectedPolicyVersion);
+  assert.deepEqual(strict.parentSourcePolicy,pins.parentStrict);
+  assert.deepEqual(protectedPolicy.parentSourcePolicy,pins.parentProtected);
+  assert.deepEqual(parentProtectedSources,pins.parentProtected.sourceSha256);
+  assert.equal(parentProtectedPatch,pins.parentProtected.patchSha256);
+  for(const key of ['patchSha256','basePolicy','embeddingBoundaryPatchSha256'])assert.deepEqual(strict[key],pins.parentStrict[key]);
+  const strictSources=resolveLayer(pins.parentStrict.nativeSourceSha256,policy);
+  for(const path of ['runtime/node_tick_queue.cpp','runtime/node_tick_queue.h'])strictSources[path]=policy.sourceLayer[path].afterSha256;
+  assert.deepEqual(strict.nativeSourceSha256,strictSources);
+  assert.deepEqual(protectedPolicy.sourceSha256,resolveLayer(pins.parentProtected.sourceSha256,policy));
+  assert.equal(protectedPolicy.patchSha256,pins.parentProtected.patchSha256);
+  assert.equal(protectedPolicy.strictPolicyVersion,strict.version);
+  assert.equal(typeof metadata.eventsEnabled,'boolean');
+  assert.equal(protectedPolicy.enabled,metadata.eventsEnabled);assert.equal(metadata.protectedAbortListenerEnabled,metadata.eventsEnabled);
+  assert.deepEqual(protectedPolicy.prerequisiteCMakeOptions,pins.prerequisiteCMakeOptions);
+  assert.deepEqual(metadata.componentizeSourceManifest,pins.parentExternalSourceManifest.map(item=>({
+    ...item,sha256:item.path==='embedding/embedding.cpp'?policy.embedding.afterSha256:item.sha256})));
+  const patch={name:policy.version+'-boundary',sha256:policy.embedding.patchSha256,
+    baseRevision:pins.componentizeJsRevision,applied:true,files:['embedding/embedding.cpp']};
+  assert.deepEqual(normalizedPatches(metadata.componentizeJsPatches),[...pins.parentPatchChain,patch]);
+  assert.equal(metadata.componentizeJsRevision,pins.componentizeJsRevision);
+  const cpp=current.filter(item=>item.path.endsWith('.cpp')&&/^(builtins|runtime)\//.test(item.path)).map(item=>item.path);
+  assert.equal(cpp.length,61);
+  const active=cpp.filter(path=>enabled||path!=='runtime/node_tick_queue.cpp');
+  assert(Array.isArray(ticks.actualLayoutCompileCommands));
+  const layout=new Map();
+  for(const command of ticks.actualLayoutCompileCommands){const path=compiled(command,cpp,enabled,metadata.eventsEnabled);assert(!layout.has(path));layout.set(path,command);}
+  assert.deepEqual([...layout.keys()].sort(),active.sort());
+  assert.deepEqual(protectedPolicy.actualLayoutCompileCommands,ticks.actualLayoutCompileCommands);
+  const embedding=ticks.actualEmbeddingCompileCommands;
+  assert(Array.isArray(embedding)&&embedding.length===1);
+  compiled(embedding[0],['embedding/embedding.cpp'],enabled,metadata.eventsEnabled);
+  assert.deepEqual(metadata.actualEmbeddingCompileCommands,embedding);assert.deepEqual(protectedPolicy.actualEmbeddingCompileCommands,embedding);
+  assert.deepEqual(ticks.actualQueueCompileCommands,enabled?[layout.get('runtime/node_tick_queue.cpp')]:[]);
+  const strictCpp=Object.keys(strictSources).filter(path=>path.endsWith('.cpp')&&(enabled||path!=='runtime/node_tick_queue.cpp'));
+  assert.equal(strict.actualNativeCompileCommands.length,strictCpp.length);
+  assert.deepEqual([...strict.actualNativeCompileCommands].sort(),strictCpp.map(path=>layout.get(path)).sort());
+  return Object.freeze({branch:policy.version,internalTicksEnabled:enabled,sourceInputs:306,
+    runtimeOrGuestExecutionProof:false,resetSafeReuse:'OPEN'});
+}

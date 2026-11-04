@@ -1,0 +1,117 @@
+{
+  "parent": "tests/node-compat/foundation-classic-streams/independent-native-verification-v2/verify.py",
+  "parentSha256": "b8a2b3247855d64f0f313c38d4ca0f59984ba5083ce43f21854e6384ca037e03",
+  "replacements": [
+    {
+      "before": "PACKET = HERE.parent / 'integration-candidate-v1'",
+      "after": "PACKET = HERE.parent / 'trace-integration-candidate-v1'\nSOURCE = Path('/private/tmp/starling-node-compat/classic-trace-source-v1')",
+      "count": 1
+    },
+    {
+      "before": "production-classic-artifacts-v1/native-freeze",
+      "after": "production-classic-trace-v1/native-freeze",
+      "count": 1
+    },
+    {
+      "before": "71b48d2e70c5e003fcbcce7620366744c089dd55036036e52926224dfa2614f7",
+      "after": "3694c88b7d000f27e11ffcac835fe0b205b2075f5b1d8d29c61f5b0038ba1cf3",
+      "count": 1
+    },
+    {
+      "before": "137a35959131d5cb5125bb5fc97324dfa4ba2ce18441818dd95cf83d19c88d6f",
+      "after": "891a4c53dd4a7b7d776c21003acdd12c7944c6a3eca019a1d9b2be620ed8b11c",
+      "count": 1
+    },
+    {
+      "before": "f4a303250ac979206f0c2b358f4dd16d2a5e3a3e3007200901dedba8576b9a1e",
+      "after": "43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9",
+      "count": 1
+    },
+    {
+      "before": "f68267eff5126af83c099346d07e5befbf6261ed4ca245e14a68f292f32087e3",
+      "after": "d50e7d7ad946a80c7d7f58c23395ed1bb40ab437e53fc0f84c3a64a9c16e39f1",
+      "count": 1
+    },
+    {
+      "before": "5826a3dfc8d79ebbbbd139665dd06f9f493af3aa6f48302f2865611591fcff6d",
+      "after": "224fba889e72283d68e5ad01008c91ccfb7970e743a249019856aa43e7422d0b",
+      "count": 1
+    },
+    {
+      "before": "TOOLS_INDEX = 'b3404af2d65929903577b5d1bc989218ec30e2e8daa0c1e012a2b8bbb21f9731'\n",
+      "after": "",
+      "count": 1
+    },
+    {
+      "before": "    tools_index = reader.document(PACKET / 'artifact-tools/index.json', TOOLS_INDEX, REPO)\n    for index, base in ((packet_index, PACKET), (tools_index, PACKET / 'artifact-tools')):\n        for row in index['files']:\n            reader.checked(base / relative(row['path']), row['sha256'], row['bytes'], base)",
+      "after": "    for row in packet_index['files']:\n        reader.checked(PACKET / relative(row['path']), row['sha256'], row['bytes'], PACKET)\n    tools_index = {'files': [{**row, 'path': row['path'][len('artifact-tools/'):]}\n                   for row in packet_index['files'] if row['path'].startswith('artifact-tools/')]}",
+      "count": 1
+    },
+    {
+      "before": "'immutable-release-engine-frozen'",
+      "after": "'immutable-trace-release-engine-frozen'",
+      "count": 1
+    },
+    {
+      "before": "len(tools['toolDependencies']) == 23",
+      "after": "len(tools['toolDependencies']) == 92",
+      "count": 1
+    },
+    {
+      "before": "len(planned) == 405",
+      "after": "len(planned) == 474",
+      "count": 1
+    },
+    {
+      "before": "str(REPO / 'builtins')",
+      "after": "str(SOURCE / 'builtins')",
+      "count": 1
+    },
+    {
+      "before": "str(REPO / 'runtime')",
+      "after": "str(SOURCE / 'runtime')",
+      "count": 1
+    },
+    {
+      "before": "relative_to(REPO)): row['command']",
+      "after": "relative_to(SOURCE)): row['command']",
+      "count": 1
+    },
+    {
+      "before": "command_words(command, str(REPO / source)",
+      "after": "command_words(command, str(SOURCE / source)",
+      "count": 1
+    },
+    {
+      "before": "admission['toolDependenciesVerified'] == 23",
+      "after": "admission['toolDependenciesVerified'] == 92",
+      "count": 1
+    },
+    {
+      "before": "'frozenCopies': 405",
+      "after": "'frozenCopies': 474",
+      "count": 1
+    },
+    {
+      "before": "'INDEPENDENT_CLASSIC_NATIVE_FREEZE_VERIFIED_NO_GUEST'",
+      "after": "'INDEPENDENT_CORRECTED_TRACE_NORMAL_OFF_NATIVE_FREEZE_VERIFIED_NO_GUEST'",
+      "count": 1
+    },
+    {
+      "before": "    reader.finish()\n    return {'schemaVersion': 1,",
+      "after": "    trace_checks(reader, metadata, freeze, policy, tools, mapped, embedding_words, launch)\n    reader.finish()\n    return {'schemaVersion': 1,",
+      "count": 1
+    },
+    {
+      "before": "    macro(embedding_words, 'NODE_COMPAT_STREAM_WEB', False)",
+      "after": "    macro(embedding_words, 'NODE_COMPAT_STREAM_WEB', False)\n    assert not any(w.startswith('-flto') for w in embedding_words)",
+      "count": 1
+    },
+    {
+      "before": "        reader.checked(ROOT / name, row['sha256'], row['bytes'], ROOT)\n        assert row['shared']",
+      "after": "        reader.checked(ROOT / name, row['sha256'], row['bytes'], ROOT)\n        if row['original'] is not None:\n            reader.checked(row['original'], row['sha256'], row['bytes'])\n        assert row['shared']",
+      "count": 1
+    }
+  ],
+  "newScope": "normal-off only; independent trace-specific checks and fixed parent-supplied anchors appended"
+}

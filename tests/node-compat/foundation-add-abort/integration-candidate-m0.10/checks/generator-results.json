@@ -1,0 +1,99 @@
+{
+  "state": "HOST_GENERATOR_ONLY_NO_NATIVE_CALLBACK_PROOF",
+  "command": [
+    "/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+    "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-add-abort/integration-candidate-m0.10/source/builtins/node-compat/generate-factories.mjs",
+    "--check"
+  ],
+  "stdout": "PASS checked-in Node profile factories match canonical sources\nPASS optional Path factories match canonical sources\nPASS optional Querystring factory/schema/exports match canonical sources\nPASS optional StringDecoder factory/schema/exports match canonical sources\nPASS optional Util factory/schema/exports match canonical sources\nPASS optional Assert factory/schema/export graph matches canonical sources\nPASS optional Events exact Node22 inventory, strict finite graph and helper bindings\nPASS optional stream/web exact Node22 inventory, strict factory graph and header\n",
+  "headers": [
+    {
+      "path": "assert-factories.generated.h",
+      "sha256": "c5502d92ed2621271bcc339c6aaa078b487bb4cc4c17bf8bfa239a54d5c83d27",
+      "changed": false
+    },
+    {
+      "path": "events-factories.generated.h",
+      "sha256": "41b4c286e24089e0c223d0e80d4d0f587322afee8816811f2e754217f8103437",
+      "changed": true
+    },
+    {
+      "path": "factories.generated.h",
+      "sha256": "cc04376c304ce2c4fe5a6f17eff54256123f02bdfe88555880e1e888babfc869",
+      "changed": false
+    },
+    {
+      "path": "path-factories.generated.h",
+      "sha256": "6e532ae164f9bffc53424a6e784b356d0f945c630b9d6d8110f5fef80b9bbf56",
+      "changed": false
+    },
+    {
+      "path": "querystring-factories.generated.h",
+      "sha256": "8bd7c70107b0ae33ae09be100e122be97584c8a02da43a07297d6aa0be42c4c9",
+      "changed": false
+    },
+    {
+      "path": "stream-web-factories.generated.h",
+      "sha256": "bfa6a1d9e61effcd76bd73ac2316bbcda6164e14d55836677d79eb1e4e909f23",
+      "changed": false
+    },
+    {
+      "path": "string-decoder-factories.generated.h",
+      "sha256": "7722cd08dc9399628d9c8077f3f11b49d7c62bdea75f67d727d467b6a4a909d4",
+      "changed": false
+    },
+    {
+      "path": "util-factories.generated.h",
+      "sha256": "81ae4ae2e0956c9a5ff9a991be00d5a4cc267b2545e10f956e26501cd0163b58",
+      "changed": false
+    }
+  ],
+  "negativeCases": [
+    {
+      "name": "helper-import",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "file:///private/tmp/starling-node-compat/sm-abort-generator-v486t6p0/helper-import/generate-events-factory.mjs:23\nif (facade.split(statement).length !== 2) throw new Error('Missing or duplicate private helper binding');\n                                                ^\n\nError: Missing or duplicate private helper binding\n    at file:///private/tmp/starling-node-compat/sm-abort-generator-v486t6p0/helper-import/generate-events-factory.mjs:23:49\n\nNode.js v22.14.0\n",
+      "headerPreserved": true
+    },
+    {
+      "name": "unbound-helper",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "<generated-events-factory>:236\nconst addAbortListener = createAddAbortListener(resistStopSymbol);\n                         ^\n\nReferenceError: createAddAbortListener is not defined\n    at createEventsFacade (<generated-events-factory>:236:26)\n    at <generated-events-factory>:250:8\n    at file:///private/tmp/starling-node-compat/sm-abort-generator-v486t6p0/unbound-helper/generate-events-factory.mjs:34:16\n\nNode.js v22.14.0\n",
+      "headerPreserved": true
+    },
+    {
+      "name": "extra-graph-key",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "file:///private/tmp/starling-node-compat/sm-abort-generator-v486t6p0/extra-graph-key/generate-events-factory.mjs:35\nif (Object.keys(record).sort().join() !== [...modulePolicy.exports].sort().join() || record.then !== undefined) throw new Error('Events finite namespace differs from manifest');\n                                                                                                                      ^\n\nError: Events finite namespace differs from manifest\n    at file:///private/tmp/starling-node-compat/sm-abort-generator-v486t6p0/extra-graph-key/generate-events-factory.mjs:35:119\n\nNode.js v22.14.0\n",
+      "headerPreserved": true
+    },
+    {
+      "name": "wrong-error-profile",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "file:///private/tmp/starling-node-compat/sm-abort-generator-v486t6p0/wrong-error-profile/generate-events-factory.mjs:45\n  if (error?.code !== 'ERR_SM_NODE_UNSUPPORTED' || error.module !== 'node:events' || error.profile !== manifest.profileVersion) throw new Error('Unbound Events unsupported helper: ' + name);\n                                                                                                                                      ^\n\nError: Unbound Events unsupported helper: once\n    at file:///private/tmp/starling-node-compat/sm-abort-generator-v486t6p0/wrong-error-profile/generate-events-factory.mjs:45:135\n\nNode.js v22.14.0\n",
+      "headerPreserved": true
+    },
+    {
+      "name": "then-export",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "file:///private/tmp/starling-node-compat/sm-abort-generator-v486t6p0/then-export/validate-manifest.mjs:73\n    if (module.exports.includes('then')) throw new Error(`${id}: then export would make namespace assimilation observable`);\n                                               ^\n\nError: node:events: then export would make namespace assimilation observable\n    at validateManifest (file:///private/tmp/starling-node-compat/sm-abort-generator-v486t6p0/then-export/validate-manifest.mjs:73:48)\n    at file:///private/tmp/starling-node-compat/sm-abort-generator-v486t6p0/then-export/generate-events-factory.mjs:15:1\n\nNode.js v22.14.0\n",
+      "headerPreserved": true
+    },
+    {
+      "name": "raw-delimiter",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "file:///private/tmp/starling-node-compat/sm-abort-generator-v486t6p0/raw-delimiter/generate-events-factory.mjs:27\nif (factory.includes(')SM_NODE_PROFILE\"')) throw new Error('Events raw-string delimiter collision');\n                                                 ^\n\nError: Events raw-string delimiter collision\n    at file:///private/tmp/starling-node-compat/sm-abort-generator-v486t6p0/raw-delimiter/generate-events-factory.mjs:27:50\n\nNode.js v22.14.0\n",
+      "headerPreserved": true
+    }
+  ],
+  "driverSha256": "ab06426a20174993af5c8fa9916db3599b2f50be16f46515311bd853a0367223",
+  "generatorSha256": "90a7ae6b887fce3bf92dc167090ea44c0bb8755400be2ff577658539f4a84354",
+  "engineBuilt": false,
+  "guestExecuted": false
+}

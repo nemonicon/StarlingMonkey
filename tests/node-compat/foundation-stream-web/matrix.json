@@ -1,0 +1,681 @@
+{
+  "node": "v22.14.0",
+  "module": "node:stream/web",
+  "aliases": [
+    "stream/web"
+  ],
+  "productionStatus": "deferred; uninstalled",
+  "requiredHostInterfaces": [],
+  "scope": "Source/candidate matrix, not a production export manifest or complete compatibility assertion.",
+  "ordinaryProof": {
+    "engineSha256": "33b9cb248afbb4a3b3653c7b76bd656e51443e6823fa72d712758c742cd59516",
+    "componentSha256": "a04beca67fbf1925ccb4e121332966004dd4a6a3ab152ec8c5cc8a05a6095686",
+    "zeroImports": true,
+    "cases": 11,
+    "exactMatchesForRecordedFields": 9,
+    "deviations": [
+      "writable-basic",
+      "byob-minimum"
+    ],
+    "backends": [
+      "Jco-hosted Wasm",
+      "Wasmtime42.0.1"
+    ]
+  },
+  "retainedConstructorProof": {
+    "report": "constructors-component-results.json",
+    "componentSha256": "1a788072bd41a90b8a341556024c25c68e6705618a204d9835e7053dc6bda380",
+    "zeroImports": true,
+    "writerNewWriteCloseRelease": true,
+    "controllerCallAndNewTypeErrors": true,
+    "deviations": [
+      "Node-specific invalid/locked writer and illegal controller construction error codes are absent.",
+      "Native TransformStreamDefaultController.length is1; Node22 length is0."
+    ],
+    "jsGetClassObjectExecuted": false
+  },
+  "rows": [
+    {
+      "name": "ByteLengthQueuingStrategy",
+      "productionStatus": "deferred",
+      "candidateStatus": "partial",
+      "isolatedExportStatus": "partial",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "ByteLengthQueuingStrategy",
+        "length": 1,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "constructor",
+          "highWaterMark",
+          "size"
+        ]
+      },
+      "globalAvailability": "function",
+      "retainedNativeConstructorProven": false,
+      "strategy": "Reuse actual SM global.",
+      "deviations": [
+        "Complete conversions/descriptors/shared size-function behavior unverified."
+      ],
+      "verifiedOrdinaryCases": [
+        "queuing-strategies"
+      ],
+      "validation": [
+        "Pinned conversions, invalid HWM, size reentrancy and property descriptors."
+      ]
+    },
+    {
+      "name": "CompressionStream",
+      "productionStatus": "deferred",
+      "candidateStatus": "deferred",
+      "isolatedExportStatus": "partial",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "CompressionStream",
+        "length": 1,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "constructor",
+          "readable",
+          "writable"
+        ]
+      },
+      "globalAvailability": "function",
+      "retainedNativeConstructorProven": false,
+      "strategy": "Existing native zlib class; reuse deferred until source gates close.",
+      "deviations": [
+        "Unchecked constructor result, borrowed input across allocating loop, missing owned-state teardown/finalizer."
+      ],
+      "verifiedOrdinaryCases": [],
+      "validation": [
+        "Harden source first; bounded gzip/deflate/raw/error/cleanup/backpressure differentials."
+      ]
+    },
+    {
+      "name": "CountQueuingStrategy",
+      "productionStatus": "deferred",
+      "candidateStatus": "partial",
+      "isolatedExportStatus": "partial",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "CountQueuingStrategy",
+        "length": 1,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "constructor",
+          "highWaterMark",
+          "size"
+        ]
+      },
+      "globalAvailability": "function",
+      "retainedNativeConstructorProven": false,
+      "strategy": "Reuse actual SM global.",
+      "deviations": [
+        "Complete conversions/descriptors/shared size-function behavior unverified."
+      ],
+      "verifiedOrdinaryCases": [
+        "queuing-strategies"
+      ],
+      "validation": [
+        "Pinned conversions, invalid HWM, size reentrancy and property descriptors."
+      ]
+    },
+    {
+      "name": "DecompressionStream",
+      "productionStatus": "deferred",
+      "candidateStatus": "deferred",
+      "isolatedExportStatus": "partial",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "DecompressionStream",
+        "length": 1,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "constructor",
+          "readable",
+          "writable"
+        ]
+      },
+      "globalAvailability": "function",
+      "retainedNativeConstructorProven": false,
+      "strategy": "Existing native zlib class; reuse deferred until source gates close.",
+      "deviations": [
+        "Same ownership gaps, empty unexpected-inflate-status branch and missing output/expansion budget."
+      ],
+      "verifiedOrdinaryCases": [],
+      "validation": [
+        "Harden source first; malformed/truncated/trailing data, bounded expansion, cleanup and backpressure."
+      ]
+    },
+    {
+      "name": "ReadableByteStreamController",
+      "productionStatus": "deferred",
+      "candidateStatus": "partial",
+      "isolatedExportStatus": "partial",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "ReadableByteStreamController",
+        "length": 0,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "byobRequest",
+          "close",
+          "constructor",
+          "desiredSize",
+          "enqueue",
+          "error"
+        ]
+      },
+      "globalAvailability": "function",
+      "retainedNativeConstructorProven": false,
+      "strategy": "Reuse actual SM global.",
+      "deviations": [
+        "Complete byte queue/auto-allocation semantics unverified."
+      ],
+      "verifiedOrdinaryCases": [
+        "byob-basic",
+        "byob-minimum"
+      ],
+      "validation": [
+        "enqueue/autoAllocateChunkSize, cancellation/error, transfer boundaries."
+      ]
+    },
+    {
+      "name": "ReadableStream",
+      "productionStatus": "deferred",
+      "candidateStatus": "partial",
+      "isolatedExportStatus": "partial",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "ReadableStream",
+        "length": 0,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "from",
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "cancel",
+          "constructor",
+          "getReader",
+          "locked",
+          "pipeThrough",
+          "pipeTo",
+          "tee",
+          "values"
+        ]
+      },
+      "globalAvailability": "function",
+      "retainedNativeConstructorProven": false,
+      "strategy": "Reuse actual SM global; preserve identity.",
+      "deviations": [
+        "from, values and Symbol.asyncIterator absent."
+      ],
+      "verifiedOrdinaryCases": [
+        "readable-basic",
+        "readable-cancel",
+        "pipe-to",
+        "tee"
+      ],
+      "validation": [
+        "Implement/test iterable conversion and cancellation; pipeThrough/signal/error/lock and transfer gates."
+      ]
+    },
+    {
+      "name": "ReadableStreamBYOBReader",
+      "productionStatus": "deferred",
+      "candidateStatus": "partial",
+      "isolatedExportStatus": "partial",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "ReadableStreamBYOBReader",
+        "length": 1,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "cancel",
+          "closed",
+          "constructor",
+          "read",
+          "releaseLock"
+        ]
+      },
+      "globalAvailability": "function",
+      "retainedNativeConstructorProven": false,
+      "strategy": "Reuse actual SM global with reviewed captured read guard.",
+      "deviations": [
+        "Native read ignores Node22 options.min; explicitly reject unsupported minimum fill before native call."
+      ],
+      "verifiedOrdinaryCases": [
+        "byob-basic",
+        "byob-minimum"
+      ],
+      "validation": [
+        "Minimum-fill, invalid options, EOF, ownership and cancellation; no silent ignored options."
+      ]
+    },
+    {
+      "name": "ReadableStreamBYOBRequest",
+      "productionStatus": "deferred",
+      "candidateStatus": "partial",
+      "isolatedExportStatus": "partial",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "ReadableStreamBYOBRequest",
+        "length": 0,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "constructor",
+          "respond",
+          "respondWithNewView",
+          "view"
+        ]
+      },
+      "globalAvailability": "function",
+      "retainedNativeConstructorProven": false,
+      "strategy": "Reuse actual SM global.",
+      "deviations": [
+        "respondWithNewView and wider boundary semantics unverified."
+      ],
+      "verifiedOrdinaryCases": [
+        "byob-basic"
+      ],
+      "validation": [
+        "respondWithNewView, close/error and byte accounting."
+      ]
+    },
+    {
+      "name": "ReadableStreamDefaultController",
+      "productionStatus": "deferred",
+      "candidateStatus": "partial",
+      "isolatedExportStatus": "partial",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "ReadableStreamDefaultController",
+        "length": 0,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "close",
+          "constructor",
+          "desiredSize",
+          "enqueue",
+          "error"
+        ]
+      },
+      "globalAvailability": "function",
+      "retainedNativeConstructorProven": false,
+      "strategy": "Reuse actual SM global.",
+      "deviations": [
+        "Complete desiredSize/error/reentrancy semantics unverified."
+      ],
+      "verifiedOrdinaryCases": [
+        "readable-basic",
+        "pipe-to",
+        "tee"
+      ],
+      "validation": [
+        "desiredSize, enqueue/close/error state and reentrancy."
+      ]
+    },
+    {
+      "name": "ReadableStreamDefaultReader",
+      "productionStatus": "deferred",
+      "candidateStatus": "partial",
+      "isolatedExportStatus": "partial",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "ReadableStreamDefaultReader",
+        "length": 1,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "cancel",
+          "closed",
+          "constructor",
+          "read",
+          "releaseLock"
+        ]
+      },
+      "globalAvailability": "function",
+      "retainedNativeConstructorProven": false,
+      "strategy": "Reuse actual SM global.",
+      "deviations": [
+        "Complete property/error semantics unverified."
+      ],
+      "verifiedOrdinaryCases": [
+        "readable-basic",
+        "readable-cancel"
+      ],
+      "validation": [
+        "Pending-read release, brands, closed rejection and descriptor tests."
+      ]
+    },
+    {
+      "name": "TextDecoderStream",
+      "productionStatus": "deferred",
+      "candidateStatus": "deferred",
+      "isolatedExportStatus": "import-only",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "TextDecoderStream",
+        "length": 0,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "constructor",
+          "encoding",
+          "fatal",
+          "ignoreBOM",
+          "readable",
+          "writable"
+        ]
+      },
+      "globalAvailability": "undefined",
+      "retainedNativeConstructorProven": false,
+      "strategy": "Audited JS facade over fixed native TextDecoder and TransformStream.",
+      "deviations": [
+        "No native/global implementation found; prototype callable export throws explicitly."
+      ],
+      "verifiedOrdinaryCases": [],
+      "validation": [
+        "UTF8 split/BOM/fatal/flush, BufferSource ownership/shared policy, coercion and cancellation."
+      ]
+    },
+    {
+      "name": "TextEncoderStream",
+      "productionStatus": "deferred",
+      "candidateStatus": "deferred",
+      "isolatedExportStatus": "import-only",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "TextEncoderStream",
+        "length": 0,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "constructor",
+          "encoding",
+          "readable",
+          "writable"
+        ]
+      },
+      "globalAvailability": "undefined",
+      "retainedNativeConstructorProven": false,
+      "strategy": "Audited JS framing facade over native TransformStream and TextEncoder.",
+      "deviations": [
+        "No native/global implementation found; prototype callable export throws explicitly."
+      ],
+      "verifiedOrdinaryCases": [],
+      "validation": [
+        "Cross-chunk high surrogate, flush/replacement, coercion, getters, cancel and backpressure."
+      ]
+    },
+    {
+      "name": "TransformStream",
+      "productionStatus": "deferred",
+      "candidateStatus": "partial",
+      "isolatedExportStatus": "partial",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "TransformStream",
+        "length": 0,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "constructor",
+          "readable",
+          "writable"
+        ]
+      },
+      "globalAvailability": "function",
+      "retainedNativeConstructorProven": false,
+      "strategy": "Reuse actual Starling native class.",
+      "deviations": [
+        "Complete strategy/cancel/error semantics unverified."
+      ],
+      "verifiedOrdinaryCases": [
+        "transform-basic"
+      ],
+      "validation": [
+        "Writable/readable cancellation, errors, strategies and backpressure."
+      ]
+    },
+    {
+      "name": "TransformStreamDefaultController",
+      "productionStatus": "deferred",
+      "candidateStatus": "partial",
+      "isolatedExportStatus": "import-only",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "TransformStreamDefaultController",
+        "length": 0,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "constructor",
+          "desiredSize",
+          "enqueue",
+          "error",
+          "terminate"
+        ]
+      },
+      "globalAvailability": "undefined",
+      "retainedNativeConstructorProven": true,
+      "strategy": "Capture real retained native constructor from existing public proto_obj root.",
+      "deviations": [
+        "Global intentionally removed; prototype probe presently exports explicit unavailable function for this missing global."
+      ],
+      "verifiedOrdinaryCases": [
+        "transform-basic"
+      ],
+      "validation": [
+        "Use real function; constructor/prototype/instance identity and illegal-constructor errors."
+      ]
+    },
+    {
+      "name": "WritableStream",
+      "productionStatus": "deferred",
+      "candidateStatus": "partial",
+      "isolatedExportStatus": "partial",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "WritableStream",
+        "length": 0,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "abort",
+          "close",
+          "constructor",
+          "getWriter",
+          "locked"
+        ]
+      },
+      "globalAvailability": "function",
+      "retainedNativeConstructorProven": false,
+      "strategy": "Reuse actual SM global.",
+      "deviations": [
+        "Complete direct-close/error/abort-signal interactions unverified."
+      ],
+      "verifiedOrdinaryCases": [
+        "writable-basic",
+        "writable-abort",
+        "writable-backpressure",
+        "pipe-to"
+      ],
+      "validation": [
+        "Direct stream.close, locked/error states and pipeline propagation."
+      ]
+    },
+    {
+      "name": "WritableStreamDefaultController",
+      "productionStatus": "deferred",
+      "candidateStatus": "partial",
+      "isolatedExportStatus": "import-only",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "WritableStreamDefaultController",
+        "length": 0,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "constructor",
+          "error",
+          "signal"
+        ]
+      },
+      "globalAvailability": "undefined",
+      "retainedNativeConstructorProven": true,
+      "strategy": "Capture real cached/retained native constructor; native signal work needed.",
+      "deviations": [
+        "Global hidden; controller.signal absent. Do not fabricate AbortSignal semantics from sink.abort."
+      ],
+      "verifiedOrdinaryCases": [
+        "writable-basic"
+      ],
+      "validation": [
+        "Native controller-abort linkage, signal identity/event/reason lifecycle."
+      ]
+    },
+    {
+      "name": "WritableStreamDefaultWriter",
+      "productionStatus": "deferred",
+      "candidateStatus": "partial",
+      "isolatedExportStatus": "import-only",
+      "requiredHostInterfaces": [],
+      "nodeInventory": {
+        "name": "WritableStreamDefaultWriter",
+        "length": 1,
+        "globalIdentity": true,
+        "defaultIdentity": true,
+        "staticNames": [
+          "length",
+          "name",
+          "prototype"
+        ],
+        "prototypeNames": [
+          "abort",
+          "close",
+          "closed",
+          "constructor",
+          "desiredSize",
+          "ready",
+          "releaseLock",
+          "write"
+        ]
+      },
+      "globalAvailability": "undefined",
+      "retainedNativeConstructorProven": true,
+      "strategy": "Capture real cached/retained native constructor.",
+      "deviations": [
+        "Global hidden with ClassSpec::DontDefineConstructor; prototype binding remains unavailable placeholder."
+      ],
+      "verifiedOrdinaryCases": [
+        "writable-basic",
+        "writable-abort",
+        "writable-backpressure"
+      ],
+      "validation": [
+        "Use real function via existing JSAPI or retained prototype; no fabricated class."
+      ]
+    },
+    {
+      "name": "default",
+      "productionStatus": "deferred",
+      "candidateStatus": "partial",
+      "requiredHostInterfaces": [],
+      "strategy": "Ordinary mutable seventeen-member record, initial named/default identities; selected literal CommonJS default lowering only.",
+      "deviations": [
+        "Current isolated namespace uses explicit unavailable exports for five missing globals; not a native registered module."
+      ],
+      "validation": [
+        "Exactly18 ESM names; no then export/Proxy/property-read trap; future native alias/cache/CJS/initfail gate."
+      ]
+    }
+  ]
+}

@@ -25,6 +25,9 @@ public:
     Count
   };
 
+  // Public JS entry points must reject the uninitialized class prototype.
+  static bool check_receiver(JSContext *cx, JS::HandleValue receiver, const char *method_name);
+
   using TransformAlgorithmImplementation = JSObject *(JSContext *, JS::HandleObject, JS::HandleValue);
   using FlushAlgorithmImplementation = JSObject *(JSContext *, JS::HandleObject);
 

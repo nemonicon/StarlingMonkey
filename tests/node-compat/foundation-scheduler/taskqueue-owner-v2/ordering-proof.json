@@ -1,0 +1,149 @@
+{
+  "status": "reused-executed-Node22-oracles-plus-pure-Python-phase-model",
+  "nodeRelease": "v22.14.0",
+  "nodeBinarySha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+  "nodeEvidence": {
+    "path": "../node-results.json",
+    "sha256": "7e61775b17b889f3bc0ccfae37eba8520f8f48a9b153002361019c728d7bdb18"
+  },
+  "nativeSchedulerCompiled": false,
+  "guestExecuted": false,
+  "cases": [
+    {
+      "boundary": "cjs-initial",
+      "executedNodeTrace": [
+        "tick-first",
+        "nested-tick",
+        "promise-first",
+        "microtask",
+        "promise-from-tick",
+        "nested-promise",
+        "tick-from-promise"
+      ],
+      "predictedPhaseModelTrace": [
+        "tick-first",
+        "nested-tick",
+        "promise-first",
+        "microtask",
+        "promise-from-tick",
+        "nested-promise",
+        "tick-from-promise"
+      ],
+      "phaseModelMatchesNode": true
+    },
+    {
+      "boundary": "task",
+      "executedNodeTrace": [
+        "tick-first",
+        "nested-tick",
+        "promise-first",
+        "microtask",
+        "promise-from-tick",
+        "nested-promise",
+        "tick-from-promise"
+      ],
+      "predictedPhaseModelTrace": [
+        "tick-first",
+        "nested-tick",
+        "promise-first",
+        "microtask",
+        "promise-from-tick",
+        "nested-promise",
+        "tick-from-promise"
+      ],
+      "phaseModelMatchesNode": true
+    },
+    {
+      "boundary": "promise-job",
+      "executedNodeTrace": [
+        "promise-first",
+        "microtask",
+        "nested-promise",
+        "tick-first",
+        "tick-from-promise",
+        "nested-tick",
+        "promise-from-tick"
+      ],
+      "predictedPhaseModelTrace": [
+        "promise-first",
+        "microtask",
+        "nested-promise",
+        "tick-first",
+        "tick-from-promise",
+        "nested-tick",
+        "promise-from-tick"
+      ],
+      "phaseModelMatchesNode": true
+    },
+    {
+      "boundary": "esm-initial",
+      "executedNodeTrace": [
+        "promise-first",
+        "microtask",
+        "nested-promise",
+        "tick-first",
+        "tick-from-promise",
+        "nested-tick",
+        "promise-from-tick"
+      ],
+      "predictedPhaseModelTrace": [
+        "promise-first",
+        "microtask",
+        "nested-promise",
+        "tick-first",
+        "tick-from-promise",
+        "nested-tick",
+        "promise-from-tick"
+      ],
+      "phaseModelMatchesNode": true
+    }
+  ],
+  "contractAndFatalEvidenceReused": {
+    "invalidCallbacks": [
+      {
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      },
+      {
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      },
+      {
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      },
+      {
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      },
+      {
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      },
+      {
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      }
+    ],
+    "callbacks": [
+      {
+        "receiverUndefined": true,
+        "argumentCount": 3,
+        "objectIdentity": true,
+        "symbolIdentity": true,
+        "primitive": 17
+      }
+    ],
+    "returnIsUndefined": true,
+    "publicNodeNextTickConstructible": true,
+    "constructedCallbackRan": true
+  },
+  "fatalNodeEvidence": {
+    "status": 1,
+    "stdout": "first\n",
+    "expectedMessagePresent": true,
+    "stderrSha256": "cd1395ef3fe13e9411cebb8a89509c9748ef45173668333572a89b50a359849e",
+    "source": "process.nextTick(()=>{process.stdout.write('first\\n');throw new Error('SCHEDULER_NODE_FATAL_ORACLE')});process.nextTick(()=>process.stdout.write('second\\n'));"
+  },
+  "qualification": "Promise-job row models ticks registered while full checkpoint is already draining; it does not add a reentrant C++ checkpoint."
+}

@@ -1,0 +1,87 @@
+{
+  "state": "READ_ONLY_SELECTED_PATH_AND_TASK_SCOPE_QUIESCENCE_OBSERVED",
+  "observedAtUtc": "2026-11-03T17:40:06.720752+00:00",
+  "inventoryPath": "tests/node-compat/storage-candidate-audit-earlier-v1/results.json",
+  "inventorySha256": "6a3664ff4ebe283910672090ed4481123ab3d634146781ff7a9321a1302378a8",
+  "filesRehashed": 92,
+  "allRecordedStatAndMetadataUnchanged": true,
+  "allAcceptedClosureWitnessesRehashed": 40,
+  "allGeneratedJsReferencesRehashed": true,
+  "forbiddenPathsSelected": false,
+  "ps": {
+    "argv": [
+      "ps",
+      "-axo",
+      "pid=,ppid=,pgid=,etime=,stat=,args="
+    ],
+    "status": 0,
+    "stderr": "",
+    "processCount": 933,
+    "scope": "Task-owned and selected-path operations only; unrelated runtimes observed and left untouched. No unrelated project paths retained.",
+    "taskOwnedBuildGuestOrSelectedPathMatches": [],
+    "unrelatedRuntimesObserved": [
+      {
+        "pid": 24630,
+        "executable": "wash",
+        "elapsed": "03-05:06:42",
+        "scope": "preexisting runtime outside task; left untouched"
+      },
+      {
+        "pid": 88142,
+        "executable": "wash",
+        "elapsed": "04-06:57:59",
+        "scope": "preexisting runtime outside task; left untouched"
+      }
+    ],
+    "cwdScopeChecks": [
+      {
+        "pid": 24630,
+        "command": [
+          "/usr/sbin/lsof",
+          "-a",
+          "-p",
+          "24630",
+          "-d",
+          "cwd",
+          "-nP"
+        ],
+        "status": 0,
+        "cwdOutsideTask": true
+      },
+      {
+        "pid": 88142,
+        "command": [
+          "/usr/sbin/lsof",
+          "-a",
+          "-p",
+          "88142",
+          "-d",
+          "cwd",
+          "-nP"
+        ],
+        "status": 0,
+        "cwdOutsideTask": true
+      }
+    ]
+  },
+  "lsof": {
+    "argvPrefix": [
+      "/usr/sbin/lsof",
+      "-nP",
+      "--"
+    ],
+    "exactPathsCount": 92,
+    "exactPathsCanonicalJsonSha256": "363851aac51e3b826369aebc3209e447577dafb482ea2827fde22882e2c2d80c",
+    "status": 1,
+    "stdout": "",
+    "stderr": "",
+    "noOpenFilesObserved": true,
+    "scope": "Point-in-time exact paths; no access-tier change; status1 with empty output means no observed opens"
+  },
+  "allTaskBuildGuestAndStorageProcessesAbsent": true,
+  "safePointInTimeObservation": true,
+  "helperReviewPending": true,
+  "compressionDeletionBuildOrGuestExecuted": false,
+  "wholeMachineHostFreeClaim": false,
+  "claim": "No task-owned/selected-path operations; exact92 no open files observed. Root must repeat lsof immediately before any separately authorized mutation."
+}

@@ -1,0 +1,1 @@
+import {Buffer} from 'node:buffer';Buffer.alloc(1).fill();export function run(){return '';}

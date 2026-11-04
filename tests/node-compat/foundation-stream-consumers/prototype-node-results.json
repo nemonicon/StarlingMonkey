@@ -1,0 +1,339 @@
+{
+  "schema": 1,
+  "contractVersion": "stream-consumers-prototype-v1",
+  "node": "v22.14.0",
+  "installed": false,
+  "nodeOnly": true,
+  "differentialGroups": 18,
+  "cases": [
+    {
+      "name": "empty and string chunks",
+      "result": [
+        "",
+        "abcd",
+        "abc"
+      ]
+    },
+    {
+      "name": "split UTF8 BOM and incomplete final sequence",
+      "result": "A€�"
+    },
+    {
+      "name": "strings do not flush a pending byte decoder",
+      "result": "X€"
+    },
+    {
+      "name": "strings do not consume decoder BOM state",
+      "result": "AB﻿C"
+    },
+    {
+      "name": "string surrogate halves concatenate without UTF8 conversion",
+      "result": "😀"
+    },
+    {
+      "name": "typed views decode only visible raw bytes",
+      "result": [
+        "AB",
+        "AB",
+        "AB",
+        "\u0000AB\u0000"
+      ]
+    },
+    {
+      "name": "eager decoding precedes later mutation of reused chunk",
+      "result": "AB"
+    },
+    {
+      "name": "undefined byte chunk is an empty decoder input",
+      "result": "A"
+    },
+    {
+      "name": "invalid byte chunks reject with error type and code",
+      "result": [
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        }
+      ]
+    },
+    {
+      "name": "sync iterator yielded promises are unwrapped",
+      "result": "AB"
+    },
+    {
+      "name": "async iterator yielded promise value is not unwrapped",
+      "result": {
+        "fulfilled": false,
+        "name": "TypeError",
+        "code": "ERR_INVALID_ARG_TYPE"
+      }
+    },
+    {
+      "name": "body decoding failure closes the iterator once",
+      "result": {
+        "error": {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        "log": [
+          "iterator",
+          "next",
+          "return"
+        ]
+      }
+    },
+    {
+      "name": "next rejection propagates original error without return",
+      "result": {
+        "same": true,
+        "log": [
+          "next"
+        ]
+      }
+    },
+    {
+      "name": "sync iterator body failure invokes finally",
+      "result": {
+        "error": {
+          "fulfilled": false,
+          "name": "TypeError",
+          "code": "ERR_INVALID_ARG_TYPE"
+        },
+        "log": [
+          "finally"
+        ]
+      }
+    },
+    {
+      "name": "json consumes streaming text before parsing",
+      "result": {
+        "value": {
+          "x": 2
+        },
+        "log": [
+          "complete"
+        ]
+      }
+    },
+    {
+      "name": "json syntax failure occurs after iterator completion",
+      "result": {
+        "error": {
+          "fulfilled": false,
+          "name": "SyntaxError"
+        },
+        "log": [
+          "complete"
+        ]
+      }
+    },
+    {
+      "name": "literal BOM json differs from byte BOM",
+      "result": {
+        "literal": {
+          "fulfilled": false,
+          "name": "SyntaxError"
+        },
+        "bytes": {
+          "x": 1
+        }
+      }
+    },
+    {
+      "name": "native Promise result and supported async non-construction",
+      "result": {
+        "promise": true,
+        "then": "function",
+        "value": "a",
+        "text": {
+          "name": "TypeError"
+        },
+        "json": {
+          "name": "TypeError"
+        }
+      }
+    }
+  ],
+  "profileGroups": 12,
+  "profiles": [
+    {
+      "name": "all Blob-dependent operations refuse call and construction",
+      "result": [
+        {
+          "name": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "operation": "arrayBuffer"
+        },
+        {
+          "name": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "operation": "arrayBuffer"
+        },
+        {
+          "name": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "operation": "blob"
+        },
+        {
+          "name": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "operation": "blob"
+        },
+        {
+          "name": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "operation": "buffer"
+        },
+        {
+          "name": "Error",
+          "code": "ERR_SM_NODE_UNSUPPORTED",
+          "operation": "buffer"
+        }
+      ]
+    },
+    {
+      "name": "real ESM inspection and default graph",
+      "result": {
+        "namespace": "[object Module]",
+        "keys": [
+          "arrayBuffer",
+          "blob",
+          "buffer",
+          "default",
+          "json",
+          "text"
+        ],
+        "defaultKeys": [
+          "arrayBuffer",
+          "blob",
+          "buffer",
+          "text",
+          "json"
+        ],
+        "then": "undefined"
+      }
+    },
+    {
+      "name": "supported function async shape matches pinned Node",
+      "result": {
+        "text": "AsyncFunction",
+        "json": "AsyncFunction"
+      }
+    },
+    {
+      "name": "default mutation does not rewrite named bindings or lexical json text",
+      "result": {
+        "namedRetained": true,
+        "jsonUsesLexicalText": true
+      }
+    },
+    {
+      "name": "captured decoder JSON parser and brand helpers",
+      "result": {
+        "replacementCalls": 0,
+        "output": {
+          "x": 1
+        }
+      }
+    },
+    {
+      "name": "string input cap closes ordinary iterator",
+      "result": {
+        "code": "ERR_SM_NODE_LIMIT",
+        "closed": true
+      }
+    },
+    {
+      "name": "byte input cap rejects before native decode and closes iterator",
+      "result": {
+        "code": "ERR_SM_NODE_LIMIT",
+        "closed": true
+      }
+    },
+    {
+      "name": "output cap spans mixed byte and string inputs",
+      "result": {
+        "code": "ERR_SM_NODE_LIMIT",
+        "closed": true
+      }
+    },
+    {
+      "name": "final decoder flush output cap occurs after source completion",
+      "result": {
+        "code": "ERR_SM_NODE_LIMIT",
+        "log": [
+          "complete"
+        ]
+      }
+    },
+    {
+      "name": "chunk cap also bounds empty chunks and closes exactly once",
+      "result": {
+        "nextCalls": 4097,
+        "returnCalls": 1
+      }
+    },
+    {
+      "name": "profile cap error wins over iterator-return rejection",
+      "result": {
+        "code": "ERR_SM_NODE_LIMIT",
+        "returns": 1
+      }
+    },
+    {
+      "name": "factory does not install globals or expose dependencies",
+      "result": {
+        "frozenRecord": true,
+        "globalMutation": false
+      }
+    }
+  ],
+  "sources": {
+    "create-module.mjs": "25a673d5cb3ebd02d8ae1e59830638a810b8c6dd08e90b58bc6c77bcc4802b64",
+    "prototype.mjs": "9accb67bb53032996a0083a66b4cb06e7dea95f557efcd07a7aa0cfb14dc66d2",
+    "node-checks.mjs": "6f551fe7129824cdbd8a671e9378b984aaa5aafaea70fdb1dece22daab801a3a",
+    "run-prototype-node.mjs": "23ca51ff8f922994b30adbed6baadc5429a0f876f010197d92ef72a825a53c7d",
+    "export-contract.node-v22.14.0.json": "b34e53439c027642fbb0aa2e65fa4610e2c6ca166cde953afb78a60bd350711a",
+    "LICENSE.node": "21a82bbee91262a076c2e34533d51d73475d55e889f1c42cf884c86b2a0d5773"
+  },
+  "oracleSha256": "6a2571a90f6f272dd4940f3e400914d6a86d0b042751f965836ca63c02a327fd",
+  "scope": "Isolated factory and real finite ESM host tests use Node22 native TextDecoder. No StarlingMonkey guest/component run, Blob implementation or production registration is exercised.",
+  "limits": {
+    "MAX_BYTE_INPUT": 1048576,
+    "MAX_CHUNKS": 4096,
+    "MAX_OUTPUT_CODE_UNITS": 1048576,
+    "MAX_STRING_INPUT_CODE_UNITS": 1048576
+  },
+  "limitations": [
+    "Native Blob-dependent exports are explicit refusals, not JS copies or blank objects",
+    "No getter/detach/shared lifetime or OOM probe",
+    "No byte-copy timing, native scheduling, guest iterator cancellation, snapshot or host-import support claim from host tests"
+  ]
+}

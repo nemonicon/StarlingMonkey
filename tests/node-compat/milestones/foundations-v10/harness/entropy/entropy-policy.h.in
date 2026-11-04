@@ -1,0 +1,18 @@
+// UNCOMPILED PRIVATE GUEST INTERFACE PROPOSAL. These symbols do not exist yet.
+// No wasm import/export annotations and no content-JS setter are permitted.
+#ifndef SM_NODE_STAGED_ENTROPY_POLICY_H
+#define SM_NODE_STAGED_ENTROPY_POLICY_H
+#include <stddef.h>
+#include "extension-api.h"
+
+enum class SmNodeEntropyStatus { Disabled, BeforeRuntime, Ready };
+SmNodeEntropyStatus sm_node_entropy_status();
+// Call only at verified deployed native entry points. Never in wizen(),
+// finish_pre_initialization(), bindExports(), check_init() or module install.
+void sm_node_enter_deployed_execution();
+// Existing JS_ReportErrorUTF8/GetPendingException/ClearPendingException and
+// rooted JS_DefineProperty can create an Error with code and operation fields.
+// Returnfalse with the pending error; preserve an intervening JSAPI OOM.
+bool sm_node_require_secure_entropy(JSContext *cx, const char *operation);
+extern "C" int sm_node_secure_random_fill(unsigned char *destination, size_t length);
+#endif

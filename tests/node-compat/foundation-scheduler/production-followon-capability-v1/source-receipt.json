@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_ONLY_CAPABILITY_FOLLOWON_READY_FOR_REVIEW_NOT_RUNTIME_ACCEPTANCE",
+  "capturedAtUtc": "2026-11-03T20:23:40.303152+00:00",
+  "parentPacket": {
+    "path": "tests/node-compat/foundation-scheduler/production-regression-candidate-v3",
+    "indexSha256": "3064605fbf043c26e3d1bc85378b91d68c98be4034f4b6c5cf0f30f964ac61a2"
+  },
+  "enginePinDocument": {
+    "path": "pins.json",
+    "sha256": "ce265df8ad60cdcae450013597a2ac1f20d83dbcffcc1114b2a00af927743c74",
+    "state": "UNCONFIGURED_ACTUAL_PRODUCTION_FREEZES_REQUIRED",
+    "variants": {
+      "normal-off": null,
+      "gc-off": null,
+      "normal-runtime": null
+    }
+  },
+  "httpComponentPinDocument": {
+    "path": "http-component-pins.json",
+    "sha256": "a9be39264829706dcc04d322a183423d026ab3fed9d89154162b0f9b5e4cbd19",
+    "state": "UNCONFIGURED_ACTUAL_HTTP_COMPONENT_REQUIRED",
+    "component": null,
+    "phasePinExcludedFromPrepackSeal": true,
+    "afterConfiguredPrimitiveDigestRecheckedBy": "verifyHTTPReady"
+  },
+  "runtimeSourceInputSeal": {
+    "path": "input-freeze.json",
+    "sha256": "a429dc1f3cace57d3b6daf3277b206ae98e076f345251e2b98ca501cd37dec97",
+    "files": 764,
+    "ancestralLineageInputs": 665,
+    "nativePartition": 306,
+    "externalEmbeddingPartition": 3,
+    "binariesCopied": false
+  },
+  "sourceTransforms": {
+    "path": "transformations.json",
+    "sha256": "ba6770fe1762bd2125b0c7db8cb87840a21327ce84deffe2514416a6335ccb76",
+    "derivedFiles": 10,
+    "reverseEditsRestoreEveryOldByte": true
+  },
+  "reviewDiff": {
+    "path": "derivations.REVIEW.diff",
+    "sha256": "c8c8f53916e397b46769e00e3b000800f319ebb5679efeb8a4e9a7e505a2c031",
+    "role": "Review-only; old sources are not to be modified or renamed"
+  },
+  "checks": {
+    "hostOnly": {
+      "path": "test-results.json",
+      "sha256": "7a5ccc21b922a03d5edc32c0050e8600c9d597e682bdc3facc4a635ee98fe714",
+      "passed": 75,
+      "negativeChildEntries": 11,
+      "scratchSealCases": 7
+    },
+    "source": {
+      "path": "source-checks.json",
+      "sha256": "bac3ba029f0210740dfe36c1a1c5f2aec4f71cb986507b401eac5fdbf48b0cb3",
+      "syntaxChecks": 29,
+      "nativeInputsRehashed": 306
+    }
+  },
+  "capabilityContracts": {
+    "normalOffScalar": [],
+    "gcOffScalar": [],
+    "normalRuntimeScalar": [
+      "wasi:random/random@0.2.10"
+    ],
+    "runtimeHttp": [
+      "wasi:clocks/monotonic-clock@0.2.10",
+      "wasi:http/types@0.2.10",
+      "wasi:io/error@0.2.10",
+      "wasi:io/poll@0.2.10",
+      "wasi:io/streams@0.2.10",
+      "wasi:random/random@0.2.10"
+    ],
+    "httpExports": [
+      "wasi:http/incoming-handler@0.2.10"
+    ],
+    "clock": "nominal-duration-only; no callable/core clock imports",
+    "observedNewComponentImports": false
+  },
+  "preservedFocusedScope": {
+    "public": 16,
+    "nested": 4,
+    "receivers": 9,
+    "total": 29,
+    "namespaceExports": 16,
+    "ownErrors": 7,
+    "initializationFailures": 8,
+    "deployedFatalCases": 5,
+    "ordinarySuccessfulRetainedCalls": 9,
+    "ordinarySuccessfulFreshWasmtime": 3,
+    "gcRoundtripsPerCall": 8,
+    "getterExpectedNode": {
+      "ordinary": 1,
+      "protectedSignal": 1,
+      "alreadyAborted": 0
+    },
+    "getterExpectedNative": {
+      "ordinary": 0,
+      "protectedSignal": 0,
+      "alreadyAborted": 0
+    },
+    "nodeCompatibilityPassed": false
+  },
+  "bothHostContract": {
+    "sameComponentBytes": true,
+    "requestsPerHost": 3,
+    "stockWasmtime": "42.0.1",
+    "officialWash": "2.11.0",
+    "cleanStopAndExit0Required": true,
+    "instanceReuseClaim": false,
+    "currentHostsExecuted": false
+  },
+  "limitations": [
+    "Actual engine/component pins and all artifact-success branches remain absent/unexecuted.",
+    "GC validates combined co-owners only; factory closure also owns the Symbol.",
+    "Fresh getter counterexample remains false parity; Symbol registry/description and request/reset/ALS/process gaps remain.",
+    "Standard HTTP transport is not node:http; no new outgoing/network/filesystem/TLS capability inferred.",
+    "No performance/memory/source-only test is a new runtime compatibility claim."
+  ],
+  "launchGatesUnchanged": {
+    "requiredStartFreeBytes": 2147483648,
+    "stopBelowFreeBytes": 838860800
+  },
+  "nativeBuildComponentGuestHostExecuted": false,
+  "liveNativeCMakeRecipeOrSharedHarnessEdited": false,
+  "oldPacketsEdited": false,
+  "stoppedBranchesResumed": false
+}

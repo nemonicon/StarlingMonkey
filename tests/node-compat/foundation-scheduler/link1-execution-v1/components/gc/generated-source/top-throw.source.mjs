@@ -1,0 +1,1 @@
+import{nextTick}from'starling:test-internal-ticks';nextTick(()=>{throw new Error('TICK_TOP_THROW')});export function run(){return ''}

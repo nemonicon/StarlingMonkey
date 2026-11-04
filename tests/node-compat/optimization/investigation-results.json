@@ -1,0 +1,5002 @@
+{
+  "schema": 1,
+  "node": "v22.14.0",
+  "baselineEngineSha256": "da69618da72315c3b3f20d105708fd625a3b7c0691f49329201036c3c2fd5796",
+  "componentSha256": "60e515a35a4cf072f8577b1d0e3dc9f89c51fe9870898c4f90645005c3dd108f",
+  "facts": {
+    "capturedABDetached": true,
+    "capturedABResizable": true,
+    "uint8FromHex": "function",
+    "uint8ToHex": "function",
+    "productionBrandRejectsPrototypeSpoof": true,
+    "productionBrandRejectsPseudoTaggedU8": true,
+    "ownPropertyBrandObservableAndCopyable": true,
+    "privateStampRejectsSpoof": true,
+    "privateStampHasGenuineObject": true,
+    "privateStampAddsNoReflectableKey": true,
+    "scope": "Factorial stage probes; control objects are Uint8Arrays, not supported alternate Buffers"
+  },
+  "host": "/tmp/starling-node-compat/bench-host-target/release/node-profile-bench-host",
+  "hostSha256": "f7fb77ff16ce765bc0d4f4ac0f095770ee6baee9bf03dbccb3568b1f93b1ca1f",
+  "compilation": {
+    "baselineRssBytes": 2244608,
+    "compileNs": 5131276333,
+    "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+    "component": "/tmp/starling-node-compat/optimization/probes.component.wasm",
+    "engineNs": 3827791,
+    "finalRssBytes": 393576448,
+    "mode": "compile",
+    "peakProcessRssBytes": 393576448,
+    "serializeNs": 4819458,
+    "serializedBytes": 43122752,
+    "settings": {
+      "allocator": "on-demand",
+      "compiler": "Cranelift",
+      "guestHostImports": [],
+      "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+      "optimization": "speed",
+      "parallelCompilation": false,
+      "timingClock": "host std::time::Instant",
+      "wasmtimeCrate": "42.0.1"
+    }
+  },
+  "records": [
+    {
+      "operation": "plain-copy",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2333208,
+        "engineNs": 61083,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              23540666,
+              23404250,
+              23363000,
+              23247959,
+              23218834,
+              23211375,
+              23276292
+            ],
+            "finalRssBytes": 25182208,
+            "firstBatchNs": 23380041,
+            "index": 0,
+            "instantiateNs": 32375,
+            "instantiatedRssBytes": 23035904,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25182208,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 1090334,
+            "setupRssBytes": 24870912,
+            "warmRssBytes": 25165824
+          },
+          {
+            "batchNs": [
+              23243584,
+              23251959,
+              23239750,
+              23283583,
+              23203958,
+              23178208,
+              23353291
+            ],
+            "finalRssBytes": 25214976,
+            "firstBatchNs": 23343875,
+            "index": 1,
+            "instantiateNs": 26208,
+            "instantiatedRssBytes": 23248896,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25214976,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 487333,
+            "setupRssBytes": 24969216,
+            "warmRssBytes": 25214976
+          },
+          {
+            "batchNs": [
+              23399375,
+              25359875,
+              24539208,
+              24074458,
+              23403583,
+              23265417,
+              23923916
+            ],
+            "finalRssBytes": 25231360,
+            "firstBatchNs": 23410250,
+            "index": 2,
+            "instantiateNs": 27583,
+            "instantiatedRssBytes": 23265280,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25231360,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 460708,
+            "setupRssBytes": 24985600,
+            "warmRssBytes": 25231360
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22970368,
+        "mode": "measure",
+        "operation": "plain-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 23283583,
+        "instanceMedianBatchNs": [
+          23276292,
+          23243584,
+          23923916
+        ],
+        "peakProcessRssBytes": 25231360,
+        "largestLinearMemoryRequestBytes": 9502720
+      }
+    },
+    {
+      "operation": "plain-copy",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2577500,
+        "engineNs": 60875,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              792917,
+              822792,
+              779959,
+              783667,
+              779667,
+              794625,
+              780791
+            ],
+            "finalRssBytes": 36798464,
+            "firstBatchNs": 900167,
+            "index": 0,
+            "instantiateNs": 30292,
+            "instantiatedRssBytes": 23019520,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36798464,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5248625,
+            "setupRssBytes": 24854528,
+            "warmRssBytes": 29179904
+          },
+          {
+            "batchNs": [
+              824250,
+              799042,
+              796000,
+              778542,
+              777583,
+              786958,
+              794625
+            ],
+            "finalRssBytes": 36831232,
+            "firstBatchNs": 861417,
+            "index": 1,
+            "instantiateNs": 30458,
+            "instantiatedRssBytes": 23183360,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36831232,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5039459,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29229056
+          },
+          {
+            "batchNs": [
+              800000,
+              822916,
+              781417,
+              786459,
+              790917,
+              803667,
+              784250
+            ],
+            "finalRssBytes": 36831232,
+            "firstBatchNs": 864792,
+            "index": 2,
+            "instantiateNs": 23500,
+            "instantiatedRssBytes": 23183360,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36831232,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4918334,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29229056
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22937600,
+        "mode": "measure",
+        "operation": "plain-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 790917,
+        "instanceMedianBatchNs": [
+          783667,
+          794625,
+          790917
+        ],
+        "peakProcessRssBytes": 36831232,
+        "largestLinearMemoryRequestBytes": 18415616
+      }
+    },
+    {
+      "operation": "buffer-copy",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2705291,
+        "engineNs": 55333,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              28897000,
+              28842041,
+              27825333,
+              27805333,
+              29005542,
+              27934625,
+              27843583
+            ],
+            "finalRssBytes": 45727744,
+            "firstBatchNs": 29869167,
+            "index": 0,
+            "instantiateNs": 29625,
+            "instantiatedRssBytes": 23052288,
+            "largestLinearMemoryRequestBytes": 45154304,
+            "linearMemoryGrowCalls": 18,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 45727744,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 755083,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 33406976
+          },
+          {
+            "batchNs": [
+              27726209,
+              28395583,
+              27781042,
+              27713125,
+              28704208,
+              27865708,
+              27774375
+            ],
+            "finalRssBytes": 45744128,
+            "firstBatchNs": 27886167,
+            "index": 1,
+            "instantiateNs": 26334,
+            "instantiatedRssBytes": 23265280,
+            "largestLinearMemoryRequestBytes": 45154304,
+            "linearMemoryGrowCalls": 18,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 45744128,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 437625,
+            "setupRssBytes": 24985600,
+            "warmRssBytes": 33439744
+          },
+          {
+            "batchNs": [
+              28012458,
+              28541833,
+              27791250,
+              28224333,
+              28941250,
+              27807125,
+              27905417
+            ],
+            "finalRssBytes": 45776896,
+            "firstBatchNs": 29196500,
+            "index": 2,
+            "instantiateNs": 25792,
+            "instantiatedRssBytes": 23281664,
+            "largestLinearMemoryRequestBytes": 45154304,
+            "linearMemoryGrowCalls": 18,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 45776896,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 408750,
+            "setupRssBytes": 25001984,
+            "warmRssBytes": 33456128
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22970368,
+        "mode": "measure",
+        "operation": "buffer-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 27905417,
+        "instanceMedianBatchNs": [
+          27934625,
+          27781042,
+          28012458
+        ],
+        "peakProcessRssBytes": 45776896,
+        "largestLinearMemoryRequestBytes": 45154304
+      }
+    },
+    {
+      "operation": "buffer-copy",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2325667,
+        "engineNs": 54583,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              814458,
+              815333,
+              798833,
+              816625,
+              806583,
+              819667,
+              812667
+            ],
+            "finalRssBytes": 36847616,
+            "firstBatchNs": 938584,
+            "index": 0,
+            "instantiateNs": 31875,
+            "instantiatedRssBytes": 23068672,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36847616,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4998167,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29229056
+          },
+          {
+            "batchNs": [
+              882375,
+              817083,
+              813292,
+              811000,
+              800750,
+              799125,
+              818083
+            ],
+            "finalRssBytes": 36896768,
+            "firstBatchNs": 863000,
+            "index": 1,
+            "instantiateNs": 23084,
+            "instantiatedRssBytes": 23232512,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36896768,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4716625,
+            "setupRssBytes": 24969216,
+            "warmRssBytes": 29294592
+          },
+          {
+            "batchNs": [
+              843000,
+              831000,
+              826083,
+              821250,
+              804500,
+              798708,
+              810917
+            ],
+            "finalRssBytes": 36929536,
+            "firstBatchNs": 861125,
+            "index": 2,
+            "instantiateNs": 21542,
+            "instantiatedRssBytes": 23265280,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36929536,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4649084,
+            "setupRssBytes": 24985600,
+            "warmRssBytes": 29310976
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22986752,
+        "mode": "measure",
+        "operation": "buffer-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 814458,
+        "instanceMedianBatchNs": [
+          814458,
+          813292,
+          821250
+        ],
+        "peakProcessRssBytes": 36929536,
+        "largestLinearMemoryRequestBytes": 18415616
+      }
+    },
+    {
+      "operation": "weak-copy",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2604292,
+        "engineNs": 51291,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              26801083,
+              25966584,
+              25800375,
+              25740209,
+              26712292,
+              26316833,
+              26183792
+            ],
+            "finalRssBytes": 25346048,
+            "firstBatchNs": 26258209,
+            "index": 0,
+            "instantiateNs": 28625,
+            "instantiatedRssBytes": 23003136,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25346048,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 671791,
+            "setupRssBytes": 24838144,
+            "warmRssBytes": 25329664
+          },
+          {
+            "batchNs": [
+              25718834,
+              25727292,
+              25919375,
+              27228666,
+              26848208,
+              25943250,
+              25744708
+            ],
+            "finalRssBytes": 25362432,
+            "firstBatchNs": 26144917,
+            "index": 1,
+            "instantiateNs": 29583,
+            "instantiatedRssBytes": 23199744,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25362432,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 490958,
+            "setupRssBytes": 24920064,
+            "warmRssBytes": 25362432
+          },
+          {
+            "batchNs": [
+              25865709,
+              25794209,
+              25791000,
+              25730791,
+              25843042,
+              25904750,
+              25869125
+            ],
+            "finalRssBytes": 25378816,
+            "firstBatchNs": 26009625,
+            "index": 2,
+            "instantiateNs": 33958,
+            "instantiatedRssBytes": 23216128,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25378816,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 439250,
+            "setupRssBytes": 24936448,
+            "warmRssBytes": 25378816
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22904832,
+        "mode": "measure",
+        "operation": "weak-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 25869125,
+        "instanceMedianBatchNs": [
+          26183792,
+          25919375,
+          25843042
+        ],
+        "peakProcessRssBytes": 25378816,
+        "largestLinearMemoryRequestBytes": 9502720
+      }
+    },
+    {
+      "operation": "weak-copy",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 3499458,
+        "engineNs": 53167,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              822292,
+              841084,
+              784833,
+              795416,
+              795792,
+              812917,
+              793916
+            ],
+            "finalRssBytes": 36880384,
+            "firstBatchNs": 878958,
+            "index": 0,
+            "instantiateNs": 31500,
+            "instantiatedRssBytes": 23003136,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36880384,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4971958,
+            "setupRssBytes": 24838144,
+            "warmRssBytes": 29212672
+          },
+          {
+            "batchNs": [
+              836958,
+              830042,
+              808084,
+              803542,
+              790417,
+              791292,
+              807209
+            ],
+            "finalRssBytes": 36913152,
+            "firstBatchNs": 868375,
+            "index": 1,
+            "instantiateNs": 20458,
+            "instantiatedRssBytes": 23166976,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36913152,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4643791,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29278208
+          },
+          {
+            "batchNs": [
+              831541,
+              821917,
+              828584,
+              790125,
+              797875,
+              795250,
+              810208
+            ],
+            "finalRssBytes": 36929536,
+            "firstBatchNs": 875791,
+            "index": 2,
+            "instantiateNs": 19083,
+            "instantiatedRssBytes": 23199744,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36929536,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4641000,
+            "setupRssBytes": 24920064,
+            "warmRssBytes": 29294592
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22921216,
+        "mode": "measure",
+        "operation": "weak-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 807209,
+        "instanceMedianBatchNs": [
+          795792,
+          807209,
+          810208
+        ],
+        "peakProcessRssBytes": 36929536,
+        "largestLinearMemoryRequestBytes": 18481152
+      }
+    },
+    {
+      "operation": "prototype-copy",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2999834,
+        "engineNs": 57167,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              26961292,
+              26629875,
+              27177541,
+              26207208,
+              26143375,
+              26216292,
+              26154541
+            ],
+            "finalRssBytes": 25198592,
+            "firstBatchNs": 28720208,
+            "index": 0,
+            "instantiateNs": 38875,
+            "instantiatedRssBytes": 23052288,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25198592,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 851459,
+            "setupRssBytes": 24887296,
+            "warmRssBytes": 25182208
+          },
+          {
+            "batchNs": [
+              27480167,
+              27452750,
+              26347958,
+              26246416,
+              26204583,
+              26349917,
+              26577666
+            ],
+            "finalRssBytes": 25247744,
+            "firstBatchNs": 26204500,
+            "index": 1,
+            "instantiateNs": 37333,
+            "instantiatedRssBytes": 23265280,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25247744,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 448875,
+            "setupRssBytes": 25001984,
+            "warmRssBytes": 25247744
+          },
+          {
+            "batchNs": [
+              27183625,
+              26207042,
+              26217208,
+              26163000,
+              26294958,
+              26172125,
+              26139292
+            ],
+            "finalRssBytes": 25264128,
+            "firstBatchNs": 26313042,
+            "index": 2,
+            "instantiateNs": 37417,
+            "instantiatedRssBytes": 23298048,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25264128,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 479042,
+            "setupRssBytes": 25018368,
+            "warmRssBytes": 25264128
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22970368,
+        "mode": "measure",
+        "operation": "prototype-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 26246416,
+        "instanceMedianBatchNs": [
+          26216292,
+          26349917,
+          26207042
+        ],
+        "peakProcessRssBytes": 25264128,
+        "largestLinearMemoryRequestBytes": 9502720
+      }
+    },
+    {
+      "operation": "prototype-copy",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 3794875,
+        "engineNs": 60875,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              877708,
+              845583,
+              847792,
+              812958,
+              814541,
+              824625,
+              831833
+            ],
+            "finalRssBytes": 36782080,
+            "firstBatchNs": 896250,
+            "index": 0,
+            "instantiateNs": 32333,
+            "instantiatedRssBytes": 22986752,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36782080,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5058792,
+            "setupRssBytes": 24821760,
+            "warmRssBytes": 29147136
+          },
+          {
+            "batchNs": [
+              863334,
+              831750,
+              834209,
+              835584,
+              811542,
+              813875,
+              827083
+            ],
+            "finalRssBytes": 36831232,
+            "firstBatchNs": 888916,
+            "index": 1,
+            "instantiateNs": 21417,
+            "instantiatedRssBytes": 23183360,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36831232,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4740791,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29229056
+          },
+          {
+            "batchNs": [
+              864709,
+              837625,
+              839500,
+              815625,
+              821333,
+              822625,
+              828750
+            ],
+            "finalRssBytes": 36831232,
+            "firstBatchNs": 884541,
+            "index": 2,
+            "instantiateNs": 16541,
+            "instantiatedRssBytes": 23183360,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36831232,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4663750,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29229056
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22921216,
+        "mode": "measure",
+        "operation": "prototype-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 831750,
+        "instanceMedianBatchNs": [
+          831833,
+          831750,
+          828750
+        ],
+        "peakProcessRssBytes": 36831232,
+        "largestLinearMemoryRequestBytes": 18415616
+      }
+    },
+    {
+      "operation": "buffer-weak-copy",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2798833,
+        "engineNs": 52875,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              33038250,
+              31920042,
+              30799625,
+              31159083,
+              32524958,
+              33069250,
+              32717125
+            ],
+            "finalRssBytes": 55148544,
+            "firstBatchNs": 31143958,
+            "index": 0,
+            "instantiateNs": 27292,
+            "instantiatedRssBytes": 23068672,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55148544,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 741125,
+            "setupRssBytes": 24920064,
+            "warmRssBytes": 35799040
+          },
+          {
+            "batchNs": [
+              31188208,
+              31719459,
+              32289250,
+              30830250,
+              32524708,
+              31981208,
+              30605708
+            ],
+            "finalRssBytes": 55164928,
+            "firstBatchNs": 30856875,
+            "index": 1,
+            "instantiateNs": 31458,
+            "instantiatedRssBytes": 23281664,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55164928,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 444708,
+            "setupRssBytes": 25001984,
+            "warmRssBytes": 35831808
+          },
+          {
+            "batchNs": [
+              31202791,
+              32503375,
+              31155875,
+              31013750,
+              32562709,
+              31867625,
+              30807125
+            ],
+            "finalRssBytes": 55164928,
+            "firstBatchNs": 30905791,
+            "index": 2,
+            "instantiateNs": 29667,
+            "instantiatedRssBytes": 23281664,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55164928,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 449500,
+            "setupRssBytes": 25001984,
+            "warmRssBytes": 35831808
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22986752,
+        "mode": "measure",
+        "operation": "buffer-weak-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 31867625,
+        "instanceMedianBatchNs": [
+          32524958,
+          31719459,
+          31202791
+        ],
+        "peakProcessRssBytes": 55164928,
+        "largestLinearMemoryRequestBytes": 51445760
+      }
+    },
+    {
+      "operation": "buffer-weak-copy",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2459458,
+        "engineNs": 57500,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              877667,
+              889333,
+              850083,
+              860584,
+              901375,
+              872208,
+              868500
+            ],
+            "finalRssBytes": 36880384,
+            "firstBatchNs": 953583,
+            "index": 0,
+            "instantiateNs": 28292,
+            "instantiatedRssBytes": 23003136,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36880384,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5159250,
+            "setupRssBytes": 24838144,
+            "warmRssBytes": 29212672
+          },
+          {
+            "batchNs": [
+              884584,
+              898333,
+              855625,
+              854875,
+              854958,
+              871125,
+              904666
+            ],
+            "finalRssBytes": 36913152,
+            "firstBatchNs": 930000,
+            "index": 1,
+            "instantiateNs": 17500,
+            "instantiatedRssBytes": 23183360,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36913152,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4790583,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29278208
+          },
+          {
+            "batchNs": [
+              867709,
+              885917,
+              851334,
+              851500,
+              851167,
+              867333,
+              860291
+            ],
+            "finalRssBytes": 36929536,
+            "firstBatchNs": 931792,
+            "index": 2,
+            "instantiateNs": 18958,
+            "instantiatedRssBytes": 23199744,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36929536,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4670792,
+            "setupRssBytes": 24920064,
+            "warmRssBytes": 29294592
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22937600,
+        "mode": "measure",
+        "operation": "buffer-weak-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 867709,
+        "instanceMedianBatchNs": [
+          872208,
+          871125,
+          860291
+        ],
+        "peakProcessRssBytes": 36929536,
+        "largestLinearMemoryRequestBytes": 18481152
+      }
+    },
+    {
+      "operation": "buffer-prototype-copy",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 3816750,
+        "engineNs": 52125,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              31749917,
+              32135209,
+              31239166,
+              31367625,
+              33289542,
+              32209333,
+              31393125
+            ],
+            "finalRssBytes": 45678592,
+            "firstBatchNs": 32017208,
+            "index": 0,
+            "instantiateNs": 29083,
+            "instantiatedRssBytes": 23019520,
+            "largestLinearMemoryRequestBytes": 45154304,
+            "linearMemoryGrowCalls": 18,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 45678592,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 720084,
+            "setupRssBytes": 24854528,
+            "warmRssBytes": 33357824
+          },
+          {
+            "batchNs": [
+              30693250,
+              31270708,
+              30762875,
+              31240709,
+              31699958,
+              30941584,
+              30772834
+            ],
+            "finalRssBytes": 45694976,
+            "firstBatchNs": 33516167,
+            "index": 1,
+            "instantiateNs": 29500,
+            "instantiatedRssBytes": 23216128,
+            "largestLinearMemoryRequestBytes": 45154304,
+            "linearMemoryGrowCalls": 18,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 45694976,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 503083,
+            "setupRssBytes": 24936448,
+            "warmRssBytes": 33390592
+          },
+          {
+            "batchNs": [
+              30745333,
+              31300875,
+              30740417,
+              30660333,
+              31629750,
+              31277208,
+              32554584
+            ],
+            "finalRssBytes": 45711360,
+            "firstBatchNs": 31160583,
+            "index": 2,
+            "instantiateNs": 27750,
+            "instantiatedRssBytes": 23216128,
+            "largestLinearMemoryRequestBytes": 45154304,
+            "linearMemoryGrowCalls": 18,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 45711360,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 463542,
+            "setupRssBytes": 24952832,
+            "warmRssBytes": 33406976
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22921216,
+        "mode": "measure",
+        "operation": "buffer-prototype-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 31277208,
+        "instanceMedianBatchNs": [
+          31749917,
+          30941584,
+          31277208
+        ],
+        "peakProcessRssBytes": 45711360,
+        "largestLinearMemoryRequestBytes": 45154304
+      }
+    },
+    {
+      "operation": "buffer-prototype-copy",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2519875,
+        "engineNs": 60625,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              917250,
+              916625,
+              886125,
+              911333,
+              881917,
+              878042,
+              881500
+            ],
+            "finalRssBytes": 36798464,
+            "firstBatchNs": 1000125,
+            "index": 0,
+            "instantiateNs": 34041,
+            "instantiatedRssBytes": 23019520,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36798464,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5271209,
+            "setupRssBytes": 24854528,
+            "warmRssBytes": 29179904
+          },
+          {
+            "batchNs": [
+              929458,
+              898375,
+              908958,
+              897208,
+              877083,
+              878208,
+              885458
+            ],
+            "finalRssBytes": 36831232,
+            "firstBatchNs": 956667,
+            "index": 1,
+            "instantiateNs": 24833,
+            "instantiatedRssBytes": 23183360,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36831232,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4756334,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29229056
+          },
+          {
+            "batchNs": [
+              884875,
+              884625,
+              887750,
+              876166,
+              913417,
+              876250,
+              875250
+            ],
+            "finalRssBytes": 36831232,
+            "firstBatchNs": 945209,
+            "index": 2,
+            "instantiateNs": 18459,
+            "instantiatedRssBytes": 23183360,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36831232,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4824958,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29229056
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22937600,
+        "mode": "measure",
+        "operation": "buffer-prototype-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 885458,
+        "instanceMedianBatchNs": [
+          886125,
+          897208,
+          884625
+        ],
+        "peakProcessRssBytes": 36831232,
+        "largestLinearMemoryRequestBytes": 18415616
+      }
+    },
+    {
+      "operation": "prototype-weak-copy",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 4006833,
+        "engineNs": 60708,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              28634708,
+              28702041,
+              28699750,
+              28496917,
+              28792833,
+              28634166,
+              29030959
+            ],
+            "finalRssBytes": 25362432,
+            "firstBatchNs": 28763125,
+            "index": 0,
+            "instantiateNs": 27750,
+            "instantiatedRssBytes": 23019520,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25362432,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 683541,
+            "setupRssBytes": 24854528,
+            "warmRssBytes": 25346048
+          },
+          {
+            "batchNs": [
+              28791583,
+              28728417,
+              28637291,
+              28546125,
+              28593667,
+              28684834,
+              28678958
+            ],
+            "finalRssBytes": 25411584,
+            "firstBatchNs": 29004625,
+            "index": 1,
+            "instantiateNs": 23375,
+            "instantiatedRssBytes": 23232512,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25411584,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 401458,
+            "setupRssBytes": 24969216,
+            "warmRssBytes": 25411584
+          },
+          {
+            "batchNs": [
+              30077667,
+              29326875,
+              28822833,
+              29033167,
+              28598709,
+              28509417,
+              28651458
+            ],
+            "finalRssBytes": 25411584,
+            "firstBatchNs": 28821875,
+            "index": 2,
+            "instantiateNs": 29084,
+            "instantiatedRssBytes": 23248896,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25411584,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 408625,
+            "setupRssBytes": 24969216,
+            "warmRssBytes": 25411584
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22937600,
+        "mode": "measure",
+        "operation": "prototype-weak-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 28684834,
+        "instanceMedianBatchNs": [
+          28699750,
+          28678958,
+          28822833
+        ],
+        "peakProcessRssBytes": 25411584,
+        "largestLinearMemoryRequestBytes": 9502720
+      }
+    },
+    {
+      "operation": "prototype-weak-copy",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2342750,
+        "engineNs": 54375,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              959166,
+              1005083,
+              892209,
+              979792,
+              923083,
+              915292,
+              897625
+            ],
+            "finalRssBytes": 36880384,
+            "firstBatchNs": 1029625,
+            "index": 0,
+            "instantiateNs": 37250,
+            "instantiatedRssBytes": 23003136,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36880384,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5209750,
+            "setupRssBytes": 24838144,
+            "warmRssBytes": 29212672
+          },
+          {
+            "batchNs": [
+              918584,
+              907167,
+              879208,
+              895416,
+              865917,
+              881584,
+              878500
+            ],
+            "finalRssBytes": 36913152,
+            "firstBatchNs": 943834,
+            "index": 1,
+            "instantiateNs": 25750,
+            "instantiatedRssBytes": 23166976,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36913152,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4714459,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29278208
+          },
+          {
+            "batchNs": [
+              904375,
+              894084,
+              868042,
+              858958,
+              860083,
+              870333,
+              875500
+            ],
+            "finalRssBytes": 36929536,
+            "firstBatchNs": 945750,
+            "index": 2,
+            "instantiateNs": 17709,
+            "instantiatedRssBytes": 23199744,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36929536,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4669333,
+            "setupRssBytes": 24920064,
+            "warmRssBytes": 29294592
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22921216,
+        "mode": "measure",
+        "operation": "prototype-weak-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 894084,
+        "instanceMedianBatchNs": [
+          923083,
+          881584,
+          870333
+        ],
+        "peakProcessRssBytes": 36929536,
+        "largestLinearMemoryRequestBytes": 18481152
+      }
+    },
+    {
+      "operation": "buffer-prototype-weak-copy",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2907958,
+        "engineNs": 59333,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              36687250,
+              36347625,
+              34121458,
+              35053584,
+              36402125,
+              36430334,
+              34603833
+            ],
+            "finalRssBytes": 55115776,
+            "firstBatchNs": 34419958,
+            "index": 0,
+            "instantiateNs": 29208,
+            "instantiatedRssBytes": 23052288,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55115776,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 737625,
+            "setupRssBytes": 24887296,
+            "warmRssBytes": 35766272
+          },
+          {
+            "batchNs": [
+              33987625,
+              36446208,
+              34464875,
+              34450625,
+              35670584,
+              34639834,
+              33675958
+            ],
+            "finalRssBytes": 55164928,
+            "firstBatchNs": 34417250,
+            "index": 1,
+            "instantiateNs": 36625,
+            "instantiatedRssBytes": 23265280,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55164928,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 454875,
+            "setupRssBytes": 25001984,
+            "warmRssBytes": 35831808
+          },
+          {
+            "batchNs": [
+              34013875,
+              34620291,
+              33578459,
+              33549084,
+              35519041,
+              34704042,
+              33911125
+            ],
+            "finalRssBytes": 55164928,
+            "firstBatchNs": 34262833,
+            "index": 2,
+            "instantiateNs": 31083,
+            "instantiatedRssBytes": 23281664,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55164928,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 437208,
+            "setupRssBytes": 25001984,
+            "warmRssBytes": 35831808
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22970368,
+        "mode": "measure",
+        "operation": "buffer-prototype-weak-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 34620291,
+        "instanceMedianBatchNs": [
+          36347625,
+          34464875,
+          34013875
+        ],
+        "peakProcessRssBytes": 55164928,
+        "largestLinearMemoryRequestBytes": 51445760
+      }
+    },
+    {
+      "operation": "buffer-prototype-weak-copy",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 3860292,
+        "engineNs": 53541,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              954083,
+              981375,
+              932834,
+              932000,
+              925292,
+              930708,
+              928333
+            ],
+            "finalRssBytes": 36929536,
+            "firstBatchNs": 1027834,
+            "index": 0,
+            "instantiateNs": 32084,
+            "instantiatedRssBytes": 23068672,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36929536,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4969583,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29278208
+          },
+          {
+            "batchNs": [
+              938375,
+              960791,
+              925500,
+              929625,
+              929875,
+              931708,
+              931708
+            ],
+            "finalRssBytes": 36962304,
+            "firstBatchNs": 1016208,
+            "index": 1,
+            "instantiateNs": 21708,
+            "instantiatedRssBytes": 23232512,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36962304,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4705958,
+            "setupRssBytes": 24952832,
+            "warmRssBytes": 29327360
+          },
+          {
+            "batchNs": [
+              949333,
+              958958,
+              921750,
+              934084,
+              927042,
+              968250,
+              931292
+            ],
+            "finalRssBytes": 36962304,
+            "firstBatchNs": 1009166,
+            "index": 2,
+            "instantiateNs": 18125,
+            "instantiatedRssBytes": 23232512,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36962304,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4700167,
+            "setupRssBytes": 24952832,
+            "warmRssBytes": 29327360
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 23003136,
+        "mode": "measure",
+        "operation": "buffer-prototype-weak-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 931708,
+        "instanceMedianBatchNs": [
+          932000,
+          931708,
+          934084
+        ],
+        "peakProcessRssBytes": 36962304,
+        "largestLinearMemoryRequestBytes": 18481152
+      }
+    },
+    {
+      "operation": "source-checked-copy",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 3052000,
+        "engineNs": 51500,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              65462417,
+              65888959,
+              64577083,
+              64876125,
+              63514958,
+              62891792,
+              62363583
+            ],
+            "finalRssBytes": 25116672,
+            "firstBatchNs": 62816208,
+            "index": 0,
+            "instantiateNs": 29125,
+            "instantiatedRssBytes": 22970368,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25116672,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 678375,
+            "setupRssBytes": 24805376,
+            "warmRssBytes": 25100288
+          },
+          {
+            "batchNs": [
+              62560917,
+              62359708,
+              62583416,
+              64585584,
+              65714000,
+              63557084,
+              64509459
+            ],
+            "finalRssBytes": 25149440,
+            "firstBatchNs": 62539458,
+            "index": 1,
+            "instantiateNs": 29208,
+            "instantiatedRssBytes": 23183360,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25149440,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 460625,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 25149440
+          },
+          {
+            "batchNs": [
+              64146250,
+              65642875,
+              64658667,
+              64278459,
+              63264167,
+              62367834,
+              62533083
+            ],
+            "finalRssBytes": 25198592,
+            "firstBatchNs": 65917916,
+            "index": 2,
+            "instantiateNs": 34625,
+            "instantiatedRssBytes": 23216128,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25198592,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 471834,
+            "setupRssBytes": 24952832,
+            "warmRssBytes": 25198592
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22888448,
+        "mode": "measure",
+        "operation": "source-checked-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 64146250,
+        "instanceMedianBatchNs": [
+          64577083,
+          63557084,
+          64146250
+        ],
+        "peakProcessRssBytes": 25198592,
+        "largestLinearMemoryRequestBytes": 9502720
+      }
+    },
+    {
+      "operation": "source-checked-copy",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2476417,
+        "engineNs": 61000,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              1766208,
+              1775583,
+              1788417,
+              1786083,
+              1818458,
+              1810916,
+              1812459
+            ],
+            "finalRssBytes": 36798464,
+            "firstBatchNs": 1811667,
+            "index": 0,
+            "instantiateNs": 29542,
+            "instantiatedRssBytes": 23003136,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36798464,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4948625,
+            "setupRssBytes": 24854528,
+            "warmRssBytes": 29179904
+          },
+          {
+            "batchNs": [
+              1926708,
+              1840083,
+              1791958,
+              1901292,
+              1854291,
+              1864583,
+              1934083
+            ],
+            "finalRssBytes": 36831232,
+            "firstBatchNs": 1951625,
+            "index": 1,
+            "instantiateNs": 26208,
+            "instantiatedRssBytes": 23166976,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36831232,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4988833,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29229056
+          },
+          {
+            "batchNs": [
+              1874833,
+              1871958,
+              1997958,
+              1887959,
+              1900625,
+              1849333,
+              1874292
+            ],
+            "finalRssBytes": 36831232,
+            "firstBatchNs": 1874458,
+            "index": 2,
+            "instantiateNs": 26500,
+            "instantiatedRssBytes": 23183360,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36831232,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4869166,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29229056
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22921216,
+        "mode": "measure",
+        "operation": "source-checked-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 1854291,
+        "instanceMedianBatchNs": [
+          1788417,
+          1864583,
+          1874833
+        ],
+        "peakProcessRssBytes": 36831232,
+        "largestLinearMemoryRequestBytes": 18415616
+      }
+    },
+    {
+      "operation": "output-checked-copy",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2597250,
+        "engineNs": 58583,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              63974875,
+              64723792,
+              63943750,
+              63947750,
+              64873792,
+              64088417,
+              63891667
+            ],
+            "finalRssBytes": 45727744,
+            "firstBatchNs": 65667917,
+            "index": 0,
+            "instantiateNs": 32958,
+            "instantiatedRssBytes": 23068672,
+            "largestLinearMemoryRequestBytes": 45154304,
+            "linearMemoryGrowCalls": 18,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 45727744,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 777250,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 33406976
+          },
+          {
+            "batchNs": [
+              64118958,
+              64462083,
+              63921833,
+              63788125,
+              68725875,
+              66089166,
+              66255958
+            ],
+            "finalRssBytes": 45760512,
+            "firstBatchNs": 64503042,
+            "index": 1,
+            "instantiateNs": 35791,
+            "instantiatedRssBytes": 23281664,
+            "largestLinearMemoryRequestBytes": 45154304,
+            "linearMemoryGrowCalls": 18,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 45760512,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 478458,
+            "setupRssBytes": 25001984,
+            "warmRssBytes": 33456128
+          },
+          {
+            "batchNs": [
+              68333875,
+              65913667,
+              65631334,
+              65720334,
+              66688625,
+              67207959,
+              68155125
+            ],
+            "finalRssBytes": 45760512,
+            "firstBatchNs": 64950333,
+            "index": 2,
+            "instantiateNs": 32709,
+            "instantiatedRssBytes": 23281664,
+            "largestLinearMemoryRequestBytes": 45154304,
+            "linearMemoryGrowCalls": 18,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 45760512,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 477084,
+            "setupRssBytes": 25001984,
+            "warmRssBytes": 33456128
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 23003136,
+        "mode": "measure",
+        "operation": "output-checked-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 64873792,
+        "instanceMedianBatchNs": [
+          63974875,
+          64462083,
+          66688625
+        ],
+        "peakProcessRssBytes": 45760512,
+        "largestLinearMemoryRequestBytes": 45154304
+      }
+    },
+    {
+      "operation": "output-checked-copy",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2661583,
+        "engineNs": 61708,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              1841791,
+              1927458,
+              1870875,
+              1796209,
+              1778291,
+              1959542,
+              1778125
+            ],
+            "finalRssBytes": 36814848,
+            "firstBatchNs": 1940625,
+            "index": 0,
+            "instantiateNs": 37833,
+            "instantiatedRssBytes": 23035904,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36814848,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5237667,
+            "setupRssBytes": 24870912,
+            "warmRssBytes": 29196288
+          },
+          {
+            "batchNs": [
+              1772541,
+              1748208,
+              1784791,
+              1774042,
+              1776875,
+              1766583,
+              1748292
+            ],
+            "finalRssBytes": 36847616,
+            "firstBatchNs": 1867541,
+            "index": 1,
+            "instantiateNs": 24000,
+            "instantiatedRssBytes": 23183360,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36847616,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4829166,
+            "setupRssBytes": 24920064,
+            "warmRssBytes": 29245440
+          },
+          {
+            "batchNs": [
+              1834667,
+              1783083,
+              1860208,
+              1813500,
+              1809083,
+              1780458,
+              1808000
+            ],
+            "finalRssBytes": 36847616,
+            "firstBatchNs": 1779625,
+            "index": 2,
+            "instantiateNs": 21542,
+            "instantiatedRssBytes": 23199744,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36847616,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4699166,
+            "setupRssBytes": 24920064,
+            "warmRssBytes": 29245440
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22953984,
+        "mode": "measure",
+        "operation": "output-checked-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 1784791,
+        "instanceMedianBatchNs": [
+          1841791,
+          1772541,
+          1809083
+        ],
+        "peakProcessRssBytes": 36847616,
+        "largestLinearMemoryRequestBytes": 18415616
+      }
+    },
+    {
+      "operation": "own-property-brand-copy",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2510125,
+        "engineNs": 52750,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              49820375,
+              49788625,
+              49804000,
+              50079625,
+              50289666,
+              51839459,
+              51131667
+            ],
+            "finalRssBytes": 25149440,
+            "firstBatchNs": 50316541,
+            "index": 0,
+            "instantiateNs": 27083,
+            "instantiatedRssBytes": 23003136,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25149440,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 724375,
+            "setupRssBytes": 24838144,
+            "warmRssBytes": 25133056
+          },
+          {
+            "batchNs": [
+              49913500,
+              49862416,
+              49866583,
+              49978083,
+              49892584,
+              49839209,
+              49901917
+            ],
+            "finalRssBytes": 25165824,
+            "firstBatchNs": 50134000,
+            "index": 1,
+            "instantiateNs": 35583,
+            "instantiatedRssBytes": 23199744,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25165824,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 452625,
+            "setupRssBytes": 24920064,
+            "warmRssBytes": 25165824
+          },
+          {
+            "batchNs": [
+              50081291,
+              50324000,
+              50012417,
+              51445625,
+              51797333,
+              50046916,
+              51746041
+            ],
+            "finalRssBytes": 25182208,
+            "firstBatchNs": 50129000,
+            "index": 2,
+            "instantiateNs": 22583,
+            "instantiatedRssBytes": 23216128,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25182208,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 436875,
+            "setupRssBytes": 24936448,
+            "warmRssBytes": 25182208
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22904832,
+        "mode": "measure",
+        "operation": "own-property-brand-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 50012417,
+        "instanceMedianBatchNs": [
+          50079625,
+          49892584,
+          50324000
+        ],
+        "peakProcessRssBytes": 25182208,
+        "largestLinearMemoryRequestBytes": 9502720
+      }
+    },
+    {
+      "operation": "own-property-brand-copy",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2363125,
+        "engineNs": 55041,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              1496584,
+              1441625,
+              1734917,
+              1422625,
+              1434334,
+              1433500,
+              1465958
+            ],
+            "finalRssBytes": 37076992,
+            "firstBatchNs": 1552375,
+            "index": 0,
+            "instantiateNs": 28958,
+            "instantiatedRssBytes": 23019520,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 37076992,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5033458,
+            "setupRssBytes": 24854528,
+            "warmRssBytes": 29294592
+          },
+          {
+            "batchNs": [
+              1477292,
+              1452042,
+              1713459,
+              1440375,
+              1472000,
+              1430500,
+              1446375
+            ],
+            "finalRssBytes": 37109760,
+            "firstBatchNs": 1501541,
+            "index": 1,
+            "instantiateNs": 22125,
+            "instantiatedRssBytes": 23216128,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 37109760,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4710958,
+            "setupRssBytes": 24952832,
+            "warmRssBytes": 29392896
+          },
+          {
+            "batchNs": [
+              1508792,
+              1527959,
+              1735833,
+              1441042,
+              1458791,
+              1525625,
+              1637375
+            ],
+            "finalRssBytes": 37126144,
+            "firstBatchNs": 1492333,
+            "index": 2,
+            "instantiateNs": 20958,
+            "instantiatedRssBytes": 23248896,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 37126144,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4702292,
+            "setupRssBytes": 24969216,
+            "warmRssBytes": 29409280
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22937600,
+        "mode": "measure",
+        "operation": "own-property-brand-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 1465958,
+        "instanceMedianBatchNs": [
+          1441625,
+          1452042,
+          1525625
+        ],
+        "peakProcessRssBytes": 37126144,
+        "largestLinearMemoryRequestBytes": 18415616
+      }
+    },
+    {
+      "operation": "private-field-brand-copy",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2489458,
+        "engineNs": 61208,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              38708459,
+              38445792,
+              38394542,
+              38478583,
+              38323917,
+              38349375,
+              38339917
+            ],
+            "finalRssBytes": 25149440,
+            "firstBatchNs": 38504750,
+            "index": 0,
+            "instantiateNs": 31125,
+            "instantiatedRssBytes": 22986752,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25149440,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 781541,
+            "setupRssBytes": 24821760,
+            "warmRssBytes": 25116672
+          },
+          {
+            "batchNs": [
+              39842166,
+              38617083,
+              38351583,
+              38417042,
+              38375625,
+              38423334,
+              38421875
+            ],
+            "finalRssBytes": 25198592,
+            "firstBatchNs": 38946917,
+            "index": 1,
+            "instantiateNs": 37125,
+            "instantiatedRssBytes": 23232512,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25198592,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 598584,
+            "setupRssBytes": 24952832,
+            "warmRssBytes": 25198592
+          },
+          {
+            "batchNs": [
+              38453500,
+              38424834,
+              38295250,
+              38334667,
+              38406417,
+              38484791,
+              38409042
+            ],
+            "finalRssBytes": 25198592,
+            "firstBatchNs": 38566209,
+            "index": 2,
+            "instantiateNs": 51333,
+            "instantiatedRssBytes": 23232512,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25198592,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 464459,
+            "setupRssBytes": 24952832,
+            "warmRssBytes": 25198592
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22921216,
+        "mode": "measure",
+        "operation": "private-field-brand-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 38417042,
+        "instanceMedianBatchNs": [
+          38394542,
+          38421875,
+          38409042
+        ],
+        "peakProcessRssBytes": 25198592,
+        "largestLinearMemoryRequestBytes": 9502720
+      }
+    },
+    {
+      "operation": "private-field-brand-copy",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2566583,
+        "engineNs": 60667,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              1399375,
+              1139333,
+              1149917,
+              1156916,
+              1330667,
+              1135958,
+              1186542
+            ],
+            "finalRssBytes": 37126144,
+            "firstBatchNs": 1215042,
+            "index": 0,
+            "instantiateNs": 29500,
+            "instantiatedRssBytes": 23003136,
+            "largestLinearMemoryRequestBytes": 18350080,
+            "linearMemoryGrowCalls": 136,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 37126144,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5009959,
+            "setupRssBytes": 24838144,
+            "warmRssBytes": 29343744
+          },
+          {
+            "batchNs": [
+              1347875,
+              1143041,
+              1148625,
+              1137250,
+              1300833,
+              1127292,
+              1153250
+            ],
+            "finalRssBytes": 37158912,
+            "firstBatchNs": 1193041,
+            "index": 1,
+            "instantiateNs": 26083,
+            "instantiatedRssBytes": 23232512,
+            "largestLinearMemoryRequestBytes": 18350080,
+            "linearMemoryGrowCalls": 136,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 37158912,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4680750,
+            "setupRssBytes": 24952832,
+            "warmRssBytes": 29458432
+          },
+          {
+            "batchNs": [
+              1341417,
+              1129458,
+              1145208,
+              1136042,
+              1294625,
+              1143417,
+              1158000
+            ],
+            "finalRssBytes": 37175296,
+            "firstBatchNs": 1190125,
+            "index": 2,
+            "instantiateNs": 22583,
+            "instantiatedRssBytes": 23248896,
+            "largestLinearMemoryRequestBytes": 18350080,
+            "linearMemoryGrowCalls": 136,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 37175296,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4667750,
+            "setupRssBytes": 24969216,
+            "warmRssBytes": 29474816
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22937600,
+        "mode": "measure",
+        "operation": "private-field-brand-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 1149917,
+        "instanceMedianBatchNs": [
+          1156916,
+          1148625,
+          1145208
+        ],
+        "peakProcessRssBytes": 37175296,
+        "largestLinearMemoryRequestBytes": 18350080
+      }
+    },
+    {
+      "operation": "both-checked-tagged-copy",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2974333,
+        "engineNs": 59667,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              118296333,
+              117317875,
+              113833875,
+              120615792,
+              130089042,
+              121355125,
+              117826792
+            ],
+            "finalRssBytes": 55083008,
+            "firstBatchNs": 116890542,
+            "index": 0,
+            "instantiateNs": 31833,
+            "instantiatedRssBytes": 23019520,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55083008,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 714375,
+            "setupRssBytes": 24854528,
+            "warmRssBytes": 35733504
+          },
+          {
+            "batchNs": [
+              118250083,
+              122536792,
+              120107833,
+              118227958,
+              125153000,
+              120669042,
+              116658333
+            ],
+            "finalRssBytes": 55115776,
+            "firstBatchNs": 119469416,
+            "index": 1,
+            "instantiateNs": 35500,
+            "instantiatedRssBytes": 23216128,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55115776,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 501166,
+            "setupRssBytes": 24952832,
+            "warmRssBytes": 35782656
+          },
+          {
+            "batchNs": [
+              121712417,
+              124341500,
+              123110416,
+              122434333,
+              126071084,
+              118893083,
+              119342792
+            ],
+            "finalRssBytes": 55132160,
+            "firstBatchNs": 122116084,
+            "index": 2,
+            "instantiateNs": 34583,
+            "instantiatedRssBytes": 23248896,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55132160,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 548875,
+            "setupRssBytes": 24969216,
+            "warmRssBytes": 35799040
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22921216,
+        "mode": "measure",
+        "operation": "both-checked-tagged-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 120615792,
+        "instanceMedianBatchNs": [
+          118296333,
+          120107833,
+          122434333
+        ],
+        "peakProcessRssBytes": 55132160,
+        "largestLinearMemoryRequestBytes": 51445760
+      }
+    },
+    {
+      "operation": "both-checked-tagged-copy",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2657667,
+        "engineNs": 56292,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              3114875,
+              3137083,
+              3097792,
+              3224042,
+              3089084,
+              3115709,
+              3173500
+            ],
+            "finalRssBytes": 36880384,
+            "firstBatchNs": 3225583,
+            "index": 0,
+            "instantiateNs": 29208,
+            "instantiatedRssBytes": 23019520,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36880384,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5304875,
+            "setupRssBytes": 24854528,
+            "warmRssBytes": 29229056
+          },
+          {
+            "batchNs": [
+              3199166,
+              3132708,
+              3297042,
+              3092792,
+              3192208,
+              3118000,
+              3068917
+            ],
+            "finalRssBytes": 36896768,
+            "firstBatchNs": 3293084,
+            "index": 1,
+            "instantiateNs": 26167,
+            "instantiatedRssBytes": 23166976,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36896768,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5084459,
+            "setupRssBytes": 24887296,
+            "warmRssBytes": 29261824
+          },
+          {
+            "batchNs": [
+              3166417,
+              3189792,
+              3074791,
+              3078292,
+              3048041,
+              3060333,
+              3097500
+            ],
+            "finalRssBytes": 36913152,
+            "firstBatchNs": 3286000,
+            "index": 2,
+            "instantiateNs": 28625,
+            "instantiatedRssBytes": 23166976,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36913152,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4939166,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29278208
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22921216,
+        "mode": "measure",
+        "operation": "both-checked-tagged-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 3115709,
+        "instanceMedianBatchNs": [
+          3115709,
+          3132708,
+          3078292
+        ],
+        "peakProcessRssBytes": 36913152,
+        "largestLinearMemoryRequestBytes": 18481152
+      }
+    },
+    {
+      "operation": "source-checked-trusted-copy",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2487833,
+        "engineNs": 63500,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              70427500,
+              70080625,
+              70180000,
+              69870125,
+              72277417,
+              70287583,
+              70182500
+            ],
+            "finalRssBytes": 25346048,
+            "firstBatchNs": 70699417,
+            "index": 0,
+            "instantiateNs": 31875,
+            "instantiatedRssBytes": 23003136,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25346048,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 776666,
+            "setupRssBytes": 24838144,
+            "warmRssBytes": 25329664
+          },
+          {
+            "batchNs": [
+              72918625,
+              71988083,
+              70034875,
+              70054958,
+              69863667,
+              69804292,
+              73116208
+            ],
+            "finalRssBytes": 25362432,
+            "firstBatchNs": 70986708,
+            "index": 1,
+            "instantiateNs": 29000,
+            "instantiatedRssBytes": 23199744,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25362432,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 467541,
+            "setupRssBytes": 24920064,
+            "warmRssBytes": 25362432
+          },
+          {
+            "batchNs": [
+              71683875,
+              70261208,
+              71046833,
+              70760583,
+              70094750,
+              70035875,
+              70570041
+            ],
+            "finalRssBytes": 25378816,
+            "firstBatchNs": 71541667,
+            "index": 2,
+            "instantiateNs": 37000,
+            "instantiatedRssBytes": 23216128,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25378816,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 504792,
+            "setupRssBytes": 24936448,
+            "warmRssBytes": 25378816
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22904832,
+        "mode": "measure",
+        "operation": "source-checked-trusted-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 70261208,
+        "instanceMedianBatchNs": [
+          70182500,
+          70054958,
+          70570041
+        ],
+        "peakProcessRssBytes": 25378816,
+        "largestLinearMemoryRequestBytes": 9502720
+      }
+    },
+    {
+      "operation": "source-checked-trusted-copy",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 3535542,
+        "engineNs": 56417,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              1954792,
+              2022375,
+              2036750,
+              1983584,
+              2020541,
+              2133500,
+              2122208
+            ],
+            "finalRssBytes": 36864000,
+            "firstBatchNs": 2071500,
+            "index": 0,
+            "instantiateNs": 28041,
+            "instantiatedRssBytes": 23003136,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36864000,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5040250,
+            "setupRssBytes": 24838144,
+            "warmRssBytes": 29212672
+          },
+          {
+            "batchNs": [
+              1946625,
+              1950458,
+              2059583,
+              2133917,
+              2181084,
+              2108708,
+              2115000
+            ],
+            "finalRssBytes": 36880384,
+            "firstBatchNs": 2203584,
+            "index": 1,
+            "instantiateNs": 29250,
+            "instantiatedRssBytes": 23150592,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36880384,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5236917,
+            "setupRssBytes": 24870912,
+            "warmRssBytes": 29245440
+          },
+          {
+            "batchNs": [
+              2082417,
+              2253417,
+              2265709,
+              2073667,
+              2195833,
+              2179625,
+              2162166
+            ],
+            "finalRssBytes": 36896768,
+            "firstBatchNs": 2256666,
+            "index": 2,
+            "instantiateNs": 27000,
+            "instantiatedRssBytes": 23166976,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36896768,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5259500,
+            "setupRssBytes": 24887296,
+            "warmRssBytes": 29261824
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22904832,
+        "mode": "measure",
+        "operation": "source-checked-trusted-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 2108708,
+        "instanceMedianBatchNs": [
+          2022375,
+          2108708,
+          2179625
+        ],
+        "peakProcessRssBytes": 36896768,
+        "largestLinearMemoryRequestBytes": 18481152
+      }
+    },
+    {
+      "operation": "native-copy",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 3093041,
+        "engineNs": 53667,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              127550958,
+              129421666,
+              127001625,
+              127847584,
+              131704917,
+              134729500,
+              133300250
+            ],
+            "finalRssBytes": 55066624,
+            "firstBatchNs": 128759041,
+            "index": 0,
+            "instantiateNs": 32625,
+            "instantiatedRssBytes": 22986752,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55066624,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 1029583,
+            "setupRssBytes": 24821760,
+            "warmRssBytes": 35700736
+          },
+          {
+            "batchNs": [
+              131480208,
+              135366667,
+              129851250,
+              127188792,
+              129430917,
+              130542041,
+              129675916
+            ],
+            "finalRssBytes": 55115776,
+            "firstBatchNs": 128270667,
+            "index": 1,
+            "instantiateNs": 48958,
+            "instantiatedRssBytes": 23232512,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55115776,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 719791,
+            "setupRssBytes": 24952832,
+            "warmRssBytes": 35782656
+          },
+          {
+            "batchNs": [
+              137656625,
+              133337208,
+              128465542,
+              126858125,
+              129577416,
+              130994083,
+              128060250
+            ],
+            "finalRssBytes": 55115776,
+            "firstBatchNs": 128592709,
+            "index": 2,
+            "instantiateNs": 28708,
+            "instantiatedRssBytes": 23232512,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55115776,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 698250,
+            "setupRssBytes": 24952832,
+            "warmRssBytes": 35782656
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22921216,
+        "mode": "measure",
+        "operation": "native-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 129675916,
+        "instanceMedianBatchNs": [
+          129421666,
+          129851250,
+          129577416
+        ],
+        "peakProcessRssBytes": 55115776,
+        "largestLinearMemoryRequestBytes": 51445760
+      }
+    },
+    {
+      "operation": "native-copy",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2377541,
+        "engineNs": 61417,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              3395583,
+              3441750,
+              3329833,
+              3408542,
+              3321958,
+              3382041,
+              3336250
+            ],
+            "finalRssBytes": 36929536,
+            "firstBatchNs": 3473292,
+            "index": 0,
+            "instantiateNs": 33375,
+            "instantiatedRssBytes": 23068672,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36929536,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5312584,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29278208
+          },
+          {
+            "batchNs": [
+              3378042,
+              3408708,
+              3369167,
+              3337542,
+              3405541,
+              3416959,
+              3354584
+            ],
+            "finalRssBytes": 36962304,
+            "firstBatchNs": 3469292,
+            "index": 1,
+            "instantiateNs": 20458,
+            "instantiatedRssBytes": 23232512,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36962304,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4952250,
+            "setupRssBytes": 24952832,
+            "warmRssBytes": 29327360
+          },
+          {
+            "batchNs": [
+              3390416,
+              3429500,
+              3386167,
+              3352750,
+              3350208,
+              3350667,
+              3357834
+            ],
+            "finalRssBytes": 36962304,
+            "firstBatchNs": 3450583,
+            "index": 2,
+            "instantiateNs": 19333,
+            "instantiatedRssBytes": 23232512,
+            "largestLinearMemoryRequestBytes": 18481152,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36962304,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4870166,
+            "setupRssBytes": 24952832,
+            "warmRssBytes": 29327360
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 23003136,
+        "mode": "measure",
+        "operation": "native-copy",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 3378042,
+        "instanceMedianBatchNs": [
+          3382041,
+          3378042,
+          3357834
+        ],
+        "peakProcessRssBytes": 36962304,
+        "largestLinearMemoryRequestBytes": 18481152
+      }
+    },
+    {
+      "operation": "native-hex-decode",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 3444125,
+        "engineNs": 61625,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              97424917,
+              99247000,
+              96685583,
+              98390459,
+              98894708,
+              97789458,
+              96561417
+            ],
+            "finalRssBytes": 55132160,
+            "firstBatchNs": 97308125,
+            "index": 0,
+            "instantiateNs": 27333,
+            "instantiatedRssBytes": 23019520,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55132160,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 953917,
+            "setupRssBytes": 24887296,
+            "warmRssBytes": 35766272
+          },
+          {
+            "batchNs": [
+              98818083,
+              99509833,
+              100193083,
+              99678291,
+              101735375,
+              103490083,
+              104324167
+            ],
+            "finalRssBytes": 55164928,
+            "firstBatchNs": 97319625,
+            "index": 1,
+            "instantiateNs": 29208,
+            "instantiatedRssBytes": 23232512,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55164928,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 687042,
+            "setupRssBytes": 25001984,
+            "warmRssBytes": 35831808
+          },
+          {
+            "batchNs": [
+              97114041,
+              98693584,
+              98698167,
+              96475208,
+              98666375,
+              97729625,
+              97019375
+            ],
+            "finalRssBytes": 55164928,
+            "firstBatchNs": 100830541,
+            "index": 2,
+            "instantiateNs": 43458,
+            "instantiatedRssBytes": 23248896,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55164928,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 758083,
+            "setupRssBytes": 25001984,
+            "warmRssBytes": 35831808
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22953984,
+        "mode": "measure",
+        "operation": "native-hex-decode",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 98693584,
+        "instanceMedianBatchNs": [
+          97789458,
+          100193083,
+          97729625
+        ],
+        "peakProcessRssBytes": 55164928,
+        "largestLinearMemoryRequestBytes": 51445760
+      }
+    },
+    {
+      "operation": "native-hex-decode",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2340167,
+        "engineNs": 58959,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              6387916,
+              6299958,
+              6240458,
+              6331000,
+              6273458,
+              6259292,
+              6260208
+            ],
+            "finalRssBytes": 36945920,
+            "firstBatchNs": 6525708,
+            "index": 0,
+            "instantiateNs": 33958,
+            "instantiatedRssBytes": 23003136,
+            "largestLinearMemoryRequestBytes": 18546688,
+            "linearMemoryGrowCalls": 139,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36945920,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 6032375,
+            "setupRssBytes": 24870912,
+            "warmRssBytes": 29278208
+          },
+          {
+            "batchNs": [
+              6288416,
+              6245625,
+              6271333,
+              6282333,
+              6307666,
+              6379667,
+              6384417
+            ],
+            "finalRssBytes": 36962304,
+            "firstBatchNs": 6426458,
+            "index": 1,
+            "instantiateNs": 27958,
+            "instantiatedRssBytes": 23150592,
+            "largestLinearMemoryRequestBytes": 18546688,
+            "linearMemoryGrowCalls": 139,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36962304,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4994083,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29310976
+          },
+          {
+            "batchNs": [
+              6312042,
+              6372333,
+              6397125,
+              6370917,
+              6329750,
+              6281834,
+              6331709
+            ],
+            "finalRssBytes": 36978688,
+            "firstBatchNs": 6398709,
+            "index": 2,
+            "instantiateNs": 20042,
+            "instantiatedRssBytes": 23166976,
+            "largestLinearMemoryRequestBytes": 18546688,
+            "linearMemoryGrowCalls": 139,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36978688,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4917625,
+            "setupRssBytes": 24920064,
+            "warmRssBytes": 29327360
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22904832,
+        "mode": "measure",
+        "operation": "native-hex-decode",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 6307666,
+        "instanceMedianBatchNs": [
+          6273458,
+          6288416,
+          6331709
+        ],
+        "peakProcessRssBytes": 36978688,
+        "largestLinearMemoryRequestBytes": 18546688
+      }
+    },
+    {
+      "operation": "intrinsic-hex-decode",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2762125,
+        "engineNs": 52625,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              28662750,
+              27044583,
+              27557000,
+              27244417,
+              27344000,
+              27588000,
+              26976833
+            ],
+            "finalRssBytes": 25214976,
+            "firstBatchNs": 26718458,
+            "index": 0,
+            "instantiateNs": 30417,
+            "instantiatedRssBytes": 23019520,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25214976,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 689792,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 25198592
+          },
+          {
+            "batchNs": [
+              26533125,
+              26438292,
+              26381125,
+              26396750,
+              27043125,
+              26481666,
+              27324375
+            ],
+            "finalRssBytes": 25231360,
+            "firstBatchNs": 26783375,
+            "index": 1,
+            "instantiateNs": 29708,
+            "instantiatedRssBytes": 23232512,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25231360,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 508875,
+            "setupRssBytes": 24985600,
+            "warmRssBytes": 25231360
+          },
+          {
+            "batchNs": [
+              26574750,
+              26484500,
+              26507834,
+              28040042,
+              27004625,
+              27208750,
+              40288583
+            ],
+            "finalRssBytes": 25231360,
+            "firstBatchNs": 27672417,
+            "index": 2,
+            "instantiateNs": 25625,
+            "instantiatedRssBytes": 23232512,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25231360,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 481084,
+            "setupRssBytes": 24985600,
+            "warmRssBytes": 25231360
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22937600,
+        "mode": "measure",
+        "operation": "intrinsic-hex-decode",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 27043125,
+        "instanceMedianBatchNs": [
+          27344000,
+          26481666,
+          27004625
+        ],
+        "peakProcessRssBytes": 25231360,
+        "largestLinearMemoryRequestBytes": 9502720
+      }
+    },
+    {
+      "operation": "intrinsic-hex-decode",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2244608,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 4097959,
+        "engineNs": 54959,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              1500250,
+              1477917,
+              1474625,
+              1462000,
+              1462542,
+              1458792,
+              1480208
+            ],
+            "finalRssBytes": 36782080,
+            "firstBatchNs": 1550958,
+            "index": 0,
+            "instantiateNs": 29750,
+            "instantiatedRssBytes": 22953984,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36782080,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5032709,
+            "setupRssBytes": 24821760,
+            "warmRssBytes": 29163520
+          },
+          {
+            "batchNs": [
+              1488958,
+              1470834,
+              1471833,
+              1490583,
+              1455125,
+              1456916,
+              1469750
+            ],
+            "finalRssBytes": 36831232,
+            "firstBatchNs": 1523541,
+            "index": 1,
+            "instantiateNs": 32417,
+            "instantiatedRssBytes": 23134208,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36831232,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4734875,
+            "setupRssBytes": 24887296,
+            "warmRssBytes": 29229056
+          },
+          {
+            "batchNs": [
+              1492375,
+              1472042,
+              1468834,
+              1475625,
+              1457209,
+              1457334,
+              1479666
+            ],
+            "finalRssBytes": 36847616,
+            "firstBatchNs": 1540167,
+            "index": 2,
+            "instantiateNs": 18583,
+            "instantiatedRssBytes": 23150592,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36847616,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4661166,
+            "setupRssBytes": 24903680,
+            "warmRssBytes": 29245440
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22872064,
+        "mode": "measure",
+        "operation": "intrinsic-hex-decode",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 1471833,
+        "instanceMedianBatchNs": [
+          1474625,
+          1470834,
+          1472042
+        ],
+        "peakProcessRssBytes": 36847616,
+        "largestLinearMemoryRequestBytes": 18415616
+      }
+    },
+    {
+      "operation": "intrinsic-hex-materialized",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2415292,
+        "engineNs": 64167,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              31303959,
+              31901500,
+              31393583,
+              31286417,
+              32161125,
+              31362083,
+              31364042
+            ],
+            "finalRssBytes": 45760512,
+            "firstBatchNs": 33562834,
+            "index": 0,
+            "instantiateNs": 27292,
+            "instantiatedRssBytes": 23068672,
+            "largestLinearMemoryRequestBytes": 45154304,
+            "linearMemoryGrowCalls": 18,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 45760512,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 793542,
+            "setupRssBytes": 24936448,
+            "warmRssBytes": 33439744
+          },
+          {
+            "batchNs": [
+              31689209,
+              32012083,
+              31384417,
+              31271667,
+              32185708,
+              31228000,
+              31494958
+            ],
+            "finalRssBytes": 45793280,
+            "firstBatchNs": 31888958,
+            "index": 1,
+            "instantiateNs": 33125,
+            "instantiatedRssBytes": 23281664,
+            "largestLinearMemoryRequestBytes": 45154304,
+            "linearMemoryGrowCalls": 18,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 45793280,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 453625,
+            "setupRssBytes": 25034752,
+            "warmRssBytes": 33488896
+          },
+          {
+            "batchNs": [
+              31241625,
+              31831333,
+              31204541,
+              31253250,
+              34537208,
+              31475250,
+              31425000
+            ],
+            "finalRssBytes": 45793280,
+            "firstBatchNs": 31421833,
+            "index": 2,
+            "instantiateNs": 24458,
+            "instantiatedRssBytes": 23281664,
+            "largestLinearMemoryRequestBytes": 45154304,
+            "linearMemoryGrowCalls": 18,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 45793280,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 442875,
+            "setupRssBytes": 25034752,
+            "warmRssBytes": 33488896
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22986752,
+        "mode": "measure",
+        "operation": "intrinsic-hex-materialized",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 31393583,
+        "instanceMedianBatchNs": [
+          31364042,
+          31494958,
+          31425000
+        ],
+        "peakProcessRssBytes": 45793280,
+        "largestLinearMemoryRequestBytes": 45154304
+      }
+    },
+    {
+      "operation": "intrinsic-hex-materialized",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 3721083,
+        "engineNs": 61333,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              1567250,
+              1629375,
+              1691750,
+              1618375,
+              1705125,
+              1556334,
+              1566709
+            ],
+            "finalRssBytes": 36847616,
+            "firstBatchNs": 1622375,
+            "index": 0,
+            "instantiateNs": 29000,
+            "instantiatedRssBytes": 23019520,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36847616,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5057750,
+            "setupRssBytes": 24887296,
+            "warmRssBytes": 29229056
+          },
+          {
+            "batchNs": [
+              1562542,
+              1557417,
+              1587750,
+              1587542,
+              1554583,
+              1541667,
+              1551541
+            ],
+            "finalRssBytes": 36880384,
+            "firstBatchNs": 1608708,
+            "index": 1,
+            "instantiateNs": 20291,
+            "instantiatedRssBytes": 23166976,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36880384,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4732583,
+            "setupRssBytes": 24936448,
+            "warmRssBytes": 29278208
+          },
+          {
+            "batchNs": [
+              1590583,
+              1542916,
+              1550167,
+              1539209,
+              1573625,
+              1529333,
+              1541583
+            ],
+            "finalRssBytes": 36896768,
+            "firstBatchNs": 1585000,
+            "index": 2,
+            "instantiateNs": 18834,
+            "instantiatedRssBytes": 23199744,
+            "largestLinearMemoryRequestBytes": 18415616,
+            "linearMemoryGrowCalls": 137,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36896768,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4701541,
+            "setupRssBytes": 24952832,
+            "warmRssBytes": 29294592
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22937600,
+        "mode": "measure",
+        "operation": "intrinsic-hex-materialized",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 1562542,
+        "instanceMedianBatchNs": [
+          1618375,
+          1557417,
+          1542916
+        ],
+        "peakProcessRssBytes": 36896768,
+        "largestLinearMemoryRequestBytes": 18415616
+      }
+    },
+    {
+      "operation": "intrinsic-hex-checked-tag",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 3426042,
+        "engineNs": 59875,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              82146292,
+              82253625,
+              83730166,
+              80586333,
+              86581625,
+              81325959,
+              79909416
+            ],
+            "finalRssBytes": 55132160,
+            "firstBatchNs": 81121916,
+            "index": 0,
+            "instantiateNs": 27625,
+            "instantiatedRssBytes": 23019520,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55132160,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 722541,
+            "setupRssBytes": 24887296,
+            "warmRssBytes": 35766272
+          },
+          {
+            "batchNs": [
+              79921708,
+              80916667,
+              79438708,
+              79411083,
+              81893000,
+              83146708,
+              82346375
+            ],
+            "finalRssBytes": 55164928,
+            "firstBatchNs": 80613541,
+            "index": 1,
+            "instantiateNs": 34000,
+            "instantiatedRssBytes": 23232512,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55164928,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 494084,
+            "setupRssBytes": 25001984,
+            "warmRssBytes": 35831808
+          },
+          {
+            "batchNs": [
+              80894709,
+              80904667,
+              81340166,
+              79421917,
+              81371792,
+              83706875,
+              88649625
+            ],
+            "finalRssBytes": 55164928,
+            "firstBatchNs": 80758042,
+            "index": 2,
+            "instantiateNs": 27000,
+            "instantiatedRssBytes": 23248896,
+            "largestLinearMemoryRequestBytes": 51445760,
+            "linearMemoryGrowCalls": 20,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 55164928,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 478583,
+            "setupRssBytes": 25001984,
+            "warmRssBytes": 35831808
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22953984,
+        "mode": "measure",
+        "operation": "intrinsic-hex-checked-tag",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 81340166,
+        "instanceMedianBatchNs": [
+          82146292,
+          80916667,
+          81340166
+        ],
+        "peakProcessRssBytes": 55164928,
+        "largestLinearMemoryRequestBytes": 51445760
+      }
+    },
+    {
+      "operation": "intrinsic-hex-checked-tag",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 2554042,
+        "engineNs": 55625,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              2970542,
+              2866667,
+              3005583,
+              3051458,
+              3052917,
+              2901541,
+              2984792
+            ],
+            "finalRssBytes": 36945920,
+            "firstBatchNs": 2912708,
+            "index": 0,
+            "instantiateNs": 30500,
+            "instantiatedRssBytes": 23003136,
+            "largestLinearMemoryRequestBytes": 18546688,
+            "linearMemoryGrowCalls": 139,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36945920,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5500000,
+            "setupRssBytes": 24887296,
+            "warmRssBytes": 29278208
+          },
+          {
+            "batchNs": [
+              2916958,
+              2882167,
+              2949458,
+              2891458,
+              2801834,
+              2829250,
+              2935000
+            ],
+            "finalRssBytes": 36978688,
+            "firstBatchNs": 2917000,
+            "index": 1,
+            "instantiateNs": 22375,
+            "instantiatedRssBytes": 23166976,
+            "largestLinearMemoryRequestBytes": 18546688,
+            "linearMemoryGrowCalls": 139,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36978688,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4989542,
+            "setupRssBytes": 24936448,
+            "warmRssBytes": 29327360
+          },
+          {
+            "batchNs": [
+              3019791,
+              2883208,
+              2949125,
+              2901000,
+              2941250,
+              2962417,
+              2962208
+            ],
+            "finalRssBytes": 36978688,
+            "firstBatchNs": 2908250,
+            "index": 2,
+            "instantiateNs": 24250,
+            "instantiatedRssBytes": 23183360,
+            "largestLinearMemoryRequestBytes": 18546688,
+            "linearMemoryGrowCalls": 139,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36978688,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4925750,
+            "setupRssBytes": 24936448,
+            "warmRssBytes": 29327360
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22921216,
+        "mode": "measure",
+        "operation": "intrinsic-hex-checked-tag",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 2941250,
+        "instanceMedianBatchNs": [
+          2984792,
+          2891458,
+          2949125
+        ],
+        "peakProcessRssBytes": 36978688,
+        "largestLinearMemoryRequestBytes": 18546688
+      }
+    },
+    {
+      "operation": "intrinsic-hex-trusted-tag",
+      "size": 64,
+      "iterations": 10000,
+      "expectedSetupChecksum": 2342402100,
+      "expectedRunChecksum": 492055800,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 4056292,
+        "engineNs": 52500,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              35725125,
+              36203250,
+              36768750,
+              35358417,
+              35425500,
+              35899291,
+              35073792
+            ],
+            "finalRssBytes": 25444352,
+            "firstBatchNs": 36998833,
+            "index": 0,
+            "instantiateNs": 30125,
+            "instantiatedRssBytes": 23068672,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25444352,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 859584,
+            "setupRssBytes": 24936448,
+            "warmRssBytes": 25427968
+          },
+          {
+            "batchNs": [
+              35398292,
+              35653583,
+              35010208,
+              34632458,
+              36712583,
+              36576666,
+              37113167
+            ],
+            "finalRssBytes": 25477120,
+            "firstBatchNs": 35126416,
+            "index": 1,
+            "instantiateNs": 32083,
+            "instantiatedRssBytes": 23281664,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25477120,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 478750,
+            "setupRssBytes": 25034752,
+            "warmRssBytes": 25477120
+          },
+          {
+            "batchNs": [
+              34468916,
+              34636375,
+              34715500,
+              34549292,
+              34876500,
+              35123459,
+              34693792
+            ],
+            "finalRssBytes": 25477120,
+            "firstBatchNs": 37112625,
+            "index": 2,
+            "instantiateNs": 33875,
+            "instantiatedRssBytes": 23281664,
+            "largestLinearMemoryRequestBytes": 9502720,
+            "linearMemoryGrowCalls": 1,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 25477120,
+            "runChecksum": 492055800,
+            "setupChecksum": 2342402100,
+            "setupNs": 539708,
+            "setupRssBytes": 25034752,
+            "warmRssBytes": 25477120
+          }
+        ],
+        "iterations": 10000,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 23003136,
+        "mode": "measure",
+        "operation": "intrinsic-hex-trusted-tag",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 64,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 35358417,
+        "instanceMedianBatchNs": [
+          35725125,
+          35653583,
+          34693792
+        ],
+        "peakProcessRssBytes": 25477120,
+        "largestLinearMemoryRequestBytes": 9502720
+      }
+    },
+    {
+      "operation": "intrinsic-hex-trusted-tag",
+      "size": 4096,
+      "iterations": 256,
+      "expectedSetupChecksum": 1521071422,
+      "expectedRunChecksum": 1497071488,
+      "report": {
+        "baselineRssBytes": 2260992,
+        "compiledComponent": "/tmp/starling-node-compat/optimization/probes.local.cwasm",
+        "deserializeNs": 4023833,
+        "engineNs": 61584,
+        "freshInstances": 3,
+        "instances": [
+          {
+            "batchNs": [
+              1798208,
+              1746000,
+              1703209,
+              1730000,
+              1853542,
+              1777458,
+              1806917
+            ],
+            "finalRssBytes": 36929536,
+            "firstBatchNs": 1984500,
+            "index": 0,
+            "instantiateNs": 31375,
+            "instantiatedRssBytes": 22986752,
+            "largestLinearMemoryRequestBytes": 18546688,
+            "linearMemoryGrowCalls": 139,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36929536,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 5109541,
+            "setupRssBytes": 24854528,
+            "warmRssBytes": 29245440
+          },
+          {
+            "batchNs": [
+              1785875,
+              1709167,
+              1662167,
+              1670709,
+              1670667,
+              1701167,
+              1749209
+            ],
+            "finalRssBytes": 36978688,
+            "firstBatchNs": 1860709,
+            "index": 1,
+            "instantiateNs": 34709,
+            "instantiatedRssBytes": 23183360,
+            "largestLinearMemoryRequestBytes": 18546688,
+            "linearMemoryGrowCalls": 139,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36978688,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4890959,
+            "setupRssBytes": 24936448,
+            "warmRssBytes": 29327360
+          },
+          {
+            "batchNs": [
+              1768084,
+              1721417,
+              1665916,
+              1733042,
+              1685666,
+              1681208,
+              1694292
+            ],
+            "finalRssBytes": 36978688,
+            "firstBatchNs": 1800917,
+            "index": 2,
+            "instantiateNs": 22833,
+            "instantiatedRssBytes": 23183360,
+            "largestLinearMemoryRequestBytes": 18546688,
+            "linearMemoryGrowCalls": 139,
+            "linearMemoryGrowFailures": 0,
+            "peakProcessRssBytes": 36978688,
+            "runChecksum": 1497071488,
+            "setupChecksum": 1521071422,
+            "setupNs": 4809334,
+            "setupRssBytes": 24936448,
+            "warmRssBytes": 29327360
+          }
+        ],
+        "iterations": 256,
+        "limitations": [
+          "Process RSS includes runtime/code and allocator retention; later instance watermarks are cumulative",
+          "First batch is a batch latency, not an isolated single-operation latency",
+          "Largest linear-memory request is not total guest heap or total resident memory"
+        ],
+        "loadedRssBytes": 22921216,
+        "mode": "measure",
+        "operation": "intrinsic-hex-trusted-tag",
+        "samplesPerInstance": 7,
+        "settings": {
+          "allocator": "on-demand",
+          "compiler": "Cranelift",
+          "guestHostImports": [],
+          "memoryObserver": "allow-all ResourceLimiter; largest requested linear memory, not sum of memories",
+          "optimization": "speed",
+          "parallelCompilation": false,
+          "timingClock": "host std::time::Instant",
+          "wasmtimeCrate": "42.0.1"
+        },
+        "size": 4096,
+        "warmupBatches": 3
+      },
+      "summary": {
+        "medianBatchNs": 1721417,
+        "instanceMedianBatchNs": [
+          1777458,
+          1701167,
+          1694292
+        ],
+        "peakProcessRssBytes": 36978688,
+        "largestLinearMemoryRequestBytes": 18546688
+      }
+    }
+  ],
+  "sourceManifest": [
+    {
+      "path": "probes.mjs",
+      "sha256": "fdffa52951ee5c696a90cade33d1766d4c4afff51f42647e67d1efade8fdda7d"
+    },
+    {
+      "path": "probes.wit",
+      "sha256": "610bbcaead042bc6fc6aab4910a38e96475ba01f479ac77cbfa9e508570c91ff"
+    },
+    {
+      "path": "build-probes.mjs",
+      "sha256": "93cb300ec1717f6265a4f82866c88d86d0366194f0713b5094861daaeded8e37"
+    },
+    {
+      "path": "run-probes.mjs",
+      "sha256": "a05f3f166a58ffa5d07aedfff7274d93331ec34c978b35425254a2027a1a5d78"
+    }
+  ],
+  "protocol": {
+    "freshInstancesPerCase": 3,
+    "warmupBatches": 3,
+    "firstBatchUntimed": true,
+    "samplesPerInstance": 7,
+    "sameMaterializedSource": true,
+    "sameComponentForAllControls": true,
+    "comparison": "Only selected per-output allocation/validation stages differ",
+    "measurementUnits": "Host batch nanoseconds; process peak RSS; largest single linear-memory growth request"
+  },
+  "limitations": [
+    "Diagnostic controls are not compatible alternate Buffer implementations",
+    "Own-property brands are reflectable/spoofable and excluded from production recommendations",
+    "Class-private stamping is only a control; full realm, species and lifecycle behavior is not established",
+    "Native Uint8Array.fromHex controls use valid input only; strict malformed semantics differ from Node",
+    "Different native hex implementations cannot by themselves attribute kernel differences to the facade",
+    "Within-instance batches are correlated; RSS includes host/runtime and later fresh-instance high-water marks are cumulative",
+    "These are controlled performance/allocation observations, not per-allocation GC counters or total guest heap measurements"
+  ]
+}

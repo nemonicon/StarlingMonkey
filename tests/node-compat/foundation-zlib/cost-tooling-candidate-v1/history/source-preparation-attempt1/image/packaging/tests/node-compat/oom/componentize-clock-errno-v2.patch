@@ -1,0 +1,18 @@
+--- a/crates/spidermonkey-embedding-splicer/src/stub_wasi.rs
++++ b/crates/spidermonkey-embedding-splicer/src/stub_wasi.rs
+@@ -350,7 +350,6 @@
+         let precision: LocalID = LocalID(1); // Second Parameter
+         let time_ptr: LocalID = LocalID(2); // Third Parameter
+         body.local_get(time_ptr);
+-        body.local_get(time_ptr);
+         body.i64_const(i64::try_from(unix_time.as_nanos())?);
+         body.i64_store(MemArg {
+             align: 3,
+@@ -358,6 +357,7 @@
+             max_align: 0,
+             memory: *memory,
+         });
++        body.i32_const(0); // clock_time_get returns errno, not the output pointer.
+         Ok(vec![clock_id, precision, time_ptr])
+     })?;
+ 

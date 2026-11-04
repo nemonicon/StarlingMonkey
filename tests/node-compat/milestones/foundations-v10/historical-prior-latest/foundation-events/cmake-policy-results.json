@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "atUtc": "2026-11-03T04:40:05.159807+00:00",
+  "kind": "Actual cmake/builtins.cmake with unrelated dependency target creation mocked; configure only, no compilation",
+  "sourceSha256": "a0d56f49f199baac095fc0611c4e89d64f4d092cf214bcc29ed364f10f2d3e60",
+  "cases": [
+    {
+      "name": "default-core-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON"
+      ],
+      "accepted": true,
+      "eventsDefinition": false,
+      "exitCode": 0
+    },
+    {
+      "name": "events-on",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=ON",
+        "-DNODE_COMPAT_EVENTS=ON"
+      ],
+      "accepted": true,
+      "eventsDefinition": true,
+      "exitCode": 0
+    },
+    {
+      "name": "events-without-core",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=OFF",
+        "-DNODE_COMPAT_EVENTS=ON"
+      ],
+      "accepted": false,
+      "eventsDefinition": false,
+      "exitCode": 1
+    },
+    {
+      "name": "off-without-core",
+      "flags": [
+        "-DENABLE_BUILTIN_NODE_COMPAT=OFF",
+        "-DNODE_COMPAT_EVENTS=OFF"
+      ],
+      "accepted": true,
+      "eventsDefinition": false,
+      "exitCode": 0
+    }
+  ]
+}

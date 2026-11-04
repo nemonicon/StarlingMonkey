@@ -1,0 +1,1 @@
+let calls=0;export async function run(){let seen=0,handled=null;queueMicrotask(()=>{seen++;try{throw undefined}catch(error){handled=error===undefined?'caught-undefined':'bad'}});await Promise.resolve();await Promise.resolve();return JSON.stringify({calls:++calls,seen,handled})}

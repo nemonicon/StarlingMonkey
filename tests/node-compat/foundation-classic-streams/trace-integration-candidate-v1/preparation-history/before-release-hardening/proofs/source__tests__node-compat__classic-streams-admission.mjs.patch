@@ -1,0 +1,37 @@
+--- a/tests/node-compat/classic-streams-admission.mjs
++++ b/source/tests/node-compat/classic-streams-admission.mjs
+@@ -4,8 +4,8 @@
+ import {readFileSync,lstatSync} from 'node:fs';
+ import {resolve,join} from 'node:path';
+ const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+-const PINS_SHA='9c8e3c209c97372b09cff55cd2d05d3491c143799a0820659c62ec94ba193248';
+-const RECIPE_SHA='71b48d2e70c5e003fcbcce7620366744c089dd55036036e52926224dfa2614f7';
++const PINS_SHA='4f8eb9d457a83649276230f04b2e39a437b875aea6d944e1bccb4904a481ec05';
++const RECIPE_SHA='f63fdaca5ee1d1f4795a54eb9175376ef1657a579b01ed3101d5593ffc3431e5';
+ function entries(value) {
+   assert(Array.isArray(value), 'Need an explicit source inventory');
+   const seen = new Set();
+@@ -74,12 +74,12 @@
+ 
+ // Full source/metadata contract. This alone is never engine/runtime proof.
+ function loadContract(){
+- const pinsBytes=readFileSync(new URL('./foundation-classic-streams/integration-candidate-v1/admission-pins.json',import.meta.url));
++ const pinsBytes=readFileSync(new URL('./foundation-classic-streams/trace-integration-candidate-v1/admission-pins.json',import.meta.url));
+  assert.equal(hash(pinsBytes),PINS_SHA,'Unreviewed classic admission contract');
+  const pins=JSON.parse(pinsBytes);
+- const policyBytes=readFileSync(new URL('./foundation-classic-streams/integration-candidate-v1/policy.json',import.meta.url));
++ const policyBytes=readFileSync(new URL('./foundation-classic-streams/trace-integration-candidate-v1/policy.json',import.meta.url));
+  assert.equal(hash(policyBytes),pins.policySha256);
+- assert.equal(hash(readFileSync(new URL('./foundation-classic-streams/integration-candidate-v1/layer-policy.py',import.meta.url))),pins.helperSha256);
++ assert.equal(hash(readFileSync(new URL('./foundation-classic-streams/trace-integration-candidate-v1/layer-policy.py',import.meta.url))),pins.helperSha256);
+  const policy=JSON.parse(policyBytes);
+  const parentPinsBytes=readFileSync(new URL('./foundation-scheduler/admission-candidate-v1/pins.json',import.meta.url));
+  assert.equal(hash(parentPinsBytes),pins.parentAdmissionPinsSha256);
+@@ -118,6 +118,7 @@
+  assert(!(metadata.gcStress&&metadata.entropyPolicy==='runtime-only'),'RuntimeOnly+GC is outside this finite producer');
+  assert.equal(metadata.hostApi,'wasi-0.2.10');assert.equal(metadata.generatedRustProject?.cargoBuildLocked,true);assert.equal(metadata.generatedRustProject?.manifestAndLockCheckedBeforeAndAfterBuild,true);
+  for(const field of['sourceInputsCapturedBeforeBuild','componentizeSourcesCapturedBeforeBuild','buildRecipeCheckedBeforeAndAfterBuild'])assert.equal(metadata[field],true);
++ assert.deepEqual(metadata.classicTraceSourcePolicy,policy.classicTraceSourcePolicy,'Exact corrected source provenance required');
+  const current=entries(metadata.sourceManifest);assert.equal(current.length,342);assert.deepEqual(current,entries(policy.expectedNativeSourceManifest));
+  const immediate=current.filter(row=>!policy.addedSourcePaths.includes(row.path)).map(row=>({path:row.path,sha256:policy.sourceLayer[row.path]?.beforeSha256??row.sha256}));
+  assert.equal(immediate.length,306);assert.deepEqual(immediate,entries(parent.expectedNativeSourceManifest));

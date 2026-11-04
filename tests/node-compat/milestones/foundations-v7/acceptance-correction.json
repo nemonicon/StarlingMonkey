@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "recordedAtUtc": "2026-11-03T09:11:05.262152+00:00",
+  "state": "bounded-module-tests-pass-broader-strict-initialization-gate-fails",
+  "originalBoundedIndexSha256": "bd33a4fee220ca86e779cc3094a8848b6957927cb99b29b15775dc34c851ca2b",
+  "originalReportsRetainedUnchanged": true,
+  "engineSha256": "ee92d5d451c16eb7ce83e0306e8dab6920f4aacd9f2c4bb9d6e5e4af2c20ea09",
+  "counterexamples": [
+    "Synchronous EventTarget listener invokes unsupported child_process.spawn; callback exception is dumped/cleared and componentization incorrectly succeeds.",
+    "Synchronous AbortSignal listener does the same; resulting zero-import component exports execute on Jco and fresh Wasmtime."
+  ],
+  "controls": [
+    "Direct unsupported operation rejects componentization.",
+    "Async listener rejected promise rejects componentization.",
+    "queueMicrotask rejected callback rejects componentization.",
+    "Explicitly caught callback exception remains handled."
+  ],
+  "requiredNextGate": "Reviewed and compiled guest exception-checkpoint fix, ordinary initializer/deployed/GC tests and target-host regressions; no profile promotion until the broad requirement is met.",
+  "copiedCounterevidence": [
+    {
+      "path": "known-gaps/initialization-diagnostic.mjs",
+      "sha256": "4a20146337a6638094cc6cbb6af6cba5055f39a26e1d5c1d2e324d6484a9ce61"
+    },
+    {
+      "path": "known-gaps/initialization-results.json",
+      "sha256": "68675f605f4ca91a54c93303048a003dee87381fff24ac3603cbd16762faf477"
+    },
+    {
+      "path": "known-gaps/node-results.json",
+      "sha256": "dfcf5ad0af9781cd2e56b983aed9b60595cf3d7116f7e9c3399b47cce696f3c6"
+    },
+    {
+      "path": "known-gaps/node-source-ledger.json",
+      "sha256": "5b8d0ad030175f0311d21574d045d1287f08ad2d6424e13f6ebab2a8a2ace515"
+    },
+    {
+      "path": "known-gaps/source-audit.json",
+      "sha256": "d62e9650f97f728bf6c7188deba6bd1f8159f9abc306e1a2ad5c7d59a4fb4abc"
+    },
+    {
+      "path": "known-gaps/README.md",
+      "sha256": "0f5e84a34c36baed0636bc68a9cbd59b8162db57318ab584e80a37db60f7a54f"
+    },
+    {
+      "path": "known-gaps/native-proposal.md",
+      "sha256": "62c520c6cc71a35ceb3797450ab51323a790acf8e7f02e3eab931056d4026897"
+    },
+    {
+      "path": "known-gaps/evidence-receipt.json",
+      "sha256": "2bff6748b7106017db0da482c46fd51a49cd7c66a803d9f6a9d66621b4259c35"
+    }
+  ]
+}

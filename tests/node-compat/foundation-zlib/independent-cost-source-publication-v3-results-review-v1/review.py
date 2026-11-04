@@ -1,0 +1,116 @@
+"""Actual source-copy data review; no owner modules/helpers or runtime actions."""
+from pathlib import Path
+import hashlib,json,os,stat
+HERE=Path(__file__).resolve().parent
+BASE=HERE.parent
+OWNER=BASE/'cost-tooling-candidate-v3'
+ROOT=Path('/private/tmp/starling-node-compat/zlib-cost-source-v3')
+LOG=Path('/tmp/starling-node-compat/zlib-cost-source-v3-root-publication')
+SOURCE_SHA='ff208e72d0b87933aa75cdeb7c1ae16f29aa6ae94c357318a9d6676af04b36b8'
+INDEX_SHA='4621f7e72b4fb0555a5df630b1aedd4d2a04743b0db9188fc50099779f07387b'
+AUTH_SHA='3579dcb5945b3b6be8d57e53ff1bbe0bd27e2264593479ebd9e2da556fc30524'
+checks=[];observed={};cache={}
+def hashfile(path):
+ p=Path(path);s=p.stat();key=(str(p.resolve()),s.st_dev,s.st_ino,s.st_size,s.st_mtime_ns,s.st_ctime_ns)
+ if key not in cache:
+  h=hashlib.sha256()
+  with p.open('rb')as f:
+   for raw in iter(lambda:f.read(1024*1024),b''):h.update(raw)
+  t=p.stat();assert(s.st_dev,s.st_ino,s.st_size,s.st_mtime_ns,s.st_ctime_ns)==(t.st_dev,t.st_ino,t.st_size,t.st_mtime_ns,t.st_ctime_ns)
+  cache[key]=h.hexdigest()
+ observed[str(p)]={'path':str(p),'realpath':str(p.resolve()),'sha256':cache[key],'bytes':s.st_size,'device':s.st_dev,'inode':s.st_ino,'mode':stat.S_IMODE(s.st_mode),'nlink':s.st_nlink}
+ return cache[key]
+def verify(row,path=None):
+ p=Path(path or row.get('path')or row.get('source'));s=p.lstat();assert stat.S_ISREG(s.st_mode)and not stat.S_ISLNK(s.st_mode),p
+ assert s.st_size==row['bytes']and hashfile(p)==row['sha256'],p
+ return p
+source_index=json.loads((OWNER/'index.json').read_bytes());assert hashfile(OWNER/'index.json')==SOURCE_SHA and len(source_index['files'])==286
+for row in source_index['files']:verify(row,OWNER/row['path'])
+checks.append('sealed286SourceMembersUnchanged')
+plan=json.loads((OWNER/'publication-plan.json').read_bytes());assert hashfile(OWNER/'publication-plan.json')=='4b4cf78427da5ef81d028989df9c37a3fce2c01bad0669d3ba3765b2e7e31235'
+assert len(plan['objects'])==5072 and plan['copyPermissionSchemaVersion']==2
+root_receipt=BASE/'cost-source-publication-v3-root-results.json';assert hashfile(root_receipt)=='f292fc927888e46005c2dfb7eabea95fb77c3c8f217b7e8f96c172123b1f67a7'
+root_data=json.loads(root_receipt.read_bytes())
+auth=BASE/'cost-source-publication-v3-root-authority.json';assert hashfile(auth)==AUTH_SHA;authority=json.loads(auth.read_bytes())
+assert authority['toolingCandidateIndexSha256']==SOURCE_SHA and authority['publicationPlanSha256']==hashfile(OWNER/'publication-plan.json')and authority['sourceCopyOnly']is True
+assert authority['action']=='source-publication'and authority['nodeOracleCodecLibraryBundleComponentGuestNativePilotOrTimingAllowed']is False
+terminal=json.loads((LOG/'terminal.json').read_bytes());hashfile(LOG/'terminal.json')
+assert terminal['rawExitCode']==0 and terminal['pid']==20075 and terminal['sourceCopyOnly']is True and terminal['codecOrRuntimeExecuted']is False
+assert terminal['argv']==['python3',str(OWNER/'publish.py'),SOURCE_SHA,'--root-config',str(auth),'--root-config-sha',AUTH_SHA]
+for field in ['stdout','stderr']:verify(terminal[field])
+assert terminal['stdout']['sha256']=='109626b65cf1b49d1f257290daa0274c4425efd2084efbed312c436ee575a584'and terminal['stderr']['bytes']==0
+stdout=json.loads((LOG/'stdout.log').read_bytes());assert stdout['state']=='SOURCE_PUBLICATION_PENDING_INDEPENDENT_REVIEW'and stdout['actionsBeyondSourceCopyAllowed']is False
+verify(stdout['index'],ROOT/'index.json');verify(stdout['completion'],ROOT/'completion.json');assert hashfile(ROOT/'index.json')==INDEX_SHA
+index=json.loads((ROOT/'index.json').read_bytes());completion=json.loads((ROOT/'completion.json').read_bytes());initial=ROOT.lstat()
+assert stat.S_ISDIR(initial.st_mode)and not stat.S_ISLNK(initial.st_mode)and stat.S_IMODE(initial.st_mode)==0o700
+identity={'device':initial.st_dev,'inode':initial.st_ino}
+assert index['rootIdentity']==completion['rootIdentity']==identity=={'device':16777234,'inode':169827073}
+assert index['toolingSourceIndexSha256']==completion['sourceIndexSha256']==SOURCE_SHA
+assert index['state']=='FRESH_ZLIB350_COST_SOURCE_PUBLICATION_V1'and completion['state']=='SOURCE_PUBLICATION_PENDING_INDEPENDENT_REVIEW'
+assert index['operationalAdmission']is False and index['libraryCodecOrRuntimeActionExecuted']is False and completion['codecOrLibraryExecuted']is False
+assert completion['requiresActualExternalExitZeroAndIndependentReview']is True and completion['index']==stdout['index']
+checks.append('auth3579ExactRawExit0LogsIndexCompletionAndHeldRootIdentity')
+expected=list(plan['objects']);capsules=[]
+for role,key in [('source-peer','sourceIndependentReview'),('root-pair','rootReviewedPair')]:
+ proof=authority[key];ix=verify(proof['index']);d=json.loads(ix.read_bytes());items=[{'source':str(ix),'sha256':proof['index']['sha256'],'bytes':proof['index']['bytes']}]
+ for row in d['files']:
+  f=verify(row,ix.parent/row['path']);items.append({'source':str(f),'sha256':row['sha256'],'bytes':row['bytes']})
+ for number,row in enumerate(items):
+  row.update(sourceMode=stat.S_IMODE(Path(row['source']).lstat().st_mode),outputMode=0o600,destination='authority/'+role+'/'+str(number).zfill(4)+'.data',role=role);expected.append(row);capsules.append(row)
+assert len(capsules)==20 and all(r['sourceMode']==0o644 and r['outputMode']==0o600 for r in capsules)
+expected_by_name={row['destination']:row for row in expected};assert len(expected_by_name)==5092
+records={row['path']:row for row in index['files']};assert len(records)==10187 and len(records)==len(index['files'])
+mode_counts={};logical=0
+for name,row in records.items():
+ assert name and not name.startswith('/')and all(p not in ['','.','..']for p in name.split('/'))
+ target=verify(row,ROOT/name);info=target.lstat();assert info.st_nlink==1 and stat.S_IMODE(info.st_mode)==row['mode'];logical+=row['bytes'];mode_counts[str(row['mode'])]=mode_counts.get(str(row['mode']),0)+1
+for name,row in expected_by_name.items():
+ src=verify(row);srcstat=src.lstat();dest=ROOT/name;dst=dest.lstat();copy=records[name]
+ assert stat.S_IMODE(srcstat.st_mode)==row['sourceMode']and stat.S_IMODE(dst.st_mode)==row['outputMode']
+ assert (srcstat.st_dev,srcstat.st_ino)!=(dst.st_dev,dst.st_ino)and dst.st_nlink==1
+ assert copy['originalSource']==row['source']and copy['sourceMode']==row['sourceMode']and copy['outputMode']==copy['mode']==row['outputMode']
+ assert copy['sha256']==row['sha256']and copy['bytes']==row['bytes']and copy['role']==row.get('role','source')
+assert logical==358037108
+checks.append('all10187IndexedHashesModesAnd5092CopiesDistinctFromOriginalsWithExplicitPermissionRoles')
+checks.append('all20DynamicOriginal0644Copies0600NoSourceChmodM3RegressionClosedInActualCopy')
+start=json.loads((ROOT/'journal/000000-start.json').read_bytes());assert start['state']=='PARTIAL_SOURCE_PUBLICATION_STARTED'and start['sourceIndexSha256']==SOURCE_SHA and start['planSha256']==hashfile(OWNER/'publication-plan.json')
+for number,row in enumerate(expected,1):
+ name='journal/'+str(number).zfill(6)+'.json';value=json.loads((ROOT/name).read_bytes());assert value=={'copied':row['destination'],'sha256':row['sha256'],'partialOnly':True}
+expected_metadata={'authority/root-source-publication.json','context.json','journal/000000-start.json'}|{'journal/'+str(n).zfill(6)+'.json'for n in range(1,len(expected)+1)}
+assert set(records)==set(expected_by_name)|expected_metadata
+assert (ROOT/'authority/root-source-publication.json').read_bytes()==auth.read_bytes()
+assert json.loads((ROOT/'context.json').read_bytes())==plan['context']
+checks.append('5093ExactJournalEntriesContextAndAuthorityCapsulesNoUnknownIndexedFiles')
+link_fields=['destination','newLinkText','mappedTarget','source','sourceLinkText','resolvedOriginal','targetKind']
+links={row['destination']:row for row in index['links']};assert len(links)==22 and all(set(row)==set(link_fields)for row in index['links'])and index['links']==[{k:row[k]for k in link_fields}for row in plan['links']]
+actual_files=set();actual_links=set();actual_dirs=set()
+for directory,dirs,files in os.walk(ROOT,followlinks=False):
+ for name in dirs+files:
+  p=Path(directory)/name;relative=str(p.relative_to(ROOT));s=p.lstat()
+  if stat.S_ISLNK(s.st_mode):
+   actual_links.add(relative);row=links[relative];assert os.readlink(p)==row['newLinkText']and p.resolve()==ROOT/row['mappedTarget']
+   original=Path(row['source']);assert original.is_symlink()and os.readlink(original)==row['sourceLinkText']and str(original.resolve())==row['resolvedOriginal']
+  elif stat.S_ISDIR(s.st_mode):assert stat.S_IMODE(s.st_mode)==0o700;actual_dirs.add(relative)
+  else:assert stat.S_ISREG(s.st_mode)and s.st_nlink==1;actual_files.add(relative)
+assert actual_files==set(records)|{'index.json','completion.json'}and len(actual_files)==10189
+assert actual_links==set(links)and actual_dirs==set(index['directories'])and len(actual_dirs)==471
+checks.append('full10189Regular22Link471PrivateDirectoryMembershipAndOriginalLinkProvenance')
+tree_counts=[]
+for tree in plan['toolTrees']:
+ original=Path(tree['originalRoot']);found=set();expected_tree={r['path']:r for r in tree['entries']}
+ for directory,dirs,files in os.walk(original,followlinks=False):
+  for name in dirs+files:
+   p=Path(directory)/name;rel=str(p.relative_to(original));entry=expected_tree[rel];found.add(rel);s=p.lstat()
+   if entry['kind']=='file':verify(entry,p);assert stat.S_IMODE(s.st_mode)==entry['mode']
+   elif entry['kind']=='directory':assert stat.S_ISDIR(s.st_mode)and not stat.S_ISLNK(s.st_mode)
+   else:assert p.is_symlink()and os.readlink(p)==entry['sourceLinkText']and str(p.resolve())==entry['resolvedOriginal']
+ assert found==set(expected_tree);tree_counts.append({'root':str(original),'fileRows':sum(r['kind']=='file'for r in tree['entries']),'links':sum(r['kind']=='symlink'for r in tree['entries'])})
+checks.append('completeOriginalToolTreesUnchanged4890Files22LinksNoPackageExecution')
+for name in ['index.json','completion.json']:hashfile(ROOT/name)
+final=ROOT.lstat();assert(final.st_dev,final.st_ino,stat.S_IMODE(final.st_mode))==(initial.st_dev,initial.st_ino,0o700)
+assert hashfile(OWNER/'index.json')==SOURCE_SHA and hashfile(auth)==AUTH_SHA and hashfile(ROOT/'index.json')==INDEX_SHA
+assert not Path('/tmp/starling-node-compat/zlib-cost-source-v2').exists()
+checks.append('finalCapturedSourceAuthorityRootAndPublicationDigestsStableFailedV2StillAbsent')
+result={'schemaVersion':1,'state':'INDEPENDENT_FRESH_ZLIB_COST_SOURCE_PUBLICATION_VERIFIED','verifiedPassed':True,'publicationIndexSha256':INDEX_SHA,'toolingSourceIndexSha256':SOURCE_SHA,'externalPublisherExitCode':0,'rootIdentity':identity,'libraryCodecOrRuntimeActionExecuted':False,'operationalAdmission':False,'sourceOnly':True,'ownerActionsInvoked':False,'actualSourcePublicationRoot':str(ROOT),'rootAuthoritySha256':AUTH_SHA,'rootAggregateSha256':hashfile(root_receipt),'actualRegularFiles':10189,'indexedRegularFiles':10187,'copiedOriginalFiles':5092,'staticPlanObjects':5072,'dynamicProofCapsules':20,'links':22,'privateDirectories':471,'indexedLogicalBytes':logical,'modeCounts':mode_counts,'m3ActualOriginals0644Copies0600':True,'allCopiedInodesDistinctFromOriginals':True,'journalEntries':5093,'toolTrees':tree_counts,'checks':checks,'passedDataChecks':len(checks),'lexicalPathsObserved':len(observed),'physicalContentHashReads':len(cache),'proofScope':'Source publication only. No Node oracle, bundle, component, native, guest, host, pilot, timing, operational or acceptance authorization.','futureRootNextActionAuthorityRequired':True,'sourceOrRuntimeAcceptanceClaim':False}
+(HERE/'results.json').write_text(json.dumps(result,indent=2)+'\n');(HERE/'rehashed-files.json').write_text(json.dumps({'schemaVersion':1,'files':sorted(observed.values(),key=lambda r:r['path']),'streamBlockBytes':1048576},indent=2)+'\n')
+print(json.dumps({'state':result['state'],'checks':len(checks),'actualFiles':10189,'copies':5092,'links':22,'paths':len(observed),'physicalReads':len(cache)}))

@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "beforePath": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/measurement-execution-activated-v2/audit-inputs.mjs",
+  "beforeSha256": "2652e8fa13d2e7b62fc306ed1021161c9875893bae236e8fb5fe874e6e496b49",
+  "afterSha256": "018df3711b192981c963e8e0b85579bc546768ebbed1ca195df2d39e29905e49",
+  "edits": [
+    {
+      "old": "{fileURLToPath}",
+      "new": "{fileURLToPath,pathToFileURL}",
+      "count": 1
+    },
+    {
+      "old": "const here=dirname(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex');\nconst[indexSha,phasePath,phaseSha]=process.argv.slice(2);assert(/^[0-9a-f]{64}$/.test(indexSha??''));const raw=await readFile(join(here,'index.json'));assert.equal(hash(raw),indexSha);\nfor(const row of JSON.parse(raw).files){const bytes=await readFile(join(here,row.path));assert.equal(hash(bytes),row.sha256);assert.equal(bytes.length,row.bytes);}\n",
+      "new": "import {parentRoot,parentIndexSha256,verifyTimingSources,auditComposedCorrectness} from './admission.mjs';\nimport {selectTimingPhase} from './phase.mjs';\nconst here=parentRoot,admissionHere=dirname(fileURLToPath(import.meta.url)),hash=raw=>createHash('sha256').update(raw).digest('hex');\nconst[indexSha,phasePath,phaseSha]=process.argv.slice(2);await verifyTimingSources(admissionHere,indexSha);\n",
+      "count": 1
+    },
+    {
+      "old": "await import('./runtime-preflight.mjs')",
+      "new": "await import(pathToFileURL(join(here,'runtime-preflight.mjs')))",
+      "count": 1
+    },
+    {
+      "old": "const phase=JSON.parse(bytes);assert.equal(phase.sourceFamilyIndexSha256,indexSha);",
+      "new": "const phase=selectTimingPhase(JSON.parse(bytes));assert.equal(phase.sourceFamilyIndexSha256,parentIndexSha256);assert.equal(phase.timingAdmissionSourceIndexSha256,indexSha);await auditComposedCorrectness(phase,indexSha);",
+      "count": 1
+    },
+    {
+      "old": "sourceFamilyIndexSha256:indexSha",
+      "new": "sourceFamilyIndexSha256:parentIndexSha256,timingAdmissionSourceIndexSha256:indexSha",
+      "count": 1
+    }
+  ],
+  "reverseExact": true
+}

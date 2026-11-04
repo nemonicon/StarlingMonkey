@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 1,
+  "state": "CONSUMERS355_COMBINED_OWNER_GC_VALIDATION_PASSED",
+  "variant": "gc-off",
+  "sourceFamilyIndexSha256": "bfb689fe993b9f55abc4848e77930c773597e769a7f08a0f2404914d82227835",
+  "nativeSourceFiles": 355,
+  "engineSha256": "b378dea3bafa01d3b85728883d20c1e61a8a22807f2614cb6eceeb615da910e7",
+  "namespacePassed": true,
+  "fixture": {
+    "componentPath": "/tmp/starling-node-compat/consumers355-v2-gc-component-validation-v1/consumer_validation.component.wasm",
+    "modulePath": "/tmp/starling-node-compat/consumers355-v2-gc-component-validation-v1/consumer_validation.js",
+    "componentSha256": "ff4c2aaeb4590b206b4c2ec494f06411c3efd377d8e00d358c4675ba6a053421",
+    "componentBytes": 13118622,
+    "interfaceAudit": {
+      "schemaVersion": 1,
+      "entropyPolicy": "off",
+      "selectedInterfaces": [],
+      "catalogueSha256": "a9b23a7158e4cfc1951ac166511a2b3d4b8d8b3714794a8757f5198597f80d01",
+      "state": "verified-final-component",
+      "componentSha256": "ff4c2aaeb4590b206b4c2ec494f06411c3efd377d8e00d358c4675ba6a053421",
+      "emittedImports": [],
+      "unusedSelectedInterfaces": [],
+      "scope": "Exact component interface names/versions; type-only versus callable dependencies remain a separate type-graph audit"
+    },
+    "emittedWit": "package root:component;\n\nworld root {\n  export run: func(index: u32) -> string;\n  export module-contract: func() -> string;\n  export ordinary-gc: func() -> string;\n}\n"
+  },
+  "bundle": {
+    "code": "import bufferDefault, { Buffer } from \"node:buffer\";\nimport __smBuiltin0, * as consumers from \"node:stream/consumers\";\nimport { ReadableStream } from \"node:stream/web\";\nimport { Readable } from \"node:stream\";\n// tests/node-compat/foundation-stream-consumers/component-validation-activated-v2/consumer.cjs.native-profile.mjs\nconst __smModule = { exports: {} };\n(function(module, exports) {\n\tmodule.exports = __smBuiltin0;\n}).call(__smModule.exports, __smModule, __smModule.exports);\nvar consumer_cjs_native_profile_default = __smModule.exports;\n// tests/node-compat/foundation-stream-consumers/component-validation-activated-v2/differential.mjs\nconst U8 = Uint8Array;\nasync function outcome(run) {\n\ttry {\n\t\treturn {\n\t\t\tfulfilled: true,\n\t\t\tvalue: await run()\n\t\t};\n\t} catch (error) {\n\t\treturn {\n\t\t\tfulfilled: false,\n\t\t\tname: error.name,\n\t\t\t...error.code === void 0 ? {} : { code: error.code }\n\t\t};\n\t}\n}\nasync function* from(chunks) {\n\tfor (const chunk of chunks) yield chunk;\n}\nasync function textChecks(consumers, selected = null) {\n\tconst cases = [];\n\tlet index = 0;\n\tasync function check(name, run) {\n\t\tconst current = index++;\n\t\tif (selected === null || selected === current) cases.push({\n\t\t\tname,\n\t\t\tresult: await run()\n\t\t});\n\t}\n\tawait check(\"empty and string chunks\", async () => [\n\t\tawait consumers.text([]),\n\t\tawait consumers.text([\"ab\", \"cd\"]),\n\t\tawait consumers.text(\"abc\")\n\t]);\n\tawait check(\"split UTF8 BOM and incomplete final sequence\", async () => consumers.text(from([\n\t\tnew U8([239]),\n\t\tnew U8([\n\t\t\t187,\n\t\t\t191,\n\t\t\t65\n\t\t]),\n\t\tnew U8([226]),\n\t\tnew U8([\n\t\t\t130,\n\t\t\t172,\n\t\t\t226,\n\t\t\t130\n\t\t])\n\t])));\n\tawait check(\"strings do not flush a pending byte decoder\", async () => consumers.text(from([\n\t\tnew U8([226]),\n\t\t\"X\",\n\t\tnew U8([130, 172])\n\t])));\n\tawait check(\"strings do not consume decoder BOM state\", async () => consumers.text([\n\t\t\"A\",\n\t\tnew U8([\n\t\t\t239,\n\t\t\t187,\n\t\t\t191,\n\t\t\t66\n\t\t]),\n\t\t\"﻿C\"\n\t]));\n\tawait check(\"string surrogate halves concatenate without UTF8 conversion\", async () => consumers.text([\"\\ud83d\", \"\\ude00\"]));\n\tawait check(\"typed views decode only visible raw bytes\", async () => {\n\t\tconst a = new U8([\n\t\t\t0,\n\t\t\t65,\n\t\t\t66,\n\t\t\t0\n\t\t]);\n\t\treturn [\n\t\t\tawait consumers.text([new DataView(a.buffer, 1, 2)]),\n\t\t\tawait consumers.text([new U8(a.buffer, 1, 2)]),\n\t\t\tawait consumers.text([new Uint16Array(new U8([65, 66]).buffer)]),\n\t\t\tawait consumers.text([a.buffer])\n\t\t];\n\t});\n\tawait check(\"eager decoding precedes later mutation of reused chunk\", async () => {\n\t\tasync function* source() {\n\t\t\tconst a = new U8([65]);\n\t\t\tyield a;\n\t\t\ta[0] = 66;\n\t\t\tyield a;\n\t\t\ta[0] = 67;\n\t\t}\n\t\treturn consumers.text(source());\n\t});\n\tawait check(\"undefined byte chunk is an empty decoder input\", async () => consumers.text([\n\t\tvoid 0,\n\t\tnew U8([65]),\n\t\tvoid 0\n\t]));\n\tawait check(\"invalid byte chunks reject with error type and code\", async () => {\n\t\tconst cases = [];\n\t\tfor (const value of [\n\t\t\tnull,\n\t\t\t1,\n\t\t\tfalse,\n\t\t\t{},\n\t\t\tSymbol(\"part\")\n\t\t]) cases.push(await outcome(() => consumers.text([value])));\n\t\treturn cases;\n\t});\n\tawait check(\"sync iterator yielded promises are unwrapped\", async () => consumers.text([Promise.resolve(\"A\"), Promise.resolve(new U8([66]))]));\n\tawait check(\"async iterator yielded promise value is not unwrapped\", async () => {\n\t\tlet step = 0;\n\t\tconst source = {\n\t\t\t[Symbol.asyncIterator]() {\n\t\t\t\treturn this;\n\t\t\t},\n\t\t\tasync next() {\n\t\t\t\treturn step++ ? { done: true } : {\n\t\t\t\t\tdone: false,\n\t\t\t\t\tvalue: Promise.resolve(\"A\")\n\t\t\t\t};\n\t\t\t}\n\t\t};\n\t\treturn outcome(() => consumers.text(source));\n\t});\n\tawait check(\"body decoding failure closes the iterator once\", async () => {\n\t\tconst log = [], sentinel = /* @__PURE__ */ new Error(\"return failure\");\n\t\tlet step = 0;\n\t\tconst source = {\n\t\t\t[Symbol.asyncIterator]() {\n\t\t\t\tlog.push(\"iterator\");\n\t\t\t\treturn this;\n\t\t\t},\n\t\t\tasync next() {\n\t\t\t\tlog.push(\"next\");\n\t\t\t\treturn step++ ? { done: true } : {\n\t\t\t\t\tdone: false,\n\t\t\t\t\tvalue: {}\n\t\t\t\t};\n\t\t\t},\n\t\t\tasync return() {\n\t\t\t\tlog.push(\"return\");\n\t\t\t\tthrow sentinel;\n\t\t\t}\n\t\t};\n\t\treturn {\n\t\t\terror: await outcome(() => consumers.text(source)),\n\t\t\tlog\n\t\t};\n\t});\n\tawait check(\"next rejection propagates original error without return\", async () => {\n\t\tconst sentinel = /* @__PURE__ */ new Error(\"source failure\"), log = [];\n\t\tconst source = {\n\t\t\t[Symbol.asyncIterator]() {\n\t\t\t\treturn this;\n\t\t\t},\n\t\t\tasync next() {\n\t\t\t\tlog.push(\"next\");\n\t\t\t\tthrow sentinel;\n\t\t\t},\n\t\t\tasync return() {\n\t\t\t\tlog.push(\"return\");\n\t\t\t\treturn { done: true };\n\t\t\t}\n\t\t};\n\t\tlet same = false;\n\t\ttry {\n\t\t\tawait consumers.text(source);\n\t\t} catch (error) {\n\t\t\tsame = error === sentinel;\n\t\t}\n\t\treturn {\n\t\t\tsame,\n\t\t\tlog\n\t\t};\n\t});\n\tawait check(\"sync iterator body failure invokes finally\", async () => {\n\t\tconst log = [];\n\t\tfunction* source() {\n\t\t\ttry {\n\t\t\t\tyield new U8([65]);\n\t\t\t\tyield {};\n\t\t\t} finally {\n\t\t\t\tlog.push(\"finally\");\n\t\t\t}\n\t\t}\n\t\treturn {\n\t\t\terror: await outcome(() => consumers.text(source())),\n\t\t\tlog\n\t\t};\n\t});\n\tawait check(\"json consumes streaming text before parsing\", async () => {\n\t\tconst log = [];\n\t\tasync function* valid() {\n\t\t\ttry {\n\t\t\t\tyield new U8([239, 187]);\n\t\t\t\tyield new U8([\n\t\t\t\t\t191,\n\t\t\t\t\t123,\n\t\t\t\t\t34,\n\t\t\t\t\t120,\n\t\t\t\t\t34,\n\t\t\t\t\t58\n\t\t\t\t]);\n\t\t\t\tyield \"2}\";\n\t\t\t} finally {\n\t\t\t\tlog.push(\"complete\");\n\t\t\t}\n\t\t}\n\t\treturn {\n\t\t\tvalue: await consumers.json(valid()),\n\t\t\tlog\n\t\t};\n\t});\n\tawait check(\"json syntax failure occurs after iterator completion\", async () => {\n\t\tconst log = [];\n\t\tasync function* invalid() {\n\t\t\ttry {\n\t\t\t\tyield \"{\";\n\t\t\t\tyield \"bad\";\n\t\t\t} finally {\n\t\t\t\tlog.push(\"complete\");\n\t\t\t}\n\t\t}\n\t\treturn {\n\t\t\terror: await outcome(() => consumers.json(invalid())),\n\t\t\tlog\n\t\t};\n\t});\n\tawait check(\"literal BOM json differs from byte BOM\", async () => ({\n\t\tliteral: await outcome(() => consumers.json([\"﻿{\\\"x\\\":1}\"])),\n\t\tbytes: await consumers.json([new U8([\n\t\t\t239,\n\t\t\t187,\n\t\t\t191,\n\t\t\t123,\n\t\t\t34,\n\t\t\t120,\n\t\t\t34,\n\t\t\t58,\n\t\t\t49,\n\t\t\t125\n\t\t])])\n\t}));\n\tawait check(\"native Promise result and supported async non-construction\", async () => {\n\t\tconst promise = consumers.text([\"a\"]);\n\t\tconst result = {\n\t\t\tpromise: promise instanceof Promise,\n\t\t\tthen: typeof promise.then,\n\t\t\tvalue: await promise\n\t\t};\n\t\tfor (const name of [\"text\", \"json\"]) try {\n\t\t\tReflect.construct(consumers[name], [[]]);\n\t\t\tresult[name] = \"returned\";\n\t\t} catch (e) {\n\t\t\tresult[name] = {\n\t\t\t\tname: e.name,\n\t\t\t\t...e.code === void 0 ? {} : { code: e.code }\n\t\t\t};\n\t\t}\n\t\treturn result;\n\t});\n\treturn cases;\n}\nconst MAX_OUTPUT_CODE_UNITS = 1048576;\n// tests/node-compat/foundation-stream-consumers/component-validation-activated-v2/profiles.mjs\nconst OwnKeys = Object.keys;\nconst GetProto = Object.getPrototypeOf;\nconst Tag = Object.prototype.toString;\nconst Apply = Reflect.apply;\nconst Construct = Reflect.construct;\nconst ErrorCtor = Error;\nfunction check(value, message) {\n\tif (!value) throw new ErrorCtor(\"Consumer policy: \" + message);\n}\nfunction equal(a, b, message) {\n\tcheck(JSON.stringify(a) === JSON.stringify(b), message);\n}\nasync function expectLimit(prototype, chunks) {\n\tconst log = [];\n\tasync function* source() {\n\t\ttry {\n\t\t\tfor (const chunk of chunks) yield chunk;\n\t\t} finally {\n\t\t\tlog.push(\"finally\");\n\t\t}\n\t}\n\tlet failure;\n\ttry {\n\t\tawait prototype.text(source());\n\t} catch (error) {\n\t\tfailure = error;\n\t}\n\tcheck(failure?.code === \"ERR_SM_NODE_LIMIT\" && failure.name === \"RangeError\", \"limit error\");\n\tequal(log, [\"finally\"], \"limit closes iterator\");\n\treturn {\n\t\tcode: failure.code,\n\t\tclosed: true\n\t};\n}\nasync function profileChecks(prototype, selected = null) {\n\tconst cases = [];\n\tlet index = 0;\n\tasync function group(name, run) {\n\t\tconst current = index++;\n\t\tif (selected === null || selected === current) cases.push({\n\t\t\tname,\n\t\t\tresult: await run()\n\t\t});\n\t}\n\tawait group(\"all Blob-dependent operations refuse call and construction\", () => {\n\t\tconst result = [];\n\t\tfor (const name of [\n\t\t\t\"arrayBuffer\",\n\t\t\t\"blob\",\n\t\t\t\"buffer\"\n\t\t]) {\n\t\t\tcheck(prototype[name].name === name && prototype[name].length === 1, \"deferred function shape\");\n\t\t\tfor (const call of [() => prototype[name]([]), () => Construct(prototype[name], [[]])]) {\n\t\t\t\tlet failure;\n\t\t\t\ttry {\n\t\t\t\t\tcall();\n\t\t\t\t} catch (error) {\n\t\t\t\t\tfailure = error;\n\t\t\t\t}\n\t\t\t\tcheck(failure instanceof ErrorCtor, \"deferred Error\");\n\t\t\t\tcheck(failure.code === \"ERR_SM_NODE_UNSUPPORTED\", \"deferred code\");\n\t\t\t\tcheck(failure.module === \"node:stream/consumers\" && failure.operation === name && failure.profile === \"sm-node-22.14.0-m0.14\", \"deferred fields\");\n\t\t\t\tresult.push({\n\t\t\t\t\tname: failure.name,\n\t\t\t\t\tcode: failure.code,\n\t\t\t\t\toperation: failure.operation\n\t\t\t\t});\n\t\t\t}\n\t\t}\n\t\treturn result;\n\t});\n\tawait group(\"real ESM inspection and default graph\", async () => {\n\t\tcheck(Apply(Tag, prototype, []) === \"[object Module]\" && GetProto(prototype) === null && !Object.isExtensible(prototype), \"registered namespace shape\");\n\t\tcheck(prototype.then === void 0 && prototype.default.then === void 0, \"no thenables\");\n\t\tcheck(await Promise.resolve(prototype) === prototype && await Promise.resolve(prototype.default) === prototype.default, \"safe await\");\n\t\tequal(OwnKeys(prototype).sort(), [\n\t\t\t\"arrayBuffer\",\n\t\t\t\"blob\",\n\t\t\t\"buffer\",\n\t\t\t\"default\",\n\t\t\t\"json\",\n\t\t\t\"text\"\n\t\t], \"finite exports\");\n\t\tequal(OwnKeys(prototype.default), [\n\t\t\t\"arrayBuffer\",\n\t\t\t\"blob\",\n\t\t\t\"buffer\",\n\t\t\t\"text\",\n\t\t\t\"json\"\n\t\t], \"default order\");\n\t\tcheck(!Object.isFrozen(prototype.default), \"mutable default\");\n\t\tfor (const name of [\n\t\t\t\"arrayBuffer\",\n\t\t\t\"blob\",\n\t\t\t\"buffer\",\n\t\t\t\"text\",\n\t\t\t\"json\"\n\t\t]) check(prototype[name] === prototype.default[name], \"initial identity\");\n\t\treturn {\n\t\t\tnamespace: Apply(Tag, prototype, []),\n\t\t\tkeys: OwnKeys(prototype).sort(),\n\t\t\tdefaultKeys: OwnKeys(prototype.default),\n\t\t\tthen: \"undefined\"\n\t\t};\n\t});\n\tawait group(\"supported function async shape matches pinned Node\", () => {\n\t\tconst ownKeys = {};\n\t\tfor (const name of [\"text\", \"json\"]) {\n\t\t\tcheck(prototype[name].name === name && prototype[name].length === 1, \"supported function shape\");\n\t\t\townKeys[name] = Reflect.ownKeys(prototype[name]).map(String);\n\t\t\tequal(ownKeys[name], [\"length\", \"name\"], \"exact Node async own-key order\");\n\t\t\tcheck(prototype[name].constructor.name === \"AsyncFunction\", \"async constructor\");\n\t\t}\n\t\treturn {\n\t\t\ttext: \"AsyncFunction\",\n\t\t\tjson: \"AsyncFunction\",\n\t\t\townKeys\n\t\t};\n\t});\n\tawait group(\"default mutation does not rewrite named bindings or lexical json text\", async () => {\n\t\tconst saved = prototype.default.text;\n\t\ttry {\n\t\t\tprototype.default.text = () => {\n\t\t\t\tthrow new ErrorCtor(\"Mutable default called\");\n\t\t\t};\n\t\t\tcheck(prototype.text === saved, \"named function retained\");\n\t\t\tequal(await prototype.json([\"{\\\"x\\\":1}\"]), { x: 1 }, \"lexical json\");\n\t\t} finally {\n\t\t\tprototype.default.text = saved;\n\t\t}\n\t\treturn {\n\t\t\tnamedRetained: true,\n\t\t\tjsonUsesLexicalText: true\n\t\t};\n\t});\n\tawait group(\"captured decoder JSON parser and brand helpers\", async () => {\n\t\tconst saved = {\n\t\t\tctor: globalThis.TextDecoder,\n\t\t\tdecode: TextDecoder.prototype.decode,\n\t\t\tparse: JSON.parse,\n\t\t\tisView: ArrayBuffer.isView,\n\t\t\tapply: Reflect.apply\n\t\t};\n\t\tlet called = 0, output;\n\t\tconst poison = () => {\n\t\t\tcalled++;\n\t\t\tthrow new ErrorCtor(\"Public replacement called\");\n\t\t};\n\t\ttry {\n\t\t\tglobalThis.TextDecoder = poison;\n\t\t\tsaved.ctor.prototype.decode = poison;\n\t\t\tJSON.parse = poison;\n\t\t\tArrayBuffer.isView = poison;\n\t\t\tReflect.apply = poison;\n\t\t\toutput = await prototype.json([new Uint8Array([\n\t\t\t\t123,\n\t\t\t\t34,\n\t\t\t\t120,\n\t\t\t\t34,\n\t\t\t\t58\n\t\t\t]), \"1}\"]);\n\t\t} finally {\n\t\t\tglobalThis.TextDecoder = saved.ctor;\n\t\t\tsaved.ctor.prototype.decode = saved.decode;\n\t\t\tJSON.parse = saved.parse;\n\t\t\tArrayBuffer.isView = saved.isView;\n\t\t\tReflect.apply = saved.apply;\n\t\t}\n\t\tcheck(called === 0, \"captured dependencies\");\n\t\tequal(output, { x: 1 }, \"captured output\");\n\t\treturn {\n\t\t\treplacementCalls: called,\n\t\t\toutput\n\t\t};\n\t});\n\tawait group(\"string input cap closes ordinary iterator\", () => expectLimit(prototype, [\"a\".repeat(1048577)]));\n\tawait group(\"byte input cap rejects before native decode and closes iterator\", () => expectLimit(prototype, [/* @__PURE__ */ new Uint8Array(1048577)]));\n\tawait group(\"output cap spans mixed byte and string inputs\", () => expectLimit(prototype, [\"a\".repeat(MAX_OUTPUT_CODE_UNITS), new Uint8Array([66])]));\n\tawait group(\"final decoder flush output cap occurs after source completion\", async () => {\n\t\tconst log = [];\n\t\tasync function* source() {\n\t\t\ttry {\n\t\t\t\tyield \"a\".repeat(MAX_OUTPUT_CODE_UNITS);\n\t\t\t\tyield new Uint8Array([226]);\n\t\t\t} finally {\n\t\t\t\tlog.push(\"complete\");\n\t\t\t}\n\t\t}\n\t\tlet failure;\n\t\ttry {\n\t\t\tawait prototype.text(source());\n\t\t} catch (error) {\n\t\t\tfailure = error;\n\t\t}\n\t\tcheck(failure?.code === \"ERR_SM_NODE_LIMIT\" && failure.name === \"RangeError\", \"flush limit\");\n\t\tequal(log, [\"complete\"], \"completed source\");\n\t\treturn {\n\t\t\tcode: failure.code,\n\t\t\tlog\n\t\t};\n\t});\n\tawait group(\"chunk cap also bounds empty chunks and closes exactly once\", async () => {\n\t\tlet calls = 0, returns = 0;\n\t\tconst source = {\n\t\t\t[Symbol.asyncIterator]() {\n\t\t\t\treturn this;\n\t\t\t},\n\t\t\tasync next() {\n\t\t\t\tcalls++;\n\t\t\t\treturn {\n\t\t\t\t\tvalue: \"\",\n\t\t\t\t\tdone: false\n\t\t\t\t};\n\t\t\t},\n\t\t\tasync return() {\n\t\t\t\treturns++;\n\t\t\t\treturn { done: true };\n\t\t\t}\n\t\t};\n\t\tlet failure;\n\t\ttry {\n\t\t\tawait prototype.text(source);\n\t\t} catch (error) {\n\t\t\tfailure = error;\n\t\t}\n\t\tcheck(failure?.code === \"ERR_SM_NODE_LIMIT\" && calls === 4097 && returns === 1, \"chunk limit\");\n\t\treturn {\n\t\t\tnextCalls: calls,\n\t\t\treturnCalls: returns\n\t\t};\n\t});\n\tawait group(\"profile cap error wins over iterator-return rejection\", async () => {\n\t\tlet returns = 0;\n\t\tconst source = {\n\t\t\t[Symbol.asyncIterator]() {\n\t\t\t\treturn this;\n\t\t\t},\n\t\t\tasync next() {\n\t\t\t\treturn {\n\t\t\t\t\tvalue: /* @__PURE__ */ new Uint8Array(1048577),\n\t\t\t\t\tdone: false\n\t\t\t\t};\n\t\t\t},\n\t\t\tasync return() {\n\t\t\t\treturns++;\n\t\t\t\tthrow new ErrorCtor(\"Return failed\");\n\t\t\t}\n\t\t};\n\t\tlet failure;\n\t\ttry {\n\t\t\tawait prototype.text(source);\n\t\t} catch (error) {\n\t\t\tfailure = error;\n\t\t}\n\t\tcheck(failure?.code === \"ERR_SM_NODE_LIMIT\" && returns === 1, \"cap precedence\");\n\t\treturn {\n\t\t\tcode: failure.code,\n\t\t\treturns\n\t\t};\n\t});\n\tawait group(\"registered public record exposes no factory or native dependencies\", () => {\n\t\tequal(OwnKeys(prototype).sort(), [\n\t\t\t\"arrayBuffer\",\n\t\t\t\"blob\",\n\t\t\t\"buffer\",\n\t\t\t\"default\",\n\t\t\t\"json\",\n\t\t\t\"text\"\n\t\t], \"finite registered public exports\");\n\t\tcheck(prototype.createConsumersModule === void 0 && prototype.TextDecoder === void 0 && prototype.kernel === void 0, \"private factory/dependency absent\");\n\t\treturn {\n\t\t\tfiniteRegisteredBindings: true,\n\t\t\tprivateFactoryType: \"undefined\",\n\t\t\tprivateDecoderType: \"undefined\"\n\t\t};\n\t});\n\treturn cases;\n}\n// tests/node-compat/foundation-stream-consumers/component-validation-activated-v2/extras.mjs\nconst extraNames = Object.freeze([\n\t\"selected node:stream/web ReadableStream text\",\n\t\"selected node:stream/web ReadableStream json\",\n\t\"selected classic Readable text\",\n\t\"selected classic Readable json\",\n\t\"exact string/output cap accepts full content\",\n\t\"exact4096 empty chunks accept\",\n\t\"native Buffer visible offset input is immutable\",\n\t\"decoder/json state recovers between calls\"\n]);\nasync function extraCase(c, { Buffer, Readable, ReadableStream }, index) {\n\tfunction web(chunks) {\n\t\treturn new ReadableStream({ start(controller) {\n\t\t\tfor (const chunk of chunks) controller.enqueue(chunk);\n\t\t\tcontroller.close();\n\t\t} });\n\t}\n\tfunction classic(chunks) {\n\t\tlet sent = false;\n\t\treturn new Readable({\n\t\t\tobjectMode: true,\n\t\t\tread() {\n\t\t\t\tif (sent) return;\n\t\t\t\tsent = true;\n\t\t\t\tfor (const chunk of chunks) this.push(chunk);\n\t\t\t\tthis.push(null);\n\t\t\t}\n\t\t});\n\t}\n\tif (index === 0) return c.text(web([\n\t\tnew Uint8Array([226]),\n\t\t\"X\",\n\t\tnew Uint8Array([130, 172])\n\t]));\n\tif (index === 1) return c.json(web([new Uint8Array([\n\t\t239,\n\t\t187,\n\t\t191,\n\t\t123,\n\t\t34,\n\t\t120,\n\t\t34,\n\t\t58\n\t]), \"2}\"]));\n\tif (index === 2) return c.text(classic([\n\t\tnew Uint8Array([65]),\n\t\t\"B\",\n\t\tnew Uint8Array([67])\n\t]));\n\tif (index === 3) return c.json(classic([\"{\\\"x\\\":\", new Uint8Array([50, 125])]));\n\tif (index === 4) {\n\t\tconst wanted = \"a\".repeat(1048576), actual = await c.text([wanted]);\n\t\tif (actual !== wanted) throw new Error(\"Exact cap content\");\n\t\treturn {\n\t\t\tlength: actual.length,\n\t\t\tvalue: actual,\n\t\t\tfullContentEqual: true\n\t\t};\n\t}\n\tif (index === 5) return {\n\t\tvalue: await c.text(Array.from({ length: 4096 }, () => \"\")),\n\t\tchunks: 4096\n\t};\n\tif (index === 6) {\n\t\tconst backing = /* @__PURE__ */ new ArrayBuffer(8);\n\t\tnew Uint8Array(backing, 2, 3).set([\n\t\t\t65,\n\t\t\t66,\n\t\t\t67\n\t\t]);\n\t\tconst input = Buffer.from(backing, 2, 3), before = input.toString(\"hex\");\n\t\treturn {\n\t\t\tvalue: await c.text([input, \"!\"]),\n\t\t\tbefore,\n\t\t\tafter: input.toString(\"hex\"),\n\t\t\toffset: input.byteOffset,\n\t\t\tbackingBytes: backing.byteLength,\n\t\t\tisBuffer: Buffer.isBuffer(input)\n\t\t};\n\t}\n\tif (index === 7) {\n\t\tlet syntax = false;\n\t\ttry {\n\t\t\tawait c.json([\"{\"]);\n\t\t} catch (error) {\n\t\t\tsyntax = error.name === \"SyntaxError\";\n\t\t}\n\t\treturn {\n\t\t\tsyntax,\n\t\t\tpendingFlush: await c.text([new Uint8Array([226])]),\n\t\t\tfreshPartial: await c.text([new Uint8Array([130, 172])]),\n\t\t\tjson: await c.json([\"{\\\"ok\\\":true}\"])\n\t\t};\n\t}\n\tthrow new RangeError(\"Finite extra case index\");\n}\n// tests/node-compat/foundation-stream-consumers/component-validation-activated-v2/component.mjs\nconst own = Object.hasOwn;\nconst backing = /* @__PURE__ */ new ArrayBuffer(7);\nconst view = new Uint8Array(backing, 2, 3);\nview.set([\n\t65,\n\t66,\n\t67\n]);\nconst snapshotBuffer = Buffer.from(new Uint8Array([17, 18]));\nconst snapshotText = await consumers.text([view, \"!\"]);\nconst snapshotJson = await consumers.json([\"{\\\"snapshot\\\":true}\"]);\nconst snapshotFlush = await consumers.text([new Uint8Array([226])]);\nlet calls = 0;\nlet gcCalls = 0;\nfunction errorFields(error) {\n\tconst fields = {};\n\tfor (const key of [\n\t\t\"code\",\n\t\t\"module\",\n\t\t\"operation\",\n\t\t\"profile\"\n\t]) fields[key] = {\n\t\town: own(error, key),\n\t\ttype: typeof error[key],\n\t\tvalue: error[key]\n\t};\n\treturn {\n\t\tname: error.name,\n\t\tfields\n\t};\n}\nfunction refusalRecords() {\n\tconst records = [];\n\tfor (const name of [\n\t\t\"arrayBuffer\",\n\t\t\"blob\",\n\t\t\"buffer\"\n\t]) for (const mode of [\"call\", \"new\"]) {\n\t\tlet error;\n\t\ttry {\n\t\t\tif (mode === \"new\") Reflect.construct(consumers[name], [[]]);\n\t\t\telse consumers[name]([]);\n\t\t} catch (caught) {\n\t\t\terror = caught;\n\t\t}\n\t\tif (!error) throw new Error(\"Missing consumer refusal\");\n\t\trecords.push({\n\t\t\tname,\n\t\t\tmode,\n\t\t\terror: errorFields(error)\n\t\t});\n\t}\n\treturn records;\n}\nconst initializationRefusals = refusalRecords();\nfunction snapshot() {\n\treturn {\n\t\ttext: snapshotText,\n\t\tjson: snapshotJson,\n\t\tflush: snapshotFlush,\n\t\tbufferByte: snapshotBuffer[0],\n\t\tbufferBrand: Buffer.isBuffer(snapshotBuffer),\n\t\tviewOffset: view.byteOffset,\n\t\tbackingBytes: backing.byteLength\n\t};\n}\nasync function moduleContract() {\n\tconst canonicalId = String.fromCharCode(110, 111, 100, 101, 58, 115, 116, 114, 101, 97, 109, 47, 99, 111, 110, 115, 117, 109, 101, 114, 115), aliasId = String.fromCharCode(115, 116, 114, 101, 97, 109, 47, 99, 111, 110, 115, 117, 109, 101, 114, 115);\n\tconst canonical = await import(canonicalId), canonicalAgain = await import(canonicalId), alias = await import(aliasId), aliasAgain = await import(aliasId);\n\tconst names = Object.keys(consumers).sort(), values = [\n\t\t\"arrayBuffer\",\n\t\t\"blob\",\n\t\t\"buffer\",\n\t\t\"text\",\n\t\t\"json\"\n\t];\n\treturn JSON.stringify({\n\t\tcalls,\n\t\tgcCalls,\n\t\tnames,\n\t\taliasNames: Object.keys(alias).sort(),\n\t\tcanonicalCached: canonical === canonicalAgain,\n\t\taliasCached: alias === aliasAgain,\n\t\tcanonicalStatic: canonical === consumers,\n\t\taliasValues: values.every((name) => alias[name] === consumers[name]) && alias.default === __smBuiltin0,\n\t\tdefaultNamed: values.every((name) => __smBuiltin0[name] === consumers[name]),\n\t\tdefaultKeys: Object.keys(__smBuiltin0),\n\t\tdefaultMutable: !Object.isFrozen(__smBuiltin0),\n\t\tcjsDefault: consumer_cjs_native_profile_default === __smBuiltin0,\n\t\tthenType: typeof consumers.then,\n\t\taliasThenType: typeof alias.then,\n\t\tdefaultThenType: typeof __smBuiltin0.then,\n\t\tsafeAwaitNamespace: await Promise.resolve(consumers) === consumers,\n\t\tsafeAwaitAlias: await Promise.resolve(alias) === alias,\n\t\tsafeAwaitDefault: await Promise.resolve(__smBuiltin0) === __smBuiltin0,\n\t\tnamespaceTag: Object.prototype.toString.call(consumers),\n\t\tnamespacePrototypeNull: Object.getPrototypeOf(consumers) === null,\n\t\tnamespaceExtensible: Object.isExtensible(consumers),\n\t\tglobalBuffer: globalThis.Buffer === Buffer && bufferDefault.Buffer === Buffer,\n\t\tprivateFactoryType: typeof consumers.createConsumersModule,\n\t\tprivateDecoderType: typeof consumers.TextDecoder,\n\t\tselectedWeb: {\n\t\t\tconstructor: typeof ReadableStream,\n\t\t\tasyncIterator: typeof ReadableStream.prototype[Symbol.asyncIterator]\n\t\t},\n\t\trawGlobalReadableObservation: {\n\t\t\tconstructor: typeof globalThis.ReadableStream,\n\t\t\tasyncIterator: typeof globalThis.ReadableStream?.prototype[Symbol.asyncIterator],\n\t\t\tpassedToConsumer: false\n\t\t},\n\t\tsnapshot: snapshot(),\n\t\tinitializationRefusals\n\t});\n}\nasync function run(index) {\n\tif (!Number.isInteger(index) || index < 0 || index >= 38) throw new RangeError(\"Finite public case index\");\n\tcalls++;\n\tsnapshotBuffer[0]++;\n\tlet group, kind;\n\tif (index < 18) {\n\t\tgroup = (await textChecks(consumers, index))[0];\n\t\tkind = \"node-differential\";\n\t} else if (index < 30) {\n\t\tgroup = (await profileChecks(consumers, index - 18))[0];\n\t\tkind = \"profile\";\n\t} else {\n\t\tgroup = {\n\t\t\tname: extraNames[index - 30],\n\t\t\tresult: await extraCase(consumers, {\n\t\t\t\tBuffer,\n\t\t\t\tReadable,\n\t\t\t\tReadableStream\n\t\t\t}, index - 30)\n\t\t};\n\t\tkind = \"public-stream-and-boundary\";\n\t}\n\tif (!group) throw new Error(\"Missing finite consumer case\");\n\treturn JSON.stringify({\n\t\tcalls,\n\t\tgcCalls,\n\t\tindex,\n\t\tkind,\n\t\t...group,\n\t\tsnapshot: snapshot(),\n\t\trefusals: refusalRecords(),\n\t\tnativeBlobInvoked: false\n\t});\n}\nasync function ordinaryGc() {\n\tgcCalls++;\n\tconst operations = [], owner = Buffer.from(new Uint8Array([65]));\n\tasync function* source() {\n\t\tyield new Uint8Array([226]);\n\t\tfor (let i = 0; i < 8; i++) {\n\t\t\tconst input = Buffer.from(new Uint8Array([i]));\n\t\t\toperations.push(input.toString(\"hex\"));\n\t\t\tawait Promise.resolve();\n\t\t}\n\t\tyield new Uint8Array([130, 172]);\n\t}\n\tconst value = await consumers.text(source());\n\treturn JSON.stringify({\n\t\tcalls,\n\t\tgcCalls,\n\t\tvalue,\n\t\toperations,\n\t\townerHex: owner.toString(\"hex\"),\n\t\tapplicationStrongOwnerRetained: true,\n\t\tdecoderSpansAwaitAndNativeHex: true,\n\t\tvmTemporaryRootsIsolated: false,\n\t\tnativeBlobInvoked: false\n\t});\n}\nexport { moduleContract, ordinaryGc, run };\n",
+    "imports": [
+      "node:buffer",
+      "node:stream",
+      "node:stream/consumers",
+      "node:stream/web"
+    ],
+    "moduleIds": [
+      "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-activated-v2/consumer.cjs.native-profile.mjs",
+      "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-activated-v2/differential.mjs",
+      "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-activated-v2/profile-contract.mjs",
+      "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-activated-v2/profiles.mjs",
+      "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-activated-v2/extras.mjs",
+      "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/component-validation-activated-v2/component.mjs"
+    ],
+    "sha256": "5135ed46d2b02bba003757c206cb785456bfc33bd95ab887fec1da98b7d65a2f"
+  },
+  "interfaceAudit": {
+    "schemaVersion": 1,
+    "entropyPolicy": "off",
+    "selectedInterfaces": [],
+    "catalogueSha256": "a9b23a7158e4cfc1951ac166511a2b3d4b8d8b3714794a8757f5198597f80d01",
+    "state": "verified-final-component",
+    "componentSha256": "ff4c2aaeb4590b206b4c2ec494f06411c3efd377d8e00d358c4675ba6a053421",
+    "emittedImports": [],
+    "unusedSelectedInterfaces": [],
+    "scope": "Exact component interface names/versions; type-only versus callable dependencies remain a separate type-graph audit"
+  },
+  "records": [
+    {
+      "id": "0002-ordinary-GC-1",
+      "value": {
+        "calls": 0,
+        "gcCalls": 1,
+        "value": "€",
+        "operations": [
+          "00",
+          "01",
+          "02",
+          "03",
+          "04",
+          "05",
+          "06",
+          "07"
+        ],
+        "ownerHex": "41",
+        "applicationStrongOwnerRetained": true,
+        "decoderSpansAwaitAndNativeHex": true,
+        "vmTemporaryRootsIsolated": false,
+        "nativeBlobInvoked": false
+      },
+      "rawFile": {
+        "path": "/tmp/starling-node-compat/consumers355-v2-gc-component-validation-v1/calls/0002-ordinary-GC-1.raw.txt",
+        "sha256": "9ca01adfc78df0cc9a4cae07e99d4fe6ba2a3c0163a9271836ba7d13f1673cae",
+        "bytes": 242
+      },
+      "transportFile": {
+        "path": "/tmp/starling-node-compat/consumers355-v2-gc-component-validation-v1/calls/0002-ordinary-GC-1.transport.json",
+        "sha256": "8c9c52fa8a2d69722dc0c46a3fcc02d8553a1f08a1ba24d6cf22fc63243bbde0",
+        "bytes": 87
+      }
+    },
+    {
+      "id": "0003-ordinary-GC-2",
+      "value": {
+        "calls": 0,
+        "gcCalls": 2,
+        "value": "€",
+        "operations": [
+          "00",
+          "01",
+          "02",
+          "03",
+          "04",
+          "05",
+          "06",
+          "07"
+        ],
+        "ownerHex": "41",
+        "applicationStrongOwnerRetained": true,
+        "decoderSpansAwaitAndNativeHex": true,
+        "vmTemporaryRootsIsolated": false,
+        "nativeBlobInvoked": false
+      },
+      "rawFile": {
+        "path": "/tmp/starling-node-compat/consumers355-v2-gc-component-validation-v1/calls/0003-ordinary-GC-2.raw.txt",
+        "sha256": "7588d07c5b0974060139a13a168703a7e6c89a9af0eee9d3a7625069d384619e",
+        "bytes": 242
+      },
+      "transportFile": {
+        "path": "/tmp/starling-node-compat/consumers355-v2-gc-component-validation-v1/calls/0003-ordinary-GC-2.transport.json",
+        "sha256": "8c9c52fa8a2d69722dc0c46a3fcc02d8553a1f08a1ba24d6cf22fc63243bbde0",
+        "bytes": 87
+      }
+    },
+    {
+      "id": "0004-ordinary-GC-3",
+      "value": {
+        "calls": 0,
+        "gcCalls": 3,
+        "value": "€",
+        "operations": [
+          "00",
+          "01",
+          "02",
+          "03",
+          "04",
+          "05",
+          "06",
+          "07"
+        ],
+        "ownerHex": "41",
+        "applicationStrongOwnerRetained": true,
+        "decoderSpansAwaitAndNativeHex": true,
+        "vmTemporaryRootsIsolated": false,
+        "nativeBlobInvoked": false
+      },
+      "rawFile": {
+        "path": "/tmp/starling-node-compat/consumers355-v2-gc-component-validation-v1/calls/0004-ordinary-GC-3.raw.txt",
+        "sha256": "9ac0f22bbfacec28eab55bcb3fd6977c240bf3912d1c512a34ca32f7bd571b5e",
+        "bytes": 242
+      },
+      "transportFile": {
+        "path": "/tmp/starling-node-compat/consumers355-v2-gc-component-validation-v1/calls/0004-ordinary-GC-3.transport.json",
+        "sha256": "8c9c52fa8a2d69722dc0c46a3fcc02d8553a1f08a1ba24d6cf22fc63243bbde0",
+        "bytes": 87
+      }
+    },
+    {
+      "id": "0006-fresh-Wasmtime-ordinary-GC",
+      "value": {
+        "calls": 0,
+        "gcCalls": 1,
+        "value": "€",
+        "operations": [
+          "00",
+          "01",
+          "02",
+          "03",
+          "04",
+          "05",
+          "06",
+          "07"
+        ],
+        "ownerHex": "41",
+        "applicationStrongOwnerRetained": true,
+        "decoderSpansAwaitAndNativeHex": true,
+        "vmTemporaryRootsIsolated": false,
+        "nativeBlobInvoked": false
+      },
+      "rawFile": {
+        "path": "/tmp/starling-node-compat/consumers355-v2-gc-component-validation-v1/calls/0006-fresh-Wasmtime-ordinary-GC.raw.txt",
+        "sha256": "9ca01adfc78df0cc9a4cae07e99d4fe6ba2a3c0163a9271836ba7d13f1673cae",
+        "bytes": 242
+      },
+      "transportFile": {
+        "path": "/tmp/starling-node-compat/consumers355-v2-gc-component-validation-v1/calls/0006-fresh-Wasmtime-ordinary-GC.transport.json",
+        "sha256": "8c9c52fa8a2d69722dc0c46a3fcc02d8553a1f08a1ba24d6cf22fc63243bbde0",
+        "bytes": 87
+      }
+    }
+  ],
+  "initializerRecords": [],
+  "denials": [],
+  "componentizeCalls": 1,
+  "scope": {
+    "plannedDifferentialGroups": 18,
+    "plannedProfileGroups": 12,
+    "plannedPublicAdditionalGroups": 8,
+    "plannedNormalRecords": 190,
+    "normalRecordsExecuted": 0,
+    "ordinaryCombinedOwnerGcOnly": true,
+    "vmTemporaryRootsIsolated": false,
+    "rawGlobalWebPassedToConsumer": false,
+    "nativeBlobInvoked": false,
+    "HTTPBodyCancellationOrReuseInferred": false,
+    "old293Or350RuntimeTransferred": false,
+    "operationalAdmission": false,
+    "noTiming": true
+  },
+  "requiresIndependentTerminalExitZero": true
+}

@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "state": "isolated-uninstalled-codec-guard-candidate",
+  "nodeRelease": "v22.14.0",
+  "factoryExport": "createStreamWebModule",
+  "privateRecord": {
+    "ownDataFunctionKeys": [
+      "ByteLengthQueuingStrategy",
+      "CountQueuingStrategy",
+      "ReadableByteStreamController",
+      "ReadableStream",
+      "ReadableStreamBYOBReader",
+      "ReadableStreamBYOBRequest",
+      "ReadableStreamDefaultController",
+      "ReadableStreamDefaultReader",
+      "TextDecoder",
+      "TextEncoder",
+      "TransformStream",
+      "TransformStreamDefaultController",
+      "WritableStream",
+      "WritableStreamDefaultController",
+      "WritableStreamDefaultWriter",
+      "isReadableStreamBYOBReader"
+    ],
+    "additionalKeys": "rejected ERR_SM_NODE_RECORD",
+    "isReadableStreamBYOBReader": "one arbitrary JavaScript value -> boolean, no exception or observable callbacks; prototype fixture uses only registered genuine readers, not the uncompiled native implementation"
+  },
+  "moduleExports": [
+    "ByteLengthQueuingStrategy",
+    "CompressionStream",
+    "CountQueuingStrategy",
+    "DecompressionStream",
+    "ReadableByteStreamController",
+    "ReadableStream",
+    "ReadableStreamBYOBReader",
+    "ReadableStreamBYOBRequest",
+    "ReadableStreamDefaultController",
+    "ReadableStreamDefaultReader",
+    "TextDecoderStream",
+    "TextEncoderStream",
+    "TransformStream",
+    "TransformStreamDefaultController",
+    "WritableStream",
+    "WritableStreamDefaultController",
+    "WritableStreamDefaultWriter",
+    "default"
+  ],
+  "default": "ordinary mutable 17-member record; initial named/default function identities; no synchronization or real ESM registration yet",
+  "hostInterfaces": [],
+  "limits": {
+    "encoderSourceUtf16UnitsPerIncomingChunk": 1048576,
+    "decoderInputBytesPerIncomingChunk": 16777216,
+    "byobViewBytes": 16777216,
+    "errorCode": "ERR_SM_NODE_LIMIT",
+    "totalLifetimeOrQueueBudget": null
+  },
+  "supportedCodecs": {
+    "TextEncoderStream": "UTF8, native bulk conversion, one trailing high surrogate retained, String(chunk) coercion including Symbol",
+    "TextDecoderStream": "UTF8 labels normalized by captured native decoder, fixed attached unshared BufferSources; BOM/fatal/stream/flush in native decoder"
+  },
+  "deferred": {
+    "code": "ERR_SM_NODE_UNSUPPORTED",
+    "operations": [
+      "CompressionStream call/new",
+      "DecompressionStream call/new",
+      "ReadableStream.from call/new",
+      "ReadableStream.prototype.values call/new",
+      "ReadableStream.prototype[Symbol.asyncIterator] call/new",
+      "TextDecoderStream known non-UTF8 encoding",
+      "decoder shared/resizable/detached input",
+      "BYOB min greater than 1",
+      "BYOB DataView",
+      "BYOB shared/resizable/subclass/cross-realm/modified layout views"
+    ]
+  },
+  "knownNativeDeviations": [
+    "WritableStreamDefaultController.signal absent",
+    "native retained constructor arity/error codes differ in previously recorded cases",
+    "proxy of genuine BYOB reader rejected by proposed native callback; Node22 accepts it"
+  ],
+  "isolatedMutations": [
+    "BYOBReader.prototype.read",
+    "ReadableStream.from",
+    "ReadableStream.prototype.values",
+    "ReadableStream.prototype[Symbol.asyncIterator]",
+    "TransformStreamDefaultController.prototype.desiredSize",
+    "TransformStreamDefaultController.prototype.enqueue",
+    "TransformStreamDefaultController.prototype.error",
+    "TransformStreamDefaultController.prototype.terminate"
+  ],
+  "productionGates": [
+    "Compile actual 16-key native capture kernel and public brand callback",
+    "Compile ordinary native TSDC receiver guard and run invalid receiver tests on new engine",
+    "Implement/test real from/values/asyncIterator independently",
+    "Resolve DataView BYOB through tested no-copy adapter or native change",
+    "Review global prototype policy and versioned module admission/registration",
+    "Native compression ownership/error/output-budget hardening and ordinary validation"
+  ]
+}

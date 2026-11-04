@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:starlingmonkey:node-compat:manifest:1",
+  "description": "Finite opt-in Node v22.14.0 guest profile; additional modules require explicit factory/registry integration.",
+  "type": "object",
+  "required": ["schemaVersion", "profileVersion", "nodeVersion", "status", "moduleContract", "modules", "requiredHostInterfaces"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "profileVersion": { "type": "string", "pattern": "^sm-node-22\\.14\\.0-m[0-9]+\\.[0-9]+$" },
+    "nodeVersion": { "const": "v22.14.0" },
+    "status": { "type": "string", "minLength": 1 },
+    "moduleContract": { "type": "string", "minLength": 1 },
+    "modules": {
+      "type": "object",
+      "propertyNames": { "pattern": "^node:[a-z][a-z0-9_]*(?:/[a-z][a-z0-9_]*)*$" },
+      "additionalProperties": { "$ref": "#/$defs/module" }
+    },
+    "requiredHostInterfaces": {
+      "type": "array", "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^wasi:[a-z][a-z0-9-]*/[a-z][a-z0-9-]*@0\\.2\\.10$" }
+    }
+  },
+  "$defs": {
+    "strings": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "module": {
+      "type": "object",
+      "required": ["aliases", "status", "exports"],
+      "additionalProperties": false,
+      "properties": {
+        "aliases": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*(?:/[a-z][a-z0-9_]*)*$" } },
+        "status": { "enum": ["supported", "partial", "import-only", "deferred", "unavailable"] },
+        "exports": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "pattern": "^(?:default|[A-Za-z_$][A-Za-z0-9_$]*)$" } },
+        "globals": { "$ref": "#/$defs/strings" },
+        "callablePolicy": { "type": "string", "minLength": 1 },
+        "supportedStatic": { "$ref": "#/$defs/strings" },
+        "supportedPrototype": { "$ref": "#/$defs/strings" },
+        "encodingNames": { "$ref": "#/$defs/strings" },
+        "limits": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 } },
+        "numericExports": { "type": "object", "additionalProperties": { "type": "number" } },
+        "importOnlyExports": { "$ref": "#/$defs/strings" },
+        "unsupportedStatic": { "$ref": "#/$defs/strings" },
+        "unsupportedPrototypePolicy": { "type": "string", "minLength": 1 },
+        "deviations": { "$ref": "#/$defs/strings" }
+      }
+    }
+  }
+}

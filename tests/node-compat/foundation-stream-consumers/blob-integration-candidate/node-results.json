@@ -1,0 +1,840 @@
+{
+  "schemaVersion": 1,
+  "node": "v22.14.0",
+  "nodeBinary": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+  "nodeBinarySha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+  "ordinary": [
+    {
+      "name": "empty fresh storage and minimum one-unit text",
+      "result": {
+        "emptyText": "",
+        "emptySize": 0,
+        "independent": true,
+        "emptyBytes": [],
+        "oneByte": "A"
+      }
+    },
+    {
+      "name": "UTF8 strings repair each source part",
+      "result": {
+        "text": "A€😀�",
+        "bytes": [
+          65,
+          226,
+          130,
+          172,
+          240,
+          159,
+          152,
+          128,
+          239,
+          191,
+          189
+        ],
+        "split": "��"
+      }
+    },
+    {
+      "name": "UTF8 BOM removal malformed and truncated replacement",
+      "result": [
+        "A",
+        "�",
+        "�A"
+      ]
+    },
+    {
+      "name": "only visible view bytes copied at construction",
+      "result": {
+        "bytes": [
+          65,
+          66,
+          66
+        ],
+        "size": 3,
+        "text": "ABB"
+      }
+    },
+    {
+      "name": "ArrayBuffer and nonbyte typed views use raw byte range",
+      "result": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "name": "arrayBuffer and bytes outputs are independent copies",
+      "result": {
+        "a": [
+          90,
+          66,
+          67
+        ],
+        "b": [
+          65,
+          66,
+          67
+        ],
+        "c": [
+          65,
+          89,
+          67
+        ],
+        "independent": true,
+        "source": "ABC"
+      }
+    },
+    {
+      "name": "nested Blob and File are immutable byte parts",
+      "result": {
+        "bytes": [
+          65,
+          66,
+          65,
+          67
+        ],
+        "type": "",
+        "fileType": "",
+        "name": "x.txt",
+        "lastModified": 17,
+        "fileIsBlob": true
+      }
+    },
+    {
+      "name": "finite integer slices clamp and preserve original",
+      "result": {
+        "variants": [
+          {
+            "text": "abcdef",
+            "type": "text/x",
+            "size": 6
+          },
+          {
+            "text": "de",
+            "type": "text/x",
+            "size": 2
+          },
+          {
+            "text": "",
+            "type": "text/x",
+            "size": 0
+          },
+          {
+            "text": "abcdef",
+            "type": "text/x",
+            "size": 6
+          },
+          {
+            "text": "",
+            "type": "text/x",
+            "size": 0
+          }
+        ],
+        "source": "abcdef"
+      }
+    },
+    {
+      "name": "ordinary ASCII MIME normalization",
+      "result": [
+        "text/plain;x=a",
+        "",
+        ""
+      ]
+    },
+    {
+      "name": "explicit finite integer File fields and slice result",
+      "result": {
+        "name": "plain.txt",
+        "lastModified": -17,
+        "type": "text/plain",
+        "size": 2,
+        "text": "AB",
+        "tag": "[object File]",
+        "sliceText": "B",
+        "sliceIsBlob": true,
+        "sliceIsFile": false
+      }
+    },
+    {
+      "name": "bounded repeated reads and small-object pressure",
+      "result": {
+        "objects": 64,
+        "sum": 2016,
+        "lastText": "?"
+      }
+    }
+  ],
+  "receivers": [
+    {
+      "api": "Blob.arrayBuffer",
+      "receiver": "plain",
+      "result": {
+        "phase": "reject",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.arrayBuffer",
+      "receiver": "prototype",
+      "result": {
+        "phase": "reject",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.arrayBuffer",
+      "receiver": "null",
+      "result": {
+        "phase": "reject",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.bytes",
+      "receiver": "plain",
+      "result": {
+        "phase": "reject",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.bytes",
+      "receiver": "prototype",
+      "result": {
+        "phase": "reject",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.bytes",
+      "receiver": "null",
+      "result": {
+        "phase": "reject",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.text",
+      "receiver": "plain",
+      "result": {
+        "phase": "reject",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.text",
+      "receiver": "prototype",
+      "result": {
+        "phase": "reject",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.text",
+      "receiver": "null",
+      "result": {
+        "phase": "reject",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.slice",
+      "receiver": "plain",
+      "result": {
+        "phase": "throw",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.slice",
+      "receiver": "prototype",
+      "result": {
+        "phase": "throw",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.slice",
+      "receiver": "null",
+      "result": {
+        "phase": "throw",
+        "name": "TypeError"
+      }
+    },
+    {
+      "api": "Blob.stream",
+      "receiver": "plain",
+      "result": {
+        "phase": "throw",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.stream",
+      "receiver": "prototype",
+      "result": {
+        "phase": "throw",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.stream",
+      "receiver": "null",
+      "result": {
+        "phase": "throw",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.size",
+      "receiver": "plain",
+      "result": {
+        "phase": "throw",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.size",
+      "receiver": "prototype",
+      "result": {
+        "phase": "throw",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.type",
+      "receiver": "plain",
+      "result": {
+        "phase": "throw",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "Blob.type",
+      "receiver": "prototype",
+      "result": {
+        "phase": "throw",
+        "name": "TypeError",
+        "code": "ERR_INVALID_THIS"
+      }
+    },
+    {
+      "api": "File.name",
+      "receiver": "plain",
+      "result": {
+        "phase": "throw",
+        "name": "TypeError"
+      }
+    },
+    {
+      "api": "File.name",
+      "receiver": "prototype",
+      "result": {
+        "phase": "throw",
+        "name": "TypeError"
+      }
+    },
+    {
+      "api": "File.lastModified",
+      "receiver": "plain",
+      "result": {
+        "phase": "throw",
+        "name": "TypeError"
+      }
+    },
+    {
+      "api": "File.lastModified",
+      "receiver": "prototype",
+      "result": {
+        "phase": "throw",
+        "name": "TypeError"
+      }
+    }
+  ],
+  "nodeOnly": [
+    {
+      "name": "options getter and conversion order",
+      "result": {
+        "log": [
+          "get-type",
+          "get-endings",
+          "endings-toString",
+          "iterator",
+          "part-toString",
+          "type-toString"
+        ],
+        "text": "A",
+        "type": "text/plain"
+      }
+    },
+    {
+      "name": "MIME primitive conversion",
+      "result": [
+        {
+          "type": "number",
+          "result": {
+            "phase": "fulfilled",
+            "value": "17"
+          }
+        },
+        {
+          "type": "boolean",
+          "result": {
+            "phase": "fulfilled",
+            "value": "true"
+          }
+        },
+        {
+          "type": "object",
+          "result": {
+            "phase": "fulfilled",
+            "value": "null"
+          }
+        },
+        {
+          "type": "undefined",
+          "result": {
+            "phase": "fulfilled",
+            "value": ""
+          }
+        },
+        {
+          "type": "symbol",
+          "result": {
+            "phase": "throw",
+            "name": "TypeError"
+          }
+        }
+      ]
+    },
+    {
+      "name": "endings conversion validation and native LF",
+      "result": [
+        {
+          "endings": "transparent",
+          "result": {
+            "phase": "fulfilled",
+            "value": "a\r\nb\rc\n"
+          }
+        },
+        {
+          "endings": "native",
+          "result": {
+            "phase": "fulfilled",
+            "value": "a\nb\rc\n"
+          }
+        },
+        {
+          "endings": "invalid",
+          "result": {
+            "phase": "reject",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_VALUE"
+          }
+        },
+        {
+          "endings": null,
+          "result": {
+            "phase": "reject",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_VALUE"
+          }
+        },
+        {
+          "endings": 17,
+          "result": {
+            "phase": "reject",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_VALUE"
+          }
+        }
+      ]
+    },
+    {
+      "name": "option dictionary primitive inputs",
+      "result": [
+        {
+          "kind": "object",
+          "result": {
+            "phase": "fulfilled",
+            "value": 0
+          }
+        },
+        {
+          "kind": "number",
+          "result": {
+            "phase": "throw",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE"
+          }
+        },
+        {
+          "kind": "boolean",
+          "result": {
+            "phase": "throw",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE"
+          }
+        },
+        {
+          "kind": "string",
+          "result": {
+            "phase": "throw",
+            "name": "TypeError",
+            "code": "ERR_INVALID_ARG_TYPE"
+          }
+        }
+      ]
+    },
+    {
+      "name": "File field order and well-formed name",
+      "result": {
+        "log": [
+          "type",
+          "endings",
+          "part",
+          "lastModified",
+          "name"
+        ],
+        "name": "�.txt",
+        "lastModified": 7
+      }
+    },
+    {
+      "name": "File numeric lastModified semantics",
+      "result": [
+        {
+          "input": "1.75",
+          "result": {
+            "phase": "fulfilled",
+            "value": 1.75
+          }
+        },
+        {
+          "input": "-1.75",
+          "result": {
+            "phase": "fulfilled",
+            "value": -1.75
+          }
+        },
+        {
+          "input": "NaN",
+          "result": {
+            "phase": "fulfilled",
+            "value": 0
+          }
+        },
+        {
+          "input": "Infinity",
+          "result": {
+            "phase": "fulfilled",
+            "value": "+Infinity"
+          }
+        },
+        {
+          "input": "-Infinity",
+          "result": {
+            "phase": "fulfilled",
+            "value": "-Infinity"
+          }
+        },
+        {
+          "input": "0",
+          "result": {
+            "phase": "fulfilled",
+            "value": "-0"
+          }
+        },
+        {
+          "input": "1",
+          "result": {
+            "phase": "throw",
+            "name": "TypeError"
+          }
+        }
+      ]
+    },
+    {
+      "name": "File default timestamp is a live Node clock fact",
+      "result": {
+        "withinWindow": true
+      }
+    },
+    {
+      "name": "slice full numeric coercion",
+      "result": [
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "name": "ordinary iterator conversion error closes once",
+      "result": {
+        "same": true,
+        "log": [
+          "convert",
+          "finally"
+        ]
+      }
+    },
+    {
+      "name": "Node Blob stream supports BYOB and cancellation",
+      "result": {
+        "bytes": [
+          97,
+          98
+        ],
+        "done": false,
+        "text": "ab"
+      }
+    },
+    {
+      "name": "nonempty result settlement ordering",
+      "result": [
+        {
+          "method": "arrayBuffer",
+          "log": [
+            "promise",
+            "microtask",
+            "arrayBuffer"
+          ]
+        },
+        {
+          "method": "bytes",
+          "log": [
+            "promise",
+            "microtask",
+            "bytes"
+          ]
+        },
+        {
+          "method": "text",
+          "log": [
+            "promise",
+            "microtask",
+            "text"
+          ]
+        }
+      ]
+    }
+  ],
+  "inventory": {
+    "Blob": {
+      "constructorName": "Blob",
+      "constructorLength": 0,
+      "prototypeMembers": [
+        {
+          "key": "constructor",
+          "keyKind": "string",
+          "getter": false,
+          "callable": true,
+          "enumerable": false,
+          "configurable": true,
+          "length": 0
+        },
+        {
+          "key": "type",
+          "keyKind": "string",
+          "getter": true,
+          "callable": false,
+          "enumerable": true,
+          "configurable": true
+        },
+        {
+          "key": "size",
+          "keyKind": "string",
+          "getter": true,
+          "callable": false,
+          "enumerable": true,
+          "configurable": true
+        },
+        {
+          "key": "slice",
+          "keyKind": "string",
+          "getter": false,
+          "callable": true,
+          "enumerable": true,
+          "configurable": true,
+          "length": 0
+        },
+        {
+          "key": "arrayBuffer",
+          "keyKind": "string",
+          "getter": false,
+          "callable": true,
+          "enumerable": true,
+          "configurable": true,
+          "length": 0
+        },
+        {
+          "key": "text",
+          "keyKind": "string",
+          "getter": false,
+          "callable": true,
+          "enumerable": true,
+          "configurable": true,
+          "length": 0
+        },
+        {
+          "key": "bytes",
+          "keyKind": "string",
+          "getter": false,
+          "callable": true,
+          "enumerable": true,
+          "configurable": true,
+          "length": 0
+        },
+        {
+          "key": "stream",
+          "keyKind": "string",
+          "getter": false,
+          "callable": true,
+          "enumerable": true,
+          "configurable": true,
+          "length": 0
+        },
+        {
+          "key": "Symbol(nodejs.util.inspect.custom)",
+          "keyKind": "registered-symbol",
+          "registryKey": "nodejs.util.inspect.custom",
+          "getter": false,
+          "callable": true,
+          "enumerable": false,
+          "configurable": true,
+          "length": 2
+        },
+        {
+          "key": "Symbol(messaging_clone_symbol)",
+          "keyKind": "nonregistry-reflection-only",
+          "getter": false,
+          "callable": true,
+          "enumerable": false,
+          "configurable": true,
+          "length": 0
+        },
+        {
+          "key": "Symbol(messaging_deserialize_symbol)",
+          "keyKind": "nonregistry-reflection-only",
+          "getter": false,
+          "callable": true,
+          "enumerable": false,
+          "configurable": true,
+          "length": 1
+        },
+        {
+          "key": "Symbol(Symbol.toStringTag)",
+          "keyKind": "well-known-symbol",
+          "getter": false,
+          "callable": false,
+          "enumerable": false,
+          "configurable": true,
+          "value": "Blob"
+        }
+      ],
+      "inheritedPrototype": "Object.prototype",
+      "globalEqualsNodeBuffer": true
+    },
+    "File": {
+      "constructorName": "File",
+      "constructorLength": 2,
+      "prototypeMembers": [
+        {
+          "key": "constructor",
+          "keyKind": "string",
+          "getter": false,
+          "callable": true,
+          "enumerable": false,
+          "configurable": true,
+          "length": 2
+        },
+        {
+          "key": "name",
+          "keyKind": "string",
+          "getter": true,
+          "callable": false,
+          "enumerable": true,
+          "configurable": true
+        },
+        {
+          "key": "lastModified",
+          "keyKind": "string",
+          "getter": true,
+          "callable": false,
+          "enumerable": true,
+          "configurable": true
+        },
+        {
+          "key": "Symbol(nodejs.util.inspect.custom)",
+          "keyKind": "registered-symbol",
+          "registryKey": "nodejs.util.inspect.custom",
+          "getter": false,
+          "callable": true,
+          "enumerable": false,
+          "configurable": true,
+          "length": 2
+        },
+        {
+          "key": "Symbol(Symbol.toStringTag)",
+          "keyKind": "well-known-symbol",
+          "getter": false,
+          "callable": false,
+          "enumerable": false,
+          "configurable": true,
+          "value": "File"
+        }
+      ],
+      "inheritedPrototype": "Blob.prototype",
+      "globalEqualsNodeBuffer": true
+    }
+  },
+  "sources": {
+    "cases.mjs": "3d14d89f1f6c7bd9f589aab7a485469258029849a23f777357166fe3d3d206f9",
+    "run-node.mjs": "beb2cdf7a0813daa0e3ef653c19e9969808b45a176b236cdfd838f7491be0d27"
+  },
+  "nodeSources": [
+    {
+      "module": "internal/blob",
+      "path": "node-source/internal-blob.node-v22.14.0.js",
+      "sha256": "858bcb3fd7604a7548fdd43c14dbb26dc7f6849d23e0d6b6a66a67fc14af5967"
+    },
+    {
+      "module": "internal/file",
+      "path": "node-source/internal-file.node-v22.14.0.js",
+      "sha256": "23ba01fba166664efbe480f60757eb97924b73a39cdef9e281ed442262e07a61"
+    }
+  ],
+  "guestSelection": {
+    "ordinary": 11,
+    "receivers": 23,
+    "nodeOnlyExcluded": 11,
+    "reason": "No genuine Blob stream, default guest clock, broad WebIDL/coercion or known unsafe legacy path enters the future v2 gate."
+  },
+  "productionChanged": false,
+  "guestExecuted": false,
+  "scope": "Pinned Node host evidence only; corrected native candidate remains unlinked/unexecuted."
+}

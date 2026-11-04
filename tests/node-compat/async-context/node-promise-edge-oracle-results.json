@@ -1,0 +1,458 @@
+{
+  "schemaVersion": 1,
+  "verifiedAtUtc": "2026-11-03T03:59:35.975Z",
+  "node": "v22.14.0",
+  "executable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+  "executableSha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+  "sourceSha256": "3dddbe9a24a80570da9d518d32f28f0b01a87fcf0c174893d0d44cc0210824fc",
+  "execArgv": [],
+  "nodeOptionsPresent": false,
+  "cases": [
+    {
+      "name": "real Promise species result controls callback resource (pending)",
+      "passed": true,
+      "observations": [
+        {
+          "label": "species-getter",
+          "store": "REGISTER",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "species-constructor-before",
+          "store": "REGISTER",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "species-constructor-after",
+          "store": "REGISTER",
+          "executionAsyncId": 0,
+          "resultAsyncId": 11
+        },
+        {
+          "label": "reaction",
+          "store": "SPECIES",
+          "executionAsyncId": 11
+        },
+        {
+          "label": "after-await",
+          "store": "<undefined>",
+          "executionAsyncId": 12
+        }
+      ],
+      "details": {
+        "sourceAsyncId": 10,
+        "resultAsyncId": 11,
+        "relevantAsyncIds": [
+          10,
+          11
+        ],
+        "verified": "The callback executes on the real result Promise resource created inside the species constructor, under SPECIES rather than REGISTER."
+      },
+      "relevantInitEvents": [
+        {
+          "case": "real Promise species result controls callback resource (pending)",
+          "asyncId": 10,
+          "type": "PROMISE",
+          "triggerAsyncId": 0,
+          "currentExecutionAsyncId": 0,
+          "store": "SOURCE"
+        },
+        {
+          "case": "real Promise species result controls callback resource (pending)",
+          "asyncId": 11,
+          "type": "PROMISE",
+          "triggerAsyncId": 0,
+          "currentExecutionAsyncId": 0,
+          "store": "SPECIES"
+        }
+      ]
+    },
+    {
+      "name": "real Promise species result controls callback resource (settled)",
+      "passed": true,
+      "observations": [
+        {
+          "label": "species-getter",
+          "store": "REGISTER",
+          "executionAsyncId": 14
+        },
+        {
+          "label": "species-constructor-before",
+          "store": "REGISTER",
+          "executionAsyncId": 14
+        },
+        {
+          "label": "species-constructor-after",
+          "store": "REGISTER",
+          "executionAsyncId": 14,
+          "resultAsyncId": 20
+        },
+        {
+          "label": "reaction",
+          "store": "SPECIES",
+          "executionAsyncId": 20
+        },
+        {
+          "label": "after-await",
+          "store": "<undefined>",
+          "executionAsyncId": 21
+        }
+      ],
+      "details": {
+        "sourceAsyncId": 19,
+        "resultAsyncId": 20,
+        "relevantAsyncIds": [
+          19,
+          20
+        ],
+        "verified": "The callback executes on the real result Promise resource created inside the species constructor, under SPECIES rather than REGISTER."
+      },
+      "relevantInitEvents": [
+        {
+          "case": "real Promise species result controls callback resource (settled)",
+          "asyncId": 19,
+          "type": "PROMISE",
+          "triggerAsyncId": 14,
+          "currentExecutionAsyncId": 14,
+          "store": "SOURCE"
+        },
+        {
+          "case": "real Promise species result controls callback resource (settled)",
+          "asyncId": 20,
+          "type": "PROMISE",
+          "triggerAsyncId": 14,
+          "currentExecutionAsyncId": 14,
+          "store": "SPECIES"
+        }
+      ]
+    },
+    {
+      "name": "plain-object species has no result Promise callback resource (pending)",
+      "passed": true,
+      "observations": [
+        {
+          "label": "species-getter",
+          "store": "REGISTER",
+          "executionAsyncId": 23
+        },
+        {
+          "label": "species-constructor",
+          "store": "SPECIES",
+          "executionAsyncId": 23
+        },
+        {
+          "label": "reaction",
+          "store": "<undefined>",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "capability-resolve",
+          "store": "<undefined>",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "after-await",
+          "store": "<undefined>",
+          "executionAsyncId": 28
+        }
+      ],
+      "details": {
+        "sourceAsyncId": 26,
+        "resultHasAsyncId": false,
+        "relevantAsyncIds": [
+          26
+        ],
+        "verified": "The callback and capability resolver run on shared root resource ID0, without REGISTER or SPECIES, because the result capability is not a Promise."
+      },
+      "relevantInitEvents": [
+        {
+          "case": "plain-object species has no result Promise callback resource (pending)",
+          "asyncId": 26,
+          "type": "PROMISE",
+          "triggerAsyncId": 23,
+          "currentExecutionAsyncId": 23,
+          "store": "SOURCE"
+        }
+      ]
+    },
+    {
+      "name": "plain-object species has no result Promise callback resource (settled)",
+      "passed": true,
+      "observations": [
+        {
+          "label": "species-getter",
+          "store": "REGISTER",
+          "executionAsyncId": 30
+        },
+        {
+          "label": "species-constructor",
+          "store": "SPECIES",
+          "executionAsyncId": 30
+        },
+        {
+          "label": "reaction",
+          "store": "<undefined>",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "capability-resolve",
+          "store": "<undefined>",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "after-await",
+          "store": "<undefined>",
+          "executionAsyncId": 35
+        }
+      ],
+      "details": {
+        "sourceAsyncId": 33,
+        "resultHasAsyncId": false,
+        "relevantAsyncIds": [
+          33
+        ],
+        "verified": "The callback and capability resolver run on shared root resource ID0, without REGISTER or SPECIES, because the result capability is not a Promise."
+      },
+      "relevantInitEvents": [
+        {
+          "case": "plain-object species has no result Promise callback resource (settled)",
+          "asyncId": 33,
+          "type": "PROMISE",
+          "triggerAsyncId": 30,
+          "currentExecutionAsyncId": 30,
+          "store": "SOURCE"
+        }
+      ]
+    },
+    {
+      "name": "run restores only its own ALS instance entry",
+      "passed": true,
+      "observations": [
+        {
+          "label": "inside",
+          "store": "A",
+          "secondStore": "B",
+          "executionAsyncId": 37
+        },
+        {
+          "label": "after-a-run",
+          "store": "<undefined>",
+          "secondStore": "B",
+          "executionAsyncId": 37
+        },
+        {
+          "label": "captured-child",
+          "store": "<undefined>",
+          "secondStore": "B",
+          "executionAsyncId": 41
+        }
+      ],
+      "details": {
+        "verified": "Restoring the entire prior context map would incorrectly discard the other instance’s enterWith mutation."
+      },
+      "relevantInitEvents": []
+    },
+    {
+      "name": "nested thenable jobs share one mutable Promise resource; earlier child keeps snapshot",
+      "passed": true,
+      "observations": [
+        {
+          "label": "first-thenable",
+          "store": "CREATION-A",
+          "executionAsyncId": 47
+        },
+        {
+          "label": "first-after-enterWith",
+          "store": "MUTATED-X",
+          "executionAsyncId": 47
+        },
+        {
+          "label": "child-captured-before-mutation",
+          "store": "CREATION-A",
+          "executionAsyncId": 57
+        },
+        {
+          "label": "second-thenable",
+          "store": "MUTATED-X",
+          "executionAsyncId": 47
+        },
+        {
+          "label": "await-continuation",
+          "store": "AWAIT-D",
+          "executionAsyncId": 50
+        },
+        {
+          "label": "outer-after",
+          "store": "<undefined>",
+          "executionAsyncId": 54
+        }
+      ],
+      "details": {
+        "promiseAsyncId": 47,
+        "relevantAsyncIds": [
+          47
+        ],
+        "verified": "The same target Promise resource retains enterWith changes across assimilation jobs, while an independently created child retains its earlier map value."
+      },
+      "relevantInitEvents": [
+        {
+          "case": "nested thenable jobs share one mutable Promise resource; earlier child keeps snapshot",
+          "asyncId": 47,
+          "type": "PROMISE",
+          "triggerAsyncId": 44,
+          "currentExecutionAsyncId": 44,
+          "store": "CREATION-A"
+        }
+      ]
+    },
+    {
+      "name": "plain species callbacks share a mutable root resource without leaking into earlier children",
+      "passed": true,
+      "observations": [
+        {
+          "label": "outside-child-captured-before",
+          "store": "<undefined>",
+          "executionAsyncId": 64
+        },
+        {
+          "label": "first-plain-before",
+          "store": "<undefined>",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "first-plain-after",
+          "store": "ROOT-X",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "second-plain",
+          "store": "ROOT-X",
+          "executionAsyncId": 0
+        },
+        {
+          "label": "inside-child-after-mutation",
+          "store": "ROOT-X",
+          "executionAsyncId": 72
+        },
+        {
+          "label": "ordinary-await-after",
+          "store": "<undefined>",
+          "executionAsyncId": 69
+        }
+      ],
+      "details": {
+        "relevantAsyncIds": [
+          60
+        ],
+        "verified": "ID0 is a mutable shared resource, not a new immutable-empty context for each plain-species job. Pre-existing and newly registered child resources keep their respective captures."
+      },
+      "relevantInitEvents": [
+        {
+          "case": "plain species callbacks share a mutable root resource without leaking into earlier children",
+          "asyncId": 60,
+          "type": "PROMISE",
+          "triggerAsyncId": 56,
+          "currentExecutionAsyncId": 56,
+          "store": "<undefined>"
+        }
+      ]
+    },
+    {
+      "name": "repeated AsyncResource calls retain mutation while an earlier child stays unchanged",
+      "passed": true,
+      "observations": [
+        {
+          "label": "resource-first-before",
+          "store": "RESOURCE-A",
+          "executionAsyncId": 75
+        },
+        {
+          "label": "resource-first-after",
+          "store": "RESOURCE-B",
+          "executionAsyncId": 75
+        },
+        {
+          "label": "outer-between",
+          "store": "<undefined>",
+          "executionAsyncId": 71
+        },
+        {
+          "label": "resource-second",
+          "store": "RESOURCE-B",
+          "executionAsyncId": 75
+        },
+        {
+          "label": "child-captured-before",
+          "store": "RESOURCE-A",
+          "executionAsyncId": 77
+        },
+        {
+          "label": "outer-after",
+          "store": "<undefined>",
+          "executionAsyncId": 78
+        }
+      ],
+      "details": {
+        "resourceAsyncId": 75,
+        "relevantAsyncIds": [
+          75
+        ],
+        "verified": "The resource cell changes, but a previously created child cell must not alias that mutable cell."
+      },
+      "relevantInitEvents": [
+        {
+          "case": "repeated AsyncResource calls retain mutation while an earlier child stays unchanged",
+          "asyncId": 75,
+          "type": "edge-reused",
+          "triggerAsyncId": 71,
+          "currentExecutionAsyncId": 71,
+          "store": "RESOURCE-A"
+        }
+      ]
+    },
+    {
+      "name": "disable then re-enable exposes an old pending resource store",
+      "passed": true,
+      "observations": [
+        {
+          "label": "new-run",
+          "store": "NEW",
+          "executionAsyncId": 80
+        },
+        {
+          "label": "old-after-reenable",
+          "store": "OLD",
+          "executionAsyncId": 85
+        },
+        {
+          "label": "outer-after",
+          "store": "<undefined>",
+          "executionAsyncId": 86
+        }
+      ],
+      "details": {
+        "verified": "Re-enable does not permanently invalidate old resource entries. A generation scheme that permanently deletes OLD would diverge."
+      },
+      "relevantInitEvents": []
+    }
+  ],
+  "caseCount": 9,
+  "observationCount": 44,
+  "assertionPropagationChecked": true,
+  "predecessor": {
+    "sourcePath": "node-promise-edge-oracle-v1.mjs",
+    "sourceSha256": "f14e6752668ec8516161264c354054e371c5e4cbe08850fbb01b72ca167b9398",
+    "resultsPath": "node-promise-edge-oracle-v1-results.json",
+    "resultsSha256": "2ac4b5c238ac81883ef749af204f156630e16dd069148c3b75b01cfbe51549e3",
+    "reason": "Preserve the original observations; corrected current species completion gates reject on handler failure instead of potentially swallowing assertion errors."
+  },
+  "findings": [
+    "Real Promise species controls the result resource: construction in SPECIES makes its reaction execute in SPECIES, even though registration and the getter/constructor caller use REGISTER.",
+    "A plain-object species result has no Promise init resource; its callback executes on shared resource0, not REGISTER or SPECIES.",
+    "enterWith mutates a resource cell; subsequent jobs on the same promise, explicit AsyncResource or root resource can observe that mutation.",
+    "Independent child resources capture the earlier map; their cells must not alias the parent resource cell.",
+    "run restores only its own AsyncLocalStorage instance entry, preserving changes made to other instances.",
+    "disable then re-enable can reveal an existing pending resource store again."
+  ],
+  "scope": "Executed exact Node v22.14.0 defaults. These are behavioral oracle observations, not a SpiderMonkey implementation claim. Async IDs identify relationships in this run and are not stable constants. No external service or production file is used."
+}

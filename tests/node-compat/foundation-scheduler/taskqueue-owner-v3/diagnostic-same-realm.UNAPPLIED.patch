@@ -1,0 +1,25 @@
+--- a/test-extension.UNCOMPILED.cpp
++++ b/test-extension.UNCOMPILED.cpp
+@@ -6,6 +6,7 @@
+ #include "js/Array.h"
+ #include "js/CallAndConstruct.h"
+ #include "js/PropertyAndElement.h"
++#include "js/Realm.h"
+ #include "js/ValueArray.h"
+ #include "js/TracingAPI.h"
+ #include "js/Utility.h"
+@@ -61,9 +62,13 @@
+   CallArgs args = CallArgsFromVp(argc, vp);
+   if (argc == 0 || !args[0].isObject() || !IsCallable(&args[0].toObject()))
+     return core::InternalTickQueue::fail(cx, JSEXN_TYPEERR, "ERR_INVALID_ARG_TYPE", "callback must be callable");
++  RootedObject callback(cx, &args[0].toObject());
++  // Match the private tick callable's realm contract before allocating argv.
++  // Dispatch then stays in this realm; no cross-realm argument wrapping claim.
++  if (GetObjectRealmOrNull(callback) != GetCurrentRealmOrNull(cx))
++    return core::InternalTickQueue::fail(cx, JSEXN_TYPEERR, "ERR_SM_NODE_UNSUPPORTED", "cross-realm diagnostic callback is outside the private contract");
+   if (argc-1 > core::InternalTickQueue::MaxArgumentsPerTick || diagnostic_pending_tasks == 16)
+     return core::InternalTickQueue::fail(cx, JSEXN_RANGEERR, "ERR_SM_NODE_SCHEDULER_LIMIT", "diagnostic task budget exceeded");
+-  RootedObject callback(cx, &args[0].toObject());
+   RootedObject arguments(cx, NewArrayObject(cx, HandleValueArray::subarray(args, 1, argc-1)));
+   if (!arguments) return false;
+   RefPtr<BoundaryTask> task = js_new<BoundaryTask>(callback, arguments, argc-1);

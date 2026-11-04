@@ -1,0 +1,1 @@
+Root reader attempt1 rejects an explicitly declared SDK clang++ symlink because the reader assumed every input leaf was ordinary. No owner/action/native failure occurred. Attempt2 authenticates the one declared compiler alias, its literal link text and exact clang-21 target, then hashes the ordinary target. Original source and records are unchanged.
