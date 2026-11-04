@@ -5,7 +5,7 @@ import {pathToFileURL,fileURLToPath} from 'node:url';
 import {descriptor,regular,need,sha} from '../ownership-component-candidate-v1/authority.mjs';
 import {local,indexed,deepFreeze} from '../ownership-component-candidate-v1/proofs.mjs';
 import {loadPackaging,streamHash,packagingEnvironment} from '../ownership-component-candidate-v1/packaging.mjs';
-import {captureConfiguredBootstrap} from './bootstrap-context.mjs';
+import {captureConfiguredBootstrap,bootstrapEnvironment} from './bootstrap-context.mjs';
 const HERE=dirname(fileURLToPath(import.meta.url));
 export const OUTPUT='/private/tmp/starling-node-compat/crypto-owner355-component-v3';
 export const ENGINE_SHA='36bd850895a11af8ffaefdb8296630222c4ad4652a0e58f45ce0ec23c1bebc05';
@@ -39,6 +39,7 @@ export async function componentPreflight(options={}){
  const publicationPeer=await indexed(p.publicationReview,{state:'INDEPENDENT_FRESH_ZLIB_COST_SOURCE_PUBLICATION_VERIFIED'});need(publicationPeer.data.publicationIndexSha256==='4621f7e72b4fb0555a5df630b1aedd4d2a04743b0db9188fc50099779f07387b'&&publicationPeer.data.verifiedPassed===true&&publicationPeer.data.externalPublisherExitCode===0,'Actual SOURCE publication review, not its native/action authority');
  const mapRow=donor.rows.find(r=>r.path===join(HERE,'../ownership-component-candidate-v1/packaging-context.json')),packaging=await loadPackaging(mapRow);packagingEnvironment(packaging);
  need(process.version==='v22.14.0'&&process.execArgv.length===0&&await realpath(process.execPath)===p.node.path,'Exact pinned plain Node22 process');await streamHash(p.node);
+ bootstrapEnvironment();
  await regular(p.bootstrapEntry); // original preparation entry is provenance DATA only
  const contextRow=own.rows.find(r=>r.path===join(HERE,'bootstrap-context.json'));need(contextRow,'Indexed actual configured bootstrap context');const configured=await captureConfiguredBootstrap(contextRow,p,root);
  await configured.recheck();const {cryptoOwnerBootstrapPreflight}=await import(pathToFileURL(configured.entry.path));

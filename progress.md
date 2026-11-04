@@ -4,25 +4,47 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-04. Overall roadmap: **in progress**.
 
-Git checkpoint requested on 2026-11-04: this checkpoint preserves all Git-visible
-implementation, documentation, source snapshots, validation evidence, historical
-failures and unfinished templates. The unsealed
-`tests/node-compat/foundation-crypto/ownership-component-candidate-v3/` draft is
-work in progress: its new tests have not run, it has no sealed PASS, and it must
-not authorize component or key execution. A commit audit also identifies a draft
-checker path error: `check-source.py` names `artifact-tools/common.py` where the
-actual helper is `artifact_common.py`; this remains outstanding. The actual control-v2 result review
-and pilot/timing implementation also remain unfinished. Native engines and other
-external build/runtime artifacts under `/tmp/starling-node-compat` remain outside
-this repository; committed receipts retain their exact references and limits.
-The pinned `54b3329b3ce818fd1f244e871e9c259b63667cda` remains the historical
-baseline, not an automatic revalidation or repinning of this checkpoint.
+Git checkpoint requested on 2026-11-04: commit
+`e7c6e2ce4f430811b90bcad77620c1e549963ca0` preserves the implementation,
+documentation, source snapshots, validation evidence, historical failures and
+unfinished templates. A follow-up checkpoint collects the final in-flight work
+and this updated tracker. Native engines and external build/runtime artifacts
+under `/tmp/starling-node-compat` remain outside this repository; committed
+receipts retain their exact references and limits. The pinned
+`54b3329b3ce818fd1f244e871e9c259b63667cda` remains the historical baseline;
+the Git checkpoints do not automatically revalidate or repin earlier evidence.
 
-Checkpoint checks: the existing manifest test passes under pinned Node22.14.0.
-The tracked diff has one known trailing-space line in
-`deps/patches/rand.patch`; its stored patch bytes are preserved because existing
-source receipts depend on them. Full native/component suites are not rerun for
-the commit; their previously executed, bounded evidence remains linked below.
+The [crypto-v3 source correction](tests/node-compat/foundation-crypto/ownership-component-candidate-v3/README.md)
+is now sealed at index `593a0e02…c492` with25 files. The draft checker's
+`common.py` path was corrected to the actual `artifact_common.py` before its
+checks. Preparation reports40 pure,1,759 source/data and8 parse checks;
+Root separately verifies all25 indexed members and repeats the40 pure checks.
+This is source preparation only: independent source review, component authority,
+actual component construction and key-runtime validation remain outstanding.
+No bootstrap/component/key operation ran for this source checkpoint.
+
+The [independent control-v2 result review](tests/node-compat/foundation-zlib/independent-cost-jco-control-v2-results-review-v1/README.md)
+is now sealed at index `20380e3b…7ae9`. It verifies726 complete raw strings,
+540 controls,90 setups,90 checkpoints and6 identity calls, the1,480-indexed/
+1,482-actual-file output closure and all three worker exits/cleanup. This is
+bounded public control correctness; it provides no private heap inspection or
+global codec instrumentation. The original `pilotPrerequisitesSatisfied:false`
+and `timingAllowed:false` remain unchanged; a new phase still needs its own
+complete source and execution authority.
+
+The [pilot/timing draft](tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v1/README.md)
+is preserved as eight explicitly unsealed, unverified WIP files. It has no usable
+action authority or complete worker lifecycle. Root's four parser-only module
+checks and three JSON decodes pass; no draft workload or pilot ran. The original
+360 timing workers,3,600 codec batch calls and2,160 N1 controls remain the planned
+counts. Loader/lifecycle integration, pure tests, calibration review, independent
+source review and execution authority remain outstanding.
+
+Checkpoint checks: the existing manifest test passes again under pinned
+Node22.14.0. The historical `deps/patches/rand.patch` trailing-space line is
+preserved because existing receipts depend on its bytes. Full native/component
+suites are not rerun for the commit; their previously executed, bounded evidence
+remains linked below. The roadmap remains in progress.
 
 This file tracks completed work, work in progress, and outstanding gates for the
 portable StarlingMonkey Node compatibility profile. It is not a claim of complete
@@ -41,8 +63,8 @@ phases have substantially different sizes and unresolved design decisions.
 | Corrected classic streams | Full 20-workload/14-boundary gate passes all 105 observations; fresh replay, follow-on and HTTP gates pass. | Accepted in v13; preserve bounded contracts and continue remaining roadmap phases. |
 | Corrected HTTP component | Both hosts, combined audit and independent final review pass; included in bounded v13. | Preserve the one-request-per-instance limitation; test new experimental engines separately. |
 | Performance comparison | All168 timing workers plus18 corrected RSS workers/126 typed returns pass independent review. | Preserve the separate measurement scopes and failed RSS v1. Same-engine peak RSS ratios cross1; no universal or guest-heap benefit. |
-| Codec cost tooling | Fresh source copy and55-call Node oracle pass independent review; Root input capsule is complete. All three source bundles finish raw0 and per-arm source proofs pass. The WIT/glue corrections pass review. All three v3 component builds finish raw0 with imports[]/seven-function ABI; per-arm artifact reviews pass. | The thin v3 Uint8Array retention correction passes independent source review. Full untimed correctness and stock Wasmtime small/largest string transport pass independent review. The first control failure is preserved. Corrected control-v2 finishes raw0 with540 controls and zero codecs; independent result review, pilot and timing remain pending. |
-| Crypto key ownership | Unapplied owner and prototype-key guard candidates pass independent source review and SDK147 frontend checks. | V2 integration source and isolated source copy pass independent review. Normal Release/OFF native provenance passes independent review; normal-only pin export/derivation and genuine two-context JS bootstrap pass independent review. The first HMAC construction source is held on an adapter/options mismatch; a thin successor is in preparation. No key runtime validation yet. Runtime lifetimes and secret-temporary/allocation follow-ons remain. |
+| Codec cost tooling | Fresh source copy and55-call Node oracle pass independent review; Root input capsule is complete. All three source bundles finish raw0 and per-arm source proofs pass. The WIT/glue corrections pass review. All three v3 component builds finish raw0 with imports[]/seven-function ABI; per-arm artifact reviews pass. | V3 retention, full untimed correctness, stock Wasmtime string transport and actual control-v2 results pass independent review. The first control failure is preserved. Pilot/timing implementation is an unsealed source draft; actual pilots, timing and performance conclusions remain pending. |
+| Crypto key ownership | Unapplied owner and prototype-key guard candidates pass independent source review and SDK147 frontend checks. | V2 integration, native provenance and normal-only read-only bootstrap pass independent review. Component-source v1/v2 holds are preserved; the sealed v3 context/adapter correction passes preparation checks and awaits independent source review. No actual crypto component or key runtime validation yet. Runtime lifetimes and secret-temporary/allocation follow-ons remain. |
 | Native zlib extension | Three native variants and bounded normal/GC/control component results pass independent review;22 Node error-case differences are recorded. | Complete matched cost, Node-deviation contract and new-engine host/release gates; operational admission remains closed. |
 | Stream consumers | Four native355 variants and bounded normal/GC/control components pass review. Context/data-closure failures remain preserved. The corrected v3 family and admission checks pass review; its entire eight-stage release retry now finishes raw0. | The full eight-stage release and all five follow-ons pass independent review, with false getter parity and raw-output limits retained. Both-host HTTP and later acceptance gates remain. Blob-dependent APIs remain refusals. |
 | Corrected classic checkpoint | Accepted in bounded foundations-v13 after independent preservation and post-promotion verification. | Preserve its limits; continue consumer355 runtime and later phases. |

@@ -7,7 +7,7 @@
       "bytes": 8626
     },
     "afterimage": "guard.mjs",
-    "afterSha256": "2a1bf83e46c72ae9074f6ed49d6a21469a70cea3b91a19abdd0c715181c04ab0",
+    "afterSha256": "9163d9ed0b808bb0cf0a64d6be87993e2cbfd8e4903dd559993a06b8440cd5a3",
     "edits": [
       {
         "old": "import {loadPackaging,streamHash,packagingEnvironment} from '../ownership-component-candidate-v1/packaging.mjs';",
@@ -68,6 +68,18 @@
         "new": "[...own.rows,...donor.rows,...parent.rows]",
         "afterOffsetAtEdit": 9126,
         "count": 1
+      },
+      {
+        "old": "import {captureConfiguredBootstrap} from './bootstrap-context.mjs';",
+        "new": "import {captureConfiguredBootstrap,bootstrapEnvironment} from './bootstrap-context.mjs';",
+        "afterOffsetAtEdit": 527,
+        "count": 1
+      },
+      {
+        "old": "await regular(p.bootstrapEntry); // original preparation entry is provenance DATA only",
+        "new": "bootstrapEnvironment();\n await regular(p.bootstrapEntry); // original preparation entry is provenance DATA only",
+        "afterOffsetAtEdit": 6458,
+        "count": 1
       }
     ],
     "forwardAndOffsetReverseExact": true
@@ -90,6 +102,15 @@
       },
       "afterimage": "build-worker.mjs",
       "sha256": "65fdc964240b18488f8dfdfd6fc4455a62bce8963c3a7b3b313f2b641cb89621"
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-component-candidate-v2/test-options-pure.mjs",
+        "sha256": "fd04b14660dcbe907c3d30d7d63b984b9cf6585e3ab8fc50e3c0f96b70184586",
+        "bytes": 3998
+      },
+      "afterimage": "test-options-pure.mjs",
+      "sha256": "fd04b14660dcbe907c3d30d7d63b984b9cf6585e3ab8fc50e3c0f96b70184586"
     }
   ],
   "originalGuestNativeWitToolOrAdapterPayloadChanged": false

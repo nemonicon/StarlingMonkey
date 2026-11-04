@@ -28,7 +28,7 @@ for r in policy['expectedNativeSourceManifest']:
  for prefix in [root,Path(c['sourceRoot'])]:need(digest(prefix/r['path'])==r['sha256'],'actual configured/frozen native '+str(prefix/r['path']))
 oldp=json.loads((K/'ownership-component-candidate-v1/prerequisites.json').read_bytes());need(digest(oldp['bootstrapEntry']['path'])==c['configuredBootstrapEntry']['sha256'] and oldp['bootstrapEntry']['path']!=c['configuredBootstrapEntry']['path'],'same source bytes distinct executable contexts')
 # Data-only reconstruction of the real Python helper root, no module execution.
-configured_common=Path(c['configuredBootstrapEntry']['path']).parent/'common.py';original_common=Path(oldp['bootstrapEntry']['path']).parent/'common.py';text=configured_common.read_text();need('REPO=HERE.parents[4]' in text or 'REPO = HERE.parents[4]' in text,'actual helper root semantics')
+configured_common=Path(c['configuredBootstrapEntry']['path']).parent/'artifact_common.py';original_common=Path(oldp['bootstrapEntry']['path']).parent/'artifact_common.py';text=configured_common.read_text();need('REPO=HERE.parents[4]' in text or 'REPO = HERE.parents[4]' in text,'actual helper root semantics')
 need(configured_common.parent.parents[4]==root and original_common.parent.parents[4]!=root,'actual Python __file__ contexts differ')
 need((root/'tests/node-compat/build-engine.sh').stat().st_size==49377 and digest(root/'tests/node-compat/build-engine.sh')=='eec3245841fff07e5bf9c3ff7b488106c94b71705262b22272d60a8ea4d7bfb3','actual configured owner355 recipe')
 need("import(pathToFileURL(configured.entry.path))" in s and "import(pathToFileURL(p.bootstrapEntry.path))" not in s,'only configured authenticated entry imports')

@@ -6,6 +6,12 @@ import {indexed,deepFreeze,local} from '../ownership-component-candidate-v1/proo
 const ROOT='/private/tmp/starling-node-compat/crypto-owner-source-v2',REL='tests/node-compat/foundation-crypto/native-integration-candidate-v2';
 const NATIVE_SHA='68b6f2a50174adbf30d8257f8107dd6c5b38beddf0db4b95ad972e3f47e25575';
 const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+export function bootstrapEnvironment(env=process.env){
+ // The actual reviewed bootstrap launch excludes these overrides. Do not let
+ // a future loader obtain unsealed Python modules or disabled assertions.
+ for(const key of ['PYTHONPATH','PYTHONHOME','PYTHONOPTIMIZE'])need(!env[key],'Inherited Python bootstrap override refuses '+key);
+ return true;
+}
 export function executableContextModel(c,contract,prerequisites){
  need(c?.schemaVersion===1&&c.state==='ACTUAL_CONFIGURED_CRYPTO_OWNER355_BOOTSTRAP_CONTEXT_DATA_V1'&&c.sourcePreparationEntryIsProvenanceOnly===true,'Explicit original/configured role split');
  need(c.configuredSourceRoot===ROOT&&c.sourceRoot==='/tmp/starling-node-compat/production-crypto-owner-v2/native-freeze/source'&&c.normalOnly===true,'Exact actual configured/frozen roots; no relocation/projection');
@@ -22,8 +28,9 @@ export function assertReturnedContexts(frame,contract,expectedFrame){
  for(const key of ['metadata','pin','selectedManifests'])need(equal(frame[key],expectedFrame[key]),'Whole genuine returned frame equals actual reviewed frame '+key);return true;
 }
 export async function captureConfiguredBootstrap(contextRow,prerequisites,rootAuthority){
- const row=descriptor(contextRow),c=deepFreeze(JSON.parse(await regular(row))),p=deepFreeze(structuredClone(prerequisites));
- need(equal(rootAuthority.actualBootstrapReview,c.actualBootstrapReview)&&rootAuthority.actualBootstrapReviewGrantsComponentAuthority===false,'Root explicitly pins real read-only bootstrap DATA without promoting its scope');
+ const row=descriptor(contextRow),p=deepFreeze(structuredClone(prerequisites)),root=deepFreeze(structuredClone(rootAuthority));
+ const c=deepFreeze(JSON.parse(await regular(row)));
+ need(equal(root.actualBootstrapReview,c.actualBootstrapReview)&&root.actualBootstrapReviewGrantsComponentAuthority===false,'Root explicitly pins real read-only bootstrap DATA without promoting its scope');
  const proof=await indexed(c.actualBootstrapReview,{state:'INDEPENDENT_CRYPTO_OWNER355_NORMAL_OFF_PIN_AND_JS_BOOTSTRAP_RESULTS_REVIEW_PASSED_V1'}),contractRow=descriptor(c.actualContract);
  need(proof.rows.filter(v=>equal(v,contractRow)).length===1,'Actual stable contract is indexed exactly once');const contract=deepFreeze(JSON.parse(await regular(contractRow)));executableContextModel(c,contract,p);
  need(proof.data.verifiedPassed===true&&proof.data.sourceIndexSha256===NATIVE_SHA&&proof.data.configuredToolDependencyRowsRehashed===922&&proof.data.otherVariantsNull===true&&proof.data.positiveKeyOperationsInvoked===false,'Actual independent completed read-only review');
