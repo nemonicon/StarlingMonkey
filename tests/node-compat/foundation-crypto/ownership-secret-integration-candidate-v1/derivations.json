@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "exactTextDerivations": [
+    {
+      "output": "layer-policy.py",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/native-integration-candidate-v2/layer-policy.py",
+        "sha256": "4e5a1019ceffea629f2ec0b42322e17444cb877519596cb273ea34464d15bd78",
+        "bytes": 18109
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-integration-candidate-v1/layer-policy.py",
+        "sha256": "a13e44c4cde29fec220972cb055a905d95d52485df7e7a3d6acfccc8fc80d3c6",
+        "bytes": 20253
+      },
+      "edits": [
+        {
+          "before": "Explicit342 source/compile layer; parent306 data is ancestry, never projection.",
+          "after": "Exact355 secret-failure source/compile layer; old owner355 is ancestry DATA.",
+          "count": 1
+        },
+        {
+          "before": "POLICY_SHA256='5a3bd48ebac975f7a3fd72691432b34c0e4afb9eec33bd2ad6273d78225193f9'",
+          "after": "POLICY_SHA256='b64378980f64db7c7602a296e584c18ee003d284f2a3e929be25fb08c16a0497'",
+          "count": 1
+        },
+        {
+          "before": "    after={row['path']:row['sha256']for row in POLICY['expectedNativeSourceManifest']}",
+          "after": "    owner_parent=json.loads((HERE.parent/'native-integration-candidate-v2/policy.json').read_bytes())\n    after={row['path']:row['sha256']for row in owner_parent['expectedNativeSourceManifest']}",
+          "count": 1
+        },
+        {
+          "before": "verify_crypto_ancestry()\nverify_consumers_ancestry()",
+          "after": "def verify_secret_failure_ancestry():\n    contract=POLICY['cryptoSecretFailureSourcePolicy']\n    for role in ['parent355Index','parent355Policy','parent355Helper','parent355Recipe','payloadSourceIndex','payloadSourceContract']:\n        row=contract[role]\n        relative=Path(row['path']).relative_to(Path('/Users/dan/dev/StarlingMonkey'))\n        path=HERE.parents[3]/relative\n        assert path.is_file() and not path.is_symlink() and path.stat().st_size==row['bytes'] and digest(path)==row['sha256']\n    base=json.loads((HERE.parent/'native-integration-candidate-v2/policy.json').read_bytes())\n    payload=json.loads((HERE.parent/'ownership-secret-failure-candidate-v2/source-contract.json').read_bytes())\n    before={r['path']:r['sha256']for r in base['expectedNativeSourceManifest']}\n    after={r['path']:r['sha256']for r in POLICY['expectedNativeSourceManifest']}\n    assert len(before)==len(after)==355 and before.keys()==after.keys()\n    assert payload['expectedNativeSourceManifest']==POLICY['expectedNativeSourceManifest']\n    assert sum(before[k]==after[k]for k in before)==352 and len(contract['changes'])==3\n    assert sorted(k for k in before if before[k]!=after[k])==sorted(r['path']for r in contract['changes'])\n    for row in contract['changes']:assert before[row['path']]==row['beforeSha256'] and after[row['path']]==row['afterSha256']\n    return True\nverify_secret_failure_ancestry()\nverify_crypto_ancestry()\nverify_consumers_ancestry()",
+          "count": 1
+        },
+        {
+          "before": "    metadata['cryptoKeyOwnershipPolicy']=copy.deepcopy(POLICY['cryptoKeyOwnershipSourcePolicy'])\n    return metadata",
+          "after": "    metadata['cryptoKeyOwnershipPolicy']=copy.deepcopy(POLICY['cryptoKeyOwnershipSourcePolicy'])\n    metadata['cryptoSecretFailureSourcePolicy']=copy.deepcopy(POLICY['cryptoSecretFailureSourcePolicy'])\n    secret_cpp=[str(Path(repo)/r['path'])for r in POLICY['cryptoSecretFailureSourcePolicy']['changes']if r['path'].endswith('.cpp')]\n    secret_commands=[r['command']for r in entries if r['file']in secret_cpp]\n    assert len(secret_commands)==2\n    metadata['cryptoSecretFailureBuildEvidence']={'version':'sm-webcrypto-secret-failure-build-evidence-v1','cryptoBuiltinEnabled':True,'changedNativeCompileCommands':secret_commands,'currentSourceManifestValidated':True,'faultInjectionObserved':False,'runtimeValidation':None}\n    return metadata",
+          "count": 1
+        },
+        {
+          "before": "Exact355 consumer source policy verified; no compiler or guest ran",
+          "after": "Exact355 secret-failure source policy verified; no compiler or guest ran",
+          "count": 1
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "output": "proposed/tests/node-compat/build-engine.sh",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/native-integration-candidate-v2/proposed/tests/node-compat/build-engine.sh",
+        "sha256": "eec3245841fff07e5bf9c3ff7b488106c94b71705262b22272d60a8ea4d7bfb3",
+        "bytes": 49377
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-integration-candidate-v1/proposed/tests/node-compat/build-engine.sh",
+        "sha256": "298f227ac9aa96122624b3b7600c746f73c6c35b003df2479dcea0c2568c837e",
+        "bytes": 50118
+      },
+      "edits": [
+        {
+          "before": "/tmp/starling-node-compat/crypto-owner-v2-build",
+          "after": "/private/tmp/starling-node-compat/crypto-owner355-secret-v1-build",
+          "count": 1
+        },
+        {
+          "before": "tests/node-compat/foundation-crypto/native-integration-candidate-v2",
+          "after": "tests/node-compat/foundation-crypto/ownership-secret-integration-candidate-v1",
+          "count": 3
+        },
+        {
+          "before": "keyowner-v2.",
+          "after": "secretfailure-v1.",
+          "count": 2
+        },
+        {
+          "before": "4e5a1019ceffea629f2ec0b42322e17444cb877519596cb273ea34464d15bd78",
+          "after": "a13e44c4cde29fec220972cb055a905d95d52485df7e7a3d6acfccc8fc80d3c6",
+          "count": 5
+        },
+        {
+          "before": "5a3bd48ebac975f7a3fd72691432b34c0e4afb9eec33bd2ad6273d78225193f9",
+          "after": "b64378980f64db7c7602a296e584c18ee003d284f2a3e929be25fb08c16a0497",
+          "count": 2
+        },
+        {
+          "before": "layer_root=\"$repo_root/tests/node-compat/foundation-zlib/native-integration-candidate-v4\"",
+          "after": "# This source-only family supports one future initial normal-OFF build.\n# An independently reviewed owned controller and fresh Root phase remain required.\n[[ \"$repo_root\" == \"/private/tmp/starling-node-compat/crypto-owner355-secret-v1-source\" ]] || { echo 'Exact separate configured secret source root required' >&2; exit 1; }\n[[ \"$stress\" == 0 && \"$entropy_mode\" == OFF && \"$build_type\" == Release && \"$oom\" == 0 ]] || { echo 'Only initial ordinary Release normal-OFF is implemented in this source candidate' >&2; exit 1; }\n[[ \"$work_root\" == \"/private/tmp/starling-node-compat/crypto-owner355-secret-v1-build\" ]] || { echo 'Exact separate secret work root required' >&2; exit 1; }\nlayer_root=\"$repo_root/tests/node-compat/foundation-zlib/native-integration-candidate-v4\"",
+          "count": 1
+        }
+      ],
+      "forwardAndReverseExact": true
+    },
+    {
+      "output": "build-admission.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/native-integration-candidate-v2/build-admission.mjs",
+        "sha256": "421c7bf2400f9f3e8bb237d3b8a1e39b0164f4c8908a7450ea20c1038d0657de",
+        "bytes": 23588
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-integration-candidate-v1/build-admission.mjs",
+        "sha256": "df16a269639e453b5f10cad18957b51695bb5ea90944d920c2c9843de3452f37",
+        "bytes": 24339
+      },
+      "edits": [
+        {
+          "before": "71e18efa7ddac64de6176032ad6fba4b2d31e33e8115f9265ced131730a476ad",
+          "after": "d8b50ec3a9bac74a59a9c0b05821ba18654dc0cae59b311ffe91deb7631b140f",
+          "count": 1
+        },
+        {
+          "before": "eec3245841fff07e5bf9c3ff7b488106c94b71705262b22272d60a8ea4d7bfb3",
+          "after": "298f227ac9aa96122624b3b7600c746f73c6c35b003df2479dcea0c2568c837e",
+          "count": 1
+        },
+        {
+          "before": "validateCryptoOwnerSourceModel",
+          "after": "validateCryptoSecretFailureSourceModel",
+          "count": 2
+        },
+        {
+          "before": "validateCryptoOwnerSourceAdmission",
+          "after": "validateCryptoSecretFailureSourceAdmission",
+          "count": 1
+        },
+        {
+          "before": "validateCryptoOwnerBuildSourceAdmission",
+          "after": "validateCryptoSecretFailureBuildSourceAdmission",
+          "count": 1
+        },
+        {
+          "before": " assert.deepEqual(metadata.cryptoKeyOwnershipPolicy,policy.cryptoKeyOwnershipSourcePolicy,'Exact new ownership layer; same355 count is not authority');",
+          "after": " assert.deepEqual(metadata.cryptoSecretFailureSourcePolicy,policy.cryptoSecretFailureSourcePolicy,'Exact secret-failure layer required');\n const secretEvidence=metadata.cryptoSecretFailureBuildEvidence;\n assert.equal(secretEvidence?.version,'sm-webcrypto-secret-failure-build-evidence-v1');\n assert.equal(secretEvidence.cryptoBuiltinEnabled,true);assert.equal(secretEvidence.currentSourceManifestValidated,true);\n assert.equal(secretEvidence.faultInjectionObserved,false);assert.equal(secretEvidence.runtimeValidation,null);\n assert.deepEqual([...secretEvidence.changedNativeCompileCommands].sort(),policy.cryptoSecretFailureSourcePolicy.changes.filter(row=>row.path.endsWith('.cpp')).map(row=>layout.get(row.path)).sort());\n assert.deepEqual(metadata.cryptoKeyOwnershipPolicy,policy.cryptoKeyOwnershipSourcePolicy,'Exact inherited ownership ancestry required');",
+          "count": 1
+        },
+        {
+          "before": "CryptoOwner355 operational admission CLOSED:",
+          "after": "CryptoSecretFailure355 operational admission CLOSED:",
+          "count": 1
+        }
+      ],
+      "forwardAndReverseExact": true
+    }
+  ],
+  "policyTransformation": {
+    "parent": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/native-integration-candidate-v2/policy.json",
+      "sha256": "5a3bd48ebac975f7a3fd72691432b34c0e4afb9eec33bd2ad6273d78225193f9",
+      "bytes": 134267
+    },
+    "output": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-integration-candidate-v1/policy.json",
+      "sha256": "b64378980f64db7c7602a296e584c18ee003d284f2a3e929be25fb08c16a0497",
+      "bytes": 140448
+    },
+    "fieldsChanged": [
+      "version",
+      "expectedNativeSourceManifest",
+      "sourceLayer[three crypto files].afterSha256",
+      "cryptoSecretFailureSourcePolicy"
+    ],
+    "nativePathsPreserved": 355,
+    "unchangedNativeHashes": 352,
+    "correctedNativeHashes": 3
+  },
+  "policyAncestryNotEngineMetadata": true,
+  "globalContextRebinding": false
+}

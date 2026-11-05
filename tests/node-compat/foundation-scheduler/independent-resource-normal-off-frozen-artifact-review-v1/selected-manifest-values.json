@@ -1,0 +1,1297 @@
+{
+  "schemaVersion": 1,
+  "values": [
+    {
+      "selection": {
+        "path": "builtins/node-compat/export-manifest.node-v22.14.0.json",
+        "sha256": "abfcc6a07e1b3d2e0877293a7c5fe02bc1ff971a7703c5860d8385b3ad510872",
+        "profileVersion": "sm-node-22.14.0-m0.11"
+      },
+      "fullValue": {
+        "schemaVersion": 1,
+        "profileVersion": "sm-node-22.14.0-m0.11",
+        "nodeVersion": "v22.14.0",
+        "status": "experimental-opt-in; bounded native byte-kernel implementation",
+        "moduleContract": "ESM with explicit named exports and default data-property object; no dynamic CommonJS require or syncBuiltinESMExports",
+        "modules": {
+          "node:child_process": {
+            "aliases": [
+              "child_process"
+            ],
+            "status": "import-only",
+            "exports": [
+              "ChildProcess",
+              "_forkChild",
+              "default",
+              "exec",
+              "execFile",
+              "execFileSync",
+              "execSync",
+              "fork",
+              "spawn",
+              "spawnSync"
+            ],
+            "callablePolicy": "Every non-default export is a function that immediately throws ERR_SM_NODE_UNSUPPORTED on invocation or construction, including during snapshot initialization"
+          },
+          "node:buffer": {
+            "aliases": [
+              "buffer"
+            ],
+            "globals": [
+              "Buffer (only if profile selected)"
+            ],
+            "status": "partial",
+            "exports": [
+              "Blob",
+              "Buffer",
+              "File",
+              "INSPECT_MAX_BYTES",
+              "SlowBuffer",
+              "atob",
+              "btoa",
+              "constants",
+              "default",
+              "isAscii",
+              "isUtf8",
+              "kMaxLength",
+              "kStringMaxLength",
+              "resolveObjectURL",
+              "transcode"
+            ],
+            "supportedStatic": [
+              "alloc(size:number-integer, fill?:number)",
+              "from(string, utf8|utf-8|hex)",
+              "from(Uint8Array): copy",
+              "from(ArrayBuffer, integerOffset?, integerLength?): shared view",
+              "isBuffer",
+              "isEncoding: profile encodings only",
+              "byteLength(string|Uint8Array|ArrayBuffer, encoding?)",
+              "allocUnsafe(finite nonnegative number <=16777216): truncate length; fresh zeroed owned Buffer; no pool"
+            ],
+            "supportedPrototype": [
+              "toString(utf8|utf-8|hex, integerStart?, integerEnd?)",
+              "subarray",
+              "slice: shared view",
+              "parent",
+              "offset"
+            ],
+            "encodingNames": [
+              "utf8",
+              "utf-8",
+              "hex"
+            ],
+            "limits": {
+              "MAX_LENGTH": 16777216,
+              "MAX_STRING_LENGTH": 33554432,
+              "MAX_SOURCE_CODE_UNITS": 1048576,
+              "poolSize": 0
+            },
+            "numericExports": {
+              "INSPECT_MAX_BYTES": 50,
+              "kMaxLength": 16777216,
+              "kStringMaxLength": 33554432
+            },
+            "importOnlyExports": [
+              "Blob",
+              "File",
+              "SlowBuffer",
+              "atob",
+              "btoa",
+              "isAscii",
+              "isUtf8",
+              "resolveObjectURL",
+              "transcode"
+            ],
+            "unsupportedStatic": [
+              "copyBytesFrom",
+              "of",
+              "allocUnsafeSlow",
+              "compare",
+              "concat"
+            ],
+            "unsupportedPrototypePolicy": "Every other own Node Buffer prototype function is explicitly installed as a throwing function; inventory checked against pinned Node at test time",
+            "deviations": [
+              "No deprecated Buffer or SlowBuffer constructor",
+              "No slab allocator or uninitialized storage; allocUnsafe guarantees fresh zeroed exact backing at offset 0 and ignores poolSize",
+              "No arrays, array-like inputs, DataView, non-Uint8 typed arrays, SharedArrayBuffer or resizable backing stores",
+              "No copying slice: Buffer.slice shares storage",
+              "Source strings limited to 1048576 UTF-16 code units",
+              "Only allocUnsafe truncates finite nonnegative fractional sizes; other fractional sizes/index coercions remain outside the declared overloads",
+              "Default object and constants frozen; CJS mutation synchronization unsupported",
+              "Detached/shared/resizable ArrayBuffers and views fail ERR_SM_NODE_UNSUPPORTED; inherited Uint8Array APIs keep engine behavior",
+              "allocUnsafe validates the raw requested size before truncation; requests above 16777216 reject even if their truncated length would fit",
+              "allocUnsafe uses captured constructors and own data code/module/operation fields for validation; detailed Node error text and pooled backing semantics differ",
+              "allocUnsafeSlow remains explicitly deferred; no legacy Buffer constructor or other method support follows"
+            ]
+          }
+        },
+        "requiredHostInterfaces": []
+      }
+    },
+    {
+      "selection": {
+        "path": "builtins/node-compat/export-manifest.path.node-v22.14.0.json",
+        "sha256": "70c15899224ff4e8bf8bf3eafe2778622ab77d1981a82ff95814245408fc8ca6",
+        "profileVersion": "sm-node-22.14.0-m0.2"
+      },
+      "fullValue": {
+        "schemaVersion": 1,
+        "profileVersion": "sm-node-22.14.0-m0.2",
+        "nodeVersion": "v22.14.0",
+        "status": "Optional Path foundation selected only by NODE_COMPAT_PATH=ON; core m0.1 manifest is unchanged.",
+        "moduleContract": "Explicit finite ESM export records. Root default equals posix; default and named functions initially share identity; all variants share the same posix/win32 object graph. Bare aliases select the same values, with module namespace records cached per registered specifier.",
+        "modules": {
+          "node:path": {
+            "aliases": [
+              "path"
+            ],
+            "status": "partial",
+            "exports": [
+              "_makeLong",
+              "basename",
+              "default",
+              "delimiter",
+              "dirname",
+              "extname",
+              "format",
+              "isAbsolute",
+              "join",
+              "matchesGlob",
+              "normalize",
+              "parse",
+              "posix",
+              "relative",
+              "resolve",
+              "sep",
+              "toNamespacedPath",
+              "win32"
+            ],
+            "callablePolicy": "All 13 callable exports implement lexical path operations; matchesGlob additionally enforces explicit profile budgets. No operation consults a host capability.",
+            "supportedStatic": [
+              "_makeLong",
+              "basename",
+              "dirname",
+              "extname",
+              "format",
+              "isAbsolute",
+              "join",
+              "matchesGlob",
+              "normalize",
+              "parse",
+              "relative",
+              "resolve",
+              "toNamespacedPath"
+            ],
+            "limits": {
+              "pathCodeUnits": 4096,
+              "patternCodeUnits": 1024,
+              "braceAlternatives": 128,
+              "braceOutputCodeUnits": 32768,
+              "braceDepth": 8,
+              "braceRewrites": 16,
+              "extglobDepth": 8,
+              "segments": 128,
+              "magicSegmentCodeUnits": 256,
+              "stateEstimate": 65536,
+              "workEstimate": 2000000,
+              "workUnits": 250000,
+              "stateKeyCodeUnits": 32768,
+              "globstarRecursion": 32,
+              "dfaCacheUnits": 262144
+            },
+            "deviations": [
+              "Default namespace is POSIX and virtual cwd is always '/'; no host cwd or drive-specific environment is queried.",
+              "matchesGlob uses fixed POSIX-host case sensitivity for both variants, suppresses Node's experimental warning and uses explicitly patched minimatch 11.0.1 rather than Node 22.14's vulnerable matcher.",
+              "matchesGlob rejects resource-budget exhaustion with RangeError code ERR_SM_NODE_PATH_BUDGET and a resource string instead of truncating expansions or returning a false result.",
+              "TypeError names and ERR_INVALID_ARG_TYPE codes match the supported invalid input domain; received-value message rendering differs from Node's internal inspector.",
+              "Default path objects remain mutable; ESM named bindings capture their initial members. syncBuiltinESMExports is unavailable."
+            ]
+          },
+          "node:path/posix": {
+            "aliases": [
+              "path/posix"
+            ],
+            "status": "partial",
+            "exports": [
+              "_makeLong",
+              "basename",
+              "default",
+              "delimiter",
+              "dirname",
+              "extname",
+              "format",
+              "isAbsolute",
+              "join",
+              "matchesGlob",
+              "normalize",
+              "parse",
+              "posix",
+              "relative",
+              "resolve",
+              "sep",
+              "toNamespacedPath",
+              "win32"
+            ],
+            "callablePolicy": "All 13 callable exports implement lexical path operations; matchesGlob additionally enforces explicit profile budgets. No operation consults a host capability.",
+            "supportedStatic": [
+              "_makeLong",
+              "basename",
+              "dirname",
+              "extname",
+              "format",
+              "isAbsolute",
+              "join",
+              "matchesGlob",
+              "normalize",
+              "parse",
+              "relative",
+              "resolve",
+              "toNamespacedPath"
+            ],
+            "limits": {
+              "pathCodeUnits": 4096,
+              "patternCodeUnits": 1024,
+              "braceAlternatives": 128,
+              "braceOutputCodeUnits": 32768,
+              "braceDepth": 8,
+              "braceRewrites": 16,
+              "extglobDepth": 8,
+              "segments": 128,
+              "magicSegmentCodeUnits": 256,
+              "stateEstimate": 65536,
+              "workEstimate": 2000000,
+              "workUnits": 250000,
+              "stateKeyCodeUnits": 32768,
+              "globstarRecursion": 32,
+              "dfaCacheUnits": 262144
+            },
+            "deviations": [
+              "Default namespace is POSIX and virtual cwd is always '/'; no host cwd or drive-specific environment is queried.",
+              "matchesGlob uses fixed POSIX-host case sensitivity for both variants, suppresses Node's experimental warning and uses explicitly patched minimatch 11.0.1 rather than Node 22.14's vulnerable matcher.",
+              "matchesGlob rejects resource-budget exhaustion with RangeError code ERR_SM_NODE_PATH_BUDGET and a resource string instead of truncating expansions or returning a false result.",
+              "TypeError names and ERR_INVALID_ARG_TYPE codes match the supported invalid input domain; received-value message rendering differs from Node's internal inspector.",
+              "Default path objects remain mutable; ESM named bindings capture their initial members. syncBuiltinESMExports is unavailable."
+            ]
+          },
+          "node:path/win32": {
+            "aliases": [
+              "path/win32"
+            ],
+            "status": "partial",
+            "exports": [
+              "_makeLong",
+              "basename",
+              "default",
+              "delimiter",
+              "dirname",
+              "extname",
+              "format",
+              "isAbsolute",
+              "join",
+              "matchesGlob",
+              "normalize",
+              "parse",
+              "posix",
+              "relative",
+              "resolve",
+              "sep",
+              "toNamespacedPath",
+              "win32"
+            ],
+            "callablePolicy": "All 13 callable exports implement lexical path operations; matchesGlob additionally enforces explicit profile budgets. No operation consults a host capability.",
+            "supportedStatic": [
+              "_makeLong",
+              "basename",
+              "dirname",
+              "extname",
+              "format",
+              "isAbsolute",
+              "join",
+              "matchesGlob",
+              "normalize",
+              "parse",
+              "relative",
+              "resolve",
+              "toNamespacedPath"
+            ],
+            "limits": {
+              "pathCodeUnits": 4096,
+              "patternCodeUnits": 1024,
+              "braceAlternatives": 128,
+              "braceOutputCodeUnits": 32768,
+              "braceDepth": 8,
+              "braceRewrites": 16,
+              "extglobDepth": 8,
+              "segments": 128,
+              "magicSegmentCodeUnits": 256,
+              "stateEstimate": 65536,
+              "workEstimate": 2000000,
+              "workUnits": 250000,
+              "stateKeyCodeUnits": 32768,
+              "globstarRecursion": 32,
+              "dfaCacheUnits": 262144
+            },
+            "deviations": [
+              "Default namespace is POSIX and virtual cwd is always '/'; no host cwd or drive-specific environment is queried.",
+              "matchesGlob uses fixed POSIX-host case sensitivity for both variants, suppresses Node's experimental warning and uses explicitly patched minimatch 11.0.1 rather than Node 22.14's vulnerable matcher.",
+              "matchesGlob rejects resource-budget exhaustion with RangeError code ERR_SM_NODE_PATH_BUDGET and a resource string instead of truncating expansions or returning a false result.",
+              "TypeError names and ERR_INVALID_ARG_TYPE codes match the supported invalid input domain; received-value message rendering differs from Node's internal inspector.",
+              "Default path objects remain mutable; ESM named bindings capture their initial members. syncBuiltinESMExports is unavailable."
+            ]
+          }
+        },
+        "requiredHostInterfaces": []
+      }
+    },
+    {
+      "selection": {
+        "path": "builtins/node-compat/export-manifest.events.node-v22.14.0.json",
+        "sha256": "90f7dc152b990dc8955c0801eab11b9410a10dc96a8019c1b7a81b69981eb561",
+        "profileVersion": "sm-node-22.14.0-m0.10"
+      },
+      "fullValue": {
+        "schemaVersion": 1,
+        "profileVersion": "sm-node-22.14.0-m0.10",
+        "nodeVersion": "v22.14.0",
+        "status": "Optional bounded Events extension selected only by NODE_COMPAT_EVENTS=ON. m0.10 adds a finite addAbortListener facade and selected native protected-listener semantics; no external host interface is required. Support remains limited to the explicit policy below.",
+        "moduleContract": "Exactly the16 pinned Node22 ESM names. Default is the callable EventEmitter constructor and equals named EventEmitter and default.EventEmitter. Exported functions share initial identity with default static members. errorMonitor is a unique symbol, captureRejectionSymbol is Symbol.for(nodejs.rejection); captureRejections/usingDomains are false and defaultMaxListeners is10. Static defaultMaxListeners is a mutable accessor while its named ESM export captures10. Selected literal CommonJS lowering will return default; runtime require and syncBuiltinESMExports remain excluded. Proposed m0.10 retains the16 export names, default/static identities and alias/cache contract; addAbortListener uses a guest protected-option Symbol and a finite JavaScript facade.",
+        "modules": {
+          "node:events": {
+            "aliases": [
+              "events"
+            ],
+            "status": "partial",
+            "exports": [
+              "EventEmitter",
+              "EventEmitterAsyncResource",
+              "addAbortListener",
+              "captureRejectionSymbol",
+              "captureRejections",
+              "default",
+              "defaultMaxListeners",
+              "errorMonitor",
+              "getEventListeners",
+              "getMaxListeners",
+              "init",
+              "listenerCount",
+              "on",
+              "once",
+              "setMaxListeners",
+              "usingDomains"
+            ],
+            "callablePolicy": "Listed synchronous methods accept string/symbol event names and ordinary initialized EventEmitter/mixin receivers. Deferred callable exports throw ERR_SM_NODE_UNSUPPORTED on call or construction, including during initialization. No Proxy or fabricated host operation.",
+            "supportedStatic": [
+              "EventEmitter",
+              "init",
+              "getEventListeners",
+              "getMaxListeners",
+              "listenerCount",
+              "setMaxListeners",
+              "addAbortListener"
+            ],
+            "supportedPrototype": [
+              "setMaxListeners",
+              "getMaxListeners",
+              "emit",
+              "addListener",
+              "on",
+              "prependListener",
+              "once",
+              "prependOnceListener",
+              "removeListener",
+              "off",
+              "removeAllListeners",
+              "listeners",
+              "rawListeners",
+              "listenerCount",
+              "eventNames"
+            ],
+            "unsupportedStatic": [
+              "EventEmitterAsyncResource",
+              "on",
+              "once"
+            ],
+            "unsupportedPrototypePolicy": "Only the15 listed EventEmitter prototype methods are claimed. AsyncResource instances cannot be constructed.",
+            "numericExports": {
+              "defaultMaxListeners": 10
+            },
+            "limits": {
+              "listenersPerEvent": 65536,
+              "eventNamesPerEmitter": 4096,
+              "nestedEmitEntries": 64
+            },
+            "deviations": [
+              "Event-name coercion beyond strings/symbols is explicitly deferred even though Node accepts other property-key values.",
+              "Resource caps throw RangeError ERR_SM_NODE_LIMIT while preserving already-registered state; Node has no corresponding fixed caps.",
+              "Listener warning thresholds retain advisory behavior and warned markers, but process warning delivery is deferred; no console/stdio import is introduced.",
+              "captureRejections=true and its global setter are deferred until correct scheduler/error propagation; false remains supported.",
+              "Static once promises, on async iteration and EventEmitterAsyncResource are explicit throwing stubs.",
+              "getEventListeners/getMaxListeners/setMaxListeners support EventEmitter-compatible targets; native EventTarget integration is deferred.",
+              "Invalid argument names/codes are matched for tested supported cases; detailed received-value messages and non-Error error-event rendering differ.",
+              "Private internal symbol layout, arbitrary external mutation of _events, cross-realm receivers, runtime CommonJS loading and mutable ESM synchronization are not claimed.",
+              "Target Symbol.dispose is captured for native disposal interoperability; pinned Node22 registry identity can differ. Target symbol identity still requires a component test.",
+              "The current selected-profile strict v3 error policy is fatal/discard at a drained boundary, not Node process error handlers/nextTick semantics.",
+              "Node EventTarget parity is not claimed, including registration getter timing and pre-stopped stopPropagation/cancelBubble synthetic events. Native function target receiver correction is proposed separately.",
+              "General AbortSignal container finalization and option-signal Terminator unlinking are pre-existing lifetime gaps and need a separate prerequisite review; no immediate reclamation claim.",
+              "addAbortListener targets structural signal validation, dynamic public hooks, once/disposal/already-aborted scheduling and protected stopImmediatePropagation order. Detailed received-value messages differ; no general EventTarget, process or AsyncResource parity is claimed.",
+              "Selected native EventTarget public add/remove/dispatch reject uninitialized class prototypes with TypeError, matching the uncoded prototype errors observed in pinned Node22. Detailed messages and ERR_INVALID_THIS normalization for other receivers remain outside this guard. Structural addAbortListener signal validation is preserved."
+            ]
+          }
+        },
+        "requiredHostInterfaces": []
+      }
+    },
+    {
+      "selection": {
+        "path": "builtins/node-compat/export-manifest.string-decoder.node-v22.14.0.json",
+        "sha256": "e4fdf44af26cb5c80729a44e06a3d8c58c8d37f083cd8ae3c779c366b0aefe3a",
+        "profileVersion": "sm-node-22.14.0-m0.4"
+      },
+      "fullValue": {
+        "schemaVersion": 1,
+        "profileVersion": "sm-node-22.14.0-m0.4",
+        "nodeVersion": "v22.14.0",
+        "status": "Optional bounded StringDecoder foundation selected only by NODE_COMPAT_STRING_DECODER=ON; requires the core Buffer and native web codec builtins. Other manifests remain unchanged.",
+        "moduleContract": "Exactly the two pinned Node22 ESM bindings StringDecoder and default. The ordinary mutable default object initially has only StringDecoder, identical to the named constructor. Named bindings capture their initial values; default-object mutation does not synchronize ESM bindings. Selected literal CommonJS lowering returns default. Runtime require and syncBuiltinESMExports remain excluded.",
+        "modules": {
+          "node:string_decoder": {
+            "aliases": [
+              "string_decoder"
+            ],
+            "status": "partial",
+            "exports": [
+              "StringDecoder",
+              "default"
+            ],
+            "callablePolicy": "StringDecoder supports the listed UTF-8 aliases and hex, including ordinary constructor/call receivers and captured private encoding. Node-recognized deferred encodings throw ERR_SM_NODE_UNSUPPORTED at construction, including during componentization. Unknown labels throw TypeError ERR_UNKNOWN_ENCODING. No Proxy or host operation is used.",
+            "supportedStatic": [
+              "StringDecoder"
+            ],
+            "supportedPrototype": [
+              "write",
+              "end",
+              "text",
+              "lastChar",
+              "lastNeed",
+              "lastTotal"
+            ],
+            "encodingNames": [
+              "utf8",
+              "utf-8",
+              "hex"
+            ],
+            "limits": {
+              "inputBytes": 16777216,
+              "stateBytes": 7,
+              "lastCharBytes": 4,
+              "pendingInputBytes": 3
+            },
+            "deviations": [
+              "Only UTF-8 and hex are implemented. ASCII, latin1/binary, UTF-16LE/UCS-2, base64 and base64url are recognized but explicitly unavailable; no full StringDecoder support is claimed.",
+              "Encoding names are case-insensitive under the pinned normalization algorithm; undefined, null and the empty string select UTF-8. Boxed/custom labels use the tested length-before-lowercase coercion order.",
+              "write accepts strings unchanged and ordinary fixed unshared ArrayBufferViews as raw bytes; bare ArrayBuffer, shared, resizable and detached byte inputs are rejected. Input cap violations throw RangeError ERR_SM_NODE_LIMIT.",
+              "Strings passed to write are returned unchanged before receiver validation and do not consume pending bytes. The byte cap applies to byte input, not this zero-copy string passthrough.",
+              "State uses owned seven-byte fixed Buffer storage, with a fresh live four-byte lastChar view on every read. Node Buffer pool machinery and undocumented storage identities beyond the tested state/view contract are not implemented.",
+              "Public encoding mutation does not change the private constructor-selected encoding. Mutating carry bytes is observable. Arbitrary replacement/corruption of the exposed internal-symbol storage, counter fields or encoding marker is excluded; detached or out-of-bounds-count storage is rejected with TypeError ERR_SM_NODE_DECODER_STATE.",
+              "text clears pending counters before the observable input.slice(offset) call and then uses the observable receiver.write. It validates view backing/limits before slice may allocate; resizable/shared/detached views remain excluded.",
+              "Detailed error messages, deliberately modified Buffer constructors/species, cross-realm inputs and arbitrary mutation of captured intrinsics during installation are not claimed. After installation the facade uses captured codec/Buffer methods and byte-view length getters.",
+              "No async context, scheduler, filesystem, process, entropy or other host interface is required. Correct generic native TextDecoder ownership is a prerequisite; unrelated fatal-decoding lifecycle and Rust allocator-abort behavior are not solved by this facade."
+            ]
+          }
+        },
+        "requiredHostInterfaces": []
+      }
+    },
+    {
+      "selection": {
+        "path": "builtins/node-compat/export-manifest.assert.node-v22.14.0.json",
+        "sha256": "815429917fe9a4378f09b1ce345b0a51b8f9622f2743dac2087167621cecd4d0",
+        "profileVersion": "sm-node-22.14.0-m0.5"
+      },
+      "fullValue": {
+        "schemaVersion": 1,
+        "profileVersion": "sm-node-22.14.0-m0.5",
+        "nodeVersion": "v22.14.0",
+        "status": "Prepared optional bounded Assert facade; planned NODE_COMPAT_ASSERT=ON selection. Shared registration/build integration and native component gates are pending.",
+        "moduleContract": "Both modules declare exactly22 pinned Node22 ESM exports. node:assert default===ok; named strict===node:assert/strict default; strict.strict===strict; strict.ok===root.ok. Strict equal/notEqual/deepEqual/notDeepEqual alias the root strict variants. Functions on each default initially share identity with named exports; later default-property reassignment does not rewrite named ESM cells. Future selected literal CommonJS lowering may return default; runtime require and syncBuiltinESMExports are excluded.",
+        "modules": {
+          "node:assert": {
+            "aliases": [
+              "assert"
+            ],
+            "status": "partial",
+            "exports": [
+              "AssertionError",
+              "CallTracker",
+              "deepEqual",
+              "deepStrictEqual",
+              "default",
+              "doesNotMatch",
+              "doesNotReject",
+              "doesNotThrow",
+              "equal",
+              "fail",
+              "ifError",
+              "match",
+              "notDeepEqual",
+              "notDeepStrictEqual",
+              "notEqual",
+              "notStrictEqual",
+              "ok",
+              "partialDeepStrictEqual",
+              "rejects",
+              "strict",
+              "strictEqual",
+              "throws"
+            ],
+            "callablePolicy": "Deferred functions synchronously throw TypeError ERR_SM_NODE_UNSUPPORTED with operation on call and construction, including application initialization. Supported throws/doesNotThrow execute the callback before applicable matcher handling. A successful doesNotThrow returns without consulting an unused matcher.",
+            "deviations": [
+              "Auto messages use bounded opaque-object rendering, without util.inspect, custom inspectors, V8 source-file expression lookup, rich diffs, color or exact Node stack framing. Successful assertions do not render diagnostic inputs.",
+              "AssertionError preserves tested code/name/operator/generatedMessage and actual/expected identity. stackStartFn/stackStartFunction are ignored; details is explicitly deferred. Native error stack layout, custom message diff decoration and prototype inspection helpers differ.",
+              "Ordinary same-realm Error messages are rethrown by identity for ok/equality/fail/match; throws matcher failure renders its supplied message, matching the pinned reference. Cross-realm native-error detection and proxies posing as errors/regexps are not claimed.",
+              "Complex exception validation objects and Error-instance matchers are deferred. Error constructors/classes, ordinary predicates returning exactly true and native RegExp matching are supported.",
+              "RegExp matching uses captured native exec and retains lastIndex behavior; regex algorithmic complexity remains the JavaScript engine's responsibility.",
+              "Async helpers are synchronous explicit unsupported operations rather than partial Promise implementations. No async scheduling or AsyncLocalStorage behavior is claimed.",
+              "Warning delivery for deprecated fail overload and CallTracker is deferred. No process/stdio/clock/random/filesystem capability is introduced.",
+              "Support is not complete Node Assert compatibility or a prerequisite proven by readable-stream4.7: that package uses a private local assertion helper."
+            ],
+            "supportedStatic": [
+              "AssertionError",
+              "ok",
+              "strict",
+              "equal",
+              "notEqual",
+              "strictEqual",
+              "notStrictEqual",
+              "fail",
+              "ifError",
+              "throws",
+              "doesNotThrow",
+              "match",
+              "doesNotMatch"
+            ],
+            "unsupportedStatic": [
+              "deepEqual",
+              "notDeepEqual",
+              "deepStrictEqual",
+              "notDeepStrictEqual",
+              "partialDeepStrictEqual",
+              "rejects",
+              "doesNotReject",
+              "CallTracker"
+            ]
+          },
+          "node:assert/strict": {
+            "aliases": [
+              "assert/strict"
+            ],
+            "status": "partial",
+            "exports": [
+              "AssertionError",
+              "CallTracker",
+              "deepEqual",
+              "deepStrictEqual",
+              "default",
+              "doesNotMatch",
+              "doesNotReject",
+              "doesNotThrow",
+              "equal",
+              "fail",
+              "ifError",
+              "match",
+              "notDeepEqual",
+              "notDeepStrictEqual",
+              "notEqual",
+              "notStrictEqual",
+              "ok",
+              "partialDeepStrictEqual",
+              "rejects",
+              "strict",
+              "strictEqual",
+              "throws"
+            ],
+            "callablePolicy": "Shares the root implementation, references and deferred-operation policy. The four strict aliases do not wrap or duplicate functions.",
+            "supportedStatic": [
+              "AssertionError",
+              "ok",
+              "strict",
+              "equal",
+              "notEqual",
+              "strictEqual",
+              "notStrictEqual",
+              "fail",
+              "ifError",
+              "throws",
+              "doesNotThrow",
+              "match",
+              "doesNotMatch"
+            ],
+            "unsupportedStatic": [
+              "deepEqual",
+              "notDeepEqual",
+              "deepStrictEqual",
+              "notDeepStrictEqual",
+              "partialDeepStrictEqual",
+              "rejects",
+              "doesNotReject",
+              "CallTracker"
+            ],
+            "deviations": [
+              "Shares all root diagnostic, same-realm, overload and deferred-operation restrictions. Default is root.strict and strict.strict is self; equal/notEqual/deepEqual/notDeepEqual alias root strict variants without wrappers."
+            ]
+          }
+        },
+        "requiredHostInterfaces": []
+      }
+    },
+    {
+      "selection": {
+        "path": "builtins/node-compat/export-manifest.querystring.node-v22.14.0.json",
+        "sha256": "0f58f6280715e206709fc49d1fec1ea8d4597a4b990e90dbf52a2f504faef882",
+        "profileVersion": "sm-node-22.14.0-m0.6"
+      },
+      "fullValue": {
+        "schemaVersion": 1,
+        "profileVersion": "sm-node-22.14.0-m0.6",
+        "nodeVersion": "v22.14.0",
+        "status": "Prepared optional bounded Querystring facade; planned NODE_COMPAT_QUERYSTRING=ON selection. Shared registration/build integration and native component gates are pending.",
+        "moduleContract": "Exactly8 pinned ESM exports. Default is an ordinary object whose initial method references match the named exports; encode===stringify and decode===parse. Reassigning a default property does not rewrite named bindings, while parser/stringifier use mutable default escape/unescape hooks as pinned Node does. Future selected literal CommonJS lowering may return default; runtime require and syncBuiltinESMExports remain excluded. Depends on the existing guest Buffer constructor supplied privately to the factory; no global Buffer injection or new host capability.",
+        "modules": {
+          "node:querystring": {
+            "aliases": [
+              "querystring"
+            ],
+            "status": "partial",
+            "exports": [
+              "decode",
+              "default",
+              "encode",
+              "escape",
+              "parse",
+              "stringify",
+              "unescape",
+              "unescapeBuffer"
+            ],
+            "callablePolicy": "Nonstring unescapeBuffer overloads throw TypeError ERR_SM_NODE_UNSUPPORTED with operation on call or construction. Resource caps throw RangeError ERR_SM_NODE_LIMIT. No blank objects, universal Proxy or silent failure substitutes for declared bindings. Null-prototype output; duplicate key aggregation; safe own __proto__ fields; custom separators/equal delimiters; Node1000 default segment limit; positive integer maxKeys decrement and exact pinned fractional/nonpositive/NaN/Infinity behavior within profile hard caps. Empty segments count toward Node maxKeys. Custom decoder callbacks receive plus as %20 and exceptions fall back through mutable default.unescape. Callback return values are not restricted to strings, following pinned Node behavior. Captured native URI encoding/decoding fast paths. On malformed UTF16, escape emulates Node22 legacy surrogate pairing and terminal URIError ERR_INVALID_URI. Malformed percent fallback scans UTF16 code units into bytes modulo256 then decodes nonfatal UTF8 preserving BOM through existing guest Buffer.toString. No URLSearchParams or TextEncoder substitution.",
+            "limits": {
+              "inputCodeUnits": 1048576,
+              "parsedSegments": 65536,
+              "stringifyKeys": 65536,
+              "stringifyValues": 65536,
+              "stringifyOutputCodeUnits": 16777216
+            },
+            "deviations": [
+              "Profile hard caps are additional to Node maxKeys and cannot be disabled by maxKeys0, negative, fractional, NaN or Infinity. Failed caps may occur after earlier callback/getter effects; no rollback is promised.",
+              "Nonstring unescapeBuffer is explicitly deferred, including fallback after a failing nonstring unescape coercion. Native successful unescape scalar/object coercions remain supported within output input-size bound.",
+              "unescapeBuffer allocates using supported captured Buffer.alloc rather than deferred allocUnsafe. Every returned byte is initialized; Buffer pooling/uninitialized unused backing semantics are not claimed.",
+              "Buffer allocation, shared slice views, Uint8Array brand and UTF8 replacement follow the bounded core Buffer profile. This does not expand its encodings, limits or APIs.",
+              "Native intrinsic and Buffer allocation/slice references are captured. Application callbacks and mutable default hooks execute with Node's inspected invocation order; arbitrary engine-specific stack/error formatting is not claimed.",
+              "Proxy-backed arrays with noninteger/nonfinite reported lengths are deferred. Exact out-of-memory behavior and performance/size comparison remain unmeasured."
+            ],
+            "supportedStatic": [
+              "parse",
+              "decode",
+              "stringify",
+              "encode",
+              "escape",
+              "unescape",
+              "unescapeBuffer"
+            ]
+          }
+        },
+        "requiredHostInterfaces": []
+      }
+    },
+    {
+      "selection": {
+        "path": "builtins/node-compat/export-manifest.util.node-v22.14.0.json",
+        "sha256": "dc8a4ba0756bcc31156498282232e3710538e372c82462353a875be075820fed",
+        "profileVersion": "sm-node-22.14.0-m0.7"
+      },
+      "fullValue": {
+        "schemaVersion": 1,
+        "profileVersion": "sm-node-22.14.0-m0.7",
+        "nodeVersion": "v22.14.0",
+        "status": "Prepared optional bounded Util factory; planned NODE_COMPAT_UTIL=ON, defaultOFF. Shared registration/build/admission and installed nativebuiltin component gates are pending.",
+        "moduleContract": "Exact Node22 util/sys47named+default and util/types42predicates+default. Factory takes privateundefined and returns finite root/types ESM export records; util/sys share record values and default object, types default===root.types. Existing loader makes per-specifier namespaces; selected literal aliases/CJS lowering must canonicalize appropriately. No runtime require, syncBuiltinESMExports or JcoNode24 extraexports. Symbol constants, inspect palettes/aliases/defaultOptions and safe namespace inspection are meaningful; no universalProxy/blank-object substitutions.",
+        "modules": {
+          "node:util": {
+            "aliases": [
+              "util"
+            ],
+            "status": "partial",
+            "exports": [
+              "MIMEParams",
+              "MIMEType",
+              "TextDecoder",
+              "TextEncoder",
+              "_errnoException",
+              "_exceptionWithHostPort",
+              "_extend",
+              "aborted",
+              "callbackify",
+              "debug",
+              "debuglog",
+              "default",
+              "deprecate",
+              "format",
+              "formatWithOptions",
+              "getCallSite",
+              "getCallSites",
+              "getSystemErrorMap",
+              "getSystemErrorMessage",
+              "getSystemErrorName",
+              "inherits",
+              "inspect",
+              "isArray",
+              "isBoolean",
+              "isBuffer",
+              "isDate",
+              "isDeepStrictEqual",
+              "isError",
+              "isFunction",
+              "isNull",
+              "isNullOrUndefined",
+              "isNumber",
+              "isObject",
+              "isPrimitive",
+              "isRegExp",
+              "isString",
+              "isSymbol",
+              "isUndefined",
+              "log",
+              "parseArgs",
+              "parseEnv",
+              "promisify",
+              "stripVTControlCharacters",
+              "styleText",
+              "toUSVString",
+              "transferableAbortController",
+              "transferableAbortSignal",
+              "types"
+            ],
+            "supportedStatic": [
+              "TextDecoder",
+              "TextEncoder",
+              "inherits",
+              "promisify",
+              "toUSVString",
+              "types"
+            ],
+            "unsupportedStatic": [
+              "MIMEParams",
+              "MIMEType",
+              "_errnoException",
+              "_exceptionWithHostPort",
+              "_extend",
+              "aborted",
+              "callbackify",
+              "debug",
+              "debuglog",
+              "deprecate",
+              "format",
+              "formatWithOptions",
+              "getCallSite",
+              "getCallSites",
+              "getSystemErrorMap",
+              "getSystemErrorMessage",
+              "getSystemErrorName",
+              "inspect",
+              "isArray",
+              "isBoolean",
+              "isBuffer",
+              "isDate",
+              "isDeepStrictEqual",
+              "isError",
+              "isFunction",
+              "isNull",
+              "isNullOrUndefined",
+              "isNumber",
+              "isObject",
+              "isPrimitive",
+              "isRegExp",
+              "isString",
+              "isSymbol",
+              "isUndefined",
+              "log",
+              "parseArgs",
+              "parseEnv",
+              "stripVTControlCharacters",
+              "styleText",
+              "transferableAbortController",
+              "transferableAbortSignal"
+            ],
+            "callablePolicy": "Declared deferred functions throw Error ERR_SM_NODE_UNSUPPORTED with canonical module, operation and m0.7 profile on call or construction, including componentization. Meaningful registry symbols/palettes/options remain readable on unsupported inspect. Supported validation errors preserve tested TypeError/code, not exact Node diagnostic text.",
+            "deviations": [
+              "Not complete util support.41 util callable bindings are deferred; their declared names/default relationships remain intact.",
+              "TextEncoder/TextDecoder are exact installed Web constructors; existing codec encoding/coercion/resource limits remain, including encodeInto nonstring coercion deviation.",
+              "promisify supports ordinary err-first and publiccustom symbol shapes. Node internal customArgs annotations and DEP0174/process warning emission are excluded; Promise-returning originals retain callback settlement behavior without that warning.",
+              "Function error text/stack, metadata arity and constructibility outside tested supported/deferred shapes are not fully Node-equivalent. Runtime require and syncBuiltinESMExports are excluded.",
+              "No process/env/stdio/clock/entropy/filesystem capability is introduced. Warning delivery, inspect rendering/format, callbackify nextTick, native callsites/errno and transfer hooks remain deferred."
+            ]
+          },
+          "node:sys": {
+            "aliases": [
+              "sys"
+            ],
+            "status": "partial",
+            "exports": [
+              "MIMEParams",
+              "MIMEType",
+              "TextDecoder",
+              "TextEncoder",
+              "_errnoException",
+              "_exceptionWithHostPort",
+              "_extend",
+              "aborted",
+              "callbackify",
+              "debug",
+              "debuglog",
+              "default",
+              "deprecate",
+              "format",
+              "formatWithOptions",
+              "getCallSite",
+              "getCallSites",
+              "getSystemErrorMap",
+              "getSystemErrorMessage",
+              "getSystemErrorName",
+              "inherits",
+              "inspect",
+              "isArray",
+              "isBoolean",
+              "isBuffer",
+              "isDate",
+              "isDeepStrictEqual",
+              "isError",
+              "isFunction",
+              "isNull",
+              "isNullOrUndefined",
+              "isNumber",
+              "isObject",
+              "isPrimitive",
+              "isRegExp",
+              "isString",
+              "isSymbol",
+              "isUndefined",
+              "log",
+              "parseArgs",
+              "parseEnv",
+              "promisify",
+              "stripVTControlCharacters",
+              "styleText",
+              "toUSVString",
+              "transferableAbortController",
+              "transferableAbortSignal",
+              "types"
+            ],
+            "supportedStatic": [
+              "TextDecoder",
+              "TextEncoder",
+              "inherits",
+              "promisify",
+              "toUSVString",
+              "types"
+            ],
+            "unsupportedStatic": [
+              "MIMEParams",
+              "MIMEType",
+              "_errnoException",
+              "_exceptionWithHostPort",
+              "_extend",
+              "aborted",
+              "callbackify",
+              "debug",
+              "debuglog",
+              "deprecate",
+              "format",
+              "formatWithOptions",
+              "getCallSite",
+              "getCallSites",
+              "getSystemErrorMap",
+              "getSystemErrorMessage",
+              "getSystemErrorName",
+              "inspect",
+              "isArray",
+              "isBoolean",
+              "isBuffer",
+              "isDate",
+              "isDeepStrictEqual",
+              "isError",
+              "isFunction",
+              "isNull",
+              "isNullOrUndefined",
+              "isNumber",
+              "isObject",
+              "isPrimitive",
+              "isRegExp",
+              "isString",
+              "isSymbol",
+              "isUndefined",
+              "log",
+              "parseArgs",
+              "parseEnv",
+              "stripVTControlCharacters",
+              "styleText",
+              "transferableAbortController",
+              "transferableAbortSignal"
+            ],
+            "callablePolicy": "Declared deferred functions throw Error ERR_SM_NODE_UNSUPPORTED with canonical module, operation and m0.7 profile on call or construction, including componentization. Meaningful registry symbols/palettes/options remain readable on unsupported inspect. Supported validation errors preserve tested TypeError/code, not exact Node diagnostic text.",
+            "deviations": [
+              "Not complete util support.41 util callable bindings are deferred; their declared names/default relationships remain intact.",
+              "TextEncoder/TextDecoder are exact installed Web constructors; existing codec encoding/coercion/resource limits remain, including encodeInto nonstring coercion deviation.",
+              "promisify supports ordinary err-first and publiccustom symbol shapes. Node internal customArgs annotations and DEP0174/process warning emission are excluded; Promise-returning originals retain callback settlement behavior without that warning.",
+              "Function error text/stack, metadata arity and constructibility outside tested supported/deferred shapes are not fully Node-equivalent. Runtime require and syncBuiltinESMExports are excluded.",
+              "No process/env/stdio/clock/entropy/filesystem capability is introduced. Warning delivery, inspect rendering/format, callbackify nextTick, native callsites/errno and transfer hooks remain deferred.",
+              "Sys shares util default/named values but has a distinct module namespace. DEP0025 warning delivery is deliberately omitted to avoid implicit capabilities; this is partial compatibility."
+            ]
+          },
+          "node:util/types": {
+            "aliases": [
+              "util/types"
+            ],
+            "status": "partial",
+            "exports": [
+              "default",
+              "isAnyArrayBuffer",
+              "isArgumentsObject",
+              "isArrayBuffer",
+              "isArrayBufferView",
+              "isAsyncFunction",
+              "isBigInt64Array",
+              "isBigIntObject",
+              "isBigUint64Array",
+              "isBooleanObject",
+              "isBoxedPrimitive",
+              "isCryptoKey",
+              "isDataView",
+              "isDate",
+              "isExternal",
+              "isFloat32Array",
+              "isFloat64Array",
+              "isGeneratorFunction",
+              "isGeneratorObject",
+              "isInt16Array",
+              "isInt32Array",
+              "isInt8Array",
+              "isKeyObject",
+              "isMap",
+              "isMapIterator",
+              "isModuleNamespaceObject",
+              "isNativeError",
+              "isNumberObject",
+              "isPromise",
+              "isProxy",
+              "isRegExp",
+              "isSet",
+              "isSetIterator",
+              "isSharedArrayBuffer",
+              "isStringObject",
+              "isSymbolObject",
+              "isTypedArray",
+              "isUint16Array",
+              "isUint32Array",
+              "isUint8Array",
+              "isUint8ClampedArray",
+              "isWeakMap",
+              "isWeakSet"
+            ],
+            "supportedStatic": [
+              "isAnyArrayBuffer",
+              "isArrayBuffer",
+              "isArrayBufferView",
+              "isBigInt64Array",
+              "isBigIntObject",
+              "isBigUint64Array",
+              "isBooleanObject",
+              "isBoxedPrimitive",
+              "isDataView",
+              "isDate",
+              "isFloat32Array",
+              "isFloat64Array",
+              "isInt16Array",
+              "isInt32Array",
+              "isInt8Array",
+              "isMap",
+              "isNumberObject",
+              "isRegExp",
+              "isSet",
+              "isSharedArrayBuffer",
+              "isStringObject",
+              "isSymbolObject",
+              "isTypedArray",
+              "isUint16Array",
+              "isUint32Array",
+              "isUint8Array",
+              "isUint8ClampedArray",
+              "isWeakMap",
+              "isWeakSet"
+            ],
+            "unsupportedStatic": [
+              "isArgumentsObject",
+              "isAsyncFunction",
+              "isCryptoKey",
+              "isExternal",
+              "isGeneratorFunction",
+              "isGeneratorObject",
+              "isKeyObject",
+              "isMapIterator",
+              "isModuleNamespaceObject",
+              "isNativeError",
+              "isPromise",
+              "isProxy",
+              "isSetIterator"
+            ],
+            "callablePolicy": "29 predicates use captured native ECMAScript intrinsics; arbitrary object tags/prototypes/instanceof are not brands.13 others synchronously throw identifiable errors on call/new. No proxy-target, private engine or byte-data inspection.",
+            "deviations": [
+              "Six additional core nativebrand candidates (arguments/map/set iterator/native Error/Promise/scripted Proxy), optionalCryptoKey and six Node/engine-kind APIs remain explicit stubs; no C++ helper is claimed.",
+              "SharedArrayBuffer constructor is absent in audited currentStarling; predicate returns false for constructible current-domain inputs. No target SAB positivecase or portable crossrealm factory is proven.",
+              "Wrong-brand intrinsic exceptions are caught to produce false. Exact out-of-memory behavior of that route is unverified; no fault-injection gate is reopened.",
+              "Prototype/scripted/revoked-proxy safety passed real-component ordinarytests; security wrappers and newly added realms require separate gates."
+            ]
+          }
+        },
+        "requiredHostInterfaces": []
+      }
+    },
+    {
+      "selection": {
+        "path": "builtins/node-compat/export-manifest.stream-web.node-v22.14.0.json",
+        "sha256": "2b96f7df35ffbfab0dd0214acb6c68a4fe01a4db6c77527b0916bdf5ac41cd62",
+        "profileVersion": "sm-node-22.14.0-m0.9"
+      },
+      "fullValue": {
+        "schemaVersion": 1,
+        "profileVersion": "sm-node-22.14.0-m0.9",
+        "nodeVersion": "v22.14.0",
+        "status": "Optional bounded stream/web foundation selected only by NODE_COMPAT_STREAM_WEB=ON; requires the existing native web streams and text-codec builtins. No host interface is selected. Support is limited to the explicit policy below.",
+        "moduleContract": "Exactly the 17 pinned Node22 named exports plus default. The mutable ordinary default object initially maps each name to the same function; ESM bindings capture initial values without syncBuiltinESMExports. Proposed literal CommonJS lowering returns default; runtime require remains excluded. Private record capture is guest implementation detail, never a host service.",
+        "modules": {
+          "node:stream/web": {
+            "aliases": [
+              "stream/web"
+            ],
+            "status": "partial",
+            "exports": [
+              "ByteLengthQueuingStrategy",
+              "CompressionStream",
+              "CountQueuingStrategy",
+              "DecompressionStream",
+              "ReadableByteStreamController",
+              "ReadableStream",
+              "ReadableStreamBYOBReader",
+              "ReadableStreamBYOBRequest",
+              "ReadableStreamDefaultController",
+              "ReadableStreamDefaultReader",
+              "TextDecoderStream",
+              "TextEncoderStream",
+              "TransformStream",
+              "TransformStreamDefaultController",
+              "WritableStream",
+              "WritableStreamDefaultController",
+              "WritableStreamDefaultWriter",
+              "default"
+            ],
+            "callablePolicy": "Reuse thirteen real native stream/strategy constructors, implement native-bulk UTF8 codec stream facades plus serialized ReadableStream.from/values/asyncIterator, and adapt ordinary DataView BYOB requests through same-backing Uint8Array views. Compression/decompression bindings are explicit functions throwing ERR_SM_NODE_UNSUPPORTED when called or constructed. All unsupported and resource-limit errors use own coded properties; no Proxy export substitute.",
+            "supportedStatic": [
+              "ReadableStream.from"
+            ],
+            "supportedPrototype": [
+              "ReadableStream.values",
+              "ReadableStream[Symbol.asyncIterator]",
+              "ReadableStreamBYOBReader.read:ordinary fixed unshared views,min1",
+              "TextEncoderStream.encoding",
+              "TextEncoderStream.readable",
+              "TextEncoderStream.writable",
+              "TextDecoderStream.encoding",
+              "TextDecoderStream.fatal",
+              "TextDecoderStream.ignoreBOM",
+              "TextDecoderStream.readable",
+              "TextDecoderStream.writable"
+            ],
+            "encodingNames": [
+              "utf-8"
+            ],
+            "limits": {
+              "encoderSourceUtf16UnitsPerChunk": 1048576,
+              "decoderInputBytesPerChunk": 16777216,
+              "byobViewBytes": 16777216,
+              "pendingEncoderSurrogateUnits": 1
+            },
+            "importOnlyExports": [
+              "CompressionStream",
+              "DecompressionStream"
+            ],
+            "deviations": [
+              "This optional bounded module does not claim complete node:stream/web or Web Streams conformance. Existing native operations beyond the recorded ordinary corpus retain their existing implementation and unverified overloads.",
+              "TextDecoderStream supports UTF8 only through native label normalization. Other known native labels throw ERR_SM_NODE_UNSUPPORTED after the recorded getter effects; unknown labels use RangeError ERR_ENCODING_NOT_SUPPORTED.",
+              "Decoder inputs are fixed attached unshared BufferSources. Shared, resizable and detached decoder inputs are rejected explicitly; native generic TextDecoder retains its separate broader contract. Buffer-source validation can materialize inline typed-array ArrayBuffers.",
+              "BYOB supports only ordinary local unmodified fixed unshared typed-array/DataView views with default/null/min1. min>1, shared/resizable backing, subclass/cross-realm/modified layout views are rejected. Proxy reader receivers are excluded although Node22 can accept a Proxy of a genuine reader.",
+              "DataView requests use a Uint8Array view over the same backing/offset/length, then a DataView over the moved result. This introduces no explicit byte copy but makes no claim about native transfer copies. The broken old-native DataView branch is never entered.",
+              "WritableStreamDefaultController.signal remains absent and requires native implementation; it is not fabricated from sink.abort. Native retained constructor error codes and Transform controller arity have recorded differences.",
+              "A released native BYOB reader throws TypeError without Node ERR_INVALID_STATE. Source error objects retain identity; this difference is not hidden by message parsing or blanket TypeError relabeling.",
+              "The optional profile replaces eight static/prototype descriptors while preserving native constructor/prototype identities. Installation runs once in the content realm before application initialization; no runtime syncBuiltinESMExports is provided.",
+              "The uninitialized Transform controller prototype is rejected by guarded public operations. Native class/slot validation independently protects web methods. The Node-facing wrapper attaches ERR_INVALID_THIS for that prototype only; other invalid native receiver paths can retain uncoded TypeError. Full receiver error-code parity is not claimed.",
+              "Native classes are captured through public JS_GetClassObject and existing retained prototype roots in the content realm. The private BYOB callback uses public JS::IsReadableStreamBYOBReader and excludes scripted Proxy receivers; no temporary initialization streams or public test hook is used.",
+              "from uses HWM0, async protocol preference and an async-from-sync generator bridge. values serializes pending next/return, releases/cancels on close/error/return, supports preventCancel. Arbitrary protocol mutation, Promise.prototype.then immunity, worker transfer and cross-realm semantics are not claimed.",
+              "Per-operation input caps do not bound application-retained queues, total lifetime stream output or arbitrarily many queued iterator calls. Compression output limits, native allocation failure/fatal Rust allocator behavior and complete scheduler/async-context behavior remain separate gates.",
+              "No new global TextEncoderStream/TextDecoderStream name is installed by this module proposal; existing native global constructor identities are reused where present.",
+              "CompressionStream and DecompressionStream remain explicit import-only/deferred callable bindings until ownership, cleanup, malformed-input and expansion-budget hardening and ordinary tests pass. No native compression transform was invoked by these candidate tests."
+            ]
+          }
+        },
+        "requiredHostInterfaces": []
+      }
+    },
+    {
+      "selection": {
+        "path": "builtins/node-compat/classic-streams/export-manifest.classic-streams.node-v22.14.0.json",
+        "sha256": "2e980ee70e8aaf9b960c76716f352329ef6cadc2fe3f96b3b70a405a7c3fd163",
+        "profileVersion": "sm-node-22.14.0-m0.12"
+      },
+      "fullValue": {
+        "schemaVersion": 1,
+        "profileVersion": "sm-node-22.14.0-m0.12",
+        "nodeVersion": "v22.14.0",
+        "status": "UNAPPLIED optional classic-stream state-machine candidate. Host algorithms only; no selected native engine/component evidence.",
+        "moduleContract": "Finite root and promises namespaces. Root default is callable Stream; Stream.Stream is itself; shared constructors retain installed EventEmitter ancestry. Root.promises equals promises.default; pipeline/finished custom-promisify getters return matching promise bindings. Named ESM bindings snapshot installation values. Mutable default graphs do not synchronize named exports. Literal static CommonJS lowering returns default. No runtime public require/process or globals.",
+        "modules": {
+          "node:stream": {
+            "aliases": [
+              "stream"
+            ],
+            "status": "partial",
+            "exports": [
+              "Duplex",
+              "PassThrough",
+              "Readable",
+              "Stream",
+              "Transform",
+              "Writable",
+              "_isArrayBufferView",
+              "_isUint8Array",
+              "_uint8ArrayToBuffer",
+              "addAbortSignal",
+              "compose",
+              "default",
+              "destroy",
+              "duplexPair",
+              "finished",
+              "getDefaultHighWaterMark",
+              "isDestroyed",
+              "isDisturbed",
+              "isErrored",
+              "isReadable",
+              "isWritable",
+              "pipeline",
+              "promises",
+              "setDefaultHighWaterMark"
+            ],
+            "callablePolicy": "Candidate implementation of ordinary core constructors/lifecycle in the stated domain; deferred callable members throw own-coded ERR_SM_NODE_UNSUPPORTED on call/new including top-level code.",
+            "supportedStatic": [
+              "Duplex",
+              "PassThrough",
+              "Readable",
+              "Stream",
+              "Transform",
+              "Writable",
+              "_isArrayBufferView",
+              "_isUint8Array",
+              "_uint8ArrayToBuffer",
+              "addAbortSignal",
+              "destroy",
+              "finished",
+              "getDefaultHighWaterMark",
+              "isDestroyed",
+              "isDisturbed",
+              "isErrored",
+              "isReadable",
+              "isWritable",
+              "pipeline",
+              "setDefaultHighWaterMark"
+            ],
+            "supportedPrototype": [
+              "Readable.read",
+              "Readable.push",
+              "Readable.unshift",
+              "Readable.pause",
+              "Readable.resume",
+              "Readable.pipe",
+              "Readable.unpipe",
+              "Readable.setEncoding",
+              "Readable[Symbol.asyncIterator]",
+              "Writable.write",
+              "Writable.end",
+              "Writable.cork",
+              "Writable.uncork",
+              "Writable.setDefaultEncoding",
+              "destroy",
+              "_construct callback",
+              "_read callback",
+              "_write callback",
+              "_writev callback",
+              "_final callback",
+              "Transform._transform callback",
+              "Transform._flush callback"
+            ],
+            "unsupportedStatic": [
+              "compose",
+              "duplexPair",
+              "Readable.fromWeb",
+              "Readable.toWeb",
+              "Writable.fromWeb",
+              "Writable.toWeb",
+              "Duplex.fromWeb",
+              "Duplex.toWeb",
+              "Duplex.from"
+            ],
+            "unsupportedPrototypePolicy": "Readable compose/map/filter/forEach/toArray/some/find/every/flatMap/drop/take/reduce/iterator and Readable/Writable Symbol.asyncDispose are explicit throwing functions. asIndexedPairs is absent because not in Node22. Inherited copies of these deferred methods on Duplex remain deferred.",
+            "encodingNames": [
+              "utf8",
+              "utf-8",
+              "hex"
+            ],
+            "limits": {
+              "maxQueuedNonObjectUnits": 16777216,
+              "maxQueuedChunks": 4096,
+              "maxObjectModeUnits": 4096,
+              "maxBufferBytes": 16777216,
+              "maxInputStringCodeUnits": 1048576
+            },
+            "deviations": [
+              "No native component gate yet; host reference scheduling is not the guest scheduler.",
+              "Byte inputs are ordinary attached fixed unshared ArrayBufferViews; raw byte windows preserve offset/backing, not element truncation. Shared/resizable/detached/proxy/exotic state domains are not claimed.",
+              "Default byte HWM is deterministically65536 and object HWM16. HWM remains a threshold, not a memory bound.",
+              "Queue budget units match Node state.length: bytes before decoding or UTF16 code units after decoding. Object/chunk counts do not bound arbitrary application payload or total memory. Discard a stream after its profile limit failure; full atomic rollback is not claimed.",
+              "Only existing bounded Buffer/StringDecoder encodings and errors apply; no Buffer pool, copy/concat/write/numeric API expansion.",
+              "Web overloads, function pipeline stages, pair/compose/operators/disposal/legacy module aliases remain deferred. This candidate does not register consumers or stream/web.",
+              "Registration getter/return-then-getter/Symbol.dispose identity and scheduler/reset/ALS/request teardown limitations remain independent. captureRejections:true remains explicitly unavailable through the installed Events foundation.",
+              "Public own-state mutation, arbitrary primordial mutation, full exact own-property reflection/error text/stack/cross-realm and async_hooks parity are not claimed."
+            ]
+          },
+          "node:stream/promises": {
+            "aliases": [
+              "stream/promises"
+            ],
+            "status": "partial",
+            "exports": [
+              "default",
+              "finished",
+              "pipeline"
+            ],
+            "supportedStatic": [
+              "finished",
+              "pipeline"
+            ],
+            "callablePolicy": "Promise wrappers over the same bounded classic lifecycle. Native Web/function stages are explicitly deferred; no timers or host I/O.",
+            "deviations": [
+              "No complete Node stream implementation or external I/O claimed."
+            ]
+          }
+        },
+        "requiredHostInterfaces": []
+      }
+    }
+  ],
+  "sourceMetadataUnchanged": true
+}

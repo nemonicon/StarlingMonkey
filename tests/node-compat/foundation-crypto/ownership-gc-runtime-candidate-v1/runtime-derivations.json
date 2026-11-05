@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 1,
+  "derived": [
+    {
+      "file": "checks.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-runtime-candidate-v1/checks.mjs",
+        "sha256": "75b6dc91c28dab385f6091d9f0989d66bfd52a4ef66c992e67bb8be832af4ac2",
+        "bytes": 7115
+      },
+      "changes": [
+        {
+          "before": "const COUNTERS=",
+          "after": "export const PRESSURE_DELTAS=Object.freeze([4,4,8,0]);\nconst COUNTERS="
+        },
+        {
+          "before": "export function runRecord(r,id,expected,oracle){",
+          "after": "export function runRecord(r,id,expected,oracle,gcExpected){"
+        },
+        {
+          "before": "need(r.gcOrEntropyRequested===false&&r.finalizerCountOrWipeProof===false&&Array.isArray(r.observations),'Explicit observations and limits');",
+          "after": "need(equal(r.gcObservation,gcObservation('this-run',PRESSURE_DELTAS[id],PRESSURE_DELTAS[id]))&&r.finalizerCountOrWipeProof===false&&Array.isArray(r.observations),'Truthful scoped public pressure observations; no native GC count');"
+        },
+        {
+          "before": " return true;\n}\nfunction observations",
+          "after": " const whole=structuredClone(gcExpected.records[id]);whole.counters=expected;whole.state=publicState(true,id!==0||expected.keyImportsFulfilled>1);wholeEqual(r,whole,'Whole typed run record, no extra/omitted fields');return true;\n}\nfunction observations"
+        },
+        {
+          "before": "export function inspectRecord(r,c,raw,jwk){",
+          "after": "export function inspectRecord(r,c,raw,jwk,gcExpected){"
+        },
+        {
+          "before": "initial(r);counters(r,c);state(r,raw,jwk);return true;}",
+          "after": "initial(r);counters(r,c);state(r,raw,jwk);const whole=structuredClone(gcExpected.before);whole.counters=c;whole.state=publicState(raw,jwk);wholeEqual(r,whole,'Whole typed inspect');return true;}"
+        },
+        {
+          "before": "export function clearRecord(r,c){",
+          "after": "export function clearRecord(r,c,gcExpected){"
+        },
+        {
+          "before": "initial(r);counters(r,c);state(r,false,false);return true;}",
+          "after": "initial(r);counters(r,c);state(r,false,false);const whole=structuredClone(gcExpected.released);whole.counters=c;wholeEqual(r,whole,'Whole typed clear');return true;}"
+        },
+        {
+          "before": "export function validateRecord(r,oracle){",
+          "after": "export function validateRecord(r,oracle,gcExpected){"
+        },
+        {
+          "before": "r?.schemaVersion===1&&r.kind==='crypto-owner-within-export-validation-v1'",
+          "after": "r?.schemaVersion===2&&r.kind==='crypto-owner-within-export-gc-validation-v2'"
+        },
+        {
+          "before": "inspectRecord(r.before,c,false,false);",
+          "after": "inspectRecord(r.before,c,false,false,gcExpected);"
+        },
+        {
+          "before": "runRecord(r.records[id],id,c,oracle);",
+          "after": "runRecord(r.records[id],id,c,oracle,gcExpected);"
+        },
+        {
+          "before": "clearRecord(r.released,c);",
+          "after": "clearRecord(r.released,c,gcExpected);"
+        },
+        {
+          "before": "inspectRecord(r.after,c,false,false);return true;",
+          "after": "inspectRecord(r.after,c,false,false,gcExpected);wholeEqual(r,gcExpected,'Whole typed schema2 GC wrapper');return true;"
+        }
+      ],
+      "appended": "\nexport function gcObservation(scope,requests,records){return{version:'public-buffer-gc-pressure-v1',scope,publicGcPressureRequested:requests>0,publicGcPressureRequests:requests,publicGcPressureRecords:records,entropyRequested:false,actualNativeGcCountObserved:false,strongApplicationOwnersCombined:true,isolatedTemporaryRootsProved:false,finalizerFreeWipeObserved:false};}\nexport function publicState(raw,jwk){return{rawRetained:raw,jwkRetained:jwk,strongApplicationKeyOwners:Number(raw)+Number(jwk),pendingOperationsInstrumented:false,finalizersOrWipesObserved:false};}\nexport function canonical(v){if(Array.isArray(v))return v.map(canonical);if(v&&typeof v==='object')return Object.fromEntries(Object.keys(v).sort().map(k=>[k,canonical(v[k])]));return v;}\nexport function wholeEqual(actual,expected,label){need(JSON.stringify(canonical(actual))===JSON.stringify(canonical(expected)),label);return true;}\n"
+    },
+    {
+      "file": "worker.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-runtime-candidate-v1/worker.mjs",
+        "sha256": "33de8cc9214929a65d563d76c422c82bbf10faecb3e9c7435e69b703c5d8e08d",
+        "bytes": 3677
+      },
+      "changes": [
+        {
+          "before": "const session=await loadSession(frame),oracle={tagHex:EXPECTED};",
+          "after": "const session=await loadSession(frame),oracle={tagHex:EXPECTED},gcExpected=frame.expectedRecord;let pressureRequestsObserved=0,pressureRecordsObserved=0;"
+        },
+        {
+          "before": "if(scenario==='wrapper'){validateRecord(await call('validate',[]),oracle);",
+          "after": "if(scenario==='wrapper'){const value=await call('validate',[]);validateRecord(value,oracle,gcExpected);pressureRequestsObserved=value.gcObservation.publicGcPressureRequests;pressureRecordsObserved=value.gcObservation.publicGcPressureRecords;"
+        },
+        {
+          "before": "   c.inspectCalls++;inspectRecord(await call('inspect',[]),c,false,false);",
+          "after": "   c.inspectCalls++;inspectRecord(await call('inspect',[]),c,false,false,gcExpected);"
+        },
+        {
+          "before": "runRecord(await call('run',[id]),id,c,oracle);",
+          "after": "const value=await call('run',[id]);runRecord(value,id,c,oracle,gcExpected);pressureRequestsObserved+=value.gcObservation.publicGcPressureRequests;pressureRecordsObserved+=value.gcObservation.publicGcPressureRecords;"
+        },
+        {
+          "before": "clearRecord(await call('clear',[]),c);c.inspectCalls++;inspectRecord(await call('inspect',[]),c,false,false);",
+          "after": "clearRecord(await call('clear',[]),c,gcExpected);c.inspectCalls++;inspectRecord(await call('inspect',[]),c,false,false,gcExpected);"
+        },
+        {
+          "before": "CRYPTO_OWNER355_NORMAL_SESSION_COMPLETE_EXTERNAL_ZERO_REQUIRED",
+          "after": "CRYPTO_OWNER355_GC_SESSION_COMPLETE_EXTERNAL_ZERO_REQUIRED"
+        },
+        {
+          "before": "publicStringReturns:seq,finalCounters:c,",
+          "after": "publicStringReturns:seq,finalCounters:c,publicGcPressureRequestsObserved:pressureRequestsObserved,publicGcPressureRecordsObserved:pressureRecordsObserved,actualNativeGcCountObserved:false,"
+        },
+        {
+          "before": "CRYPTO_OWNER355_NORMAL_WORKER_COMPLETE_EXTERNAL_EXIT_ZERO_REQUIRED",
+          "after": "CRYPTO_OWNER355_GC_WORKER_COMPLETE_EXTERNAL_EXIT_ZERO_REQUIRED"
+        },
+        {
+          "before": "FAILED_CRYPTO_NORMAL_SESSION_NO_ACCEPTANCE",
+          "after": "FAILED_CRYPTO_GC_SESSION_NO_ACCEPTANCE"
+        },
+        {
+          "before": "finally{await out.close();}",
+          "after": "finally{try{await frame.recheck();}finally{await out.close();}}"
+        },
+        {
+          "before": "let seq=0;",
+          "after": "let seq=0,rawWritten=0;"
+        },
+        {
+          "before": "},{json:true});throw error;}",
+          "after": "},{json:true});rawWritten++;throw error;}"
+        },
+        {
+          "before": "},{json:true});\n   need(typeof value",
+          "after": "},{json:true});rawWritten++;\n   need(typeof value"
+        },
+        {
+          "before": "rawReturnsRetained:seq,",
+          "after": "rawReturnRecordAttempts:seq,rawReturnRecordsRetained:rawWritten,"
+        }
+      ]
+    },
+    {
+      "file": "run.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-runtime-candidate-v1/run.mjs",
+        "sha256": "1af28d4c347e42c27d2820d2091f6aa0ca7c42b75dcd3760d577b65054d91e20",
+        "bytes": 5194
+      },
+      "changes": [
+        {
+          "before": "export async function runNormal(config)",
+          "after": "export async function runGc(config)"
+        },
+        {
+          "before": "crypto-normal-operational-heartbeat",
+          "after": "crypto-gc-operational-heartbeat"
+        },
+        {
+          "before": "CRYPTO_OWNER355_NORMAL_WORKER_COMPLETE_EXTERNAL_EXIT_ZERO_REQUIRED",
+          "after": "CRYPTO_OWNER355_GC_WORKER_COMPLETE_EXTERNAL_EXIT_ZERO_REQUIRED"
+        },
+        {
+          "before": "sessions.push({scenario,result:resultRow,terminal:await rowAt(terminal.terminalPath),publicStringReturns:result.publicStringReturns});",
+          "after": "need(result.publicGcPressureRequestsObserved===(scenario==='retained'?48:16)&&result.publicGcPressureRecordsObserved===result.publicGcPressureRequestsObserved&&result.actualNativeGcCountObserved===false,'Exact scoped public pressure counts, no native collection count');sessions.push({scenario,result:resultRow,terminal:await rowAt(terminal.terminalPath),publicStringReturns:result.publicStringReturns,publicGcPressureRequestsObserved:result.publicGcPressureRequestsObserved});"
+        },
+        {
+          "before": "CRYPTO_OWNER355_NORMAL_RUNTIME_COMPLETE_UNREVIEWED_V1",
+          "after": "CRYPTO_OWNER355_GC_RUNTIME_COMPLETE_UNREVIEWED_V1"
+        },
+        {
+          "before": "normalOnly:true,",
+          "after": "gcVariantOnly:true,publicGcPressureRequestsObserved:sessions.reduce((n,s)=>n+s.publicGcPressureRequestsObserved,0),expectedScopedRequests:{retained:48,fresh:16,wrapper:16},actualNativeGcCountObserved:false,"
+        },
+        {
+          "before": "gcOrOomOrResetExecuted:false,",
+          "after": "publicBufferPressureFixtureExecuted:true,oomOrResetExecuted:false,"
+        },
+        {
+          "before": "CRYPTO_OWNER355_NORMAL_RUNTIME_COMPLETE_EXTERNAL_PARENT_ZERO_AND_REVIEW_REQUIRED",
+          "after": "CRYPTO_OWNER355_GC_RUNTIME_COMPLETE_EXTERNAL_PARENT_ZERO_AND_REVIEW_REQUIRED"
+        },
+        {
+          "before": "FAILED_CRYPTO_NORMAL_RUNTIME_NO_ACCEPTANCE",
+          "after": "FAILED_CRYPTO_GC_RUNTIME_NO_ACCEPTANCE"
+        },
+        {
+          "before": "finally{await out.close();}",
+          "after": "finally{try{await frame.recheck();}finally{await out.close();}}"
+        },
+        {
+          "before": "await runNormal(JSON.parse(process.argv[2]))",
+          "after": "await runGc(JSON.parse(process.argv[2]))"
+        }
+      ]
+    }
+  ],
+  "exactCopies": [
+    {
+      "file": "loading.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-runtime-candidate-v1/loading.mjs",
+        "sha256": "603c77882b84da9c05138ccb5ce8e3f55df038f97b2d1af4c00d6aae4edaf123",
+        "bytes": 4993
+      }
+    },
+    {
+      "file": "oracle.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-runtime-candidate-v1/oracle.mjs",
+        "sha256": "93aeaf87702ba7055c39a80952c87bd5e6ee640560899b769ba81e16b7aa3fa9",
+        "bytes": 1660
+      }
+    }
+  ]
+}

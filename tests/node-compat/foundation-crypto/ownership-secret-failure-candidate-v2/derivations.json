@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "parentSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1/index.json",
+    "sha256": "070f1c20247f4538622cf60fdc1613d44b113c10de0173250456c13d81db1958",
+    "bytes": 5888
+  },
+  "parentHistoryErratum": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1-history-erratum.json",
+    "sha256": "0cad60adee41138aaa395585b3a9e60b2000d9634763c8667998049bf8766656",
+    "bytes": 1005
+  },
+  "newEdits": [
+    {
+      "file": "builtins/web/crypto/crypto-algorithm.cpp",
+      "label": "r helper failure propagates before next allocation/length/copy",
+      "before": "  auto [r_bytes, r_len] = to_bytes_expand(cx, r_raw, coord_size);\n",
+      "after": "  auto [r_bytes, r_len] = to_bytes_expand(cx, r_raw, coord_size);\n  if (!r_bytes) {\n    JS_ReportOutOfMemory(cx);\n    return nullptr;\n  }\n",
+      "occurrences": 1
+    },
+    {
+      "file": "builtins/web/crypto/crypto-algorithm.cpp",
+      "label": "s helper failure propagates before next allocation/length/copy",
+      "before": "  auto [s_bytes, s_len] = to_bytes_expand(cx, s_raw, coord_size);\n",
+      "after": "  auto [s_bytes, s_len] = to_bytes_expand(cx, s_raw, coord_size);\n  if (!s_bytes) {\n    JS_ReportOutOfMemory(cx);\n    return nullptr;\n  }\n",
+      "occurrences": 1
+    }
+  ],
+  "newReversibleEdits": 2,
+  "composedReversibleEdits": 13,
+  "changedRelativeToParent": [
+    "builtins/web/crypto/crypto-algorithm.cpp"
+  ],
+  "unchangedParentAfterimages": [
+    "builtins/web/crypto/crypto-key.cpp",
+    "builtins/web/crypto/crypto-raii.h"
+  ],
+  "files": [
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "parentAfterimage": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+        "sha256": "cde6fb727254580a69c1b64202f16155d16329fdc88d08ac5b33980957d54aff",
+        "bytes": 115156
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+        "sha256": "c608a2f71ec2e8bd24ecc64905cc2943a520953cf3cd18dc5cc344dd5bee1812",
+        "bytes": 115300
+      }
+    },
+    {
+      "path": "builtins/web/crypto/crypto-key.cpp",
+      "parentAfterimage": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1/afterimages/builtins/web/crypto/crypto-key.cpp",
+        "sha256": "ef18e1729db70012211cbe6fabf338f9764bd2ef8f851c353f1a2c5b350293e4",
+        "bytes": 30759
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/afterimages/builtins/web/crypto/crypto-key.cpp",
+        "sha256": "ef18e1729db70012211cbe6fabf338f9764bd2ef8f851c353f1a2c5b350293e4",
+        "bytes": 30759
+      }
+    },
+    {
+      "path": "builtins/web/crypto/crypto-raii.h",
+      "parentAfterimage": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1/afterimages/builtins/web/crypto/crypto-raii.h",
+        "sha256": "27ef2cbde410aa8c2e518dfe7b41bd59fa32d6dac9640a7d41e9ae8ca9752f96",
+        "bytes": 3189
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/afterimages/builtins/web/crypto/crypto-raii.h",
+        "sha256": "27ef2cbde410aa8c2e518dfe7b41bd59fa32d6dac9640a7d41e9ae8ca9752f96",
+        "bytes": 3189
+      }
+    }
+  ],
+  "composedSourceDerivation": [
+    {
+      "path": "builtins/web/crypto/crypto-algorithm.cpp",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1/before/builtins/web/crypto/crypto-algorithm.cpp",
+        "sha256": "fff3182d01acca42e688cfa974d5f75298cceb9708a7e1507cc580fa67d18755",
+        "bytes": 115333
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+        "sha256": "cde6fb727254580a69c1b64202f16155d16329fdc88d08ac5b33980957d54aff",
+        "bytes": 115156
+      }
+    },
+    {
+      "path": "builtins/web/crypto/crypto-key.cpp",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1/before/builtins/web/crypto/crypto-key.cpp",
+        "sha256": "9e1e93c15cc68702398e2f2a7779efedb9d2a20fd014b003a2acde94a0a29ecc",
+        "bytes": 30704
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1/afterimages/builtins/web/crypto/crypto-key.cpp",
+        "sha256": "ef18e1729db70012211cbe6fabf338f9764bd2ef8f851c353f1a2c5b350293e4",
+        "bytes": 30759
+      }
+    },
+    {
+      "path": "builtins/web/crypto/crypto-raii.h",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1/before/builtins/web/crypto/crypto-raii.h",
+        "sha256": "4ecb84967839a25c1228420764cda74f357197eb6377ab284127c219524b7f77",
+        "bytes": 2972
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1/afterimages/builtins/web/crypto/crypto-raii.h",
+        "sha256": "27ef2cbde410aa8c2e518dfe7b41bd59fa32d6dac9640a7d41e9ae8ca9752f96",
+        "bytes": 3189
+      }
+    }
+  ],
+  "allForwardAndReverseByteExact": true
+}

@@ -1,0 +1,18 @@
+--- a/builtins/web/crypto/crypto-algorithm.cpp
++++ b/builtins/web/crypto/crypto-algorithm.cpp
+@@ -941,7 +941,15 @@
+   size_t coord_size = num_bits_to_bytes(curveSize(cx, key).unwrap());
+ 
+   auto [r_bytes, r_len] = to_bytes_expand(cx, r_raw, coord_size);
++  if (!r_bytes) {
++    JS_ReportOutOfMemory(cx);
++    return nullptr;
++  }
+   auto [s_bytes, s_len] = to_bytes_expand(cx, s_raw, coord_size);
++  if (!s_bytes) {
++    JS_ReportOutOfMemory(cx);
++    return nullptr;
++  }
+ 
+   size_t result_size = r_len + s_len;
+   mozilla::UniquePtr<uint8_t[], JS::FreePolicy> result{

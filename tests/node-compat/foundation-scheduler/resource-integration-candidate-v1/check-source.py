@@ -108,6 +108,8 @@ check('wasi:clocks/wall-clock'in splicer and 'wasi:io/streams'in splicer)
 check('EngineState::Initialized'in(REPO/'include/builtin.h').read_text())
 syntax=[]
 for file in sorted(HERE.glob('*.py')):ast.parse(file.read_bytes());syntax.append(file.name)
+for root in ('/private/tmp/starling-node-compat/scheduler-resource-v1-source','/private/tmp/starling-node-compat/scheduler-resource-v1-build'):
+ check(not Path(root).exists()and not Path(root).is_symlink())
 for row in list(inputs.values()):checked(row)
 value=dict(schemaVersion=1,state='RESOURCE342_UNAPPLIED_SOURCE_DATA_CHECKS_PASSED',checks=checks,inputs=list(inputs.values()),stageRows=467,nativeRows=342,nativeReplacements=2,unchangedNative=340,actualExpectedFunctionCases=342,oldReceiptRejections=4,positiveNativeMetadataFabricated=False,derivations=exact,pythonAst=syntax,recipePythonHeredocs=heredocs,nodeOrJsOrWitParserInvoked=False,jsAndWitSyntaxStillUnexecuted=True,ownerHelpersImported=False,stageOrNativeOrGuestInvoked=False,sourceOnly=True)
 if len(sys.argv)==2:

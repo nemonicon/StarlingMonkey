@@ -1,0 +1,7 @@
+# Independent GC runtime v1 preflight failure review
+
+Confirmed the actual pre-output failure without invoking an owner entrypoint. Node21439 exited1 in0.600199917 operational seconds with clean observed groups and empty stdout. The canonical JavaScript descriptor guard rejected17 relative f812 member paths at `freeze.files.map(descriptor)`; the other11078 rows are absolute. The Python preparation checker and prior05e independent reader had hashed those rows relative to repository cwd and missed the actual JavaScript input contract. Prior source review remains immutable and is now qualified by this correction record.
+
+The failed v1 output root is absent. Source control flow places output creation, host Node oracle and worker/generated-module/key/pressure calls after the failed preflight. These negative action observations are source/terminal-coupled; no guest or runtime regression is inferred. Root authority and all raw streams/terminal/owned records are pinned. The Root aggregate was not yet supplied and remains NULL here.
+
+An immutable v2 must carry explicit original absolute paths with unchanged hash/size identities, a new output/Root authority and a genuine descriptor-boundary pure regression. It may not normalize contexts or relabel v1 as successful. Reviewer read/hash/DATA only; no helpers, Node, oracle, generated module, guest, crypto, pressure, native or host action ran.

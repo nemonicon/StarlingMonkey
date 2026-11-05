@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "derived": [
+    {
+      "file": "protocol.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-wasmtime-candidate-v1/protocol.mjs",
+        "sha256": "6d3a694d455c144848f17931ce6afa69e2ab6700a74ebb1b575304e1b874c6c9",
+        "bytes": 1172
+      },
+      "changes": [
+        {
+          "before": "../ownership-runtime-candidate-v1/checks.mjs",
+          "after": "../ownership-gc-runtime-candidate-v2/checks.mjs"
+        },
+        {
+          "before": "../ownership-runtime-candidate-v1/oracle.mjs",
+          "after": "../ownership-gc-runtime-candidate-v2/oracle.mjs"
+        },
+        {
+          "before": "842f82e8ae330580bee2d160880b5a3a35aac7c9baf357938814ecf2237a149d",
+          "after": "52d99f4e95860b686d896c88f39b2fa5734eabeb433f48545ba814b2e45ce5f1"
+        },
+        {
+          "before": "row.bytes===13107415",
+          "after": "row.bytes===13118152"
+        },
+        {
+          "before": "checkWholeRecord(value,oracle,expectedWrapper){checkOracle(oracle);validateRecord(value,oracle);",
+          "after": "checkWholeRecord(value,oracle,expectedWrapper,gcExpected){checkOracle(oracle);validateRecord(value,oracle,gcExpected);"
+        },
+        {
+          "before": "actual normal fresh-wrapper",
+          "after": "actual GC Jco fresh-wrapper"
+        }
+      ]
+    },
+    {
+      "file": "run.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-wasmtime-candidate-v1/run.mjs",
+        "sha256": "415d84159d54f297823964668a6cd7a743db949f3a2405a120e27ce28dac20b0",
+        "bytes": 5220
+      },
+      "changes": [
+        {
+          "before": "checkWholeRecord(record,frame.oracle,frame.normalWrapper);",
+          "after": "need(value===frame.jcoWrapper.value,'Whole decoded string exact actual GC Jco scalar, no skipped bytes');checkWholeRecord(record,frame.oracle,frame.jcoWrapper,frame.expectedRecord);"
+        },
+        {
+          "before": "crypto-stock-wt-operational-heartbeat",
+          "after": "crypto-gc-stock-wt-operational-heartbeat"
+        },
+        {
+          "before": "CRYPTO_OWNER355_STOCK_WASMTIME_VALIDATE_COMPLETE_UNREVIEWED_V1",
+          "after": "CRYPTO_OWNER355_GC_STOCK_WASMTIME_VALIDATE_COMPLETE_UNREVIEWED_V1"
+        },
+        {
+          "before": "allWholeFieldsMatchActualNormalWrapper:true,",
+          "after": "allWholeFieldsMatchActualGcJcoWrapper:true,allWholeDecodedStringsExactlyMatchActualGcJco:true,publicGcPressureRequests:48,fullPressureByteRecords:48,actualNativeGcCountObserved:false,"
+        },
+        {
+          "before": "gcOomResetExecuted:false,",
+          "after": "publicBufferPressureFixtureExecuted:true,oomResetExecuted:false,"
+        },
+        {
+          "before": "CRYPTO_OWNER355_STOCK_WT_COMPLETE_EXTERNAL_PARENT_ZERO_AND_INDEPENDENT_REVIEW_REQUIRED",
+          "after": "CRYPTO_OWNER355_GC_STOCK_WT_COMPLETE_EXTERNAL_PARENT_ZERO_AND_INDEPENDENT_REVIEW_REQUIRED"
+        },
+        {
+          "before": "FAILED_CRYPTO_STOCK_WT_NO_ACCEPTANCE",
+          "after": "FAILED_CRYPTO_GC_STOCK_WT_NO_ACCEPTANCE"
+        },
+        {
+          "before": "finally{await out.close();}",
+          "after": "finally{try{await frame.recheck();}finally{await out.close();}}"
+        }
+      ]
+    }
+  ]
+}

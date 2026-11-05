@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "lifecycleDonor": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/trace-integration-candidate-v1/artifact-tools/build-one.py",
+    "sha256": "a25d3891046354275cf5d6ccf0909da8dd3d0d5c57a5f6098ef72734a20850e7",
+    "bytes": 13867
+  },
+  "selection": "Exact standard imports; two disk constants; all source class/function definitions except main. No unrelated admission-pins top-level read or operational main.",
+  "segments": [
+    {
+      "kind": "Import",
+      "name": null,
+      "lineno": 6,
+      "endLineno": 6,
+      "text": "import errno",
+      "sha256": "dc9d53d3339257bcc6266edf7a5319d7cf3a0acc225809f4b2db1792dd457afc"
+    },
+    {
+      "kind": "Import",
+      "name": null,
+      "lineno": 7,
+      "endLineno": 7,
+      "text": "import hashlib",
+      "sha256": "ada1d9e0a360cda0fd1c8757d297aa74a4fc8d7193a69d3c28b43afc6950e9f9"
+    },
+    {
+      "kind": "Import",
+      "name": null,
+      "lineno": 8,
+      "endLineno": 8,
+      "text": "import json",
+      "sha256": "ff3e4d4dcf7250cae8d622d77c9a6d69aefcf4ab04ef9920218fafe93c0f1991"
+    },
+    {
+      "kind": "Import",
+      "name": null,
+      "lineno": 9,
+      "endLineno": 9,
+      "text": "import os",
+      "sha256": "de2abade832c8e350a1bdc98cfcdb1e202ac4749c5fc51a4a970d41736b6df5c"
+    },
+    {
+      "kind": "ImportFrom",
+      "name": null,
+      "lineno": 10,
+      "endLineno": 10,
+      "text": "from pathlib import Path",
+      "sha256": "6d69f2ac09017b8a49d050ab336e953b8fa02ae08c24396916ea7ea42418e627"
+    },
+    {
+      "kind": "Import",
+      "name": null,
+      "lineno": 11,
+      "endLineno": 11,
+      "text": "import signal",
+      "sha256": "10f4eea8db43494c2dac862c74fe855e285da947f5228dffb3480b571b7574ef"
+    },
+    {
+      "kind": "Import",
+      "name": null,
+      "lineno": 12,
+      "endLineno": 12,
+      "text": "import subprocess",
+      "sha256": "7d8752c4c7ea34c2c6d04a15aa31a1f25f62848f8c3c82528fd62439c01a225b"
+    },
+    {
+      "kind": "Import",
+      "name": null,
+      "lineno": 13,
+      "endLineno": 13,
+      "text": "import sys",
+      "sha256": "9e77b3746ea081eb4c557e71cc84ca29dc66a89d18a07e85dba66a336e7310ae"
+    },
+    {
+      "kind": "Import",
+      "name": null,
+      "lineno": 14,
+      "endLineno": 14,
+      "text": "import time",
+      "sha256": "4f9b8491ba4deee622e6c29ca383c71279fa604b7aff389b0bf5ba279f4453c3"
+    },
+    {
+      "kind": "Assign",
+      "name": null,
+      "lineno": 18,
+      "endLineno": 18,
+      "text": "MINIMUM_FREE = 800 * 1024 * 1024",
+      "sha256": "c54059c9982f31cfe0193a619683bb28f89816683cc27ed287557844a43800d3"
+    },
+    {
+      "kind": "Assign",
+      "name": null,
+      "lineno": 19,
+      "endLineno": 19,
+      "text": "REQUIRED_START_FREE = 2 * 1024 * 1024 * 1024",
+      "sha256": "d2dd153511e6af40ad76219a06920f2ed35588a6b739d3b00f37f4e1b24f7ee7"
+    },
+    {
+      "kind": "FunctionDef",
+      "name": "digest",
+      "lineno": 22,
+      "endLineno": 27,
+      "text": "def digest(path):\n    value = hashlib.sha256()\n    with path.open('rb') as stream:\n        for block in iter(lambda: stream.read(1024 * 1024), b''):\n            value.update(block)\n    return value.hexdigest()",
+      "sha256": "15d3f9e0f3523a8a19dab9a0a02093dbcb724621425c3e1fd4109b1aa84a6229"
+    },
+    {
+      "kind": "FunctionDef",
+      "name": "error_record",
+      "lineno": 30,
+      "endLineno": 31,
+      "text": "def error_record(stage, error):\n    return {'stage': stage, 'type': type(error).__name__, 'message': str(error)}",
+      "sha256": "cca382e0d30603fa92f3c3b185ec2c2e021ff5ea1379d2465e4dc9cd005e1e1c"
+    },
+    {
+      "kind": "ClassDef",
+      "name": "ExternalTermination",
+      "lineno": 34,
+      "endLineno": 35,
+      "text": "class ExternalTermination(Exception):\n    pass",
+      "sha256": "6774e0440f0991223ccdc242ca0bdc5c39fc08a0e44efc476d6e89ddd39604cc"
+    },
+    {
+      "kind": "ClassDef",
+      "name": "OwnedSession",
+      "lineno": 38,
+      "endLineno": 110,
+      "text": "class OwnedSession:\n    \"\"\"Only constructed for the Popen this helper starts with setsid enabled.\"\"\"\n    def __init__(self, process):\n        self.process = process\n        self.pgid = process.pid\n        assert self.pgid > 1 and self.pgid != os.getpgrp()\n        self.gone = False\n        self.events = []\n\n    def alive(self):\n        if self.gone:\n            return False\n        # Reap only our own leader before querying the group. A dead unreaped\n        # leader is not useful group-liveness evidence after SIGKILL.\n        self.process.poll()\n        try:\n            os.killpg(self.pgid, 0)\n            return True\n        except OSError as error:\n            if error.errno != errno.ESRCH:\n                raise\n            self.gone = True\n            return False\n\n    def send(self, number):\n        if self.gone:\n            return\n        try:\n            os.killpg(self.pgid, number)\n            self.events.append({'signal': number, 'result': 'sent', 'pgid': self.pgid})\n        except OSError as error:\n            if error.errno != errno.ESRCH:\n                raise\n            # A completed group is terminal: do not signal this number again.\n            self.gone = True\n            self.events.append({'signal': number, 'result': 'already-gone', 'pgid': self.pgid})\n\n    def cleanup(self, term_seconds=10.0, kill_seconds=5.0, interval=0.05):\n        \"\"\"Escalate against the group even after its shell leader has exited.\"\"\"\n        problems = []\n        complete = False\n        try:\n            if self.alive():\n                self.send(signal.SIGTERM)\n                deadline = time.monotonic() + term_seconds\n                while self.alive() and time.monotonic() < deadline:\n                    self.process.poll()  # Preserve raw leader status; not a group-liveness test.\n                    time.sleep(interval)\n                if self.alive():\n                    self.send(signal.SIGKILL)\n                    deadline = time.monotonic() + kill_seconds\n                    while self.alive() and time.monotonic() < deadline:\n                        self.process.poll()\n                        time.sleep(interval)\n            complete = not self.alive()\n        except BaseException as error:\n            problems.append(error_record('group-cleanup', error))\n            # Even an interrupted/failed monitor must attempt bounded escalation\n            # of this OWNED group; no PID lookup or other group is substituted.\n            try:\n                self.send(signal.SIGKILL)\n            except BaseException as escalation_error:\n                problems.append(error_record('group-escalation', escalation_error))\n        try:\n            self.process.wait(timeout=max(0.1, kill_seconds))\n        except BaseException as error:\n            problems.append(error_record('leader-reap', error))\n        try:\n            complete = not self.alive()\n        except BaseException as error:\n            problems.append(error_record('final-group-observation', error))\n        return {'pgid': self.pgid, 'complete': complete, 'events': self.events,\n                'errors': problems, 'rawChildExitCode': self.process.returncode}",
+      "sha256": "59c92b8e86066426091342b7375446bb9592c44e0b8fd8a12c51a79d8b3ad63b"
+    },
+    {
+      "kind": "FunctionDef",
+      "name": "monitor_owned_command",
+      "lineno": 113,
+      "endLineno": 189,
+      "text": "def monitor_owned_command(command, cwd, environment, log, free_bytes,\n                          minimum_free=MINIMUM_FREE, interval=1.0,\n                          term_seconds=10.0, kill_seconds=5.0):\n    \"\"\"Always return lifecycle status, including startup/monitor/cleanup errors.\"\"\"\n    process = None\n    owner = None\n    problems = []\n    stop_reason = None\n    cleanup = None\n    low_space = False\n    cleanup_started = False\n    spawning = True\n    term_count = 0\n    previous_term_handler = None\n    handler_installed = False\n    handler_restored = False\n\n    def receive_term(_number, _frame):\n        nonlocal term_count\n        term_count += 1\n        # Repeated cancellation is recorded, but cannot interrupt bounded group\n        # cleanup and orphan its new-session children.\n        if not cleanup_started and not spawning and term_count == 1:\n            raise ExternalTermination('launcher received SIGTERM')\n\n    try:\n        previous_term_handler = signal.getsignal(signal.SIGTERM)\n        signal.signal(signal.SIGTERM, receive_term)\n        handler_installed = True\n        process = subprocess.Popen(command, cwd=cwd, env=environment, stdout=log,\n                                   stderr=subprocess.STDOUT, start_new_session=True)\n        owner = OwnedSession(process)\n        # Do not interrupt Popen between child creation and ownership handoff.\n        # A TERM recorded during those few setup steps cancels immediately now.\n        spawning = False\n        if term_count:\n            raise ExternalTermination('launcher received SIGTERM during child setup')\n        # Popen returns only after the child setsid/exec setup succeeds. Never\n        # derive a signal target from an unrelated queried process or a caller.\n        try:\n            assert os.getpgid(process.pid) == process.pid\n            assert os.getsid(process.pid) == process.pid\n        except ProcessLookupError:\n            pass  # Leader may already have exited; owned descendants can remain.\n        while process.poll() is None:\n            if free_bytes() < minimum_free:\n                low_space = True\n                stop_reason = 'disk-space-stop'\n                break\n            time.sleep(interval)\n    except BaseException as error:\n        stop_reason = ('external-signal-stop' if isinstance(error, ExternalTermination)\n                       else 'launcher-or-monitor-error')\n        problems.append(error_record('launch-or-monitor', error))\n    finally:\n        cleanup_started = True\n        if owner is not None:\n            try:\n                cleanup = owner.cleanup(term_seconds, kill_seconds)\n                problems.extend(cleanup['errors'])\n            except BaseException as error:\n                problems.append(error_record('cleanup-finalization', error))\n        raw_status = process.returncode if process is not None else None\n        if term_count and stop_reason is None:\n            stop_reason = 'external-signal-stop'\n        if handler_installed:\n            try:\n                signal.signal(signal.SIGTERM, previous_term_handler)\n                handler_restored = True\n            except BaseException as error:\n                problems.append(error_record('restore-sigterm-handler', error))\n    return {'rawChildExitCode': raw_status, 'status': raw_status,\n            'stoppedForDiskSpace': low_space, 'stopReason': stop_reason,\n            'sigtermReceived': term_count, 'temporarySigtermHandlerRestored': handler_restored,\n            'ownedGroupCleanup': cleanup, 'launcherErrors': problems,\n            'childStarted': process is not None,\n            'lifecycleComplete': cleanup is not None and cleanup['complete'] and raw_status is not None}",
+      "sha256": "cbbad710eeeb027d0d6a88cee4fc7ea6a81f78642553a6e9c0ed52ce7cd80859"
+    },
+    {
+      "kind": "FunctionDef",
+      "name": "prepare_output",
+      "lineno": 192,
+      "endLineno": 197,
+      "text": "def prepare_output(output, free_bytes, required=REQUIRED_START_FREE):\n    before = free_bytes()\n    if before < required:\n        raise RuntimeError('Need at least 2 GiB available before retry')\n    output.mkdir(parents=True, exist_ok=False)\n    return before",
+      "sha256": "fb6b2aa45a01156e5ed69d945630360d7c179d09352a6fb55e4eb559e7f9872c"
+    },
+    {
+      "kind": "FunctionDef",
+      "name": "publish_result",
+      "lineno": 200,
+      "endLineno": 214,
+      "text": "def publish_result(output, result, stream=sys.stdout, writer=None):\n    \"\"\"Keep the complete status on stdout even if fresh result storage fills.\"\"\"\n    try:\n        if writer is None:\n            with (output / 'result.json').open('x') as target:\n                json.dump(result, target, indent=2)\n                target.write('\\n')\n        else:\n            writer(output / 'result.json', result)\n    except OSError as error:\n        result['resultFileWriteError'] = error_record('result-file-write', error)\n        result['evidenceComplete'] = False\n        result['launcherExitCode'] = 1\n        result['state'] = 'native-build-failed-or-evidence-incomplete'\n    print(json.dumps({'output': str(output), 'result': result}), file=stream, flush=True)",
+      "sha256": "531c09c38ca5939c0d4984444b94af8b8c776585710fd829dd5a4f32703e252c"
+    },
+    {
+      "kind": "FunctionDef",
+      "name": "finalize_status",
+      "lineno": 217,
+      "endLineno": 223,
+      "text": "def finalize_status(result):\n    succeeded = (result.get('rawChildExitCode') == 0 and result.get('lifecycleComplete') is True\n                 and not result.get('stoppedForDiskSpace') and not result.get('launcherErrors')\n                 and not result.get('sigtermReceived') and not result.get('finalObservationErrors'))\n    result['state'] = 'native-build-completed-runtime-pending' if succeeded else 'native-build-failed-or-incomplete'\n    result['launcherExitCode'] = 0 if succeeded else 1\n    result['evidenceComplete'] = succeeded",
+      "sha256": "fad1a33dcc88b7593c9f29daa8fbd6296c09dea8a488659cea164661bfcd6204"
+    }
+  ],
+  "header": "\"\"\"Exact accepted342 lifecycle segments only; no admission read or old launcher main.\"\"\"\n",
+  "tail": "\n\nif __name__ == \"__main__\":\n    raise RuntimeError(\"Use the separately reviewed scheduler normal-OFF build caller\")\n",
+  "monitorDonor": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-build-controller-candidate-v1/monitor.py",
+    "sha256": "86913867251bc889701859ca6a361ccf9c17288a6a3bfc7a5c8d8e5bbe5c4cbe",
+    "bytes": 15094
+  },
+  "monitorAfterSha256": "86913867251bc889701859ca6a361ccf9c17288a6a3bfc7a5c8d8e5bbe5c4cbe",
+  "monitorByteIdentical": true
+}

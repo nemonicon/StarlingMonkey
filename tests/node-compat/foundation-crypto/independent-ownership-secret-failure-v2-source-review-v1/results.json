@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "state": "INDEPENDENT_CRYPTO_OWNER355_SECRET_FAILURE_SOURCE_REVIEW_PASSED_V1",
+  "sourceIndexSha256": "26eddb871e6538277e4b98f3c3912bb4f1c86e9e59640488fb06d457930cce54",
+  "sourceOnly": true,
+  "sourceReviewPassed": true,
+  "verifiedPassed": true,
+  "ownerActionsInvoked": false,
+  "runtimeActionsInvoked": false,
+  "compilerInvokedByReader": false,
+  "nativeBuildOrLinkInvoked": false,
+  "nativeSourceFiles": 355,
+  "externalEmbeddingSources": 3,
+  "changedNativeFiles": 3,
+  "unchangedNativeFiles": 352,
+  "newReversibleEdits": 2,
+  "composedReversibleEdits": 13,
+  "allHelperCallSites": 17,
+  "allHelperCallSitesCheckedBeforeConsumption": true,
+  "immediateEcdsaCallerGuards": 2,
+  "unchangedCollectivelyCheckedSites": 15,
+  "predecessorM1ResolvedForExactSuccessor": true,
+  "sourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/index.json",
+    "sha256": "26eddb871e6538277e4b98f3c3912bb4f1c86e9e59640488fb06d457930cce54",
+    "bytes": 5007
+  },
+  "parentSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1/index.json",
+    "sha256": "070f1c20247f4538622cf60fdc1613d44b113c10de0173250456c13d81db1958",
+    "bytes": 5888
+  },
+  "mandatoryParentHistoryErratum": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1-history-erratum.json",
+    "sha256": "0cad60adee41138aaa395585b3a9e60b2000d9634763c8667998049bf8766656",
+    "bytes": 1005
+  },
+  "parentHoldReview": {
+    "index": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-secret-failure-source-review-v1/index.json",
+      "sha256": "dbcf5cfa37a80ac15b50430d158ec6ba543652a67a6ef9d38201db86f1db0672",
+      "bytes": 1703
+    },
+    "result": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-secret-failure-source-review-v1/results.json",
+      "sha256": "896d475af4988ed004dd3b794a752c63501bfa87114a2be4bba897b71c56f728",
+      "bytes": 6709
+    }
+  },
+  "requiredCorrectionContract": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-secret-failure-source-review-v1/required-correction-contract.json",
+    "sha256": "8307b40c23d20ff347495618b9226c68596707ef1a3e98020dbbc4a62f1d7e49",
+    "bytes": 2703
+  },
+  "finalSourceContract": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/source-contract.json",
+    "sha256": "18fe35120a7ef4a2f7958e2a0669f4bd0bd44f0ab666ae4aa7103a273a0b5239",
+    "bytes": 58186
+  },
+  "findings": [
+    {
+      "id": "M1",
+      "disposition": "RESOLVED_IN_EXACT_SUCCESSOR",
+      "file": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+        "sha256": "c608a2f71ec2e8bd24ecc64905cc2943a520953cf3cd18dc5cc344dd5bee1812",
+        "bytes": 115300
+      },
+      "rCallLine": 943,
+      "rGuardLine": 944,
+      "sCallLine": 948,
+      "sGuardLine": 949,
+      "firstResultLengthUseLine": 954,
+      "claim": "Each helper result is immediately checked with existing JS_ReportOutOfMemory and return nullptr. r failure cannot invoke s; s failure cannot reach result length/allocation/copy/ArrayBuffer. Independent all17-site inventory verifies owner checks before all pointer/returned-length consumption."
+    },
+    {
+      "id": "OWNERSHIP",
+      "disposition": "SOURCE_CONSISTENT",
+      "claim": "BIGNUM15 adoption/status/order/CRT fallback and EC point OPENSSL_free owner through borrowed-to-copied parameter lifetime remain exact parent bytes. r/s owners retire on failure; successful result ownership is released only after ArrayBuffer creation. No allocator family or transfer behavior changes beyond the failure guards."
+    },
+    {
+      "id": "SUCCESS_PATH",
+      "disposition": "BYTE_EXACT_OUTSIDE_TWO_GUARDS",
+      "claim": "Two exact forward/reverse additions preserve every other algorithm byte. key/RAII afterimages equal070f. Original signature concatenation r then s and downstream allocation/ArrayBuffer failure branches remain unchanged."
+    }
+  ],
+  "evidence": {
+    "dataAudit": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-secret-failure-v2-source-review-v1/data-audit.json",
+      "sha256": "655acce0052deefab29db1993bd984979d3bc5308b82a3e09510f0cf5d8e2466",
+      "bytes": 5046
+    },
+    "candidateResults": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/results.json",
+      "sha256": "9363a4d16f258ef3b172586e1c6f3164305780a91c255ffa4788964b9bf11aeb",
+      "bytes": 5392
+    },
+    "derivations": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/derivations.json",
+      "sha256": "c75a646da91448f01d7e90eb8740f41b6c15072025dbdde5d3c61bc35f6427c9",
+      "bytes": 5879
+    },
+    "callerInventory": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/caller-inventory.json",
+      "sha256": "67282cdcdbad7a72dc5517647690f7d296ee51e652799a5a6be89a08c8a6fe6d",
+      "bytes": 4362
+    },
+    "storedCallerModels": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/source-check-results.json",
+      "sha256": "49f3e34c0edf3eeaa2bc6edeceb3aa88fe54f149c3845a2648069e237bda12ed",
+      "bytes": 21147
+    },
+    "storedSyntax": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/syntax-results.json",
+      "sha256": "b16476b2a29aaf1e12ce398d384fb15665d5a36d11189c04f21a23daf61d42fc",
+      "bytes": 2055
+    },
+    "freshSyntaxTerminal": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/evidence/crypto-algorithm/terminal.json",
+      "sha256": "342f7252a57773a5359ee75d05addcc541f4be9657279624c0bf4bd3d4c1a526",
+      "bytes": 981
+    },
+    "parentSyntax": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1/syntax-results.json",
+      "sha256": "a0e9ff6e8d1e79e9a0e78f21801ee72cdb765aa2ec3170eae7377f3e78333f2b",
+      "bytes": 5535
+    },
+    "finalInputHashes": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/final-input-hashes.json",
+      "sha256": "c7a6a1e2a40cd2abbe03320d3c8f533def1e91fc4c7324d1bd395087aee5db92",
+      "bytes": 1526018
+    },
+    "syntaxInputHashes": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/syntax-input-hashes.json",
+      "sha256": "f72729a86efece2be1847d5badfc33cf9f5f0840b8380c3022754457c029ba60",
+      "bytes": 593518
+    },
+    "headerDependencies": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/header-dependencies.json",
+      "sha256": "9da5e7929091ac8b2a912f7f10dcfaa11541f0c64d6521739fdaa6aba83ecb08",
+      "bytes": 787988
+    },
+    "syntaxOverlay": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/syntax-overlay.json",
+      "sha256": "8c4be92284b5337171b5475db5bf6de84749095b475d8bb1efda429512b57c8e",
+      "bytes": 249674
+    }
+  },
+  "coverage": {
+    "candidateMembers": 30,
+    "finalInputRows": 5428,
+    "syntaxInputRows": 2225,
+    "parentInputRows": 37,
+    "distinctHashedFiles": 5446,
+    "dataAssertions": 39054,
+    "nativeSourceFiles": 355,
+    "changed": 3,
+    "unchanged": 352,
+    "callerSites": 17,
+    "callerGroups": 6,
+    "callerModels": 48,
+    "heldContinuationModels": 18,
+    "storedSourceModelChecks": 220,
+    "freshStoredSdkSyntaxCalls": 1,
+    "freshStoredRawExitCodes": [
+      0
+    ],
+    "freshDependencies": 1103,
+    "freshTranslationUnits": 1,
+    "freshHeaders": 1102,
+    "mirroredNativeInputs": 355,
+    "additionalConfiguredHeaders": 4,
+    "normalFrozenMembers": 1391,
+    "normalOriginalReferences": 1387
+  },
+  "concreteBlockers": [],
+  "rootActivation": null,
+  "nativeBuild": null,
+  "runtimeProof": null,
+  "nativeAdoption": false,
+  "operationalAdmission": false,
+  "runtimeAcceptanceClaim": false,
+  "securityCompleteClaim": false,
+  "grantsAnyActionAuthority": false,
+  "limitations": [
+    "UNAPPLIED source/syntax/data review only. No native source, configured/frozen bytes, policy, recipe, engine, pins or operational admission was replaced or adopted.",
+    "No compiler, owner helper, native allocator/OpenSSL/JS function, crypto/key operation, engine, guest, GC, OOM/fault injection, prototype/reset or host action ran during this review.",
+    "The48 retained caller cases are source-shaped abstract pointer/event models. Both configured conversion failures stop at r, so the configured s failure is not executed in those cases. These are not native allocation-fault, erasure, cleanup or runtime observations.",
+    "One author-retained fresh algorithm SDK30/LLVM21.1.4 frontend syntax command returned raw0 with complete empty streams and1103 dependencies. The unchanged key/header syntax proof is reused by exact bytes; it is not relabelled as a fresh compiler run. No object/link proof is established.",
+    "The full355+4 VFS, genuine compileDB flags, actual API/header bytes and inherited SDK driver/archive/config/alias proofs were authenticated. This remains finite tool provenance, not a hermetic operating-system dynamic-library reconstruction.",
+    "The other15 caller sites retain collective OOM checks before pointer/length consumption; some can allocate remaining conversion buffers before that collective check. Only the two ECDSA guards are asserted immediate before the next helper/result operation.",
+    "BN_free remains unchanged. Numeric/length/bounds and additional secret-copy/clearing policies remain separate open follow-ons. No security-complete, all-copies erasure, finalizer or runtime-acceptance claim follows.",
+    "070f, mandatory0cad history erratum and dbcf M1 HOLD remain historical unchanged evidence. Final source-contract.json/references.json bind that HOLD; earlier proposed/parent-input pending labels remain explicitly qualified derivation-stage DATA.",
+    "This source PASS resolves M1 for this exact successor only and grants no Root/native/runtime/build/freeze/timing/action authority."
+  ]
+}

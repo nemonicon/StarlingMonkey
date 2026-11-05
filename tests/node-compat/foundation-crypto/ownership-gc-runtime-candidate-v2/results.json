@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "state": "SEALED_SOURCE_ONLY_CRYPTO_OWNER355_GC_RUNTIME_V2_CORRECTION_PREPARED",
+  "sourceOnly": true,
+  "sourceAuthorChecksPassed": true,
+  "sourceReviewPassed": false,
+  "requiredSourcePeerState": "INDEPENDENT_CRYPTO_OWNER355_GC_RUNTIME_SOURCE_REVIEW_PASSED_V2",
+  "heldRuntimeV1": {
+    "index": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-runtime-candidate-v1/index.json",
+      "sha256": "c298e623d83591f40341cf7c3d37a98a40a94e889be7e3dee34413d145b6a43a",
+      "bytes": 7869
+    },
+    "sourcePeerIndex": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-gc-runtime-source-review-v1/index.json",
+      "sha256": "05e9810c4d1bbb6b680adc876271642936b0a16e0f155c357998c9e5c0ad3cf6",
+      "bytes": 2021
+    },
+    "failurePeerIndex": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-gc-runtime-v1-preflight-failure-review-v1/index.json",
+      "sha256": "ec5b8ddcaf84ce6c97a660502fe59b5c00e559d60a504c7ae8c67366cfbdbe9e",
+      "bytes": 1027
+    },
+    "rootFailure": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-runtime-v1-preflight-failure-root-results.json",
+      "sha256": "b0db188eb944779ad26ecf155520ac8547b46d04d59de403799f82644190da1a",
+      "bytes": 7901
+    },
+    "role": "IMMUTABLE_FAILED_SOURCE_AND_HISTORICAL_SOURCE_PASS_DATA_NOT_V2_AUTHORITY"
+  },
+  "findingCorrected": "CRYPTO_GC_RUNTIME_V1_M1_RELATIVE_MANIFEST_ROWS",
+  "relativeRowsCorrected": 17,
+  "other11078BaseRowsUnchanged": true,
+  "allRowsCanonicalAbsolute": true,
+  "runtimeCwdNormalizationAdded": false,
+  "explicitOriginalRepositoryRoot": "/Users/dan/dev/StarlingMonkey",
+  "artifactIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-gc-component-results-review-v1/index.json",
+    "sha256": "f812eeec5fc53a3b289f970add2f3d1a9a52df71462f18767baeac81b090a195",
+    "bytes": 2637
+  },
+  "genuineDescriptorBoundaryPassed": true,
+  "genuineFullReadBoundaryPassed": true,
+  "inputDescriptors": 11171,
+  "actualRowsRead": 11171,
+  "regularRows": 11170,
+  "streamRows": 1,
+  "declaredBytes": 872756583,
+  "actualBytes": 872756583,
+  "before17AllDescriptorRejected": true,
+  "after17AllDescriptorAndBytesPassed": true,
+  "genuineDataUtilityImports": true,
+  "pureDataAndLoadingChecks": 73,
+  "mockedRawCaptureChecks": 6,
+  "sourceChecks": 42,
+  "syntaxOnlyCommands": 9,
+  "pythonAst": true,
+  "codeNamespaceDerivations": [
+    {
+      "file": "guard.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-runtime-candidate-v1/guard.mjs",
+        "sha256": "2a2648529a0e8499eb26fce2b799f01e3c5a93641144cd49f04967cc92c4fee8",
+        "bytes": 6155
+      },
+      "changes": [
+        {
+          "before": "/private/tmp/starling-node-compat/crypto-owner355-gc-runtime-v1",
+          "after": "/private/tmp/starling-node-compat/crypto-owner355-gc-runtime-v2"
+        },
+        {
+          "before": "ROOT_REVIEWED_CRYPTO_OWNER355_GC_RUNTIME_V1",
+          "after": "ROOT_REVIEWED_CRYPTO_OWNER355_GC_RUNTIME_V2"
+        },
+        {
+          "before": "INDEPENDENT_CRYPTO_OWNER355_GC_RUNTIME_SOURCE_REVIEW_PASSED_V1",
+          "after": "INDEPENDENT_CRYPTO_OWNER355_GC_RUNTIME_SOURCE_REVIEW_PASSED_V2"
+        }
+      ]
+    },
+    {
+      "file": "test-pure.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-runtime-candidate-v1/test-pure.mjs",
+        "sha256": "54e9f681b750aa34cfa77f16a3b0de5d3b7a549dc0afcc9735c4d3d741cc7581",
+        "bytes": 7978
+      },
+      "changes": [
+        {
+          "before": "/private/tmp/starling-node-compat/crypto-owner355-gc-runtime-v1",
+          "after": "/private/tmp/starling-node-compat/crypto-owner355-gc-runtime-v2"
+        },
+        {
+          "before": "ROOT_REVIEWED_CRYPTO_OWNER355_GC_RUNTIME_V1",
+          "after": "ROOT_REVIEWED_CRYPTO_OWNER355_GC_RUNTIME_V2"
+        }
+      ]
+    },
+    {
+      "file": "check-source.py",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-runtime-candidate-v1/check-source.py",
+        "sha256": "6aaba5af6f34d630746d7503ee76e40ff0eff83e68ca7107215266a9e0d5c75f",
+        "bytes": 6548
+      },
+      "changes": [
+        {
+          "before": "for row in f['files']:\n p=Path(row['path']);",
+          "after": "for row in f['files']:\n declared=row['path'];assert isinstance(declared,str)and declared.startswith('/')and'\\x00'not in declared and'\\\\'not in declared and all(x not in ('','.','..')for x in declared.split('/')[1:]),'Whole manifest canonical absolute path required before file reads'\n p=Path(declared);"
+        },
+        {
+          "before": "INDEPENDENT_CRYPTO_OWNER355_GC_RUNTIME_SOURCE_REVIEW_PASSED_V1",
+          "after": "INDEPENDENT_CRYPTO_OWNER355_GC_RUNTIME_SOURCE_REVIEW_PASSED_V2"
+        }
+      ]
+    }
+  ],
+  "exactSourceCopies": [
+    {
+      "file": "checks.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-runtime-candidate-v1/checks.mjs",
+        "sha256": "e26bb3393aa534fd525699e022214d76ed9a3c9146c37623cfda639194a60144",
+        "bytes": 8776
+      }
+    },
+    {
+      "file": "loading.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-runtime-candidate-v1/loading.mjs",
+        "sha256": "603c77882b84da9c05138ccb5ce8e3f55df038f97b2d1af4c00d6aae4edaf123",
+        "bytes": 4993
+      }
+    },
+    {
+      "file": "oracle.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-runtime-candidate-v1/oracle.mjs",
+        "sha256": "93aeaf87702ba7055c39a80952c87bd5e6ee640560899b769ba81e16b7aa3fa9",
+        "bytes": 1660
+      }
+    },
+    {
+      "file": "run.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-runtime-candidate-v1/run.mjs",
+        "sha256": "34b10213e3fd3dcb81685cd00054f59100166bf806b67e1cc940cd4d61098362",
+        "bytes": 5772
+      }
+    },
+    {
+      "file": "worker.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-runtime-candidate-v1/worker.mjs",
+        "sha256": "c5eb2ecb3473bafc828437346d32df98a9654e592f9f1a2e5f0c75bd0f93c2cf",
+        "bytes": 4387
+      }
+    },
+    {
+      "file": "test-capture-pure.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-runtime-candidate-v1/test-capture-pure.mjs",
+        "sha256": "c8ca0403721b539e53d4779c749df2eb1b4ec9d33c27f47ce16a486400acb66c",
+        "bytes": 2371
+      }
+    },
+    {
+      "file": "runtime-derivations.json",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-runtime-candidate-v1/runtime-derivations.json",
+        "sha256": "daab65b40053cecb096fd916521cde4ebecd236ba8b5c128f45d201dc11ae95e",
+        "bytes": 11165
+      }
+    },
+    {
+      "file": "future-artifact-input-contract.json",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-runtime-candidate-v1/future-artifact-input-contract.json",
+        "sha256": "5374366ea330364fb707958a4667142de0d37db851b9d4642327a45f1346e427",
+        "bytes": 1001
+      }
+    }
+  ],
+  "dataDescriptorPathCorrections": 2,
+  "outputRoot": "/private/tmp/starling-node-compat/crypto-owner355-gc-runtime-v2",
+  "rootAuthorityRequiredState": "ROOT_REVIEWED_CRYPTO_OWNER355_GC_RUNTIME_V2",
+  "sourcePeer": null,
+  "rootAction": null,
+  "actualArtifactReview": null,
+  "actualArtifactContract": null,
+  "actualComponentSha256": null,
+  "reviewedGcPins": null,
+  "gcNativeRootReview": null,
+  "actualRuntimeResult": null,
+  "expectedPublicStrings": {
+    "retained": 15,
+    "fresh": 7,
+    "wrapper": 1,
+    "total": 23
+  },
+  "expectedRunRecords": 20,
+  "expectedGuestImports": 10,
+  "expectedSignAttempts": 55,
+  "expectedVerifyAttempts": 50,
+  "expectedPressureRequestCounters": {
+    "retained": 48,
+    "fresh": 16,
+    "wrapper": 16,
+    "total": 80
+  },
+  "wrapperFullPressureByteRecords": 16,
+  "actualNativeGcCountObserved": false,
+  "guestComponentNativeMetadataPinsAndFourAbiChanged": false,
+  "normalProofTransferred": false,
+  "metadataOrContextProjected": false,
+  "oldSealedPacketsChanged": false,
+  "bootstrapPreflightOrNodeOracleInvoked": false,
+  "generatedJsImported": false,
+  "guestKeyPressureGcNativeActionsInvoked": false,
+  "rootActivationCreated": false,
+  "operationalAdmission": false,
+  "runtimeAcceptanceClaim": false,
+  "timingAllowed": false,
+  "scope": "Thin source/provenance/namespace correction after pre-output failure. Authorized genuine descriptor+full file read data utility regression only; no runtime retry.",
+  "limitations": [
+    "V1 source/peer statements remain historical and missed the canonical read boundary.",
+    "A real runtime retry still requires this new source peer and a separately issued V2 Root action.",
+    "No new guest/Nodeoracle/HMAC/GC outcome, native collection count/root-isolation/free/wipe/reuse or performance proof."
+  ]
+}

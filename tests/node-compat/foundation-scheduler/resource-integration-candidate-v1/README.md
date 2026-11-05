@@ -1,17 +1,17 @@
-# Scheduler resource integration draft
+# Scheduler resource integration source candidate
 
-**Unsealed work in progress, preserved at the user's requested Git checkpoint
-on 2026-11-05.** No index, independent review or acceptance exists.
+This sealed, UNAPPLIED source proposal integrates the reviewed two-file timer/task ownership cut with the accepted v13 **342-source** baseline. It preserves 340 native inputs and replaces only `builtins/web/timers.cpp` and `runtime/event_loop.cpp`. It does not use consumer/crypto355 native contexts as its build baseline or approve old crypto behavior. Current Root source, accepted artifacts, manifests, pins and prior packets remain unchanged.
 
-The draft contains two timer/task ownership afterimages, a proposed342-source
-policy and build recipe, a467-row staging plan, dormant staging code and runtime
-fixtures. Preparation reports5,399 source/pure checks over822 inputs, including
-four Python AST checks. These are preparation findings, not runtime evidence.
+The proposed policy/helper/recipe have distinct identities and a resource source contract. The full manifest remains342 and the separate embedding count remains3. The recipe explicitly enables the existing Web timers builtin, captures its actual generated installation, retains the old Release/no-OOM/locked dependency guards, and uses fresh source/work/artifact names with one build job. `stage.py` is dormant, original-context-only, and requires a new exact source peer plus Root stage authority before cloning54b and copying its467-row accepted source/tool/proof plan plus this complete packet. No stage or build action ran. A future reviewed owned build controller must retain2GiB/800MiB guards; normal artifacts must be frozen and independently checked before GC reconfiguration. New freezer/native admission and artifact proofs remain unimplemented gates.
 
-No Node, compiler, staging, build or guest action has run for this draft. The
-production timer/task patch remains unapplied. Source sealing, independent
-review, actual activation, native build/freezer/controller gates, packaging,
-clock-import admission and runtime validation remain open. Clock capability
-scope and deterministic argument-allocation-failure testing need decisions.
-See [integration-plan.md](integration-plan.md) and
-[progress.md](../../../../progress.md).
+The existing accepted embedding already drives Promise-returning generated scalar bindings through the real event loop. No new native entry hook is needed. Concrete unexecuted guest/WIT sources cover seven bounded timer/clear/interval/handled-error/public-pressure cases, a pure import-preservation control, an unhandled initializer and a fresh disposable callback-error fixture. The driver template uses real ComponentizeJS/Jco methods and captures construction bytes before final import audit, real generated-file lists, and typed raw returns before assertions. Its activation is **hard NULL**, before any dynamic packager or guest operation. Actual preflight/native/packaging/type-graph/component/ESM-loader/Root export admission does not exist yet; this is not a runnable runtime family.
+
+Timer capability selection remains exactly `wasi:clocks/monotonic-clock@0.2.10` and `wasi:io/poll@0.2.10`, with actual callable clock/poll proof required. The pinned splicer's coarse Clocks option also leaves wall-clock and IO branches unstubbed. Any additional emitted interface must fail the proposed gate; neither the standard-interface catalogue nor old type-only HTTP clock evidence authorizes widening it. Resolving actual final import/type closure is a required future gate. Pure controls disable all five features and require imports[]. No custom host service, wire adapter or new packaging hook is introduced.
+
+Native argv-allocation failure and ID exhaustion remain source/model-only: no deterministic approved public operation exercises those branches. No fault/OOM/DEBUG control is invented. Public pressure uses eight valid native Buffer hex operations under a future genuinely reviewed GC engine, with combined-owner limits. No raw memory, private GC entry, resource-table count, isolated sole-root theorem, same-instance request reuse or timing claim follows.
+
+Preparation uses read/hash, Python AST, exact derivations and extracted pure source-map checks only. The committed unsealed draft at checkpoint `6bc62c115d940568e8d21653127881f097db40ce` remains identifiable history; the baseline is54b. `first-check-results.json` retains the earlier partial preparation pass, not a runtime pass. No Node/JS/WIT parser, C++ frontend/compiler, helper import, Git/staging, componentization, generated-module import, guest, host or benchmark action ran for this packet. JavaScript/WIT grammar and all actual runtime outcomes remain unverified. The original two C++ afterimages retain their separately recorded SDK/source review, which supplies no new runtime proof here.
+
+Full transactional enqueue, all-invalid selection, generic HTTP/stream cancellation, interest accounting, Promise/finalizer quiescence, reset, owner epochs and ALS remain separate roadmap gates. New baseline regressions must run on fresh admitted artifacts; old passes cannot be relabelled. See [integration-plan.md](integration-plan.md) for the exact seams and follow-on dependencies.
+
+Prospective independent source result: schemaVersion1, state `INDEPENDENT_SCHEDULER_RESOURCE_INTEGRATION_SOURCE_REVIEW_PASSED_V1`, sourceIndexSha256 equal to this final index, sourceOnly/sourceReviewPassed true, ownerActionsInvoked false. It is a source review, not stage/build/component/guest or acceptance authority.

@@ -4,18 +4,62 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-05. Overall roadmap: **in progress**.
 
-Latest continuation:
+All-work Git checkpoint requested again on 2026-11-05. Writers are stopped. This
+checkpoint includes the subsequent crypto GC component/runtime/stock-Wasmtime
+results and independent reviews, preserved failures and corrections, scheduler
+normal build/freeze evidence and reviews, source fixes, and current documentation.
+The [crypto secret integration draft](tests/node-compat/foundation-crypto/ownership-secret-integration-candidate-v1/README.md)
+is deliberately included as unsealed work in progress: stored source checks pass
+for355 paths (352 unchanged and three corrected), but final source review/seal,
+independent review, stage/build controllers, artifact tooling and actual native
+validation remain open. No new production acceptance or complete compatibility
+claim follows. External engines and build artifacts stay outside the repository;
+their receipts remain committed. No push is requested.
+
+Checkpoint checks parse381 structured JSON files and70 Python files and resolve
+1,437 local documentation links without missing targets. Two additional files
+named `stdout.json` are intentionally empty raw streams from retained failed
+source-check attempts; their adjacent terminals record raw1. Whitespace checks
+report only preserved crypto source snapshots and unapplied patches. Those
+evidence bytes are retained to preserve their hashes. No runtime suite or
+calibration retry is run for this Git-only checkpoint.
+
+Latest continuation after Git checkpoint `6bc62c1`:
 
 - Consumer355 HTTP: actual both-host gate and independent result review pass;
   six accepted responses and77 separate readiness attempts are retained.
 - Crypto GC: isolated source stage and native build pass review. Corrected freeze
   and full frozen-artifact review pass. Corrected unreviewed pin export finishes
-  raw0 and its independent data review passes; new reviewed pins/bootstrap and GC
-  component work remain pending. No key/GC workload or new production adoption has run.
-- Scheduler: the timer/task ownership patch and its source review pass; it remains
-  unapplied, with runtime, fallible global enqueue, reset/reuse and ALS work open.
-- Codec pilots/timing, broader lifecycle work and optional standard-capability
-  variants remain outstanding. Accepted production remains bounded foundations-v13.
+  raw0 and its independent data review passes. New validation-only GC pins and
+  paired bootstrap authorities are issued; the genuine pure selector passes.
+  Independent finite pin/authority checking passes. Actual Python bootstrap
+  and genuine JS API observation finish raw0 with equal full frames,11 actual
+  manifests, stable rechecks and clean process cleanup; independent actual
+  bootstrap review passes. GC component source and independent source review pass;
+  actual construction finishes raw0 under Root96509, with imports[] and four WIT
+  functions; independent artifact review passes. GC runtime v1 source passes
+  review, but its first actual attempt fails before guest execution on17 relative
+  input paths. Failure and review correction are preserved; the v2 source and
+  independent review pass. The fresh v2 runtime finishes raw0 under Root52246:
+  23 whole strings/20 records and45 full signatures match the retained Node
+  oracle; independent actual-result review passes. Three fresh stock-Wasmtime GC
+  wrapper calls finish raw0 and match the entire Jco wrapper. Independent host
+  result review passes. No new production adoption has run.
+- Scheduler: the timer/task ownership patch,342-source integration candidate and
+  independent integration source review pass. Production remains unchanged; actual
+  staging and independent stage review pass in separate Root session52275.
+  The normal-OFF build controller and its independent source review pass; actual
+  native compilation and independent BUILD-only review pass under
+  Root12069/Python96368. Normal freeze finishes raw0 under Root19779 and its
+  independent frozen-artifact review passes. Pins/bootstrap/runtime, clock closure,
+  fallible global enqueue, reset/reuse and ALS work remain open.
+- Codec calibration pilot v3 ends raw1 under Root62440: the first native-on
+  case0/N1 worker exits status1 with empty streams; no pair or matched plan
+  completes. [Failure evidence](tests/node-compat/foundation-zlib/cost-pilot-v3-failure-root-checkpoint-v1/README.md)
+  is retained and the coordinated window is closed. Diagnosis and independent
+  failure review remain open. Actual timing, broader
+  lifecycle work and optional standard-capability variants remain outstanding.
+  Accepted production remains bounded foundations-v13.
 
 Git checkpoint requested on 2026-11-04: commit
 `e7c6e2ce4f430811b90bcad77620c1e549963ca0` preserves the implementation,
@@ -32,7 +76,7 @@ receipts retain their exact references and limits. The pinned
 `54b3329b3ce818fd1f244e871e9c259b63667cda` remains the historical baseline;
 the Git checkpoints do not automatically revalidate or repin earlier evidence.
 
-A further all-work Git checkpoint was requested on 2026-11-05. It includes the
+At Git checkpoint `6bc62c1`, a further all-work commit was requested on 2026-11-05. It includes the
 subsequent HTTP both-host results, GC source/build/freeze/export evidence and
 reviews, preserved failures, scheduler ownership source, and updated trackers.
 Writers stopped before staging. Two current drafts are deliberately included
@@ -313,6 +357,252 @@ The candidate remains UNREVIEWED and pins remain unadopted. NEW GC-only reviewed
 pins and actual read-only bootstrap remain pending. Old native
 export/bootstrap entries stay closed; only the reviewed corrected tooling can run.
 
+New [GC-only validation pins](tests/node-compat/foundation-crypto/reviewed-ownership-gc-v2-native-pins-v1.json)
+(`e2923fa2…8111`) and their [Root pin review](tests/node-compat/foundation-crypto/reviewed-ownership-gc-v2-native-pin-root-review-v1.json)
+(`4f881996…e4f1`) preserve every candidate artifact field and all1,462 frozen rows.
+Only the pin state/review flag and four independent artifact-proof fields change;
+all three non-GC variants remain NULL. The genuine existing pure selector passes;
+an independent finite data check passes69 predicates. Separate native/tooling
+bootstrap authorities bind new config `d4e0f991…1107`. The
+[actual Python bootstrap](tests/node-compat/foundation-crypto/ownership-gc-v2-bootstrap-v1-cli-root-results.json)
+finishes Root35664/Python88872 raw0 in17.311 operational seconds. The genuine
+[JS API observation](tests/node-compat/foundation-crypto/ownership-gc-v2-bootstrap-v1-root-results.json)
+then finishes Root77845/Node89115 raw0 in54.567 operational seconds. Its initial
+call/internal recheck/explicit recheck run three read-only bootstrap bodies,
+separate from the one CLI call. The entire frames compare equal; Root also checks
+the full metadata against actual frozen sidecar90c3 and all11 manifest values
+against actual frozen files. Both external monitors report all observed groups
+and PIDs gone with no signals/errors/timeouts/forced cleanup. Full CLI stdout
+(`9520bf31…3f9a`,818,188 bytes) and API frame (`675b24c7…62a2`,917,166 bytes)
+are retained. The independent actual review is recorded next. This
+validates read-only tooling; no engine/component/guest/key/GC workload or runtime
+acceptance follows, and the accepted foundations-v13 source remains unchanged.
+
+The [independent actual bootstrap review](tests/node-compat/foundation-crypto/independent-ownership-gc-bootstrap-results-review-v1/README.md)
+now passes at `00fad522…a9c8`, result `1dac553c…1b64`. It freshly verifies11,354
+physical inputs, both complete25-field retained frames, all11 manifests,1,462
+frozen rows, six pin changes, normal protections and process cleanup. Four
+completed read-only bodies/four metadata-Node children are source/process coupled;
+internal raw body returns and individual metadata-helper terminals are not
+separately retained. No reviewer engine or workload action occurs.
+
+The [GC component source](tests/node-compat/foundation-crypto/ownership-gc-component-candidate-v1/README.md)
+seals76 members/8,171 inputs at `6f0faf4b…f0db`, with61 pure/67 source checks.
+Its [independent construction-source review](tests/node-compat/foundation-crypto/independent-ownership-gc-component-source-review-v1/README.md)
+passes at `fbf165fa…a2c9`:69,741 read/hash/source checks,8,248 paths,4,934 packaging
+roles,22 links and exact parent/worker derivations. It requires the actual GC-only
+pins/bootstrap proofs, genuine native Buffer bundling and unchanged four-function
+WIT. Separate [Root construction authority](tests/node-compat/foundation-crypto/ownership-gc-component-v1-root-authority.json)
+now starts Root96509/Node92352, allowing component initialization and construction
+only. Ordinary/key/GC-pressure exports and runtime acceptance remain closed.
+
+The [actual GC component construction](tests/node-compat/foundation-crypto/ownership-gc-component-v1-root-results.json)
+finishes Root96509/Node92352 raw0 in130.359 operational seconds. Worker93037
+finishes status0 in11.942 seconds; all observed groups/PIDs are gone with no
+signals/errors/timeouts/forced cleanup. Component `52d99f4e…e5f1` is13,118,152
+bytes; core `ac5d7a51…9fef` is13,117,532 bytes. Root verifies25 indexed/27 actual
+files, retained imports[], four ordinary WIT functions and the empty non-WIT
+Jco `_util` helper. The full16,574-byte bundle retains only native `node:buffer`
+and one exact physical guest fixture, with11 selected manifests. Generated ESM
+has not been imported and no ordinary/key/GC-pressure export has run.
+Independent full artifact/ABI/loader-source review is recorded next. A Root data-reader
+field mistake (`rawExitCode` versus the durable worker's actual `status`) is
+recorded and corrected; it caused no repeated construction or artifact change.
+
+The [independent GC component artifact review](tests/node-compat/foundation-crypto/independent-ownership-gc-component-results-review-v1/README.md)
+now passes at `f812eeec…a195`, result `cdca4ae9…4774`, contract `4b2b6897…4a61`.
+It freshly checks16,593 physical inputs, all25 indexed/27 actual outputs,104 worker
+critical rows,76 source members,8,171 preparation inputs,4,934 packaging files and
+22 links. A new metadata-only WIT decode finishes raw0 and exactly matches191
+bytes/four functions/imports[]. The nested core is byte-identical to the captured
+Jco core, with no imports or start section. Loading-source grammar evidence is
+bound by full byte equality with the previously reviewed glue, not a new JS
+parse or generated import. The exact12-artifact map is shared by result/contract.
+Initialization/Wizer execution is explicit; no ordinary/key/GC-pressure export
+has run. New GC runtime source and its separate source/action gates remain open.
+
+The [scheduler integration source](tests/node-compat/foundation-scheduler/resource-integration-candidate-v1/README.md)
+now seals33 members at `20e6bab4…c414`. Preparation reports5,401 source/pure checks
+over822 inputs,342 expected-source cases and four old-receipt negatives. The
+[independent integration source review](tests/node-compat/foundation-scheduler/independent-resource-integration-source-review-v1/README.md)
+passes at `360732de…dd5d`:5,290 read/data/pure/grammar checks over858 unique inputs,
+all33 members, exact342/340+2/external3 ancestry,467 staging rows and reversible
+helper/recipe derivations. Five pinned-Node syntax-only checks pass with empty
+streams; no WIT parser, helper, stage, compiler, component or guest runs. The new
+source can proceed to a separate Root stage phase. Actual native/freeze/ABI/clock
+admission and hard-NULL runtime activation remain open, together with global
+fallible enqueue, argv-failure testing, reset/reuse and ALS.
+
+New [scheduler stage authority](tests/node-compat/foundation-scheduler/resource-integration-stage-v1-root-authority.json)
+starts a separate accepted342 reconstruction. The [actual stage](tests/node-compat/foundation-scheduler/resource-integration-stage-v1-root-results.json)
+finishes Root52275/Python91561 raw0 in8.066 operational seconds, with clean observed
+group/PID cleanup and no signals/errors/timeout/forced cleanup. Journal
+`266eef63…5e14` retains501 copies: Root verifies every copy/original hash, mode and
+distinct inode, all342 final native hashes, detached54b/no alternates and no Git
+object inode intersection. Whole raw stdout equals the journal. The separate
+source checkout is staged; production remains unchanged. Independent actual
+stage review, normal native build/freezer and later GC/runtime gates remain open.
+
+The [independent actual scheduler-stage review](tests/node-compat/foundation-scheduler/independent-resource-integration-stage-review-v1/README.md)
+now passes at `f28a190d…5eca`, result `58d6265f…1c40`, checking1,908 physical inputs,
+all501 copies,342 final sources and process/Git-context evidence. The three
+accepted embedding files are ancestry data; **zero embedding files were copied
+by this stage**. Fresh actual build capture must prove its own external3 inputs.
+The original UNREVIEWED journal is preserved. A normal-OFF build-controller source
+candidate and GC runtime source are being prepared; no native build or exported
+GC workload has started for these new phases.
+
+The [scheduler normal-OFF build-controller source](tests/node-compat/foundation-scheduler/resource-build-controller-candidate-v1/README.md)
+seals26 members at `f7510454…2bd8`, with4,301 source/pure checks and six AST parses.
+Its [independent source review](tests/node-compat/foundation-scheduler/independent-resource-build-controller-source-review-v1/README.md)
+passes at `de4a0b43…d18e`:8,438 source/data/pure checks,1,085 inputs, exact19
+lifecycle segments, byte-identical7200-second monitor,19 actual extracted Root
+predicate cases and eight stage cases. The new local lifecycle module omits the
+donor's unrelated admission-pins read and operational main; no globals are
+rebound. Initial author syntax whitespace failure is preserved from preparation.
+New [normal-OFF Root build authority](tests/node-compat/foundation-scheduler/resource-normal-off-build-v1-root-authority.json)
+`9b0ad35a…7907` and config `db981219…a555` now launch Root12069/Python96368.
+Only single-job Release342/OFF/no-OOM compilation is selected, with2GiB start and
+800MiB stop guards. GC reconfiguration, freezer, engine/guest execution and
+runtime acceptance remain closed; a normal freeze/review must precede later GC.
+
+The [actual scheduler normal-OFF build](tests/node-compat/foundation-scheduler/resource-normal-off-build-v1-root-results.json)
+finishes Root12069/Python96368 and Bash96374 raw0 in486.794 external/485.340 inner
+operational seconds. All714 observed processes and their groups are gone, without
+signals/errors/timeouts/forced cleanup. Engine `fec7a900…a704` is9,976,561 bytes;
+metadata `51fbc0a0…e80e` is303,587 bytes. Root's actual metadata classifier passes
+342/external3/Release/OFF/no-OOM and verifies the generated timer namespace once.
+Ninja reports107/107 completion. This actual342 baseline selects nine module
+manifests, not355's eleven. The compile DB has67 entries:61 policy builtins/runtime
+C++ files, five other configured-source files and one generated `null.cpp`. The
+one embedding command is captured separately, not in that DB. The log is not a
+full verbose compiler/link transcript; independent
+review must qualify command execution using the captured DB/Ninja/library and
+clean build evidence. The stdout envelope's complete `result` equals the on-disk
+result; a Root data-reader envelope mistake is preserved without rerunning the
+build. BUILD-only review is underway. Normal freeze and independent proof must
+still precede any GC reconfiguration or timer runtime gate.
+
+The [independent normal-OFF BUILD-only review](tests/node-compat/foundation-scheduler/independent-resource-normal-off-build-review-v1/README.md)
+now passes at `bf48593b…f369`, result `dcf60f1e…e432`, contract `e21c5607…80c9`.
+It freshly verifies7,500 physical inputs, all501 staged protections,342 native/
+external3 identities, nine genuine manifests, SDK/LLVM/SM/archive/header, all4,650
+OpenSSL source rows, locked Rust and static-link inputs, and separate embedding
+evidence. The67-row DB is correctly61 policy C++, five other configured files
+and one generated `null.cpp`, with no embedding row. Retained progress has107
+lines,31 twice/no literal32/final107; the review qualifies execution through the
+actual DB/rules/objects and successful parent rather than inventing individual
+compiler/link terminals. All714 observed identities/77 groups are gone. Native
+runtime validation and normal freeze remain NULL; no GC reconfiguration or
+engine/bootstrap/timer execution is admitted by this review.
+
+The [GC runtime source](tests/node-compat/foundation-crypto/ownership-gc-runtime-candidate-v1/README.md)
+now seals49 members/11,095 inputs at `c298e623…a43a`, with73 extracted data/loader,
+six capture-seam,42 source/closure and eight grammar checks. It binds the actual
+`f812eeec` artifact/contract as DATA, preserves all23 complete public strings and
+20 HMAC records across three fresh retained/fresh/wrapper sessions, and keeps new
+Root activation NULL. Expected public pressure counters total48/16/16=80; only
+the wrapper returns16 full pressure-byte records. Ordinary64 requests remain
+counter/source-assertion observations. Independent source review is finishing;
+no generated import or key/GC operation has run for this runtime phase.
+
+The [GC runtime v1 source review](tests/node-compat/foundation-crypto/independent-ownership-gc-runtime-source-review-v1/README.md)
+passes at `05e9810c…3cf6`, with57,188 checks/11,163 paths and exact39 derivation
+edits plus two unchanged loader/oracle copies. Its first
+[actual attempt fails in preflight](tests/node-compat/foundation-crypto/ownership-gc-runtime-v1-preflight-failure-root-results.json)
+on **GC-RUNTIME-CANONICAL-INPUTS-M1**: Node21439 raw1 after0.600 operational
+seconds, before output creation/oracle/worker/generated import or guest calls.
+The strict descriptor correctly rejects17 relative artifact-peer member paths
+in the11,095-row input freeze; the other11,078 rows are absolute. Preparation
+hashed those rows relative to the original checkout, and source review missed
+the actual runtime descriptor boundary. All observed groups/PIDs are gone with
+no signals/errors/timeouts/forced cleanup, stdout is empty, and1194 bytes of
+stderr identify `guard.mjs:34`. The
+[independent failure review](tests/node-compat/foundation-crypto/independent-ownership-gc-runtime-v1-preflight-failure-review-v1/README.md)
+seals at `ec5b8ddc…be9e`, explicitly preserving the earlier review miss. The v1
+source, peer and failed authority remain immutable and closed to further runtime
+activation. R is preparing a thin v2 with17 explicit authenticated original
+absolute paths, full real file-reader regression and new source/output/Root
+identities. It will not normalize arbitrary runtime paths or project metadata.
+The unsealed stock-Wasmtime GC draft is held while this correction is completed.
+
+The [thin GC runtime v2 source](tests/node-compat/foundation-crypto/ownership-gc-runtime-candidate-v2/README.md)
+seals56 members/11,171 inputs at `5abe5ed8…0959`, results `e33729ad…05df`. Its
+17 active row substitutions explicitly name authenticated original-repository
+`f812eeec` members; the other11,078 base rows stay unchanged. New source/output/
+Root identities preserve every v1/failure record. The real read-boundary
+regression passes all11,171 rows (11,170 regular reads/one streamed read), matching
+872,756,583 declared/actual bytes, and rejects all17 original relative rows with
+the genuine descriptor. It runs only authenticated file-read/hash utilities;
+no preflight, bootstrap, oracle, generated import, guest or key/pressure operation.
+Independent v2 source review is underway before a fresh Root retry. The stock-
+Wasmtime source draft can now resume against the new v2 provenance; its actual
+Jco result/contract/Root activation remain unissued.
+
+The [independent GC runtime v2 source review](tests/node-compat/foundation-crypto/independent-ownership-gc-runtime-v2-source-review-v1/README.md)
+passes at `94a2a267…7669`, result `c4c261be…42fb`:56,859 source/data checks,
+11,228 paths, all56 source members and11,171 canonical input rows,17 explicit
+original-path corrections, unchanged11,078 base rows/five runtime bodies and
+genuine file-boundary evidence. New [v2 Root runtime authority](tests/node-compat/foundation-crypto/ownership-gc-runtime-v2-root-authority.json)
+starts Root52246/Node25409 for the same three fresh retained/fresh/wrapper sessions.
+The new controller has seven explicit reversible changes from the preserved v1
+caller; it uses5abe/V2/source/output/Root identities and unchanged actual f812
+artifact roles. No metadata/frame projection or runtime path normalization is
+introduced. Actual v2 execution and independent result review are recorded next.
+
+The [actual GC runtime v2](tests/node-compat/foundation-crypto/ownership-gc-runtime-v2-root-results.json)
+finishes Root52246/Node25409 raw0 in83.029 operational seconds. Workers25459,
+25602 and25760 each finish status0; all four observed groups are gone with no
+signals/errors/timeouts/forced cleanup and empty stderr. All46 indexed/48 actual
+files rehash. Root decodes23 entire public strings/20 records;45 complete
+`SignatureHex` values equal the retained pinned-Node/RFC oracle. The whole
+within-export wrapper equals the sealed complete schema2 expected record.
+Pressure counters total48/16/16=80; all16 exposed wrapper pressure records contain
+the complete64 bytes/encoded+decoded128 hex characters. The other64 requests have
+counter/source-assertion evidence, without full byte records. Native collection
+count, finalizer/free/wipe and isolated roots remain unobserved. No OOM, reset or
+stock-Wasmtime run occurs, and no performance/reuse/production acceptance follows.
+Root's initial data reader mistook other64-character hex buffers for signatures;
+it is corrected to the actual signature fields without rerunning the workload.
+The independent actual-result review is queued after the finite secret-failure
+source cut is sealed; actual stock-host validation remains a later gate.
+
+The [secret-failure ownership source cut](tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1/README.md)
+now seals35 members at `070f1c20…1958`, results `0135f7df…fb28`. Eleven reversible
+edits change only three genuine355 files, preserving352 inputs: all15 BIGNUM
+extractions acquire immediate owners, the OpenSSL point buffer is owned through
+parameter conversion, and the allocation check precedes writes. Two genuine
+SDK30/LLVM21 syntax-only calls finish raw0 with empty streams and1,104 dependency
+paths. The complete355/VFS overlay and four actual configured headers are
+captured. The390 source/model checks use synthetic failure scenarios; no real
+allocation fault, crypto/guest/GC or new engine build ran. It remains UNAPPLIED
+and requires independent source review/new native gates. A separate explicit
+[history erratum](tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1-history-erratum.json)
+corrects an output-chunk ID mislabelled as a session; the sealed source is retained.
+Numeric/length bounds, additional secret-copy policies and security-complete
+claims remain outside this cut. R is independently reviewing this source.
+
+The [stock-Wasmtime GC source](tests/node-compat/foundation-crypto/ownership-gc-wasmtime-candidate-v1/README.md)
+now seals60 members/11,279 inputs at `c5d3ea49…ec35`, with65 pure/data,31 source/
+closure and five final syntax checks plus genuine full file-reader regression.
+It targets three fresh literal `validate()` calls, full decoded WAVE strings
+equal to the actual Jco v2 wrapper, complete schema2/HMAC checks and48 exposed
+pressure records across three calls. Actual Jco-result peer/contract and host
+activation remain NULL; independent source review and real stock-host execution
+are outstanding. Source preparation invoked no Wasmtime/guest/key/pressure call.
+
+The [finite secret/bounds audit](tests/node-compat/foundation-crypto/ownership-secret-bounds-audit-v1/README.md)
+seals at `ea74c480…0233`, findings `23291c93…2de7`. It checks14 configured/frozen
+native pairs and nine actual OpenSSL3.0.17 API files. Concrete source findings
+include `to_bytes_expand` writing through an unchecked `JS_malloc` result, five
+BIGNUM extraction groups with partial-failure/CRT-fallback ownership gaps, and
+`EC_POINT_point2buf` output missing cleanup on success and early returns. The
+proposed first cut is immediate BIGNUM owners, an actual `OPENSSL_free` buffer
+owner held through `to_param`, and an allocation check before writing. Numeric/
+length bounds and additional secret-copy policies remain separate work. This is
+source evidence, not an allocation-fault/runtime/security PASS; the current
+20-byte RFC4231 HMAC fixture does not reach those paths. No source was patched.
+
 Parallel Phase3.4 work now has an [unapplied timer/task ownership candidate](tests/node-compat/foundation-scheduler/resource-ownership-candidate-v1/README.md),
 index `02e9779b…6f4c` (25 members). Two source afterimages/nine reversible edits
 add strong traced timer ownership, idempotent ordinary-path retirement and rooted
@@ -367,6 +657,121 @@ Node.js or Buffer support. The detailed [execution ledger](docs/node-compat/exec
 contracts and evidence. No overall completion percentage is assigned: remaining
 phases have substantially different sizes and unresolved design decisions.
 
+The [independent actual GC runtime v2 review](tests/node-compat/foundation-crypto/independent-ownership-gc-runtime-v2-results-review-v1/README.md)
+passes at `35218a21…7828`, results `a03cb407…9ce9`, contract `0388578b…30a5`.
+It checks16,839 physical inputs, all23 full strings/20 records,45 signatures/
+sign-return copies and45 verification booleans (25 true/20 false), whole wrapper,
+Node oracle, source/component/native/normal protection and four clean processes.
+The exact coverage retains80 counters versus16 full wrapper pressure records;
+no native collection/erasure/isolated-root/reuse claim follows. The indexed
+contract binds actual index, oracle and raw wrapper for a separate stock-host run.
+
+The [independent stock-Wasmtime source review](tests/node-compat/foundation-crypto/independent-ownership-gc-wasmtime-source-review-v1/README.md)
+passes at `486ddaa9…556a`, with56,787 source/data checks over11,340 inputs and35
+additional cases exercising the actual pure decoder, argv, full-record and
+authority/coverage models. Complete retained Jco values are DATA in that review;
+no host/guest action occurs. New [Root host authority](tests/node-compat/foundation-crypto/ownership-gc-wasmtime-v1-root-authority.json)
+`88598b7c…c8d9` starts Root54793/Node29869. A prior controller entry stopped before
+any phase/output creation on inherited `RUST_LOG`; the actual task removes only
+that variable from its child environment, preserving user home variables.
+
+The [actual stock-Wasmtime GC run](tests/node-compat/foundation-crypto/ownership-gc-wasmtime-v1-root-results.json)
+finishes Root54793/Node29869 raw0 in42.140 operational seconds. CLI processes29944,
+30018 and30124 finish status0; all four observed groups are gone without
+signals/errors/timeouts/forced cleanup. All23 indexed/25 actual files rehash.
+Three entire decoded strings/records are byte/value-identical to the actual Jco
+GC wrapper, with12 inner records,27 complete signatures equal to the retained
+Node oracle and48 complete64-byte pressure records. Source-reported attempts
+are six key imports,33 signs and30 verifies. No oracle rerun, generated JS import,
+OOM/reset or process/request reuse occurs. Native GC count, frees/wipes and
+isolated roots remain unobserved. Independent actual host-result review is in
+progress; operational duration does not establish startup/throughput performance.
+
+The [secret-failure source v1 review](tests/node-compat/foundation-crypto/independent-ownership-secret-failure-source-review-v1/README.md)
+seals **HOLD M1** at `dbcf5cfa…0672`: the new null result from `to_bytes_expand`
+is unchecked by ECDSA's r/s conversion consumers before length use/result
+allocation/copy. The17-call inventory has15 checked sites and two unchecked
+sites. Both failures must report OOM and return before any later consumption.
+The finite BN/point ownership and provenance checks pass, but syntax/model
+success does not cover this caller-propagation gap. Original070f/erratum remain
+unchanged. A thin v2 source correction is being prepared; nothing is applied to
+production or admitted as a security-complete crypto implementation.
+
+The [independent actual stock-Wasmtime GC review](tests/node-compat/foundation-crypto/independent-ownership-gc-wasmtime-results-review-v1/README.md)
+passes at `52c435cd…f7ad`, results `f71967f1…cd40`, contract `4954e206…8893`.
+It independently consumes every raw WAVE byte, including escaped-apostrophe error
+text, and matches all three whole strings/typed records to Jco. Derived totals
+are27 signatures/sign-return copies and27 verification booleans (15 true/12 false),
+six imports/33 sign attempts/30 verify attempts and48 complete pressure records.
+The review checks12,783 distinct hashes, all11,279 source rows,23 indexed/25
+actual files, native/frozen/original/normal protections and four saved clean
+lifetimes. It performs no CLI/helper/guest action or fresh WIT decode. Root's
+outer tool exit is Root-observed; full inherited environment values are not
+retained. The same limitations on native GC count/free/wipe/isolated roots and
+reuse remain; no production or security-complete crypto acceptance follows.
+
+The [thin secret-failure v2 source](tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v2/README.md)
+seals at `26eddb87…ce54`, with two immediate ECDSA r/s guards,13 composed
+reversible edits,48 abstract caller cases and one fresh changed-CPP SDK syntax
+check. Key/header grammar is reused only by complete byte/dependency identity.
+Its [independent source review](tests/node-compat/foundation-crypto/independent-ownership-secret-failure-v2-source-review-v1/README.md)
+passes at `b8ca947b…dc3d`, result `ea2d5d9c…ce72`:39,056 assertions/5,446 files,
+all17 consumer sites,355/3+352 source, ownership/order/derivation/compiler proofs
+and the original HOLD/erratum are checked. M1 is resolved in source. It remains
+UNAPPLIED, with native integration/build/runtime/fault gates open. Existing289
+HMAC/GC passes are not transferred to these corrected, unbuilt bytes.
+
+The [resource normal-OFF freezer source](tests/node-compat/foundation-scheduler/resource-freezer-candidate-v1/README.md)
+seals31 members at `f88db73e…b072`, with25,591 source/pure checks/seven AST files.
+Its [independent source review](tests/node-compat/foundation-scheduler/independent-resource-freezer-source-review-v1/README.md)
+passes at `4724fa4a…348c`, with39,936 checks/7,548 inputs and17 extracted Root
+predicate cases. The623-row base plan copies593,181,282 bytes,342 native/three
+embedding/159 nonnative source rows and29 static archives. The7,500 original
+build references remain explicitly verified references, not all physically copied.
+Twelve genuine copy/command functions have explicit output arguments; no old
+trace selector, classifier identity or global rebinding is used.
+
+New [Root freeze authority](tests/node-compat/foundation-scheduler/resource-normal-off-freeze-v1-root-authority.json)
+`39efd108…be5f` launches Root19779/Python33769. The
+[actual normal freeze](tests/node-compat/foundation-scheduler/resource-normal-off-freeze-v1-root-results.json)
+finishes raw0 in16.892 operational seconds, with clean observed-group cleanup and
+empty stderr. Receipt `b96f801d…8d86` binds666 copies/663 original references/667
+actual files. Root rehashes every copy/original, private modes, distinct inodes
+and exact membership. Enginefec7/meta51fb raw bytes stay unchanged. Fresh
+post-build Ninja command listing finishes0 and equals the separately captured
+embedding command; it executes no compiler or engine. The frozen-only verifier
+passes without original-work reexecution. Independent full frozen-artifact review
+is underway; new pin export/bootstrap and later GC/runtime gates remain closed.
+
+The [independent resource normal frozen-artifact review](tests/node-compat/foundation-scheduler/independent-resource-normal-off-frozen-artifact-review-v1/README.md)
+passes at `80b7174e…1794`, results `285934e5…fe92`, contract `38392252…da71`.
+It checks140,844 data assertions/8,227 files, all666 copies/663 originals/667 files,
+the623-base/dynamic plan union,7,500 verified references,29 archives, raw metadata,
+source/flags/DB/cache/SDK and fresh post-build Ninja evidence. No helper, verifier,
+Ninja, compiler, engine or runtime action is performed by the reviewer. Pins,
+bootstrap, GC reconfiguration and timer execution remain separate later phases.
+
+Root starts the first [codec calibration pilot](tests/node-compat/foundation-zlib/cost-pilot-v3-root-authority.json)
+under session62440/Node35821 using unchanged source `c2ce5f08…64e9`, selected
+calibration decision `3cf4eb74…546e`, actual prepared plan `c914e3a0…383b` and
+source/plan independent reviews. All three agents confirm terminal tools and a
+stable source-work hold before the [quiet window](tests/node-compat/foundation-zlib/cost-pilot-v3-quiet-window.json)
+is issued. The phase has a preselected90-minute global budget, two-hour window
+and7200-second external monitor. It must complete all60 comparison/case pairs,
+using original geometric caps and both arms at50ms, with three warmups/one sample
+per candidate and six separate N1 controls per fresh worker. No skipped case,
+clipping, control subtraction, timing promotion or performance conclusion is
+allowed. Unrelated desktop/system activity is not controlled and remains a
+measurement limitation. The attempt ends raw1 after256.524 operational seconds:
+first native-on case0/N1 worker37184 exits status1 in227ms with empty streams.
+The parent rejects that terminal; no calibration origin or pair completes and
+no matched-N plan is produced. Both observed groups are gone without timeout,
+signals or forced cleanup. The [Root failure checkpoint](tests/node-compat/foundation-zlib/cost-pilot-v3-failure-root-checkpoint-v1/README.md)
+preserves all12 small raw external/partial-output files and closes the coordinated
+window. Worker startup cause and independent failure review remain outstanding;
+no retry or timing follows. Resource pin-tooling is planning-only with no files,
+and secret integration remains unsealed. Agents stay stopped for the Git checkpoint.
+
 ## Current work at a glance
 
 | Work | Status | Next required step |
@@ -376,8 +781,8 @@ phases have substantially different sizes and unresolved design decisions.
 | Corrected classic streams | Full 20-workload/14-boundary gate passes all 105 observations; fresh replay, follow-on and HTTP gates pass. | Accepted in v13; preserve bounded contracts and continue remaining roadmap phases. |
 | Corrected HTTP component | Both hosts, combined audit and independent final review pass; included in bounded v13. | Preserve the one-request-per-instance limitation; test new experimental engines separately. |
 | Performance comparison | All168 timing workers plus18 corrected RSS workers/126 typed returns pass independent review. | Preserve the separate measurement scopes and failed RSS v1. Same-engine peak RSS ratios cross1; no universal or guest-heap benefit. |
-| Codec cost tooling | Fresh source copy and55-call Node oracle pass independent review; Root input capsule is complete. All three source bundles finish raw0 and per-arm source proofs pass. The WIT/glue corrections pass review. All three v3 component builds finish raw0 with imports[]/seven-function ABI; per-arm artifact reviews pass. | V3 retention, full untimed correctness, stock Wasmtime string transport, control-v2 results and the read-only90-row plan pass independent review. Timing v1/v2 holds stay preserved; v3 source review passes. Actual pilots/timing and their explicit phase/window/budget remain pending. No performance conclusion follows. |
-| Crypto key ownership | Owner/prototype source, native355 normal-OFF provenance, read-only bootstrap, actual no-import component, runtime source and first normal-key results pass independent review. | All23 whole strings/20 cases, Node oracle,45 tags/45 verify booleans and three worker lifetimes pass. Three actual stock-Wasmtime validations finish raw0 and match the whole normal wrapper; independent result review passes. Corrected GC guest/native source and the isolated source stage pass review. Actual GC native build and its provenance review pass. The11-match helper-selector failure is preserved; corrected freeze, full frozen-artifact review and unreviewed pin-export data review pass. New reviewed GC pins/bootstrap, component/runtime, lifetimes, secret-temporary/allocation and Node crypto API follow-ons remain. Construction holds stay preserved. |
+| Codec cost tooling | Fresh source copy and55-call Node oracle pass independent review; Root input capsule is complete. All three source bundles finish raw0 and per-arm source proofs pass. The WIT/glue corrections pass review. All three v3 component builds finish raw0 with imports[]/seven-function ABI; per-arm artifact reviews pass. | V3 retention, full untimed correctness, stock Wasmtime string transport, control-v2 results and the read-only90-row plan pass independent review. Timing v1/v2 holds stay preserved; v3 source review passes. The first authorized v3 pilot fails on its first worker status1; failure evidence is retained and its window is closed. Diagnose/review the failure before a fresh authorized retry and timing. No performance conclusion follows. |
+| Crypto key ownership | Normal and GC native/component/Jco/stock-Wasmtime bounded validations pass independent review. GC runtime v1 preflight failure and corrected v2 evidence are preserved. | Corrected three-file secret-failure source passes review but remains unapplied/unbuilt. Complete native integration and algorithm/bounds/secret-copy gates, then Node Hash/Hmac/KeyObject APIs; no erasure, isolated-root, reuse or complete crypto claim. |
 | Native zlib extension | Three native variants and bounded normal/GC/control component results pass independent review;22 Node error-case differences are recorded. | Complete matched cost, Node-deviation contract and new-engine host/release gates; operational admission remains closed. |
 | Stream consumers | Four native355 variants and bounded normal/GC/control components pass review. Context/data-closure failures remain preserved. The corrected v3 family and admission checks pass review; its entire eight-stage release retry now finishes raw0. | The full eight-stage release and all five follow-ons pass independent review, with false getter parity and raw-output limits retained. New both-host HTTP execution and independent actual-result review pass with six accepted responses and77 separate readiness attempts; later cost/adoption/acceptance gates remain. Blob-dependent APIs remain refusals. |
 | Corrected classic checkpoint | Accepted in bounded foundations-v13 after independent preservation and post-promotion verification. | Preserve its limits; continue consumer355 runtime and later phases. |

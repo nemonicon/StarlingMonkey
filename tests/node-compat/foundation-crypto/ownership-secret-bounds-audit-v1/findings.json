@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "state": "CRYPTO_OWNER355_SECRET_BOUNDS_SOURCE_FINDINGS_ONLY_V1",
+  "auditComplete": true,
+  "sourceOnly": true,
+  "securityPassClaim": false,
+  "verifiedRuntimeClaim": false,
+  "engineSha256": "289df4455b56b50a9598c42a7d924aaa2adca7f5461f96782f5758a979e966c8",
+  "metadataSha256": "90c3f45e439c116aaa526167b6fc26122a38c7da702984d53dd3e35fde5304c8",
+  "nativeSourceFiles": 355,
+  "configuredSourceRoot": "/private/tmp/starling-node-compat/crypto-owner355-gc-v2-source",
+  "frozenSourceRoot": "/private/tmp/starling-node-compat/crypto-owner355-gc-v2-freeze/source",
+  "findings": [
+    {
+      "id": "SB1",
+      "priority": "P1",
+      "kind": "conditional-allocation-failure write before check",
+      "locations": [
+        {
+          "file": "crypto-algorithm.cpp",
+          "lines": "30-43"
+        }
+      ],
+      "evidence": "JS_malloc buffer is used by fill_n/BN_bn2bin before any null check; current callers check only after return.",
+      "impact": "A failed nonempty allocation can reach a null-derived write rather than the intended clean failure. No fault was induced.",
+      "nextCut": "Check allocation/empty-size contract before pointer arithmetic, padding or BN export; preserve existing failure result/error ordering."
+    },
+    {
+      "id": "SB2",
+      "priority": "P2",
+      "kind": "partial BIGNUM outputs escape ownership",
+      "locations": [
+        {
+          "file": "crypto-algorithm.cpp",
+          "lines": "1792-1805"
+        },
+        {
+          "file": "crypto-algorithm.cpp",
+          "lines": "1887-1897"
+        },
+        {
+          "file": "crypto-algorithm.cpp",
+          "lines": "2550-2563"
+        },
+        {
+          "file": "crypto-algorithm.cpp",
+          "lines": "2584-2606"
+        },
+        {
+          "file": "crypto-algorithm.cpp",
+          "lines": "2658-2668"
+        }
+      ],
+      "evidence": "Five groups/15 get_bn_param calls write raw outputs before later RAII adoption. Short-circuit failure, especially optional CRT fallback, returns with earlier successful outputs unowned.",
+      "api": "OpenSSL p_lib.c2154-2200 calls OSSL_PARAM_get_BN; params.c921-935 calls BN_native2bn and transfers successful allocation through *val.",
+      "impact": "Source-visible leak on partial extraction. Whether a provider/input/allocation reaches a particular failure was not tested.",
+      "nextCut": "Sequential helper acquires output into BignumPtr immediately after each call, before status branching; preserve original short-circuit/fallback semantics and every acquired owner across fallback."
+    },
+    {
+      "id": "SB3",
+      "priority": "P2",
+      "kind": "successful EC point buffer has no owner",
+      "locations": [
+        {
+          "file": "crypto-key.cpp",
+          "lines": "490-547"
+        }
+      ],
+      "evidence": "pub_key allocated by EC_POINT_point2buf is used by param builder but never freed on success or subsequent failure paths.",
+      "api": "OpenSSL ec_oct.c137-157 OPENSSL_malloc allocates and assigns *pbuf on success; param_build.c274 onward stores the pointer until conversion.",
+      "impact": "Repeated successful EC key reconstruction retains an otherwise lost native public-point allocation; no runtime leak measurement was run.",
+      "nextCut": "Add actual OPENSSL_free functor/unique owner and adopt pub_key immediately; keep it alive through OSSL_PARAM_BLD_to_param and all later failures."
+    },
+    {
+      "id": "SB4",
+      "priority": "P2",
+      "kind": "unchecked arithmetic/narrowing and allocation assumptions",
+      "locations": [
+        {
+          "file": "crypto-algorithm.cpp",
+          "lines": "762;1329-1343;1371;1406;1483-1484;1755;1850;2110;2146;2537;2646"
+        },
+        {
+          "file": "crypto-key.cpp",
+          "lines": "386-393"
+        }
+      ],
+      "evidence": "HMAC bytes*8 uses size_t, optional JS Number is assigned to unsigned long without finite/range conversion, new_mac_key takes int, BN_bin2bn takes int, DER length is long. Bare vector/new allocation is compiled with -fno-exceptions; if(!data) does not establish recoverable vector allocation failure.",
+      "impact": "Bit-length wrap or narrowing can alter native length interpretation beyond bounds; large-input reachability and observable error parity are not established here.",
+      "nextCut": "Separate checked size-to-bit and size-to-int/long helpers before copies/library calls, explicit numeric conversion policy and fallible owner allocation choice. Do not invent broad input caps or change errors without source/API review."
+    },
+    {
+      "id": "SB5",
+      "priority": "P2 hardening",
+      "kind": "secret copies outside current logical-byte wiping",
+      "locations": [
+        {
+          "file": "crypto-algorithm.cpp",
+          "lines": "1398-1406;1825-1838;2571-2633"
+        },
+        {
+          "file": "crypto-raii.h",
+          "lines": "16-30"
+        },
+        {
+          "file": "crypto-key-ec-components.h",
+          "lines": "13-18"
+        },
+        {
+          "file": "crypto-key-rsa-components.h",
+          "lines": "10-39"
+        }
+      ],
+      "evidence": "Decoded HMAC JWK data_string, EC/RSA private component strings, private byte exports and BIGNUM temporaries use ordinary storage/deleters. BN_free does not select BN_clear_free; normal OSSL_PARAM_free calls OPENSSL_free for ordinary param storage.",
+      "impact": "Existing SecretByteVectorDeleter covers logical vector bytes and sensitive CopiedBufferSource covers owned raw copies; no all-copies erasure proof follows.",
+      "nextCut": "Separate audited secret-buffer/string/BN ownership policy with lengths and partial-failure cleanup; verify param-storage ownership and preserve no-all-copies/no-finalizer-wipe claims."
+    }
+  ],
+  "currentFixtureScope": "20-byte RFC4231 HMAC only; does not reach EC/RSA BIGNUM extraction or arithmetic boundaries; no new fault/GC evidence",
+  "selectedIntegrationTestGap": "Configured tests/integration/crypto/crypto.js990-992 labels EC/RSA PKCS8 tests TODO; no claim about every repository test",
+  "ownerActionsInvoked": false,
+  "productionMutation": false,
+  "operationalAdmission": false,
+  "runtimeAcceptanceClaim": false,
+  "nativeAdoption": false,
+  "nextRootAction": null
+}

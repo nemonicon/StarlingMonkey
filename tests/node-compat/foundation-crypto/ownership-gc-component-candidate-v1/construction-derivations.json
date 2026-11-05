@@ -24,6 +24,14 @@
         {
           "before": "ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false,operationalAdmission:false",
           "after": "ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false,gcPressureCallsInvoked:false,operationalAdmission:false"
+        },
+        {
+          "before": "finally{await output.close();}",
+          "after": "finally{try{await frame.recheck();}finally{await output.close();}}"
+        },
+        {
+          "before": "nativeRootReview:frame.nativeRootReview,workerCompletion:",
+          "after": "nativeRootReview:frame.nativeRootReview,bootstrapConfig:frame.bootstrapConfig,actualBootstrapObservation:frame.actualBootstrapObservation,actualBootstrapReview:frame.actualBootstrapReview,workerCompletion:"
         }
       ]
     },
@@ -62,6 +70,10 @@
         {
           "before": "ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false,asyncScalarRuntimeProof:false",
           "after": "ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false,gcPressureCallsInvoked:false,asyncScalarRuntimeProof:false"
+        },
+        {
+          "before": "finally{await output.close();}",
+          "after": "finally{try{await recheck();}finally{await output.close();}}"
         }
       ]
     }
