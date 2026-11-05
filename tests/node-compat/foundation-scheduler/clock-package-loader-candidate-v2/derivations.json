@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "predecessorSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-package-loader-candidate-v1/index.json",
+    "sha256": "21b9f3063de6995b555400b2afd6deb3fdf0a6191fb1a540a6673ddb59dc060c",
+    "bytes": 7179
+  },
+  "predecessorLoader": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-package-loader-candidate-v1/loader.mjs",
+    "sha256": "0562fc5c5a3b5ed08dea42c0febaf35522393b582287b4aa3ddd08cebd06305b",
+    "bytes": 19538
+  },
+  "newLoader": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-package-loader-candidate-v2/loader.mjs",
+    "sha256": "5402fb22627313cd891916201eb1b243b28aaccd82df47baf02440dbb1db8beb",
+    "bytes": 19954
+  },
+  "exactReversibleEdits": [
+    {
+      "label": "Pure one-load gate retains latest actual partial/full recheck",
+      "before": "let handleIssued=false;",
+      "after": "function createLoadGate(){\n  let issued=false,retainedRecheck=null;\n  return Object.freeze({\n    retain(recheck){assert(typeof recheck==='function');retainedRecheck=recheck;},\n    run:async(load)=>{\n      try{\n        assert(!issued,'One helper load per fresh owned process');issued=true;\n        return await load();\n      }finally{if(retainedRecheck)await retainedRecheck();}\n    }\n  });\n}\nconst loadGate=createLoadGate();"
+    },
+    {
+      "label": "Own physical Source context",
+      "before": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-package-loader-candidate-v1",
+      "after": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-package-loader-candidate-v2"
+    },
+    {
+      "label": "New explicit Root phase",
+      "before": "ROOT_REVIEWED_EXPERIMENTAL_CLOCK_PACKAGE_CONSTRUCTION_V1",
+      "after": "ROOT_REVIEWED_EXPERIMENTAL_CLOCK_PACKAGE_CONSTRUCTION_V2"
+    },
+    {
+      "label": "New config kind",
+      "before": "CLOCK_PACKAGE_LOADER_CONFIG_V1",
+      "after": "CLOCK_PACKAGE_LOADER_CONFIG_V2"
+    },
+    {
+      "label": "New independent Source peer",
+      "before": "INDEPENDENT_CLOCK_PACKAGE_LOADER_SOURCE_REVIEW_PASSED_V1",
+      "after": "INDEPENDENT_CLOCK_PACKAGE_LOADER_SOURCE_REVIEW_PASSED_V2"
+    },
+    {
+      "label": "Honest distinct tooling provenance",
+      "before": "kind:'experimental-clock-package-v1'",
+      "after": "kind:'experimental-clock-package-v2'"
+    },
+    {
+      "label": "Gate before input capture; invalid repeated config never inspected",
+      "before": "export async function loadExperimentalClockPackage({configDescriptor}){\n  const configRow=descriptor(configDescriptor);assert(!handleIssued,'One helper load per fresh owned process');handleIssued=true;",
+      "after": "export async function loadExperimentalClockPackage(input={}){\n  return loadGate.run(async()=>{\n  const configRow=descriptor(input?.configDescriptor);"
+    },
+    {
+      "label": "Retain genuine partial capture immediately",
+      "before": "  const c=new Capture();",
+      "after": "  const c=new Capture();loadGate.retain(()=>c.recheck());"
+    },
+    {
+      "label": "Retain genuine complete native/package/TMP/environment check before imports",
+      "before": "  try{\n    await recheck();\n    const capability=",
+      "after": "  loadGate.retain(recheck);\n  try{\n    await recheck();\n    const capability="
+    },
+    {
+      "label": "All load outcomes and forbidden repeats pass gate finally",
+      "before": "  }finally{await c.recheck();}\n}\n\nasync function fingerprint",
+      "after": "  }finally{await c.recheck();}\n  });\n}\n\nasync function fingerprint"
+    }
+  ],
+  "wholeReversePassed": true,
+  "unchangedPackageLinks": true,
+  "allNativePackageArtifactBytesUnchanged": true,
+  "ownerActionsInvoked": false
+}

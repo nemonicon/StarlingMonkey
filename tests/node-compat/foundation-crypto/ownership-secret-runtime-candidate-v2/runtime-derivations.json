@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "output": "checks.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-runtime-candidate-v1/checks.mjs",
+        "sha256": "75b6dc91c28dab385f6091d9f0989d66bfd52a4ef66c992e67bb8be832af4ac2",
+        "bytes": 7115
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-runtime-candidate-v2/checks.mjs",
+        "sha256": "75b6dc91c28dab385f6091d9f0989d66bfd52a4ef66c992e67bb8be832af4ac2",
+        "bytes": 7115
+      },
+      "edits": []
+    },
+    {
+      "output": "oracle.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-runtime-candidate-v1/oracle.mjs",
+        "sha256": "93aeaf87702ba7055c39a80952c87bd5e6ee640560899b769ba81e16b7aa3fa9",
+        "bytes": 1660
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-runtime-candidate-v2/oracle.mjs",
+        "sha256": "93aeaf87702ba7055c39a80952c87bd5e6ee640560899b769ba81e16b7aa3fa9",
+        "bytes": 1660
+      },
+      "edits": []
+    },
+    {
+      "output": "loading.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-runtime-candidate-v1/loading.mjs",
+        "sha256": "603c77882b84da9c05138ccb5ce8e3f55df038f97b2d1af4c00d6aae4edaf123",
+        "bytes": 4993
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-runtime-candidate-v2/loading.mjs",
+        "sha256": "76e86d9d46f54dfc9ed2ac02079eacf3bd5473c2fd689bde8bf45158f6f7c6a2",
+        "bytes": 5003
+      },
+      "edits": [
+        {
+          "beforeOffset": 0,
+          "afterOffset": 0,
+          "before": "// Actual captured crypto_owner ESM/TLA protocol; no generated code at import.\n",
+          "after": "// Actual captured crypto_secret_owner ESM/TLA protocol; no generated code at import.\n"
+        },
+        {
+          "beforeOffset": 386,
+          "afterOffset": 393,
+          "before": "import {PARSER} from '../../foundation-zlib/cost-jco-correctness-candidate-v2/parser-tuple.mjs';\n",
+          "after": "import {PARSER} from './parser-tuple.mjs';\n"
+        },
+        {
+          "beforeOffset": 1422,
+          "afterOffset": 1375,
+          "before": " need(u.arguments.length===2&&u.arguments[0]?.type==='Literal'&&u.arguments[0].value==='./crypto_owner.core.wasm','Exact captured core name');\n",
+          "after": " need(u.arguments.length===2&&u.arguments[0]?.type==='Literal'&&u.arguments[0].value==='./crypto_secret_owner.core.wasm','Exact captured core name');\n"
+        },
+        {
+          "beforeOffset": 3146,
+          "afterOffset": 3106,
+          "before": " need(r.glue.path.endsWith('/worker/transpiled/crypto_owner.js')&&r.core.path===join(dirname(r.glue.path),'crypto_owner.core.wasm')&&r.dts.path===join(dirname(r.glue.path),'crypto_owner.d.ts')&&r.packageJson.path===join(dirname(r.glue.path),'package.json'),'Exact actual relative loading tuple');\n",
+          "after": " need(r.glue.path.endsWith('/crypto-owner355-secret-component-v2/transpiled/crypto_secret_owner.js')&&r.core.path===join(dirname(r.glue.path),'crypto_secret_owner.core.wasm')&&r.dts.path===join(dirname(r.glue.path),'crypto_secret_owner.d.ts')&&r.packageJson.path===join(dirname(r.glue.path),'package.json'),'Exact actual relative loading tuple');\n"
+        }
+      ]
+    },
+    {
+      "output": "parser-tuple.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-jco-correctness-candidate-v2/parser-tuple.mjs",
+        "sha256": "eb8116d5a7372fc5dd03e99cb807d99ee8a44c38caadd0d790c40c31abb1c1e6",
+        "bytes": 296
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-runtime-candidate-v2/parser-tuple.mjs",
+        "sha256": "eb8116d5a7372fc5dd03e99cb807d99ee8a44c38caadd0d790c40c31abb1c1e6",
+        "bytes": 296
+      },
+      "edits": []
+    }
+  ],
+  "semanticsAndOracleByteCopies": [
+    "checks.mjs",
+    "oracle.mjs"
+  ],
+  "guestOrCompiledWasmModified": false
+}

@@ -3,14 +3,14 @@
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
 The [optional package-bundler follow-on](../../tests/node-compat/frameworks/package-bundler-execution-v1/README.md)
-now runs nested native CommonJS interop, supported modules and real React
-creation with complete Node/Jco/Wasmtime agreement. V2 passes bounded Source
-review; ReactDOM edge gets through component construction but fails on the
-zero-capability clock-subscription path. The clock tools have an actual reviewed
-eight-command build, while valid adapter pruning and selected-clock runtime
-remain open. Crypto's new normal-only pins and one-shot read-only bootstrap
-pass actual review; new retained preflight/component/runtime gates remain open.
-These experimental steps do not change accepted foundations-v13.
+runs native CommonJS interop, supported modules and real React creation with
+complete Node/Jco/Wasmtime agreement. Its pure-profile ReactDOM clock trap
+remains the original baseline. A separate selected-clock component passes its
+artifact/type graph review, a first Wasmtime render and a seven-return
+Jco/Wasmtime differential at raw0, with independent actual-result review passed.
+Guarded secret355 component/runtime and three fresh stock-host validations pass
+independent review. These experimental results do not implement Node crypto or
+promote new API statuses; foundations-v13 remains accepted.
 
 The [Next.js application experiment](../../tests/node-compat/frameworks/nextjs/README.md)
 now has two real Node production builds,24 HTTP and two browser checks per run,
@@ -23,7 +23,11 @@ Node-equal values on Jco and fresh Wasmtime. These findings add repeatable
 regression checks and demand priorities, not complete Next.js compatibility or
 new API support.
 
-Latest experimental evidence: [codec timing DATA](../../tests/node-compat/foundation-zlib/independent-cost-timing-v5-results-review-v1/README.md) passes for the exact360-worker workload; the [cost decision](codec-cost-decision.md) continues the bounded native candidate through remaining compatibility/release/adoption gates. It establishes neither universal speedup nor reduced guest memory. Crypto's new frozen-only verifier has an actual exit0 complete-helper observation, with independent result review passing; corrected v3 source, normal-only export DATA, reviewed pins and one-shot read-only bootstrap pass; retained preflight/component/runtime remain open. The [clock-profile proposal](clock-capability-decision.md) now has a reviewed actual Rust/Jco tool build; valid adapter pruning and selected-clock runtime remain open. These results do not promote API support statuses or change foundations-v13.
+Latest experimental evidence and remaining gates are recorded in
+[progress.md](../../progress.md). The reviewed codec cost workload does not
+establish universal speed or lower guest memory. Native combined355 build/freeze
+passes remain separate from admission/runtime/adoption; the experimental clock
+and guarded-key results remain separate from public API compatibility.
 
 The machine-readable [API matrix](api-matrix.csv) is the per-API record: each row has module, API, type, inventory origin, status, implementation strategy, required capability, deviation and validation plan. [Node export inventory](node-v22.14.0-exports.json) contains the exact 72 module namespaces obtained from Node v22.14.0 on macOS arm64. [Policy](policy.json) defines dispositions and overrides; [generator](scripts/inventory.mjs) checks the oracle version and documentation hash. Documented overload/event/property records supplement reflection and can duplicate reflected API records.
 
@@ -387,14 +391,16 @@ The interface package version is **0.2.10** for every production capability sele
 | `tty` | Unavailable full Node fd/termios APIs | Standard CLI terminal handles could permit narrow future detection only | Reject unsupported terminal setters; no host fd assumptions |
 | `os` | Deferred profile constants/pure conversions; host introspection unavailable | No general P2 system CPU/memory/hostname/network interface service | Explicit values/throws, no invented host facts |
 
-The [proposed clock profile](../../tests/node-compat/foundation-scheduler/clock-profile-v1-design.json)
-explicitly selects monotonic-clock, wall-clock and poll at 0.2.10 for the existing
-engine's clock closure. It is unadmitted and has no runtime result. This preserves
-the historical failed two-interface policy and its unmodified resource cases;
-it does not accept their unwanted stream/error/stdio imports. The zero-capability
-ReactDOM trap is an observed limitation, not an identifiable JavaScript refusal
-or proof that a selected-clock component works. Node timer objects, request
-context, host-handle lifetimes and async scheduling still require separate tests.
+The [experimental clock profile](clock-capability-decision.md) explicitly selects
+monotonic-clock, wall-clock and poll at 0.2.10. Its actual component passes a
+callable/resource graph audit, and [one fresh stock-Wasmtime render](../../tests/node-compat/foundation-scheduler/clock-v13-wasmtime-first-render-v1-comparison.json)
+matches the complete retained Node oracle. A subsequent seven-return Jco/
+Wasmtime differential finishes raw0 with all whole strings equal to Node;
+independent result review passes. It remains unadmitted: the seven
+resource cases and broader lifecycle tests are still required. The historical two-interface failure and zero-capability
+ReactDOM trap remain unchanged; neither unwanted IO imports nor an identifiable
+pure-profile JavaScript refusal are claimed fixed. Node timer objects, request
+context, host-handle lifetimes and async scheduling remain separate work.
 
 ## Runtime and engine modules
 

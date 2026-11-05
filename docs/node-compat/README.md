@@ -10,15 +10,22 @@ and traps at clock subscription. Full Next.js HTTP/Wasm execution remains
 unavailable. Both framework runners and regression comparators are documented
 and retained for future checks.
 
-The experimental clock adapter passes core validation and a separate,
-independently reviewed complete WIT decode; the original Jco decoder failure is
-preserved. A new explicit loader remains source-only. Combined355 staging passes
-actual review, but its first native build stops at private Rustup bootstrap.
-A separate six-command bootstrap diagnostic passes. The secret355 read-only
-preflight passes actual review; its component attempt stops at packaging-path
-validation before bundling or engine initialization. These failures and remaining
-gates are recorded in [progress.md](../../progress.md). Accepted production
-remains foundations-v13.
+The experimental clock adapter passes core validation and complete WIT-package
+review. Its corrected loader and real ReactDOM component pass source and
+artifact review with exactly three standard 0.2.10 clock/poll imports. The
+seven-return follow-up finishes raw0: three retained/one fresh Jco and three
+fresh Wasmtime values all match the complete retained Node return. Independent
+actual-result review passes; snapshot and broader clock gates remain open.
+
+The combined355 native retry completes all 108 build steps and passes
+independent BUILD review. Its complete 80-field sidecar and 2,596-copy freeze
+pass independent DATA review; native admission and runtime remain open. The separate secret355
+component and corrected v3 guarded runtime also pass actual review: 23 complete
+returns and 45 Node-oracle signatures. Three fresh stock-Wasmtime validations
+finish raw0 with 27 matching tags and pass independent actual-result review.
+Node crypto exports, native wiping and request reuse are not established.
+[progress.md](../../progress.md) records evidence and remaining work. Accepted
+production remains foundations-v13.
 
 The [Next.js application experiment](../../tests/node-compat/frameworks/nextjs/README.md)
 now has two real Node production builds,24 HTTP and two browser checks per run,
@@ -33,7 +40,12 @@ new API support.
 
 Current results and outstanding work are maintained in [progress.md](../../progress.md). Consumer355 HTTP passes its bounded both-host review. Crypto normal-key/stock-Wasmtime validation and the isolated GC native build, freeze, bootstrap and component artifact reviews pass. The first GC runtime attempt failed before guest execution on17 relative input paths; the corrected v2 source passes independent review and the new runtime finishes raw0, retaining23 complete public strings and45 Node-oracle-matching signatures. Independent actual-result review passes, and three stock-Wasmtime GC calls finish raw0 with entire results equal to Jco; their independent result review passes.
 
-The scheduler resource pure component and retained timer-policy failure pass independent artifact/graph review. The all-invalid selector's native build and freezer source pass their reviews; its actual normal freeze exits0 with762 copies and passes independent artifact review; pins/runtime remain open. Codec timing now passes [independent DATA review](../../tests/node-compat/foundation-zlib/independent-cost-timing-v5-results-review-v1/README.md); the [bounded cost decision](codec-cost-decision.md) continues the native candidate through remaining compatibility/release/adoption gates without claiming universal speed or guest-memory benefit. Crypto's complete frozen verifier passes actual-result review. Corrected v3 source, actual normal-only export DATA review, reviewed pins and the genuine one-shot read-only bootstrap all pass. The new retained preflight passes actual review; component construction stops at packaging-root validation before bundling, with runtime gates still open. The proposed [clock profile](clock-capability-decision.md) has reviewed selective-IO source and a successful, independently reviewed Rust/Jco tool build. The original controller remains held on redirects; corrected v2 passed. Separate actual core pruning/validation and complete package-WIT decoding now pass bounded review; loader admission and clock-application component/runtime gates remain open. [progress.md](../../progress.md) records exact evidence and outstanding work. Accepted production remains bounded foundations-v13.
+The scheduler resource/selector, native codec, guarded-key ownership and clock
+adapter experiments retain separate source, actual-result and cost evidence.
+Their latest bounded results and open adoption gates are maintained in
+[progress.md](../../progress.md). Historical source-only and pending labels in
+sealed packets describe those packets at creation; later evidence does not
+rewrite them. Accepted production remains bounded foundations-v13.
 
 This directory preserves the initial architecture audit and opt-in implementation templates for a bounded `node:buffer` and an importable, explicitly unavailable `node:child_process`. The initial audit did not add runtime built-ins or establish complete Node or Buffer compatibility. The compatibility reference is **Node.js v22.14.0**. Native code below means code compiled into the Wasm guest, with no additional host service.
 

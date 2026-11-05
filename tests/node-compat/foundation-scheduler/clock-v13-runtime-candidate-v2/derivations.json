@@ -1,0 +1,253 @@
+{
+  "schemaVersion": 1,
+  "parentSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-runtime-candidate-v1/index.json",
+    "sha256": "3107eee7440638cef9b54d9add797cc5ffda8c766f8fd060b550be7493d0f939",
+    "bytes": 11676
+  },
+  "heldReview": {
+    "index": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/independent-clock-v13-runtime-source-review-v1/index.json",
+      "sha256": "05ec90ba7cbca8aa6b333b6daf3231f8a674b613529c85c98a64fafd96ccc37c",
+      "bytes": 1710
+    },
+    "result": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/independent-clock-v13-runtime-source-review-v1/results.json",
+      "sha256": "a7466cd9e76b87803b8122ba3b50f23a47c0efaa52128db5f7c434da44ed286a",
+      "bytes": 10929
+    }
+  },
+  "requiredCorrectionContract": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/independent-clock-v13-runtime-source-review-v1/required-correction-contract.json",
+    "sha256": "660b2fa1c41a1eb8e2e14d95343a4c9749cb75dc0eae39f1d906a649a763a7a3",
+    "bytes": 1744
+  },
+  "files": [
+    {
+      "output": "entry.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-runtime-candidate-v1/entry.mjs",
+        "sha256": "982e57bf41568d49229afaf880c3c0e08c526f6948207c1ac3b4d79a60a6476c",
+        "bytes": 16713
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-runtime-candidate-v2/entry.mjs",
+        "sha256": "4f027d77537a62795754f4e192bfe464a209420e22b1ee260fda3beb25548bc0",
+        "bytes": 17201
+      },
+      "edits": [
+        {
+          "before": "clock-v13-runtime-candidate-v1",
+          "after": "clock-v13-runtime-candidate-v2",
+          "occurrences": 1
+        },
+        {
+          "before": "CLOCK_V13_REACTDOM_DIFFERENTIAL_V1",
+          "after": "CLOCK_V13_REACTDOM_DIFFERENTIAL_V2",
+          "occurrences": 1
+        },
+        {
+          "before": "CLOCK_V13_REACTDOM_CONFIG_V1",
+          "after": "CLOCK_V13_REACTDOM_CONFIG_V2",
+          "occurrences": 1
+        },
+        {
+          "before": "INDEPENDENT_CLOCK_V13_REACTDOM_RUNTIME_SOURCE_REVIEW_PASSED_V1",
+          "after": "INDEPENDENT_CLOCK_V13_REACTDOM_RUNTIME_SOURCE_REVIEW_PASSED_V2",
+          "occurrences": 1
+        },
+        {
+          "before": "let primary=null;",
+          "after": "let primary=null,primaryPresent=false;",
+          "occurrences": 1
+        },
+        {
+          "before": "let native=null,primary=null;",
+          "after": "let native=null,primary=null,primaryPresent=false;",
+          "occurrences": 1
+        },
+        {
+          "before": "catch(error){primary=error;throw error;}",
+          "after": "catch(error){primaryPresent=true;primary=error;throw error;}",
+          "occurrences": 2
+        },
+        {
+          "before": "if(primary!==null)",
+          "after": "if(primaryPresent)",
+          "occurrences": 2
+        },
+        {
+          "before": "  need(refs.actualArtifactReview&&refs.actualArtifactContract,'Real completed artifact proof, never NULL readiness');",
+          "after": "  const held=await c.proof(refs.previousSourceHold),correction=await c.read(refs.requiredCorrectionContract);need(held.state==='INDEPENDENT_CLOCK_V13_REACTDOM_RUNTIME_SOURCE_REVIEW_HELD_V1'&&held.sourceReviewPassed===false&&held.sourceIndexSha256===refs.previousSourceIndex.sha256&&same(correction.heldSourceIndex,refs.previousSourceIndex),'Exact prior null-presence Source HOLD, never action authority');\n  need(refs.actualArtifactReview&&refs.actualArtifactContract,'Real completed artifact proof, never NULL readiness');",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "output": "body.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-runtime-candidate-v1/body.mjs",
+        "sha256": "f4a36201ae7a0caa4b5cd668d07e3424a6e5edfb1f7b7f0b24faa7a05911a759",
+        "bytes": 20337
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-runtime-candidate-v2/body.mjs",
+        "sha256": "1fe03694205b435690655b7162fc021ea7bbaf7a57e1ffcd8b2ef3335469b65d",
+        "bytes": 20511
+      },
+      "edits": [
+        {
+          "before": "CLOCK_V13_MAPPED_OUTPUT_COMPLETE_UNREVIEWED_V1",
+          "after": "CLOCK_V13_MAPPED_OUTPUT_COMPLETE_UNREVIEWED_V2",
+          "occurrences": 2
+        },
+        {
+          "before": "CLOCK_V13_MAPPED_OUTPUT_COMPLETE_EXTERNAL_RAW_ZERO_AND_SEPARATE_REVIEW_REQUIRED",
+          "after": "CLOCK_V13_MAPPED_OUTPUT_COMPLETE_EXTERNAL_RAW_ZERO_AND_SEPARATE_REVIEW_REQUIRED_V2",
+          "occurrences": 2
+        },
+        {
+          "before": "ROOT_REVIEWED_CLOCK_V13_MAPPED_OUTPUT_V1",
+          "after": "ROOT_REVIEWED_CLOCK_V13_MAPPED_OUTPUT_V2",
+          "occurrences": 1
+        },
+        {
+          "before": "CLOCK_V13_REACTDOM_CONFIG_V1",
+          "after": "CLOCK_V13_REACTDOM_CONFIG_V2",
+          "occurrences": 1
+        },
+        {
+          "before": "CLOCK_V13_JCO_SESSION_COMPLETE_UNREVIEWED_V1",
+          "after": "CLOCK_V13_JCO_SESSION_COMPLETE_UNREVIEWED_V2",
+          "occurrences": 2
+        },
+        {
+          "before": "CLOCK_V13_REACTDOM_DIFFERENTIAL_COMPLETE_UNREVIEWED_V1",
+          "after": "CLOCK_V13_REACTDOM_DIFFERENTIAL_COMPLETE_UNREVIEWED_V2",
+          "occurrences": 1
+        },
+        {
+          "before": "let primary=null,finalErrors=[]",
+          "after": "let primary=null,primaryPresent=false,finalErrors=[]",
+          "occurrences": 3
+        },
+        {
+          "before": "catch(error){primary=error;}",
+          "after": "catch(error){primaryPresent=true;primary=error;}",
+          "occurrences": 3
+        },
+        {
+          "before": "if(primary!==null||finalErrors.length)",
+          "after": "if(primaryPresent||finalErrors.length)",
+          "occurrences": 3
+        },
+        {
+          "before": "if(primary!==null)throw primary",
+          "after": "if(primaryPresent)throw primary",
+          "occurrences": 3
+        },
+        {
+          "before": "primary:observed(primary)",
+          "after": "primaryPresent,primary:observed(primary)",
+          "occurrences": 3
+        }
+      ]
+    },
+    {
+      "output": "models.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-runtime-candidate-v1/models.mjs",
+        "sha256": "19594d1e7ba56d77444cf7763e404374e673be482c80fbe757e673162c4e9875",
+        "bytes": 9193
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-runtime-candidate-v2/models.mjs",
+        "sha256": "880aafa0df4f3e8ae729a84fe0f2725fea307b51267755efd9718e949e745867",
+        "bytes": 9193
+      },
+      "edits": [
+        {
+          "before": "CLOCK_V13_REACTDOM_DIFFERENTIAL_V1",
+          "after": "CLOCK_V13_REACTDOM_DIFFERENTIAL_V2",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "output": "wave.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-runtime-candidate-v1/wave.mjs",
+        "sha256": "155c434506c73bd86170a4146607634f32fd48c9aff0d4114303db72586e7afa",
+        "bytes": 1840
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-runtime-candidate-v2/wave.mjs",
+        "sha256": "155c434506c73bd86170a4146607634f32fd48c9aff0d4114303db72586e7afa",
+        "bytes": 1840
+      },
+      "edits": []
+    },
+    {
+      "output": "external.py",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-runtime-candidate-v1/external.py",
+        "sha256": "1bf1d61c186847a9ad05af8d182c1f5de651143938864332e7f5b85df1457e6a",
+        "bytes": 9973
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-runtime-candidate-v2/external.py",
+        "sha256": "cf5153931ff4dd380b93102fc67c60eff665299cde9bd65980ba792283ba01ea",
+        "bytes": 9973
+      },
+      "edits": [
+        {
+          "before": "clock-v13-runtime-candidate-v1",
+          "after": "clock-v13-runtime-candidate-v2",
+          "occurrences": 1
+        },
+        {
+          "before": "CLOCK_V13_REACTDOM_DIFFERENTIAL_V1",
+          "after": "CLOCK_V13_REACTDOM_DIFFERENTIAL_V2",
+          "occurrences": 1
+        },
+        {
+          "before": "CLOCK_V13_REACTDOM_CONFIG_V1",
+          "after": "CLOCK_V13_REACTDOM_CONFIG_V2",
+          "occurrences": 1
+        },
+        {
+          "before": "INDEPENDENT_CLOCK_V13_REACTDOM_RUNTIME_SOURCE_REVIEW_PASSED_V1",
+          "after": "INDEPENDENT_CLOCK_V13_REACTDOM_RUNTIME_SOURCE_REVIEW_PASSED_V2",
+          "occurrences": 1
+        },
+        {
+          "before": "CLOCK_V13_SLICE_EXTERNAL_RAW_ZERO_UNREVIEWED_V1",
+          "after": "CLOCK_V13_SLICE_EXTERNAL_RAW_ZERO_UNREVIEWED_V2",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "output": "test-pure.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-runtime-candidate-v1/test-pure.mjs",
+        "sha256": "bba1b476bfed8e2a923ca6a8db19af8aef87b69c7cb00f915681e4e1e3364934",
+        "bytes": 7508
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-runtime-candidate-v2/test-pure.mjs",
+        "sha256": "76f7ec02679c5dd6847060e35a7ae4bb4d4e77a70eb4bb596d8f914fef3d5a0a",
+        "bytes": 7508
+      },
+      "edits": [
+        {
+          "before": "CLOCK_V13_REACTDOM_DIFFERENTIAL_V1",
+          "after": "CLOCK_V13_REACTDOM_DIFFERENTIAL_V2",
+          "occurrences": 1
+        }
+      ]
+    }
+  ],
+  "componentNativeGuestOracleScheduleOrFourCoresChanged": false,
+  "noModuleGlobalsRebound": true
+}

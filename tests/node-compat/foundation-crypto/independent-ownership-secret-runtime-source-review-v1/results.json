@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "state": "INDEPENDENT_CRYPTO_OWNER355_SECRET_RUNTIME_SOURCE_REVIEW_HELD_V1",
+  "sourceIndexSha256": "6afdb00ac990ff88592c75e6069994840b1c236ce88bdce376a2773a32e7cab9",
+  "sourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-runtime-candidate-v1/index.json",
+    "sha256": "6afdb00ac990ff88592c75e6069994840b1c236ce88bdce376a2773a32e7cab9",
+    "bytes": 11710
+  },
+  "sourceOnly": true,
+  "sourceReviewPassed": false,
+  "ownerActionsInvoked": false,
+  "hostActionsInvoked": false,
+  "runtimeActionsInvoked": false,
+  "pureHostNodeUsed": true,
+  "sourceModuleImported": false,
+  "generatedModuleImported": false,
+  "engineOrGuestOrCryptoInvoked": false,
+  "findings": [
+    {
+      "id": "M1",
+      "title": "Combined guest throw and raw-writer failure loses original thrown value",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-runtime-candidate-v1/runtime-body.mjs",
+        "sha256": "b2dcdd2c5e677436b69a0a984f6eeb610555e7f7defb0304a60fe50510c07825",
+        "bytes": 10799
+      },
+      "function": "capturedCall",
+      "mechanism": "invoke throws X; await write rejects Y; execution exits before if(thrown)throw value. Worker then records/rethrows only Y.",
+      "observedBy": "Seven synthetic actual-function extraction cases; no guest/module/engine/crypto action.",
+      "impact": "Diagnostic/exception fidelity defect; failed raw capture remains failed and counters attempted1/written0 remain honest. No claim of an actual runtime failure or accepted bad result.",
+      "originalThrowOnlyPathPreserved": true,
+      "combinedFailureOriginalLost": true
+    }
+  ],
+  "coverage": {
+    "sourceMembers": 70,
+    "sourceInputFiles": 34008,
+    "modeRows": 34008,
+    "completeFamilies": 30,
+    "historicalDonorTrees": 1,
+    "packagingFiles": 4934,
+    "packagingAliases": 22,
+    "nativeSourceFiles": 355,
+    "externalEmbeddingSources": 3,
+    "rawMetadataFields": 75,
+    "wholeManifests": 11,
+    "sessions": 3,
+    "rawPublicStrings": 23,
+    "runRecords": 20,
+    "keyImports": 10,
+    "signAttempts": 55,
+    "verifyAttempts": 50,
+    "fullGuestTags": 45,
+    "exactLoaderEdits": 4,
+    "pureCounterexamples": 7
+  },
+  "audit": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-secret-runtime-source-review-v1/audit-results.json",
+    "sha256": "dfb72a2b4e36ee7ddcc0de3de2307ba269a487aa85a1a7bf56971e68b93b47d5",
+    "bytes": 7397
+  },
+  "pureEvidence": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-secret-runtime-source-review-v1/pure.terminal.json",
+    "sha256": "2dcb2dec33d1f993a4f95043d872cd7cb53c7b4b1b6dc90ac1af5f302a7f709d",
+    "bytes": 1259
+  },
+  "actualRuntimeProof": null,
+  "grantsRuntimeAuthority": false,
+  "operationalAdmission": false,
+  "runtimeAcceptanceClaim": false,
+  "limits": [
+    "Finite Source/read-hash/AST/pure audit only. Normal paths/raw counts/schedule/current native/artifact/API/closures source-consistent; no second concrete blocker found.",
+    "Original exception preservation was tested only as a host synthetic function seam. No original API,module/worker/monitor/oracle/generated code/key/engine ran.",
+    "All historical355 native/artifact/source/runtime packets remain unchanged. Full34008 protection and30families plus donor extra receipt were rehashed; this HOLD does not grant a new phase."
+  ]
+}

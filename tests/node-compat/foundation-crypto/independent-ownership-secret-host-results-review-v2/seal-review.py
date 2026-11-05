@@ -1,0 +1,54 @@
+"""Seal independent actual DATA evidence; never invoke the producer."""
+from pathlib import Path
+import hashlib,json,stat
+OWN=Path(__file__).resolve().parent
+def desc(p):
+ b=p.read_bytes();return dict(path=str(p),sha256=hashlib.sha256(b).hexdigest(),bytes=len(b))
+def read(p):return json.loads(p.read_bytes())
+def save(n,v):(OWN/n).write_text(json.dumps(v,indent=2)+'\n')
+checks=read(OWN/'checks.json');refs=read(OWN/'references.json');assert checks['passed']is True and not(OWN/'reader.stderr.log').read_bytes()
+root=read(Path(refs['rootResult']['path']));assert desc(Path(refs['rootResult']['path']))==refs['rootResult']
+output=Path(refs['actualIndex']['path']).parent;external=Path(refs['outerTerminal']['path']).parent
+for p in(output,external):assert p.is_dir()and not p.is_symlink()and stat.S_IMODE(p.stat().st_mode)==0o700
+assert {p.name for p in external.iterdir()}=={'owned-0000.json','owned-0001.json','owned-0002.json','owned-0003.json','started.json','stdout.log','stderr.log','terminal.json'}
+for row in refs['rawReturns']:
+ assert read(Path(row['decodedString']['path']))['ordinal']==row['ordinal']
+ for key in('rawStdout','rawStderr','terminal','decodedString','record'):assert desc(Path(row[key]['path']))==row[key]
+for row in read(OWN/'raw-evidence.json')['copies']:
+ assert desc(Path(row['original']['path']))==row['original']and desc(Path(row['copy']['path']))==row['copy']and row['original']['sha256']==row['copy']['sha256']
+ a,b=Path(row['original']['path']).stat(),Path(row['copy']['path']).stat();assert(a.st_dev,a.st_ino)!=(b.st_dev,b.st_ino)and b.st_nlink==1
+future=read(Path(refs['futureResultsContract']['path']));coverage=future['requiredCoverage'];assert coverage==dict(freshWasmtimeProcesses=3,outerPublicStrings=3,withinExportRunRecords=12,guestKeyImports=6,guestSignAttempts=33,guestVerifyAttempts=30,full32ByteTags=27,verificationBooleans=27,verifyTrue=15,verifyFalse=12,guardedCase3Records=3)
+save('reader-terminal.json',dict(schemaVersion=1,kind='tool-observed-independent-actual-data-reader',toolSession=42784,rawExitCode=0,stdout=desc(OWN/'reader.stdout.log'),stderr=desc(OWN/'reader.stderr.log'),ownerActionsInvoked=False,hostActionsInvoked=False,processIdNotIndependentlyRecorded=True))
+result=dict(schemaVersion=1,state='INDEPENDENT_CRYPTO_OWNER355_SECRET_HOST_RESULTS_REVIEW_PASSED_V1',verifiedPassed=True,readOnlyDataReview=True,sourceIndexSha256=refs['sourceIndex']['sha256'],sourceIndex=refs['sourceIndex'],sourcePeer=refs['sourcePeer'],rootAuthority=refs['rootAuthority'],rootConfig=refs['rootConfig'],rootResult=refs['rootResult'],invocation=refs['invocation'],actualIndex=refs['actualIndex'],actualResults=refs['actualResults'],actualCompletion=refs['actualCompletion'],externalParentTerminal=refs['outerTerminal'],parentStdout=refs['parentStdout'],parentStderr=refs['parentStderr'],actualJcoReview=refs['actualJcoReview'],actualJcoContract=refs['actualJcoContract'],actualArtifactReview=refs['actualArtifactReview'],actualArtifactContract=refs['actualArtifactContract'],component=refs['component'],componentSha256=refs['component']['sha256'],engine=refs['engine'],engineSha256=refs['engine']['sha256'],metadata=refs['metadata'],wasmtime=refs['wasmtime'],nativeSourceFiles=355,externalEmbeddingSources=3,fullMetadataFields=75,selectedManifestCount=11,emittedImports=[],coverage=coverage,
+ freshWasmtimeProcesses=3,outerPublicStrings=3,withinExportRunRecords=12,guestKeyImports=6,guestSignAttempts=33,guestVerifyAttempts=30,full32ByteTags=27,verificationBooleans=27,verifyTrue=15,verifyFalse=12,guardedCase3Records=3,allFourGuardedCasesReviewed=True,allWholeWaveStringsExactlyEqualActualJco=True,allTagsMatchRetainedNodeOracle=True,wholeRawReturnsAndTerminals=refs['rawReturns'],freshWasmtimePids=checks['freshStockWasmtimePids'],ownedNodePid=checks['outerNodePid'],allInnerExitCodesZero=True,outerNodeExitCode=0,rootToolObservedExitCode=0,rootToolObservationIsNotSeparateProcessLog=True,allObservedOwnedGroupsGone=True,noForcedCleanup=True,noTimeoutSignalsErrorsOrOverflow=True,allInnerStderrEmpty=True,
+ actualIndexedFiles=23,actualFiles=25,actualExternalFiles=8,actualRawTextCopies=40,currentDeclaredProtectionInputs=34403,currentInheritedFamilies=38,currentUniqueReadHashInputs=checks['currentUniqueReadHashInputs'],currentReadHashLogicalBytes=checks['currentLogicalBytes'],currentOriginalModesAndSourceBytesVerified=True,currentOriginalJcoWasmtimeAllowedRemainsFalse=True,actualTimeProtectionEvidence=checks['actualTimeProtectionEvidence'],completeActualMembershipVerified=True,relativePublicationPreservedWithConfinedAbsoluteDescriptors=True,inheritedTreesRecopied=False,rawEvidence=desc(OWN/'raw-evidence.json'),independentChecks=desc(OWN/'checks.json'),sourceDataChecks=checks['checks'],
+ ownerActionsInvoked=False,hostActionsInvoked=False,reviewerHelperApiNodeMonitorOrEngineInvoked=False,observedOrdinaryGuestExportByOwner=True,observedBoundedKeyOperationsByOwner=True,observedGeneratedJsApplicationImport=False,observedFreshNodeOracle=False,observedGcOomFaultPressureReset=False,oldUnsafePrototypeArtifactExecuted=False,oneOuterExportPerFreshProcess=True,separateHostCallInterleavingProved=False,processOrRequestReuseProved=False,nativeFreeWipeOrIsolatedRootObserved=False,uniqueNativeRefusalCauseInferred=False,operationalAdmission=False,runtimeAcceptanceClaim=False,newActionAuthorityIssuedByReview=False,materialFindings=[],reviewerFailures=[],
+ limits=['Actual-time protection is Source-coupled raw0/control-flow evidence, independently current-hashed, not separately retained per-recheck historical digests.','Root49701 raw0 is explicitly tool-observed; persisted monitor and inner terminals are separately retained.','Counters record attempted public fixture calls; successful returns are27 tags and27 booleans.','Node oracle is retained prior DATA, not a new Node oracle run.','Only three fresh within-export guarded fixtures are proved; no separate host-call interleaving, reuse, GC/erasure/sole-root or all-algorithm proof.','No unsafe prior artifact, 75-to80 metadata projection, performance/security completeness, production adoption or further action authority.'])
+repair=read(OWN/'publication-repair.json');assert repair['newReviewContext']==str(OWN)
+result.update(reviewContext=str(OWN),publicationRepair=desc(OWN/'publication-repair.json'),previousPublicationIndex=repair['previousIndex'],previousPublicationWholeFamilyUseHeld=True,actualSourceDataAndMetricsUnchanged=True,publicationMembershipCorrected=True)
+save('results.json',result)
+save('result-contract.json',dict(schemaVersion=1,requiredReviewState=result['state'],requiredFixedValues={k:result[k]for k in('schemaVersion','verifiedPassed','sourceIndexSha256','componentSha256','engineSha256','nativeSourceFiles','externalEmbeddingSources','fullMetadataFields','selectedManifestCount','allFourGuardedCasesReviewed','allWholeWaveStringsExactlyEqualActualJco','allObservedOwnedGroupsGone','operationalAdmission','runtimeAcceptanceClaim')},requiredCoverage=coverage,requiredExactDescriptors={k:result[k]for k in('sourceIndex','rootAuthority','rootConfig','rootResult','invocation','actualIndex','actualResults','actualCompletion','externalParentTerminal','component','engine','metadata','actualJcoContract','actualArtifactContract')},grantsFurtherActionAuthority=False))
+save('review-receipt.json',dict(schemaVersion=1,readOnlyDataReview=True,result=desc(OWN/'results.json'),contract=desc(OWN/'result-contract.json'),checks=desc(OWN/'checks.json'),reader=desc(OWN/'review.py'),readerTerminal=desc(OWN/'reader-terminal.json'),actualRawCopies=desc(OWN/'raw-evidence.json'),rootResult=refs['rootResult'],grantsFurtherActions=False))
+payload=[]
+for p in sorted(OWN.rglob('*')):
+ assert not p.is_symlink()
+ if p.is_file()and p not in (OWN/'index.json',OWN/'member-ledger.json'):payload.append(dict(desc(p),path=p.relative_to(OWN).as_posix()))
+save('member-ledger.json',dict(schemaVersion=1,scope='All files except own root index and this ledger; own index binds this ledger',files=payload))
+files=[]
+for p in sorted(OWN.rglob('*')):
+ assert not p.is_symlink()
+ if p.is_file()and p != OWN/'index.json':files.append(dict(desc(p),path=p.relative_to(OWN).as_posix()))
+save('index.json',dict(schemaVersion=1,files=files))
+for r in files:assert desc(OWN/r['path'])==dict(r,path=str(OWN/r['path']))
+actual={p.relative_to(OWN).as_posix()for p in OWN.rglob('*')if p.is_file()}
+indexed={r['path']for r in files}
+assert actual==indexed|{'index.json'}
+ledger=read(OWN/'member-ledger.json')
+assert {r['path']for r in ledger['files']}==indexed-{'member-ledger.json'}
+for r in ledger['files']:assert desc(OWN/r['path'])==dict(r,path=str(OWN/r['path']))
+for row in repair['missingPreviouslyUnindexedFiles']:
+ assert row['relativePath']in indexed
+ newrow=next(r for r in files if r['path']==row['relativePath'])
+ assert newrow['sha256']==row['descriptor']['sha256']and newrow['bytes']==row['descriptor']['bytes']
+assert any(r['path']=='evidence/actual/index.json'for r in files)
+for n in('index.json','results.json','result-contract.json','review-receipt.json'):print(n,json.dumps(desc(OWN/n)),flush=True)

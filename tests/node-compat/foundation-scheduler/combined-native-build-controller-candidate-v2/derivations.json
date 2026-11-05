@@ -1,0 +1,345 @@
+{
+  "schemaVersion": 1,
+  "state": "EXACT_UNAPPLIED_COMBINED355_RETRY_SOURCE_DERIVATIONS_V2",
+  "files": [
+    {
+      "output": "controller.py",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v1/controller.py",
+        "sha256": "db716c69879e5888bcb3bd9a22ed6c80a0f4a914e58b7ba0b9beabdae3c40bc3",
+        "bytes": 24427
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/controller.py",
+        "sha256": "37122b407c3d599b6a410580cb8169cc197600562bc63a719a0278b7b1705faf",
+        "bytes": 30497
+      },
+      "byteIdentical": false,
+      "edits": [
+        {
+          "beforeOffset": 0,
+          "afterOffset": 0,
+          "before": "\"\"\"Dormant combined355 normal-OFF build controller. Standard-library bootstrap only.\"\"\"\n",
+          "after": "\"\"\"Dormant combined355 retry. Own recipe/context, unchanged staged355; standard-library bootstrap.\"\"\"\n"
+        },
+        {
+          "beforeOffset": 215,
+          "afterOffset": 229,
+          "before": "OWN=REPO/'tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v1'\n",
+          "after": "OWN=REPO/'tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2'\n"
+        },
+        {
+          "beforeOffset": 566,
+          "afterOffset": 580,
+          "before": "WORK=Path('/private/tmp/starling-node-compat/combined-native355-v1-build')\nFREEZE=Path('/private/tmp/starling-node-compat/combined-native355-v1-freeze')\nBUILD_OUTPUT=Path('/private/tmp/starling-node-compat/combined-native355-v1-normal-off-build-root')\nOUT=Path('/private/tmp/starling-node-compat/combined-native355-v1-normal-off-build-external-root')\n",
+          "after": "WORK=Path('/private/tmp/starling-node-compat/combined-native355-v2-build')\nFREEZE=Path('/private/tmp/starling-node-compat/combined-native355-v2-freeze')\nBUILD_OUTPUT=Path('/private/tmp/starling-node-compat/combined-native355-v2-normal-off-build-root')\nOUT=Path('/private/tmp/starling-node-compat/combined-native355-v2-normal-off-build-external-root')\n"
+        },
+        {
+          "beforeOffset": 972,
+          "afterOffset": 986,
+          "before": "",
+          "after": "OBSERVER=Path('/private/tmp/starling-node-compat/combined-native355-v2-build-root-observer')\nENV_POLICY=dict(schemaVersion=1,mandatoryBeforeControllerSpawn=True,removePrefixes=['BASH_FUNC_'],removeExactNames=['BASH_ENV','ENV','SHELLOPTS','BASHOPTS','CDPATH','GLOBIGNORE'],preserveExactNames=['HOME','home','CODEX_HOME'],rootAuthorityMustBindPolicy=True,rootLauncherMustEnforcePolicy=True,actualChildMustContainNoRemovedEntries=True,recordRemovedVariableNamesOnly=True,recordEnvironmentValues=False,scope='Known inherited Bash function and startup controls; not an OS or universal environment sandbox')\n\n\ndef clean_environment(parent):\n    removed=sorted(k for k in parent if k.startswith(tuple(ENV_POLICY['removePrefixes']))or k in ENV_POLICY['removeExactNames'])\n    child={k:v for k,v in parent.items()if k not in removed}\n    for k in ENV_POLICY['preserveExactNames']:assert(k in child)==(k in parent)and child.get(k)==parent.get(k)\n    assert not any(k.startswith(tuple(ENV_POLICY['removePrefixes']))or k in ENV_POLICY['removeExactNames']for k in child)\n    return child,removed\n\n\ndef require_clean_environment(parent):\n    child,removed=clean_environment(parent);assert removed==[] and child==parent,'Clean launcher entry required before controller/recipe'\n\n"
+        },
+        {
+          "beforeOffset": 4104,
+          "afterOffset": 5381,
+          "before": "    assert root['schemaVersion']==1 and root['state']=='ROOT_REVIEWED_COMBINED355_NORMAL_OFF_BUILD_V1'\n",
+          "after": "    assert root['schemaVersion']==1 and root['state']=='ROOT_REVIEWED_COMBINED355_NORMAL_OFF_BUILD_RETRY_V2'\n"
+        },
+        {
+          "beforeOffset": 5651,
+          "afterOffset": 6934,
+          "before": "",
+          "after": "    assert root['rootEnvironmentPolicy']==ENV_POLICY and root['rootLauncherRequired']is True\n    assert root['rootObserverOutputRoot']==str(OBSERVER)\n    assert root['retryRecipe']==refs['recipe']and root['retryPolicy']==refs['policy']and root['retryHelper']==refs['helper']\n    assert root['failedBuildReview']==refs['failedBuildReview']and root['privateRustupProbeReview']==refs['privateRustupProbeReview']\n    assert root['persistentPrivateRustupAutoSelfUpdateDisableRequired']is True and root['oldWorkResumeAllowed']is False\n"
+        },
+        {
+          "beforeOffset": 8040,
+          "afterOffset": 9852,
+          "before": "    assert value['schemaVersion']==1 and value['state']=='INDEPENDENT_COMBINED355_BUILD_CONTROLLER_SOURCE_REVIEW_PASSED_V1'\n",
+          "after": "    assert value['schemaVersion']==1 and value['state']=='INDEPENDENT_COMBINED355_BUILD_CONTROLLER_SOURCE_REVIEW_PASSED_V2'\n"
+        },
+        {
+          "beforeOffset": 8459,
+          "afterOffset": 10271,
+          "before": "",
+          "after": "    assert value['requiredRootEnvironmentPolicy']==ENV_POLICY\n    assert value['retryRecipeSha256']==refs['recipe']['sha256']\n    assert value['failedBuildReviewIndexSha256']==refs['failedBuildReview']['index']['sha256']\n    assert value['privateRustupProbeReviewIndexSha256']==refs['privateRustupProbeReview']['index']['sha256']\n"
+        },
+        {
+          "beforeOffset": 8667,
+          "afterOffset": 10809,
+          "before": "    assert plan['schemaVersion']==1 and plan['state']=='FINITE_COMBINED355_PRIVATE_IMMUTABLE_CACHE_PLAN_V1'\n",
+          "after": "    assert plan['schemaVersion']==1 and plan['state']=='FINITE_COMBINED355_PRIVATE_IMMUTABLE_CACHE_PLAN_V2'\n"
+        },
+        {
+          "beforeOffset": 11686,
+          "afterOffset": 13828,
+          "before": "",
+          "after": "    for row in frame['protectedTreeInventories']:protected_tree_model(row)\n\n\ndef protected_tree_model(row):\n    inventory=read(row);root=Path(inventory['root']);names=set()\n    for r in inventory['files']:\n        name=r['path'];assert name not in names and not name.startswith('/')and all(p not in('','.','..')for p in name.split('/'));names.add(name)\n        p=checked(dict(path=str(root/name),sha256=r['sha256'],bytes=r['bytes']));assert stat.S_IMODE(p.stat().st_mode)==r['mode']\n    actual={p.relative_to(root).as_posix()for p in root.rglob('*')if p.is_file()}\n    assert actual==names\n    assert all(not p.is_symlink()for p in root.rglob('*'))\n\n\ndef failure_model(value,refs):\n    assert value['schemaVersion']==1 and value['state']=='INDEPENDENT_COMBINED355_NATIVE_BUILD_BOOTSTRAP_FAILURE_REVIEW_PASSED_V1'and value['verifiedPassed']is True\n    assert value['integrationSourceIndexSha256']==SOURCE_SHA and value['controllerSourceIndexSha256']==refs['parentControllerIndex']['sha256']\n    assert value['rawRecipeExitCode']==value['rawOwnedWorkerExitCode']==value['rootReportedExitCode']==1\n    assert value['nativeBuildSucceeded']is value['cmakeGuestCompilationReached']is value['engineArtifactProduced']is value['metadataSidecarProduced']is False\n    assert value['sourceAndStageInputsPreserved']is True and value['allObservedOwnedGroupsGone']is True\n    assert value['actualBuildResult']==refs['failedBuildResult']and value['rootObservation']==refs['failedBuildObservation']\n    assert value['repeatOrResumeGranted']is value['newBuildAuthorityGranted']is False\n\n\ndef probe_model(value,refs):\n    assert value['schemaVersion']==1 and value['state']=='INDEPENDENT_RUSTUP_PRIVATE_BOOTSTRAP_PROBE_REVIEW_PASSED_V1'and value['verifiedPassed']is True\n    assert value['rawCommandCount']==6 and value['allRawExitCodesZero']is True\n    for k in ['privateAutoSelfUpdateDisabled','wasm32Wasip1Installed','repeatedInstallPassed','cargoProxyPassed']:assert value[k]is True\n    assert value['nativeBuildAuthorityGranted']is False\n"
+        },
+        {
+          "beforeOffset": 11831,
+          "afterOffset": 15997,
+          "before": "    config=read(config_row);assert config['schemaVersion']==1 and config['state']=='COMBINED355_NORMAL_OFF_BUILD_CONFIG_V1'\n",
+          "after": "    config=read(config_row);assert config['schemaVersion']==1 and config['state']=='COMBINED355_NORMAL_OFF_BUILD_CONFIG_V2'\n"
+        },
+        {
+          "beforeOffset": 12875,
+          "afterOffset": 17041,
+          "before": "",
+          "after": "    for key,validator in [('failedBuildReview',lambda v:failure_model(v,refs)),('privateRustupProbeReview',lambda v:probe_model(v,refs))]:\n        value,rows=indexed_result(refs[key]);validator(value);captured+=rows;indices.append(refs[key]['index'])\n"
+        },
+        {
+          "beforeOffset": 13644,
+          "afterOffset": 18061,
+          "before": "    frame=dict(config=config,configDescriptor=config_row,root=root,ownIndex=own,refs=refs,captured=captured,familyIndices=indices,stageJournal=stage,copyPlan=copies,cachePlan=plan,inputModes=manifest['modeRows'])\n",
+          "after": "    frame=dict(config=config,configDescriptor=config_row,root=root,ownIndex=own,refs=refs,captured=captured,familyIndices=indices,stageJournal=stage,copyPlan=copies,cachePlan=plan,inputModes=manifest['modeRows'],protectedTreeInventories=refs['protectedTreeInventories'])\n"
+        },
+        {
+          "beforeOffset": 14056,
+          "afterOffset": 18531,
+          "before": "    names={'NODE_OPTIONS','NODE_PATH','PYTHONPATH','PYTHONHOME','PYTHONOPTIMIZE','BASH_ENV','ENV','LD_PRELOAD','LD_LIBRARY_PATH','CC','CXX','CPP','CFLAGS','CXXFLAGS','CPPFLAGS','LDFLAGS','AR','LD','RANLIB','CPATH','C_INCLUDE_PATH','CPLUS_INCLUDE_PATH','LIBRARY_PATH','COMPILER_PATH','GCC_EXEC_PREFIX','CONFIG_SITE'}\n    env={k:v for k,v in parent.items()if not k.startswith(blocked)and k not in names}\n",
+          "after": "    names=set(ENV_POLICY['removeExactNames'])|{'NODE_OPTIONS','NODE_PATH','PYTHONPATH','PYTHONHOME','PYTHONOPTIMIZE','BASH_ENV','ENV','LD_PRELOAD','LD_LIBRARY_PATH','CC','CXX','CPP','CFLAGS','CXXFLAGS','CPPFLAGS','LDFLAGS','AR','LD','RANLIB','CPATH','C_INCLUDE_PATH','CPLUS_INCLUDE_PATH','LIBRARY_PATH','COMPILER_PATH','GCC_EXEC_PREFIX','CONFIG_SITE'}\n    env={k:v for k,v in parent.items()if not k.startswith(blocked+tuple(ENV_POLICY['removePrefixes']))and k not in names}\n"
+        },
+        {
+          "beforeOffset": 16945,
+          "afterOffset": 21492,
+          "before": "",
+          "after": "    assert value['privateRustupBootstrapPolicy']['persistentSetting']=='disable'and value['privateRustupBootstrapPolicy']['privateHomes']==dict(rustup=str(WORK/'rustup-home'),cargo=str(WORK/'cargo-home'))\n    checked(value['privateRustupBootstrapPolicy']['beforeInstallRecord']);checked(value['privateRustupBootstrapPolicy']['settingsAtBuildCompletion'])\n"
+        },
+        {
+          "beforeOffset": 18012,
+          "afterOffset": 22914,
+          "before": "",
+          "after": "    require_clean_environment(dict(os.environ))\n"
+        },
+        {
+          "beforeOffset": 18471,
+          "afterOffset": 23421,
+          "before": "    command=[refs['bash']['path'],str(SOURCE/'tests/node-compat/build-engine.sh')]\n",
+          "after": "    command=[refs['bash']['path'],str(checked(refs['recipe']))]\n"
+        },
+        {
+          "beforeOffset": 22394,
+          "afterOffset": 27325,
+          "before": "",
+          "after": "    require_clean_environment(dict(os.environ))\n    preentry=read(descriptor(OBSERVER/'preentry-environment.json'))\n    assert preentry['rootAuthority']==frame['config']['rootAuthority']and preentry['policy']==ENV_POLICY and preentry['requiredEntriesAbsent']is True\n"
+        },
+        {
+          "beforeOffset": 23774,
+          "afterOffset": 28971,
+          "before": "    print(json.dumps(dict(schemaVersion=1,state='COMBINED355_NORMAL_OFF_BUILD_RAW_ZERO_UNREVIEWED_V1',actualBuildResult=actual,externalParentTerminal=descriptor(OUT/'terminal.json'),sourceIndexSha256=SOURCE_SHA,independentBuildReviewRequired=True,engineExecuted=False,operationalAdmission=False)),flush=True)\n",
+          "after": "    print(json.dumps(dict(schemaVersion=1,state='COMBINED355_NORMAL_OFF_BUILD_RAW_ZERO_UNREVIEWED_V2',actualBuildResult=actual,externalParentTerminal=descriptor(OUT/'terminal.json'),sourceIndexSha256=SOURCE_SHA,independentBuildReviewRequired=True,engineExecuted=False,operationalAdmission=False)),flush=True)\n\n\ndef launcher(frame):\n    for p in [WORK,FREEZE,OUT,BUILD_OUTPUT,OBSERVER]:absent(p)\n    os.umask(0o077);OBSERVER.mkdir(mode=0o700)\n    child,removed=clean_environment(dict(os.environ))\n    argv=[frame['refs']['pythonExecutable']['path'],'-B','-I',str(OWN/'controller.py'),'parent',json.dumps(frame['configDescriptor'],separators=(',',':'))]\n    write(OBSERVER/'preentry-environment.json',dict(schemaVersion=1,state='COMBINED355_RETRY_CLEAN_PREENTRY_OBSERVATION_V2',rootAuthority=frame['config']['rootAuthority'],controllerIndex=frame['ownIndex'],policy=ENV_POLICY,removedVariableNames=removed,environmentValuesRecorded=False,requiredEntriesAbsent=True,hostHomeValuesPreserved=True,argv=argv,nativeBuildStartedByThisRecord=False,engineOrGuestExecuted=False))\n    recheck(frame);os.execve(argv[0],argv,child)\n"
+        },
+        {
+          "beforeOffset": 24172,
+          "afterOffset": 30178,
+          "before": "    assert len(sys.argv)==3 and sys.argv[1]in('parent','worker')\n",
+          "after": "    assert len(sys.argv)==3 and sys.argv[1]in('launcher','parent','worker')\n"
+        },
+        {
+          "beforeOffset": 24291,
+          "afterOffset": 30308,
+          "before": "        if sys.argv[1]=='parent':parent(frame)\n",
+          "after": "        if sys.argv[1]=='launcher':launcher(frame)\n        elif sys.argv[1]=='parent':parent(frame)\n"
+        }
+      ]
+    },
+    {
+      "output": "build-engine.sh",
+      "donor": {
+        "path": "/private/tmp/starling-node-compat/combined-native355-v1-source/tests/node-compat/build-engine.sh",
+        "sha256": "285f2dc04ef0653d916f533a6f5e97485e1464099104689f91065ab08e586c6a",
+        "bytes": 52911
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/build-engine.sh",
+        "sha256": "12bbfbf46d129dd7993a982f7138043c050f0c912b37bd373af9db7c59f99f98",
+        "bytes": 55015
+      },
+      "byteIdentical": false,
+      "edits": [
+        {
+          "beforeOffset": 274,
+          "afterOffset": 274,
+          "before": "repo_root=\"$(cd \"$(dirname \"${BASH_SOURCE[0]}\")/../..\" && pwd -P)\"\nwork_root=\"${NODE_COMPAT_BUILD_ROOT:-/private/tmp/starling-node-compat/combined-native355-v1-build}\"\n",
+          "after": "recipe_path=\"$(cd \"$(dirname \"${BASH_SOURCE[0]}\")\" && pwd -P)/${BASH_SOURCE[0]##*/}\"\n[[ \"$recipe_path\" == \"/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/build-engine.sh\" ]] || exit 1\nrepo_root=\"/private/tmp/starling-node-compat/combined-native355-v1-source\"\nwork_root=\"${NODE_COMPAT_BUILD_ROOT:-/private/tmp/starling-node-compat/combined-native355-v2-build}\"\n"
+        },
+        {
+          "beforeOffset": 2884,
+          "afterOffset": 3144,
+          "before": "[[ \"$work_root\" == \"/private/tmp/starling-node-compat/combined-native355-v1-build\" ]] || { echo 'Exact separate combined355 work root required' >&2; exit 1; }\n",
+          "after": "[[ \"$work_root\" == \"/private/tmp/starling-node-compat/combined-native355-v2-build\" ]] || { echo 'Exact separate combined355 work root required' >&2; exit 1; }\n"
+        },
+        {
+          "beforeOffset": 3133,
+          "afterOffset": 3393,
+          "before": "consumers_layer_root=\"$repo_root/tests/node-compat/foundation-scheduler/combined-native-integration-candidate-v1\"\n",
+          "after": "consumers_layer_root=\"/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2\"\n"
+        },
+        {
+          "beforeOffset": 7438,
+          "afterOffset": 7722,
+          "before": "policy_suffix=\"combined355-v1.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled.z$zlib_enabled.s$consumers_enabled\"\n",
+          "after": "policy_suffix=\"combined355-v2.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled.z$zlib_enabled.s$consumers_enabled\"\n"
+        },
+        {
+          "beforeOffset": 8044,
+          "afterOffset": 8328,
+          "before": "artifact_name=\"$artifact_name.combined355-v1.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled.z$zlib_enabled.s$consumers_enabled\"\n",
+          "after": "artifact_name=\"$artifact_name.combined355-v2.$entropy_mode.p$path_enabled.e$events_enabled.d$string_decoder_enabled.a$assert_enabled.q$querystring_enabled.u$util_enabled.w$stream_web_enabled.t$ticks_enabled.c$classic_enabled.z$zlib_enabled.s$consumers_enabled\"\n"
+        },
+        {
+          "beforeOffset": 11795,
+          "afterOffset": 12079,
+          "before": "[[ \"$(sha256_file \"$consumers_layer_root/layer-policy.py\")\" == 55695eaa2ed45b67c72a391bfb0f00fb78fae102ab1c150ae790fe4b8ba1177a ]] || exit 1\n[[ \"$(sha256_file \"$consumers_layer_root/policy.json\")\" == db5e9f5a3dce27d607505a79b25a51d0d4ea4ff12dff3e92cdad8769a489e401 ]] || exit 1\n",
+          "after": "[[ \"$(sha256_file \"$consumers_layer_root/layer-policy.py\")\" == 4e30750fc8967514493b26096e814929ac4e567f1a01d86bc6a140f3bcecf609 ]] || exit 1\n[[ \"$(sha256_file \"$consumers_layer_root/policy.json\")\" == fc9c5e97594507513ed20efeced61dbf2be1a92ff038e7f1df1bcddd0b56a681 ]] || exit 1\n"
+        },
+        {
+          "beforeOffset": 12709,
+          "afterOffset": 12993,
+          "before": "[[ \"$(sha256_file \"$consumers_layer_root/layer-policy.py\")\" == 55695eaa2ed45b67c72a391bfb0f00fb78fae102ab1c150ae790fe4b8ba1177a ]] || exit 1\n[[ \"$(sha256_file \"$consumers_layer_root/policy.json\")\" == db5e9f5a3dce27d607505a79b25a51d0d4ea4ff12dff3e92cdad8769a489e401 ]] || exit 1\n",
+          "after": "[[ \"$(sha256_file \"$consumers_layer_root/layer-policy.py\")\" == 4e30750fc8967514493b26096e814929ac4e567f1a01d86bc6a140f3bcecf609 ]] || exit 1\n[[ \"$(sha256_file \"$consumers_layer_root/policy.json\")\" == fc9c5e97594507513ed20efeced61dbf2be1a92ff038e7f1df1bcddd0b56a681 ]] || exit 1\n"
+        },
+        {
+          "beforeOffset": 18255,
+          "afterOffset": 18539,
+          "before": "",
+          "after": "# Persist the actual probed private-manager setting BEFORE the original install.\n[[ \"$RUSTUP_HOME\" == \"$work_root/rustup-home\" && \"$CARGO_HOME\" == \"$work_root/cargo-home\" ]] || exit 1\nrustup set auto-self-update disable\npython3 - \"$RUSTUP_HOME/settings.toml\" \"$work_root/private-rustup-settings-before-install.json\" <<'PYRUSTUP'\nimport hashlib,json,pathlib,sys\np=pathlib.Path(sys.argv[1]);raw=p.read_bytes()\n# Python3.9 has no tomllib; require exactly the documented persisted scalar.\ndef validate_private_settings(raw):\n    assert type(raw)is bytes\n    lines=[line.strip()for line in raw.decode('utf-8','strict').splitlines()if line.strip().startswith('auto_self_update')]\n    assert lines==['auto_self_update = \"disable\"']\nvalidate_private_settings(raw)\nrecord={'state':'PRIVATE_RUSTUP_AUTO_SELF_UPDATE_DISABLED_BEFORE_INSTALL_V1','settings':{'path':str(p),'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw)},'persistentSetting':'disable','installedToolchainClaim':False}\nwith open(sys.argv[2],'x')as f:json.dump(record,f,indent=2);f.write('\\n')\nPYRUSTUP\n"
+        },
+        {
+          "beforeOffset": 19922,
+          "afterOffset": 21270,
+          "before": "sha256_file \"$repo_root/tests/node-compat/build-engine.sh\" > \"$recipe_before\"\npython3 - \"$repo_root\" \"$input_manifest\" <<'PYINPUT'\n",
+          "after": "sha256_file \"$recipe_path\" > \"$recipe_before\"\npython3 - \"$repo_root\" \"$input_manifest\" \"$consumers_layer_root/layer-policy.py\" <<'PYINPUT'\n"
+        },
+        {
+          "beforeOffset": 20152,
+          "afterOffset": 21508,
+          "before": "helper=repo/'tests/node-compat/foundation-scheduler/combined-native-integration-candidate-v1/layer-policy.py'\n",
+          "after": "helper=pathlib.Path(sys.argv[3])\n"
+        },
+        {
+          "beforeOffset": 25004,
+          "afterOffset": 26283,
+          "before": "python3 - \"$repo_root\" \"$work_root\" \"$artifact\" \"$stress\" \"$componentize_revision\" \"$componentize_archive_sha\" \"$spidermonkey_archive_sha\" \"$source_dir\" \"$build_dir\" \"$abi_fix\" \"$abi_patch\" \"$oom\" \"$build_type\" \"$input_manifest\" \"$bigint_fix\" \"$bigint_patch\" \"$entropy_mode\" \"$path_enabled\" \"$entry_patch\" \"$events_enabled\" \"$componentize_input_manifest\" \"$recipe_before\" \"$string_decoder_enabled\" \"$assert_enabled\" \"$querystring_enabled\" \"$util_enabled\" \"$stream_web_enabled\" \"$ticks_enabled\" \"$classic_enabled\" \"$zlib_enabled\" \"$spidermonkey_dir\" \"$codec_before_sha\" \"$consumers_enabled\" <<'PY'\n",
+          "after": "python3 - \"$repo_root\" \"$work_root\" \"$artifact\" \"$stress\" \"$componentize_revision\" \"$componentize_archive_sha\" \"$spidermonkey_archive_sha\" \"$source_dir\" \"$build_dir\" \"$abi_fix\" \"$abi_patch\" \"$oom\" \"$build_type\" \"$input_manifest\" \"$bigint_fix\" \"$bigint_patch\" \"$entropy_mode\" \"$path_enabled\" \"$entry_patch\" \"$events_enabled\" \"$componentize_input_manifest\" \"$recipe_before\" \"$string_decoder_enabled\" \"$assert_enabled\" \"$querystring_enabled\" \"$util_enabled\" \"$stream_web_enabled\" \"$ticks_enabled\" \"$classic_enabled\" \"$zlib_enabled\" \"$spidermonkey_dir\" \"$codec_before_sha\" \"$consumers_enabled\" \"$recipe_path\" \"$consumers_layer_root/layer-policy.py\" <<'PY'\n"
+        },
+        {
+          "beforeOffset": 25662,
+          "afterOffset": 26996,
+          "before": "repo, work, artifact, stress, componentize, componentize_archive, sm_archive, source_dir, build_dir, abi_fix, abi_patch, oom, build_type, input_manifest, bigint_fix, bigint_patch, entropy_mode, path_enabled, entry_patch, events_enabled, componentize_input_manifest, recipe_before, string_decoder_enabled, assert_enabled, querystring_enabled, util_enabled, stream_web_enabled, ticks_enabled, classic_enabled, zlib_enabled, spidermonkey_dir, codec_before_sha, consumers_enabled = sys.argv[1:]\n",
+          "after": "repo, work, artifact, stress, componentize, componentize_archive, sm_archive, source_dir, build_dir, abi_fix, abi_patch, oom, build_type, input_manifest, bigint_fix, bigint_patch, entropy_mode, path_enabled, entry_patch, events_enabled, componentize_input_manifest, recipe_before, string_decoder_enabled, assert_enabled, querystring_enabled, util_enabled, stream_web_enabled, ticks_enabled, classic_enabled, zlib_enabled, spidermonkey_dir, codec_before_sha, consumers_enabled, actual_recipe, actual_helper = sys.argv[1:]\n"
+        },
+        {
+          "beforeOffset": 26483,
+          "afterOffset": 27847,
+          "before": "layer_file = pathlib.Path(repo) / 'tests/node-compat/foundation-scheduler/combined-native-integration-candidate-v1/layer-policy.py'\nassert digest(layer_file) == '55695eaa2ed45b67c72a391bfb0f00fb78fae102ab1c150ae790fe4b8ba1177a'\n",
+          "after": "layer_file = pathlib.Path(actual_helper)\nassert digest(layer_file) == '4e30750fc8967514493b26096e814929ac4e567f1a01d86bc6a140f3bcecf609'\n"
+        },
+        {
+          "beforeOffset": 27546,
+          "afterOffset": 28819,
+          "before": "assert digest(pathlib.Path(repo)/'tests/node-compat/build-engine.sh') == pathlib.Path(recipe_before).read_text().strip(), 'Build recipe changed during compilation'\n",
+          "after": "assert digest(pathlib.Path(actual_recipe)) == pathlib.Path(recipe_before).read_text().strip(), 'Build recipe changed during compilation'\n"
+        },
+        {
+          "beforeOffset": 34822,
+          "afterOffset": 36068,
+          "before": "assert digest(layer_file) == '55695eaa2ed45b67c72a391bfb0f00fb78fae102ab1c150ae790fe4b8ba1177a', 'Classic source helper changed during compilation'\n",
+          "after": "assert digest(layer_file) == '4e30750fc8967514493b26096e814929ac4e567f1a01d86bc6a140f3bcecf609', 'Classic source helper changed during compilation'\n"
+        },
+        {
+          "beforeOffset": 45002,
+          "afterOffset": 46248,
+          "before": "    'buildRecipeSha256': digest(pathlib.Path(repo) / 'tests/node-compat/build-engine.sh'),\n",
+          "after": "    'buildRecipeSha256': digest(pathlib.Path(actual_recipe)),\n"
+        },
+        {
+          "beforeOffset": 50744,
+          "afterOffset": 51961,
+          "before": "assert digest(layer_file) == '55695eaa2ed45b67c72a391bfb0f00fb78fae102ab1c150ae790fe4b8ba1177a'\n",
+          "after": "assert digest(layer_file) == '4e30750fc8967514493b26096e814929ac4e567f1a01d86bc6a140f3bcecf609'\n"
+        },
+        {
+          "beforeOffset": 51988,
+          "afterOffset": 53205,
+          "before": "classification=model.validate_metadata(metadata,layer.POLICY,layer.POLICY_SHA256,digest(layer_file),digest(pathlib.Path(repo)/'tests/node-compat/build-engine.sh'),componentize_inputs,'normal-off')\n",
+          "after": "classification=model.validate_metadata(metadata,layer.POLICY,layer.POLICY_SHA256,digest(layer_file),digest(pathlib.Path(actual_recipe)),componentize_inputs,'normal-off')\n"
+        },
+        {
+          "beforeOffset": 52352,
+          "afterOffset": 53542,
+          "before": "",
+          "after": "before_rustup=pathlib.Path(work)/'private-rustup-settings-before-install.json'\nrustup_before=json.loads(before_rustup.read_bytes())\nassert rustup_before['state']=='PRIVATE_RUSTUP_AUTO_SELF_UPDATE_DISABLED_BEFORE_INSTALL_V1'and rustup_before['persistentSetting']=='disable'\nsettings=pathlib.Path(work)/'rustup-home/settings.toml'\nassert [line.strip()for line in settings.read_text().splitlines()if line.strip().startswith('auto_self_update')]==['auto_self_update = \"disable\"']\nmetadata['privateRustupBootstrapPolicy']={'persistentSetting':'disable','privateHomes':{'rustup':str(pathlib.Path(work)/'rustup-home'),'cargo':str(pathlib.Path(work)/'cargo-home')},'beforeInstallRecord':{'path':str(before_rustup),'sha256':digest(before_rustup),'bytes':before_rustup.stat().st_size},'settingsAtBuildCompletion':{'path':str(settings),'sha256':digest(settings),'bytes':settings.stat().st_size},'oldFailedWorkResumed':False}\n"
+        }
+      ]
+    },
+    {
+      "output": "layer-policy.py",
+      "donor": {
+        "path": "/private/tmp/starling-node-compat/combined-native355-v1-source/tests/node-compat/foundation-scheduler/combined-native-integration-candidate-v1/layer-policy.py",
+        "sha256": "55695eaa2ed45b67c72a391bfb0f00fb78fae102ab1c150ae790fe4b8ba1177a",
+        "bytes": 24179
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/layer-policy.py",
+        "sha256": "4e30750fc8967514493b26096e814929ac4e567f1a01d86bc6a140f3bcecf609",
+        "bytes": 24409
+      },
+      "byteIdentical": false,
+      "edits": [
+        {
+          "beforeOffset": 353,
+          "afterOffset": 353,
+          "before": "REPO=HERE.parents[3]\nPOLICY_SHA256='db5e9f5a3dce27d607505a79b25a51d0d4ea4ff12dff3e92cdad8769a489e401'\n",
+          "after": "REPO=Path('/private/tmp/starling-node-compat/combined-native355-v1-source')\n# Own literal configured-native context; never mutate an imported donor namespace.\nDONOR_INPUTS=REPO/'tests/node-compat/foundation-scheduler/combined-native-integration-candidate-v1/donor-inputs.json'\nPOLICY_SHA256='fc9c5e97594507513ed20efeced61dbf2be1a92ff038e7f1df1bcddd0b56a681'\n"
+        },
+        {
+          "beforeOffset": 740,
+          "afterOffset": 996,
+          "before": "    assert digest(HERE/'donor-inputs.json')==AUTH_SHA256\n    rows=json.loads((HERE/'donor-inputs.json').read_bytes())['files']\n",
+          "after": "    assert digest(DONOR_INPUTS)==AUTH_SHA256\n    rows=json.loads(DONOR_INPUTS.read_bytes())['files']\n"
+        }
+      ]
+    },
+    {
+      "output": "policy.json",
+      "donor": {
+        "path": "/private/tmp/starling-node-compat/combined-native355-v1-source/tests/node-compat/foundation-scheduler/combined-native-integration-candidate-v1/policy.json",
+        "sha256": "db5e9f5a3dce27d607505a79b25a51d0d4ea4ff12dff3e92cdad8769a489e401",
+        "bytes": 300290
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/policy.json",
+        "sha256": "fc9c5e97594507513ed20efeced61dbf2be1a92ff038e7f1df1bcddd0b56a681",
+        "bytes": 300290
+      },
+      "byteIdentical": false,
+      "edits": [
+        {
+          "beforeOffset": 141528,
+          "afterOffset": 141528,
+          "before": "    \"workRoot\": \"/private/tmp/starling-node-compat/combined-native355-v1-build\",\n    \"freezeRoot\": \"/private/tmp/starling-node-compat/combined-native355-v1-freeze\"\n",
+          "after": "    \"workRoot\": \"/private/tmp/starling-node-compat/combined-native355-v2-build\",\n    \"freezeRoot\": \"/private/tmp/starling-node-compat/combined-native355-v2-freeze\"\n"
+        }
+      ]
+    },
+    {
+      "output": "native-admission-model.py",
+      "donor": {
+        "path": "/private/tmp/starling-node-compat/combined-native355-v1-source/tests/node-compat/foundation-scheduler/combined-native-integration-candidate-v1/native-admission-model.py",
+        "sha256": "8287b5da1488ffc32a0bf76c4d0f9bcca85681240586c5f144c3822f2e6917f1",
+        "bytes": 8237
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/native-admission-model.py",
+        "sha256": "8287b5da1488ffc32a0bf76c4d0f9bcca85681240586c5f144c3822f2e6917f1",
+        "bytes": 8237
+      },
+      "byteIdentical": true,
+      "edits": []
+    }
+  ],
+  "nativeFilesChanged": 0,
+  "importedModuleNamespacesRebound": false
+}

@@ -43,6 +43,33 @@ snapshot and both-host runtime tests. The [previous v1 matrix](results-component
 and [v1 Source HOLD](../package-bundler-implementation-review-v1/README.md)
 remain unchanged.
 
+A separate explicitly selected standard-clock component now returns the complete
+Node-equal ReactDOM edge result on both execution paths: three retained Jco
+calls, one fresh Jco call and three fresh Wasmtime calls finish raw0. The
+[actual Root records](../../foundation-scheduler/clock-v13-runtime-v2-root-results.json)
+cover the unchanged v13 native engine and retained bundle, with only the three
+standard clocks/poll interfaces at0.2.10. [Independent actual-result review](../../foundation-scheduler/independent-clock-v13-runtime-v2-results-review-v2/results.json)
+passes. The original pure-profile failures above stay unchanged; broader
+clock/resource/snapshot/teardown and full Next gates remain open.
+
+[check-clock-render.mjs](check-clock-render.mjs) is a separate read-only checker
+for that pinned experimental generation:
+
+```sh
+node tests/node-compat/frameworks/package-bundler-execution-v1/check-clock-render.mjs \
+  /private/tmp/starling-node-compat/clock-v13-runtime-v2 \
+  tests/node-compat/foundation-scheduler/clock-v13-runtime-v2-root-results.json \
+  --self-test
+```
+
+It verifies the complete publication hashes, seven raw/decoded Node-equal values,
+five inner terminals and recorded native/interface scope. The argument can name
+a complete relocated copy; original metadata contents remain unchanged. It does
+not execute a component or re-audit its type graph, external native inputs or
+outer process provenance. Eighteen injected semantic changes and two separate
+publication-integrity negatives are rejected. A changed source/component pin
+needs a new reviewed baseline. The ten-case comparator remains unchanged.
+
 The two initial direct Node controls for `next/server` and `next/headers` hit
 Node ESM's extensionless-subpath resolution error. The
 [corrected controls](node-library-controls.json) resolve the real CJS entry with

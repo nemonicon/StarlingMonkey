@@ -1,0 +1,7 @@
+# Selected-clock runtime Source review: HOLD
+
+Source3107 passes the bounded physical/API/provenance review, but its failure-presence sentinel needs correction before runtime. Full11,995 rows/16 families, the actual4,889-file/21-link package, genuine external-module context, component/native/Node oracle and10 exact donor segments were authenticated. Five grammar checks and an11-check extracted host-pure null model passed without an action.
+
+Three body paths use primary=null and primary!==null. A captured literal null throw is durably represented as a raw throw, but can be mistaken for absence of an error in child completion logic. The full parent raw validator rejects every throw, so this does not establish a full false PASS or any observed guest failure. Mapping also normally fails on its missing result. Two entry combined-failure sites likewise omit null from the combined error. The correction contract requires explicit presence booleans and truthful failure records in all five sites.
+
+No original Source was changed. No genuine preflight, monitor, Jco API, shim, generated application, Wasmtime, engine or guest was invoked. This review grants no mapping/runtime phase. The known component/native/four cores/full oracle and schedule remain unchanged. Mapping's compiler-tool work is separately bounded by its1200s external parent; application Jco/WT children are180s. All seven wider clock/resource/snapshot/teardown gates remain open.

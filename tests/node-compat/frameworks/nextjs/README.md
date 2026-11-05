@@ -13,6 +13,37 @@ retain the corrected Node Next subpath controls and every guest failure. The tab
 below describes the original finite-profile baseline; the optional experiment has
 its own runner and regression baseline. It does not replace that baseline.
 
+A separate opt-in standard-clock probe now renders the exact retained ReactDOM
+edge workload on stock Wasmtime and returns the complete Node-equal HTML. Its
+component imports only `wasi:clocks/monotonic-clock`,
+`wasi:clocks/wall-clock` and `wasi:io/poll` at **0.2.10**.
+[The retained comparison](../../foundation-scheduler/clock-v13-wasmtime-first-render-v1-comparison.json)
+and [independent result review](../../foundation-scheduler/independent-clock-v13-first-wasmtime-render-results-review-v1/results.json)
+cover the first fresh render. A later [seven-return differential](../../foundation-scheduler/clock-v13-runtime-v2-root-results.json)
+finishes raw0: three retained Jco calls, one fresh Jco call and three fresh
+Wasmtime calls all match the complete retained Node result. [Independent review](../../foundation-scheduler/independent-clock-v13-runtime-v2-results-review-v2/results.json)
+passes all seven full returns and raw cleanup. The zero-import failure above remains the
+original regression baseline. Clock lifecycle gates and the full Next server
+remain unfinished.
+
+Use the separate read-only [clock record checker](../package-bundler-execution-v1/check-clock-render.mjs)
+for this exact experimental source/component generation:
+
+```sh
+node tests/node-compat/frameworks/package-bundler-execution-v1/check-clock-render.mjs \
+  /private/tmp/starling-node-compat/clock-v13-runtime-v2 \
+  tests/node-compat/foundation-scheduler/clock-v13-runtime-v2-root-results.json \
+  --self-test
+```
+
+The directory argument may point at a genuine fresh run or a complete relocated
+copy. The checker validates all published file hashes, seven complete strings,
+five child terminals, recorded native frame and selected-interface fields.
+Changed source/component pins require review. It does not rerun a component,
+reaudit the emitted type graph, or replace the independent parent/provenance
+review. Its 18 semantic negative cases and separate changed-byte/unindexed-file
+checks pass; the original Next comparators below retain their own baselines.
+
 The fixture pins Next.js **16.4.5**, React/ReactDOM **19.3.1**, Node **22.14.0**,
 ComponentizeJS **0.23.0**, Jco **1.40.0**, Rolldown **1.2.16**, and Wasmtime
 **42.0.1**. Browser controls use Playwright Core **1.64.1** and the installed

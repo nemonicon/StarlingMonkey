@@ -1,0 +1,910 @@
+{
+  "schemaVersion": 1,
+  "component": {
+    "path": "/private/tmp/starling-node-compat/clock-v13-component-v1/clock-v13.component.wasm",
+    "sha256": "5c002f8da675016fd7061d245074965413d6914e4f40eb2a32a8141c1f3b7460",
+    "bytes": 15693386
+  },
+  "rootInterfaces": [
+    "wasi:clocks/monotonic-clock@0.2.10",
+    "wasi:clocks/wall-clock@0.2.10",
+    "wasi:io/poll@0.2.10"
+  ],
+  "rootCallableFunctions": [
+    {
+      "interface": "wasi:io/poll@0.2.10",
+      "functions": [
+        "poll"
+      ],
+      "types": [
+        "pollable"
+      ]
+    },
+    {
+      "interface": "wasi:clocks/monotonic-clock@0.2.10",
+      "functions": [
+        "now",
+        "subscribe-instant",
+        "subscribe-duration"
+      ],
+      "types": [
+        "instant",
+        "pollable",
+        "duration"
+      ]
+    },
+    {
+      "interface": "wasi:clocks/wall-clock@0.2.10",
+      "functions": [
+        "now"
+      ],
+      "types": [
+        "datetime"
+      ]
+    }
+  ],
+  "pollableResourceSharedByPollAndMonotonicClock": true,
+  "pollableCanonicalDrop": true,
+  "publicAbi": {
+    "run": "() -> string"
+  },
+  "embeddedModules": [
+    {
+      "index": 0,
+      "sha256": "2f0868272468865c12c16b03b8dc1a5eaf4f4f916a3dc73d6b4b2651bdc27d4b",
+      "bytes": 15687023,
+      "functionTypeCount": 136,
+      "functionImports": [
+        {
+          "module": "wasi:io/poll@0.2.10",
+          "name": "[resource-drop]pollable",
+          "kind": "function",
+          "typeIndex": 6,
+          "signature": {
+            "params": [
+              "i32"
+            ],
+            "results": []
+          }
+        },
+        {
+          "module": "wasi:io/poll@0.2.10",
+          "name": "poll",
+          "kind": "function",
+          "typeIndex": 3,
+          "signature": {
+            "params": [
+              "i32",
+              "i32",
+              "i32"
+            ],
+            "results": []
+          }
+        },
+        {
+          "module": "wasi:clocks/monotonic-clock@0.2.10",
+          "name": "now",
+          "kind": "function",
+          "typeIndex": 42,
+          "signature": {
+            "params": [],
+            "results": [
+              "i64"
+            ]
+          }
+        },
+        {
+          "module": "wasi:clocks/monotonic-clock@0.2.10",
+          "name": "subscribe-instant",
+          "kind": "function",
+          "typeIndex": 35,
+          "signature": {
+            "params": [
+              "i64"
+            ],
+            "results": [
+              "i32"
+            ]
+          }
+        },
+        {
+          "module": "wasi:clocks/monotonic-clock@0.2.10",
+          "name": "subscribe-duration",
+          "kind": "function",
+          "typeIndex": 35,
+          "signature": {
+            "params": [
+              "i64"
+            ],
+            "results": [
+              "i32"
+            ]
+          }
+        },
+        {
+          "module": "wasi_snapshot_preview1",
+          "name": "clock_time_get",
+          "kind": "function",
+          "typeIndex": 28,
+          "signature": {
+            "params": [
+              "i32",
+              "i64",
+              "i32"
+            ],
+            "results": [
+              "i32"
+            ]
+          }
+        }
+      ],
+      "functionExports": [
+        {
+          "name": "wizer-initialize",
+          "kind": 0,
+          "index": 4489,
+          "signature": {
+            "params": [],
+            "results": []
+          }
+        },
+        {
+          "name": "wizer.resume",
+          "kind": 0,
+          "index": 4492,
+          "signature": {
+            "params": [],
+            "results": []
+          }
+        },
+        {
+          "name": "cabi_realloc",
+          "kind": 0,
+          "index": 3786,
+          "signature": {
+            "params": [
+              "i32",
+              "i32",
+              "i32",
+              "i32"
+            ],
+            "results": [
+              "i32"
+            ]
+          }
+        },
+        {
+          "name": "wasi:cli/run@0.2.10#run",
+          "kind": 0,
+          "index": 4660,
+          "signature": {
+            "params": [],
+            "results": [
+              "i32"
+            ]
+          }
+        },
+        {
+          "name": "wasi:http/incoming-handler@0.2.10#handle",
+          "kind": 0,
+          "index": 4661,
+          "signature": {
+            "params": [
+              "i32",
+              "i32"
+            ],
+            "results": []
+          }
+        },
+        {
+          "name": "cabi_realloc_adapter",
+          "kind": 0,
+          "index": 3785,
+          "signature": {
+            "params": [
+              "i32",
+              "i32",
+              "i32",
+              "i32"
+            ],
+            "results": [
+              "i32"
+            ]
+          }
+        },
+        {
+          "name": "check_init",
+          "kind": 0,
+          "index": 3794,
+          "signature": {
+            "params": [],
+            "results": [
+              "i32"
+            ]
+          }
+        },
+        {
+          "name": "run",
+          "kind": 0,
+          "index": 11592,
+          "signature": {
+            "params": [],
+            "results": [
+              "i32"
+            ]
+          }
+        },
+        {
+          "name": "cabi_post_run",
+          "kind": 0,
+          "index": 11593,
+          "signature": {
+            "params": [
+              "i32"
+            ],
+            "results": []
+          }
+        }
+      ],
+      "startSectionPresent": false
+    },
+    {
+      "index": 1,
+      "sha256": "689ca03a350e9e61a8ffa4ea0bfb60562ecb933e08f3303ccdc279e088e041b0",
+      "bytes": 3761,
+      "functionTypeCount": 10,
+      "functionImports": [
+        {
+          "module": "wasi:clocks/wall-clock@0.2.0",
+          "name": "now",
+          "kind": "function",
+          "typeIndex": 0,
+          "signature": {
+            "params": [
+              "i32"
+            ],
+            "results": []
+          }
+        },
+        {
+          "module": "wasi:clocks/monotonic-clock@0.2.0",
+          "name": "now",
+          "kind": "function",
+          "typeIndex": 1,
+          "signature": {
+            "params": [],
+            "results": [
+              "i64"
+            ]
+          }
+        },
+        {
+          "module": "__main_module__",
+          "name": "cabi_realloc_adapter",
+          "kind": "function",
+          "typeIndex": 4,
+          "signature": {
+            "params": [
+              "i32",
+              "i32",
+              "i32",
+              "i32"
+            ],
+            "results": [
+              "i32"
+            ]
+          }
+        }
+      ],
+      "functionExports": [
+        {
+          "name": "clock_time_get",
+          "kind": 0,
+          "index": 13,
+          "signature": {
+            "params": [
+              "i32",
+              "i64",
+              "i32"
+            ],
+            "results": [
+              "i32"
+            ]
+          }
+        },
+        {
+          "name": "cabi_import_realloc",
+          "kind": 0,
+          "index": 9,
+          "signature": {
+            "params": [
+              "i32",
+              "i32",
+              "i32",
+              "i32"
+            ],
+            "results": [
+              "i32"
+            ]
+          }
+        }
+      ],
+      "startSectionPresent": false
+    },
+    {
+      "index": 2,
+      "sha256": "cd03233a5c2a739bcf774eb402ffaf1c7cdb066f85c5112a487d5f83cc6fd3e8",
+      "bytes": 157,
+      "functionTypeCount": 3,
+      "functionImports": [],
+      "functionExports": [
+        {
+          "name": "0",
+          "kind": 0,
+          "index": 0,
+          "signature": {
+            "params": [
+              "i32",
+              "i32",
+              "i32"
+            ],
+            "results": []
+          }
+        },
+        {
+          "name": "1",
+          "kind": 0,
+          "index": 1,
+          "signature": {
+            "params": [
+              "i32",
+              "i64",
+              "i32"
+            ],
+            "results": [
+              "i32"
+            ]
+          }
+        },
+        {
+          "name": "2",
+          "kind": 0,
+          "index": 2,
+          "signature": {
+            "params": [
+              "i32"
+            ],
+            "results": []
+          }
+        }
+      ],
+      "startSectionPresent": false
+    },
+    {
+      "index": 3,
+      "sha256": "f5224977be227b3dded77823d91f7167e3ebb6200e23931cd66467a65cfc6bc1",
+      "bytes": 143,
+      "functionTypeCount": 3,
+      "functionImports": [
+        {
+          "module": "actual",
+          "name": "0",
+          "kind": "function",
+          "typeIndex": 0,
+          "signature": {
+            "params": [
+              "i32",
+              "i32",
+              "i32"
+            ],
+            "results": []
+          }
+        },
+        {
+          "module": "actual",
+          "name": "1",
+          "kind": "function",
+          "typeIndex": 1,
+          "signature": {
+            "params": [
+              "i32",
+              "i64",
+              "i32"
+            ],
+            "results": [
+              "i32"
+            ]
+          }
+        },
+        {
+          "module": "actual",
+          "name": "2",
+          "kind": "function",
+          "typeIndex": 2,
+          "signature": {
+            "params": [
+              "i32"
+            ],
+            "results": []
+          }
+        }
+      ],
+      "functionExports": [],
+      "startSectionPresent": false
+    }
+  ],
+  "physicalCoreWholeBytesEqualModule0": true,
+  "allThreeInlineCoreBytesEqualComponentModules": true,
+  "preview1ExternalComponentImport": false,
+  "internalPreview1ClockBridgePresent": true,
+  "internalAdapterClockLabelsVersion": "0.2.0",
+  "externalClockInterfacesVersion": "0.2.10",
+  "clockBridge": {
+    "module": 0,
+    "instance": 4,
+    "importModule": "wasi_snapshot_preview1",
+    "importName": "clock_time_get",
+    "kind": "function",
+    "suppliedInstance": 3,
+    "inlineExport": {
+      "name": "clock_time_get",
+      "sort": 0,
+      "index": 5
+    },
+    "coreFunctionOrigin": {
+      "kind": "core-instance-export",
+      "instance": 0,
+      "name": "1"
+    },
+    "resolvedFunctionOrigin": {
+      "kind": "generated-table-shim",
+      "shimModule": 2,
+      "shimExport": "1",
+      "tableSlot": 1,
+      "fixupModule": 3,
+      "target": {
+        "kind": "core-module-export",
+        "module": 1,
+        "instance": 9,
+        "name": "clock_time_get"
+      }
+    }
+  },
+  "adapterClockBindings": [
+    {
+      "module": 1,
+      "instance": 9,
+      "importModule": "wasi:clocks/wall-clock@0.2.0",
+      "importName": "now",
+      "kind": "function",
+      "suppliedInstance": 6,
+      "inlineExport": {
+        "name": "now",
+        "sort": 0,
+        "index": 6
+      },
+      "coreFunctionOrigin": {
+        "kind": "core-instance-export",
+        "instance": 0,
+        "name": "2"
+      },
+      "resolvedFunctionOrigin": {
+        "kind": "generated-table-shim",
+        "shimModule": 2,
+        "shimExport": "2",
+        "tableSlot": 2,
+        "fixupModule": 3,
+        "target": {
+          "kind": "root-function",
+          "interface": "wasi:clocks/wall-clock@0.2.10",
+          "name": "now"
+        }
+      }
+    },
+    {
+      "module": 1,
+      "instance": 9,
+      "importModule": "wasi:clocks/monotonic-clock@0.2.0",
+      "importName": "now",
+      "kind": "function",
+      "suppliedInstance": 7,
+      "inlineExport": {
+        "name": "now",
+        "sort": 0,
+        "index": 7
+      },
+      "coreFunctionOrigin": {
+        "kind": "lower",
+        "function": 3,
+        "options": []
+      },
+      "componentFunctionOrigin": {
+        "kind": "instance-export",
+        "instance": 1,
+        "name": "now"
+      },
+      "rootImport": "wasi:clocks/monotonic-clock@0.2.10",
+      "resolvedFunctionOrigin": {
+        "kind": "root-function",
+        "interface": "wasi:clocks/monotonic-clock@0.2.10",
+        "name": "now"
+      }
+    }
+  ],
+  "allCanonicalCoreBindings": [
+    {
+      "module": 0,
+      "instance": 4,
+      "importModule": "wasi:io/poll@0.2.10",
+      "importName": "[resource-drop]pollable",
+      "kind": "function",
+      "suppliedInstance": 1,
+      "inlineExport": {
+        "name": "[resource-drop]pollable",
+        "sort": 0,
+        "index": 0
+      },
+      "coreFunctionOrigin": {
+        "kind": "resource-drop",
+        "typeIndex": 4
+      },
+      "resolvedFunctionOrigin": {
+        "kind": "resource-drop",
+        "typeIndex": 4
+      }
+    },
+    {
+      "module": 0,
+      "instance": 4,
+      "importModule": "wasi:io/poll@0.2.10",
+      "importName": "poll",
+      "kind": "function",
+      "suppliedInstance": 1,
+      "inlineExport": {
+        "name": "poll",
+        "sort": 0,
+        "index": 1
+      },
+      "coreFunctionOrigin": {
+        "kind": "core-instance-export",
+        "instance": 0,
+        "name": "0"
+      },
+      "resolvedFunctionOrigin": {
+        "kind": "generated-table-shim",
+        "shimModule": 2,
+        "shimExport": "0",
+        "tableSlot": 0,
+        "fixupModule": 3,
+        "target": {
+          "kind": "root-function",
+          "interface": "wasi:io/poll@0.2.10",
+          "name": "poll"
+        }
+      }
+    },
+    {
+      "module": 0,
+      "instance": 4,
+      "importModule": "wasi:clocks/monotonic-clock@0.2.10",
+      "importName": "now",
+      "kind": "function",
+      "suppliedInstance": 2,
+      "inlineExport": {
+        "name": "now",
+        "sort": 0,
+        "index": 2
+      },
+      "coreFunctionOrigin": {
+        "kind": "lower",
+        "function": 0,
+        "options": []
+      },
+      "componentFunctionOrigin": {
+        "kind": "instance-export",
+        "instance": 1,
+        "name": "now"
+      },
+      "rootImport": "wasi:clocks/monotonic-clock@0.2.10",
+      "resolvedFunctionOrigin": {
+        "kind": "root-function",
+        "interface": "wasi:clocks/monotonic-clock@0.2.10",
+        "name": "now"
+      }
+    },
+    {
+      "module": 0,
+      "instance": 4,
+      "importModule": "wasi:clocks/monotonic-clock@0.2.10",
+      "importName": "subscribe-instant",
+      "kind": "function",
+      "suppliedInstance": 2,
+      "inlineExport": {
+        "name": "subscribe-instant",
+        "sort": 0,
+        "index": 3
+      },
+      "coreFunctionOrigin": {
+        "kind": "lower",
+        "function": 1,
+        "options": []
+      },
+      "componentFunctionOrigin": {
+        "kind": "instance-export",
+        "instance": 1,
+        "name": "subscribe-instant"
+      },
+      "rootImport": "wasi:clocks/monotonic-clock@0.2.10",
+      "resolvedFunctionOrigin": {
+        "kind": "root-function",
+        "interface": "wasi:clocks/monotonic-clock@0.2.10",
+        "name": "subscribe-instant"
+      }
+    },
+    {
+      "module": 0,
+      "instance": 4,
+      "importModule": "wasi:clocks/monotonic-clock@0.2.10",
+      "importName": "subscribe-duration",
+      "kind": "function",
+      "suppliedInstance": 2,
+      "inlineExport": {
+        "name": "subscribe-duration",
+        "sort": 0,
+        "index": 4
+      },
+      "coreFunctionOrigin": {
+        "kind": "lower",
+        "function": 2,
+        "options": []
+      },
+      "componentFunctionOrigin": {
+        "kind": "instance-export",
+        "instance": 1,
+        "name": "subscribe-duration"
+      },
+      "rootImport": "wasi:clocks/monotonic-clock@0.2.10",
+      "resolvedFunctionOrigin": {
+        "kind": "root-function",
+        "interface": "wasi:clocks/monotonic-clock@0.2.10",
+        "name": "subscribe-duration"
+      }
+    },
+    {
+      "module": 0,
+      "instance": 4,
+      "importModule": "wasi_snapshot_preview1",
+      "importName": "clock_time_get",
+      "kind": "function",
+      "suppliedInstance": 3,
+      "inlineExport": {
+        "name": "clock_time_get",
+        "sort": 0,
+        "index": 5
+      },
+      "coreFunctionOrigin": {
+        "kind": "core-instance-export",
+        "instance": 0,
+        "name": "1"
+      },
+      "resolvedFunctionOrigin": {
+        "kind": "generated-table-shim",
+        "shimModule": 2,
+        "shimExport": "1",
+        "tableSlot": 1,
+        "fixupModule": 3,
+        "target": {
+          "kind": "core-module-export",
+          "module": 1,
+          "instance": 9,
+          "name": "clock_time_get"
+        }
+      }
+    },
+    {
+      "module": 1,
+      "instance": 9,
+      "importModule": "env",
+      "importName": "memory",
+      "kind": "memory",
+      "suppliedInstance": 5,
+      "inlineExport": {
+        "name": "memory",
+        "sort": 2,
+        "index": 0
+      }
+    },
+    {
+      "module": 1,
+      "instance": 9,
+      "importModule": "wasi:clocks/wall-clock@0.2.0",
+      "importName": "now",
+      "kind": "function",
+      "suppliedInstance": 6,
+      "inlineExport": {
+        "name": "now",
+        "sort": 0,
+        "index": 6
+      },
+      "coreFunctionOrigin": {
+        "kind": "core-instance-export",
+        "instance": 0,
+        "name": "2"
+      },
+      "resolvedFunctionOrigin": {
+        "kind": "generated-table-shim",
+        "shimModule": 2,
+        "shimExport": "2",
+        "tableSlot": 2,
+        "fixupModule": 3,
+        "target": {
+          "kind": "root-function",
+          "interface": "wasi:clocks/wall-clock@0.2.10",
+          "name": "now"
+        }
+      }
+    },
+    {
+      "module": 1,
+      "instance": 9,
+      "importModule": "wasi:clocks/monotonic-clock@0.2.0",
+      "importName": "now",
+      "kind": "function",
+      "suppliedInstance": 7,
+      "inlineExport": {
+        "name": "now",
+        "sort": 0,
+        "index": 7
+      },
+      "coreFunctionOrigin": {
+        "kind": "lower",
+        "function": 3,
+        "options": []
+      },
+      "componentFunctionOrigin": {
+        "kind": "instance-export",
+        "instance": 1,
+        "name": "now"
+      },
+      "rootImport": "wasi:clocks/monotonic-clock@0.2.10",
+      "resolvedFunctionOrigin": {
+        "kind": "root-function",
+        "interface": "wasi:clocks/monotonic-clock@0.2.10",
+        "name": "now"
+      }
+    },
+    {
+      "module": 1,
+      "instance": 9,
+      "importModule": "__main_module__",
+      "importName": "cabi_realloc_adapter",
+      "kind": "function",
+      "suppliedInstance": 8,
+      "inlineExport": {
+        "name": "cabi_realloc_adapter",
+        "sort": 0,
+        "index": 8
+      },
+      "coreFunctionOrigin": {
+        "kind": "core-instance-export",
+        "instance": 4,
+        "name": "cabi_realloc_adapter"
+      },
+      "resolvedFunctionOrigin": {
+        "kind": "core-module-export",
+        "module": 0,
+        "instance": 4,
+        "name": "cabi_realloc_adapter"
+      }
+    },
+    {
+      "module": 3,
+      "instance": 11,
+      "importModule": "actual",
+      "importName": "0",
+      "kind": "function",
+      "suppliedInstance": 10,
+      "inlineExport": {
+        "name": "0",
+        "sort": 0,
+        "index": 10
+      },
+      "coreFunctionOrigin": {
+        "kind": "lower",
+        "function": 4,
+        "options": [
+          {
+            "kind": 3,
+            "index": 0
+          },
+          {
+            "kind": 4,
+            "index": 9
+          }
+        ]
+      },
+      "componentFunctionOrigin": {
+        "kind": "instance-export",
+        "instance": 0,
+        "name": "poll"
+      },
+      "rootImport": "wasi:io/poll@0.2.10",
+      "resolvedFunctionOrigin": {
+        "kind": "root-function",
+        "interface": "wasi:io/poll@0.2.10",
+        "name": "poll"
+      }
+    },
+    {
+      "module": 3,
+      "instance": 11,
+      "importModule": "actual",
+      "importName": "1",
+      "kind": "function",
+      "suppliedInstance": 10,
+      "inlineExport": {
+        "name": "1",
+        "sort": 0,
+        "index": 11
+      },
+      "coreFunctionOrigin": {
+        "kind": "core-instance-export",
+        "instance": 9,
+        "name": "clock_time_get"
+      },
+      "resolvedFunctionOrigin": {
+        "kind": "core-module-export",
+        "module": 1,
+        "instance": 9,
+        "name": "clock_time_get"
+      }
+    },
+    {
+      "module": 3,
+      "instance": 11,
+      "importModule": "actual",
+      "importName": "2",
+      "kind": "function",
+      "suppliedInstance": 10,
+      "inlineExport": {
+        "name": "2",
+        "sort": 0,
+        "index": 12
+      },
+      "coreFunctionOrigin": {
+        "kind": "lower",
+        "function": 5,
+        "options": [
+          {
+            "kind": 3,
+            "index": 0
+          }
+        ]
+      },
+      "componentFunctionOrigin": {
+        "kind": "instance-export",
+        "instance": 2,
+        "name": "now"
+      },
+      "rootImport": "wasi:clocks/wall-clock@0.2.10",
+      "resolvedFunctionOrigin": {
+        "kind": "root-function",
+        "interface": "wasi:clocks/wall-clock@0.2.10",
+        "name": "now"
+      }
+    },
+    {
+      "module": 3,
+      "instance": 11,
+      "importModule": "shim",
+      "importName": "$imports",
+      "kind": "table",
+      "suppliedInstance": 0,
+      "suppliedModule": 2
+    }
+  ],
+  "noExternalStderrStreamsError": true,
+  "callableNotMerelyTypeOnly": true,
+  "hostCallsActuallyObserved": false,
+  "componentOrEngineInstantiated": false
+}

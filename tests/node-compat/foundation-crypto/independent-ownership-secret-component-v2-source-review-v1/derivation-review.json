@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "parent": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-component-candidate-v1/build.mjs",
+    "sha256": "81219545ca00437fed57b56aa0459be5518a8a15372affc4beaea2ca662cab46",
+    "bytes": 23826
+  },
+  "child": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-component-candidate-v2/build.mjs",
+    "sha256": "eae1fd1d067ba437d2dde52a8d053f7d512e15a7107fb38375e2db5ad2fba3f6",
+    "bytes": 25635
+  },
+  "exactForwardAndReverse": true,
+  "transformationCount": 11,
+  "changes": [
+    {
+      "before": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-component-candidate-v1",
+      "after": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-component-candidate-v2"
+    },
+    {
+      "before": "ROOT_REVIEWED_SECRET355_COMPONENT_CONSTRUCTION_V1",
+      "after": "ROOT_REVIEWED_SECRET355_COMPONENT_CONSTRUCTION_V2"
+    },
+    {
+      "before": "SECRET355_COMPONENT_CONFIG_V1",
+      "after": "SECRET355_COMPONENT_CONFIG_V2"
+    },
+    {
+      "before": "INDEPENDENT_CRYPTO_OWNER355_SECRET_COMPONENT_SOURCE_REVIEW_PASSED_V1",
+      "after": "INDEPENDENT_CRYPTO_OWNER355_SECRET_COMPONENT_SOURCE_REVIEW_PASSED_V2"
+    },
+    {
+      "before": "SECRET_OWNER355_COMPONENT_CONSTRUCTED_UNREVIEWED_V1",
+      "after": "SECRET_OWNER355_COMPONENT_CONSTRUCTED_UNREVIEWED_V2"
+    },
+    {
+      "before": "SECRET_OWNER355_COMPONENT_CONSTRUCTION_FAILED_V1",
+      "after": "SECRET_OWNER355_COMPONENT_CONSTRUCTION_FAILED_V2"
+    },
+    {
+      "before": "export function constructionAuthority(root,own,refs){",
+      "after": "export function requiredPackagingEnvironment(environment,roles){\n const expected={NODE_COMPAT_TOOLCHAIN:roles.toolchainRoot,NODE_COMPAT_COMPONENTIZE_MODULE:join(roles.packagerRoot,'src/componentize.js')};\n for(const[key,value]of Object.entries(expected))need(environment?.[key]===value,'Required packaging environment: '+key);\n return Object.freeze(expected);\n}\nexport function constructionAuthority(root,own,refs){"
+    },
+    {
+      "before": " need(root.actualComponentReview===null&&root.actualRuntimeAuthority===null,'No actual component/runtime adoption');captureDescriptor(root.retainedConfig);return true;",
+      "after": " need(same(root.requiredPackagingEnvironment,refs.requiredPackagingEnvironment),'Explicit packaging environment bound by Root');\n need(root.actualComponentReview===null&&root.actualRuntimeAuthority===null,'No actual component/runtime adoption');captureDescriptor(root.retainedConfig);return true;"
+    },
+    {
+      "before": " const history=await validateActualPreflight(c,refs),retainedConfig=captureDescriptor(root.retainedConfig),ro=await c.read(retainedConfig);await c.file(ro.rootAuthority);",
+      "after": " const failure=await c.proof(refs.priorConstructionFailureReview),failureContract=await c.read(refs.priorConstructionFailureContract);\n for(const[key,value]of Object.entries(failureContract.requiredFixedValues))need(same(failure[key],value),'Exact prior construction failure: '+key);\n const failureDescriptorFields={terminal:'actualOwnedNodeTerminal',stdout:'actualStdout',stderr:'actualStderr',rootObservation:'rootObservation',sourceIndex:'sourceIndex'};\n need(same(Object.keys(failureDescriptorFields).sort(),Object.keys(failureContract.requiredExactDescriptors).sort()),'Complete failure descriptor roles');\n for(const[key,value]of Object.entries(failureContract.requiredExactDescriptors))need(same(failure[failureDescriptorFields[key]],value),'Exact prior failure descriptor: '+key);\n need(failureContract.grantsRetryOrRuntimeAuthority===false&&same(refs.requiredPackagingEnvironment,failureContract.requiredEnvironmentForAnySeparatelyAuthorizedSuccessor),'Failure evidence does not authorize this phase');\n const history=await validateActualPreflight(c,refs),retainedConfig=captureDescriptor(root.retainedConfig),ro=await c.read(retainedConfig);await c.file(ro.rootAuthority);"
+    },
+    {
+      "before": " await headroom(dirname(refs.outputRoot),2*1024*1024*1024);try{await lstat(refs.outputRoot);throw new Error('Fresh output root required');}catch(e){need(e.code==='ENOENT','Fresh output root required');}",
+      "after": " const packagingEnvironmentRecord=requiredPackagingEnvironment(process.env,refs.physicalRoles);need(same(packagingEnvironmentRecord,refs.requiredPackagingEnvironment),'Actual required packaging environment');\n await headroom(dirname(refs.outputRoot),2*1024*1024*1024);try{await lstat(refs.outputRoot);throw new Error('Fresh output root required');}catch(e){need(e.code==='ENOENT','Fresh output root required');}"
+    },
+    {
+      "before": "  await out.write('retained-record-data.json',Object.fromEntries(Object.entries(record).filter(([k])=>k!=='recheck')),{json:true});",
+      "after": "  await out.write('required-packaging-environment.json',packagingEnvironmentRecord,{json:true});\n  await out.write('retained-record-data.json',Object.fromEntries(Object.entries(record).filter(([k])=>k!=='recheck')),{json:true});"
+    }
+  ],
+  "inheritedWholeFiles": [
+    "guest.mjs",
+    "public-abi.wit",
+    "future-validation-workload.json",
+    "future-artifact-boundary.json"
+  ]
+}

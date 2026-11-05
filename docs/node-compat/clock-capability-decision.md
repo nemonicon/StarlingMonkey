@@ -4,6 +4,27 @@ This is an engineering decision for the next clock-profile source proposal.
 It does not change an accepted profile, activate a capability, or admit the
 captured timer component. The accepted checkpoint remains foundations-v13.
 
+Current experimental evidence advances the earlier proposal below: actual core
+pruning/validation succeeds, and the separate complete WIT-package decode passes
+[independent DATA review](../../tests/node-compat/foundation-scheduler/independent-clock-io-metadata-package-results-review-v1/README.md).
+The original Jco decoder phase remains failed. The first package-loader source
+is held on a repeated-call protection gap; the genuine v2 successor passes
+[independent source review](../../tests/node-compat/foundation-scheduler/independent-clock-package-loader-v2-source-review-v1/README.md).
+The fresh [ReactDOM construction](../../tests/node-compat/foundation-scheduler/clock-v13-component-v1-root-results.json)
+now exits0: its 15,693,386-byte component imports exactly these three0.2.10
+interfaces and exports run()->string. The full accepted v13 engine and retained
+ReactDOM bundle remain unchanged. [Independent artifact/type-graph review](../../tests/node-compat/foundation-scheduler/independent-clock-v13-component-results-review-v1/README.md)
+passes callable/resource bindings and all four core identities. The
+[first fresh stock-Wasmtime run](../../tests/node-compat/foundation-scheduler/clock-v13-wasmtime-first-render-v1-comparison.json)
+now returns complete Node-equal ReactDOM markup at raw0. A subsequent
+[seven-return differential](../../tests/node-compat/foundation-scheduler/clock-v13-runtime-v2-root-results.json)
+finishes raw0: three retained/one fresh Jco and three fresh Wasmtime calls all
+equal the complete retained Node result. [Independent actual-result review](../../tests/node-compat/foundation-scheduler/independent-clock-v13-runtime-v2-results-review-v2/results.json)
+passes all seven strings and raw cleanup. All seven resource cases and broader clock/snapshot/lifetime/target-host gates
+remain open.
+The accepted pure profile and original failure baseline stay unchanged.
+Historical statements below describe their original preparation checkpoints.
+
 The intended runtime-clock profile will explicitly select:
 
 - `wasi:clocks/wall-clock@0.2.10` for live realtime reads used by `Date`.
@@ -53,10 +74,10 @@ splits poll from stream/error stubbing and adds a narrow adapter-pruning CLI.
 The original memory-first adapter violates the selected wirm replacement
 helpers' import-entry/function-index assumption. A checked import-order
 normalizer and exact normalized-input hash guard precede the proposed operation;
-engine-specific random/realloc stubs are excluded. In-memory hash preparation
-and pure tests have run. No normalized adapter is published and no Rust pruner,
-new package, component or guest has run. Source review, compilation, full final
-import/type graph and runtime gates remain open.
+engine-specific random/realloc stubs are excluded. At that proposal checkpoint, in-memory hash preparation
+and pure tests had run, without normalized-adapter publication, Rust pruner,
+new package or guest execution. Later tool/core/type evidence is linked above;
+final application import graphs and runtime gates remain open.
 
 The native bridge alternative also needs snapshot analysis before coding.
 [`clock_gettime` and `wizen`](../../runtime/js.cpp#L38) currently call Preview1

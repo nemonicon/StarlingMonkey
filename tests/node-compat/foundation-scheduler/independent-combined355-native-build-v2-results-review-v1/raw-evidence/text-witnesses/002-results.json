@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "state": "INDEPENDENT_CRYPTO_OWNER355_SECRET_FAILURE_SOURCE_REVIEW_HOLD_V1",
+  "sourceIndexSha256": "070f1c20247f4538622cf60fdc1613d44b113c10de0173250456c13d81db1958",
+  "sourceOnly": true,
+  "sourceReviewPassed": false,
+  "verifiedPassed": false,
+  "disposition": "HOLD_M1",
+  "sourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1/index.json",
+    "sha256": "070f1c20247f4538622cf60fdc1613d44b113c10de0173250456c13d81db1958",
+    "bytes": 5888
+  },
+  "mandatoryHistoryErratum": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1-history-erratum.json",
+    "sha256": "0cad60adee41138aaa395585b3a9e60b2000d9634763c8667998049bf8766656",
+    "bytes": 1005
+  },
+  "findings": [
+    {
+      "id": "M1",
+      "classification": "SOURCE_CALLER_PROPAGATION_BLOCKER",
+      "file": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-failure-candidate-v1/afterimages/builtins/web/crypto/crypto-algorithm.cpp",
+        "sha256": "cde6fb727254580a69c1b64202f16155d16329fdc88d08ac5b33980957d54aff",
+        "bytes": 115156
+      },
+      "helperLine": 30,
+      "newNullReturnLine": 38,
+      "uncheckedCallerLines": [
+        943,
+        944
+      ],
+      "resultAllocationLine": 947,
+      "copyLines": [
+        954,
+        955
+      ],
+      "description": "The new null/zero return from to_bytes_expand is not checked by ECDSA sign for r_bytes or s_bytes. The unchanged caller computes result_size from the returned lengths, allocates result, copies and proceeds toward ArrayBuffer return. A failed r or s allocation has no explicit OOM return before those operations.",
+      "sourceCounterexample": "Let r conversion return {nullptr,0} and s conversion return an owned32-byte result, then let result allocation succeed. The caller proceeds with result_size32 and a null source in the zero-length r memcpy; the symmetric s case has the same propagation gap. This is static control-flow reasoning, not an observed fault or successful malformed signature.",
+      "consequence": "The proposed shared-helper failure return is not integrated through every caller. A pending JS allocation error does not replace an explicit caller control-flow guard.",
+      "scope": "All fifteen import/export sites have pointer checks; only these two ECDSA sign sites are unchecked. Other BIGNUM and EC point ownership findings remain source-qualified.",
+      "requiredCorrection": "In a new immutable successor, check each r/s returned owner and report the existing JS_ReportOutOfMemory plus return nullptr before result-size/result-allocation/copy/ArrayBuffer creation on failure. Preserve successful behavior and original proposal/erratum."
+    }
+  ],
+  "integrityDataChecksPassed": true,
+  "sourceIdentityChecksPassed": true,
+  "allocatorOwnershipFindingsQualified": true,
+  "checked": {
+    "candidateMembers": 35,
+    "distinctHashedFiles": 5044,
+    "distinctHashedBytes": 298863565,
+    "dataAssertions": 44876,
+    "finalInputRows": 5024,
+    "syntaxInputRows": 1839,
+    "originalSourceInputRows": 712,
+    "nativeSourceFiles": 355,
+    "changedFiles": 3,
+    "unchangedFiles": 352,
+    "exactReversibleEdits": 11,
+    "extractionCalls": 15,
+    "extractionGroups": 5,
+    "helperCallSites": 17,
+    "checkedHelperCallSites": 15,
+    "uncheckedHelperCallSites": 2,
+    "sdkSyntaxTerminals": 2,
+    "sdkRawExitCodes": [
+      0,
+      0
+    ],
+    "dependencies": 1104,
+    "translationUnits": 2,
+    "headers": 1102,
+    "mirroredNativeFiles": 355,
+    "additionalConfiguredHeaders": 4,
+    "normalFrozenMembers": 1391,
+    "normalOriginalReferenceRows": 1387
+  },
+  "nonblockingFindings": [
+    "Immediate BIGNUM adoption matches caller ownership, preserves all15 parameter call order/nonzero-status tests and closes earlier successful-output orphaning on short-circuit error/CRT fallback paths. Fresh owners and one assignment per slot introduce no ownership transfer or double-free in this source cut.",
+    "OPENSSL_free matches EC_POINT_point2buf allocation. The initially-null owner cannot double-free internally freed conversion-failure storage because the pinned API publishes only success. It precedes builder/params and covers all subsequent exits and the copy in to_param.",
+    "The null check now precedes helper-local padding/pointer arithmetic/BN export, but M1 prevents treating it as complete shared-helper error propagation.",
+    "Actual immutable configured/frozen355 originals, normal1391/1387 protection, API witnesses and syntax dependencies remain unchanged."
+  ],
+  "ownerActionsInvoked": false,
+  "runtimeActionsInvoked": false,
+  "compilerInvokedByReader": false,
+  "nativeBuildOrLinkInvoked": false,
+  "engineExecuted": false,
+  "keyOperationsInvoked": false,
+  "gcActionsInvoked": false,
+  "operationalAdmission": false,
+  "rootActivation": null,
+  "nativeAdoption": false,
+  "runtimeAcceptance": false,
+  "securityCompleteClaim": false,
+  "grantsAnyActionAuthority": false,
+  "limitations": [
+    "This is an unapplied source/data review and HOLD, not native adoption, action permission, runtime acceptance or a security-complete finding.",
+    "No compiler, owner helper, OpenSSL or JS native function, engine, key, crypto, GC, OOM/fault injection, prototype/reset, guest or host workload was invoked by this reader.",
+    "Two author-retained SDK30/LLVM21.1.4 syntax-only commands returned raw0 with full empty streams. Their actual compileDB argv, six archive/alias/config witnesses, complete355+4 VFS and1104 dependencies were checked; no new compilation or object/link proof is claimed.",
+    "The80 pointer-ID,10 point and10 helper-allocation models are abstract source-shaped models. They do not prove actual native fault cleanup, erasure or finalizer behavior and omitted the ECDSA caller boundary exposed by M1.",
+    "The pinned OpenSSL getter publishes caller-owned BIGNUM outputs only on successful conversion; partial-failed-output cases are conservative synthetic cases, not actual observed outputs.",
+    "BN_free remains unchanged; numeric/length/bounds policies and additional private/secret-copy cleanup remain open. No all-copies erasure, allocation-fault recovery or security completeness is established.",
+    "The finite compiler provenance authenticates archive/driver/config/alias/argv/header bytes, not an independently reconstructed hermetic operating-system dynamic-library environment.",
+    "The erratum corrects output chunk492121 being labelled a session; the original indexed preparation-history bytes are preserved unchanged."
+  ]
+}

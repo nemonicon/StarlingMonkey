@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "blockedSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-package-loader-candidate-v1/index.json",
+    "sha256": "21b9f3063de6995b555400b2afd6deb3fdf0a6191fb1a540a6673ddb59dc060c",
+    "bytes": 7179
+  },
+  "id": "CLOCK-PACKAGE-LOAD-REPEAT-BOOKEND-M1",
+  "source": "loader.mjs:171-175 versus209-210",
+  "problem": "Second load rejects handleIssued before Capture/try/finally, so no prior protection recheck is run. Stored59 tests cover repeated componentize, not repeated load.",
+  "required": [
+    "Preserve v1 and this HOLD unchanged.",
+    "A genuine versioned successor must retain the latest genuine Source/package/environment/native/TMP protection recheck from the first load.",
+    "Every subsequent forbidden loader invocation must refuse without reentering package loading and execute that retained recheck in a finally path, including invalid second-load config.",
+    "Before the full load context exists, retain the actual captured-file recheck once Capture is created; when the complete check exists, retain it without rebinding native/helper metadata or globals.",
+    "Test the actual reusable gate/caller seam using pure injected contexts: one successful/partial-failed load, replacement by complete recheck, repeated valid/invalid call, retained recheck failure, zero second package/body calls.",
+    "Preserve all fixed package/artifact/proof/capability/native-caller/fresh-process requirements and new independent peer/Root NULL gates."
+  ],
+  "grantsActionAuthority": false
+}

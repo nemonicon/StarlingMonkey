@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "parent": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-component-v2-root-launcher.py",
+    "sha256": "f11c1f1031b634f8d318d194f174ae59ae6ef3727a07db6e0f09e26b471cb750",
+    "bytes": 8138
+  },
+  "after": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-component-v1-root-launcher.py",
+    "sha256": "ad5795632e41ccb145ff31779252bdc13953f1d14792849bb6abbd54ac745d99",
+    "bytes": 8409
+  },
+  "exactEdits": [
+    {
+      "before": "SOURCE = HERE / 'ownership-secret-component-candidate-v2'",
+      "after": "SOURCE = HERE / 'clock-v13-component-candidate-v1'"
+    },
+    {
+      "before": "MONITOR = HERE / 'ownership-gc-build-controller-candidate-v1/monitor.py'",
+      "after": "MONITOR = HERE.parent / 'foundation-crypto/ownership-gc-build-controller-candidate-v1/monitor.py'"
+    },
+    {
+      "before": "    protected[config['rootAuthority']['path']] = config['rootAuthority']",
+      "after": "    protected[config['rootAuthority']['path']] = config['rootAuthority']\n    for descriptor in [config['loaderConfig'], authority['loaderRootAuthority']]:\n        assert row(descriptor['path']) == descriptor\n        protected[descriptor['path']] = descriptor"
+    },
+    {
+      "before": "required = refs['requiredPackagingEnvironment']",
+      "after": "required = refs['requiredNativeReadOnlyEnvironment']"
+    },
+    {
+      "before": "authority['requiredPackagingEnvironment']",
+      "after": "authority['requiredNativeReadOnlyEnvironment']"
+    },
+    {
+      "before": "authority['componentInitializationAllowed']",
+      "after": "authority['engineInitializationDuringConstructionAllowed']"
+    },
+    {
+      "before": "'keyOrCryptoOperationsAllowed'",
+      "after": "'keyOrCryptoWorkloadsAllowed'"
+    },
+    {
+      "before": "    tempdir = observer / 'tmp'\n    tempdir.mkdir(mode=0o700)",
+      "after": "    tempdir = Path(refs['privateTemporaryRoot'])\n    assert not tempdir.exists()\n    tempdir.mkdir(mode=0o700)"
+    },
+    {
+      "before": "ROOT_OBSERVED_SECRET355_COMPONENT_CONSTRUCTION_ZERO_UNREVIEWED_V2",
+      "after": "ROOT_OBSERVED_CLOCK_V13_COMPONENT_CONSTRUCTION_ZERO_UNREVIEWED_V1"
+    },
+    {
+      "before": "ROOT_OBSERVED_SECRET355_COMPONENT_CONSTRUCTION_FAILED_V2",
+      "after": "ROOT_OBSERVED_CLOCK_V13_COMPONENT_CONSTRUCTION_FAILED_V1"
+    },
+    {
+      "before": "ownership-secret-component-v2-root-results.json",
+      "after": "clock-v13-component-v1-root-results.json"
+    }
+  ],
+  "rootSourceOnly": true,
+  "actualCallsInvoked": false
+}

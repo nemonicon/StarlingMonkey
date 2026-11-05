@@ -1,0 +1,7 @@
+# Experimental clock loader Source: HOLD
+
+The21b9 family is held for one concrete bookend gap. `loadExperimentalClockPackage` rejects `handleIssued` at loader.mjs172 before creating Capture or entering either finally scope. A forbidden second load therefore does not run any previously retained protection check. The existing59 tests exercise repeated componentize calls, whose finally is correct; they do not cover repeated loader calls. No unsafe package action was observed.
+
+The independent read/hash/static reader completed108,253 checks across all43 actual indexed members,5,028 declared inputs/six complete families,4889 package regulars/21 aliases/25 build artifacts, modes/identities and final bookends. The three actual unchanged DATA proofs compose correctly; the old adapter phase remains failed. Real source+options/version APIs, explicit87777 adapter, actual capability policy, separate caller-native admission, temporary ownership and prospective Root/peer constraints were traced without invoking them. No additional concrete blocker was found.
+
+The required thin successor must retain the genuine partial/full load recheck and execute it in finally even for forbidden subsequent loads or invalid repeated config, without loading a second package. Tests must exercise the actual gate seam with pure injected rechecks and preserve all original native/capability/proof/context constraints. This HOLD, Source v1 and its old proofs remain unchanged. No operational package/engine/guest action or retry is authorized here.

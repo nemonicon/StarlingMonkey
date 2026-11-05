@@ -2,7 +2,280 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
-Last updated: 2026-11-05. Overall roadmap: **in progress**.
+Last updated: 2026-11-06. Overall roadmap: **in progress**.
+
+Current application result: the comprehensive Next.js fixture passes its Node
+build/HTTP/browser controls, while the full Next server still fails Wasm
+compilation. Three optional package cases pass full Node/Jco/Wasmtime
+comparison. A separate explicitly selected standard-clock component now renders
+real ReactDOM edge HTML on both Jco and Wasmtime in a seven-return differential;
+independent result review passes.
+See the [Next fixture](tests/node-compat/frameworks/nextjs/README.md) for the
+original failures and reusable regression commands. This Git checkpoint
+preserves the new evidence, retained failures and proposed source-only tooling; the full roadmap remains incomplete.
+
+Roadmap continuation after `9806b383`:
+
+- Previous goal turn: **progress**. All 473 pending files were committed and
+  pushed to `origin/main`; remote HEAD was verified as `9806b383`. The worktree
+  was clean at the start of this continuation. Full roadmap remains incomplete.
+- The [private Rustup diagnostic review](tests/node-compat/foundation-scheduler/independent-rustup-private-bootstrap-probe-review-v1/results.json)
+  passes (`fa0fc90a`): six exact raw-zero commands, persistent private setting,
+  target installation, repeated install and Cargo proxy. All 4,253 prior observed
+  inputs and the failed build's 755-file membership remain unchanged. Recorded
+  process/files corroborate the private Rustup home; whole child environments
+  and private Cargo/home values are not independently attested. This is a
+  bootstrap diagnostic, not native build authority.
+- Independent clock-loader source review finds one concrete blocker: the second
+  loader call refuses before running the retained protection recheck promised
+  by its documentation. [The held review](tests/node-compat/foundation-scheduler/independent-clock-package-loader-source-review-v1/results.json)
+  preserves that finding and otherwise verifies the declared package/proof
+  closure. The genuine [v2 successor](tests/node-compat/foundation-scheduler/clock-package-loader-candidate-v2/README.md)
+  now passes [independent Source reviewd0b13291](tests/node-compat/foundation-scheduler/independent-clock-package-loader-v2-source-review-v1/results.json):
+  all 5,080 inputs/eight families, 4,889 regular files/21 aliases/25 artifacts,
+  exact ten-edit reversal and 67 independent pure model checks. The original
+  held source remains unchanged. No actual package or engine runs by that review.
+- [Crypto construction source v2](tests/node-compat/foundation-crypto/ownership-secret-component-candidate-v2/README.md)
+  is sealed at `6a17edae`, with new source/config/output contexts, full prior
+  failure evidence and explicit checks for both required packaging paths before
+  custom imports. All 33,364 inputs/27 families (2.461 GB logical) pass read/hash
+  validation; 20 host-only pure checks pass. The inherited guarded guest/WIT,
+  355 native files, three embedding sources, 75 metadata fields and eleven
+  manifests remain intact. [Independent source review05323098](tests/node-compat/foundation-crypto/independent-ownership-secret-component-v2-source-review-v1/results.json)
+  passes full input/native/packaging joins and separately checks the Root caller.
+- The Root v2 crypto observer passes 22 pure lifecycle/environment checks. It
+  uses the original owned monitor, a fresh Node process and temporary directory,
+  exact packaging paths, retained raw streams and pre/final protection checks.
+  The fresh [Root v2 construction phase](tests/node-compat/foundation-crypto/ownership-secret-component-v2-root-results.json)
+  completes at Root session37855 exit 0: canonical-Python parent93692 and
+  Node93759 both finish cleanly under hard 2,400s/1,800s nested monitors. The
+  actual child environment sets and records both authenticated packaging paths.
+  Component `c067000d…` is 13,057,762 bytes, with imports[] and the four original
+  inspect/run(u32)/clear/validate WIT functions. All 33,407 Root-protected files
+  pass final checks. Guest initialization completes without ordinary exports,
+  key workloads or generated-module imports. [Independent artifact review28bc2f47](tests/node-compat/foundation-crypto/independent-ownership-secret-component-v2-results-review-v1/results.json)
+  passes 257,329 checks, verifying the whole embedded core, four-function ABI,
+  raw nested cleanup, package/native protection and loading protocol. Generated
+  glue differs from its previously parsed full predecessor only in the exact
+  core filename literal. No generated module or guest function is run by this
+  review, and no runtime compatibility is claimed.
+- [Native-build retry source v2](tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/README.md)
+  is sealed at `24584f96`: 4,515 inputs/twelve families, 78 pure cases and 43
+  reversible edits across five files. It keeps staged355 unchanged and uses its
+  own actual recipe/helper/work context, persistent private auto-self-update
+  disable and integrated clean launcher. The failed 755-file work tree stays
+  protected rather than used as a cache. [Independent Source review0430a712](tests/node-compat/foundation-scheduler/independent-combined355-native-build-controller-v2-source-review-v1/results.json)
+  passes. It independently parses six actual Python heredoc occurrences; the
+  author counted five unique delimiter names, an evidence-count qualification.
+  The [fresh actual build](tests/node-compat/foundation-scheduler/combined-native355-v2-build-root-results.json)
+  completes at Root61477 exit 0, owned worker795 under the 7,200s monitor.
+  Private Rustup bootstrap, SDK/OpenSSL setup and all 108 build steps pass.
+  Engine `355550f1…` is 10,007,568 bytes; sidecar `5f3be885…` has **80 actual
+  fields**, full355+3 source manifests, eleven selected manifests and complete
+  private-Rustup configuration provenance. The pre-install record retains a
+  historical 57-byte settings digest, with enforcement observed through the
+  unchanged Source-controlled guard; those raw 57 bytes were not archived. The
+  actual post-install 107-byte settings are retained separately. Source/stage/cache guards and
+  owned cleanup pass. The failed v1 roots stay protected. [Independent BUILD
+  DATA review1a67eb2f](tests/node-compat/foundation-scheduler/independent-combined355-native-build-v2-results-review-v1/results.json)
+  passes 20,816 actual references, full compile/SDK/library data and 757 raw text
+  copies. Compile facts use fresh build/source/DB/object/post-build-command
+  evidence, with no standalone per-compiler raw terminals. Ancestor preservation
+  is the declared current closure, not a recursive audit of every old freeze.
+  [Freezer source5230be98](tests/node-compat/foundation-scheduler/combined-native-freezer-candidate-v1/README.md)
+  is sealed with a finite 2,544-copy/653.8 MB base plan, full80 metadata, actual
+  current355 producer/model APIs and frozen-only verification. Independent source
+  [Source review6a74baab](tests/node-compat/foundation-scheduler/independent-combined355-native-freezer-source-review-v1/results.json)
+  passes, including actual untouched path constants and the full copy/protection
+  boundary. The donor monitor has the same ownership logic as original0af with
+  its ceiling narrowed from7,200s to2,400s; its whole-file hash is distinct.
+  [Actual freeze](tests/node-compat/foundation-scheduler/combined-native355-v2-freeze-root-invocation.json)
+  finishes at Root4533/owned worker32744 raw0 under that 2,400s monitor. All
+  observed owned processes are gone, with no timeout, signals or cleanup errors.
+  Receipt `9ce68140` retains 2,596 copies and the unchanged engine/full80
+  metadata. Read-only source admission and post-build Ninja capture pass;
+  engine, bootstrap and guest execution remain closed. [Independent actual
+  freeze reviewe6f9cdcc](tests/node-compat/foundation-scheduler/independent-combined355-native-freeze-v2-results-review-v1/results.json)
+  passes every frozen copy/original pair, unique inode/mode, full native/metadata
+  frame and raw owned cleanup. Its compact current-payload ledger refers to the
+  existing BUILD ledger rather than copying historical trees again. Native
+  admission/export/bootstrap tooling is being implemented; runtime remains open. The verifier
+  reads frozen payloads/models and self-authenticates its active original source;
+  this does not establish that every read was confined to the frozen tree. This combined frame must not be projected into the distinct
+  75-field crypto frame.
+- The [selected-clock application caller source](tests/node-compat/foundation-scheduler/clock-v13-component-candidate-v1/README.md)
+  is sealed at `555b8f10` (11,581 inputs/eleven families, 21 data models and
+  grammar checks), with [independent source review7bca0062](tests/node-compat/foundation-scheduler/independent-clock-v13-component-source-review-v1/results.json)
+  passed. It uses genuine v13
+  `classicPreflight` read/hash admission (full342+3/nine manifests/64-field raw
+  sidecar), the exact retained ReactDOM-edge bundle and the reviewed new loader.
+  Its historical native-admission environment paths remain separate from the
+  new package selection. It imports no old bundler/Jco before the new package.
+  [Actual construction](tests/node-compat/foundation-scheduler/clock-v13-component-v1-root-results.json)
+  finishes at Root30114 exit 0 (Python1494/Node1798, hard 2,400s/1,800s monitors,
+  clean shutdown). Component `5c002f8d…` is 15,693,386 bytes and imports exactly
+  wall-clock, monotonic-clock and poll at0.2.10; no selected interface is unused.
+  Its sole WIT export remains run()->string. The full original ReactDOM bundle
+  and native engine are unchanged. [Independent artifact/type-graph reviewb07378f3](tests/node-compat/foundation-scheduler/independent-clock-v13-component-results-review-v1/results.json)
+  passes exact callable/resource bindings and all four embedded cores. Internal
+  Preview1 clock calls and adapter0.2.0 labels resolve wholly inside the component
+  to its three real0.2.10 imports; no external Preview1/old-version/stdio/error
+  interface exists. Authorized host-only grammar/AST parsing passes without any
+  generated module, component or guest execution during that artifact review.
+  The subsequent separate first render is recorded below.
+  This is the first construction probe, with the full seven resource cases,
+  Date/monotonic/snapshot/timer/task-lifetime and host tests still required.
+- The guarded [crypto runtime caller source](tests/node-compat/foundation-crypto/ownership-secret-runtime-candidate-v1/README.md)
+  is sealed at `6afdb00a`, preserving three fresh sessions, 23 full public strings,
+  20 inner cases and 45 complete successful tags against pinned Node/RFC oracles.
+  Review finds a combined diagnostic failure: when both the guest invocation and
+  raw-result writer throw, the writer error masks the original exception.
+  The source remains held. The v2 successor fixes both diagnostic paths and
+  passes 234 host-only assertions. Before runtime issuance, Root catches another
+  source error: its external runner still defines OWN as the old v1 directory.
+  Root's first v2 Source PASS missed that constant and is explicitly superseded
+  for activation by the [context HOLD](tests/node-compat/foundation-crypto/independent-ownership-secret-runtime-v2-context-correction-v1/results.json).
+  No runtime authority, key or prototype workload was issued or executed.
+  The genuine [v3 successor](tests/node-compat/foundation-crypto/ownership-secret-runtime-candidate-v3/README.md)
+  is sealed at `1f357d3a`: 34,167 inputs/35 families plus the separately declared
+  historical donor tree and the same 234 host-only assertions pass. Tests import
+  the actual inert external module and compare its untouched OWN/OUTPUT/OUT and
+  __file__ constants directly, without a substituted model namespace. All
+  compiled artifacts, guest/ABI, oracles and schedules stay unchanged.
+  [Independent v3 Source review421fd1b1](tests/node-compat/foundation-crypto/independent-ownership-secret-runtime-v3-source-review-v1/results.json)
+  passes, including actual untouched module constants and fresh capture/error
+  checks. The separate [guarded runtime phase](tests/node-compat/foundation-crypto/ownership-secret-runtime-v3-root-invocation.json)
+  completes at Root37217 exit 0, owned Node parent22906 under its 2,400s
+  watchdog. [Actual runtime results](tests/node-compat/foundation-crypto/ownership-secret-runtime-v3-root-results.json)
+  retain all three fresh sessions: 23 full public strings, 20 case records,
+  ten imports, 55 sign/50 verify attempts and 45 full Node/RFC-matching tags.
+  All four guarded cases remain present, including case3 on the verified c067/
+  901c guard. Final source/native/API/package checks and owned cleanup pass.
+  [Independent actual-result reviewe895e34c](tests/node-compat/foundation-crypto/independent-ownership-secret-runtime-v3-results-review-v1/results.json)
+  passes all23 strings/20 full records/45 tags, 45 verification booleans,
+  fifteen native-promise TypeError refusals, twenty guarded getter checks and five
+  constructor checks, plus raw parent/three-worker cleanup. Current Source/package
+  and mode checks pass; original final-check timing is Source-coupled, without
+  standalone actual-time snapshot inventories or whole-environment attestation.
+  DEBUG/OOM/pressure/fault/reset/other variants remain unexecuted; no native-free/
+  wipe or request-reuse claim. A separate stock-Wasmtime host caller source is
+  sealed at [851392e5](tests/node-compat/foundation-crypto/ownership-secret-host-candidate-v1/README.md)
+  around this exact new runtime DATA proof. [Independent Source review3392d951](tests/node-compat/foundation-crypto/independent-ownership-secret-host-source-review-v1/results.json)
+  passes full declared inputs and 68 pure checks, with no engine action. The
+  separate [Root host phase](tests/node-compat/foundation-crypto/ownership-secret-host-v1-root-invocation.json)
+  completes at Root49701 raw0: three fresh Wasmtime validate() calls return
+  whole strings equal to the reviewed Jco wrapper, covering twelve inner cases,
+  27 full Node/Jco-matching tags and 27 verification booleans (15 true/12 false).
+  All four guarded cases run on c067/901 only. Source-controlled final checks
+  and owned cleanup pass. [Independent actual DATA review5fe406ba](tests/node-compat/foundation-crypto/independent-ownership-secret-host-results-review-v2/results.json)
+  reconstructs all three whole WAVE strings, all counters/tags and three fresh
+  child PIDs plus parent/four clean groups. It retains forty current raw text
+  copies and references the fixed declared intake without recursive history
+  expansion. Actual-time protection remains Source-coupled, with current hashes
+  and raw0; no invented historical snapshots. This is separate fresh
+  instantiation, with no request reuse, GC-pressure or wiping proof.
+- A [separate first stock-Wasmtime rendering probe](tests/node-compat/foundation-scheduler/clock-v13-wasmtime-first-render-v1-comparison.json)
+  completes at Root24861/Wasmtime22455 raw0 under a60s owned watchdog. The
+  entire decoded return equals the retained Node oracle: real ReactDOM produces
+  `<p id="wasm-ssr">Hello from real ReactDOM</p>` and bytes45. Pre/final full
+  input/native/component checks and cleanup pass. This is one fresh host call,
+  with no fresh Node oracle, Jco call, retained-instance or wasmCloud result.
+  [Independent first-render DATA reviewd0f9d1ed](tests/node-compat/foundation-scheduler/independent-clock-v13-first-wasmtime-render-results-review-v1/results.json)
+  passes a separate full raw WAVE decode and current input/component checks.
+  The original pre/final 11,935-path check count is Root/control-flow evidence;
+  no independent actual-time ledger was saved and no older construction
+  bookend is transferred. The former Wasmtime clock-subscription trap is resolved
+  for this exact workload, without overwriting its old failed baseline.
+- The [full selected-clock runtime Source](tests/node-compat/foundation-scheduler/clock-v13-runtime-candidate-v1/README.md)
+  is sealed at `3107eee7` with 11,995 inputs/sixteen families, 81 pure cases and
+  five grammar checks. [Independent review05ec90ba](tests/node-compat/foundation-scheduler/independent-clock-v13-runtime-source-review-v1/results.json)
+  holds it on a null-exception sentinel: an intermediate fresh-child completion
+  can be mislabeled after a synthetic literal-null throw. The parent rejects
+  every raw throw, so this cannot yield a full differential PASS. No guest
+  failure or runtime action is inferred. The genuine [v2 successor135d1e45](tests/node-compat/foundation-scheduler/clock-v13-runtime-candidate-v2/README.md)
+  uses explicit exception-presence flags at all five relevant catches, retains
+  failure-presence fields and fresh own/Root/config/output contexts. Full
+  12,079 inputs/eighteen families, 81 inherited plus 52 presence checks and six
+  grammar checks pass. Component, native bytes, all four cores, oracle, maps and
+  schedule remain unchanged. [Independent v2 Source reviewdd8f93f5](tests/node-compat/foundation-scheduler/independent-clock-v13-runtime-v2-source-review-v1/results.json)
+  passes, including 80 checks of the actual extracted failure statements plus
+  the inherited/presence suites (213 pure checks total). The separate mapping-only
+  phase completes at Root19813 raw0 under the genuine 1,200s external monitor.
+  Actual mapped core `2f086827` remains unchanged; seven generated files include
+  glue `ff45f429`. It invokes Jco tool helpers without importing or running the
+  application module. [Independent actual mapped-output review8ab62207](tests/node-compat/foundation-scheduler/independent-clock-v13-mapped-v2-results-review-v1/results.json)
+  passes the complete generated source/standard binding graph, all four core
+  bytes, unchanged glue suffix, ABI, raw cleanup and current declared inputs.
+  Root separately records [the actual mapping67c7a2a9](tests/node-compat/foundation-scheduler/clock-v13-mapped-output-v2-root-review.json).
+  The [genuine runtime differential](tests/node-compat/foundation-scheduler/clock-v13-runtime-v2-root-results.json)
+  finishes at Root33981 raw0: three retained plus one fresh Jco and three fresh
+  Wasmtime returns all equal the complete Node result. Five child terminals and
+  outer cleanup complete; Source-controlled final checks pass. Independent
+  [Independent actual DATA review54683955](tests/node-compat/foundation-scheduler/independent-clock-v13-runtime-v2-results-review-v2/results.json)
+  passes all seven full strings, five child PIDs/six owned groups, all three
+  unchanged full native-frame captures and current declared protection. It
+  retains 62 actual raw text copies without recursive ancestor copying. Original
+  protection timing remains Source-coupled, without invented snapshot ledgers.
+  The seven resource/Date/snapshot/timer/teardown gates remain open; no host-call
+  counts or full Next result are inferred.
+- The new [read-only clock record checker](tests/node-compat/frameworks/package-bundler-execution-v1/check-clock-render.mjs)
+  validates this genuine runtime publication, all seven values, five child
+  terminals, native-frame counts and recorded selected-interface scope. It passes
+  the real records, rejects eighteen semantic mutations plus altered indexed
+  bytes/an unexpected publication member, and leaves original evidence unchanged.
+  It can inspect a complete relocated copy without loading an application. It
+  does not re-audit external type/native provenance or substitute for independent
+  actual-result review. Next and package README files document future-check use;
+  their original pure-profile comparators and known failures remain unchanged.
+  The design preserves two distinct phases: Jco mapped-output preparation, then
+  separately reviewed actual mapping plus retained3/fresh1 Jco and three fresh
+  Wasmtime calls. It will retain unchanged application inputs, Node comparisons,
+  genuine stock Wasmtime scalar invocation and new Jco output mapped through the
+  pinned standard WASI shim. Original wasi:* glue stays unchanged. Standard shim
+  clocks/polling use a real worker thread and blocking Atomics.wait, requiring
+  externally owned Node-process deadlines rather than JavaScript timers.
+  Mapped-output review, actual runtime results and the broader clock suite remain
+  open. No new host service or widened component import is introduced by this
+  standard-shim test plan.
+
+
+- [Combined native artifact toolingc365e608](tests/node-compat/foundation-scheduler/combined-native-artifact-tooling-candidate-v1/README.md)
+  is sealed **Source-only**: a new actual80-field/355+3/eleven-manifest frame,
+  two bounded export/bootstrap phases and a separate repeatable zero-action
+  read/hash preflight proposal. It authenticates the active original verifier
+  separately from frozen payloads, preserves original metadata paths and never
+  adapts the old75-field crypto frame. The compact 2,618-row current boundary,
+  existing20,816-row BUILD ledger/fifteen families and 24,325 unique current files
+  pass Source checks; 28 pin/data plus16 read-only API model cases and grammar
+  checks pass. No helper, verifier, monitor, export, bootstrap, engine or guest
+  action runs during preparation. Independent Source review is pending C; all
+  operational proof/pin/activation slots remain NULL. These proposed APIs are
+  not existing SpiderMonkey embedding APIs or an accepted runtime implementation.
+- Pre-commit exact-membership audit catches a publication defect in the first
+  stock-crypto and repeated-clock DATA packets: their sealers omit copied nested
+  `index.json` files (one/three respectively). All indexed bytes and actual
+  runtime values remain correct, but those v1 packets are held for closed-family
+  consumption. They remain immutable. Genuine v2 sibling reviews now pass: host `5fe406ba`
+  has54 indexed/55 total files; clock `54683955` has78 indexed/79 total files.
+  Fresh DATA-only readers use their actual new contexts, with repair provenance
+  and a sealer that excludes only its own root index. Exact forward/reverse
+  membership and all hashes pass, including the four former omissions. No
+  component/guest action is repeated. These successors are the current review
+  publications; the historical c60a3b24/8946f77a packets stay held.
+- Final checkpoint audit hashes 2,752 indexed members across37 new sealed
+  families. Thirty-five are exactly closed; the two retained historical
+  publication holds have only the four documented omissions, whose bytes equal
+  the actual output indexes. Both successor publications are exactly closed.
+  Staged documentation/framework source passes whitespace checks. The whole
+  staged check reports retained generated/raw whitespace and one existing
+  descriptor-bound controller EOF blank line; those sealed bytes are preserved.
+- This continuation is **progress**: native freeze, guarded stock crypto, mapped
+  Jco output and repeated real ReactDOM rendering now have bounded actual-result
+  reviews. The read-only checker gives future runs a separate experimental
+  baseline. Accepted production remains foundations-v13; new native admission,
+  seven-case resource/clock/snapshot/lifetime gates, public Node crypto/ALS and
+  optional-capability/release/adoption work remain outstanding.
+
 
 Roadmap continuation after `fdd4ee18`:
 

@@ -1,0 +1,29 @@
+# Combined355 normal-OFF freezer source
+
+This dormant source cut freezes the actual combined355 **v2 build**. It consumes the completed independent BUILD review `1a67eb2f…`, engine `355550f1…`, and byte-exact 80-field sidecar `5f3be885…`. It provides a new genuine Frame and explicit admission/freeze/verification APIs. It never changes a donor Frame, globals, source index, policy, metadata, or historical Root action.
+
+The configured source remains `/private/tmp/starling-node-compat/combined-native355-v1-source`; current work is `combined-native355-v2-build`; fresh output is `combined-native355-v2-freeze`. Frozen native source and external embedding roots are recorded separately. The raw sidecar retains every original configured/work path. The retry controller's actual recipe, helper and policy are separately indexed from original native Source `08bfe069…` and this new freezer Source.
+
+The genuine retry producer's seven-argument `validate_metadata` and four-argument `validate_classic_compilation` run in their actual existing contexts only during a future authorized admission call. `layer.HERE`, `layer.REPO` and `layer.POLICY` must match those real contexts. Admission requires native355 + embedding3, all11 manifests, actual68 compile rows (62 policy + five other configured + one generated null), separate embedding1, strict4, private6, full combined/task/resource/crypto/zlib policy and Release/OFF macros. No old342/9/67 or secret75 classifier is adapted.
+
+Before custom imports, the entry hashes all20,816 original BUILD inputs and their modes/link counts, the complete BUILD proof and inherited source families, all1,613 stage copy/original pairs and exact failed-v1 work755 membership. The declared ancestor scope is the original4,515-row controller intake, including356 secret-frozen source rows and four selector-frozen rows. This is not a new recursive replay of every unrelated historical normal frozen receipt. The31 exact SDK symlinks and one actual source archive hardlink remain separate reference witnesses; output files are independent regular copies.
+
+The finite base copy plan contains2,544 files/653,814,002 bytes: native355 and configured-tool DATA1258, embedding3, actual linked archives29, compiled objects69, cache/database/Ninja/wrapper/current producer/ABI/Rust/OpenSSL/SDK/codec evidence, and the complete793-member BUILD review plus its index. Own source, the new Source peer, config/Root and seven generated raw/control files are added at execution. The full20,816-row provenance is verified but is explicitly **not all physically copied**. Neither the entire SDK nor OpenSSL source tree is claimed physically frozen.
+
+The368-byte before-install Rustup JSON remains historical DATA. Its nested57-byte settings descriptor is not rehashed as a current file; those57 bytes were not separately retained. The actual107-byte settings at build completion are a separate live original, with exact metadata binding. Source/control flow supplies preinstall enforcement; no missing raw57 bytes are invented.
+
+A future freeze captures the complete available stdout/stderr and terminal of the read-only Python source admission (600s) and resolved pinned Ninja `-t commands builtin_componentize_embedding` (120s) **before** status, size or semantic assertions. It requires the selected command to equal the actual sidecar's separate embedding command. These are post-build command/source checks, not per-compiler exit receipts. Default Ninja's108 successful build steps and current database/object/link evidence retain the independent BUILD review's qualification.
+
+The output is exclusively created0700, held by a no-follow root descriptor, and checked against root replacement. Every output is0600 with a unique inode, distinct from its original. Copies stream through the unchanged generic data/copy primitives and are checked before/after; no hardlink/symlink or overwrite is used. A2GiB start guard and800MiB copy floor are operational disk limits. Complete available failure bytes and partial output are retained; a failure never overwrites/reuses that namespace or grants acceptance. Directory fsync and a final durable receipt precede the frozen-only verifier.
+
+`verify.py` opens only frozen data plus its own executing bytes. It authenticates the saved own index against an externally supplied expected Source SHA, then loads only the saved byte-authenticated pure models. It verifies all copy membership/modes/inodes, complete80-field raw metadata, native/embedding/manifests, actual BUILD contract, current policy/compile database, Rustup capsules and raw admission/Ninja/control joins. It never imports a relocated producer or reopens original build paths. Its result is explicitly a verified read-only capsule **not accepted**, requiring external parent0 and a separate independent actual artifact review.
+
+The future entry is:
+
+```
+PINNED_PYTHON -B -I OWN/entry.py parent CONFIG_DESCRIPTOR_JSON
+```
+
+This uses the byte-identical six-argument0af monitor at2400s. Its stdout contains the monitor launch record and final terminal JSON; callers must retain and parse both records. The Root and independent Source peer must authenticate before any operational import. `future-source-review-contract.json` specifies the exact peer state/fields. All new authority/peer/freeze-result/export/pin/bootstrap/runtime slots remain null or unissued. No helper, Ninja, monitor, copy writer, freezer, compiler, engine, bootstrap, component, key or guest action ran during preparation. Only Source/data, pure models, actual read/hash boundary and Python AST checks ran.
+
+All-invalid scheduler/runtime lifecycle checks, remaining15 Node/profile deviations, actual linked backend version, GC/other variants, runtime/reset/reuse, adoption and security completeness remain separate future gates. No private backend hook or additional native change is introduced here.

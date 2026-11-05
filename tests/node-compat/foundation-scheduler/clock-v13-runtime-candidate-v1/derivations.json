@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "segments": [
+    {
+      "kind": "EXACT_GENUINE_FUNCTION_SEGMENT",
+      "name": "streaming-primitives",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-component-candidate-v1/build.mjs",
+        "sha256": "6c4eed20984fe8ac211487006bb4a5c4bb8bb945e062739301a6c3a22dfc5926",
+        "bytes": 19569
+      },
+      "text": "export function captureDescriptor(value){\n  const r=Object.freeze({path:value?.path,sha256:value?.sha256,bytes:value?.bytes});\n  need(typeof r.path==='string'&&isAbsolute(r.path)&&resolve(r.path)===r.path&&!r.path.includes('\\\\')&&!r.path.includes('\\0'),'Canonical absolute descriptor; no normalization');\n  need(typeof r.sha256==='string'&&/^[a-f0-9]{64}$/.test(r.sha256)&&Number.isSafeInteger(r.bytes)&&r.bytes>=0&&r.bytes<=2**40,'Exact descriptor primitives');return r;\n}\nfunction relative(n){need(typeof n==='string'&&n&&!isAbsolute(n)&&!n.includes('\\\\')&&!n.includes('\\0')&&n.split('/').every(p=>p&&p!=='.'&&p!=='..'),'Confined local name');return n;}\nfunction identity(s){return [s.dev,s.ino,s.size,s.mtimeMs,s.ctimeMs];}\nclass Capture {\n  rows=new Map();families=[];\n  async file(input){\n    const r=captureDescriptor(input),a=await lstat(r.path),physical=await realpath(r.path);need(a.isFile()&&!a.isSymbolicLink()&&a.size===r.bytes,'Ordinary pinned DATA');\n    const h=createHash('sha256');let bytes=0;for await(const b of createReadStream(r.path)){h.update(b);bytes+=b.length;}\n    const z=await lstat(r.path);need(same(identity(a),identity(z))&&physical===await realpath(r.path)&&bytes===r.bytes&&h.digest('hex')===r.sha256,'Stable exact DATA');\n    const captured={r,identity:identity(z),physical};if(this.rows.has(r.path))need(same(captured,this.rows.get(r.path)),'Captured identity changed');this.rows.set(r.path,captured);return r;\n  }\n  async read(input){const r=await this.file(input);need(r.bytes<=32*1024*1024,'Bounded JSON DATA');const b=await readFile(r.path);need(b.length===r.bytes&&sha(b)===r.sha256,'Exact JSON bytes');return JSON.parse(b);}\n  async tree(root,names){\n    const actual=[];need((await lstat(root)).isDirectory()&&!(await lstat(root)).isSymbolicLink(),'Ordinary family root');\n    async function walk(base,prefix=''){for(const name of await readdir(base)){const p=join(base,name),s=await lstat(p),n=prefix+name;need(!s.isSymbolicLink(),'No family links');if(s.isDirectory())await walk(p,n+'/');else{need(s.isFile(),'Regular family member');actual.push(n);}}}\n    await walk(root);need(actual.length===names.size&&actual.every(n=>names.has(n)),'Exact family membership');\n  }\n  async family(input){\n    const ix=captureDescriptor(input),v=await this.read(ix),base=dirname(ix.path),names=new Set(['index.json']),rows=[ix];\n    need(v.schemaVersion===1&&Array.isArray(v.files)&&v.files.length>0&&v.files.length<=2048,'Finite source/proof family');\n    for(const m of v.files){const n=relative(m.path);need(!names.has(n),'Unique member');names.add(n);const r=captureDescriptor({path:join(base,n),sha256:m.sha256,bytes:m.bytes});await this.file(r);rows.push(r);}\n    await this.tree(base,names);this.families.push({base,names});return rows;\n  }\n  async proof(pair){const rows=await this.family(pair.index);need(rows.filter(r=>same(r,captureDescriptor(pair.result))).length===1,'Result indexed exactly once');return this.read(pair.result);}\n  async recheck(){for(const {r}of [...this.rows.values()])await this.file(r);for(const {base,names}of this.families)await this.tree(base,names);}\n}\n\n",
+      "sha256": "47ff4fb5232e07775546abc38dcf81d2454dad1eabdf2b3b351c42e2e6d24a5d",
+      "bytes": 3122
+    },
+    {
+      "kind": "EXACT_GENUINE_FUNCTION_SEGMENT",
+      "name": "native-frame-and-environment",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-v13-component-candidate-v1/build.mjs",
+        "sha256": "6c4eed20984fe8ac211487006bb4a5c4bb8bb945e062739301a6c3a22dfc5926",
+        "bytes": 19569
+      },
+      "text": "export function nativeFrameModel(frame,refs,metadata){\n need(frame&&Object.isFrozen(frame)&&same(Reflect.ownKeys(frame),['enginePath','sourceRoot','metadata','pin','variant','recheck']),'Whole genuine classicPreflight frame');\n need(frame.variant==='normal-off'&&frame.enginePath===refs.nativeEngine.path&&frame.sourceRoot===refs.nativeSourceRoot&&same(frame.metadata,metadata),'Exact original native context/whole sidecar');\n need(metadata.engineSha256===refs.nativeEngine.sha256&&metadata.engineBytes===refs.nativeEngine.bytes&&metadata.sourceManifest.length===342&&metadata.componentizeSourceManifest.length===3&&metadata.selectedModuleManifests.length===9,'Actual342+3/9 metadata');\n need(metadata.observedCMakeOptions.CMAKE_BUILD_TYPE==='Release'&&metadata.entropyPolicy==='off'&&metadata.gcStress===false&&metadata.oomTesting===false,'Real normalOFF Release');\n need(frame.pin.sourceFiles===342&&frame.pin.engineSha256===refs.nativeEngine.sha256&&frame.pin.receiptSha256===refs.nativeMetadata.sha256&&frame.pin.componentizeSourceRoot===refs.nativeEmbeddingSourceRoot,'Genuine original frozen pin, no metadata projection');\n const d=Object.getOwnPropertyDescriptor(frame,'recheck');need(d&&typeof d.value==='function'&&d.enumerable&&!d.writable&&!d.configurable,'Fresh actual native recheck');return true;\n}\nexport function environmentModel(env,execArgv,version){\n need(version==='v22.14.0'&&same(execArgv,[]),'Plain pinned fresh Node22');\n for(const k of ['NODE_OPTIONS','NODE_PATH','LD_PRELOAD','LD_LIBRARY_PATH','DYLD_INSERT_LIBRARIES','DYLD_LIBRARY_PATH','NAPI_RS_NATIVE_LIBRARY_PATH','NAPI_RS_FORCE_WASI','NAPI_RS_WASI_FLAVOR','NAPI_RS_ENFORCE_VERSION_CHECK','NODE_COMPAT_LEGACY_COMPONENTIZER'])need(!env[k],'No startup/package override '+k);\n return true;\n}\n",
+      "sha256": "86f316ec944fd9717f060a4e54bfada80b4bcd1b3aa795276d0dc2ecefff2df2",
+      "bytes": 1769
+    },
+    {
+      "kind": "EXACT_GENUINE_FUNCTION_SEGMENT",
+      "name": "stock-WAVE-string-decoder",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-wasmtime-transport-candidate-v1/scalar-transport.mjs",
+        "sha256": "6ba958dfa0fcc10dd12f11c856171007e0b0a2e9def041ec2eb45642934b7451",
+        "bytes": 4559
+      },
+      "text": "export function parseScalarStringOutput({stdoutBytes,rawDurablyRetained}){\n need(rawDurablyRetained===true,'Persist complete raw stdout BEFORE parser/assertions');\n need(stdoutBytes instanceof Uint8Array&&stdoutBytes.byteLength<=16*1024*1024,'Bounded complete raw capture; never truncate');\n const raw=new TextDecoder('utf-8',{fatal:true,ignoreBOM:true}).decode(stdoutBytes);\n need(raw.endsWith('\\n')&&!raw.endsWith('\\n\\n'),'Exactly one pinned-macOS println LF');\n const text=raw.slice(0,-1);need(text.length>=2&&text[0]==='\"'&&text.at(-1)==='\"','One typed WAVE string result, not number/tuple/JSON object');\n let result='';\n for(let at=1;at<text.length-1;at++){\n  const ch=text[at];\n  if(ch==='\\\\'){\n   const escape=text[++at];need(at<text.length-1,'Complete escape');\n   if(escape==='u'){\n    need(text[++at]==='{','WAVE unicode uses braces, not JSON uXXXX');const end=text.indexOf('}',at+1),digits=text.slice(at+1,end);\n    need(end>at&&end<text.length-1&&/^[0-9a-fA-F]{1,6}$/.test(digits),'One through six hex digits');\n    const cp=Number.parseInt(digits,16);need(scalar(cp),'Valid Unicode scalar escape');result+=String.fromCodePoint(cp);at=end;\n   }else{const escapes={'\\\\':'\\\\','\"':'\"',\"'\":\"'\",t:'\\t',n:'\\n',r:'\\r'};need(Object.hasOwn(escapes,escape),'Only pinned WAVE escapes');result+=escapes[escape];}\n  }else{\n   const cp=text.codePointAt(at);need(ch!=='\"'&&scalar(cp)&&!(cp<=0x1f||cp>=0x7f&&cp<=0x9f),'No raw control, extra quote or malformed scalar');\n   result+=String.fromCodePoint(cp);if(cp>0xffff)at++;\n  }\n }\n need(result.length<=WIRE_CODE_UNITS,'Complete decoded guest string exceeds wire cap');return result;\n}\n",
+      "sha256": "ef955839e67c9b837f2d592be98e06cf98567ea4109776306442fdab0bd70186",
+      "bytes": 1632
+    },
+    {
+      "kind": "EXACT_GENUINE_FUNCTION_SEGMENT",
+      "name": "checked",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/controller.py",
+        "sha256": "37122b407c3d599b6a410580cb8169cc197600562bc63a719a0278b7b1705faf",
+        "bytes": 30497
+      },
+      "sha256": "c3b1f31b4607aba4656956e24439b2f4633a52ebe2c6c58ce69b332abd7de301",
+      "bytes": 904,
+      "text": "def checked(row):\n    assert type(row)is dict and set(row)=={'path','sha256','bytes'}\n    assert type(row['bytes'])is int and row['bytes']>=0\n    assert isinstance(row['sha256'],str)and len(row['sha256'])==64 and all(c in '0123456789abcdef'for c in row['sha256'])\n    p=Path(row['path']);assert p.is_absolute()and '..'not in p.parts\n    if str(p).startswith('/tmp/'):p=Path('/private'+str(p))\n    for parent in (p,*p.parents):assert not parent.is_symlink(),parent\n    before=p.stat();assert stat.S_ISREG(before.st_mode);h=hashlib.sha256()\n    with p.open('rb')as f:\n        for b in iter(lambda:f.read(4*1024*1024),b''):h.update(b)\n    after=p.stat()\n    assert (before.st_dev,before.st_ino,before.st_size,before.st_mtime_ns,before.st_ctime_ns)==(after.st_dev,after.st_ino,after.st_size,after.st_mtime_ns,after.st_ctime_ns)\n    assert before.st_size==row['bytes']and h.hexdigest()==row['sha256'];return p"
+    },
+    {
+      "kind": "EXACT_GENUINE_FUNCTION_SEGMENT",
+      "name": "descriptor",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/controller.py",
+        "sha256": "37122b407c3d599b6a410580cb8169cc197600562bc63a719a0278b7b1705faf",
+        "bytes": 30497
+      },
+      "sha256": "c1514c6e21b848efe5a7671995b62060b57f4f544b9a9b1ace6402de290bbad2",
+      "bytes": 256,
+      "text": "def descriptor(path):\n    path=Path(path);h=hashlib.sha256()\n    with path.open('rb')as f:\n        for b in iter(lambda:f.read(4*1024*1024),b''):h.update(b)\n    row=dict(path=str(path),sha256=h.hexdigest(),bytes=path.stat().st_size);checked(row);return row"
+    },
+    {
+      "kind": "EXACT_GENUINE_FUNCTION_SEGMENT",
+      "name": "read",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/controller.py",
+        "sha256": "37122b407c3d599b6a410580cb8169cc197600562bc63a719a0278b7b1705faf",
+        "bytes": 30497
+      },
+      "sha256": "5b92eb3b5af5643ac75a8899d4170d10144165b31519a7cf345fdbf1961f0a04",
+      "bytes": 167,
+      "text": "def read(row):\n    p=checked(row);assert row['bytes']<=32*1024*1024\n    raw=p.read_bytes();assert hashlib.sha256(raw).hexdigest()==row['sha256'];return json.loads(raw)"
+    },
+    {
+      "kind": "EXACT_GENUINE_FUNCTION_SEGMENT",
+      "name": "family",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/controller.py",
+        "sha256": "37122b407c3d599b6a410580cb8169cc197600562bc63a719a0278b7b1705faf",
+        "bytes": 30497
+      },
+      "sha256": "ca75b5fdcebebb38020ac6b7426bef8999a6430e9ac727f26a618d0447437c80",
+      "bytes": 637,
+      "text": "def family(row):\n    value=read(row);root=Path(row['path']).parent;rows=[row];seen=set()\n    for r in value['files']:\n        name=r['path'];assert isinstance(name,str)and name and name not in seen and '\\\\'not in name and '\\0'not in name\n        assert not name.startswith('/')and all(p not in ('','.','..')for p in name.split('/'))\n        seen.add(name);d=dict(path=str(root/name),sha256=r['sha256'],bytes=r['bytes']);checked(d);rows.append(d)\n    actual=set()\n    for p in root.rglob('*'):\n        assert not p.is_symlink()\n        if p.is_file():actual.add(str(p.relative_to(root)))\n    assert actual==seen|{'index.json'};return rows"
+    },
+    {
+      "kind": "EXACT_GENUINE_FUNCTION_SEGMENT",
+      "name": "indexed_result",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/controller.py",
+        "sha256": "37122b407c3d599b6a410580cb8169cc197600562bc63a719a0278b7b1705faf",
+        "bytes": 30497
+      },
+      "sha256": "b3b60232c0d557e6343b7731a3541e0522cfa4a6a395d22b5e1bcc6c204981d8",
+      "bytes": 143,
+      "text": "def indexed_result(pair):\n    rows=family(pair['index']);assert sum(r==pair['result']for r in rows[1:])==1\n    return read(pair['result']),rows"
+    },
+    {
+      "kind": "EXACT_GENUINE_FUNCTION_SEGMENT",
+      "name": "validate_terminal",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/controller.py",
+        "sha256": "37122b407c3d599b6a410580cb8169cc197600562bc63a719a0278b7b1705faf",
+        "bytes": 30497
+      },
+      "sha256": "42604fd579a5cb694ea1cc85e7f5e209ee2b7b58f505011a2614cbfddf79d078",
+      "bytes": 532,
+      "text": "def validate_terminal(value,authority):\n    assert value['schemaVersion']==1 and value['authority']==authority and value['rawExitCode']==0\n    assert value['parentOwnedGroupGone']is True and value['allObservedOwnedGroupsGone']is True\n    for k in ['forcedCleanup','timeout']:assert value[k]is False\n    for k in ['remainingObservedPids','signals','errors','interruptedSignals']:assert value[k]==[]\n    assert value['observedProcesses']and value['finalGroups']and all(g['alive']is False for g in value['finalGroups'])\n    return True"
+    },
+    {
+      "kind": "EXACT_GENUINE_FUNCTION_SEGMENT",
+      "name": "load_actual",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/controller.py",
+        "sha256": "37122b407c3d599b6a410580cb8169cc197600562bc63a719a0278b7b1705faf",
+        "bytes": 30497
+      },
+      "sha256": "a21d585bb06c8db8d24195138205c2fa575814c87bca390f7a40fa8f3e66247b",
+      "bytes": 184,
+      "text": "def load_actual(row,name):\n    spec=importlib.util.spec_from_file_location(name,checked(row));module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module"
+    }
+  ],
+  "oldSourceModified": false,
+  "oldNativeMetadataImportedAsDifferentContext": false,
+  "applicationGuestOrComponentModified": false,
+  "generatedMappingProduced": false
+}
