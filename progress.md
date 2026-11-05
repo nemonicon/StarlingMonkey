@@ -4,6 +4,152 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-05. Overall roadmap: **in progress**.
 
+Roadmap continuation after `fdd4ee18`:
+
+- Previous goal turn: **progress**. All repository work was pushed in `d8034839`
+  and `fdd4ee18`; the real Next.js/package experiment has two fresh Wasm matrices,
+  a passing replay comparison and 40 checker self-tests. The worktree was clean
+  at the start of this continuation. The full roadmap is still incomplete.
+- Next available runtime dependency is the selected standard-clock path exposed
+  by ReactDOM. The Rust/Jco tools are built; the valid adapter source `dc08495d`
+  passes independent source review `39013123`.
+  Original adapter/tool/package bytes and all historical failures stay unchanged.
+- Combined355 integration/stage source reviews `aa64ecb0`/`df3a4b5d` pass. The
+  [actual source stage](tests/node-compat/foundation-scheduler/combined-native355-v1-stage-root-results.json)
+  exits 0 (Root63390), producing all 1,613 overlay files on detached baseline54b.
+  [Independent actual review05346785](tests/node-compat/foundation-scheduler/independent-combined355-source-stage-results-review-v1/results.json)
+  verifies copies, modes, inode independence, eleven manifests and raw cleanup.
+  At that stage the work/freeze roots were absent. The subsequent build-only
+  attempt is recorded below; native guest compilation and engine execution were
+  not reached.
+- Retained secret-bootstrap source `c47ac2f9` passes independent review `0372effb`.
+  The [actual read-only call](tests/node-compat/foundation-crypto/ownership-secret-retained-preflight-root-results.json)
+  exits 0 (Root40084/Node77532): one genuine new API call and one fresh own
+  recheck. The entire 41-field historical frame remains identical to `fc86…`; all six
+  new DATA properties and the separate seventh callable descriptor are retained.
+  [Independent actual reviewd80e1142](tests/node-compat/foundation-crypto/independent-ownership-secret-retained-preflight-results-review-v1/results.json)
+  verifies API28256 versus Root28257 protected rows, 355+3 sources, eleven whole
+  manifests, raw process cleanup and ten evidence copies. Original API/helper/
+  historical-callable counts remain zero. New output files are0600 under0700;
+  genuine monitor raw files are0644 under0700, an explicitly qualified scope.
+  No crypto key or engine has run in this continuation.
+- The genuine355-aware component caller `4a2c1e20` passes independent source
+  review `53faf8d2` (252,075 closure checks and four grammar checks). The existing
+  `selectedManifestsForEngine` enumerates only nine optional/core manifest paths
+  and cannot admit the actual eleven-manifest355 frame. Its old policy stays
+  unchanged. After full new-frame verification, the new caller must use the
+  real `builtinMap(fullManifests)`/manifest validation APIs with all eleven whole
+  manifests and preserve the distinct native, embedding and packaging roles.
+  Node `crypto` is still unadmitted; this gate concerns the real global
+  WebCrypto ownership implementation, not Node Hash/Hmac/KeyObject compatibility.
+  The [actual construction attempt](tests/node-compat/foundation-crypto/ownership-secret-component-v1-root-results.json)
+  exits 1 before output creation: `packagingEnvironment` rejects the explicit
+  packaging-root environment. Retained preflight and packaging read/hash checks
+  run, but bundling, componentization, engine initialization and ordinary guest
+  calls are not reached. Input protection passes and all owned groups are gone.
+  The captured evidence does not identify which environment value was missing
+  or different. [Independent failure DATA review6616a140](tests/node-compat/foundation-crypto/independent-ownership-secret-component-failure-review-v1/results.json)
+  passes, retaining ten byte-exact copies and verifying terminal cleanup. A fresh
+  corrected invocation remains outstanding; the failed phase stays failed.
+- Native timers reject snapshot-time calls through `REQUEST_HANDLER_ONLY`.
+  Native `clock_gettime` uses Preview1 for both realtime and monotonic clocks;
+  the future clock profile therefore needs an explicit decision about standard
+  wall-clock as well as monotonic-clock/poll. It must not silently inherit the
+  historical failed component's stream/error interfaces or broaden all imports.
+- [Root read-only adapter preflight](tests/node-compat/foundation-scheduler/clock-io-valid-adapter-v1-root-preflight.json)
+  passes all 24,359 declared inputs, 24,384 unique files and ten full families;
+  both fixed action roots are absent. No normalizer, pruner or metadata parser
+  ran in that read-only check; the subsequent actual phase is recorded below.
+- The [first actual adapter phase](tests/node-compat/foundation-scheduler/clock-io-valid-adapter-v1-root-results.json)
+  finishes at Root16422 exit 1. Genuine normalization produces exact667/53,512B;
+  the one native pruner invocation exits 0 and produces87777d4e…/48,808B.
+  Node core validation exits 0 for both binaries; structural comparison retains
+  six clock/two poll imports, all original instructions with declared remapping,
+  fourteen unreachable stubs and byte-identical encoded WIT metadata.
+- The same phase then fails in Jco's metadata decoder with `Unexpected wit
+  package`. Its full raw stdout/stderr/terminal and failed result are preserved;
+  all observed groups are gone and final protection passes. This is not a
+  successful complete adapter phase. The independent
+  [failure DATA reviewbfeab1bb](tests/node-compat/foundation-scheduler/independent-clock-io-valid-adapter-results-and-metadata-failure-review-v1/results.json)
+  verifies the successful core steps and unchanged old scope. A new metadata-only
+  source `28a8cdab`, with [independent Source reviewe216bd6d](tests/node-compat/foundation-scheduler/independent-clock-io-metadata-package-decoder-source-review-v1/results.json),
+  uses the existing pinned native `wasm-tools`1.235.0 package-aware decoder.
+  Its [separate Root53377 phase](tests/node-compat/foundation-scheduler/clock-io-metadata-package-v1-root-results.json)
+  exits 0 under a300s outer/60s native-command bound. The native decoder retains
+  all 15,184 WIT bytes, six packages, 28 declarations and ten resource/alias
+  observations. These internal0.2.0 metadata declarations are not selected
+  deployed imports; the proposed external profile is still explicitly0.2.10.
+  [Independent actual DATA review4da84dac](tests/node-compat/foundation-scheduler/independent-clock-io-metadata-package-results-review-v1/results.json)
+  passes 372,987 checks, including the complete WIT, raw command records and
+  preserved old trees. Neither normalization nor pruning is repeated or the old
+  failure relabelled. No adapter or component is admitted.
+- [Proposed clock profile](tests/node-compat/foundation-scheduler/clock-profile-v1-design.json)
+  deliberately selects monotonic-clock, wall-clock and poll at 0.2.10. The API
+  matrix now distinguishes intrinsic timer needs from the embedding/adapter's
+  realtime dependency. No imports are activated by that proposal. The existing
+  clock-OFF generic trap remains a compatibility limitation; future identifiable
+  guest refusal behavior is open, alongside deployed clock/snapshot/lifetime tests.
+- Combined355 build controller source `d646d2ec` is sealed with66 pure checks,
+  3,403 inputs and eight families. It reuses the genuine monitor/lifecycle and
+  actual staged recipe, with private Rustup/Cargo homes and four exact cache
+  copies. Independent source review `17aa133e` passes conditionally on removing
+  inherited Bash functions/startup controls before spawning the controller. The
+  [Root launcher](tests/node-compat/foundation-scheduler/combined-native355-v1-build-root-launcher.py)
+  enforces that policy and records variable names only; actual removed names
+  are empty, required entries are absent and home variables are preserved.
+- The [actual combined355 build attempt](tests/node-compat/foundation-scheduler/combined-native355-v1-build-root-results.json)
+  exits 1 at private Rustup bootstrap. Four cache copies and five embedding
+  patches succeed; Rust1.88 installs, then Rustup self-update fails because the
+  private Cargo home has no installed Rustup binary. A rustc version child is
+  observed, but CMake/native guest compilation is not reached. No engine or
+  sidecar is produced. All groups are gone, protection passes, and the failed
+  work tree is preserved rather than resumed. [Independent failure DATA
+  review188878b4](tests/node-compat/foundation-scheduler/independent-combined355-native-build-bootstrap-failure-review-v1/results.json)
+  passes 103,346 checks over 4,253 observed files, including all source/cache
+  copies, twelve observed processes and cleanup. It does not accept a native
+  build. SDK30, fresh ABI compilation and actual metadata remain open.
+- A [fresh private Rustup diagnostic](tests/node-compat/foundation-scheduler/rustup-private-bootstrap-probe-v1-root-results.json)
+  passes all six owned commands: disable private auto-self-update, install 1.88,
+  add wasm32-wasip1, repeat installation, manager version and Cargo-proxy version.
+  It succeeds without a private Cargo bin directory and preserves the original
+  failed build and pinned manager. This tests a bootstrap correction only; it
+  runs no CMake, engine or guest. Independent DATA review and a genuine fresh
+  build recipe/context remain open.
+- The [experimental clock package loader source](tests/node-compat/foundation-scheduler/clock-package-loader-candidate-v1/README.md)
+  is sealed at `21b9f306`: 59 pure cases, two grammar checks, 5,028 declared
+  inputs, actual package/alias/artifact closure and explicit adapter selection.
+  It composes the corrected core and separate metadata evidence while leaving
+  the default loader unchanged. Independent source review, native admission and
+  actual package/component/runtime actions remain open.
+
+- Follow-up static validation passes: 295 JSON documents, 1,616 JSONL rows,
+  43 Python ASTs, seven Node syntax checks, 310 member hashes across nineteen
+  current sealed indices and 1,533 local documentation links. The
+  [audit](tests/node-compat/foundation-scheduler/post-nextjs-checkpoint-audit-v2.json)
+  qualifies one archived, unissued index as retained data, rather than treating
+  its historical member paths as a new relocated package. The original reader
+  failure is retained alongside the corrected audit. No sealed evidence changes.
+  A separate read-only checkpoint scan finds no credential candidates, binaries,
+  installed dependency caches, symlinks or unrelated paths; the largest new file
+  is a 14.8 MB text input manifest.
+  Staged whitespace checking reports five retained warnings: final blank lines
+  in two sealed Python sources and two raw reader logs, plus original Jco stdout
+  trailing whitespace. Their descriptor-bound bytes are preserved; current
+  prose changes pass whitespace checking.
+
+Next work, in dependency order: independently review the new clock-loader source
+and the successful private Rustup diagnostic; issue a genuine fresh native-build
+recipe/context; correct the crypto caller environment in a fresh observed phase;
+then validate actual changed-engine components, selected clocks, snapshot behavior
+and both-host execution. Only after those gates should the unchanged Next/React
+cases be replayed against a new admitted engine. Request context/AsyncLocalStorage,
+process/loader contracts, filesystem/crypto/HTTP capabilities, codec adoption and
+release/performance checks remain broader roadmap work. The saved Next baseline
+and comparators remain the future regression checks; known failures stay visible.
+
+The current accepted native checkpoint remains foundations-v13. All work above
+is experimental source/tooling or explicitly scoped evidence.
+
 Commit/push and framework validation checkpoint (2026-11-05):
 
 - The user requested a complete Git checkpoint and push, followed by a

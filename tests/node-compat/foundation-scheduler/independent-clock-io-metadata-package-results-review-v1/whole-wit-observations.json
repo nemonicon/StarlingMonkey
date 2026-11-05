@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "wasi:cli@0.2.0",
+    "wasi:clocks@0.2.0",
+    "wasi:filesystem@0.2.0",
+    "wasi:io@0.2.0",
+    "wasi:random@0.2.0",
+    "wasi:sockets@0.2.0"
+  ],
+  "declarations": {
+    "wasi:cli/environment@0.2.0": "interface",
+    "wasi:cli/exit@0.2.0": "interface",
+    "wasi:cli/stdin@0.2.0": "interface",
+    "wasi:cli/stdout@0.2.0": "interface",
+    "wasi:cli/stderr@0.2.0": "interface",
+    "wasi:cli/terminal-input@0.2.0": "interface",
+    "wasi:cli/terminal-output@0.2.0": "interface",
+    "wasi:cli/terminal-stdin@0.2.0": "interface",
+    "wasi:cli/terminal-stdout@0.2.0": "interface",
+    "wasi:cli/terminal-stderr@0.2.0": "interface",
+    "wasi:cli/imports@0.2.0": "world",
+    "wasi:io/error@0.2.0": "interface",
+    "wasi:io/poll@0.2.0": "interface",
+    "wasi:io/streams@0.2.0": "interface",
+    "wasi:clocks/monotonic-clock@0.2.0": "interface",
+    "wasi:clocks/wall-clock@0.2.0": "interface",
+    "wasi:filesystem/types@0.2.0": "interface",
+    "wasi:filesystem/preopens@0.2.0": "interface",
+    "wasi:sockets/network@0.2.0": "interface",
+    "wasi:sockets/instance-network@0.2.0": "interface",
+    "wasi:sockets/udp@0.2.0": "interface",
+    "wasi:sockets/udp-create-socket@0.2.0": "interface",
+    "wasi:sockets/tcp@0.2.0": "interface",
+    "wasi:sockets/tcp-create-socket@0.2.0": "interface",
+    "wasi:sockets/ip-name-lookup@0.2.0": "interface",
+    "wasi:random/random@0.2.0": "interface",
+    "wasi:random/insecure@0.2.0": "interface",
+    "wasi:random/insecure-seed@0.2.0": "interface"
+  },
+  "resourceAliasClauses": [
+    {
+      "declaration": "wasi:io/error@0.2.0",
+      "clause": "resource error"
+    },
+    {
+      "declaration": "wasi:io/poll@0.2.0",
+      "clause": "resource pollable"
+    },
+    {
+      "declaration": "wasi:io/streams@0.2.0",
+      "clause": "resource input-stream"
+    },
+    {
+      "declaration": "wasi:io/streams@0.2.0",
+      "clause": "resource output-stream"
+    },
+    {
+      "declaration": "wasi:io/streams@0.2.0",
+      "clause": "use error.{error}"
+    },
+    {
+      "declaration": "wasi:io/streams@0.2.0",
+      "clause": "use poll.{pollable}"
+    },
+    {
+      "declaration": "wasi:cli/stdin@0.2.0",
+      "clause": "use wasi:io/streams@0.2.0.{input-stream}"
+    },
+    {
+      "declaration": "wasi:cli/stdout@0.2.0",
+      "clause": "use wasi:io/streams@0.2.0.{output-stream}"
+    },
+    {
+      "declaration": "wasi:cli/stderr@0.2.0",
+      "clause": "use wasi:io/streams@0.2.0.{output-stream}"
+    },
+    {
+      "declaration": "wasi:clocks/monotonic-clock@0.2.0",
+      "clause": "use wasi:io/poll@0.2.0.{pollable}"
+    }
+  ],
+  "fullWit": {
+    "path": "/private/tmp/starling-node-compat/clock-io-metadata-package-v1-external-root/metadata-wit/stdout.log",
+    "sha256": "6d4b608e27df232ced75558a37088500e39b1cfb0362b12929b7b1d854b8fda7",
+    "bytes": 15184
+  },
+  "finiteTextObservationsOnly": true,
+  "nativeSemanticTypeDecodeFromRetainedActualCall": true,
+  "reviewerDecoderOrParserCommandInvoked": false,
+  "applicationImportFootprintInferred": false
+}

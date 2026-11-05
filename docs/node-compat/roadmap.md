@@ -12,6 +12,16 @@ bounded formatting semantics, genuine request async context and standard WASI
 HTTP integration under the existing phase dependencies. A static export or a
 passing library slice does not close the full Next server gate.
 
+The [optional package-bundler follow-on](../../tests/node-compat/frameworks/package-bundler-execution-v1/README.md)
+now passes real native CommonJS interop, supported-module and React-element
+components on Jco/Wasmtime. A genuine replay retains seven failures without new
+regressions. ReactDOM edge reaches a zero-import component and traps at a named
+clock-subscription frame. The next dependency is the reviewed clock adapter and
+an explicitly selected standard clock/poll profile, followed by real asynchronous
+runtime checks. Node's renderer and Next entries still demand separate
+async-context, process/filename/loader and crypto semantics. The optional bundler
+does not change the accepted native checkpoint or imply a full Next server.
+
 Each phase has a measurable gate. The initial deliverable supplies templates and source evidence; these phases describe the work required to turn them into a shipped profile.
 
 The user has authorized execution of the full roadmap. The active

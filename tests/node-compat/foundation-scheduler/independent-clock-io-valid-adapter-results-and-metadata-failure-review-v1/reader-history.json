@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "initialIndependentReaderExitCode": 1,
+  "stage": "core_data.compare raw unmodified-section equality",
+  "finding": "Wirm emits an explicit empty defined-memory section5 (one zero-count byte); the original module omits that section. Types already compared equal. The initial reader incorrectly required raw presence/bytes equality for these sections.",
+  "correction": "Decode complete table and memory definition vectors and compare all values. Reject unknown sections. Omitted and explicit empty defined-memory vectors are semantically identical; the imported env.memory remains separately exact.",
+  "ownerArtifactsModified": false,
+  "normalizerPrunerValidatorOrMetadataToolRerun": false
+}

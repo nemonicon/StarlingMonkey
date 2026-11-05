@@ -1,0 +1,11 @@
+# Independent actual combined355 source-stage review
+
+**DATA PASS** for the completed `937907` stage journal, genuine08bf integration and b1a controller. All1,613 overlay files match full planned bytes and modes, are regular single-link files with pairwise distinct inodes, and share no inode with originals or either Git object store. The complete355 inventory retains348+7, eleven whole selected manifest values match, and configured HEAD is detached at baseline54b. Work/freeze roots remain absent.
+
+The read-only reader performed103,827checks on3,340unique files/124,846,037B, including the complete declared source/protection inputs, source peers, monitor family, direct actual authority/config/invocation, all raw command/owned/progress records and20exact independently copied raw evidence files. Final input hashes, identities, modes, links, family/capture membership and current Git object observations were rechecked.
+
+Root63390 raw0 is explicitly a retained tool observation. Its795-byte stdout has two JSONL records (owned-monitor launch followed by final actual-stage envelope). The owned stageworker has one complete journal-descriptor row and a genuine raw0 terminal with all six observed process records reconciled, no timeout/signal/error/forced cleanup and no remaining observed groups. Both actual Git command terminals are0; their201bytes of stderr are legitimate retained output. All1,616progress records agree with the journal and ordered copy plan.
+
+This reviewer ran only the DATA reader. No Git, monitor, stage, helper, producer, compiler, engine or guest action was invoked or rerun. Original Root/source/output bytes remain unchanged. `results.json` and `result-contract.json` expose direct actual descriptors for the next source/build gate; they grant no build authority.
+
+Limits:1,613 is an overlay count, not whole checkout membership. Git object contents/whole worktree were not decoded. The real controller asserted historical pre/post object identity equality without saving its raw starting table; this review independently checks current disjoint object identities and stability. External embedding3 is unchanged build ancestry, not three staged embedding copies. Actual native build, freeze, pins/bootstrap, component/runtime, backend/parity/reset/reuse/performance acceptance remains separate.

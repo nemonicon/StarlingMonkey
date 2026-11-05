@@ -1,0 +1,9 @@
+# Independent combined355 stage-controller Source review
+
+Bounded **SOURCE PASS** for immutable `b1a21da1c0b925de8a7ccfb55113bff7487662051f95ba21d95b75e494864f1a`, integration `08bfe069`. No material source blocker found. No controller, monitor, Git clone/stage, producer or native/runtime action ran.
+
+The exact1,613-target plan comprises355 native files,1,226 tool/ancestry rows and all32 integration-family files. All source descriptors, actual modes, unique confined targets and integration-role mappings match. Both complete families, declared1,637/1,590 inputs, separate future peers and pinned original0af monitor are authenticated before the only custom import. The real six-argument monitor is called in its original context with600s; Git subcommands are120s. Initial, worker, success and failed-path rechecks preserve original contexts.
+
+The common independent read/hash/source audit and full original ledger are explicitly referenced by `results.json`; no second operational framework is introduced. `check-contract.py` exercises the actual extracted pure peer and terminal functions against the two real new review shapes and22 positive/negative DATA cases. It never imports the controller. Full closure audit,31 additional pure cases,10 ASTs and Bash parse0 are recorded in the integration review.
+
+Future acceptance must retain raw outer launch/final JSONL and Git command streams/terminals, direct journal, modes, copies and observed cleanup. Git stderr is legitimate. The declared overlay count is not total checkout membership; Git object policy is inode/size/mode observation rather than a complete object-byte inventory. Cooperative-workspace copy evidence is not an adversarial atomic filesystem guarantee. Root stage-only authority is separate; build/freeze/pin/bootstrap/component/runtime remain closed.

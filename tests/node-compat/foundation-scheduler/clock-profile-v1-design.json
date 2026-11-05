@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "state": "PROPOSED_STANDARD_CLOCK_PROFILE_V1_NOT_ADMITTED",
+  "selectedInterfaces": [
+    "wasi:clocks/monotonic-clock@0.2.10",
+    "wasi:clocks/wall-clock@0.2.10",
+    "wasi:io/poll@0.2.10"
+  ],
+  "capabilitySelectionIsExplicit": true,
+  "profilePurpose": "Existing native web timers and realtime/monotonic clock closure; not node:timers or complete Node scheduling",
+  "verifiedSourceFacts": [
+    "Native Timer uses MonotonicClock::now and an absolute pollable subscription.",
+    "clock_gettime maps CLOCK_REALTIME and CLOCK_MONOTONIC to Preview1 clock_time_get; the later adapter supplies standard Preview2 clocks.",
+    "wizen retains a monotonic offset and deinitializes the environment.",
+    "setTimeout/setInterval reject pre-initialization through REQUEST_HANDLER_ONLY."
+  ],
+  "sources": [
+    {
+      "path": "runtime/js.cpp",
+      "sha256": "e96bbc5d0d329ccc79ad18fdae0296a1e54df071031eab240d7800fd96b99507",
+      "bytes": 3508,
+      "symbols": "clock_gettime; wizen"
+    },
+    {
+      "path": "builtins/web/timers.cpp",
+      "sha256": "2995842e10417b53cb02ed6d48bfa49b8bc0c076637e928f8c457e47e9e91294",
+      "bytes": 7130,
+      "symbols": "Timer; setTimeout_or_interval"
+    },
+    {
+      "path": "host-apis/wasi-0.2.0/host_api.cpp",
+      "sha256": "10ccb1f84f659195eddc1dab5f8152cdfaa21da660345d07563fa867e87e0a4c",
+      "bytes": 36424,
+      "symbols": "MonotonicClock::now/subscribe/unsubscribe"
+    },
+    {
+      "path": "include/builtin.h",
+      "sha256": "19b759137fe14d8b7bca33c40ec50108e4501277b01a921427b4b64c836bf072",
+      "bytes": 15928,
+      "symbols": "REQUEST_HANDLER_ONLY"
+    }
+  ],
+  "proposal": [
+    "Select wall-clock deliberately because the current engine/adapter has a real realtime path; do not hide Date/realtime behavior to fit the old two-interface failure.",
+    "Remove only verified unwanted adapter stream/error/stdio imports; do not silently select those capabilities.",
+    "Preserve existing zero-import profiles and the historical strict-two-interface seven-case failure corpus.",
+    "Use a distinct reviewed loader and actual pruned adapter through ComponentizeJS options.engine/options.preview2Adapter.",
+    "Calls to Date.now at deployed invocation read the deployed wall clock; values captured by application top-level code remain ordinary snapshot values. Validate rather than claim automatic rebasing of application state.",
+    "No timer/pollable/stream/live host handle may be retained from snapshot initialization; timer calls at top level must still fail componentization.",
+    "The current zero-capability ReactDOM trap is a compatibility limitation. A future clock-OFF guest-side identifiable refusal design remains open; do not describe a generic Wasm trap as a JavaScript API error."
+  ],
+  "requiredRuntimeEvidence": [
+    "Final WIT/core/type graph contains only the explicitly selected standard 0.2.10 interfaces, and all exported ABI/resource references are valid.",
+    "Original unmodified resource/scheduler cases under a separately declared three-interface profile; timer order, cancellation/drop exactly once, rejected callbacks and failure cleanup.",
+    "Date/realtime invocation behavior and monotonic ordering across snapshot resumption, retained calls and fresh instances; no host-timestamp equality assumption across Node/processes.",
+    "Snapshot-time setTimeout/setInterval calls fail; ordinary captured Date values are reported without fabricated deployed resampling.",
+    "Real ReactDOM edge renderer produces whole Node-equal HTML on Jco and stock Wasmtime; streaming/Suspense/abort need additional independent cases.",
+    "Regression checks for zero-import native/React components; request reuse, AsyncLocalStorage and full Next HTTP remain separate."
+  ],
+  "unimplementedNodeModules": [
+    "node:timers",
+    "node:timers/promises",
+    "node:async_hooks"
+  ],
+  "sourceReviewRequired": true,
+  "actualAdapterReview": null,
+  "actualLoader": null,
+  "actualComponent": null,
+  "runtimeResult": null,
+  "hostOrGuestActionGranted": false,
+  "operationalAdmission": false,
+  "runtimeAcceptanceClaim": false
+}

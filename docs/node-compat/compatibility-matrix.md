@@ -379,13 +379,22 @@ The interface package version is **0.2.10** for every production capability sele
 | `tls`, Node HTTP/2 sessions via `http2` | Unavailable initially | **P2 sockets do not provide TLS**. HTTP may use HTTP/2 internally without exposing Node sessions/settings/push | Throwing manifests only if explicitly admitted; future guest TLS needs trust/time/cert validation design |
 | `crypto` deterministic primitives | Deferred native guest OpenSSL/web primitive reuse + Node facade | No added import for selected deterministic paths only after RNG audit; `random/random` belongs to an explicitly selected entropy variant | Known answers, Node algorithm/KeyObject/Hash/Hmac parity, key ownership and RNG reseeding |
 | `zlib` | Deferred guest zlib; assess Brotli separately | None; no `jco:node/zlib` host service | Sync/callback/stream modes, formats/options/error vectors, final size and throughput |
-| `timers`, `timers/promises` | Deferred Node scheduling facade over native event loop | `clocks/monotonic-clock`, `io/poll` | `Timeout`/Immediate/ref/unref, scheduler.wait/yield, nextTick/microtask/immediate ordering and teardown |
+| `timers`, `timers/promises` | Deferred Node scheduling facade over native event loop | Intrinsic timers need `clocks/monotonic-clock`, `io/poll`; the current engine/Preview1 adapter also retains realtime through `clocks/wall-clock` | `Timeout`/Immediate/ref/unref, scheduler.wait/yield, nextTick/microtask/immediate ordering, snapshot refusal and teardown; no Node timers module is admitted yet |
 | `process` bounded env/args/stdio/exit subset | Deferred explicit JS facade with native capability calls | Selected CLI environment/exit/stdin/stdout/stderr; optional clocks for hrtime | Read deployment env after resume, never build env. No OS process, pid fiction, signals, uid/gid mutation or addon loading |
 | `console` | Deferred Node formatting over existing native console sink | CLI stdout/stderr and IO streams | Native web console does not imply Console class/inspect parity |
 | `perf_hooks` | Deferred Node facade over monotonic clock | Monotonic clock, optional wall clock for explicit origin policy | No fabricated V8/libuv/process metrics; observer entries and resume origin |
 | `readline`, `readline/promises` | Deferred line editing after streams | CLI stdio, IO poll/streams, optional terminal interfaces | Nonterminal mode, Unicode, abort and absent TTY |
 | `tty` | Unavailable full Node fd/termios APIs | Standard CLI terminal handles could permit narrow future detection only | Reject unsupported terminal setters; no host fd assumptions |
 | `os` | Deferred profile constants/pure conversions; host introspection unavailable | No general P2 system CPU/memory/hostname/network interface service | Explicit values/throws, no invented host facts |
+
+The [proposed clock profile](../../tests/node-compat/foundation-scheduler/clock-profile-v1-design.json)
+explicitly selects monotonic-clock, wall-clock and poll at 0.2.10 for the existing
+engine's clock closure. It is unadmitted and has no runtime result. This preserves
+the historical failed two-interface policy and its unmodified resource cases;
+it does not accept their unwanted stream/error/stdio imports. The zero-capability
+ReactDOM trap is an observed limitation, not an identifiable JavaScript refusal
+or proof that a selected-clock component works. Node timer objects, request
+context, host-handle lifetimes and async scheduling still require separate tests.
 
 ## Runtime and engine modules
 

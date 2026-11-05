@@ -152,9 +152,10 @@ establish complete Buffer, Streams, Node or Next.js compatibility.
 
 The next implementation priorities from this experiment are:
 
-1. Add audited production CommonJS package bundling while preserving native
-   builtin admission and explicit denials. Re-run the unchanged real Next/React
-   entries to reveal the next barrier; this alone will not supply Node services.
+1. Integrate and extend the separately tested optional production CommonJS
+   bundler while preserving native builtin admission and explicit denials. Its
+   real React/Next runs now expose clocks, async context, process and loader
+   barriers; repeat those unchanged entries after each relevant runtime change.
 2. Implement and differentially validate demanded small semantics such as
    `util.format`, retaining the current deferred-operation failure tests.
 3. Design genuine request-context/AsyncLocalStorage propagation and a selected
