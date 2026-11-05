@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "donor": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-native-candidate-v2/bootstrap.mjs",
+    "sha256": "2de28d56d762433f2c32248289e035eed6ee41c5e37f4355a081cb0ce12b0d52",
+    "bytes": 3352
+  },
+  "changes": [
+    {
+      "before": "const ix=Object.freeze({...config.sourceIndex});assert.equal(ix.path,join(HERE,'index.json'));const index=JSON.parse(await regular(ix));",
+      "after": "const nativeIx=Object.freeze({...config.sourceIndex});assert.equal(nativeIx.path,'/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-native-candidate-v2/index.json');assert.equal(nativeIx.sha256,'ed0665046ec293b846069df0c050a388b1d717abbf4a0e56c64d8bd17d9a6d05');\n const ix=Object.freeze({...config.toolingIndex});assert.equal(ix.path,join(HERE,'index.json'));const index=JSON.parse(await regular(ix));"
+    },
+    {
+      "before": " const root=Object.freeze({...config.rootAuthority});assert(root.path);await regular(root);",
+      "after": " const root=Object.freeze({...config.rootAuthority}),toolingRoot=Object.freeze({...config.toolingRootAuthority});assert(root.path&&toolingRoot.path);await regular(root);await regular(toolingRoot);\n const nativeIndex=JSON.parse(await regular(nativeIx));const nativeRoot=dirname(nativeIx.path);const nativeRows=nativeIndex.files.map(r=>Object.freeze({path:join(nativeRoot,r.path),sha256:r.sha256,bytes:r.bytes}));"
+    },
+    {
+      "before": "await regular(ix);await regular(root);for(const r of rows)await regular(r);",
+      "after": "await regular(ix);await regular(nativeIx);await regular(root);await regular(toolingRoot);for(const r of [...rows,...nativeRows])await regular(r);"
+    },
+    {
+      "before": "[join(HERE,'bootstrap.py'),JSON.stringify(captured)]",
+      "after": "['-B','-I',join(HERE,'action.py'),'bootstrap',JSON.stringify(captured)]"
+    },
+    {
+      "before": "assert.equal(v.sourceIndexSha256,ix.sha256)",
+      "after": "assert.equal(v.sourceIndexSha256,nativeIx.sha256);assert.deepEqual(v.toolingProvenance.nativeSourceIndexed,nativeIx);assert.deepEqual(v.toolingProvenance.toolingIndexed,ix);assert.deepEqual(v.toolingProvenance.nativeRootAuthority,root);assert.deepEqual(v.toolingProvenance.toolingRootAuthority,toolingRoot)"
+    }
+  ]
+}

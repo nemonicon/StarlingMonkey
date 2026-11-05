@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "state": "PURE_RESOURCE_OWNERSHIP_MODEL_CHECKS_PASSED_NOT_NATIVE_RUNTIME",
+  "cases": [
+    {
+      "name": "registration rollback arguments",
+      "checks": 2,
+      "passed": true
+    },
+    {
+      "name": "registration rollback task",
+      "checks": 2,
+      "passed": true
+    },
+    {
+      "name": "registration rollback registry",
+      "checks": 2,
+      "passed": true
+    },
+    {
+      "name": "positive ID exhaustion",
+      "checks": 5,
+      "passed": true
+    },
+    {
+      "name": "one-shot successful completion",
+      "checks": 7,
+      "passed": true
+    },
+    {
+      "name": "ordinary argv allocation failure cleanup",
+      "checks": 6,
+      "passed": true
+    },
+    {
+      "name": "callback failure retirement and original exception",
+      "checks": 6,
+      "passed": true
+    },
+    {
+      "name": "clear queued/double cancel/late invalid run",
+      "checks": 7,
+      "passed": true
+    },
+    {
+      "name": "clear running interval exact-once",
+      "checks": 10,
+      "passed": true
+    },
+    {
+      "name": "interval four turns then clear",
+      "checks": 24,
+      "passed": true
+    },
+    {
+      "name": "nested cancellation keeps outer task traced",
+      "checks": 9,
+      "passed": true
+    },
+    {
+      "name": "timer-only retirement and monotonic IDs",
+      "checks": 8,
+      "passed": true
+    }
+  ],
+  "checks": 89,
+  "baselineCounterexample": {
+    "queueOwnerRemoved": true,
+    "registryRawPointerRetained": true,
+    "pollableDropped": false,
+    "callbackErrorReturnedBeforeCleanup": true,
+    "nativeTaskMayBeDestroyed": true
+  },
+  "nativeGcOrHostProof": false,
+  "queueAllocationFatalNotModeledAsRecoverable": true,
+  "hostTrapRollbackNotClaimed": true,
+  "fullResetOrRequestReuseUnsupported": true,
+  "ownerHelpersOrWorkloadsInvoked": false
+}

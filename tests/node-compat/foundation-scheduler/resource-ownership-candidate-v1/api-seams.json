@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "implementedUnappliedScope": [
+    "strong native timer registry which traces JS callback/argument edges until retirement",
+    "fallible argument/task/map preparation before legacy queue commit and first host subscription",
+    "one idempotent terminalization path for ordinary success, callback error, argv allocation error, queued/running clear, repeated cancellation",
+    "owned pollable invalidated before drop and destructor backstop",
+    "running/cancelling tasks explicitly JS-rooted before queue detachment and constRefPtr alias erased",
+    "positive bounded monotonic IDs; no reset rewind"
+  ],
+  "actualExistingApisUsed": [
+    "js::HashMap putNew/lookup/remove with js::SystemAllocPolicy",
+    "js::Vector reserve/infallibleAppend",
+    "JS::Rooted<T> with pinned StructGCPolicy<T>::trace",
+    "api::Engine::queue_async_task existing void API",
+    "host_api::MonotonicClock::now/subscribe/unsubscribe existing API"
+  ],
+  "unresolved": [
+    {
+      "id": "GLOBAL_FALLIBLE_QUEUE",
+      "fact": "Engine/EventLoop queue_async_task returns void and uses std::vector::emplace_back. Existing no-exception commands provide no recoverable false outcome. Candidate does not invent an embedding API or claim rollback after native queue failure.",
+      "nextPatch": "Review a genuine fallible queue representation/API and all registration callers, plus explicit queue-closing/reentry policy, before general transactional registration is claimed."
+    },
+    {
+      "id": "RESET_UNSUPPORTED",
+      "fact": "Engine::reset/live queue cancellation, interest zeroing, HTTP task cancellation, all-invalid select, Promise/finalizer quiescence and owner epochs remain outside this patch. No unsafe reset action is allowed."
+    },
+    {
+      "id": "HOST_TRAPS_AND_HANDLE_FAILURE",
+      "fact": "Existing monotonic subscription/drop API has no recoverable error result. Host traps and numeric-handle boundary guarantees remain outside the recoverable protocol."
+    },
+    {
+      "id": "PROMISE_CONTEXT_AND_ALS",
+      "fact": "No Promise or ALS code is installed. Actual SM creation metadata and registration-time reaction capture/restore, optimized-out/explicit-empty distinction and real realms remain prerequisites. No Promise.then facade/Debugger shortcut."
+    },
+    {
+      "id": "NATIVE_RUNTIME_VALIDATION",
+      "fact": "Frontend/pure model evidence only. New separately authorized Release/ReleaseGC source receipts and actual guest lifecycle/inline GC/ordinary failures are needed before adoption. No fault/OOM/host or performance result is inferred."
+    }
+  ],
+  "publicNodeTimersNextTickOrAlsEnabled": false,
+  "productionApplied": false,
+  "rootPhase": null,
+  "sourcePeer": null,
+  "nativePins": null,
+  "adoptionAuthority": null,
+  "runtimeValidation": null
+}

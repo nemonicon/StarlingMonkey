@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-controller-candidate-v1/controller.py",
+    "sha256": "498bae1c2a8fccb376e69efaaee28a494a79e56693cb13767673e164506d1ae5",
+    "bytes": 14524
+  },
+  "afterimage": "controller.py",
+  "edits": [
+    {
+      "before": "    groups = {root_pid} | {r['pgid'] for r in known.values() if r['pid'] == r['pgid']}\n",
+      "after": "    owned_sessions = {root_pid} | {r['pgid'] for r in known.values() if r['pid'] == r['pgid']}\n    # Account for every stored group and every CURRENT group of any known PID.\n    # Unknown ownership remains a refusal to signal and a refusal of completion.\n    groups = owned_sessions | {r['pgid'] for r in known.values()} | {rows[pid]['pgid'] for pid in known if pid in rows}\n",
+      "count": 1
+    },
+    {
+      "before": "signalAllowed=bool(matched), matchedPids",
+      "after": "signalAllowed=bool(matched) and pgid in owned_sessions, matchedPids",
+      "count": 1
+    },
+    {
+      "before": "\n            final_groups = group_model(observe(), known, child.pid)",
+      "after": "\n            final_rows = observe()\n            final_groups = group_model(final_rows, known, child.pid)",
+      "count": 1
+    },
+    {
+      "before": "\n                final_groups = group_model(observe(), known, child.pid)",
+      "after": "\n                final_rows = observe()\n                final_groups = group_model(final_rows, known, child.pid)",
+      "count": 1
+    },
+    {
+      "before": "    child = None\n    timed_out",
+      "after": "    child = None\n    final_rows = {}\n    timed_out",
+      "count": 1
+    },
+    {
+      "before": "    complete = child is not None and bool(final_groups) and not any(g['alive'] for g in final_groups)",
+      "after": "    remaining_observed_pids = sorted(pid for pid in known if pid in final_rows)\n    complete = child is not None and bool(final_groups) and not any(g['alive'] for g in final_groups) and not remaining_observed_pids",
+      "count": 1
+    },
+    {
+      "before": "forcedCleanup=forced_cleanup, signals=signal_events",
+      "after": "forcedCleanup=forced_cleanup, remainingObservedPids=remaining_observed_pids, signals=signal_events",
+      "count": 1
+    }
+  ],
+  "oldGenericIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-controller-candidate-v1/index.json",
+    "sha256": "5ccf3aa6b9443ff2aecad8f02f22a69934adc73a5125e148c2a67cb24b171217",
+    "bytes": 1373
+  }
+}

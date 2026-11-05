@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "donor": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-freeze-controller-candidate-v1/controller.py",
+    "sha256": "99ac01ccf660f058512e69e64e24f7b34b43b0a449a5afc98557fc8b45a42365",
+    "bytes": 15352
+  },
+  "changes": [
+    {
+      "before": "ownership-gc-freeze-controller-candidate-v1'",
+      "after": "ownership-gc-freezer-helper-amendment-v1'"
+    },
+    {
+      "before": "crypto-owner355-gc-v2-freeze-external-root'",
+      "after": "crypto-owner355-gc-v2-freeze-helper-v1-external-root'"
+    },
+    {
+      "before": "INDEPENDENT_CRYPTO_OWNER355_GC_FREEZE_CONTROLLER_SOURCE_REVIEW_PASSED_V1",
+      "after": "INDEPENDENT_CRYPTO_OWNER355_GC_FREEZER_HELPER_SOURCE_REVIEW_PASSED_V1"
+    },
+    {
+      "before": "assert value['controllerSourceIndexSha256'] == own_index['sha256'] and value['nativeSourceIndexSha256'] == NATIVE_SHA",
+      "after": "assert value['sourceIndexSha256'] == own_index['sha256'] and value['nativeSourceIndexSha256'] == NATIVE_SHA"
+    },
+    {
+      "before": "    monitor_row = next(r for r in captured if r['path'] == str(GENERIC / 'controller.py'))\n    recheck(captured, family_indices)",
+      "after": "    monitor_row = next(r for r in captured if r['path'] == str(GENERIC / 'controller.py'))\n    validate_amendment(config, root, own_index, captured, family_indices)\n    recheck(captured, family_indices)"
+    },
+    {
+      "before": "argv = [sys.executable, str(NATIVE / 'freeze.py'), json.dumps(config_row, separators=(',', ':'))]",
+      "after": "argv = [sys.executable, str(OWN / 'freeze.py'), json.dumps(config_row, separators=(',', ':'))]"
+    },
+    {
+      "before": "    build_peer = root['independentBuildReview']\n",
+      "after": "    build_peer = root['independentBuildReview']\n    assert build_peer == refs['actualBuildProof']\n"
+    }
+  ],
+  "insertedBefore": "\ndef main(config_row):",
+  "inserted": "\n\ndef validate_amendment(config, native_root, own_index, captured, family_indices):\n    assert config['helperAmendmentIndex'] == own_index\n    own_data = read(own_index)\n    assert own_data['sourceOnly'] is True and own_data['state'] == 'SEALED_SOURCE_ONLY_CRYPTO_OWNER355_GC_FREEZER_HELPER_AMENDMENT_V1'\n    amendment_row = config['helperAmendmentAuthority']\n    assert amendment_row != config['rootAuthority']\n    value = read(amendment_row)\n    validate_amendment_data(value, config, native_root, own_index)\n    own_rows = family(own_index)\n    peer = value['independentSourceReview']\n    assert peer == native_root['externalControllerReview']\n    peer_rows = family(peer['index'])\n    assert peer['result'] in peer_rows\n    validate_peer(read(peer['result']), own_index)\n    captured += [amendment_row, *peer_rows]\n    family_indices.append(peer['index'])\n    # Every recorded preparation input is strict in its original context.\n    freeze_row = next(r for r in own_rows if r['path'] == str(OWN / 'input-freeze.json'))\n    inputs = read(freeze_row)['files']\n    assert len({r['path'] for r in inputs}) == len(inputs)\n    for row in inputs:\n        checked(row)\n        captured.append(row)\n\n\ndef validate_amendment_data(value, config, native_root, own_index):\n    assert value['schemaVersion'] == 1 and value['state'] == 'ROOT_REVIEWED_CRYPTO_OWNER355_GC_FREEZER_HELPER_AMENDMENT_V1'\n    assert value['helperAmendmentIndexed'] == own_index\n    assert value['nativeSourceIndexed'] == config['sourceIndex']\n    assert value['nativeRootAuthority'] == config['rootAuthority']\n    assert value['nativeSourceIndexed']['sha256'] == NATIVE_SHA\n    assert value['activeFreezerEntry'] == native_root['helperAmendmentEntry']\n    assert value['activeFreezerEntry']['path'] == str(OWN / 'freeze.py')\n    assert value['activeFreezerEntry'] in family(own_index)\n    assert value['externalControllerEntry'] == native_root['externalControllerEntry']\n    assert value['externalControllerIndex'] == own_index\n    assert value['externalOutputRoot'] == str(OUT)\n    assert value['externalParentDeadlineSeconds'] == native_root['externalParentDeadlineSeconds'] == 2400\n    assert value['configuredSourceRoot'] == SOURCE and value['freezeRoot'] == FREEZE\n    assert value['artifactToolsRoot'] == TOOLS and value['workRoot'] == WORK\n    assert value['engine'] == native_root['engine'] and value['metadata'] == native_root['metadata']\n    assert value['independentBuildReview'] == native_root['independentBuildReview']\n    assert value['freezeAllowed'] is True\n    for key in ('buildAllowed','stageAllowed','bootstrapAllowed','exportAllowed','engineExecutionAllowed','guestAllowed','keyOperationsAllowed','gcWorkloadAllowed','nativeSourceChangesAllowed','normalMutationAllowed','metadataProjectionAllowed','operationalAdmission','runtimeAcceptanceClaim','timingAllowed'):\n        assert value[key] is False\n    assert value['priorFailure'] == {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-v2-freeze-failure-root-results-v1.json', 'sha256': 'a396094463cc6f456b9678ebb2fb50d362188986ac4b2f7213ef393c77f148c8', 'bytes': 10406}\n"
+}

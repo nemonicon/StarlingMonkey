@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "basis": "Manual source inspection only; no native lifecycle was executed.",
+  "paths": [
+    {"path": "registration preparation failure", "source": "TimerTask factory", "ownership": "Rooted input handles remain with the caller; local argument vector/task and failed registry insertion unwind before a host subscription. ID is not consumed.", "limit": "Legacy void vector queue failure is fatal and outside this recoverable claim."},
+    {"path": "one-shot normal completion", "source": "TimerTask::run/retire", "ownership": "Registry and running traced root retain task; old handle drops once; retire removes registration and saved JS edges."},
+    {"path": "argv allocation failure", "source": "TimerTask::run", "ownership": "Retires before reporting OOM and returning false; no stale raw registry entry or owned pollable remains in this source path.", "limit": "No actual OOM/fault execution proof."},
+    {"path": "callback throws", "source": "TimerTask::run", "ownership": "Retires and returns false without clearing/replacing the original pending JS exception; local rooted callback/argv remain valid through cleanup."},
+    {"path": "queued clear", "source": "TimerTask::clear/EventLoop::cancel_async_task", "ownership": "Copy native owner, register traced cancellation root before queue erase, retire registration/handle, then an idempotent second cancel."},
+    {"path": "running self-clear", "source": "TimerTask::clear/TimerTask::run", "ownership": "Queue lookup can miss, but direct cancel retires registry/handle. Current call retains independent rooted callback/argv, then retired flag prevents resubscription."},
+    {"path": "repeated cancellation/destruction", "source": "TimerTask::retire/drop_pollable/destructor", "ownership": "Retired flag suppresses repeat terminalization; exchange-to-invalid suppresses repeated host drop. Destructor is a handle backstop."},
+    {"path": "interval continuation", "source": "TimerTask::run", "ownership": "Drop old subscription, retain registry/running owner, commit legacy queue then subscribe one new pollable.", "limit": "No recovery claim for fatal native queue allocation or host traps."},
+    {"path": "nested task cancellation", "source": "TracedAsyncTask/EventLoop::cancel_async_task/run", "ownership": "Each running/cancelling frame owns a distinct registered JS traceable root; actual task trace methods retain their JS edges.", "limit": "Source/SDK proof only; actual GC and individual subclass trace completeness remain runtime/implementation gates."},
+    {"path": "timer-only cleanup", "source": "timers::reset", "ownership": "Copies each strong registry owner before idempotent removal; does not rewind IDs.", "limit": "Does not make Engine::reset or same-instance request reuse safe; no reset action is authorized."}
+  ],
+  "interestAccounting": "Timers acquire no interest token here and do not decrement the global count; no general interest-accounting repair is claimed.",
+  "runtimeValidation": null,
+  "rootAction": null,
+  "sourceOnly": true
+}

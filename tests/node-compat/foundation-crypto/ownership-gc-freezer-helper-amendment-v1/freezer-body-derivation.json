@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "donor": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-native-candidate-v2/freezer-body.py",
+    "sha256": "68ad737553e0cc19fc6d67b18428074e2dfbbae4b88eee714a51c63678f6a0bf",
+    "bytes": 23006
+  },
+  "changes": [
+    {
+      "before": "source_guard.validate_admission(admission)",
+      "after": "source_guard.validate_admission(context,admission)"
+    },
+    {
+      "before": "'amendmentSourceIndex': context['sourceIndex'], 'donorSourceIndexSha256': source_guard.DONOR_SHA,",
+      "after": "'nativeSourceIndexed': context['sourceIndex'], 'helperAmendmentIndexed': context['helperAmendmentFrame']['index'], 'donorSourceIndexSha256': source_guard.DONOR_SHA,"
+    },
+    {
+      "before": "'rootAuthority': context['rootAuthority'], 'independentSourceReview': {'index': context['peerIndex'], 'result': context['peerResult']},",
+      "after": "'nativeRootAuthority': context['rootAuthority'], 'nativeIndependentSourceReview': {'index': context['peerIndex'], 'result': context['peerResult']},\n        'helperAmendmentRootAuthority': context['helperAmendmentFrame']['rootAuthority'], 'helperAmendmentIndependentSourceReview': context['helperAmendmentFrame']['independentSourceReview'],\n        'selectedCommonHelper': context['selectedCommonHelper'],"
+    },
+    {
+      "before": "'bytes': len(correction_bytes), 'sourceIndexSha256': context['sourceIndex']['sha256']}",
+      "after": "'bytes': len(correction_bytes), 'nativeSourceIndexSha256': context['sourceIndex']['sha256'],\n            'helperAmendmentSourceIndexSha256': context['helperAmendmentFrame']['index']['sha256']}"
+    },
+    {
+      "before": "source_guard.validate_receipt_roles(receipt, context['active']['sha256'], context['donor']['sha256'])",
+      "after": "source_guard.validate_receipt_roles(context, receipt, context['active']['sha256'], context['donor']['sha256'])"
+    },
+    {
+      "before": "'state': 'ACTUAL_AUTHORIZED_CRYPTO_FREEZER_SOURCE_CORRECTION_CAPTURE'",
+      "after": "'state': 'ACTUAL_AUTHORIZED_CRYPTO_GC_FREEZER_HELPER_AMENDMENT_CAPTURE_V1'"
+    }
+  ]
+}

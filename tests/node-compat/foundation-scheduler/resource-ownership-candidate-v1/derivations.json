@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "state": "UNAPPLIED_SOURCE_AFTERIMAGES",
+  "files": [
+    {
+      "path": "builtins/web/timers.cpp",
+      "beforeSha256": "2995842e10417b53cb02ed6d48bfa49b8bc0c076637e928f8c457e47e9e91294",
+      "beforeBytes": 7130,
+      "afterSha256": "0024d009d11aab0705789f5d72fd8ec87deec9c44bdd8b913d970257aaadc9e4",
+      "afterBytes": 9077,
+      "edits": [
+        {
+          "label": "fallible SM container headers",
+          "before": "#include \"event_loop.h\"",
+          "after": "#include \"event_loop.h\"\n#include \"js/HashTable.h\"\n#include \"js/Vector.h\""
+        },
+        {
+          "label": "bounded ID and move/exchange headers",
+          "before": "#include <map>\n#include <vector>",
+          "after": "#include <limits>\n#include <utility>"
+        },
+        {
+          "label": "strong traced fallible registry, never rewind IDs",
+          "before": "  std::map<int32_t, api::AsyncTask *> timers_;\n  int32_t next_timer_id = 1;\n  void trace(JSTracer *trc) {\n    for (auto &[id, timer] : timers_) {\n      timer->trace(trc);\n    }\n  }",
+          "after": "  // Native ownership and JS-edge tracing last until explicit retirement.\n  js::HashMap<int32_t, RefPtr<api::AsyncTask>, js::DefaultHasher<int32_t>,\n              js::SystemAllocPolicy> timers_;\n  uint64_t next_timer_id = 1;\n  void trace(JSTracer *trc) {\n    for (auto iter = timers_.iter(); !iter.done(); iter.next()) {\n      iter.get().value()->trace(trc);\n    }\n  }"
+        },
+        {
+          "label": "single timer terminalization and owned pollable/edge retirement",
+          "before": "class TimerTask final : public api::AsyncTask {\n  using TimerArgumentsVector = std::vector<JS::Heap<JS::Value>>;\n\n  int32_t timer_id_;\n  int64_t delay_;\n  int64_t deadline_;\n  bool repeat_;\n\n  Heap<JSObject *> callback_;\n  TimerArgumentsVector arguments_;\n\npublic:\n  explicit TimerTask(const int64_t delay_ns, const bool repeat, HandleObject callback,\n                     JS::HandleValueVector args)\n      : timer_id_(TIMERS_MAP->next_timer_id++), delay_(delay_ns), deadline_(host_api::MonotonicClock::now() + delay_ns), repeat_(repeat), callback_(callback) {\n    \n\n    arguments_.reserve(args.length());\n    for (const auto &arg : args) {\n      arguments_.emplace_back(arg);\n    }\n\n    handle_ = host_api::MonotonicClock::subscribe(deadline_, true);\n    \n    TIMERS_MAP->timers_.emplace(timer_id_, this);\n  }\n\n  [[nodiscard]] bool run(api::Engine *engine) override {\n    JSContext *cx = engine->cx();\n\n    const RootedObject callback(cx, callback_);\n    JS::RootedValueVector argv(cx);\n    if (!argv.initCapacity(arguments_.size())) {\n      JS_ReportOutOfMemory(cx);\n      return false;\n    }\n\n    for (auto &arg : arguments_) {\n      argv.infallibleAppend(arg);\n    }\n\n    RootedValue rval(cx);\n    if (!Call(cx, NullHandleValue, callback, argv, &rval)) {\n      return false;\n    }\n\n    // The task might've been canceled during the callback.\n    if (handle_ != INVALID_POLLABLE_HANDLE) {\n      host_api::MonotonicClock::unsubscribe(handle_);\n    }\n\n    if (TIMERS_MAP->timers_.contains(timer_id_)) {\n      if (repeat_) {\n        deadline_ = host_api::MonotonicClock::now() + delay_;\n        handle_ = host_api::MonotonicClock::subscribe(deadline_, true);\n        engine->queue_async_task(this);\n      } else {\n        TIMERS_MAP->timers_.erase(timer_id_);\n      }\n    }\n\n    return true;\n  }\n\n  [[nodiscard]] bool cancel(api::Engine *engine) override {\n    if (!TIMERS_MAP->timers_.contains(timer_id_)) {\n      return false;\n    }\n\n    host_api::MonotonicClock::unsubscribe(id());\n    handle_ = -1;\n    return true;\n  }\n\n  [[nodiscard]] uint64_t deadline() override { return deadline_; }\n\n  [[nodiscard]] int32_t timer_id() const { return timer_id_; }\n\n  void trace(JSTracer *trc) override {\n    TraceEdge(trc, &callback_, \"Timer callback\");\n    for (auto &arg : arguments_) {\n      TraceEdge(trc, &arg, \"Timer callback arguments\");\n    }\n  }\n\n  static bool clear(int32_t timer_id) {\n    if (!TIMERS_MAP->timers_.contains(timer_id)) {\n      return false;\n    }\n\n    ENGINE->cancel_async_task(TIMERS_MAP->timers_[timer_id]);\n    TIMERS_MAP->timers_.erase(timer_id);\n    return true;\n  }\n};\n",
+          "after": "class TimerTask final : public api::AsyncTask {\npublic:\n  using TimerArgumentsVector = js::Vector<JS::Heap<JS::Value>, 0, js::SystemAllocPolicy>;\n\nprivate:\n  int32_t timer_id_;\n  uint64_t delay_;\n  uint64_t deadline_ = 0;\n  bool repeat_;\n  bool retired_ = false;\n  Heap<JSObject *> callback_;\n  TimerArgumentsVector arguments_;\n\n  void drop_pollable() {\n    // Invalidate ownership before the host drop; all terminal paths share this.\n    const auto owned = std::exchange(handle_, INVALID_POLLABLE_HANDLE);\n    if (owned != INVALID_POLLABLE_HANDLE) {\n      host_api::MonotonicClock::unsubscribe(owned);\n    }\n  }\n\n  void retire() {\n    if (retired_) return;\n    const RefPtr<TimerTask> keep_alive(this);\n    retired_ = true;\n    drop_pollable();\n    auto entry = TIMERS_MAP->timers_.lookup(timer_id_);\n    if (entry && entry->value() == this) TIMERS_MAP->timers_.remove(entry);\n    callback_ = nullptr;\n    arguments_.clear();\n  }\n\npublic:\n  TimerTask(int32_t id, uint64_t delay, bool repeat, HandleObject callback,\n            TimerArgumentsVector&& args)\n      : timer_id_(id), delay_(delay), repeat_(repeat), callback_(callback),\n        arguments_(std::move(args)) {}\n\n  ~TimerTask() override { drop_pollable(); }\n\n  void subscribe() {\n    const uint64_t now = host_api::MonotonicClock::now();\n    const uint64_t maximum = std::numeric_limits<uint64_t>::max();\n    deadline_ = now > maximum - delay_ ? maximum : now + delay_;\n    handle_ = host_api::MonotonicClock::subscribe(deadline_, true);\n  }\n\n  [[nodiscard]] bool run(api::Engine *engine) override {\n    if (retired_) return true;\n    JSContext *cx = engine->cx();\n    const RootedObject callback(cx, callback_);\n    JS::RootedValueVector argv(cx);\n    if (!argv.initCapacity(arguments_.length())) {\n      retire();\n      JS_ReportOutOfMemory(cx);\n      return false;\n    }\n    for (auto &arg : arguments_) argv.infallibleAppend(arg);\n    RootedValue rval(cx);\n    if (!Call(cx, NullHandleValue, callback, argv, &rval)) {\n      // Native retirement does not clear or replace the original JS exception.\n      retire();\n      return false;\n    }\n    if (retired_) return true; // clearTimeout/clearInterval during callback\n    drop_pollable();\n    if (repeat_) {\n      // Existing enqueue is void/fatal-on-allocation, not recoverably fallible.\n      // No new pollable is acquired until that native queue commit returns.\n      engine->queue_async_task(this);\n      subscribe();\n    } else {\n      retire();\n    }\n    return true;\n  }\n\n  [[nodiscard]] bool cancel(api::Engine *) override {\n    retire();\n    return true;\n  }\n\n  [[nodiscard]] uint64_t deadline() override { return deadline_; }\n  [[nodiscard]] int32_t timer_id() const { return timer_id_; }\n\n  void trace(JSTracer *trc) override {\n    TraceEdge(trc, &callback_, \"Timer callback\");\n    for (auto &arg : arguments_) TraceEdge(trc, &arg, \"Timer callback arguments\");\n  }\n\n  static bool clear(int32_t timer_id) {\n    auto entry = TIMERS_MAP->timers_.lookup(timer_id);\n    if (!entry) return false;\n    // Retain a native owner before queue or registry removal. A running timer\n    // is no longer queued, so retire it even when queue lookup returns false.\n    RefPtr<api::AsyncTask> timer = entry->value();\n    ENGINE->cancel_async_task(timer);\n    return timer->cancel(ENGINE);\n  }\n};\n"
+        },
+        {
+          "label": "prepare fallible args/task/map before queue and host acquisition",
+          "before": "  const int64_t delay = static_cast<int64_t>(delay_ms) * 1000000;\n  auto *const timer = js_new<TimerTask>(delay, repeat, handler, handle_args);\n  ENGINE->queue_async_task(timer);\n\n  *timer_id = timer->timer_id();\n  return true;",
+          "after": "  const uint64_t delay = static_cast<uint64_t>(delay_ms) * 1000000;\n  if (TIMERS_MAP->next_timer_id > static_cast<uint64_t>(std::numeric_limits<int32_t>::max())) {\n    JS_ReportErrorASCII(cx, \"Timer identifier space exhausted\");\n    return false;\n  }\n  TimerTask::TimerArgumentsVector arguments;\n  if (!arguments.reserve(handle_args.length())) {\n    JS_ReportOutOfMemory(cx);\n    return false;\n  }\n  for (const auto &arg : handle_args) arguments.infallibleAppend(arg);\n  const int32_t id = static_cast<int32_t>(TIMERS_MAP->next_timer_id);\n  RefPtr<TimerTask> timer = js_new<TimerTask>(id, delay, repeat, handler, std::move(arguments));\n  if (!timer || !TIMERS_MAP->timers_.putNew(id, RefPtr<api::AsyncTask>(timer))) {\n    JS_ReportOutOfMemory(cx);\n    return false;\n  }\n  // All recoverable allocation checks precede publication/host acquisition.\n  // The legacy void queue's native allocation failure remains fatal, not false.\n  ENGINE->queue_async_task(timer);\n  timer->subscribe();\n  ++TIMERS_MAP->next_timer_id;\n  *timer_id = id;\n  return true;"
+        },
+        {
+          "label": "retire owned timer entries without iterator invalidation or stale ID reuse",
+          "before": "  for (auto &[id, timer] : TIMERS_MAP->timers_) {\n    timer->cancel(ENGINE);\n  }\n  TIMERS_MAP->timers_.clear();\n  TIMERS_MAP->next_timer_id = 1;",
+          "after": "  // Each cancel removes its own registry entry; never retain an iterator across it.\n  while (!TIMERS_MAP->timers_.empty()) {\n    RefPtr<api::AsyncTask> timer = TIMERS_MAP->timers_.iter().get().value();\n    (void)timer->cancel(ENGINE);\n  }\n  // Do not alias old IDs. This does not make Engine::reset safe or supported."
+        }
+      ],
+      "exactReversePassed": true
+    },
+    {
+      "path": "runtime/event_loop.cpp",
+      "beforeSha256": "2230e3fe751ee323e7e60a0e609aaa652006f2f6fd26e965766b9f09700d3182",
+      "beforeBytes": 12504,
+      "afterSha256": "d8be6e450c1f8566161db30f2736d883bc3953ec965fd6abee1bcfe961ec5e1a",
+      "afterBytes": 13028,
+      "edits": [
+        {
+          "label": "actual detached run/cancel task rooting",
+          "before": "struct TaskQueue {",
+          "after": "// A native RefPtr alone is not a JS root after detaching from TaskQueue.\n// Each local root traces the actual task throughout run/cancel, including nesting.\nstruct TracedAsyncTask {\n  RefPtr<api::AsyncTask> task;\n  void trace(JSTracer *trc) {\n    if (task) task->trace(trc);\n  }\n};\n\nstruct TaskQueue {"
+        },
+        {
+          "label": "retain and trace cancellation target before vector erase",
+          "before": "      tasks->erase(it);\n      task->cancel(engine);",
+          "after": "      JS::Rooted<TracedAsyncTask> retiring(engine->cx());\n      retiring.get().task = task; // copy before erase, including an aliased RefPtr argument\n      tasks->erase(it);\n      (void)retiring.get().task->cancel(engine);"
+        },
+        {
+          "label": "trace actual running task through arbitrary callbacks",
+          "before": "    auto task = tasks->at(task_idx);\n    tasks->erase(tasks->begin() + task_idx);\n    bool success = task->run(engine);",
+          "after": "    JS::Rooted<TracedAsyncTask> running(cx);\n    running.get().task = tasks->at(task_idx);\n    tasks->erase(tasks->begin() + task_idx);\n    bool success = running.get().task->run(engine);"
+        }
+      ],
+      "exactReversePassed": true
+    }
+  ],
+  "productionApplied": false
+}

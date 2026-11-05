@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "findingId": "HTTP-HOST-M1",
+  "files": [
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-candidate-v1/models.mjs",
+        "sha256": "f5dcb8635eab3f2d38e93905d7e7a82f0d9b00d718c71af5c6f2e44d4a2b08ed",
+        "bytes": 4728
+      },
+      "afterimage": "models.mjs",
+      "afterSha256": "6bfc5a94ae53c61527d8edbfb7d8899767e9e66124ced1d63520d1f44fa1d43b",
+      "edits": [
+        {
+          "old": "consumers355-http-both-hosts-v1'",
+          "new": "consumers355-http-both-hosts-v2'",
+          "afterOffsetAtEdit": 171,
+          "count": 1
+        },
+        {
+          "old": "v.state==='ROOT_REVIEWED_CONSUMERS355_HTTP_BOTH_HOSTS_V1'",
+          "new": "v.state==='ROOT_REVIEWED_CONSUMERS355_HTTP_BOTH_HOSTS_V2'",
+          "afterOffsetAtEdit": 1496,
+          "count": 1
+        },
+        {
+          "old": "from './authority.mjs'",
+          "new": "from '../http-host-candidate-v1/authority.mjs'",
+          "afterOffsetAtEdit": 92,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-candidate-v1/run.mjs",
+        "sha256": "2536210046af089bf1e3243177bf9abd00bc82b91559224958152de71c6f988c",
+        "bytes": 1276
+      },
+      "afterimage": "run.mjs",
+      "afterSha256": "f24c2a6a027953b6b327dcbc56359867300f453593096989f5c39859a81992d5",
+      "edits": [
+        {
+          "old": "/http-host-candidate-v1'",
+          "new": "/http-host-candidate-v2'",
+          "afterOffsetAtEdit": 378,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-candidate-v1/guard.mjs",
+        "sha256": "63ba8b49f493d7552b4de1e5cf5963bdee187554a96ad64d9f3eecd544474835",
+        "bytes": 8790
+      },
+      "afterimage": "guard.mjs",
+      "afterSha256": "922a64d953f809966ab497d76ef03a55c22d7155453a5162ea069c46624b83ed",
+      "edits": [
+        {
+          "old": "from './authority.mjs'",
+          "new": "from '../http-host-candidate-v1/authority.mjs'",
+          "afterOffsetAtEdit": 257,
+          "count": 1
+        },
+        {
+          "old": "from './proofs.mjs'",
+          "new": "from '../http-host-candidate-v1/proofs.mjs'",
+          "afterOffsetAtEdit": 333,
+          "count": 1
+        },
+        {
+          "old": "from './physical.mjs'",
+          "new": "from '../http-host-candidate-v1/physical.mjs'",
+          "afterOffsetAtEdit": 415,
+          "count": 1
+        },
+        {
+          "old": "INDEPENDENT_CONSUMERS355_HTTP_HOST_SOURCE_REVIEW_PASSED_V1",
+          "new": "INDEPENDENT_CONSUMERS355_HTTP_HOST_SOURCE_REVIEW_PASSED_V2",
+          "afterOffsetAtEdit": 1226,
+          "count": 1
+        },
+        {
+          "old": "ROOT_APPROVED_CONSUMERS355_HTTP_COMPONENT_PHASE_V1",
+          "new": "ROOT_APPROVED_CONSUMERS355_HTTP_COMPONENT_PHASE_V2",
+          "afterOffsetAtEdit": 7356,
+          "count": 1
+        },
+        {
+          "old": "ROOT_APPROVED_CONSUMERS355_HTTP_HOST_CONTROLLER_V1",
+          "new": "ROOT_APPROVED_CONSUMERS355_HTTP_HOST_CONTROLLER_V2",
+          "afterOffsetAtEdit": 7780,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-candidate-v1/source-auth.mjs",
+        "sha256": "f1a083174ddaf8a805bdc611635eddfe4671a03e9c411b03fe57833f0f323561",
+        "bytes": 5002
+      },
+      "afterimage": "source-auth.mjs",
+      "afterSha256": "f36643cf95e06417236f4b5f682eac19b0d7d05fae833138815983edbfd914e3",
+      "edits": [
+        {
+          "old": "const issued=new WeakSet();\nexport async function captureHostSources(index){\n const own=primitiveDescriptor(index),family=await checkIndexedFamily(own);\n const row=family.rows.find(r=>r.path===join(dirname(own.path),'runtime-dependencies.json'));need(row,'own indexed runtime dependency seal');\n const deps=await checkFileRows(JSON.parse(await readVerified(row)).files);\n const recheck=async()=>{await family.recheck();await deps.recheck();};await recheck();\n const capsule=Object.freeze({index:own,recheck});issued.add(capsule);return capsule;\n}\nexport function assertHostSources(capsule,index){need(issued.has(capsule)&&same(capsule.index,primitiveDescriptor(index)),'private source-auth capsule');}\n",
+          "new": "const issued=new WeakSet();\nconst OLD_INDEX=Object.freeze({path:join(dirname(fileURLToPath(import.meta.url)),'../http-host-candidate-v1/index.json'),sha256:'4b7c36f2d50e2c3bee831d7c4681b62bea67fb667e5da10f227125e3dd860e70',bytes:6608});\nexport async function captureHostSources(index){\n const own=primitiveDescriptor(index),inherited=await checkIndexedFamily(OLD_INDEX),family=await checkIndexedFamily(own);\n const row=family.rows.find(r=>r.path===join(dirname(own.path),'runtime-dependencies.json'));need(row,'own indexed runtime dependency seal');\n const deps=await checkFileRows(JSON.parse(await readVerified(row)).files);\n const recheck=async()=>{await inherited.recheck();await family.recheck();await deps.recheck();};await recheck();\n const capsule=Object.freeze({index:own,recheck});issued.add(capsule);return capsule;\n}\nexport function assertHostSources(capsule,index){need(issued.has(capsule)&&same(capsule.index,primitiveDescriptor(index)),'private source-auth capsule');}\n",
+          "afterOffsetAtEdit": 4300,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-candidate-v1/run-body.mjs",
+        "sha256": "09271feeeae0c8d186e2d85dec5903656e9e5fed746d6012d83cf854acd159bf",
+        "bytes": 13879
+      },
+      "afterimage": "run-body.mjs",
+      "afterSha256": "a860f5cd6da85e2587fe513b011c42dda8dd690eb1f38b0e3dff0dc855d36da7",
+      "edits": [
+        {
+          "old": "from './authority.mjs'",
+          "new": "from '../http-host-candidate-v1/authority.mjs'",
+          "afterOffsetAtEdit": 471,
+          "count": 1
+        },
+        {
+          "old": "from './durable.mjs'",
+          "new": "from '../http-host-candidate-v1/durable.mjs'",
+          "afterOffsetAtEdit": 542,
+          "count": 1
+        },
+        {
+          "old": "from './physical.mjs'",
+          "new": "from '../http-host-candidate-v1/physical.mjs'",
+          "afterOffsetAtEdit": 608,
+          "count": 1
+        },
+        {
+          "old": "from './commands.mjs'",
+          "new": "from '../http-host-candidate-v1/commands.mjs'",
+          "afterOffsetAtEdit": 723,
+          "count": 1
+        },
+        {
+          "old": "from './server.mjs'",
+          "new": "from '../http-host-candidate-v1/server.mjs'",
+          "afterOffsetAtEdit": 791,
+          "count": 1
+        },
+        {
+          "old": "from './validate.mjs'",
+          "new": "from '../http-host-candidate-v1/validate.mjs'",
+          "afterOffsetAtEdit": 1016,
+          "count": 1
+        },
+        {
+          "old": "import {validateResponse,validateBoth} from '../http-host-candidate-v1/validate.mjs';",
+          "new": "import {validateResponse,validateBoth} from '../http-host-candidate-v1/validate.mjs';\nimport {captureResponse} from './response-capture.mjs';",
+          "afterOffsetAtEdit": 977,
+          "count": 1
+        },
+        {
+          "old": "reports={},write=(name,v)=>",
+          "new": "reports={},responseCaptures=[],write=(name,v)=>",
+          "afterOffsetAtEdit": 2704,
+          "count": 1
+        },
+        {
+          "old": "  async function request(host,url,tag,sequence,{timeoutMs=30000}={}){\n   loopback(url);const name='requests/'+host+'-'+String(sequence).padStart(4,'0');await write(name+'-before.json',{schemaVersion:1,url:url+tag,method:'GET',partial:true});\n   let response,reader;const chunks=[];let bytes=0;\n   try{\n    response=await fetch(url+tag,{signal:AbortSignal.timeout(timeoutMs),redirect:'error'});reader=response.body?.getReader();need(reader,'Public Node response readable body');\n    for(;;){const r=await reader.read();if(r.done)break;chunks.push(r.value);bytes+=r.value.byteLength;if(bytes>16*1024*1024){await output.write(name+'-body.partial.bin',Buffer.concat(chunks));await reader.cancel();throw Error('Response exceeded finite full-body16MiB capture; partial retained, never accepted');}}\n    const raw=Buffer.concat(chunks);await output.write(name+'-body.bin',raw);const metadata={schemaVersion:1,url:url+tag,status:response.status,headers:[...response.headers],bodyBytes:raw.length,publicFetchHeadersNotWireBytes:true};await write(name+'-raw.json',metadata);\n    const text=new TextDecoder('utf-8',{fatal:true}).decode(raw);return{status:response.status,headers:{contentType:response.headers.get('content-type'),cacheControl:response.headers.get('cache-control')},requestTag:tag,text,body:null,rawBodyFile:name+'-body.bin'};\n   }catch(error){const retry=readinessRetryAllowed(response!==undefined,error?.name);await write(name+'-failure.json',{schemaVersion:1,thrownType:typeof error,name:error?.name??null,message:String(error?.message??'request failed').slice(0,2048),partialBodyBytes:bytes,receivedHeaders:response!==undefined,readinessRetryAllowed:retry,acceptedResponse:false});const failed=new Error('HTTP request failed; full available raw evidence retained');failed.readinessRetryAllowed=retry;throw failed;}\n   finally{try{reader?.releaseLock();}catch{}}\n  }\n",
+          "new": "  async function request(host,url,tag,sequence,{timeoutMs=30000}={}){\n   loopback(url);const name='requests/'+host+'-'+String(sequence).padStart(4,'0');\n   try{const captured=await captureResponse({name,url,tag,\n    fetchResponse:()=>fetch(url+tag,{signal:AbortSignal.timeout(timeoutMs),redirect:'error'}),\n    writeJson:write,writeBytes:(path,bytes)=>output.write(path,bytes)});\n    responseCaptures.push(captured.capture);return captured.response;\n   }catch(error){responseCaptures.push(error?.rawCapture??{schemaVersion:1,availableRawRetained:false,completeResponseRetained:false,captureProtocolFailure:true,failureRecordRetained:false});throw error;}\n  }\n",
+          "afterOffsetAtEdit": 4574,
+          "count": 1
+        },
+        {
+          "old": "CONSUMERS355_HTTP_BOTH_HOSTS_COMPLETE_UNREVIEWED_EXTERNAL_ZERO_REQUIRED_V1",
+          "new": "CONSUMERS355_HTTP_BOTH_HOSTS_COMPLETE_UNREVIEWED_EXTERNAL_ZERO_REQUIRED_V2",
+          "afterOffsetAtEdit": 11422,
+          "count": 1
+        },
+        {
+          "old": "validation,...reports,fullActualComponentAudit",
+          "new": "validation,...reports,responseCaptures,fullActualComponentAudit",
+          "afterOffsetAtEdit": 11663,
+          "count": 1
+        },
+        {
+          "old": "HTTP_HOSTS_COMPLETE_EXTERNAL_PARENT_ZERO_AND_INDEPENDENT_REVIEW_REQUIRED_V1",
+          "new": "HTTP_HOSTS_COMPLETE_EXTERNAL_PARENT_ZERO_AND_INDEPENDENT_REVIEW_REQUIRED_V2",
+          "afterOffsetAtEdit": 12187,
+          "count": 1
+        },
+        {
+          "old": "try{await adopt(output);await write('failure.json',{schemaVersion:1,state:'FAILED_HTTP_HOSTS_UNACCEPTED',name:error?.name??null,message:String(error?.message??'host failure').slice(0,2048),partialRawRetained:true,completedHosts:Object.keys(reports),postFailureSourceAuditPassed:audited,runtimeAcceptanceClaim:false});}catch{}",
+          "new": "let partialInventoryCaptured=false;try{await adopt(output);partialInventoryCaptured=true;}catch{}try{await write('failure.json',{schemaVersion:1,state:'FAILED_HTTP_HOSTS_UNACCEPTED_V2',name:error?.name??null,message:String(error?.message??'host failure').slice(0,2048),partialRawArtifactInventoryCaptured:partialInventoryCaptured,responseCaptures,\n    availableResponseRawRetained:responseCaptures.length?responseCaptures.every(c=>c.availableRawRetained===true):null,\n    responseCaptureWriteFailureObserved:responseCaptures.some(c=>c.captureProtocolFailure===true||c.captureWriteFailures?.length>0||c.failureRecordRetained===false),\n    rawCaptureScope:'Per-attempt complete/partial/write-failure records only; no blanket full capture claim',completedHosts:Object.keys(reports),postFailureSourceAuditPassed:audited,runtimeAcceptanceClaim:false});}catch{}",
+          "afterOffsetAtEdit": 12528,
+          "count": 1
+        },
+        {
+          "old": "import {captureResponse} from './response-capture.mjs';",
+          "new": "import {captureResponse,captureSetSummary} from './response-capture.mjs';",
+          "afterOffsetAtEdit": 1063,
+          "count": 1
+        },
+        {
+          "old": "partialRawArtifactInventoryCaptured:partialInventoryCaptured,responseCaptures,\n    availableResponseRawRetained:responseCaptures.length?responseCaptures.every(c=>c.availableRawRetained===true):null,\n    responseCaptureWriteFailureObserved:responseCaptures.some(c=>c.captureProtocolFailure===true||c.captureWriteFailures?.length>0||c.failureRecordRetained===false),",
+          "new": "partialRawArtifactInventoryCaptured:partialInventoryCaptured,...captureSetSummary(responseCaptures),",
+          "afterOffsetAtEdit": 12815,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    }
+  ],
+  "guestNativeComponentOraclesValidatorsChanged": false
+}

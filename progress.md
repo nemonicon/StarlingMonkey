@@ -4,19 +4,58 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-05. Overall roadmap: **in progress**.
 
+Latest continuation:
+
+- Consumer355 HTTP: actual both-host gate and independent result review pass;
+  six accepted responses and77 separate readiness attempts are retained.
+- Crypto GC: isolated source stage and native build pass review. Corrected freeze
+  and full frozen-artifact review pass. Corrected unreviewed pin export finishes
+  raw0 and its independent data review passes; new reviewed pins/bootstrap and GC
+  component work remain pending. No key/GC workload or new production adoption has run.
+- Scheduler: the timer/task ownership patch and its source review pass; it remains
+  unapplied, with runtime, fallible global enqueue, reset/reuse and ALS work open.
+- Codec pilots/timing, broader lifecycle work and optional standard-capability
+  variants remain outstanding. Accepted production remains bounded foundations-v13.
+
 Git checkpoint requested on 2026-11-04: commit
 `e7c6e2ce4f430811b90bcad77620c1e549963ca0` preserves the implementation,
 documentation, source snapshots, validation evidence, historical failures and
 unfinished templates. Follow-up commit
 `c51cc993a536beea358ea78f4866b116300df0fb` collects the final in-flight work
 and tracker. A further all-work checkpoint was requested on 2026-11-05 and
-includes the subsequent source templates, executed results, independent reviews,
-preserved HOLDs and this updated tracker. Work pauses at this checkpoint with
-the roadmap still in progress. Native engines and external build/runtime artifacts
+commit `d54d9d4b565cdd00f84cf751ac60fe5ec553f5c5` includes the subsequent
+source templates, executed results, independent reviews, preserved HOLDs and
+tracker (644 changed files). Its final worktree was clean; nothing was pushed.
+Roadmap work has resumed after that checkpoint. Native engines and external build/runtime artifacts
 under `/tmp/starling-node-compat` remain outside this repository; committed
 receipts retain their exact references and limits. The pinned
 `54b3329b3ce818fd1f244e871e9c259b63667cda` remains the historical baseline;
 the Git checkpoints do not automatically revalidate or repin earlier evidence.
+
+A further all-work Git checkpoint was requested on 2026-11-05. It includes the
+subsequent HTTP both-host results, GC source/build/freeze/export evidence and
+reviews, preserved failures, scheduler ownership source, and updated trackers.
+Writers stopped before staging. Two current drafts are deliberately included
+without a seal or acceptance claim:
+
+- [GC component construction draft](tests/node-compat/foundation-crypto/ownership-gc-component-candidate-v1/README.md):
+  six parser-only checks pass; closure audit, lifecycle review, source seal,
+  actual bootstrap, component construction and runtime validation remain open.
+- [Scheduler integration draft](tests/node-compat/foundation-scheduler/resource-integration-candidate-v1/README.md):
+  preparation reports5,399 source/pure checks over822 inputs; source seal,
+  independent review, activation, native build, packaging and runtime gates
+  remain open. The timer/task patch is still unapplied.
+
+The checkpoint preserves work in progress; it does not complete the roadmap,
+change the accepted foundations-v13 profile, or include external temporary
+build artifacts. No push is requested.
+
+Checkpoint validation parses all288 new JSON files and96 Python files, and
+resolves988 local documentation links without missing targets. Staged whitespace
+checks report existing blank EOF lines in four sealed Python bodies and preserved
+whitespace in the scheduler baseline/patch snapshots; those evidence bytes are
+retained to preserve their hashes. No runtime suite is rerun for this Git-only
+checkpoint.
 
 The [crypto-v3 source correction](tests/node-compat/foundation-crypto/ownership-component-candidate-v3/README.md)
 is now sealed at index `593a0e02…c492` with25 files. The draft checker's
@@ -116,8 +155,15 @@ is sealed at `4b7c36f2…0e70`. Its [independent source review](tests/node-compa
 is **HOLD**, index `58ec38a3…c641`: a failure after receiving headers or body
 chunks can discard available raw response data while claiming full retention.
 The other bounded source/admission/lifecycle paths pass review. No new host
-request ran. A fresh correction, independent review and separately authorized
-both-host execution remain outstanding; the held packet stays unchanged.
+request ran. The [thin v2 correction](tests/node-compat/foundation-stream-consumers/http-host-candidate-v2/README.md)
+is now sealed at `9fc935f6…0788` (31 members/12,835 inputs), with110 injected
+pure capture checks,39,100 source/data checks and7 grammar/2 Python AST checks.
+Headers, each observed chunk and complete/partial aggregates are persisted before
+semantic validation; writer and failure-receipt flags distinguish incomplete
+capture. Old source/HOLD remain unchanged. The [independent v2 source review](tests/node-compat/foundation-stream-consumers/independent-http-host-v2-source-review-v1/README.md)
+passes at `88ed7e21…3124`, contract `c73e3ef8…dec4`: all31 current members,
+held families,12,835 declared inputs,108 graph edges,26 reversals and full actual
+native/component context are verified. Actual both-host execution is recorded below.
 
 The [crypto GC source proposal](tests/node-compat/foundation-crypto/ownership-gc-candidate-v1/README.md)
 seals an isolated-build/hex-pressure design at `3b6f0480…3dcf`.
@@ -129,13 +175,178 @@ holds it at `2ac980be…d597` because its inherited false GC/entropy flag contra
 deliberate pressure. The [thin v2 correction](tests/node-compat/foundation-crypto/ownership-gc-candidate-v2/README.md),
 index `7988586f…88b0`, removes that field and introduces versioned observations:
 per-run pressure request counts[4,4,8,0], outer16, entropy false and actual native
-GC count unobserved. Its full typed collector and parse checks are source-only;
-independent review remains pending. The separate [isolated native implementation](tests/node-compat/foundation-crypto/ownership-gc-native-candidate-v1/README.md),
-index `2fbc01ad…05a`, contains staged build/freeze/export/bootstrap templates and
-also awaits independent review. Root's native-source inspection is unfinished.
-No GC stage/build/reconfiguration, key/GC workload or new GC pin/action authority
-exists. Actual native/freeze/bootstrap proofs, selected-Buffer component and
+GC count unobserved. Its [independent v2 source review](tests/node-compat/foundation-crypto/independent-ownership-gc-v2-source-review-v1/README.md)
+passes at `3b2e3380…2cb9`, contract `a460d5cb…a92f`, including6+8 exact
+reversals, unchanged full HMAC fields and the complete typed collector. This is
+source-only evidence. The separate [isolated native implementation](tests/node-compat/foundation-crypto/ownership-gc-native-candidate-v1/README.md),
+index `2fbc01ad…05a`, contains staged build/freeze/export/bootstrap templates.
+Its [independent source review](tests/node-compat/foundation-crypto/independent-ownership-gc-native-source-review-v1/README.md)
+is **HOLD**, index `f0d12621…acdc`: the freezer reads `authority` while the
+guard/wrapper supplies `rootAuthority`. The source would raise `KeyError` after
+read-only helpers and before publishing copies. All39 source members,2,843
+physical files,14 ASTs,12+1 reversals and protected normal membership are checked;
+no actual phase ran. The [thin native v2 correction](tests/node-compat/foundation-crypto/ownership-gc-native-candidate-v2/README.md), index `ed066504…6d05`, now passes [independent source review](tests/node-compat/foundation-crypto/independent-ownership-gc-native-v2-source-review-v1/README.md) at `1cc950dd…4e3a`. The body uses the actual `rootAuthority` descriptor, bound to both authenticated config and captured Root row. All13 context reads,30 members,2,883 physical files and6+12 exact source afterimages pass; the14 stored pure seam checks are authenticated without rerunning owner modules. Old source/HOLD remain unchanged. A reviewed external stage controller and actual isolated source stage are next.
+The separate actual source stage is recorded below; no GC build/reconfiguration,
+key/GC workload, new engine or GC pin exists. Actual native/freeze/bootstrap proofs, selected-Buffer component and
 complete raw runtime collection remain outstanding.
+
+The [new HTTP external controller](tests/node-compat/foundation-stream-consumers/http-host-controller-candidate-v1/controller.py)
+is in source preparation. It authenticates the exact corrected source/config and
+Root phase before launching a finite owned Node session, captures parent streams
+and terminal status, and records observed owned descendants for bounded cleanup.
+Its sealed source index is `5ccf3aa6…1217`. All25 benign checks pass across
+normal, timeout and detached-descendant cleanup cases; raw0 streams/terminals are
+retained. The [dormant GC stage caller](tests/node-compat/foundation-crypto/ownership-gc-stage-controller-candidate-v1/README.md),
+index `8ff1af87…2cee`, reuses that actual monitor API with a600-second stage-only
+phase and source/native/controller authentication. Independent review of both
+controller sources found a blocking group-accounting gap in the generic v1
+monitor: an observed nonleader with an unobserved group leader, or a known PID
+moving to a new group, could be omitted from final cleanup accounting. The tiny
+stage caller's own seam has no blocker but remains transitively held. The
+[formal combined controller HOLD](tests/node-compat/foundation-stream-consumers/independent-http-gc-controllers-source-review-v1/README.md)
+is sealed at `23738f96…185c`; both genuine extracted-pure counterexamples and the
+retained25 benign checks are verified without controller/host invocation. Both old
+source seals remain unchanged. The generic v2 correction now accounts for every
+stored/current group of known PIDs and explicitly refuses remaining observed
+PIDs; unknown ownership is never signalled or accepted. Its35 checks and all
+three benign sessions pass raw0. The [generic controller v2](tests/node-compat/foundation-stream-consumers/http-host-controller-candidate-v2/README.md)
+is sealed at `71b7f8e5…0ddf` with seven reversible source edits; the [stage caller v2](tests/node-compat/foundation-crypto/ownership-gc-stage-controller-candidate-v2/README.md)
+is sealed at `29d59208…700d` with three exact selection/context substitutions.
+The [independent corrected-pair review](tests/node-compat/foundation-stream-consumers/independent-http-gc-controllers-v2-source-review-v1/README.md)
+passes at `e3c0589e…8a83`, result `e00ee2b0…93f2`, authenticating54 paths,
+7+3 exact reversals, eight extracted-pure models and the retained35 checks/three
+benign sessions. These source preparations ran no actual host or native phase.
+
+The new [GC source-stage authority](tests/node-compat/foundation-crypto/ownership-gc-v2-stage-root-authority.json)
+(`3d77668a…e20b`) runs only the real isolated publisher. Its [actual result](tests/node-compat/foundation-crypto/ownership-gc-v2-stage-root-results.json)
+finishes Root session49205/child44203 raw0 in3.251 operational seconds, no signals,
+forced cleanup, timeout, errors or remaining observed PIDs. Direct journal
+`c35513f8…28b8` reports the fresh v2 destination and1,311 copies; Root verifies
+every copied hash/mode/distinct inode and detached54b/no alternates. The old plan's
+v1 destination annotation remains explicitly historical DATA. The [independent actual stage review](tests/node-compat/foundation-crypto/independent-ownership-gc-v2-stage-review-v1/README.md)
+passes at `dbf58c99…121a`, contract `0ff86b2d…3a0a`: all copies, native/tool sets,
+Git context, process records and normal protections match. This runs no native
+build/freezer/bootstrap or guest. The [dormant7200-second native build controller](tests/node-compat/foundation-crypto/ownership-gc-build-controller-candidate-v1/README.md)
+is sealed at `0afae87d…7f1b` (20 members), with899 source/data,77 pure and7 AST
+checks. Its monitor differs by one deadline-ceiling edit; the actual build caller
+authenticates source, native/source-stage proofs and a new phase before launch.
+The [independent build-controller source review](tests/node-compat/foundation-crypto/independent-ownership-gc-build-controller-source-review-v1/README.md)
+passes at `76504af1…6176`, contract `dee045ee…ed98`, checking the full20/79/six-family
+closure, single ceiling edit,62 independent pure cases and7 ASTs without actions.
+The separate [actual build authority](tests/node-compat/foundation-crypto/ownership-gc-v2-build-root-authority.json)
+(`8c01977c…ae12`) now starts Root session58915/child49070 under the7200-second
+external monitor. It permits only the isolated ordinary single-job Release-GC
+compile/link, preserving original normal files and2GiB/800MiB disk guards. The
+build [finishes raw0](tests/node-compat/foundation-crypto/ownership-gc-v2-build-root-results.json)
+at Root58915/Python49070 and inner Bash49081, in508.732 external/505.746 inner
+operational seconds. Engine `289df445…66c8` is10,004,458 bytes; metadata
+`90c3f45e…04c8` is376,978 bytes. Source355/external3, Release-GC/OFF/no-OOM and
+whole engine/log hashes match; no observed groups/PIDs remain. The
+[independent BUILD-only review](tests/node-compat/foundation-crypto/independent-ownership-gc-v2-native-build-review-v1/README.md)
+passes at `fc0c7e3c…c9a7`, contract `21f206bf…c9a0`, checking98,717 main facts,
+10,986 input hashes, full108-step/log/source/compiler/library witnesses and normal
+protections. Engine execution, runtime and frozen-artifact claims remain false.
+
+The [freeze-controller source](tests/node-compat/foundation-crypto/ownership-gc-freeze-controller-candidate-v1/README.md)
+is sealed at `502027c9…f218` and its [independent source review](tests/node-compat/foundation-crypto/independent-ownership-gc-freeze-controller-source-review-v1/README.md)
+passes at `22bc75b8…82ad`:133 paths, eight families, five exact support functions,
+six ASTs and nine independent pure phase cases;85 stored author checks are
+authenticated only. New [freeze authority](tests/node-compat/foundation-crypto/ownership-gc-v2-freeze-root-authority.json)
+`4299668a…1391` now starts Root34426/Python75163 under the2400-second monitor.
+The [actual attempt fails](tests/node-compat/foundation-crypto/ownership-gc-v2-freeze-failure-root-results-v1.json)
+Root34426/Python75163 raw1 after2.555 operational seconds, with clean owned-group
+cleanup/no signals/forced cleanup/timeouts/errors and zero stdout. The898-byte
+stderr identifies **GC-HELPER-SELECTION-M2**: `guard.load_common` chooses the first
+of11 `artifact_common.py` suffix matches, a classic-stream helper hash, then
+checks the actual crypto helper against it. Both files retain their expected
+bytes; source/build proofs remain distinct valid evidence. Root's native source
+reviews missed the selector ambiguity. No common/body module import, Ninja,
+metadata-admission helper, freeze directory or receipt occurs. Outer provenance
+hashing reads the engine, but never executes it. The failed attempt and all old
+seals are preserved. The [independent failure-only audit](tests/node-compat/foundation-crypto/independent-ownership-gc-v2-freeze-failure-review-v1/README.md)
+passes at `66bc7c6c…a317`, contract `cb92d331…3027`, verifying9,715 physical files,
+the exact four stack frames/11 candidate rows and full normal/engine preservation.
+This is a failure review, with `artifactVerifiedPassed:false`. The pending artifact
+draft remains unsealed with no verdict. A thin explicit helper-selection amendment
+with separate native/amendment provenance is prepared; no retry, new native
+build, frozen-artifact proof or pin is authorized by that failure record.
+
+The [helper-selection amendment](tests/node-compat/foundation-crypto/ownership-gc-freezer-helper-amendment-v1/README.md)
+is sealed at `09ce7fb2…ee79` (20 members/3,017 inputs), with59 pure/data and5 AST
+checks. Its [independent source review](tests/node-compat/foundation-crypto/independent-ownership-gc-freezer-helper-source-review-v1/README.md)
+passes at `3708bb2a…b5a2`, contract `9dcb4f08…fabc`:3,039 paths/13 families,
+six body/seven controller reversals and16 exact-selector cases. The exact full
+crypto path is unique and order independent. The genuine native frame/index,
+common roots and validator observations remain unchanged; the new amendment's
+authority/index/capsules are explicit and separate. No native rebuild occurs.
+New [native freeze authority](tests/node-compat/foundation-crypto/ownership-gc-v2-freeze-helper-v1-native-root-authority.json)
+`c6a0decf…e423` and [amendment authority](tests/node-compat/foundation-crypto/ownership-gc-v2-freeze-helper-v1-amendment-root-authority.json)
+`2fad3e15…339b` start fresh Root session70920 in an isolated, bytecode-disabled
+Python process. The [actual corrected freeze](tests/node-compat/foundation-crypto/ownership-gc-v2-freeze-helper-v1-root-results.json)
+finishes Root70920/Python79716 raw0 in17.119 operational seconds. Receipt
+`7567f60f…f669` binds1,462 copies/1,463 actual files; Root rehashes every frozen
+copy and original, distinct inodes and exact membership. Whole stdout decodes to
+the written receipt. The correction record `40e6834b…7488` distinguishes native
+ed066 from helper09ce and records the actual crypto helper fff7; engine289/meta90
+remain unchanged. No observed groups/PIDs or controller failures remain. The
+[independent full native-artifact review](tests/node-compat/foundation-crypto/independent-ownership-gc-native-artifact-results-review-v1/README.md)
+passes at `64ec1c1e…1737`, contract `f2b30613…9144`: the ordered1,462-copy plan,
+1,459 original references, exact1,463 membership,140 capsules, whole correction,
+source/compiler/library witnesses, normal protections and both raw completions
+are checked. Backend/runtimeValidation/erasure claims remain false/NULL; the old
+draft is preserved because the failure audit pins it. No engine has executed.
+
+Corrected [pin export/bootstrap source tooling](tests/node-compat/foundation-crypto/ownership-gc-pin-tooling-candidate-v1/README.md)
+is sealed at `08ea9379…9c56` (26 members/3,058 inputs). Its [independent source review](tests/node-compat/foundation-crypto/independent-ownership-gc-pin-tooling-source-review-v1/README.md)
+passes at `9350f534…5a35`, with3,085 physical files,14 families, exact selector/
+export-body and5+5 bootstrap reversals, six ASTs/twelve pure phase cases and a
+pinned Node syntax-only raw0 check. Separate native/tooling roots stay explicit.
+New [export authority](tests/node-compat/foundation-crypto/ownership-gc-v2-pin-export-v1-native-root-authority.json)
+`4e575f48…f546` and its separate tooling authority run the [actual export](tests/node-compat/foundation-crypto/ownership-gc-v2-pin-export-v1-root-results.json)
+Root15372/Python85052 raw0 in15.435 operational seconds. Candidate `52ae49ff…ace9`
+is478,956 bytes, remains UNREVIEWED with only gc-off/non-GC NULLs, and matches all
+1,462 frozen-file rows. Whole raw stdout equals its JSON; old three build-output
+files remain exact and only this one file is added. The [independent export data review](tests/node-compat/foundation-crypto/independent-ownership-gc-pin-export-results-review-v1/README.md)
+passes at `bda61549…3229`, contract `eb8e5ee7…ff8c`, reconstructing the entire
+candidate and raw stdout, all1,462 frozen rows, provenance and preserved files.
+The candidate remains UNREVIEWED and pins remain unadopted. NEW GC-only reviewed
+pins and actual read-only bootstrap remain pending. Old native
+export/bootstrap entries stay closed; only the reviewed corrected tooling can run.
+
+Parallel Phase3.4 work now has an [unapplied timer/task ownership candidate](tests/node-compat/foundation-scheduler/resource-ownership-candidate-v1/README.md),
+index `02e9779b…6f4c` (25 members). Two source afterimages/nine reversible edits
+add strong traced timer ownership, idempotent ordinary-path retirement and rooted
+task execution/cancellation. Actual pinned SDK frontend checks finish raw0/0 with
+1,028 declared dependencies (two afterimages/1,026 headers) retained;12 pure
+scenarios/89 checks pass. This is not applied or linked/runtime-tested. The
+[independent source review](tests/node-compat/foundation-scheduler/independent-resource-ownership-source-review-v1/README.md)
+passes at `aca99b1f…52fa`:25 members/1,075 preparation rows,1,087 lexical paths,
+nine exact reversals, retained SDK evidence and ten ownership paths. New integration
+and real-component gate source is in preparation. The existing void
+global enqueue/std::vector failure seam, reset, request reuse/teardown, all-invalid
+selection and native ALS propagation remain open; no public API is enabled.
+
+The new [HTTP both-host authority](tests/node-compat/foundation-stream-consumers/http-both-hosts-v2-root-authority.json)
+(`71f8978b…143c`) and separate component/controller phases start Root session72742,
+Node child44688, under the reviewed2400-second external controller. It targets the
+same64,098,281-byte `2ce7d990…5f33` component and three ordinary responses per host.
+The [actual result](tests/node-compat/foundation-stream-consumers/http-both-hosts-v2-root-results.json)
+finishes Root72742/Node44688 raw0 in172.534 operational seconds. All391 indexed/
+393 actual files rehash. Root checks six full accepted200 bodies against their
+recorded UTF8/JSON, both server raw0/graceful SIGINT-only exits and stopped curl7
+with zero HTTP stdout. There are83 actual capture attempts: six accepted200,
+76 readiness404 responses and one preheader failure, all explicitly retained;
+Root checks every chunk sequence against its aggregate. No write failure occurs.
+All observed owned groups/PIDs are gone, with no controller signal, forced cleanup,
+timeout or error. The [independent actual-result review](tests/node-compat/foundation-stream-consumers/independent-http-both-hosts-v2-results-review-v1/README.md)
+passes at `225df389…0659`, contract `765f98d6…bf09`: all83 captures/12 chunks/
+793,272 body bytes, six whole bodies and2,172 source/oracle predicates are checked,
+plus13,574 final input paths, both configurations and lifecycle joins. Same component
+bytes and prior six standard0.2.10/type-only-clock provenance remain bound; that
+earlier binary decode is authenticated, not rerun. Internal preflight frames and
+the full inherited parent environment were not separately retained; source-coupled
+and clean-final/fresh-hash qualifications remain explicit. This
+does not establish request reuse/isolation, a wire-body adapter or acceptance.
 
 Checkpoint checks: the existing manifest test passes again under pinned
 Node22.14.0 (exact Buffer/child_process namespaces and19 malformed-manifest
@@ -166,9 +377,9 @@ phases have substantially different sizes and unresolved design decisions.
 | Corrected HTTP component | Both hosts, combined audit and independent final review pass; included in bounded v13. | Preserve the one-request-per-instance limitation; test new experimental engines separately. |
 | Performance comparison | All168 timing workers plus18 corrected RSS workers/126 typed returns pass independent review. | Preserve the separate measurement scopes and failed RSS v1. Same-engine peak RSS ratios cross1; no universal or guest-heap benefit. |
 | Codec cost tooling | Fresh source copy and55-call Node oracle pass independent review; Root input capsule is complete. All three source bundles finish raw0 and per-arm source proofs pass. The WIT/glue corrections pass review. All three v3 component builds finish raw0 with imports[]/seven-function ABI; per-arm artifact reviews pass. | V3 retention, full untimed correctness, stock Wasmtime string transport, control-v2 results and the read-only90-row plan pass independent review. Timing v1/v2 holds stay preserved; v3 source review passes. Actual pilots/timing and their explicit phase/window/budget remain pending. No performance conclusion follows. |
-| Crypto key ownership | Owner/prototype source, native355 normal-OFF provenance, read-only bootstrap, actual no-import component, runtime source and first normal-key results pass independent review. | All23 whole strings/20 cases, Node oracle,45 tags/45 verify booleans and three worker lifetimes pass. Three actual stock-Wasmtime validations finish raw0 and match the whole normal wrapper; independent result review passes. GC, runtime lifetimes, secret-temporary/allocation and Node crypto API follow-ons remain. Construction holds stay preserved. |
+| Crypto key ownership | Owner/prototype source, native355 normal-OFF provenance, read-only bootstrap, actual no-import component, runtime source and first normal-key results pass independent review. | All23 whole strings/20 cases, Node oracle,45 tags/45 verify booleans and three worker lifetimes pass. Three actual stock-Wasmtime validations finish raw0 and match the whole normal wrapper; independent result review passes. Corrected GC guest/native source and the isolated source stage pass review. Actual GC native build and its provenance review pass. The11-match helper-selector failure is preserved; corrected freeze, full frozen-artifact review and unreviewed pin-export data review pass. New reviewed GC pins/bootstrap, component/runtime, lifetimes, secret-temporary/allocation and Node crypto API follow-ons remain. Construction holds stay preserved. |
 | Native zlib extension | Three native variants and bounded normal/GC/control component results pass independent review;22 Node error-case differences are recorded. | Complete matched cost, Node-deviation contract and new-engine host/release gates; operational admission remains closed. |
-| Stream consumers | Four native355 variants and bounded normal/GC/control components pass review. Context/data-closure failures remain preserved. The corrected v3 family and admission checks pass review; its entire eight-stage release retry now finishes raw0. | The full eight-stage release and all five follow-ons pass independent review, with false getter parity and raw-output limits retained. Both-host HTTP and later acceptance gates remain. Blob-dependent APIs remain refusals. |
+| Stream consumers | Four native355 variants and bounded normal/GC/control components pass review. Context/data-closure failures remain preserved. The corrected v3 family and admission checks pass review; its entire eight-stage release retry now finishes raw0. | The full eight-stage release and all five follow-ons pass independent review, with false getter parity and raw-output limits retained. New both-host HTTP execution and independent actual-result review pass with six accepted responses and77 separate readiness attempts; later cost/adoption/acceptance gates remain. Blob-dependent APIs remain refusals. |
 | Corrected classic checkpoint | Accepted in bounded foundations-v13 after independent preservation and post-promotion verification. | Preserve its limits; continue consumer355 runtime and later phases. |
 
 The detailed evidence below also retains failed attempts. A source check, syntax

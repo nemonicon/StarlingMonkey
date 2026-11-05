@@ -1,0 +1,44 @@
+// Genuine355 admission is delegated at its actual published context, never projected.
+import {dirname,join} from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import {realpath} from 'node:fs/promises';
+import {descriptor,regular,need} from '../http-host-candidate-v1/authority.mjs';
+import {indexed,deepFreeze} from '../http-host-candidate-v1/proofs.mjs';
+import {indexFiles,streamHash,alias} from '../http-host-candidate-v1/physical.mjs';
+import {rootModel,componentProofModel,interfaceModel,SIX,same} from './models.mjs';
+const HERE=dirname(fileURLToPath(import.meta.url));
+const ARTIFACTS=['component','core','componentAudit','packagingAudit','emittedWit','typeGraph','workerIndex','workerCompletion','parentResult','externalParentTerminal','ownedWorkerTerminal','constructionConfig'];
+export async function hostPreflight(options){
+ const ownRow=descriptor(options.sourceIndex),rootRow=descriptor(options.rootAction);need(ownRow.path===join(HERE,'index.json'),'Only this host source context');
+ const root=deepFreeze(JSON.parse(await regular(rootRow)));rootModel(root,ownRow.sha256);const own=await indexFiles(ownRow,{maximumFiles:512});
+ const peer=await indexed(root.sourceIndependentReview,{state:'INDEPENDENT_CONSUMERS355_HTTP_HOST_SOURCE_REVIEW_PASSED_V2'});need(peer.data.sourceIndexSha256===ownRow.sha256&&peer.data.sourceOnly===true&&peer.data.sourceReviewPassed===true&&peer.data.ownerActionsInvoked===false,'Exact independent host source review');
+ const p=deepFreeze(JSON.parse(await regular(own.rows.find(r=>r.path===join(HERE,'prerequisites.json')))));
+ need(p.hostSourceRoot===HERE,'Exact original host source context, no preparation-manifest relocation');
+ need(same(root.actualComponentReview.index,p.availableComponentReviewData.index)&&same(root.actualComponentReview.result,p.availableComponentReviewData.result),'Only exact known actual component proof under new explicit host authority');
+ need(process.version==='v22.14.0'&&process.execArgv.length===0&&await realpath(process.execPath)===p.node.path,'Pinned plain Node22 before owner helper import');await streamHash(p.node);
+ for(const k of ['NODE_OPTIONS','NODE_PATH','PYTHONPATH','PYTHONHOME','PYTHONOPTIMIZE'])need(!process.env[k],'No loader override '+k);for(const k of Object.keys(process.env))need(!k.startsWith('NAPI_RS_'),'No native module override');need(process.env.NODE_COMPAT_HTTP_REQUIRE_INTRINSICS!=='1','Unimplemented optional intrinsic profile closed');
+ const proposal=await indexFiles(p.constructionSourceIndex,{maximumFiles:512}),oldSource=await indexFiles(p.oldHTTPSourceIndex,{maximumFiles:256});
+ const proof=await indexed(root.actualComponentReview,{state:'INDEPENDENT_CONSUMERS355_HTTP_COMPONENT_REVIEW_PASSED_V1'}),v=proof.data;componentProofModel(v,p);
+ const rows=Object.freeze(Object.fromEntries(ARTIFACTS.map(k=>[k,descriptor(v[k])])));for(const r of Object.values(rows))await streamHash(r);
+ need(same(rows.constructionConfig,descriptor(root.constructionConfig)),'Same unchanged actual construction config');
+ const config=deepFreeze(JSON.parse(await regular(rows.constructionConfig))),constructionRoot=deepFreeze(JSON.parse(await regular(config.rootAction)));
+ need(config.action==='component-build'&&config.sourceIndexSha256===p.constructionSourceIndex.sha256&&constructionRoot.state==='ROOT_REVIEWED_CONSUMERS355_HTTP_CONSTRUCTION_V1'&&constructionRoot.action==='component-build'&&constructionRoot.hostRequestsAllowed===false,'Genuine previous construction authority unchanged, no host projection');
+ const publication=await indexFiles(descriptor(constructionRoot.publicationIndex));need(publication.data.schemaVersion===1&&publication.rows.some(r=>r.path===join(dirname(constructionRoot.publicationIndex.path),'admission.mjs')),'Complete authenticated actual publication before helper import');
+ need(publication.data.files.length>0&&v.sourcePublicationIndexSha256===constructionRoot.publicationIndex.sha256,'Actual component publication binding');
+ const bridge=join(dirname(constructionRoot.publicationIndex.path),'admission.mjs');const {httpPreflight}=await import(pathToFileURL(bridge));
+ const frame=await httpPreflight({configDescriptor:rows.constructionConfig});need(frame.action==='component-build'&&frame.pin.engineSha256===p.engineSha256&&frame.pin.receiptSha256===p.engineMetadataSha256&&frame.metadata.sourceManifest.length===355&&frame.metadata.streamConsumersEnabled===true&&frame.metadata.entropyPolicy==='runtime-only','Full genuine355 Runtime frame, not old342 admission');
+ const audit=deepFreeze(JSON.parse(await regular(rows.componentAudit)));interfaceModel(audit);need(audit.state==='CONSUMERS355_HTTP_COMPONENT_AUDIT_V1'&&audit.nativeSources===355&&audit.engineSha256===p.engineSha256&&audit.engineMetadataSha256===p.engineMetadataSha256&&audit.sourceIndexSha256===p.constructionSourceIndex.sha256&&audit.publicationIndexSha256===v.sourcePublicationIndexSha256,'Full new audit source/engine');
+ need(alias(audit.componentPath)===alias(rows.component.path)&&audit.componentSha256===rows.component.sha256&&audit.componentBytes===rows.component.bytes&&audit.coreSha256===rows.core.sha256&&same(audit.fullActualNativeMetadata,frame.metadata)&&same(audit.actualSelectedManifests,frame.selectedManifests),'Unchanged complete actual component/native metadata/manifests');
+ need(audit.ordinaryGuestExportsInvoked===false&&audit.hostRequestsInvoked===false&&audit.operationalAdmission===false&&audit.runtimeAcceptanceClaim===false&&audit.wireBodyAdapter===false&&audit.consumerRequestFixtureGroups===2&&audit.classicOrdinaryGroups===19,'Construction-only audit and bounded ordinary request fixtures');
+ const external=JSON.parse(await regular(rows.externalParentTerminal)),worker=JSON.parse(await regular(rows.ownedWorkerTerminal));need(external.rawExitCode===0&&worker.status===0&&worker.terminalExitZeroObserved===true&&worker.ownedGroupGone===true&&worker.timedOut===false,'External actual construction terminals0/cleanup');
+ const workerFiles=await indexFiles(rows.workerIndex,{maximumFiles:256}),complete=JSON.parse(await regular(rows.workerCompletion)),parent=JSON.parse(await regular(rows.parentResult));
+ need(complete.state==='HTTP_CONSTRUCTION_WORKER_COMPLETE_EXTERNAL_ZERO_REQUIRED_V1'&&complete.action==='component-build'&&complete.sourceIndexSha256===p.constructionSourceIndex.sha256&&complete.index.sha256===rows.workerIndex.sha256&&complete.index.bytes===rows.workerIndex.bytes,'Actual worker completion/index binding');
+ need(parent.state==='CONSUMERS355_HTTP_CONSTRUCTION_COMPLETE_UNREVIEWED_V1'&&parent.action==='component-build'&&parent.rawWorkerExitCode===0&&parent.ownedGroupGone===true&&parent.hostRequestsInvoked===false&&parent.workerCompletion.sha256===rows.workerCompletion.sha256,'Genuine construction result remains literal unreviewed/no-host DATA');
+ for(const k of ['component','core','componentAudit','packagingAudit','emittedWit','typeGraph'])need(workerFiles.rows.filter(r=>alias(r.path)===alias(rows[k].path)&&r.sha256===rows[k].sha256&&r.bytes===rows[k].bytes).length===1,'Critical actual artifact indexed once '+k);
+ const phaseRow=descriptor(root.componentPhase),phase=deepFreeze(JSON.parse(await regular(phaseRow))),controllerRow=descriptor(root.hostController),controller=deepFreeze(JSON.parse(await regular(controllerRow)));
+ need(phase.schemaVersion===1&&phase.state==='ROOT_APPROVED_CONSUMERS355_HTTP_COMPONENT_PHASE_V2'&&phase.hostExecutionAllowed===true&&phase.hostSourceIndexSha256===ownRow.sha256&&phase.componentReviewIndexSha256===root.actualComponentReview.index.sha256&&same(phase.component,rows.component)&&same(phase.componentAudit,rows.componentAudit)&&phase.runtimeAcceptanceClaim===false,'Separate actual component phase');
+ need(controller.schemaVersion===1&&controller.state==='ROOT_APPROVED_CONSUMERS355_HTTP_HOST_CONTROLLER_V2'&&controller.hostExecutionAllowed===true&&controller.hostSourceIndexSha256===ownRow.sha256&&controller.outputRoot===root.outputRoot&&controller.serverTimeoutMs===600000&&controller.requestsPerHost===3&&controller.stoppedProbeRequired===true&&controller.ownedProcessGroupsOnly===true&&controller.runtimeAcceptanceClaim===false,'Explicit finite new host controller');
+ for(const k of ['node','wasmtime','wash','curl'])await streamHash(p[k]);
+ const recheck=async()=>{await regular(rootRow);await own.recheck();await peer.recheck();await proposal.recheck();await oldSource.recheck();await proof.recheck();await workerFiles.recheck();for(const r of Object.values(rows))await streamHash(r);await publication.recheck();await frame.recheck();await regular(phaseRow);await regular(controllerRow);for(const k of ['node','wasmtime','wash','curl'])await streamHash(p[k]);};await recheck();
+ return Object.freeze({sourceIndex:ownRow,rootAction:rootRow,root,p,rows,artifact:v,audit,frame,selectedInterfaces:Object.freeze([...SIX]),recheck});
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "originalPendingDraftModel": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-gc-native-artifact-review-v1/artifact_model.py",
+    "sha256": "1e94a8c3da97acb11d2fcfdd8013213b6edf7dbb201b35ed28d6967cb7b27e03",
+    "bytes": 10439
+  },
+  "newModel": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-gc-native-artifact-results-review-v1/artifact_model.py",
+    "sha256": "e94d243c85932fae6fed0a0aec080df8f6c509a29bd12a712258694ff07b960f",
+    "bytes": 10388
+  },
+  "exactForwardReverseReplacements": [
+    {
+      "before": "def expected_plan(m,receipt,tool_rows,own_capsules,peer_capsules,root_authority,descriptor,licenses,ancestry):",
+      "after": "def expected_plan(m,receipt,tool_rows,capsules,active_entry,active_guard,descriptor,licenses,ancestry):"
+    },
+    {
+      "before": "    add('artifact-tools/freeze-engine.py',OWN+'/freeze.py',shared=True);add('artifact-tools/active-freezer/freezer-source_guard.py',OWN+'/guard.py',shared=True)\n    for i,r in enumerate([*own_capsules,root_authority,*peer_capsules]):add('gc-off-freezer-correction-control/'+str(i)+'-'+PurePosixPath(r['path']).name,r['path'],r['sha256'])",
+      "after": "    add('artifact-tools/freeze-engine.py',active_entry,shared=True);add('artifact-tools/active-freezer/freezer-source_guard.py',active_guard,shared=True)\n    for i,r in enumerate(capsules):add('gc-off-freezer-correction-control/'+str(i)+'-'+PurePosixPath(r['path']).name,r['path'],r['sha256'])"
+    }
+  ],
+  "oldPendingDraftPreserved": true,
+  "ownIoHelperUnchanged": true,
+  "readerPreparationCorrections": [
+    "comprehension evaluates all membership checks before extending native capsule list, retaining repeated controller captures",
+    "independent byte-comparison helper accepts bytes directly",
+    "original archive rows can omit byte counts; measured sizes remain separate observations",
+    "whole build stdout has its authentic output/result wrapper"
+  ],
+  "producerFailuresObservedInThisSuccessfulFreeze": false,
+  "ownerActionsInvoked": false
+}

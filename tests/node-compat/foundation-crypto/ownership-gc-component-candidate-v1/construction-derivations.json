@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "derived": [
+    {
+      "file": "build.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-component-candidate-v3/build.mjs",
+        "sha256": "cbfa8e6577f0277d31c05b9019e4f50a5cce74549be78b540dfa894b0b8d5403",
+        "bytes": 5792
+      },
+      "changes": [
+        {
+          "before": "const d={schemaVersion:1",
+          "after": "const manifests=await output.write('selected-manifests.json',frame.selectedManifests,{json:true});\n  const d={schemaVersion:1"
+        },
+        {
+          "before": "mapRow:frame.mapRow,node:frame.node",
+          "after": "mapRow:frame.mapRow,selectedManifests:descriptor({path:join(output.root,manifests.path),sha256:manifests.sha256,bytes:manifests.bytes}),node:frame.node"
+        },
+        {
+          "before": "CRYPTO_OWNER355_COMPONENT_BUILD_COMPLETE_UNREVIEWED_V2",
+          "after": "CRYPTO_OWNER355_GC_COMPONENT_BUILD_COMPLETE_UNREVIEWED_V1"
+        },
+        {
+          "before": "ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false,operationalAdmission:false",
+          "after": "ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false,gcPressureCallsInvoked:false,operationalAdmission:false"
+        }
+      ]
+    },
+    {
+      "file": "build-worker.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-component-candidate-v3/build-worker.mjs",
+        "sha256": "65fdc964240b18488f8dfdfd6fc4455a62bce8963c3a7b3b313f2b641cb89621",
+        "bytes": 8175
+      },
+      "changes": [
+        {
+          "before": "d.engine.bytes===10002820",
+          "after": "d.engine.bytes===10004458"
+        },
+        {
+          "before": "const code=await regular(d.code),source=new TextDecoder('utf-8',{fatal:true}).decode(code),wit=",
+          "after": "const code=await regular(d.code),fixture=new TextDecoder('utf-8',{fatal:true}).decode(code),wit="
+        },
+        {
+          "before": "need(!/^import\\s/m.test(source),'Exact no-import guest; no bundler/fallback');",
+          "after": "need(/^import \\{Buffer\\} from 'node:buffer';$/m.test(fixture),'Exact sealed native Buffer import');const selectedManifests=JSON.parse(await regular(d.selectedManifests));"
+        },
+        {
+          "before": "await regular(d.code);await regular(d.wit);};",
+          "after": "await regular(d.code);await regular(d.wit);await regular(d.selectedManifests);for(const row of d.criticalSourceFiles)await regular(row,{maxBytes:64*1024*1024});};"
+        },
+        {
+          "before": "  const options=workerOptions(d,packaging,wit);",
+          "after": "  const {bundleGcFixture}=await import('./bundle.mjs');const bundled=await bundleGcFixture({packaging,toolchain,code:d.code,selectedManifests});await output.write('bundled-guest.mjs',Buffer.from(bundled.code));await output.write('bundle-graph.json',bundled.graph,{json:true});const source=bundled.code;await recheck();\n  const options=workerOptions(d,packaging,wit);"
+        },
+        {
+          "before": "CRYPTO_OWNER355_COMPONENT_BUILT_UNREVIEWED_V2",
+          "after": "CRYPTO_OWNER355_GC_COMPONENT_BUILT_UNREVIEWED_V1"
+        },
+        {
+          "before": "ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false,asyncScalarRuntimeProof:false",
+          "after": "ordinaryGuestExportsInvoked:false,keyOperationsInvoked:false,gcPressureCallsInvoked:false,asyncScalarRuntimeProof:false"
+        }
+      ]
+    }
+  ]
+}

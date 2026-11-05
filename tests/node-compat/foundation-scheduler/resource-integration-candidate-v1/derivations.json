@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "helperDonor": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/trace-integration-candidate-v1/layer-policy.py",
+    "sha256": "43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9",
+    "bytes": 12783
+  },
+  "helperAfterimage": "layer-policy.py",
+  "helperEdits": [
+    {
+      "before": "POLICY_SHA256='891a4c53dd4a7b7d776c21003acdd12c7944c6a3eca019a1d9b2be620ed8b11c'",
+      "after": "POLICY_SHA256='1f9d7de1115955c2fca5c171197eb85f5298f135dd9ea3bb5703412074aac842'"
+    },
+    {
+      "before": "def verify_trace_ancestry():\n    previous=HERE.parent/'integration-candidate-v1'\n    assert digest(previous/'policy.json')==POLICY['classicTraceSourcePolicy']['previousPolicySha256']\n    assert digest(previous/'layer-policy.py')==POLICY['classicTraceSourcePolicy']['previousHelperSha256']\n    assert digest(previous/'source/tests/node-compat/build-engine.sh')==POLICY['classicTraceSourcePolicy']['previousRecipeSha256']\n    old=json.loads((previous/'policy.json').read_bytes())\n    before={row['path']:row['sha256']for row in old['expectedNativeSourceManifest']}\n    after={row['path']:row['sha256']for row in POLICY['expectedNativeSourceManifest']}\n    changes={row['path']:row for row in POLICY['classicTraceSourcePolicy']['changes']}\n    assert len(before)==len(after)==342 and set(before)==set(after)\n    assert len(changes)==3 and sum(before[path]==after[path]for path in before)==339\n    for path,row in changes.items():assert before[path]==row['beforeSha256']and after[path]==row['afterSha256']\n    assert POLICY['strictPolicyVersion']==old['strictPolicyVersion']\n    assert POLICY['protectedPolicyVersion']==old['protectedPolicyVersion']\n    assert POLICY['embedding']==old['embedding']and POLICY['nativePatchSha256']==old['nativePatchSha256']\n    fix=HERE.parent/'trace-semantics-candidate-v1'\n    assert digest(fix/'index.json')==POLICY['classicTraceSourcePolicy']['fixSourceIndexSha256']\n    for row in json.loads((fix/'index.json').read_bytes())['files']:\n        target=fix/row['path'];assert not target.is_symlink()and target.stat().st_size==row['bytes']and digest(target)==row['sha256']\n    assert digest(fix/'canonical-3file.UNAPPLIED.patch')==POLICY['classicTraceSourcePolicy']['sourceDeltaPatchSha256']\n    assert digest(fix/'transformation-proof.json')==POLICY['classicTraceSourcePolicy']['transformationProofSha256']\n    return True\nverify_trace_ancestry()",
+      "after": "def verify_resource_ancestry():\n    previous=HERE.parents[1]/'foundation-classic-streams/trace-integration-candidate-v1'\n    source=POLICY['resourceOwnershipSourcePolicy']\n    assert digest(previous/'policy.json')==source['parentPolicySha256']\n    assert digest(previous/'layer-policy.py')==source['parentHelperSha256']\n    old=json.loads((previous/'policy.json').read_bytes())\n    before={r['path']:r['sha256']for r in old['expectedNativeSourceManifest']}\n    after={r['path']:r['sha256']for r in POLICY['expectedNativeSourceManifest']}\n    assert len(before)==len(after)==342 and set(before)==set(after)\n    assert sum(before[p]==after[p]for p in before)==340\n    assert {r['path']for r in source['changes']}=={'builtins/web/timers.cpp','runtime/event_loop.cpp'}\n    for r in source['changes']:assert before[r['path']]==r['beforeSha256']and after[r['path']]==r['afterSha256']\n    assert POLICY['classicTraceSourcePolicy']==old['classicTraceSourcePolicy']\n    assert POLICY['embedding']==old['embedding']and POLICY['nativePatchSha256']==old['nativePatchSha256']\n    proposal=HERE.parent/'resource-ownership-candidate-v1'\n    assert digest(proposal/'index.json')==source['sourceCandidateIndexSha256']\n    for r in json.loads((proposal/'index.json').read_bytes())['files']:\n        path=proposal/r['path'];assert not path.is_symlink()and path.stat().st_size==r['bytes']and digest(path)==r['sha256']\n    return True\nverify_resource_ancestry()"
+    },
+    {
+      "before": "PARENT_ROOT=HERE.parents[1]/'foundation-scheduler/integration-candidate-v1'",
+      "after": "PARENT_ROOT=HERE.parent/'integration-candidate-v1'"
+    },
+    {
+      "before": "    metadata['classicTraceSourcePolicy']=copy.deepcopy(POLICY['classicTraceSourcePolicy'])",
+      "after": "    metadata['classicTraceSourcePolicy']=copy.deepcopy(POLICY['classicTraceSourcePolicy'])\n    cache=Path(metadata['cmakeCachePath']);values={}\n    for line in cache.read_text().splitlines():\n        key,sep,rest=line.partition(':')\n        if sep and '='in rest:values[key]=rest.partition('=')[2]\n    assert values['ENABLE_BUILTIN_WEB_TIMERS']=='ON'\n    install=Path(values['INSTALL_BUILTINS']);text=install.read_text()\n    assert text.count('NS_DEF(builtins::web::timers)')==1\n    metadata['resourceOwnershipPolicy']={'sourcePolicy':copy.deepcopy(POLICY['resourceOwnershipSourcePolicy']),'policyFileSha256':POLICY_SHA256,'helperSha256':digest(__file__),'timerInstallation':{'path':str(install),'sha256':digest(install),'webTimersEnabled':'ON'},'nativeRuntimeValidation':None,'fullResetOrReuse':False}"
+    },
+    {
+      "before": "    return True\nverify_resource_ancestry()",
+      "after": "    peer=HERE.parent/'independent-resource-ownership-source-review-v1'\n    assert digest(peer/'index.json')==source['sourceReviewIndexSha256']\n    for r in json.loads((peer/'index.json').read_bytes())['files']:\n        path=peer/r['path'];assert not path.is_symlink()and path.stat().st_size==r['bytes']and digest(path)==r['sha256']\n    reviewed=json.loads((peer/'results.json').read_bytes())\n    assert reviewed['state']=='INDEPENDENT_SCHEDULER_RESOURCE_OWNERSHIP_SOURCE_REVIEW_PASSED_V1'and reviewed['sourceIndexSha256']==source['sourceCandidateIndexSha256']and reviewed['sourceOnly']is True and reviewed['sourceReviewPassed']is True and reviewed['ownerActionsInvoked']is False\n    return True\nverify_resource_ancestry()"
+    }
+  ],
+  "recipeDonor": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/build-engine.sh",
+    "sha256": "3694c88b7d000f27e11ffcac835fe0b205b2075f5b1d8d29c61f5b0038ba1cf3",
+    "bytes": 46361
+  },
+  "recipeAfterimage": "proposed/tests/node-compat/build-engine.sh",
+  "recipeEdits": [
+    {
+      "before": "/tmp/starling-node-compat/classic-trace-v1-build",
+      "after": "/private/tmp/starling-node-compat/scheduler-resource-v1-build",
+      "count": 1
+    },
+    {
+      "before": "tests/node-compat/foundation-classic-streams/trace-integration-candidate-v1",
+      "after": "tests/node-compat/foundation-scheduler/resource-integration-candidate-v1",
+      "count": 3
+    },
+    {
+      "before": "43bae8056534c1a6f384961e0b054a68d44d30030e21897bd9688a8fc8b65bc9",
+      "after": "7fb23b7137686de85e488aebaed39fb50ff893ac8fd792c621bc9dd6fdebdeea",
+      "count": 5
+    },
+    {
+      "before": "891a4c53dd4a7b7d776c21003acdd12c7944c6a3eca019a1d9b2be620ed8b11c",
+      "after": "1f9d7de1115955c2fca5c171197eb85f5298f135dd9ea3bb5703412074aac842",
+      "count": 2
+    },
+    {
+      "before": "trace-v1.$entropy_mode",
+      "after": "resource-v1.$entropy_mode",
+      "count": 2
+    },
+    {
+      "before": "-DCMAKE_BUILD_TYPE=\"$build_type\" -DCMAKE_POLICY_VERSION_MINIMUM=3.5",
+      "after": "-DCMAKE_BUILD_TYPE=\"$build_type\" -DENABLE_BUILTIN_WEB_TIMERS=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5",
+      "count": 1
+    },
+    {
+      "before": "'CMAKE_BUILD_TYPE': build_type, 'WEVAL'",
+      "after": "'CMAKE_BUILD_TYPE': build_type, 'ENABLE_BUILTIN_WEB_TIMERS':'ON', 'WEVAL'",
+      "count": 1
+    },
+    {
+      "before": "build_jobs=\"${NODE_COMPAT_JOBS:-1}\"",
+      "after": "build_jobs=\"${NODE_COMPAT_JOBS:-1}\"\nif [[ \"$build_jobs\" != 1 ]]; then echo \"Resource source candidate requires one build job\" >&2; exit 1; fi",
+      "count": 1
+    }
+  ],
+  "nativeChanges": [
+    {
+      "path": "builtins/web/timers.cpp",
+      "beforeSha256": "2995842e10417b53cb02ed6d48bfa49b8bc0c076637e928f8c457e47e9e91294",
+      "afterSha256": "0024d009d11aab0705789f5d72fd8ec87deec9c44bdd8b913d970257aaadc9e4",
+      "bytes": 9077
+    },
+    {
+      "path": "runtime/event_loop.cpp",
+      "beforeSha256": "2230e3fe751ee323e7e60a0e609aaa652006f2f6fd26e965766b9f09700d3182",
+      "afterSha256": "d8be6e450c1f8566161db30f2736d883bc3953ec965fd6abee1bcfe961ec5e1a",
+      "bytes": 13028
+    }
+  ]
+}
