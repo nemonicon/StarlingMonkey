@@ -9,7 +9,8 @@ Commit/push and framework validation checkpoint (2026-11-05):
 - The user requested a complete Git checkpoint and push, followed by a
   comprehensive, reusable Next.js/Wasm experiment. All current repository work,
   including unfinished source candidates and retained failures, is included in
-  the checkpoint. Referenced external build products are not Git contents.
+  checkpoint `d8034839`, pushed normally to `origin/main`. It contains 1,203
+  changed files. Referenced external build products are not Git contents.
 - Precommit checks pass: 572 nonempty JSON documents, 30 Python AST parses,
   248 Node 22.14.0 syntax checks, 544 member hashes across 14 new sealed indices,
   1,355 local documentation links, and 43 regression-comparator synthetic checks.
@@ -27,16 +28,56 @@ Commit/push and framework validation checkpoint (2026-11-05):
   remain outstanding. No adapter has been published or promoted.
 - The accepted runtime remains foundations-v13. Existing real Next production
   build/browser controls and optional-package component results are retained.
-  A fresh post-checkpoint framework run and regression comparison are next;
-  a driver that records known failures does not establish Next.js compatibility.
+  The [fresh post-push package-v2 matrix](tests/node-compat/frameworks/package-bundler-execution-v1/results-post-push-v2/results.json)
+  exits 0 with all ten observations, 17 clean parent commands and three complete
+  Node/Jco/Wasmtime positive differentials. All four emitted components have no
+  imports. Corrected Node controls exercise real `next/server.js` successfully
+  and preserve the expected `headers()` error outside a request scope.
+- Seven guest cases remain unsuccessful: ReactDOM edge builds a 15,685,263-byte
+  component but traps on both hosts (`subscribe-instant` is the first named
+  Wasmtime frame); the Node renderer refuses `async_hooks`; Next request/headers
+  libraries refuse unprovided process/filename references; the real standalone
+  server refuses runtime loader behavior; generated page/route entries refuse
+  `crypto`. No full Next.js server component or HTTP/Wasm result exists.
+- Independent read-only checking of the fresh matrix passes 207 checks,
+  including four physical component hashes, all nine retained typed Jco returns,
+  three fresh Wasmtime returns, interface records, executed source snapshots and
+  all nested command cleanup. The deliberately failing ReactDOM Wasmtime command
+  exits 134 without timing out; this remains a runtime failure, not a passed test.
+- The full locked Next fixture's existing two Node baseline runs retain 24 HTTP
+  and two real browser checks per run. They were not repeated because this change
+  exercises the optional bundler against the same built application and pinned
+  native engine. The new [matrix comparator](tests/node-compat/frameworks/package-bundler-execution-v1/check-components.mjs)
+  passes [40 synthetic cases](tests/node-compat/frameworks/package-bundler-execution-v1/results-post-push-v2/comparator-self-tests.json).
+  It rejects missing evidence/fixtures, unverified guest success, changed returns
+  and import widening, and flags changed full failure diagnostics for review.
+  Declared source roots may relocate without changing their recorded identities.
+  Independent review confirms the finite checker contract and reruns all 40
+  synthetic checks successfully without modifying its two source files.
+- A [genuine fresh ten-case replay](tests/node-compat/frameworks/package-bundler-execution-v1/results-post-push-v2-replay/results.json)
+  exits 0. Its [actual baseline comparison](tests/node-compat/frameworks/package-bundler-execution-v1/results-post-push-v2-replay/comparison.json)
+  exits 0 with complete evidence, no regressions/improvements/changed blockers,
+  and all seven known guest failures retained. This establishes a reusable
+  observation check, not Next.js compatibility. Both matrices' tools are terminal.
+- The broader native, selected-clock, crypto, HTTP and AsyncLocalStorage roadmap
+  remains in progress. The next runtime target from this experiment is the
+  explicitly selected standard clocks/poll profile, followed by the separately
+  bounded loader, process, crypto and request-context requirements. Full server
+  deployment, optional native355 admission, host expansion and performance are
+  not claimed by this checkpoint.
+- Follow-up precommit checks pass for 245 JSON files, 832 local documentation
+  links and the two independently reviewed checker source hashes. The 444-file
+  follow-up retains two final blank lines in original Wasmtime error logs;
+  their descriptor-bound bytes are preserved. The fresh component binaries and
+  installed Next dependencies remain at their recorded external paths.
 
 
-Roadmap continuation after pushed Next.js checkpoint `d1f8d524`:
+Work between Next.js checkpoint `d1f8d524` and checkpoint `d8034839`:
 
 - Previous goal turn classification: concrete progress. Real clock-tool builds,
   crypto pin/bootstrap actions, source/actual-result reviews and new package
-  component tests completed. These new experimental changes are uncommitted;
-  the last pushed checkpoint remains `d1f8d524`. Accepted foundations-v13 stays
+  component tests completed. These experimental changes are now committed and
+  pushed in `d8034839`. Accepted foundations-v13 stays
   unchanged and the full roadmap remains in progress.
 - [Optional production-package execution](tests/node-compat/frameworks/package-bundler-execution-v1/README.md)
   preserves the original finite bundler. V1's real CommonJS/native interop and
@@ -76,7 +117,7 @@ Roadmap continuation after pushed Next.js checkpoint `d1f8d524`:
   11 manifests and current frozen/old-normal protection agree. One API/helper
   launch and one returned read-only recheck remain distinct. No engine, key or
   guest ran. One-shot roots now exist and must not be reused. A genuinely new
-  historical-reference/current-read-only preflight is being implemented before
+  historical-reference/current-read-only preflight was subsequently sealed before
   any component construction; no serialized callable is treated as live.
 - Clock controller41b/Source review9027 pass. Actual Root30831 exits0 after
   private staging/vendor and all eight Rust/Jco commands, including four exact
@@ -86,7 +127,7 @@ Roadmap continuation after pushed Next.js checkpoint `d1f8d524`:
   passes436,062 checks over24,332 files,121 exact archives/three private downloads,
   21 aliases and all produced artifacts. Invalid-input pruner-unit invocation
   is verified; valid adapter normalization/pruning/publication never ran.
-  A separate actual-adapter phase is being authored with all grants NULL;
+  A separate actual-adapter phase was subsequently sealed with all grants NULL;
   exact output/WIT/reference and selected-host gates remain required.
 - Combined355 stage/controller [SOURCEb1a21da1](tests/node-compat/foundation-scheduler/combined-native-stage-controller-candidate-v1/README.md)
   is sealed:16 members/1,637 inputs,6,611 checks and exact1,613 copies
@@ -168,7 +209,7 @@ Next.js framework experiment after pushed checkpoint `9c426444`:
   reuse remain unestablished. Accepted production stays foundations-v13.
 
 
-Current all-work commit checkpoint (2026-11-05):
+Earlier all-work commit checkpoint `9c426444` (2026-11-05; historical state):
 
 - All three parallel workers have stopped writes; their tools and all Root
   operational jobs are terminal. This checkpoint includes all tracked changes

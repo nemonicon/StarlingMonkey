@@ -3,6 +3,16 @@ profile. **The full Next.js server does not currently compile through this profi
 bundler.** The stock Node application works; its failures in the Wasm pipeline are
 retained as regression observations.
 
+The follow-on [optional package-bundler experiment](../package-bundler-execution-v1/README.md)
+advances beyond the original CommonJS refusals below. A fresh ten-case run after
+checkpoint `d8034839` passes complete Node/Jco/Wasmtime comparisons for native
+CommonJS interop, the supported native modules and real React elements. ReactDOM
+edge builds but traps on both hosts; Next libraries and generated server/page/route
+entries remain refused. The [post-push results](../package-bundler-execution-v1/results-post-push-v2/results.json)
+retain the corrected Node Next subpath controls and every guest failure. The table
+below describes the original finite-profile baseline; the optional experiment has
+its own runner and regression baseline. It does not replace that baseline.
+
 The fixture pins Next.js **16.4.5**, React/ReactDOM **19.3.1**, Node **22.14.0**,
 ComponentizeJS **0.23.0**, Jco **1.40.0**, Rolldown **1.2.16**, and Wasmtime
 **42.0.1**. Browser controls use Playwright Core **1.64.1** and the installed

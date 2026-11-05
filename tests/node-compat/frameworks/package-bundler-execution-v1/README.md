@@ -3,6 +3,25 @@ CommonJS/native-builtin dependencies into capability-free components. Full
 Next.js and ReactDOM rendering remain incomplete. The accepted finite profile
 bundler and foundations-v13 native engine are unchanged.
 
+The [fresh post-push v2 run](results-post-push-v2/results.json), executed after
+commit `d8034839`, repeats all ten cases with the corrected Node subpath controls.
+It exits 0 for complete observations and its three required positives: native
+CommonJS identity, supported modules and real React elements. All 17 parent
+commands finish cleanly. Four real components are emitted with no imports.
+ReactDOM edge again fails on both hosts; its fresh component is 15,685,263 bytes
+and the retained Wasmtime stack starts at `subscribe-instant`. NextRequest and
+NextResponse succeed on Node, while `headers()` correctly throws outside a request
+scope. The six bundling refusals below remain unchanged. This run reuses the exact
+locked application already built and HTTP/browser-tested by the comprehensive
+Next fixture; it does not repeat or reinterpret those Node-only controls.
+
+A [genuine fresh replay](results-post-push-v2-replay/results.json) also completes
+all ten observations. Its [actual comparison](results-post-push-v2-replay/comparison.json)
+exits 0 with no regressions, improvements or changed blockers and all seven guest
+failures retained. The comparator passes [40 injected cases](results-post-push-v2/comparator-self-tests.json),
+including changed trap diagnostics, missing fixtures/oracles, return mismatches,
+interface widening and relocation of unchanged source identities.
+
 The [v2 component matrix](results-component-matrix-v2/results.json) executes ten
 actual application/library inputs with the new `packages-v2` selection:
 
@@ -70,6 +89,10 @@ node tests/node-compat/frameworks/package-bundler-execution-v1/run-components.mj
   --application /private/tmp/starling-node-compat/nextjs-16.4.5-v13-run-20261105-02/application \
   --output /private/tmp/package-components-fresh \
   --record /private/tmp/package-components-evidence
+
+node tests/node-compat/frameworks/package-bundler-execution-v1/check-components.mjs \
+  tests/node-compat/frameworks/package-bundler-execution-v1/results-post-push-v2/results.json \
+  /private/tmp/package-components-evidence/results.json
 ```
 
 The application is the real locked project produced by the
@@ -78,6 +101,20 @@ genuine pinned artifacts. The matrix passes its three required positive cases
 while retaining every later failure; exit0 is not a Next compatibility claim.
 Its initial v2 driver default-argument error occurred before any worker/output
 creation and is preserved under `preparation-history-v2`.
+
+The [matrix comparator](check-components.mjs) reads retained evidence relative to
+each `results.json`, including all three Jco returns, fresh Wasmtime values,
+recorded interface scope and command terminals. Exit 0 means no regression or
+changed blocker; the seven known guest failures remain visible. Exit 1 means
+missing/inconsistent evidence, regression or incompatible pins, and exit 2 means
+a changed blocker needs review. Run its injected checks with `--self-test`.
+The exact Node/bundler/engine/Wasmtime identities are checked from recorded fields;
+the matrix alone has no installed Next/React version record. Use the locked
+application produced by the full Next runner, which verifies those versions.
+This metadata/evidence comparison does not reinstantiate components or establish
+unrecorded runtime behavior. Use the separate Next runner/comparator for the full
+HTTP/browser baseline. `nextjs/run.mjs` uses the original profile path; optional
+bundler checks require this matrix's explicit `--bundler packages-v2` selection.
 
 All emitted application components select no host interfaces. Their engine,
 metadata, source inputs, component hashes, WIT, whole typed results, raw process
