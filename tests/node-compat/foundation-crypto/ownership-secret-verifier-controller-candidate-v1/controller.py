@@ -101,6 +101,11 @@ def clean_terminal(t,authority):
     assert t['finalGroups']and all(r['alive']is False for r in t['finalGroups'])and t['stderr']['bytes']==0
 
 
+def validate_retained_frame(value,retained,c,metadata,manifests):
+    assert type(value)is dict and value==retained,'Whole stdout JSON must equal the complete saved return'
+    assert value==expected_frame(c,metadata,manifests),'Whole returned frame must match genuine unchanged metadata/manifests/context roles'
+
+
 def authorize(config_row):
     assert __debug__ and sys.dont_write_bytecode and sys.flags.isolated
     assert not any(os.environ.get(k)for k in['PYTHONPATH','PYTHONHOME','PYTHONOPTIMIZE','LD_PRELOAD','LD_LIBRARY_PATH','DYLD_INSERT_LIBRARIES','DYLD_LIBRARY_PATH'])
@@ -175,17 +180,19 @@ def parent(frame):
     terminal=None;observed=None;errors=[];protected=False
     try:
         terminal=monitor.monitor(argv,str(REPO),{**os.environ,'PYTHONDONTWRITEBYTECODE':'1'},EXTERNAL,TIMEOUT,frame['rootRow'])
+        terminal_row=fingerprint(EXTERNAL/'terminal.json')[0]
+        assert frame['capture'].read(terminal_row)==terminal,'Durable raw terminal must equal the genuine monitor return'
         for key in['stdout','stderr']:assert fingerprint(terminal[key]['path'])[0]==terminal[key]
-        write(OUT/'raw-terminal-observed.json',dict(schemaVersion=1,terminal=fingerprint(EXTERNAL/'terminal.json')[0],stdout=terminal['stdout'],stderr=terminal['stderr'],interpretationPending=True))
+        write(OUT/'raw-terminal-observed.json',dict(schemaVersion=1,terminal=terminal_row,stdout=terminal['stdout'],stderr=terminal['stderr'],interpretationPending=True))
         clean_terminal(terminal,frame['rootRow'])
         assert terminal['stdout']['bytes']<=16*1024*1024
         raw=Path(terminal['stdout']['path']).read_bytes();value=json.loads(raw)
-        retained=frame['capture'].read(fingerprint(OUT/'whole-frame.json')[0]);assert value==retained
+        retained=frame['capture'].read(fingerprint(OUT/'whole-frame.json')[0])
         c=frame['contract'];metadata=frame['capture'].read(c['metadata']);copies={r['path']:r for r in frame['receipt']['copies']};manifests=[]
         for r in metadata['selectedModuleManifests']:
             target=str(Path(c['frozenSourceRoot'])/local(r['path']));copy=copies[target];assert copy['sha256']==r['sha256']
             manifests.append(frame['capture'].read({k:copy[k]for k in['path','sha256','bytes']}))
-        assert value==expected_frame(c,metadata,manifests),'Whole returned frame must match genuine unchanged metadata/manifests/context roles'
+        validate_retained_frame(value,retained,c,metadata,manifests)
         observed=dict(fullReturnedFrame=fingerprint(OUT/'whole-frame.json')[0],rawStdout=terminal['stdout'],wholeStdoutAndSavedFrameJsonEqual=True,wholeFrameModelPassed=True,helperCalls=1,helperPayloadReadScope='FROZEN only by reviewed e872 source flow',helperOriginalReferencesReopened=False,callerSourceAndOriginalPreservationReadsSeparate=True,syscallIsolationObserved=False,engineExecuted=False)
     except BaseException as error:errors.append(dict(stage='monitor-or-full-frame-collection',type=type(error).__name__,rawEvidenceLocationsUnchanged=True,completeEvidenceRequiresFileReview=True))
     finally:

@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "state": "UNAPPLIED_BOUNDED_ZLIB_ERROR_SEMANTICS_SOURCE_PROPOSAL_V1",
+  "sourceOnly": true,
+  "targetNode": "v22.14.0",
+  "parentProfile": "sm-node-22.14.0-m0.13",
+  "errorSemanticsRevision": "proposal-v1-not-integrated",
+  "exports": {"bindings": 40, "syncOperations": ["deflateSync", "inflateSync", "gzipSync", "gunzipSync", "deflateRawSync", "inflateRawSync"], "otherCallablesRefuseCallAndNew": 31, "implementedCallablesRefuseNew": true, "aliases": ["node:zlib", "zlib"], "hostInterfaces": []},
+  "boundedDomain": {"inputBytesMaximum": 1048576, "outputBytesMaximum": 16777216, "input": "fixed attached unshared ArrayBuffer/view byte windows; no string encoding", "options": "ordinary own-data maxOutputLength only, undefined or integer1..16777216", "ordering": "option validation before input validation, before codec", "streams": "exactly one member; no trailing bytes; no dictionary support"},
+  "codecErrors": [
+    {"status": "InvalidData", "name": "Error", "code": "Z_DATA_ERROR", "ownErrno": -3},
+    {"status": "IncompleteData", "name": "Error", "code": "Z_BUF_ERROR", "ownErrno": -5},
+    {"status": "DictionaryRequired", "name": "Error", "code": "Z_NEED_DICT", "ownErrno": 2, "message": "Missing dictionary", "dictionarySupportAdded": false}
+  ],
+  "profileErrors": [
+    {"status": "InputLimit", "name": "RangeError", "code": "ERR_OUT_OF_RANGE", "ownErrno": null},
+    {"status": "OutputLimit", "name": "RangeError", "code": "ERR_BUFFER_TOO_LARGE", "ownErrno": null},
+    {"status": "TrailingData", "name": "Error", "code": "ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED", "ownErrno": null},
+    {"status": "InternalError", "name": "Error", "code": "ERR_SM_ZLIB_INTERNAL", "ownErrno": null},
+    {"status": "Ok", "path": "invalid use of codec_failure only", "name": "Error", "code": "ERR_SM_ZLIB_INTERNAL", "ownErrno": null}
+  ],
+  "nativeErrorProperties": {"codeModuleProfile": "existing own enumerable string properties; existing JSAPI attributes unchanged", "operation": "no new own native operation field", "errno": "own enumerable numeric property only for the3 selected codec error classes; not the last success/status diagnostic", "name": "existing JSEXN kind", "messages": "existing bounded messages except dictionary; not full Node message parity"},
+  "facadeErrors": "unchanged existing name/code/module/operation/profile; no new errno",
+  "oom": "unchanged JS_ReportOutOfMemory; not converted to a profile code; no real OOM/fault test authorized",
+  "success": "same codec, defaults, output bytes/ownership/registration; C++ stages input, native output copied once to JS-owned Uint8Array, Buffer.from(ArrayBuffer) shares view; no performance/minimum-copy claim",
+  "remainingRecordedDifferences": 15,
+  "nodeMessagesAndDescriptorsFullyCompared": false,
+  "sourcePeer": null,
+  "rootAuthority": null,
+  "nativeBuild": null,
+  "runtimeValidation": null,
+  "operationalAdmission": false,
+  "adoption": false
+}

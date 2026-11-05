@@ -1,0 +1,249 @@
+--- a/crates/spidermonkey-embedding-splicer/src/stub_wasi.rs
++++ b/crates/spidermonkey-embedding-splicer/src/stub_wasi.rs
+@@ -174,12 +174,12 @@
+         _ => {}
+     }
+ 
+-    let has_io = features.contains(&Feature::Clocks)
+-        || features.contains(&Feature::Stdio)
+-        || features.contains(&Feature::Http)
+-        || target_world_requires_io(&target_world_imports);
+-    if !has_io {
+-        stub_io(&mut module)?;
++    let (has_poll_io, has_stream_io) = io_requirements(&features, &target_world_imports);
++    if !has_poll_io {
++        stub_io_poll(&mut module)?;
++    }
++    if !has_stream_io {
++        stub_io_streams(&mut module)?;
+     }
+ 
+     stub_sockets(&mut module, &target_world_imports)?;
+@@ -187,6 +187,73 @@
+         .encode()
+         .context("failed to encode module during stub")?;
+     Ok(encoded)
++}
++
++// Pollable ownership is required by clocks even when no stream transport is selected.
++// Keep the existing conservative filesystem/socket/terminal requirements, and
++// explicitly retain IO for fetch-event and declared IO/HTTP world imports.
++fn io_requirements(features: &[Feature], world_imports: &HashSet<String>) -> (bool, bool) {
++    let streams = features.contains(&Feature::Stdio)
++        || features.contains(&Feature::Http)
++        || features.contains(&Feature::FetchEvent)
++        || target_world_requires_io(world_imports)
++        || [
++            "wasi:io/streams@0.2",
++            "wasi:io/error@0.2",
++            "wasi:http/types@0.2",
++            "wasi:http/outgoing-handler@0.2",
++            "wasi:http/incoming-handler@0.2",
++        ]
++        .iter()
++        .any(|name| world_imports.contains(*name));
++    let poll = streams
++        || features.contains(&Feature::Clocks)
++        || world_imports.contains("wasi:io/poll@0.2");
++    (poll, streams)
++}
++
++/// Build-only opt-in adapter IO pruning. Caller authenticates the exact binary
++/// and normalizes import order before invoking this entry. This is deliberately
++/// separate from engine-oriented stub_wasi (notably its random/realloc stubs).
++pub fn prune_clock_adapter_io(wasm: Vec<u8>) -> Result<Vec<u8>> {
++    use sha2::{Digest, Sha256};
++    // Exact normalized input, not merely a compatible-looking import inventory.
++    if wasm.len() != 53512 || format!("{:x}", Sha256::digest(&wasm))
++        != "667907826ed62123beb0c1817969dcf32527a02b4bcbbbb10dc1dcafaba12ecc"
++    {
++        bail!("clock adapter IO pruning requires the exact pinned normalized binary");
++    }
++    let mut module = Module::parse(wasm.as_slice(), false, false)
++        .map_err(|error| anyhow::anyhow!("adapter parse failed: {error:?}"))?;
++    let mut saw_non_function = false;
++    let mut functions = 0;
++    let mut memories = 0;
++    for import in module.imports.iter() {
++        match import.ty {
++            TypeRef::Func(_) => {
++                if saw_non_function {
++                    bail!("adapter function imports must precede memory for the pinned wirm API");
++                }
++                functions += 1;
++            }
++            TypeRef::Memory(_) if import.module == "env" && import.name == "memory" => {
++                saw_non_function = true;
++                memories += 1;
++            }
++            _ => bail!("unexpected adapter import kind"),
++        }
++    }
++    if functions != 63 || memories != 1 {
++        bail!("unexpected pinned adapter import inventory");
++    }
++    for namespace in ["wasi:clocks/monotonic-clock@0.2.0", "wasi:clocks/wall-clock@0.2.0"] {
++        if module.imports.find(namespace.into(), "now".into()).is_none() {
++            bail!("missing expected adapter clock import: {namespace}");
++        }
++    }
++    stub_stdio(&mut module)?;
++    stub_io_streams(&mut module)?;
++    module.encode().context("failed to encode clock adapter IO pruning")
+ }
+ 
+ fn target_world_requires_io(target_world_imports: &HashSet<String>) -> bool {
+@@ -800,7 +867,7 @@
+     Ok(())
+ }
+ 
+-fn stub_io(module: &mut Module) -> Result<()> {
++fn stub_io_poll(module: &mut Module) -> Result<()> {
+     stub_wasi_imports(
+         module,
+         "wasi:io/poll",
+@@ -815,6 +882,17 @@
+     )?;
+     stub_wasi_imports(
+         module,
++        "wasi:io/poll",
++        "[resource-drop]pollable",
++        unreachable_stub,
++    )?;
++    stub_wasi_imports(module, "wasi:io/poll", "poll", unreachable_stub)?;
++    Ok(())
++}
++
++fn stub_io_streams(module: &mut Module) -> Result<()> {
++    stub_wasi_imports(
++        module,
+         "wasi:io/error",
+         "[method]error.to-debug-string",
+         unreachable_stub,
+@@ -881,12 +959,6 @@
+     )?;
+     stub_wasi_imports(
+         module,
+-        "wasi:io/poll",
+-        "[resource-drop]pollable",
+-        unreachable_stub,
+-    )?;
+-    stub_wasi_imports(
+-        module,
+         "wasi:io/streams",
+         "[resource-drop]input-stream",
+         unreachable_stub,
+@@ -897,7 +969,6 @@
+         "[resource-drop]output-stream",
+         unreachable_stub,
+     )?;
+-    stub_wasi_imports(module, "wasi:io/poll", "poll", unreachable_stub)?;
+     stub_wasi_imports(
+         module,
+         "wasi:io/streams",
+@@ -1606,3 +1677,44 @@
+ 
+     Ok(())
+ }
++
++#[cfg(test)]
++mod clock_io_policy_tests {
++    use super::*;
++
++    #[test]
++    fn adapter_input_guard_refuses_unknown_payloads_before_parse() {
++        for wasm in [Vec::new(), b"\0asm\x01\0\0\0".to_vec(), vec![0; 53512]] {
++            assert!(prune_clock_adapter_io(wasm).is_err());
++        }
++    }
++
++    #[test]
++    fn pure_and_clock_only_keep_distinct_capabilities() {
++        assert_eq!(io_requirements(&[], &HashSet::new()), (false, false));
++        assert_eq!(io_requirements(&[Feature::Clocks], &HashSet::new()), (true, false));
++    }
++
++    #[test]
++    fn stream_profiles_keep_poll_and_stream_transport() {
++        for feature in [Feature::Stdio, Feature::Http, Feature::FetchEvent] {
++            assert_eq!(io_requirements(&[feature], &HashSet::new()), (true, true));
++        }
++        assert_eq!(io_requirements(&[Feature::Clocks, Feature::Http], &HashSet::new()), (true, true));
++    }
++
++    #[test]
++    fn explicitly_selected_world_io_is_retained() {
++        let poll = HashSet::from(["wasi:io/poll@0.2".to_string()]);
++        assert_eq!(io_requirements(&[], &poll), (true, false));
++        for interface in [
++            "wasi:io/streams@0.2", "wasi:io/error@0.2", "wasi:http/types@0.2",
++            "wasi:sockets/tcp@0.2", "wasi:filesystem/types@0.2", "wasi:cli/terminal-input@0.2",
++        ] {
++            let world = HashSet::from([interface.to_string()]);
++            assert_eq!(io_requirements(&[], &world), (true, true));
++        }
++        let other = HashSet::from(["example:application/input@1.0".to_string()]);
++        assert_eq!(io_requirements(&[], &other), (false, false));
++    }
++}
+--- a/crates/spidermonkey-embedding-splicer/src/bin/splicer.rs
++++ b/crates/spidermonkey-embedding-splicer/src/bin/splicer.rs
+@@ -17,6 +17,13 @@
+ 
+ #[derive(Subcommand, Debug, Clone)]
+ enum Commands {
++    /// Prune stdio/stream diagnostics from a separately pinned normalized clock adapter
++    PruneClockAdapterIo {
++        #[arg(short, long)]
++        input: PathBuf,
++        #[arg(short, long)]
++        output: PathBuf,
++    },
+     /// Stub WASI imports in a WebAssembly module
+     StubWasi {
+         /// Input WebAssembly file path
+@@ -72,6 +79,24 @@
+     let cli = Cli::parse();
+ 
+     match cli.command {
++        Commands::PruneClockAdapterIo { input, output } => {
++            let wasm = fs::read(&input)
++                .with_context(|| format!("Failed to read adapter: {}", input.display()))?;
++            let result = stub_wasi::prune_clock_adapter_io(wasm)?;
++            // Exclusive creation: this opt-in build operation must not replace an adapter.
++            use std::io::Write;
++            let mut options = fs::OpenOptions::new();
++            options.write(true).create_new(true);
++            #[cfg(unix)]
++            {
++                use std::os::unix::fs::OpenOptionsExt;
++                options.mode(0o600);
++            }
++            let mut file = options.open(&output)
++                .with_context(|| format!("Need fresh adapter output: {}", output.display()))?;
++            file.write_all(&result)?;
++            file.sync_all()?;
++        }
+         Commands::StubWasi {
+             input,
+             output,
+--- a/crates/spidermonkey-embedding-splicer/Cargo.toml
++++ b/crates/spidermonkey-embedding-splicer/Cargo.toml
+@@ -12,6 +12,7 @@
+ workspace = true
+ 
+ [dependencies]
++sha2 = { version = "=0.10.9", default-features = false }
+ anyhow = { workspace = true }
+ clap = { version = "4.5.31", features = ["suggestions", "color", "derive"] }
+ heck = { workspace = true }
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -629,6 +629,7 @@
+  "js-component-bindgen",
+  "rand",
+  "serde_json",
++ "sha2",
+  "wasm-encoder 0.245.1",
+  "wasmparser 0.245.1",
+  "wirm",

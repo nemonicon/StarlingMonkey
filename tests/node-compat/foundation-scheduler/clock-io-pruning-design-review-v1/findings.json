@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "state": "CLOCK_IO_PRUNING_DESIGN_REVIEW_FINDINGS_NO_CANDIDATE_VERDICT_V1",
+  "reviewScope": "Static/source/Data/independent pure model only; mutable Root draft snapshot",
+  "sourceApprovalIssued": false,
+  "candidateExactSourceVerdictIssued": false,
+  "findings": [
+    {
+      "id": "F1",
+      "status": "CONFIRMED_SOURCE_AND_METADATA",
+      "summary": "Memory-first import entries differ from dense function indices; both caller and wirm replacement cast entry IDs",
+      "locations": [
+        "draft after stub_wasi.rs::stub_wasi_imports and stub_import",
+        "wirm5 src/ir/module/module_imports.rs::find",
+        "wirm5 src/ir/module/mod.rs::parse_internal and convert_import_fn_to_local",
+        "wirm5 src/ir/function.rs::replace_import_in_module_with_tag"
+      ],
+      "requiredBoundary": "Exact pinned import-order normalization before this replacement mechanism, with kind-space preservation proof"
+    },
+    {
+      "id": "F2",
+      "status": "GENERIC_ADAPTER_ROUTE_WITHDRAWN_BY_ROOT",
+      "summary": "Generic Random-disabled stubbing requires absent exported cabi_realloc and absent get-random-u64",
+      "actualFailureExecuted": false,
+      "requiredBoundary": "New narrow build-only entry; no engine-specific random/preview1/fs/cli/clock stubbing on adapter"
+    },
+    {
+      "id": "F3",
+      "status": "DRAFT_CALLER_CONTRACT_DEPENDENCY",
+      "summary": "Inspected shape+two-now guard is broader than exact adapter; Root plans strict normalized-input SHA256 guard",
+      "futureGuardIndependentReview": null,
+      "reportedFutureNormalizedInputSha256": "667907826ed62123beb0c1817969dcf32527a02b4bcbbbb10dc1dcafaba12ecc",
+      "reviewerComputedActualNormalizedBytes": false,
+      "requiredBoundary": "Authenticate finalized guard/new direct dependency/lock edge and original988-to-normalized derivation before action"
+    },
+    {
+      "id": "F4",
+      "status": "FINITE_POLICY_CONSISTENT_WITH_LIMITS",
+      "summary": "23 exact unique stubs split4/19; 672 Boolean cases, actual WIT resolution/aliases and Rust compilation untested",
+      "requiredBoundary": "WIT parser/world dependency and public feature regressions before general adoption"
+    },
+    {
+      "id": "F5",
+      "status": "MISSING_FUTURE_INTEGRATION_AND_ARTIFACT_EVIDENCE",
+      "summary": "Existing componentize.js passes raw adapter; a future authenticated caller/package/CLI and structural/runtime evidence are necessary",
+      "requiredBoundary": "Fresh exclusive outputs, raw failure retention, full actual import/type/export checks, then separately authorized runtime stage"
+    }
+  ],
+  "actualAdapterTransformedByReviewer": false,
+  "rootHelpersImported": false,
+  "compilerOrNodeOrWizerOrComponentOrGuestExecuted": false,
+  "rootFilesModified": false,
+  "sourcePeer": null,
+  "rootAuthority": null,
+  "buildAuthority": null,
+  "artifactReview": null,
+  "runtimeAuthority": null
+}

@@ -1,0 +1,116 @@
+--- a/builtins/node-compat/zlib/kernel.cpp
++++ b/builtins/node-compat/zlib/kernel.cpp
+@@ -13,6 +13,7 @@
+ 
+ #include <cmath>
+ #include <cstring>
++#include <optional>
+ 
+ namespace builtins::node_compat::zlib_profile {
+ namespace codec = node_compat_zlib_candidate;
+@@ -25,7 +26,7 @@
+ DEF_ERR(OutputLimit, JSEXN_RANGEERR, "Zlib output exceeds the selected profile limit", 0)
+ DEF_ERR(InvalidData, JSEXN_ERR, "Invalid compressed data", 0)
+ DEF_ERR(IncompleteData, JSEXN_ERR, "Unexpected end of compressed input", 0)
+-DEF_ERR(NeedsDictionary, JSEXN_ERR, "Zlib dictionaries are not supported by this profile", 0)
++DEF_ERR(NeedsDictionary, JSEXN_ERR, "Missing dictionary", 0)
+ DEF_ERR(TrailingData, JSEXN_ERR, "Multiple compressed members or trailing data are unsupported", 0)
+ DEF_ERR(InternalFailure, JSEXN_ERR, "Bounded zlib operation failed", 0)
+ 
+@@ -38,7 +39,7 @@
+ }
+ 
+ static bool fail(JSContext *cx, const JSErrorFormatString &format,
+-                 const char *code, int status = Z_OK) {
++                 const char *code, std::optional<int> codec_errno = std::nullopt) {
+   api::throw_error(cx, format);
+   JS::RootedValue exception(cx);
+   if (!JS_GetPendingException(cx, &exception)) return false;
+@@ -49,8 +50,13 @@
+         !string_property(cx, error, "module", "node:zlib") ||
+         !string_property(cx, error, "profile", "sm-node-22.14.0-m0.13"))
+       return false;
+-    JS::RootedValue number(cx, JS::Int32Value(status));
+-    if (!JS_DefineProperty(cx, error, "errno", number, JSPROP_ENUMERATE)) return false;
++    // A profile refusal is not a zlib errno, even when the last codec
++    // status was Z_OK or Z_STREAM_END. Never expose that diagnostic
++    // as a Node-style errno. Only actual codec errors opt in.
++    if (codec_errno) {
++      JS::RootedValue number(cx, JS::Int32Value(*codec_errno));
++      if (!JS_DefineProperty(cx, error, "errno", number, JSPROP_ENUMERATE)) return false;
++    }
+   }
+   JS_SetPendingException(cx, exception);
+   return false;
+@@ -60,7 +66,7 @@
+   // The selected linked guest codec is the authority, never Node's inventory.
+   const char *runtime = zlibVersion();
+   if (!runtime || std::strcmp(runtime, ZLIB_VERSION) != 0)
+-    return fail(cx, BackendMismatch, "ERR_SM_ZLIB_BACKEND_MISMATCH", Z_VERSION_ERROR);
++    return fail(cx, BackendMismatch, "ERR_SM_ZLIB_BACKEND_MISMATCH");
+   return true;
+ }
+ 
+@@ -84,22 +90,22 @@
+     JS_ReportOutOfMemory(cx);
+     return false;
+   case codec::Status::InputLimit:
+-    return fail(cx, InputLimit, "ERR_OUT_OF_RANGE", result.zlib_status);
++    return fail(cx, InputLimit, "ERR_OUT_OF_RANGE");
+   case codec::Status::OutputLimit:
+-    return fail(cx, OutputLimit, "ERR_BUFFER_TOO_LARGE", result.zlib_status);
++    return fail(cx, OutputLimit, "ERR_BUFFER_TOO_LARGE");
+   case codec::Status::InvalidData:
+-    return fail(cx, InvalidData, "Z_DATA_ERROR", result.zlib_status);
++    return fail(cx, InvalidData, "Z_DATA_ERROR", Z_DATA_ERROR);
+   case codec::Status::IncompleteData:
+-    return fail(cx, IncompleteData, "Z_BUF_ERROR", result.zlib_status);
++    return fail(cx, IncompleteData, "Z_BUF_ERROR", Z_BUF_ERROR);
+   case codec::Status::DictionaryRequired:
+-    return fail(cx, NeedsDictionary, "ERR_SM_ZLIB_DICTIONARY_UNSUPPORTED", result.zlib_status);
++    return fail(cx, NeedsDictionary, "Z_NEED_DICT", Z_NEED_DICT);
+   case codec::Status::TrailingData:
+-    return fail(cx, TrailingData, "ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED", result.zlib_status);
++    return fail(cx, TrailingData, "ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED");
+   case codec::Status::InternalError:
+   case codec::Status::Ok: // Caller must not use this error path for success.
+-    return fail(cx, InternalFailure, "ERR_SM_ZLIB_INTERNAL", result.zlib_status);
++    return fail(cx, InternalFailure, "ERR_SM_ZLIB_INTERNAL");
+   }
+-  return fail(cx, InternalFailure, "ERR_SM_ZLIB_INTERNAL", result.zlib_status);
++  return fail(cx, InternalFailure, "ERR_SM_ZLIB_INTERNAL");
+ }
+ 
+ // Private factory contract only: run(Uint8Array, format 0|1|2, encode:boolean,
+--- a/builtins/node-compat/export-manifest.zlib.node-v22.14.0.json
++++ b/builtins/node-compat/export-manifest.zlib.node-v22.14.0.json
+@@ -2,7 +2,7 @@
+   "schemaVersion": 1,
+   "profileVersion": "sm-node-22.14.0-m0.13",
+   "nodeVersion": "v22.14.0",
+-  "status": "UNAPPLIED optional bounded six-sync zlib integration proposal; no linked codec, guest result or installed support.",
++  "status": "UNAPPLIED error-semantics successor; no new build, runtime result, backend-version proof or installed support.",
+   "moduleContract": "One finite binding record registered with existing define_builtin_module under node:zlib and zlib; same named/default function and data identities. CommonJS uses existing literal selected-builtin lowering only.",
+   "modules": {
+     "node:zlib": {
+@@ -103,8 +103,9 @@
+         "Options only undefined or ordinary own-data maxOutputLength, integer1..16MiB. Unknown keys/symbols/accessors/prototypes explicitly refused; arbitrary Proxy reflection outside contract.",
+         "Exactly one zlib/gzip/raw member, no trailing bytes, dictionary, concatenation, streaming, async, auto-detect, Brotli or CRC32 support.",
+         "constants.ZLIB_VERNUM and legacy default.ZLIB_VERNUM use the same native header numeric value only after linked zlibVersion() matches; actual guest value remains unverified. Node baseline4865 is not fabricated for a different codec.",
+-        "Frozen null-prototype constants/codes and frozen default differ from Node mutability; Z_MAX_CHUNK remains numeric Infinity.",
+-        "Native staging/codec buffers and JS output are distinct allocator owners; output cap is not a peak-memory bound. GC/Node error-coercion/target behavior remain unproved."
++        "The profile freezes its default/constants/codes and uses null-prototype constants/codes. Pinned Node22 also freezes codes; that alone is not a deviation. Other Node descriptor/prototype/mutability comparisons require separate evidence. Z_MAX_CHUNK remains numeric Infinity.",
++        "Native staging/codec buffers and JS output are distinct allocator owners; output cap is not a peak-memory bound. GC/Node error-coercion/target behavior remain unproved.",
++        "Error-semantics proposal: only Z_DATA_ERROR, Z_BUF_ERROR and Z_NEED_DICT carry numeric codec errno; profile limits/refusals/backend/internal errors omit errno. Dictionary-required input throws Z_NEED_DICT without enabling dictionaries. Six errno-only and one dictionary-code ledger differences are targeted; 15 other recorded differences remain explicit and unapproved. Error messages/descriptors are not claimed fully Node-identical."
+       ]
+     }
+   },
+--- a/builtins/node-compat/zlib/factories.generated.h
++++ b/builtins/node-compat/zlib/factories.generated.h
+@@ -1,5 +1,5 @@
+ // Generated unapplied bounded zlib proposal; do not edit.
+-// Canonical-source SHA-256: 409628c23ba19fadab3aa9e3067c893c90d8fdd51825bafdc4c488d1b08ebb77
++// Canonical-source SHA-256: 5778767523bd6492367cd28ab86f73537cdcfd91615aed5d387f24b74ebc6478
+ static constexpr const char kZlibFactorySource[] = R"SM_NODE_PROFILE((function(argument){
+ 'use strict';
+ // Node baseline shape with a private native-backend version overlay.

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "state": "INDEPENDENT_CLOCK_IO_BUILD_CONTROLLER_SOURCE_REVIEW_HOLD_V1",
+  "controllerSourceIndexSha256": "064003004505c71b5cc28aef92fd929a0165d6cf3b69eb73bd935f9932dc72c8",
+  "sourceIndexSha256": "55338bc0e5e0f47ed473ccd283ed1eae70183f081abb8f6a61e5c8001711945f",
+  "sourceOnly": true,
+  "sourceReviewPassed": false,
+  "verifiedPassed": false,
+  "ownerActionsInvoked": false,
+  "hostActionsInvoked": false,
+  "buildActionsInvoked": false,
+  "networkActionsInvoked": false,
+  "stdlibRedirectHandlerExercisedOnlyWithFakeParent": true,
+  "checks": 12241,
+  "declaredSourceInputs": 5606,
+  "uniqueInputFiles": 5637,
+  "findingCount": 1,
+  "findings": [
+    {
+      "id": "M1",
+      "scope": "Source transport guard, no actual download failure",
+      "sourcePath": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v1/controller.py",
+      "finding": "Default urlopen follows redirects before geturl assertion; a same-URL redirect can invoke parent.open and still pass final URL equality",
+      "requiredCorrection": "Reject redirect before followup using local explicit no-proxy opener and raising HTTPRedirectHandler; preserve final URL/SHA/private/bounds guards"
+    }
+  ],
+  "pinnedStdlib": {
+    "path": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/urllib/request.py",
+    "sha256": "8d1a5f86334c468df202969a87df233dc25c1449f8696f24a986e922b2cfdefd",
+    "bytes": 101280
+  },
+  "pureDefaultRedirectModel": {
+    "parentOpenCalls": [
+      {
+        "url": "https://static.crates.io/crates/windows-sys/windows-sys-0.61.2.crate",
+        "timeout": 60
+      }
+    ],
+    "oldFinalUrlCheckPasses": true,
+    "networkPerformed": false
+  },
+  "limitations": [
+    "No operation or external request ran",
+    "Exact hashes/private outputs still guard acceptance; no altered artifact or actual network claimed",
+    "No other concrete blocker found in bounded inspected Source/guard/lifecycle/command joins"
+  ],
+  "operationalAdmission": false,
+  "runtimeAcceptanceClaim": false
+}

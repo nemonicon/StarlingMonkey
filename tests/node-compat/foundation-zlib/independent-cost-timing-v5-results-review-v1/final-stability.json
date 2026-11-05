@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "state": "FINAL_ACTUAL_TIMING_DATA_STABILITY_AND_DERIVATIONS_PASSED",
+  "uniquePaths": 77969,
+  "logicalBytes": 2358293134,
+  "groups": {
+    "output-input-hashes.json": 17656,
+    "prerequisite-input-hashes.json": 59956,
+    "outer-input-hashes.json": 380
+  },
+  "modelExactForwardAndOffsetReverse": true,
+  "modelEdits": 7,
+  "modelDonor": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/independent-cost-pilot-v4-results-review-v1/model.py",
+    "sha256": "0f9b1dbe05557da16e7c1cb6548c184e0a86719aa977a246259c08ca2a6cb9f7",
+    "bytes": 14182
+  },
+  "derivationSteps": [
+    {
+      "edit": {
+        "before": "Independent compact-return and calibration DATA models.",
+        "after": "Independent timing compact-return DATA replay models.",
+        "count": 1
+      },
+      "afterOffset": 3
+    },
+    {
+      "edit": {
+        "before": "rows += [('batch',[id,n],'sample-0')]",
+        "after": "rows += [('batch',[id,n],'sample-'+str(i))for i in range(7)]",
+        "count": 1
+      },
+      "afterOffset": 6982
+    },
+    {
+      "edit": {
+        "before": "repetition=None,side=job['side'],comparison=job['comparison']",
+        "after": "repetition=job['repetition'],side=job['side'],comparison=job['comparison']",
+        "count": 1
+      },
+      "afterOffset": 7869
+    },
+    {
+      "edit": {
+        "before": "len(rows)==14,'all14 full primitive records'",
+        "after": "len(rows)==20,'all20 full primitive records'",
+        "count": 1
+      },
+      "afterOffset": 8091
+    },
+    {
+      "edit": {
+        "before": "c.counts['codecCalls']==job['n']*4",
+        "after": "c.counts['codecCalls']==job['n']*10",
+        "count": 1
+      },
+      "afterOffset": 9876
+    },
+    {
+      "edit": {
+        "before": "repetition=None,side=job['side'],arm=e['arm']",
+        "after": "repetition=job['repetition'],side=job['side'],arm=e['arm']",
+        "count": 1
+      },
+      "afterOffset": 11681
+    },
+    {
+      "edit": {
+        "before": "warmups=3,samples=1,freshOwnedProcess=True,sampleMs=float(int(samples[0]['elapsedNs']))/1e6",
+        "after": "warmups=3,samples=7,freshOwnedProcess=True,sampleMs=None",
+        "count": 1
+      },
+      "afterOffset": 12053
+    }
+  ],
+  "aggregateWholeJsonMatched": true,
+  "aggregateByteSerializationAlsoEqual": true,
+  "pythonAstFiles": [
+    "check-outer.py",
+    "check-prerequisites.py",
+    "final-check.py",
+    "model.py",
+    "reader.py",
+    "resource-data.py",
+    "statistics.py"
+  ],
+  "ownerActionsInvoked": false,
+  "benchmarkOrHelperOrGuestRerun": false
+}

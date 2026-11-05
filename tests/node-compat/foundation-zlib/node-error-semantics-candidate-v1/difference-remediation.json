@@ -1,0 +1,2206 @@
+{
+  "schemaVersion": 1,
+  "state": "UNAPPROVED_SOURCE_ONLY_22_ROW_REMEDIATION",
+  "historicalRowsPreserved": true,
+  "originalNullDeviationLabelsPreserved": 11,
+  "observedDifferentCases": 22,
+  "observedDifferentRawErrorRecords": 100,
+  "afterimageTargetedCases": 7,
+  "afterimageTargetedObservedRecords": 35,
+  "remainingDifferentCasesPredictedNotExecuted": 15,
+  "remainingDecisionsApproved": false,
+  "sourceCoupledVernumSeparate": true,
+  "rows": [
+    {
+      "index": 7,
+      "id": "gzip-encode-limit-small",
+      "profileExpectedCode": "ERR_BUFFER_TOO_LARGE",
+      "sourceDeviationValuePreserved": null,
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "error",
+        "name": "RangeError",
+        "code": {
+          "type": "string",
+          "value": "ERR_BUFFER_TOO_LARGE"
+        },
+        "errno": {
+          "type": "undefined",
+          "value": null
+        },
+        "message": "Cannot create a Buffer larger than 1 bytes"
+      },
+      "profileErrorAsObserved": {
+        "name": "RangeError",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_BUFFER_TOO_LARGE"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 1
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "error.errno"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/7/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 7,
+          "caseId": "gzip-encode-limit-small"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0010-retained-0-7.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0071-retained-1-7.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0122-retained-2-7.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0175-fresh-Jco-7.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0237-fresh-Wasmtime-7.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "FIXABLE_ERROR_FORM",
+        "implementedInUnappliedAfterimage": true,
+        "change": "Omit errno on profile OutputLimit error; preserve RangeError/code and all historical observations.",
+        "predictedComparedDifferencesAfterNewBuild": [],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 10,
+      "id": "gzip-decode-limit-under",
+      "profileExpectedCode": "ERR_BUFFER_TOO_LARGE",
+      "sourceDeviationValuePreserved": null,
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "error",
+        "name": "RangeError",
+        "code": {
+          "type": "string",
+          "value": "ERR_BUFFER_TOO_LARGE"
+        },
+        "errno": {
+          "type": "undefined",
+          "value": null
+        },
+        "message": "Cannot create a Buffer larger than 4095 bytes"
+      },
+      "profileErrorAsObserved": {
+        "name": "RangeError",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_BUFFER_TOO_LARGE"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 1
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "error.errno"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/10/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 10,
+          "caseId": "gzip-decode-limit-under"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0013-retained-0-10.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0074-retained-1-10.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0125-retained-2-10.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0178-fresh-Jco-10.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0240-fresh-Wasmtime-10.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "FIXABLE_ERROR_FORM",
+        "implementedInUnappliedAfterimage": true,
+        "change": "Omit errno on profile OutputLimit error; preserve RangeError/code and all historical observations.",
+        "predictedComparedDifferencesAfterNewBuild": [],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 12,
+      "id": "gzip-decode-output-over-cap",
+      "profileExpectedCode": "ERR_BUFFER_TOO_LARGE",
+      "sourceDeviationValuePreserved": null,
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "ok",
+        "result": {
+          "path": "/tmp/starling-node-compat/zlib-component-oracle-v1/data/a74b58f88fb5aec9422f46d00a6c017940900dae979637dbe171e1170772b4c9.bin",
+          "sha256": "a74b58f88fb5aec9422f46d00a6c017940900dae979637dbe171e1170772b4c9",
+          "bytes": 16777217
+        },
+        "isBuffer": true
+      },
+      "profileErrorAsObserved": {
+        "name": "RangeError",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_BUFFER_TOO_LARGE"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 1
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "outcome"
+      ],
+      "observationCount": 3,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/12/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 12,
+          "caseId": "gzip-decode-output-over-cap"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0015-retained-0-12.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0180-fresh-Jco-12.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0242-fresh-Wasmtime-12.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "OUTPUT_CAP",
+        "implementedInUnappliedAfterimage": false,
+        "boundedContract": "Kept finite16MiB output bound; not globally unavoidable Node behavior.",
+        "nodeGoalFollowOn": "A separately reviewed larger or streaming profile, allocation policy and fresh correctness/cost evidence are required to remove the cap deviation.",
+        "predictedComparedDifferencesAfterNewBuild": [
+          "outcome"
+        ],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 15,
+      "id": "gzip-multi",
+      "profileExpectedCode": "ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED",
+      "sourceDeviationValuePreserved": "strict-one-member-no-trailing",
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "ok",
+        "result": {
+          "path": "/tmp/starling-node-compat/zlib-component-oracle-v1/data/755d1b881624ca8bbbb6c6a4b0eff4ab454ea229f8579acd6e3ef675c3fbdae1.bin",
+          "sha256": "755d1b881624ca8bbbb6c6a4b0eff4ab454ea229f8579acd6e3ef675c3fbdae1",
+          "bytes": 512
+        },
+        "isBuffer": true
+      },
+      "profileErrorAsObserved": {
+        "name": "Error",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 1
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "outcome"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/15/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 15,
+          "caseId": "gzip-multi"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0018-retained-0-15.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0077-retained-1-15.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0128-retained-2-15.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0183-fresh-Jco-15.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0245-fresh-Wasmtime-15.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "STRICT_MEMBER_OR_TRAILING",
+        "implementedInUnappliedAfterimage": false,
+        "boundedContract": "Kept strict single-member/no-trailing policy; not a codec limitation proven unavoidable.",
+        "nodeGoalFollowOn": "Separate per-format design must distinguish concatenated gzip decoding from zlib/raw trailing handling, consume exact byte windows, preserve output budget across members, then compare full bytes with Node.",
+        "predictedComparedDifferencesAfterNewBuild": [
+          "outcome"
+        ],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 16,
+      "id": "gzip-trailing",
+      "profileExpectedCode": "ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED",
+      "sourceDeviationValuePreserved": "strict-one-member-no-trailing",
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "ok",
+        "result": {
+          "path": "/tmp/starling-node-compat/zlib-component-oracle-v1/data/3f9d7c54b45a954d2261e01025dece726df356a0e38914e7f00383edd00762e6.bin",
+          "sha256": "3f9d7c54b45a954d2261e01025dece726df356a0e38914e7f00383edd00762e6",
+          "bytes": 256
+        },
+        "isBuffer": true
+      },
+      "profileErrorAsObserved": {
+        "name": "Error",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 1
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "outcome"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/16/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 16,
+          "caseId": "gzip-trailing"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0019-retained-0-16.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0078-retained-1-16.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0129-retained-2-16.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0184-fresh-Jco-16.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0246-fresh-Wasmtime-16.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "STRICT_MEMBER_OR_TRAILING",
+        "implementedInUnappliedAfterimage": false,
+        "boundedContract": "Kept strict single-member/no-trailing policy; not a codec limitation proven unavoidable.",
+        "nodeGoalFollowOn": "Separate per-format design must distinguish concatenated gzip decoding from zlib/raw trailing handling, consume exact byte windows, preserve output budget across members, then compare full bytes with Node.",
+        "predictedComparedDifferencesAfterNewBuild": [
+          "outcome"
+        ],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 24,
+      "id": "zlib-encode-limit-small",
+      "profileExpectedCode": "ERR_BUFFER_TOO_LARGE",
+      "sourceDeviationValuePreserved": null,
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "error",
+        "name": "RangeError",
+        "code": {
+          "type": "string",
+          "value": "ERR_BUFFER_TOO_LARGE"
+        },
+        "errno": {
+          "type": "undefined",
+          "value": null
+        },
+        "message": "Cannot create a Buffer larger than 1 bytes"
+      },
+      "profileErrorAsObserved": {
+        "name": "RangeError",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_BUFFER_TOO_LARGE"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 1
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "error.errno"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/24/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 24,
+          "caseId": "zlib-encode-limit-small"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0027-retained-0-24.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0085-retained-1-24.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0136-retained-2-24.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0192-fresh-Jco-24.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0254-fresh-Wasmtime-24.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "FIXABLE_ERROR_FORM",
+        "implementedInUnappliedAfterimage": true,
+        "change": "Omit errno on profile OutputLimit error; preserve RangeError/code and all historical observations.",
+        "predictedComparedDifferencesAfterNewBuild": [],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 27,
+      "id": "zlib-decode-limit-under",
+      "profileExpectedCode": "ERR_BUFFER_TOO_LARGE",
+      "sourceDeviationValuePreserved": null,
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "error",
+        "name": "RangeError",
+        "code": {
+          "type": "string",
+          "value": "ERR_BUFFER_TOO_LARGE"
+        },
+        "errno": {
+          "type": "undefined",
+          "value": null
+        },
+        "message": "Cannot create a Buffer larger than 4095 bytes"
+      },
+      "profileErrorAsObserved": {
+        "name": "RangeError",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_BUFFER_TOO_LARGE"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 1
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "error.errno"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/27/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 27,
+          "caseId": "zlib-decode-limit-under"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0030-retained-0-27.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0088-retained-1-27.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0139-retained-2-27.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0195-fresh-Jco-27.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0257-fresh-Wasmtime-27.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "FIXABLE_ERROR_FORM",
+        "implementedInUnappliedAfterimage": true,
+        "change": "Omit errno on profile OutputLimit error; preserve RangeError/code and all historical observations.",
+        "predictedComparedDifferencesAfterNewBuild": [],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 29,
+      "id": "zlib-decode-output-over-cap",
+      "profileExpectedCode": "ERR_BUFFER_TOO_LARGE",
+      "sourceDeviationValuePreserved": null,
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "ok",
+        "result": {
+          "path": "/tmp/starling-node-compat/zlib-component-oracle-v1/data/a74b58f88fb5aec9422f46d00a6c017940900dae979637dbe171e1170772b4c9.bin",
+          "sha256": "a74b58f88fb5aec9422f46d00a6c017940900dae979637dbe171e1170772b4c9",
+          "bytes": 16777217
+        },
+        "isBuffer": true
+      },
+      "profileErrorAsObserved": {
+        "name": "RangeError",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_BUFFER_TOO_LARGE"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 1
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "outcome"
+      ],
+      "observationCount": 3,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/29/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 29,
+          "caseId": "zlib-decode-output-over-cap"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0032-retained-0-29.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0197-fresh-Jco-29.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0259-fresh-Wasmtime-29.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "OUTPUT_CAP",
+        "implementedInUnappliedAfterimage": false,
+        "boundedContract": "Kept finite16MiB output bound; not globally unavoidable Node behavior.",
+        "nodeGoalFollowOn": "A separately reviewed larger or streaming profile, allocation policy and fresh correctness/cost evidence are required to remove the cap deviation.",
+        "predictedComparedDifferencesAfterNewBuild": [
+          "outcome"
+        ],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 32,
+      "id": "zlib-multi",
+      "profileExpectedCode": "ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED",
+      "sourceDeviationValuePreserved": "strict-one-member-no-trailing",
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "ok",
+        "result": {
+          "path": "/tmp/starling-node-compat/zlib-component-oracle-v1/data/3f9d7c54b45a954d2261e01025dece726df356a0e38914e7f00383edd00762e6.bin",
+          "sha256": "3f9d7c54b45a954d2261e01025dece726df356a0e38914e7f00383edd00762e6",
+          "bytes": 256
+        },
+        "isBuffer": true
+      },
+      "profileErrorAsObserved": {
+        "name": "Error",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 1
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "outcome"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/32/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 32,
+          "caseId": "zlib-multi"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0035-retained-0-32.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0091-retained-1-32.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0142-retained-2-32.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0200-fresh-Jco-32.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0262-fresh-Wasmtime-32.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "STRICT_MEMBER_OR_TRAILING",
+        "implementedInUnappliedAfterimage": false,
+        "boundedContract": "Kept strict single-member/no-trailing policy; not a codec limitation proven unavoidable.",
+        "nodeGoalFollowOn": "Separate per-format design must distinguish concatenated gzip decoding from zlib/raw trailing handling, consume exact byte windows, preserve output budget across members, then compare full bytes with Node.",
+        "predictedComparedDifferencesAfterNewBuild": [
+          "outcome"
+        ],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 33,
+      "id": "zlib-trailing",
+      "profileExpectedCode": "ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED",
+      "sourceDeviationValuePreserved": "strict-one-member-no-trailing",
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "ok",
+        "result": {
+          "path": "/tmp/starling-node-compat/zlib-component-oracle-v1/data/3f9d7c54b45a954d2261e01025dece726df356a0e38914e7f00383edd00762e6.bin",
+          "sha256": "3f9d7c54b45a954d2261e01025dece726df356a0e38914e7f00383edd00762e6",
+          "bytes": 256
+        },
+        "isBuffer": true
+      },
+      "profileErrorAsObserved": {
+        "name": "Error",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 1
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "outcome"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/33/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 33,
+          "caseId": "zlib-trailing"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0036-retained-0-33.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0092-retained-1-33.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0143-retained-2-33.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0201-fresh-Jco-33.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0263-fresh-Wasmtime-33.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "STRICT_MEMBER_OR_TRAILING",
+        "implementedInUnappliedAfterimage": false,
+        "boundedContract": "Kept strict single-member/no-trailing policy; not a codec limitation proven unavoidable.",
+        "nodeGoalFollowOn": "Separate per-format design must distinguish concatenated gzip decoding from zlib/raw trailing handling, consume exact byte windows, preserve output budget across members, then compare full bytes with Node.",
+        "predictedComparedDifferencesAfterNewBuild": [
+          "outcome"
+        ],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 41,
+      "id": "raw-encode-limit-small",
+      "profileExpectedCode": "ERR_BUFFER_TOO_LARGE",
+      "sourceDeviationValuePreserved": null,
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "error",
+        "name": "RangeError",
+        "code": {
+          "type": "string",
+          "value": "ERR_BUFFER_TOO_LARGE"
+        },
+        "errno": {
+          "type": "undefined",
+          "value": null
+        },
+        "message": "Cannot create a Buffer larger than 1 bytes"
+      },
+      "profileErrorAsObserved": {
+        "name": "RangeError",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_BUFFER_TOO_LARGE"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 1
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "error.errno"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/41/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 41,
+          "caseId": "raw-encode-limit-small"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0044-retained-0-41.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0099-retained-1-41.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0150-retained-2-41.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0209-fresh-Jco-41.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0271-fresh-Wasmtime-41.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "FIXABLE_ERROR_FORM",
+        "implementedInUnappliedAfterimage": true,
+        "change": "Omit errno on profile OutputLimit error; preserve RangeError/code and all historical observations.",
+        "predictedComparedDifferencesAfterNewBuild": [],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 44,
+      "id": "raw-decode-limit-under",
+      "profileExpectedCode": "ERR_BUFFER_TOO_LARGE",
+      "sourceDeviationValuePreserved": null,
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "error",
+        "name": "RangeError",
+        "code": {
+          "type": "string",
+          "value": "ERR_BUFFER_TOO_LARGE"
+        },
+        "errno": {
+          "type": "undefined",
+          "value": null
+        },
+        "message": "Cannot create a Buffer larger than 4095 bytes"
+      },
+      "profileErrorAsObserved": {
+        "name": "RangeError",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_BUFFER_TOO_LARGE"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 1
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "error.errno"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/44/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 44,
+          "caseId": "raw-decode-limit-under"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0047-retained-0-44.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0102-retained-1-44.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0153-retained-2-44.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0212-fresh-Jco-44.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0274-fresh-Wasmtime-44.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "FIXABLE_ERROR_FORM",
+        "implementedInUnappliedAfterimage": true,
+        "change": "Omit errno on profile OutputLimit error; preserve RangeError/code and all historical observations.",
+        "predictedComparedDifferencesAfterNewBuild": [],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 46,
+      "id": "raw-decode-output-over-cap",
+      "profileExpectedCode": "ERR_BUFFER_TOO_LARGE",
+      "sourceDeviationValuePreserved": null,
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "ok",
+        "result": {
+          "path": "/tmp/starling-node-compat/zlib-component-oracle-v1/data/a74b58f88fb5aec9422f46d00a6c017940900dae979637dbe171e1170772b4c9.bin",
+          "sha256": "a74b58f88fb5aec9422f46d00a6c017940900dae979637dbe171e1170772b4c9",
+          "bytes": 16777217
+        },
+        "isBuffer": true
+      },
+      "profileErrorAsObserved": {
+        "name": "RangeError",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_BUFFER_TOO_LARGE"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 1
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "outcome"
+      ],
+      "observationCount": 3,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/46/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 46,
+          "caseId": "raw-decode-output-over-cap"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0049-retained-0-46.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0214-fresh-Jco-46.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0276-fresh-Wasmtime-46.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "OUTPUT_CAP",
+        "implementedInUnappliedAfterimage": false,
+        "boundedContract": "Kept finite16MiB output bound; not globally unavoidable Node behavior.",
+        "nodeGoalFollowOn": "A separately reviewed larger or streaming profile, allocation policy and fresh correctness/cost evidence are required to remove the cap deviation.",
+        "predictedComparedDifferencesAfterNewBuild": [
+          "outcome"
+        ],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 49,
+      "id": "raw-multi",
+      "profileExpectedCode": "ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED",
+      "sourceDeviationValuePreserved": "strict-one-member-no-trailing",
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "ok",
+        "result": {
+          "path": "/tmp/starling-node-compat/zlib-component-oracle-v1/data/3f9d7c54b45a954d2261e01025dece726df356a0e38914e7f00383edd00762e6.bin",
+          "sha256": "3f9d7c54b45a954d2261e01025dece726df356a0e38914e7f00383edd00762e6",
+          "bytes": 256
+        },
+        "isBuffer": true
+      },
+      "profileErrorAsObserved": {
+        "name": "Error",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 1
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "outcome"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/49/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 49,
+          "caseId": "raw-multi"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0052-retained-0-49.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0105-retained-1-49.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0156-retained-2-49.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0217-fresh-Jco-49.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0279-fresh-Wasmtime-49.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "STRICT_MEMBER_OR_TRAILING",
+        "implementedInUnappliedAfterimage": false,
+        "boundedContract": "Kept strict single-member/no-trailing policy; not a codec limitation proven unavoidable.",
+        "nodeGoalFollowOn": "Separate per-format design must distinguish concatenated gzip decoding from zlib/raw trailing handling, consume exact byte windows, preserve output budget across members, then compare full bytes with Node.",
+        "predictedComparedDifferencesAfterNewBuild": [
+          "outcome"
+        ],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 50,
+      "id": "raw-trailing",
+      "profileExpectedCode": "ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED",
+      "sourceDeviationValuePreserved": "strict-one-member-no-trailing",
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "ok",
+        "result": {
+          "path": "/tmp/starling-node-compat/zlib-component-oracle-v1/data/3f9d7c54b45a954d2261e01025dece726df356a0e38914e7f00383edd00762e6.bin",
+          "sha256": "3f9d7c54b45a954d2261e01025dece726df356a0e38914e7f00383edd00762e6",
+          "bytes": 256
+        },
+        "isBuffer": true
+      },
+      "profileErrorAsObserved": {
+        "name": "Error",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 1
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "outcome"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/50/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 50,
+          "caseId": "raw-trailing"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0053-retained-0-50.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0106-retained-1-50.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0157-retained-2-50.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0218-fresh-Jco-50.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0280-fresh-Wasmtime-50.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "STRICT_MEMBER_OR_TRAILING",
+        "implementedInUnappliedAfterimage": false,
+        "boundedContract": "Kept strict single-member/no-trailing policy; not a codec limitation proven unavoidable.",
+        "nodeGoalFollowOn": "Separate per-format design must distinguish concatenated gzip decoding from zlib/raw trailing handling, consume exact byte windows, preserve output budget across members, then compare full bytes with Node.",
+        "predictedComparedDifferencesAfterNewBuild": [
+          "outcome"
+        ],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 51,
+      "id": "dictionary-refusal",
+      "profileExpectedCode": "ERR_SM_ZLIB_DICTIONARY_UNSUPPORTED",
+      "sourceDeviationValuePreserved": "Node reports dictionary need; profile explicitly unavailable",
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "error",
+        "name": "Error",
+        "code": {
+          "type": "string",
+          "value": "Z_NEED_DICT"
+        },
+        "errno": {
+          "type": "number",
+          "value": 2
+        },
+        "message": "Missing dictionary"
+      },
+      "profileErrorAsObserved": {
+        "name": "Error",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_SM_ZLIB_DICTIONARY_UNSUPPORTED"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": true,
+            "type": "number",
+            "value": 2
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "error.code"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/51/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 51,
+          "caseId": "dictionary-refusal"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0054-retained-0-51.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0107-retained-1-51.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0158-retained-2-51.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0219-fresh-Jco-51.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0281-fresh-Wasmtime-51.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "FIXABLE_CODEC_ERROR_CODE",
+        "implementedInUnappliedAfterimage": true,
+        "change": "Use actual codec Z_NEED_DICT code/errno2 and Missing dictionary message; no dictionary support added.",
+        "predictedComparedDifferencesAfterNewBuild": [],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 52,
+      "id": "gzipSync-input-over-cap",
+      "profileExpectedCode": "ERR_OUT_OF_RANGE",
+      "sourceDeviationValuePreserved": "profile1MiB input cap precedes codec",
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "ok",
+        "result": {
+          "path": "/tmp/starling-node-compat/zlib-component-oracle-v1/data/36d12a2eb8e830b1b349fdb5df70a65558e04f78499e7edb31fa31690cd9d07e.bin",
+          "sha256": "36d12a2eb8e830b1b349fdb5df70a65558e04f78499e7edb31fa31690cd9d07e",
+          "bytes": 1051
+        },
+        "isBuffer": true
+      },
+      "profileErrorAsObserved": {
+        "name": "RangeError",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_OUT_OF_RANGE"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": true,
+            "type": "string",
+            "value": "gzipSync"
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "outcome"
+      ],
+      "observationCount": 3,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/52/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 52,
+          "caseId": "gzipSync-input-over-cap"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0055-retained-0-52.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0220-fresh-Jco-52.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0282-fresh-Wasmtime-52.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "INPUT_CAP",
+        "implementedInUnappliedAfterimage": false,
+        "boundedContract": "Kept1MiB admission before codec, including the resulting error precedence.",
+        "nodeGoalFollowOn": "Changing the cap/precedence requires a separately reviewed input/allocator policy and fresh correctness/cost evidence; do not codec-probe rejected input to imitate a Node error.",
+        "predictedComparedDifferencesAfterNewBuild": [
+          "outcome"
+        ],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 53,
+      "id": "inflateSync-input-over-cap",
+      "profileExpectedCode": "ERR_OUT_OF_RANGE",
+      "sourceDeviationValuePreserved": "profile1MiB input cap precedes codec",
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "error",
+        "name": "Error",
+        "code": {
+          "type": "string",
+          "value": "Z_DATA_ERROR"
+        },
+        "errno": {
+          "type": "number",
+          "value": -3
+        },
+        "message": "unknown compression method"
+      },
+      "profileErrorAsObserved": {
+        "name": "RangeError",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_OUT_OF_RANGE"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": true,
+            "type": "string",
+            "value": "inflateSync"
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "error.name",
+        "error.code",
+        "error.errno"
+      ],
+      "observationCount": 3,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/53/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 53,
+          "caseId": "inflateSync-input-over-cap"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0056-retained-0-53.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0221-fresh-Jco-53.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0283-fresh-Wasmtime-53.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "INPUT_CAP",
+        "implementedInUnappliedAfterimage": false,
+        "boundedContract": "Kept1MiB admission before codec, including the resulting error precedence.",
+        "nodeGoalFollowOn": "Changing the cap/precedence requires a separately reviewed input/allocator policy and fresh correctness/cost evidence; do not codec-probe rejected input to imitate a Node error.",
+        "predictedComparedDifferencesAfterNewBuild": [
+          "error.name",
+          "error.code",
+          "error.errno"
+        ],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 56,
+      "id": "option-fractional",
+      "profileExpectedCode": "ERR_OUT_OF_RANGE",
+      "sourceDeviationValuePreserved": null,
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "error",
+        "name": "RangeError",
+        "code": {
+          "type": "string",
+          "value": "ERR_BUFFER_TOO_LARGE"
+        },
+        "errno": {
+          "type": "undefined",
+          "value": null
+        },
+        "message": "Cannot create a Buffer larger than 1.5 bytes"
+      },
+      "profileErrorAsObserved": {
+        "name": "RangeError",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_OUT_OF_RANGE"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": true,
+            "type": "string",
+            "value": "gzipSync"
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "error.code"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/56/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 56,
+          "caseId": "option-fractional"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0059-retained-0-56.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0110-retained-1-56.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0161-retained-2-56.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0224-fresh-Jco-56.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0286-fresh-Wasmtime-56.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "FRACTIONAL_OPTION",
+        "implementedInUnappliedAfterimage": false,
+        "boundedContract": "Current integer-only contract remains a deliberate unapproved option deviation.",
+        "nodeGoalFollowOn": "A future fractional compatibility change can use floor(value) as an integer byte bound after real Node range-validation source is pinned, while preserving Number type/NaN/infinity and precedence behavior; no such change is implemented here.",
+        "predictedComparedDifferencesAfterNewBuild": [
+          "error.code"
+        ],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 58,
+      "id": "option-over-profile-cap",
+      "profileExpectedCode": "ERR_OUT_OF_RANGE",
+      "sourceDeviationValuePreserved": null,
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "ok",
+        "result": {
+          "path": "/tmp/starling-node-compat/zlib-component-oracle-v1/data/4c6846eac160cb5fedccfdcd5163915f38df6ac6e58f04a2bf6edf237d638174.bin",
+          "sha256": "4c6846eac160cb5fedccfdcd5163915f38df6ac6e58f04a2bf6edf237d638174",
+          "bytes": 23
+        },
+        "isBuffer": true
+      },
+      "profileErrorAsObserved": {
+        "name": "RangeError",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_OUT_OF_RANGE"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": true,
+            "type": "string",
+            "value": "gzipSync"
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "outcome"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/58/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 58,
+          "caseId": "option-over-profile-cap"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0061-retained-0-58.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0112-retained-1-58.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0163-retained-2-58.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0226-fresh-Jco-58.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0288-fresh-Wasmtime-58.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "OPTION_ABOVE_PROFILE_CAP",
+        "implementedInUnappliedAfterimage": false,
+        "boundedContract": "Current option range is1..16MiB even when actual output would be small.",
+        "nodeGoalFollowOn": "Separate decision: accept a Node-valid larger requested maximum but enforce a distinct internal16MiB budget. Pin Node kMaxLength/range semantics and keep profile-budget failures explicit; do not silently clamp or expand resources.",
+        "predictedComparedDifferencesAfterNewBuild": [
+          "outcome"
+        ],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 59,
+      "id": "unknown-option-level",
+      "profileExpectedCode": "ERR_SM_NODE_UNSUPPORTED",
+      "sourceDeviationValuePreserved": "only maxOutputLength admitted",
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "ok",
+        "result": {
+          "path": "/tmp/starling-node-compat/zlib-component-oracle-v1/data/5a2ecd65f677dfaa5c2f266588fb7992fccafa0e99c684820f3dc36ae10b07f9.bin",
+          "sha256": "5a2ecd65f677dfaa5c2f266588fb7992fccafa0e99c684820f3dc36ae10b07f9",
+          "bytes": 23
+        },
+        "isBuffer": true
+      },
+      "profileErrorAsObserved": {
+        "name": "Error",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_SM_NODE_UNSUPPORTED"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": true,
+            "type": "string",
+            "value": "gzipSync: option level"
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "outcome"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/59/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 59,
+          "caseId": "unknown-option-level"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0062-retained-0-59.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0113-retained-1-59.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0164-retained-2-59.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0227-fresh-Jco-59.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0289-fresh-Wasmtime-59.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "UNSUPPORTED_LEVEL_OPTION",
+        "implementedInUnappliedAfterimage": false,
+        "boundedContract": "Only maxOutputLength is admitted; level1 is refused.",
+        "nodeGoalFollowOn": "Adding level requires genuine native option propagation, range tests and fresh codec/cost validation. Never ignore a recognized option or substitute a provider.",
+        "predictedComparedDifferencesAfterNewBuild": [
+          "outcome"
+        ],
+        "runtimeVerified": false
+      }
+    },
+    {
+      "index": 60,
+      "id": "ordinary-string-input-refusal",
+      "profileExpectedCode": "ERR_SM_NODE_UNSUPPORTED",
+      "sourceDeviationValuePreserved": "Node accepts strings; profile byte-only",
+      "nodeOutcomeAndErrorAsRecorded": {
+        "kind": "ok",
+        "result": {
+          "path": "/tmp/starling-node-compat/zlib-component-oracle-v1/data/1098d5b92852617fb18b14da43f82b66d71947961ac27142418ee8cc977c921e.bin",
+          "sha256": "1098d5b92852617fb18b14da43f82b66d71947961ac27142418ee8cc977c921e",
+          "bytes": 33
+        },
+        "isBuffer": true
+      },
+      "profileErrorAsObserved": {
+        "name": "Error",
+        "fields": {
+          "code": {
+            "own": true,
+            "type": "string",
+            "value": "ERR_SM_NODE_UNSUPPORTED"
+          },
+          "module": {
+            "own": true,
+            "type": "string",
+            "value": "node:zlib"
+          },
+          "operation": {
+            "own": true,
+            "type": "string",
+            "value": "gzipSync: string input"
+          },
+          "profile": {
+            "own": true,
+            "type": "string",
+            "value": "sm-node-22.14.0-m0.13"
+          },
+          "errno": {
+            "own": false,
+            "type": "undefined",
+            "value": null
+          }
+        }
+      },
+      "comparisonDifferences": [
+        "outcome"
+      ],
+      "observationCount": 5,
+      "citations": {
+        "nodeOracle": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/node-results.json",
+          "jsonPointer": "/cases/60/node"
+        },
+        "sourceCorpus": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/component-validation-activated-v8/corpus.mjs",
+          "caseIndex": 60,
+          "caseId": "ordinary-string-input-refusal"
+        },
+        "guestRawObservations": [
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0063-retained-0-60.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-0"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0114-retained-1-60.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-1"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0165-retained-2-60.raw.txt",
+            "jsonPointer": "/error",
+            "label": "retained-2"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0228-fresh-Jco-60.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Jco"
+          },
+          {
+            "path": "/tmp/starling-node-compat/production-zlib-v4-normal-off-codec-validation-v2/calls/0290-fresh-Wasmtime-60.raw.txt",
+            "jsonPointer": "/error",
+            "label": "fresh-Wasmtime"
+          }
+        ]
+      },
+      "notCompared": [
+        "Node own-property flags/module/operation/profile were not recorded by oracle",
+        "message: absent from guest errorRecord"
+      ],
+      "remediation": {
+        "classification": "BYTE_ONLY_INPUT",
+        "implementedInUnappliedAfterimage": false,
+        "boundedContract": "No string encoding is admitted.",
+        "nodeGoalFollowOn": "A future explicit string/encoding conversion layer must define UTF8/encoding errors, length accounting and bounded staging; separate source/native/correctness/cost validation required.",
+        "predictedComparedDifferencesAfterNewBuild": [
+          "outcome"
+        ],
+        "runtimeVerified": false
+      }
+    }
+  ]
+}

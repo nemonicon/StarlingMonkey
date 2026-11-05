@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "state": "DORMANT_CLOCK_IO_FRESH_BUILD_PLAN_NOT_CONTROLLER_V1",
+  "sourceRoot": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-source",
+  "workRoot": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-build",
+  "packageRoot": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-package",
+  "sourceCut": "source-cut.json",
+  "sourceDerivation": "source-derivation.json",
+  "toolReferences": "tool-cut-references.json",
+  "freshPrivateDirectoriesRequired": true,
+  "noOriginalOutputsReused": true,
+  "allInputsAuthenticatedBeforeAnyFutureTool": true,
+  "futureEnvironment": {
+    "RUSTC": "/Users/dan/.rustup/toolchains/1.96.1-aarch64-apple-darwin/bin/rustc",
+    "RUSTDOC": "/Users/dan/.rustup/toolchains/1.96.1-aarch64-apple-darwin/bin/rustdoc",
+    "RUSTUP_TOOLCHAIN": "1.96.1-aarch64-apple-darwin",
+    "CARGO_HOME": null,
+    "hostLinkerAndSdk": null
+  },
+  "commandPlans": [
+    {
+      "role": "HOST_CLI_BUILD",
+      "cwd": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-source",
+      "argv": [
+        "/Users/dan/.rustup/toolchains/1.96.1-aarch64-apple-darwin/bin/cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "--release",
+        "-p",
+        "spidermonkey-embedding-splicer",
+        "--bin",
+        "splicer",
+        "--target",
+        "aarch64-apple-darwin",
+        "--target-dir",
+        "/private/tmp/starling-node-compat/import-abi-clock-io-v1-build/target"
+      ]
+    },
+    {
+      "role": "WASM_SPLICER_COMPONENT_BUILD",
+      "cwd": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-source",
+      "argv": [
+        "/Users/dan/.rustup/toolchains/1.96.1-aarch64-apple-darwin/bin/cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "--release",
+        "-p",
+        "splicer-component",
+        "--lib",
+        "--target",
+        "wasm32-wasip1",
+        "--target-dir",
+        "/private/tmp/starling-node-compat/import-abi-clock-io-v1-build/target"
+      ]
+    },
+    {
+      "role": "WASI_COMPONENT_WRAPPER",
+      "cwd": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-source",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/private/tmp/starling-node-compat/toolchain/node_modules/@bytecodealliance/jco/dist/jco.js",
+        "new",
+        "/private/tmp/starling-node-compat/import-abi-clock-io-v1-build/target/wasm32-wasip1/release/splicer_component.wasm",
+        "--wasi-reactor",
+        "-o",
+        "/private/tmp/starling-node-compat/import-abi-clock-io-v1-build/splicer.wasm"
+      ]
+    },
+    {
+      "role": "SPLICER_JS_BINDINGS",
+      "cwd": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-source",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/private/tmp/starling-node-compat/toolchain/node_modules/@bytecodealliance/jco/dist/jco.js",
+        "transpile",
+        "-q",
+        "--name",
+        "spidermonkey-embedding-splicer",
+        "/private/tmp/starling-node-compat/import-abi-clock-io-v1-build/splicer.wasm",
+        "-o",
+        "/private/tmp/starling-node-compat/import-abi-clock-io-v1-package/lib",
+        "--",
+        "-O1"
+      ]
+    }
+  ],
+  "packageSourceFiles": [
+    "package.json",
+    "types.d.ts",
+    "src/componentize.js",
+    "src/platform.js",
+    "src/cli.js"
+  ],
+  "packageDependencyMechanism": "Future authenticated private copy of declared JS tool cut under new package/node_modules; no old package/source mutation or fake loader",
+  "selectedEngineMechanism": "Existing componentize options.engine selects separately reviewed native engine; no native engine build/copy authorized by this packet",
+  "adapterSelectionMechanism": "Existing componentize options.preview2Adapter; new Root caller must normalize original988 to fresh private file, invoke only new host CLI, authenticate actual output and supply that actual path",
+  "forbiddenConvenienceTargets": [
+    "make release",
+    "npm run build",
+    "npm pack without reviewed prepack handling"
+  ],
+  "reason": "They can build native engines or invoke unreviewed prepack actions",
+  "missingSeams": [
+    "Owned build/stage/controller source and independent Source peer",
+    "Root authority, resource budgets, raw collectors and final/failure protection",
+    "Explicit host linker/SDK and private Cargo-home preparation; registry activation/availability check",
+    "Fresh private package materialization and actual dependency resolution/artifact review",
+    "Separate normalized/pruned adapter publication authority and actual structural validation",
+    "Component/runtime action and independent result review"
+  ],
+  "controllerImplemented": false,
+  "sourceIndependentReview": null,
+  "rootAuthority": null,
+  "allActionsAllowed": false
+}

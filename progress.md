@@ -4,7 +4,46 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-05. Overall roadmap: **in progress**.
 
-Repository commit checkpoint requested on 2026-11-05:
+
+Current all-work commit checkpoint (2026-11-05):
+
+- All three parallel workers have stopped writes; their tools and all Root
+  operational jobs are terminal. This checkpoint includes all tracked changes
+  and untracked repository files, including retained failures and unfinished
+  work. It does not mark the roadmap complete or change accepted foundations-v13.
+- Completed since `23c40067`: codec timing DATA review and bounded cost decision;
+  crypto complete frozen-verifier DATA review and actual v3 normal-only export
+  at exit0; selector342 actual freeze and independent artifact review; clock
+  pruning SOURCE review, adapter provenance and redirect-controller HOLD;
+  zlib error SOURCE review; convergence audit and combined355 SOURCE candidate.
+- The independent crypto actual-export review is an unexecuted, unsealed
+  [reader draft](tests/node-compat/foundation-crypto/independent-ownership-secret-artifact-export-v3-results-review-v1/reader.py).
+  No PASS, result contract, receipt or index exists yet. Full DATA review and
+  sealing must precede reviewed pins and the one-shot Python/JS bootstrap.
+- Corrected clock build-controller v2 is an18-file unsealed draft with307 pure
+  checks. Its dependency closure, reversible derivations, final audit, seal and
+  independent review remain outstanding. No download, staging, Rust/Jco build
+  or valid adapter pruning/publication has run.
+- Combined355 source is sealed but awaits independent SOURCE review and new
+  stage/build/freeze/export/bootstrap/component/runtime gates. Its seven
+  replacements have not been promoted into the accepted production source.
+- Precommit checks pass:290 nonempty JSON documents,76 Python AST parses,
+  two Node v22.14.0 syntax checks, one Bash syntax check, and444 member hashes
+  across21 sealed indices. The single empty JSON-named stdout capture is
+  preserved as raw failed-reader evidence. All1,327 local links in the six
+  updated status/decision documents resolve. Full staged whitespace checking
+  reports28 findings confined to six sealed evidence files:25 unified-patch
+  blank context lines and three extra final blank lines. Those hash-bound bytes
+  are retained; staged whitespace checking passes when those six files are
+  excluded. No native build, complete helper, component or guest test is rerun
+  solely to make this Git checkpoint.
+- Repository files and evidence descriptors are committed. Referenced large
+  `/private/tmp` build, freeze and component artifacts remain external; their
+  descriptors do not make those artifacts part of the Git commit. No push is
+  requested. The dependency-ordered continuation and remaining lifecycle/ALS,
+  crypto API, optional capability, host/release and adoption gates remain below.
+
+Historical Git checkpoint `23c40067` on 2026-11-05 (superseded by the continuation below):
 
 - Preserve all current tracked changes and untracked repository files, including
   successful evidence, retained failures, source proposals and unfinished drafts.
@@ -37,6 +76,151 @@ Repository commit checkpoint requested on 2026-11-05:
 - Commit includes repository-resident evidence and descriptors. Large raw build,
   frozen and component outputs referenced under `/private/tmp` remain external
   artifacts and are not made portable merely by committing their descriptors.
+
+Latest continuation after Git checkpoint `23c40067`:
+
+- [Codec actual timing DATA review](tests/node-compat/foundation-zlib/independent-cost-timing-v5-results-review-v1/README.md)
+  seals52 members at `434ee6c7…83e5`; result `9cd3ef57…42a3` verifies all360
+  fresh workers,7,200 complete strings,3,600 batches,2,160 controls and the361
+  observed process/window records. All77,969 final input paths are stable.
+  The [Root cost decision](tests/node-compat/foundation-zlib/cost-timing-v5-root-decision.json)
+  (`2b3a03f5…ff4a`) authenticates that complete proof/contract and the three
+  actual components. Native has lower median batch time in27/30 provider cases;
+  three fflate counterexamples and output-size differences remain explicit.
+  Continue the bounded native candidate through compatibility/host/release and
+  adoption gates. No universal speed, guest-memory or isolated-startup advantage
+  is established. [Decision details](docs/node-compat/codec-cost-decision.md)
+  preserve the separate unused-profile comparison and all statistical limits.
+- Crypto's [read-only verifier caller SOURCE](tests/node-compat/foundation-crypto/ownership-secret-verifier-controller-candidate-v1/README.md)
+  seals16 members at `0fc0082d…a78f`. [Independent SOURCE review](tests/node-compat/foundation-crypto/independent-ownership-secret-verifier-controller-source-review-v1/README.md)
+  seals at `a2191196…8e7b`, passing227,862 checks/26,310 inputs,80 isolated cases
+  and four AST parses. Two independent-reader assumptions are corrected with
+  failures retained; the candidate is unchanged. New Root read-only authority
+  starts tool83988/owned worker65475. The actual complete original-context
+  `verify_frozen(contract)` finishes exit0 with clean groups and source/original
+  protection. [Root result](tests/node-compat/foundation-crypto/ownership-secret-frozen-verifier-v1-root-results.json)
+  `30759e29…3c34` retains the entire471,365-byte frame `7d319471…52e5`, complete
+  raw stdout/stderr and terminal. Whole stdout JSON equals the saved return with
+  unchanged355-source metadata/all11 manifests and1,902 verified copies.
+  [Independent actual-result DATA review](tests/node-compat/foundation-crypto/independent-ownership-secret-frozen-verifier-results-review-v1/README.md)
+  now seals23 members at `f894bf38…b46b`; result `116c339a…698e` passes261,560
+  checks/27,729 references with all75 metadata fields/11 manifests unchanged.
+  No engine/guest executes. Original e872 remains verifier-only; the separate
+  export/pin/bootstrap v2 source remains held; the corrected v3 source and
+  actual normal-only export are recorded below.
+- [Adapter provenance report](tests/node-compat/foundation-scheduler/clock-adapter-provenance-v1/README.md)
+  seals11 members at `dd49f614…9433`. The official equal-sized Wasmtime v25
+  reactor adapter differs from the selected988 binary in code/import/metadata
+  bytes; the exact original source revision remains unresolved. Static inspection
+  finds memory-first import ordering incompatible with pinned wirm's replacement
+  index assumption. [Design notes](tests/node-compat/foundation-scheduler/clock-io-pruning-design-review-v1/results.json)
+  seal at `8a069abc…5bb3`, with3,767 static checks/672 independent policy cases,
+  corroborating that hazard and engine-only random/realloc prerequisites.
+  The new uncompiled clock-IO source draft splits poll from stream/error stubs,
+  provides a separate narrow CLI and exact normalized-input SHA guard, and keeps
+  all clock/poll signatures. Ten pure normalizer cases and in-memory hash
+  preparation run; no normalized adapter is published, and no Rust pruner,
+  replacement package, component or guest executes. [Independent SOURCE review](tests/node-compat/foundation-scheduler/independent-clock-io-pruning-source-review-v1/README.md)
+  seals18 members at `c9fa3ef3…5805`, with54,922 checks/5,579 paths and all four
+  reversible derivations. Compilation, real Rust tests, WIT alias/dependency
+  elaboration and encoded-reference/clock/poll preservation remain open. A fresh
+  owned build controller/private-vendor/SDK plan is being implemented; no build,
+  archive download, staging or adapter publication has run. The old six-interface
+  timer rejection remains unadmitted.
+- A new [zlib error-semantics source proposal](tests/node-compat/foundation-zlib/node-error-semantics-candidate-v1/README.md)
+  seals37 members at `7d620e00…edb5`, with2,138 source/DATA checks and63
+  extracted status models. It inventories all61 cases/31 error comparisons and
+  all22 differences. Three unapplied afterimages propose removing six spurious
+  errno fields and matching dictionary-required Z_NEED_DICT/errno2 while still
+  refusing dictionary support. Fifteen policy/option/input deviations and true
+  linked-version evidence remain open. Seven addressed rows are model predictions,
+  not deployed fixes. [Independent SOURCE review](tests/node-compat/foundation-zlib/independent-node-error-semantics-source-review-v1/README.md)
+  seals at `002458df…47bc`, with14,566 checks/968 paths, complete350-source
+  before/after mapping and exact executable factory preservation. A new native
+  integration/build and complete differential/component/release gates remain
+  required. Historical codec proofs and all existing artifacts stay unchanged.
+- Crypto [artifact-tooling v2 SOURCE](tests/node-compat/foundation-crypto/ownership-secret-artifact-tooling-candidate-v2/README.md)
+  seals29 members at `8ebec1f8…1259`, implementing real export/pin/bootstrap APIs
+  without running them. [Independent Source HOLD](tests/node-compat/foundation-crypto/independent-ownership-secret-artifact-tooling-source-review-v2/README.md)
+  at `a682a562…9d55` identifies two bounded gaps: the runtime guard omits one
+  declared provenance-only donor (27,754 versus27,755 inputs), and JS labels an
+  ambiguous killed child as a proven timeout. Actual imported dependencies are
+  covered, all failures are refused, and syntax-only Node checking passes.
+  The [v3 source successor](tests/node-compat/foundation-crypto/ownership-secret-artifact-tooling-candidate-v3/README.md)
+  seals27 members at `d62b235c…52a2`, with both guards protecting all27,797
+  declared external paths and truthful nullable timeout labels. Its
+  [independent SOURCE review](tests/node-compat/foundation-crypto/independent-ownership-secret-artifact-tooling-source-review-v3/README.md)
+  seals nine members at `522e1741…6b05`; result `f01cbf84…6269` passes27,930
+  read/hash/AST checks, all12 exact reversals and six cause/capture models.
+  The v2 source/HOLD and all earlier artifacts remain immutable. New normal-only
+  [export authority](tests/node-compat/foundation-crypto/ownership-secret-artifact-export-v3-root-authority.json)
+  starts actual Root4382/outerparent86546 under the genuine1,800-second monitor.
+  That same action finishes exit0 with clean groups and no signals, timeout or
+  forced cleanup. [Root result](tests/node-compat/foundation-crypto/ownership-secret-artifact-export-v3-root-results.json)
+  `2295d612…621a` binds the complete1,105,309-byte UNREVIEWED candidate
+  `2bbb22d8…d4d4`, unchanged whole helper frame and three NULL other variants.
+  The raw worker JSON equals the entire saved candidate. A Root-only reader
+  label mistake is retained; no owner action is rerun. Independent actual-export
+  review is unfinished at this commit checkpoint. Reviewed pins, bootstrap,
+  engine/key/guest and runtime gates remain closed.
+- The [clock build-controller Source](tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v1/README.md)
+  seals30 members at `06400300…72c8`. Its pure actual-plan test catches and fixes
+  a package.json collision before any staging: two old tool-root metadata files
+  are copied as DATA under `.toolchain-metadata`, preserving the new package's
+  source package.json. It specifies5,138 copies/21 links, private locked vendor,
+  eight owned commands, four individually checked Rust tests and honest disk/
+  timeout/failure boundaries. Review then identifies a redirect-scope gap:
+  default urllib follows redirects before its post-response URL check. This is
+  held without any network/stage/compiler action. [Independent Source HOLD](tests/node-compat/foundation-scheduler/independent-clock-io-build-controller-source-review-v1/README.md)
+  seals seven members at `ef1f1d89…4b9b59`, preserving the redirect counterexample.
+  The corrected [v2 controller WIP](tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v2/README.md)
+  has18 files and307 pure checks, including explicit rejection of301/302/303/
+  307/308 before following redirects. It has no source manifest/results/receipt/
+  index seal yet. Closure, derivations, final audit, sealing and independent
+  review remain outstanding. Unissued Root build code and all actual source/
+  package/adapter publication gates remain inactive.
+- The [separate-prerequisite Root receipt](tests/node-compat/foundation-scheduler/continuation-prerequisites-after-23c-root-review-v1.json)
+  `3e6dfc9a…9b03` authenticates70 indexed proof members across crypto verifier
+  DATA, selector frozen DATA, clock SOURCE and zlib error SOURCE. These scopes
+  remain separate and grant no operation or source promotion. The [convergence
+  audit](tests/node-compat/foundation-scheduler/combined-source-convergence-audit-v1/README.md)
+  seals25 members at `84901fd1…2cd`, with6,786 checks. It maps the actual355
+  secret source, four final scheduler/resource replacements and three zlib error
+  afterimages, preserving the five crypto files and13 additions over342. The
+  [combined native SOURCE candidate](tests/node-compat/foundation-scheduler/combined-native-integration-candidate-v1/README.md)
+  now seals31 members/1,590 inputs at `08bfe069…df65`:355 native files are348
+  unchanged plus seven replacements, with three external inputs/11 manifests.
+  Its new genuine355 policy/helper/producer and metadata admission pass8,246
+  source/DATA/pure/grammar checks and25 synthetic negative cases. This is held
+  SOURCE only, awaiting independent review. Staging/controller/freezer/verifier/
+  export/bootstrap and all native/component/runtime actions remain unimplemented
+  or NULL; no build or guest validation is implied.
+- The [selector342 freezer SOURCE](tests/node-compat/foundation-scheduler/task-selection-freezer-candidate-v1/README.md)
+  seals27 members at `83c07efa…37e8`. [Independent SOURCE review](tests/node-compat/foundation-scheduler/independent-task-selection-freezer-source-review-v1/README.md)
+  seals at `6c2af2c7…b6eb`, passing158,303 checks/20,812 inputs,37 isolated cases
+  and ten AST parses, including the full20,761-file BUILD ledger and712-copy
+  base plan. One reader synthetic phase omission is corrected and retained.
+  The first Root outer observer then rejects its3,000-second limit against the
+  copied monitor's2,400-second maximum before launching any freezer/helper;
+  [failure records](tests/node-compat/foundation-scheduler/task-selection-freeze-root-observer-failure-v1/terminal.json)
+  preserve that Root API mistake. At that rejection FREEZE/EXTERNAL are absent
+  and its observer directory is empty. A distinct v2 Root caller uses the genuine original0af
+  monitor's7,200-second-cap API at3,000 seconds, preserving all v1 files and the
+  unchanged83c source. Actual tool34677/parent69997 runs under that outer
+  monitor. That same phase now finishes exit0 at both owned monitor levels,
+  with clean groups and no forced cleanup/signals. [Root result](tests/node-compat/foundation-scheduler/task-selection-normal-off-freeze-v2-root-results.json)
+  `43331162…ea00` records762 copies/755 original references/763 actual files;
+  Root rehashes every copy. Receipt `42a81bc1…1641` is515,011 bytes. Complete
+  outer JSONL has two records and its final record equals the complete inner
+  terminal. Actual enginef6a/raw metadata8219 remain unchanged;342 native/three
+  external inputs and nine manifests are retained. The f6a generation stays
+  separate from old fec7. [Independent frozen-artifact DATA review](tests/node-compat/foundation-scheduler/independent-task-selection-normal-off-frozen-artifact-review-v1/README.md)
+  now seals19 members at `6fc8165a…73c3`, with196,579 checks/21,594 current paths
+  and the complete20,761-file BUILD ledger. The first reader's strict-target
+  count assumption is corrected: four critical policy targets are distinguished
+  from61 CPP rows carrying the macro. No source/artifact changes or helper reruns.
+  Pins, bootstrap and ordinary runtime gates remain open; no engine/guest executes.
+
 
 Latest continuation after Git checkpoint `1f459dc`:
 

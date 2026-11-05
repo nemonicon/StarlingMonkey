@@ -42,6 +42,22 @@ to be a source derivation of that binary without further provenance evidence.
 No installed package, Wasmtime or wasmCloud binary may be modified, and no
 custom external host interface may replace the standard clocks.
 
+The [provenance check](../../tests/node-compat/foundation-scheduler/clock-adapter-provenance-v1/README.md)
+finds that the equal-sized Wasmtime v25.0.0 release adapter differs in imports,
+code and metadata. Exact source revision remains unproved. A third option is
+an explicit build-time transformation of the pinned repository binary, with
+new artifact identities and a checked failure contract.
+
+The [uncompiled IO-pruning proposal](../../tests/node-compat/foundation-scheduler/clock-io-pruning-candidate-v1/source-derivation.json)
+splits poll from stream/error stubbing and adds a narrow adapter-pruning CLI.
+The original memory-first adapter violates the selected wirm replacement
+helpers' import-entry/function-index assumption. A checked import-order
+normalizer and exact normalized-input hash guard precede the proposed operation;
+engine-specific random/realloc stubs are excluded. In-memory hash preparation
+and pure tests have run. No normalized adapter is published and no Rust pruner,
+new package, component or guest has run. Source review, compilation, full final
+import/type graph and runtime gates remain open.
+
 The native bridge alternative also needs snapshot analysis before coding.
 [`clock_gettime` and `wizen`](../../runtime/js.cpp#L38) currently call Preview1
 clock functions, and `wizen` captures a monotonic offset. Snapshot initialization

@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "nativeSourceCount": 350,
+  "changedSourceCount": 3,
+  "unchangedSourceCount": 347,
+  "cppBehaviorChanges": 1,
+  "factoryRuntimeCodeUnchanged": true,
+  "facadeBoundedCodecConstantsAndRegistrationsUnchanged": true,
+  "records": [
+    {
+      "path": "builtins/node-compat/zlib/kernel.cpp",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/zlib-source-v4/builtins/node-compat/zlib/kernel.cpp",
+        "sha256": "33c116ead36b7890c9e83915fd053a8cda3cdb9641381a6ca8157617e1b2f9e3",
+        "bytes": 8891
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/node-error-semantics-candidate-v1/after/builtins/node-compat/zlib/kernel.cpp",
+        "sha256": "f7e0fa67f9dce8be36f71d18e4dee9ecd564cc92daf24104d857e55623272411",
+        "bytes": 8988
+      },
+      "kind": "EXACT_REVERSIBLE_EDITS",
+      "edits": [
+        {
+          "label": "explicit optional codec errno",
+          "before": "#include <cstring>\n",
+          "after": "#include <cstring>\n#include <optional>\n"
+        },
+        {
+          "label": "dictionary is codec need, not added dictionary support",
+          "before": "DEF_ERR(NeedsDictionary, JSEXN_ERR, \"Zlib dictionaries are not supported by this profile\", 0)",
+          "after": "DEF_ERR(NeedsDictionary, JSEXN_ERR, \"Missing dictionary\", 0)"
+        },
+        {
+          "label": "errno is absent unless explicitly supplied",
+          "before": "const char *code, int status = Z_OK) {",
+          "after": "const char *code, std::optional<int> codec_errno = std::nullopt) {"
+        },
+        {
+          "label": "attach only a selected codec errno",
+          "before": "    JS::RootedValue number(cx, JS::Int32Value(status));\n    if (!JS_DefineProperty(cx, error, \"errno\", number, JSPROP_ENUMERATE)) return false;",
+          "after": "    // A profile refusal is not a zlib errno, even when the last codec\n    // status was Z_OK or Z_STREAM_END. Never expose that diagnostic\n    // as a Node-style errno. Only actual codec errors opt in.\n    if (codec_errno) {\n      JS::RootedValue number(cx, JS::Int32Value(*codec_errno));\n      if (!JS_DefineProperty(cx, error, \"errno\", number, JSPROP_ENUMERATE)) return false;\n    }"
+        },
+        {
+          "label": "backend mismatch remains profile error",
+          "before": "return fail(cx, BackendMismatch, \"ERR_SM_ZLIB_BACKEND_MISMATCH\", Z_VERSION_ERROR);",
+          "after": "return fail(cx, BackendMismatch, \"ERR_SM_ZLIB_BACKEND_MISMATCH\");"
+        },
+        {
+          "label": "input cap has no codec errno",
+          "before": "    return fail(cx, InputLimit, \"ERR_OUT_OF_RANGE\", result.zlib_status);",
+          "after": "    return fail(cx, InputLimit, \"ERR_OUT_OF_RANGE\");"
+        },
+        {
+          "label": "output cap has no codec errno",
+          "before": "    return fail(cx, OutputLimit, \"ERR_BUFFER_TOO_LARGE\", result.zlib_status);",
+          "after": "    return fail(cx, OutputLimit, \"ERR_BUFFER_TOO_LARGE\");"
+        },
+        {
+          "label": "invalid data uses its actual codec error class",
+          "before": "    return fail(cx, InvalidData, \"Z_DATA_ERROR\", result.zlib_status);",
+          "after": "    return fail(cx, InvalidData, \"Z_DATA_ERROR\", Z_DATA_ERROR);"
+        },
+        {
+          "label": "incomplete data uses Node codec error class",
+          "before": "    return fail(cx, IncompleteData, \"Z_BUF_ERROR\", result.zlib_status);",
+          "after": "    return fail(cx, IncompleteData, \"Z_BUF_ERROR\", Z_BUF_ERROR);"
+        },
+        {
+          "label": "dictionary-required code and errno",
+          "before": "    return fail(cx, NeedsDictionary, \"ERR_SM_ZLIB_DICTIONARY_UNSUPPORTED\", result.zlib_status);",
+          "after": "    return fail(cx, NeedsDictionary, \"Z_NEED_DICT\", Z_NEED_DICT);"
+        },
+        {
+          "label": "trailing policy has no codec errno",
+          "before": "    return fail(cx, TrailingData, \"ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED\", result.zlib_status);",
+          "after": "    return fail(cx, TrailingData, \"ERR_SM_ZLIB_TRAILING_DATA_UNSUPPORTED\");"
+        },
+        {
+          "label": "both internal fallback returns omit diagnostic errno",
+          "before": "InternalFailure, \"ERR_SM_ZLIB_INTERNAL\", result.zlib_status",
+          "after": "InternalFailure, \"ERR_SM_ZLIB_INTERNAL\"",
+          "occurrences": 2
+        }
+      ]
+    },
+    {
+      "path": "builtins/node-compat/export-manifest.zlib.node-v22.14.0.json",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/zlib-source-v4/builtins/node-compat/export-manifest.zlib.node-v22.14.0.json",
+        "sha256": "18e68147708e6ea0898b955e86e8a415cfd5a693483670b4c4099737aba84925",
+        "bytes": 3808
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/node-error-semantics-candidate-v1/after/builtins/node-compat/export-manifest.zlib.node-v22.14.0.json",
+        "sha256": "37f82f61e4ad258c562fd9b7b4f071779b10d258df44eaf5bdd9f2f53a244315",
+        "bytes": 4400
+      },
+      "kind": "MANIFEST_JSON_DERIVATION",
+      "edits": []
+    },
+    {
+      "path": "builtins/node-compat/zlib/factories.generated.h",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/zlib-source-v4/builtins/node-compat/zlib/factories.generated.h",
+        "sha256": "8e96f2acc9b767f590b510d89006c13e63124e0a30b9d80ba2071f6d803037a8",
+        "bytes": 15241
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/node-error-semantics-candidate-v1/after/builtins/node-compat/zlib/factories.generated.h",
+        "sha256": "e3f524d3820200435eb8bce16c74916eb820a534b97be3b209bf1d734cbd0426",
+        "bytes": 15241
+      },
+      "kind": "PINNED_FACTORY_DATA_TRANSFORM",
+      "edits": []
+    }
+  ]
+}

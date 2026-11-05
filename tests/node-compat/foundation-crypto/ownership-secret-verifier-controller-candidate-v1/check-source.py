@@ -1,6 +1,7 @@
 """Source/read/hash/AST/injected pure models only; no caller/helper/monitor import."""
 import ast,copy,hashlib,json,os,stat
 from pathlib import Path
+from types import SimpleNamespace
 HERE=Path(__file__).resolve().parent
 observed={};checks=0;cases=[]
 
@@ -80,7 +81,7 @@ def main():
     frozen=Path(refs['frozenRoot']);need({str(p.relative_to(frozen))for p in frozen.rglob('*')if p.is_file()}=={str(Path(r['path']).relative_to(frozen))for r in receipt['copies']}|{'normal-off-freeze-receipt.json'})
     c=read(refs['verifierContract']);text=(HERE/'controller.py').read_text();tree=ast.parse(text);definitions={n.name:n for n in tree.body if isinstance(n,ast.FunctionDef)}
     env=dict(Path=Path,OWN=HERE,VERIFIER=Path(refs['verifierEntry']['path']).parent,OUT=Path('/private/tmp/starling-node-compat/crypto-owner355-secret-frozen-verifier-v1'),EXTERNAL=Path('/private/tmp/starling-node-compat/crypto-owner355-secret-frozen-verifier-v1-external-root'),TIMEOUT=600,VERIFIER_SHA=refs['verifierSourceIndex']['sha256'])
-    root_model=pure(text,'validate_root',env);peer_model=pure(text,'validate_peer',env);frame_model=pure(text,'expected_frame',env);terminal_model=pure(text,'clean_terminal',env)
+    root_model=pure(text,'validate_root',env);peer_model=pure(text,'validate_peer',env);frame_model=pure(text,'expected_frame',env);terminal_model=pure(text,'clean_terminal',env);retained_model=pure(text,'validate_retained_frame',env)
     template=load(HERE/'future-root-authority.template.json');index=dict(path=str(HERE/'index.json'),sha256='a'*64,bytes=1)
     case('unissued Root template refuses',lambda:root_model(template,index,refs),True)
     root=copy.deepcopy(template);root.update(state='ROOT_REVIEWED_SECRET_OWNER355_FROZEN_VERIFIER_READ_ONLY_V1',verifierReadOnlyAllowed=True,controllerIndex=index,controllerEntry=dict(path=str(HERE/'controller.py'),sha256='b'*64,bytes=1))
@@ -95,11 +96,56 @@ def main():
     manifests=[dict(profileVersion='synthetic',modules={})for _ in range(11)];before=copy.deepcopy(metadata)
     model=frame_model(c,metadata,manifests);need(model['metadata']==metadata==before and model['verifierOriginalToolingRoot']==c['originalToolingRoot']and model['configuredSourceRoot']!=model['sourceRoot'])
     need(model['originalReferencesReopened']is False and model['engineExecuted']is False and model['grantsActionAuthority']is False)
-    for key,value in[('metadata',{}),('sourceRoot',c['configuredSourceRoot']),('runtimeAcceptanceClaim',True),('selectedManifests',[])]:case('whole frame mutation '+key,lambda k=key,v=value:need({**model,k:v}==frame_model(c,metadata,manifests)),True)
-    case('whole frame extra field',lambda:need({**model,'projected':True}==frame_model(c,metadata,manifests)),True)
+    case('whole saved and stdout frame agree with exact model',lambda:retained_model(model,copy.deepcopy(model),c,metadata,manifests))
+    case('saved whole frame differs from stdout',lambda:retained_model(model,{},c,metadata,manifests),True)
+    for key,value in[('metadata',{}),('sourceRoot',c['configuredSourceRoot']),('runtimeAcceptanceClaim',True),('selectedManifests',[])]:case('whole frame mutation '+key,lambda k=key,v=value:retained_model({**model,k:v},{**model,k:v},c,metadata,manifests),True)
+    case('whole frame extra field',lambda:retained_model({**model,'projected':True},{**model,'projected':True},c,metadata,manifests),True)
     terminal=dict(rawExitCode=0,authority=dict(path='/synthetic/authority.json',sha256='f'*64,bytes=1),parentOwnedGroupGone=True,allObservedOwnedGroupsGone=True,timeout=False,forcedCleanup=False,errors=[],signals=[],interruptedSignals=[],remainingObservedPids=[],finalGroups=[dict(alive=False)],stderr=dict(bytes=0))
     case('clean synthetic raw terminal',lambda:terminal_model(terminal,terminal['authority']))
     for key,value in[('rawExitCode',1),('rawExitCode',False),('forcedCleanup',True),('signals',[9]),('remainingObservedPids',[123]),('stderr',dict(bytes=1))]:case('terminal rejects '+key+' '+str(value),lambda k=key,v=value:terminal_model({**terminal,k:v},terminal['authority']),True)
+    # Execute only extracted caller functions with memory-only injected seams.
+    # No complete module import, filesystem write, helper or process is used.
+    def worker_model(mode):
+        events=[];saved=[]
+        class MemoryOut:
+            def is_dir(self):return True
+            def is_symlink(self):return False
+            def stat(self):return SimpleNamespace(st_mode=0o40700)
+            def __truediv__(self,name):need(name=='whole-frame.json');return self
+            def exists(self):return False
+        def fake_verify(contract):
+            need(contract is c);events.append('verify')
+            if mode=='verify failure':raise RuntimeError('synthetic verify failure')
+            return model
+        def fake_write(path,value):
+            events.append('write')
+            if mode=='writer failure':raise RuntimeError('synthetic writer failure')
+            saved.append(copy.deepcopy(value))
+        def fake_print(value,flush):
+            events.append('print');need(flush is True and json.loads(value)==model)
+            if mode=='stdout failure':raise RuntimeError('synthetic stdout failure')
+        helper=SimpleNamespace(HERE=env['VERIFIER'],FROZEN=c['frozenRoot'],verify_frozen=fake_verify)
+        injected=dict(OUT=MemoryOut(),stat=stat,VERIFIER=env['VERIFIER'],json=json,write=fake_write,print=fake_print,load_actual=lambda row,name:helper)
+        fn=pure(text,'worker',injected);failed=False
+        try:fn(dict(refs=refs,contract=c,capture=SimpleNamespace(recheck=lambda:events.append('recheck'))))
+        except RuntimeError:failed=True
+        expected={'success':['recheck','verify','write','print'],'verify failure':['recheck','verify'],'writer failure':['recheck','verify','write'],'stdout failure':['recheck','verify','write','print']}[mode]
+        need(events==expected and failed==(mode!='success'))
+        need(saved==([model]if mode in['success','stdout failure']else[]))
+    for mode in['success','verify failure','writer failure','stdout failure']:case('injected worker '+mode,lambda m=mode:worker_model(m))
+    def main_model(mode,fail):
+        events=[];frame=dict(capture=SimpleNamespace(recheck=lambda:events.append('final recheck')))
+        def action(value):
+            need(value is frame);events.append(mode)
+            if fail:raise RuntimeError('synthetic caller failure')
+            return 0
+        injected=dict(Path=Path,__file__=str(HERE/'controller.py'),OWN=HERE,sys=SimpleNamespace(argv=['synthetic',mode,'{}']),json=json,authorize=lambda row:frame,parent=action,worker=action)
+        fn=pure(text,'main',injected);failed=False
+        try:need(fn()==0)
+        except RuntimeError:failed=True
+        need(failed==fail and events==[mode,'final recheck'])
+    for mode in['parent','worker']:
+        for fail in[False,True]:case('injected main final recheck '+mode+' failure='+str(fail),lambda m=mode,f=fail:main_model(m,f))
     helper_text=Path(refs['verifierEntry']['path']).read_text();helper_tree=ast.parse(helper_text);verify_node=next(n for n in helper_tree.body if isinstance(n,ast.FunctionDef)and n.name=='verify_frozen')
     need([a.arg for a in verify_node.args.args]==['c'])
     returned=next(n for n in verify_node.body if isinstance(n,ast.Return)).value;modeled=next(n for n in definitions['expected_frame'].body if isinstance(n,ast.Return)).value
@@ -110,7 +156,8 @@ def main():
     need(not any(isinstance(n,ast.Assign)and any(isinstance(t,ast.Attribute)and isinstance(t.value,ast.Name)and t.value.id in['helper','monitor','module']for t in n.targets)for n in ast.walk(tree)))
     need("frame=authorize("in text and 'finally:frame[\'capture\'].recheck()'in text)
     need(text.index("write(OUT/'raw-terminal-observed.json'")<text.index("clean_terminal(terminal,frame['rootRow'])"))
-    need("value==retained"in text and "value==expected_frame(c,metadata,manifests)"in text)
+    need("value==retained"in text and "value==expected_frame(c,metadata,manifests)"in text and "validate_retained_frame(value,retained,c,metadata,manifests)"in text)
+    need("frame['capture'].read(terminal_row)==terminal"in text)
     mon=ast.parse(Path(refs['monitorEntry']['path']).read_text());fn=next(n for n in mon.body if isinstance(n,ast.FunctionDef)and n.name=='monitor');need([a.arg for a in fn.args.args]==['argv','cwd','environment','output','timeout_seconds','authority'])
     parent_calls=[n for n in ast.walk(definitions['parent'])if isinstance(n,ast.Call)and isinstance(n.func,ast.Attribute)and n.func.attr=='monitor'];need(len(parent_calls)==1 and len(parent_calls[0].args)==6 and not parent_calls[0].keywords)
     for field in['controllerIndependentReview','rootAuthority','actualVerifierResult','actualExport','reviewedPins','bootstrapAuthority','runtimeAuthority']:need(refs[field]is None)
@@ -125,7 +172,7 @@ def main():
     for r in snapshots:verify(r,True)
     ledger_paths={r['path']for r in ledger['files']}
     write('source-inputs.json',dict(schemaVersion=1,files=[r for r in snapshots if r['path']not in ledger_paths],artifactInputLedger=refs['artifactInputLedger'],artifactInputLedgerRows=len(ledger['files']),allObservedInputsRehashedFinally=True))
-    write('pure-results.json',dict(schemaVersion=1,scope='Extracted IO-free Root/peer/frame/terminal predicates with synthetic unissued authority/metadata values; no complete helper/caller run',cases=cases,actualVerifierFrameCreated=False))
+    write('pure-results.json',dict(schemaVersion=1,scope='Extracted Root/peer/frame/terminal predicates and worker/main functions with synthetic unissued metadata and memory-only injected seams; no complete module/helper/controller/monitor import or filesystem/process action',cases=cases,actualVerifierFrameCreated=False))
     write('check-results.json',dict(schemaVersion=1,state='SECRET_OWNER355_READ_ONLY_VERIFIER_CONTROLLER_SOURCE_CHECKS_PASSED_V1',sourceOnly=True,sourceChecksPassed=True,checks=checks,uniqueInputPaths=len(snapshots),pureCases=len(cases),pythonAstFiles=asts,helperReturnKeysExactlyModeled=True,helperCallsPerFutureWorker=1,originalHelperContextPreserved=True,monitorActualPositionalApi=6,externalParentDeadlineSeconds=600,rawAndWholeFrameRetainedBeforeModelAssertions=True,preservationOriginalReadsSeparateFromFrozenOnlyHelper=True,normalFrozen1391Original1387AndNewFrozen1903Protected=True,controllerOrHelperOrMonitorImported=False,processesStarted=False,fullVerifierInvoked=False,nodeOrNinjaInvoked=False,copyExportBootstrapOrEngineInvoked=False,operationalAdmission=False,actualRootAuthority=None,actualVerifierResult=None))
     print(json.dumps(dict(sourceChecksPassed=True,checks=checks,uniqueInputPaths=len(snapshots),pureCases=len(cases),pythonAstFiles=asts,actualVerifierResult=None)))
 

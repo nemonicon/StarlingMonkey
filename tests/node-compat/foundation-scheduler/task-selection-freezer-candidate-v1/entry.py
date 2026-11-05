@@ -58,6 +58,8 @@ def recheck(frame):
   a,b=Path(row['path']).stat(),checked(row['original']).stat()
   assert stat.S_IMODE(a.st_mode)==row['mode']==stat.S_IMODE(b.st_mode)and(a.st_dev,a.st_ino)!=(b.st_dev,b.st_ino)
  for root,names in frame['protectedTrees']:assert{p.relative_to(root).as_posix()for p in root.rglob('*')if p.is_file()}==set(names)and not any(p.is_symlink()for p in root.rglob('*'))
+ for path in frame['protectedFrozenFiles']:assert stat.S_IMODE(Path(path).stat().st_mode)==0o600
+ for root,_ in frame['protectedTrees']:assert stat.S_IMODE(root.stat().st_mode)==0o700
 def root_model(root,own):
  assert root['schemaVersion']==1 and root['state']=='ROOT_REVIEWED_SCHEDULER_TASK_SELECTION342_NORMAL_OFF_FREEZE_V1'
  assert root['phase']=='freeze'and root['variant']=='normal-off'and root['taskSelectionSourceIndexSha256']==SOURCE_SHA
@@ -102,11 +104,11 @@ def authorize(config_row):
  assert __debug__ and sys.dont_write_bytecode
  assert Path(__file__).resolve()==OWN/'entry.py'
  assert not any(os.environ.get(k)for k in('PYTHONOPTIMIZE','PYTHONPATH','PYTHONHOME','NODE_OPTIONS','NODE_PATH','DYLD_INSERT_LIBRARIES','DYLD_LIBRARY_PATH','LD_PRELOAD','LD_LIBRARY_PATH'))
- config=read(config_row);own=config['freezerIndex'];root=read(config['rootAuthority']);root_model(root,own)
+ config=read(config_row);assert config['schemaVersion']==1;own=config['freezerIndex'];root=read(config['rootAuthority']);root_model(root,own)
  assert own['path']==str(OWN/'index.json')and config['taskSelectionSourceIndex']==dict(path=str(PROPOSAL/'index.json'),sha256=SOURCE_SHA,bytes=5120)
  own_rows=family(own);source_rows=family(config['taskSelectionSourceIndex']);assert root['entry']in own_rows
  refs=read(next(r for r in own_rows if r['path']==str(OWN/'references.json')))
- frame=Frame(_token=_TOKEN,config=config,configRow=config_row,root=root,refs=refs,captured={},families=[own,config['taskSelectionSourceIndex']],ownRows=own_rows,sourceRows=source_rows,modePairs=[],protectedTrees=[])
+ frame=Frame(_token=_TOKEN,config=config,configRow=config_row,root=root,refs=refs,captured={},families=[own,config['taskSelectionSourceIndex']],ownRows=own_rows,sourceRows=source_rows,modePairs=[],protectedTrees=[],protectedFrozenFiles=[])
  try:
   for row in[config_row,config['rootAuthority'],*own_rows,*source_rows]:add(frame,row)
   for item in refs['families']:
@@ -137,11 +139,16 @@ def authorize(config_row):
   old=read(refs['oldResourceFreeze']);oldroot=Path(refs['oldResourceFreeze']['path']).parent;assert len(old['copies'])==666 and sum(c['original']is not None for c in old['copies'])==663
   for c in old['copies']:
    add(frame,{k:c[k]for k in('path','sha256','bytes')})
+   frame['protectedFrozenFiles'].append(c['path'])
    if c['original']is not None:add(frame,descriptor(c['original']))
   frame['protectedTrees'].append((oldroot,[str(Path(c['path']).relative_to(oldroot))for c in old['copies']]+['normal-off-freeze-receipt.json']))
   # ORIGINAL preparation manifests retain their declared repository contexts.
   for data in refs['preparationManifests']:
    for row in read(data)['files']:add(frame,{k:row[k]for k in('path','sha256','bytes')})
+  plan=read(next(r for r in own_rows if r['path']==str(OWN/'capture-plan.json')));destinations=set()
+  for row in plan['copies']:
+   name=row['destination'];assert name and not name.startswith('/')and '\\'not in name and all(p not in('','.','..')for p in name.split('/'))and name not in destinations;destinations.add(name);add(frame,row['source'])
+  assert plan['baseCopies']==len(plan['copies'])and plan['verifiedReferenceCount']==20761
   metadata=read(refs['metadata']);policy=read(refs['policy']);database=read(refs['compileCommands'])
   metadata_model(metadata,policy,refs);compilation_model(database,metadata,policy,refs)
   assert[read(dict(path=str(SOURCE/row['path']),sha256=row['sha256'],bytes=(SOURCE/row['path']).stat().st_size))for row in metadata['selectedModuleManifests']]==refs['selectedManifestValues']

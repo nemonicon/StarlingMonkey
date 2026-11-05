@@ -1,0 +1,471 @@
+--- a/artifact_tooling.py
++++ b/artifact_tooling.py
+@@ -3,11 +3,11 @@
+ import copy,hashlib,importlib.util,json,os,stat,sys
+ 
+ REPO=Path('/Users/dan/dev/StarlingMonkey')
+-OWN=REPO/'tests/node-compat/foundation-crypto/ownership-secret-artifact-tooling-candidate-v2'
++OWN=REPO/'tests/node-compat/foundation-crypto/ownership-secret-artifact-tooling-candidate-v3'
+ VERIFIER=REPO/'tests/node-compat/foundation-crypto/ownership-secret-pin-tooling-candidate-v1'
+-BASE=Path('/private/tmp/starling-node-compat/crypto-owner355-secret-artifact-tooling-v2')
++BASE=Path('/private/tmp/starling-node-compat/crypto-owner355-secret-artifact-tooling-v3')
+ TIMEOUT=600
+-SOURCE_PEER_STATE='INDEPENDENT_CRYPTO_OWNER355_SECRET_ARTIFACT_TOOLING_SOURCE_REVIEW_PASSED_V2'
++SOURCE_PEER_STATE='INDEPENDENT_CRYPTO_OWNER355_SECRET_ARTIFACT_TOOLING_SOURCE_REVIEW_PASSED_V3'
+ 
+ def descriptor(value):
+     assert type(value)is dict and set(value)=={'path','sha256','bytes'}
+@@ -81,7 +81,7 @@
+ 
+ 
+ def validate_root(root,index,refs,phase):
+-    assert root['schemaVersion']==2 and root['state']=='ROOT_REVIEWED_SECRET_OWNER355_ARTIFACT_TOOLING_PHASE_V2'
++    assert root['schemaVersion']==3 and root['state']=='ROOT_REVIEWED_SECRET_OWNER355_ARTIFACT_TOOLING_PHASE_V3'
+     assert root['phase']==phase and root['variant']=='normal-off' and root['toolingIndex']==index
+     assert root['nativeSourceIndex']==refs['nativeSourceIndex'] and root['verifierSourceIndex']==refs['verifierSourceIndex']
+     assert root['actualVerifierReview']==refs['actualVerifierReview'] and root['actualArtifactReview']==refs['actualArtifactReview']
+@@ -128,11 +128,16 @@
+     assert Path(__file__).resolve().parent==OWN
+     assert not any(os.environ.get(k) for k in ['PYTHONPATH','PYTHONHOME','PYTHONOPTIMIZE','NODE_OPTIONS','NODE_PATH','LD_PRELOAD','LD_LIBRARY_PATH','DYLD_INSERT_LIBRARIES','DYLD_LIBRARY_PATH'])
+     capture=Capture();config_row=descriptor(config_row);config=capture.read(config_row)
+-    assert config['schemaVersion']==2 and config['state']=='SECRET_OWNER355_ARTIFACT_TOOLING_CONFIG_V2' and config['phase']==phase
++    assert config['schemaVersion']==3 and config['state']=='SECRET_OWNER355_ARTIFACT_TOOLING_CONFIG_V3' and config['phase']==phase
+     index=descriptor(config['toolingIndex']);assert index['path']==str(OWN/'index.json')
+     own=capture.family(index);refs=capture.read(next(r for r in own if r['path']==str(OWN/'references.json')))
+-    assert refs['schemaVersion']==2 and refs['originalToolingRoot']==str(OWN)
++    assert refs['schemaVersion']==3 and refs['originalToolingRoot']==str(OWN)
+     root_row=descriptor(config['rootAuthority']);root=capture.read(root_row);validate_root(root,index,refs,phase)
++    own_inputs=capture.read(next(r for r in own if r['path']==str(OWN/'source-inputs.json')))
++    assert own_inputs['schemaVersion']==1 and type(own_inputs['files'])is list and 0<len(own_inputs['files'])<=4096
++    assert own_inputs['protectedInputLedger']==refs['protectedInputLedger']
++    assert len({r['path']for r in own_inputs['files']})==len(own_inputs['files'])
++    for item in own_inputs['files']:capture.file({k:item[k]for k in['path','sha256','bytes']})
+     for item in refs['families']:capture.family(item)
+     source_peer,_=capture.proof(root['sourceIndependentReview']);validate_source_peer(source_peer,index,refs)
+     actual=authenticate_actual_review(capture,refs)
+@@ -165,7 +170,7 @@
+     # Bootstrap review and pin gates also precede ANY custom module import.
+     if phase=='bootstrap':
+         proof,_=capture.proof(root['independentExportReview'])
+-        assert proof['schemaVersion']==2 and proof['state']=='INDEPENDENT_CRYPTO_OWNER355_SECRET_NORMAL_OFF_PIN_EXPORT_REVIEW_PASSED_V2' and proof['verifiedPassed']is True
++        assert proof['schemaVersion']==3 and proof['state']=='INDEPENDENT_CRYPTO_OWNER355_SECRET_NORMAL_OFF_PIN_EXPORT_REVIEW_PASSED_V3' and proof['verifiedPassed']is True
+         assert proof['toolingSourceIndexSha256']==index['sha256'] and proof['candidate']==root['actualExportCandidate']
+         assert proof['actualVerifierReview']==refs['actualVerifierReview'] and proof['freezeReceipt']==refs['freezeReceipt']
+         assert proof['variant']=='normal-off' and type(proof['rawExporterExitCode'])is int and proof['rawExporterExitCode']==0
+@@ -177,7 +182,7 @@
+         for key in ['actualExportCandidate','reviewedPins','rootPinReview']:capture.read(root[key])
+     capture.recheck()
+     try:
+-        model=load_actual(next(r for r in own if r['path']==str(OWN/'pin_model.py')),'secret355_artifact_pin_data_v2')
++        model=load_actual(next(r for r in own if r['path']==str(OWN/'pin_model.py')),'secret355_artifact_pin_data_v3')
+         frame['model']=model;frame['expected']=model.candidate(historical,receipt,refs,index)
+         if phase=='bootstrap':
+             assert capture.read(root['actualExportCandidate'])==model.unreviewed_document(frame['expected'])
+@@ -194,7 +199,7 @@
+ 
+ def worker(frame):
+     phase=frame['phase'];out,_=outputs(phase);assert out.is_dir()and not out.is_symlink()and stat.S_IMODE(out.stat().st_mode)==0o700
+-    helper=load_actual(frame['refs']['verifierEntry'],'genuine_original_secret355_artifact_verifier_v2')
++    helper=load_actual(frame['refs']['verifierEntry'],'genuine_original_secret355_artifact_verifier_v3')
+     assert helper.HERE==VERIFIER and str(helper.FROZEN)==frame['refs']['frozenRoot']
+     frame['capture'].recheck()
+     verified=helper.verify_frozen(frame['contract'])
+@@ -213,7 +218,7 @@
+ def parent(frame):
+     out,external=outputs(frame['phase'])
+     assert not out.exists()and not out.is_symlink()and not external.exists()and not external.is_symlink()
+-    monitor=load_actual(frame['refs']['monitorEntry'],'genuine_original_secret355_artifact_owned_monitor_v2')
++    monitor=load_actual(frame['refs']['monitorEntry'],'genuine_original_secret355_artifact_owned_monitor_v3')
+     frame['capture'].recheck();os.umask(0o077);out.mkdir(mode=0o700);external.mkdir(mode=0o700);identity=(out.stat().st_dev,out.stat().st_ino)
+     argv=[frame['refs']['python']['path'],'-B','-I',str(OWN/'artifact_tooling.py'),'worker',frame['phase'],'--config-descriptor',json.dumps(frame['configRow'],separators=(',',':'))]
+     terminal=None;value=None;errors=[];protected=False;row=None
+@@ -222,7 +227,7 @@
+         terminal_row=fingerprint(external/'terminal.json')[0]
+         assert frame['capture'].read(terminal_row)==terminal
+         for key in ['stdout','stderr']:assert fingerprint(terminal[key]['path'])[0]==terminal[key]
+-        write(out/'raw-terminal-observed.json',dict(schemaVersion=2,terminal=terminal_row,stdout=terminal['stdout'],stderr=terminal['stderr'],interpretationPending=True))
++        write(out/'raw-terminal-observed.json',dict(schemaVersion=3,terminal=terminal_row,stdout=terminal['stdout'],stderr=terminal['stderr'],interpretationPending=True))
+         clean_terminal(terminal,frame['rootRow']);assert terminal['stdout']['bytes']<=16*1024*1024
+         value=json.loads(Path(terminal['stdout']['path']).read_bytes());name='candidate-UNREVIEWED.json' if frame['phase']=='export' else 'bootstrap-frame.json'
+         row=fingerprint(out/name)[0];retained=frame['capture'].read(row);assert value==retained
+@@ -236,7 +241,7 @@
+         except BaseException as error:errors.append(dict(stage='final-or-failure-protection',type=type(error).__name__))
+     assert out.is_dir()and not out.is_symlink()and (out.stat().st_dev,out.stat().st_ino)==identity
+     success=value is not None and protected and errors==[]
+-    result=dict(schemaVersion=2,state='SECRET_OWNER355_ARTIFACT_PHASE_COMPLETE_UNREVIEWED_V2' if success else 'SECRET_OWNER355_ARTIFACT_PHASE_FAILED_UNACCEPTED_V2',
++    result=dict(schemaVersion=3,state='SECRET_OWNER355_ARTIFACT_PHASE_COMPLETE_UNREVIEWED_V3' if success else 'SECRET_OWNER355_ARTIFACT_PHASE_FAILED_UNACCEPTED_V3',
+         phase=frame['phase'],toolingIndex=frame['index'],rootAuthority=frame['rootRow'],config=frame['configRow'],actualVerifierReview=frame['refs']['actualVerifierReview'],
+         rawTerminal=None if terminal is None else fingerprint(external/'terminal.json')[0],rawExitCode=None if terminal is None else terminal['rawExitCode'],
+         completePhaseReturn=row,wholeVerifierFrame=None if not(out/'whole-verifier-frame.json').exists()else fingerprint(out/'whole-verifier-frame.json')[0],
+--- a/bootstrap.mjs
++++ b/bootstrap.mjs
+@@ -7,8 +7,8 @@
+ import {dirname,join,resolve,isAbsolute} from 'node:path';
+ import {fileURLToPath} from 'node:url';
+ const HERE=dirname(fileURLToPath(import.meta.url));
+-const ORIGINAL='/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-artifact-tooling-candidate-v2';
+-const JS_OUT='/private/tmp/starling-node-compat/crypto-owner355-secret-artifact-tooling-v2-bootstrap-js-normal-off';
++const ORIGINAL='/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-artifact-tooling-candidate-v3';
++const JS_OUT='/private/tmp/starling-node-compat/crypto-owner355-secret-artifact-tooling-v3-bootstrap-js-normal-off';
+ const run=promisify(execFile),sha=b=>createHash('sha256').update(b).digest('hex');
+ const same=isDeepStrictEqual;
+ function need(v,m){if(!v)throw new Error(m);}
+@@ -49,14 +49,18 @@
+   const cfgRow=captureDescriptor(configDescriptor); // Capture primitives before the first await.
+   need(HERE===ORIGINAL,'Only original successor tooling context');
+   for(const k of ['NODE_OPTIONS','NODE_PATH','PYTHONPATH','PYTHONHOME','PYTHONOPTIMIZE','LD_PRELOAD','LD_LIBRARY_PATH','DYLD_INSERT_LIBRARIES','DYLD_LIBRARY_PATH'])need(!process.env[k],'No loader override '+k);
+-  const c=new Capture(),cfg=freeze(await c.read(cfgRow));need(cfg.schemaVersion===2&&cfg.state==='SECRET_OWNER355_ARTIFACT_TOOLING_CONFIG_V2'&&cfg.phase==='bootstrap','Explicit bootstrap config');
++  const c=new Capture(),cfg=freeze(await c.read(cfgRow));need(cfg.schemaVersion===3&&cfg.state==='SECRET_OWNER355_ARTIFACT_TOOLING_CONFIG_V3'&&cfg.phase==='bootstrap','Explicit bootstrap config');
+   const own=captureDescriptor(cfg.toolingIndex);need(own.path===join(HERE,'index.json'),'Original own index');const rows=await c.family(own);
+   const refs=freeze(await c.read(rows.find(r=>r.path===join(HERE,'references.json'))));
++  const ownInputs=await c.read(rows.find(r=>r.path===join(HERE,'source-inputs.json')));
++  need(ownInputs.schemaVersion===1&&Array.isArray(ownInputs.files)&&ownInputs.files.length>0&&ownInputs.files.length<=4096&&same(ownInputs.protectedInputLedger,refs.protectedInputLedger),'Own complete declared input manifest');
++  need(new Set(ownInputs.files.map(r=>r.path)).size===ownInputs.files.length,'Unique declared input rows');
++  for(const input of ownInputs.files)await c.file(input);
+   need(process.version==='v22.14.0'&&process.execArgv.length===0&&await realpath(process.execPath)===refs.node.path,'Pinned plain Node22');await c.file(refs.node);await c.file(refs.python);
+-  const root=freeze(await c.read(cfg.rootAuthority));need(root.schemaVersion===2&&root.state==='ROOT_REVIEWED_SECRET_OWNER355_ARTIFACT_TOOLING_PHASE_V2'&&root.phase==='bootstrap'&&root.bootstrapAllowed===true&&root.exportAllowed===false&&same(root.toolingIndex,own)&&root.jsOutputRoot===JS_OUT,'New separate bootstrap authority');
++  const root=freeze(await c.read(cfg.rootAuthority));need(root.schemaVersion===3&&root.state==='ROOT_REVIEWED_SECRET_OWNER355_ARTIFACT_TOOLING_PHASE_V3'&&root.phase==='bootstrap'&&root.bootstrapAllowed===true&&root.exportAllowed===false&&same(root.toolingIndex,own)&&root.jsOutputRoot===JS_OUT,'New separate bootstrap authority');
+   for(const k of ['nativeBuildAllowed','nativeFreezeAllowed','gcReconfigureAllowed','ninjaAllowed','engineExecutionAllowed','guestAllowed','keyOrCryptoAllowed','componentAllowed','runtimeAcceptanceClaim','operationalAdmission','sourcePromotionAllowed','metadataProjectionAllowed','timingAllowed'])need(root[k]===false,'No other action '+k);
+   for(const ix of refs.families)await c.family(ix);
+-  const sp=await c.proof(root.sourceIndependentReview);need(sp.schemaVersion===1&&sp.state==='INDEPENDENT_CRYPTO_OWNER355_SECRET_ARTIFACT_TOOLING_SOURCE_REVIEW_PASSED_V2'&&sp.toolingSourceIndexSha256===own.sha256&&sp.sourceOnly===true&&sp.sourceReviewPassed===true&&sp.ownerActionsInvoked===false&&sp.hostActionsInvoked===false&&sp.exportOrBootstrapActionsInvoked===false,'Real successor source review');
++  const sp=await c.proof(root.sourceIndependentReview);need(sp.schemaVersion===1&&sp.state==='INDEPENDENT_CRYPTO_OWNER355_SECRET_ARTIFACT_TOOLING_SOURCE_REVIEW_PASSED_V3'&&sp.toolingSourceIndexSha256===own.sha256&&sp.sourceOnly===true&&sp.sourceReviewPassed===true&&sp.ownerActionsInvoked===false&&sp.hostActionsInvoked===false&&sp.exportOrBootstrapActionsInvoked===false,'Real successor source review');
+   const vp=await c.proof(refs.actualVerifierReview);need(vp.state==='INDEPENDENT_CRYPTO_OWNER355_SECRET_FROZEN_VERIFIER_RESULTS_REVIEW_PASSED_V1'&&vp.verifiedPassed===true&&same(vp.actualWholeFrame,refs.actualVerifierWholeFrame)&&same(vp.inputClosure,refs.protectedInputLedger),'Actual complete verifier proof');
+   const ledger=await c.read(refs.protectedInputLedger);need(ledger.files.length===refs.protectedInputRows&&ledger.files.length===27729,'Full original protection ledger');for(const r of ledger.files)await c.file(r);
+   for(const key of ['actualExportCandidate','reviewedPins','rootPinReview'])await c.read(root[key]);await c.proof(root.independentExportReview);
+@@ -69,15 +73,15 @@
+     }catch(e){error=e;stdout=Buffer.isBuffer(e.stdout)?e.stdout:Buffer.alloc(0);stderr=Buffer.isBuffer(e.stderr)?e.stderr:Buffer.alloc(0);}
+     // Raw parent JSONL (monitor PID notice plus final observation) is saved before assertions.
+     await write(join(JS_OUT,'stdout.log'),stdout);await write(join(JS_OUT,'stderr.log'),stderr);
+-    const terminal={schemaVersion:2,rawExitCode:error===null?0:(Number.isInteger(error.code)?error.code:null),signal:error?.signal??null,timedOut:error?.killed===true,rawStreamsComplete:error===null,exceptionCode:error===null?null:(typeof error.code==='string'?error.code:null),enclosingRootControllerRequiredForIndependentCleanupReview:true};
++    const terminal={schemaVersion:3,rawExitCode:error===null?0:(Number.isInteger(error.code)?error.code:null),signal:error?.signal??null,childKillReported:error===null?false:(typeof error.killed==='boolean'?error.killed:null),timedOut:error===null?false:null,timeoutCauseEstablished:false,rawStreamsComplete:error===null,exceptionCode:error===null?null:(typeof error.code==='string'?error.code:null),enclosingRootControllerRequiredForIndependentCleanupReview:true};
+     await write(join(JS_OUT,'terminal.json'),Buffer.from(JSON.stringify(terminal,null,2)+'\n'));
+     need(error===null&&stderr.length===0,'Raw-zero Python parent required; failed captures remain unaccepted');
+     const lines=stdout.toString('utf8').split('\n').filter(Boolean).map(x=>JSON.parse(x));need(lines.length===2&&Number.isSafeInteger(lines[0].pid)&&lines[0].timeoutSeconds===600&&lines[1].completeUnreviewed===true,'Exact original monitor notice plus observation; never relabel prefixes');
+-    const observation=await c.read(lines[1].observation);need(observation.state==='SECRET_OWNER355_ARTIFACT_PHASE_COMPLETE_UNREVIEWED_V2'&&observation.phase==='bootstrap'&&observation.sourceAndOriginalProtectionRechecked===true&&observation.errors.length===0&&same(observation.toolingIndex,own),'Actual parent collection');
++    const observation=await c.read(lines[1].observation);need(observation.state==='SECRET_OWNER355_ARTIFACT_PHASE_COMPLETE_UNREVIEWED_V3'&&observation.phase==='bootstrap'&&observation.sourceAndOriginalProtectionRechecked===true&&observation.errors.length===0&&same(observation.toolingIndex,own),'Actual parent collection');
+     const rawTerminal=await c.read(observation.rawTerminal);need(rawTerminal.rawExitCode===0&&rawTerminal.timeout===false&&rawTerminal.forcedCleanup===false&&rawTerminal.allObservedOwnedGroupsGone===true&&rawTerminal.parentOwnedGroupGone===true&&rawTerminal.errors.length===0&&rawTerminal.signals.length===0&&rawTerminal.interruptedSignals.length===0&&rawTerminal.remainingObservedPids.length===0&&same(rawTerminal.authority,cfg.rootAuthority)&&rawTerminal.finalGroups.length>0&&rawTerminal.finalGroups.every(g=>g.alive===false),'Owned worker clean-zero');
+     await c.file(rawTerminal.stderr);need(rawTerminal.stderr.bytes===0&&rawTerminal.stdout.bytes<=16*1024*1024,'Full bounded worker streams');
+     const value=freeze(await c.read(observation.completePhaseReturn)),raw=await c.read(rawTerminal.stdout);need(same(value,raw),'Whole actual worker stdout and saved bootstrap JSON');
+-    need(value.schemaVersion===2&&value.state==='SECRET_OWNER355_NORMAL_OFF_VALIDATION_BOOTSTRAP_PASSED_V2'&&value.variant==='normal-off'&&value.nativeSourceFiles===355&&value.externalEmbeddingSources===3&&value.selectedManifestCount===11&&same(value.toolingIndex,own)&&same(value.rootAuthority,cfg.rootAuthority)&&same(value.config,cfgRow),'Genuine new bootstrap frame');
++    need(value.schemaVersion===3&&value.state==='SECRET_OWNER355_NORMAL_OFF_VALIDATION_BOOTSTRAP_PASSED_V3'&&value.variant==='normal-off'&&value.nativeSourceFiles===355&&value.externalEmbeddingSources===3&&value.selectedManifestCount===11&&same(value.toolingIndex,own)&&same(value.rootAuthority,cfg.rootAuthority)&&same(value.config,cfgRow),'Genuine new bootstrap frame');
+     need(value.engineExecuted===false&&value.guestExecuted===false&&value.operationalAdmission===false&&value.runtimeAcceptanceClaim===false&&value.validationBootstrapOnly===true,'No engine/runtime authority');
+     need(same(value.verifierFrame,await c.read(refs.actualVerifierWholeFrame))&&same(value.pin.verifierFrame,value.verifierFrame),'Whole original verifier metadata and all manifests unchanged');
+     await c.recheck();auditPassed=true;
+@@ -86,7 +90,7 @@
+   } finally {
+     let failure=null;try{await c.recheck();auditPassed=true;}catch(e){failure=e;auditPassed=false;}
+     const s=await lstat(JS_OUT);need(s.isDirectory()&&!s.isSymbolicLink()&&same(identity(s).slice(0,2),outIdentity.slice(0,2)),'Fresh JS output directory identity');
+-    await write(join(JS_OUT,'post-audit.json'),Buffer.from(JSON.stringify({schemaVersion:2,sourceAndProofProtectionRechecked:auditPassed,engineExecuted:false,operationalAdmission:false})+'\n'));
++    await write(join(JS_OUT,'post-audit.json'),Buffer.from(JSON.stringify({schemaVersion:3,sourceAndProofProtectionRechecked:auditPassed,engineExecuted:false,operationalAdmission:false})+'\n'));
+     if(failure!==null)throw failure;
+   }
+ }
+--- a/pin_model.py
++++ b/pin_model.py
+@@ -29,7 +29,7 @@
+     assert frame['configuredSourceRoot']==refs['configuredSourceRoot'] and frame['sourceRoot']==refs['frozenSourceRoot']
+     assert frame['componentizeSourceRoot']==refs['componentizeSourceRoot'] and frame['workRoot']==refs['workRoot']
+     assert frame['verifierOriginalToolingRoot']==refs['verifierOriginalToolingRoot'] and frame['freezerOriginalToolingRoot']==refs['freezerOriginalToolingRoot']
+-    return copy.deepcopy(dict(schemaVersion=2,state='unreviewed-secret-owner355-normal-off-pin-v2',reviewRequired=True,variant='normal-off',
++    return copy.deepcopy(dict(schemaVersion=3,state='unreviewed-secret-owner355-normal-off-pin-v3',reviewRequired=True,variant='normal-off',
+         toolingIndex=index,nativeSourceIndex=refs['nativeSourceIndex'],freezerSourceIndex=refs['freezerSourceIndex'],verifierSourceIndex=refs['verifierSourceIndex'],
+         engine=refs['engine'],metadataDescriptor=refs['metadata'],freezeReceipt=refs['freezeReceipt'],enginePath=refs['engine']['path'],
+         nativeSourceFiles=355,externalEmbeddingSources=3,selectedManifestCount=11,verifierFrame=frame,
+@@ -38,24 +38,24 @@
+         validationBootstrapOnly=True,engineExecuted=False,guestExecuted=False,operationalAdmission=False,runtimeAcceptanceClaim=False))
+ 
+ def unreviewed_document(pin):
+-    assert pin['state']=='unreviewed-secret-owner355-normal-off-pin-v2' and pin['reviewRequired']is True
+-    return dict(schemaVersion=2,state='UNREVIEWED_SECRET_OWNER355_NORMAL_OFF_PIN_CANDIDATE_V2',toolingIndex=copy.deepcopy(pin['toolingIndex']),
++    assert pin['state']=='unreviewed-secret-owner355-normal-off-pin-v3' and pin['reviewRequired']is True
++    return dict(schemaVersion=3,state='UNREVIEWED_SECRET_OWNER355_NORMAL_OFF_PIN_CANDIDATE_V3',toolingIndex=copy.deepcopy(pin['toolingIndex']),
+         reviewRequired=True,variants={k:copy.deepcopy(pin) if k=='normal-off' else None for k in LABELS},
+         validationBootstrapOnly=True,operationalAdmission=False,runtimeAcceptanceClaim=False)
+ 
+ def reviewed_document(unreviewed):
+     """Pure documented state/flag derivation, NOT review or authority issuance."""
+     value=copy.deepcopy(unreviewed)
+-    assert value['state']=='UNREVIEWED_SECRET_OWNER355_NORMAL_OFF_PIN_CANDIDATE_V2' and value['reviewRequired']is True
++    assert value['state']=='UNREVIEWED_SECRET_OWNER355_NORMAL_OFF_PIN_CANDIDATE_V3' and value['reviewRequired']is True
+     assert set(value['variants'])==set(LABELS) and all(value['variants'][k]is None for k in LABELS if k!='normal-off')
+-    value['state']='ROOT_REVIEWED_SECRET_OWNER355_NORMAL_OFF_VALIDATION_PINS_V2';value['reviewRequired']=False
+-    pin=value['variants']['normal-off'];assert pin['state']=='unreviewed-secret-owner355-normal-off-pin-v2' and pin['reviewRequired']is True
+-    pin['state']='reviewed-secret-owner355-normal-off-pin-v2';pin['reviewRequired']=False
++    value['state']='ROOT_REVIEWED_SECRET_OWNER355_NORMAL_OFF_VALIDATION_PINS_V3';value['reviewRequired']=False
++    pin=value['variants']['normal-off'];assert pin['state']=='unreviewed-secret-owner355-normal-off-pin-v3' and pin['reviewRequired']is True
++    pin['state']='reviewed-secret-owner355-normal-off-pin-v3';pin['reviewRequired']=False
+     return value
+ 
+ def select_reviewed(document,review,expected,reviewed_row,export_row,export_review,refs):
+     assert document==reviewed_document(unreviewed_document(expected)), 'Only four documented state/flag values may differ; no metadata/frame/path projection'
+-    assert review['schemaVersion']==2 and review['state']=='ROOT_SECRET_OWNER355_NORMAL_OFF_VALIDATION_PIN_REVIEW_V2'
++    assert review['schemaVersion']==3 and review['state']=='ROOT_SECRET_OWNER355_NORMAL_OFF_VALIDATION_PIN_REVIEW_V3'
+     for key,value in dict(toolingIndex=expected['toolingIndex'],reviewedPins=reviewed_row,actualExportCandidate=export_row,
+                           independentExportReview=export_review,actualVerifierReview=refs['actualVerifierReview'],actualFrozenArtifactReview=refs['actualArtifactReview'],
+                           engine=refs['engine'],metadata=refs['metadata'],freezeReceipt=refs['freezeReceipt'],nativeSourceFiles=355,externalEmbeddingSources=3,selectedManifestCount=11).items():assert review[key]==value
+@@ -64,8 +64,8 @@
+     return copy.deepcopy(document['variants']['normal-off'])
+ 
+ def bootstrap_frame(pin,verified,refs,index,root_row,config_row,reviewed_row,pin_review_row,export_row,export_review):
+-    assert pin['verifierFrame']==verified and pin['state']=='reviewed-secret-owner355-normal-off-pin-v2' and pin['reviewRequired']is False
+-    return copy.deepcopy(dict(schemaVersion=2,state='SECRET_OWNER355_NORMAL_OFF_VALIDATION_BOOTSTRAP_PASSED_V2',variant='normal-off',
++    assert pin['verifierFrame']==verified and pin['state']=='reviewed-secret-owner355-normal-off-pin-v3' and pin['reviewRequired']is False
++    return copy.deepcopy(dict(schemaVersion=3,state='SECRET_OWNER355_NORMAL_OFF_VALIDATION_BOOTSTRAP_PASSED_V3',variant='normal-off',
+         toolingIndex=index,rootAuthority=root_row,config=config_row,nativeSourceIndex=refs['nativeSourceIndex'],freezerSourceIndex=refs['freezerSourceIndex'],
+         verifierSourceIndex=refs['verifierSourceIndex'],actualVerifierReview=refs['actualVerifierReview'],actualFrozenArtifactReview=refs['actualArtifactReview'],
+         actualExportCandidate=export_row,independentExportReview=export_review,reviewedPins=reviewed_row,rootPinReview=pin_review_row,
+--- a/check-source.py
++++ b/check-source.py
+@@ -44,7 +44,7 @@
+ need(frame==before,'candidate owns an independent DATA copy');pin=env['candidate'](frame,receipt,refs,test_index)
+ export_row=dict(path='/private/tmp/PURE-ONLY-candidate.json',sha256='0'*64,bytes=0);reviewed_row=dict(path='/private/tmp/PURE-ONLY-reviewed.json',sha256='0'*64,bytes=0)
+ export_review=dict(index=export_row,result=export_row)
+-review=dict(schemaVersion=2,state='ROOT_SECRET_OWNER355_NORMAL_OFF_VALIDATION_PIN_REVIEW_V2',toolingIndex=test_index,reviewedPins=reviewed_row,actualExportCandidate=export_row,independentExportReview=export_review,actualVerifierReview=refs['actualVerifierReview'],actualFrozenArtifactReview=refs['actualArtifactReview'],**{k:refs[k]for k in ['engine','metadata','freezeReceipt']},nativeSourceFiles=355,externalEmbeddingSources=3,selectedManifestCount=11,validationBootstrapOnly=True,otherVariantsNull=True,engineExecuted=False,guestExecuted=False,operationalAdmission=False,runtimeAcceptanceClaim=False,sourcePromotionAllowed=False)
++review=dict(schemaVersion=3,state='ROOT_SECRET_OWNER355_NORMAL_OFF_VALIDATION_PIN_REVIEW_V3',toolingIndex=test_index,reviewedPins=reviewed_row,actualExportCandidate=export_row,independentExportReview=export_review,actualVerifierReview=refs['actualVerifierReview'],actualFrozenArtifactReview=refs['actualArtifactReview'],**{k:refs[k]for k in ['engine','metadata','freezeReceipt']},nativeSourceFiles=355,externalEmbeddingSources=3,selectedManifestCount=11,validationBootstrapOnly=True,otherVariantsNull=True,engineExecuted=False,guestExecuted=False,operationalAdmission=False,runtimeAcceptanceClaim=False,sourcePromotionAllowed=False)
+ def select(doc=reviewed,rv=review):return env['select_reviewed'](doc,rv,pin,reviewed_row,export_row,export_review,refs)
+ selected=select();need(selected==reviewed['variants']['normal-off'],'genuine four-state/flag-only derivation model')
+ for key in frame['metadata']:
+@@ -64,10 +64,10 @@
+ need(bootstrap['metadata']['enginePath']==frame['metadata']['enginePath']and bootstrap['enginePath']==refs['engine']['path'],'raw build enginePath preserved separately from frozen selected engine')
+ 
+ source=(OWN/'artifact_tooling.py').read_text();tree=ast.parse(source)
+-runtime=extracted(['descriptor','outputs','validate_root','validate_source_peer'],source,dict(Path=Path,BASE=Path('/private/tmp/starling-node-compat/crypto-owner355-secret-artifact-tooling-v2'),TIMEOUT=600,SOURCE_PEER_STATE='INDEPENDENT_CRYPTO_OWNER355_SECRET_ARTIFACT_TOOLING_SOURCE_REVIEW_PASSED_V2'))
+-root=json.loads((OWN/'future-root-authority.template.json').read_text());root.update(schemaVersion=2,state='ROOT_REVIEWED_SECRET_OWNER355_ARTIFACT_TOOLING_PHASE_V2',toolingIndex=test_index)
++runtime=extracted(['descriptor','outputs','validate_root','validate_source_peer'],source,dict(Path=Path,BASE=Path('/private/tmp/starling-node-compat/crypto-owner355-secret-artifact-tooling-v3'),TIMEOUT=600,SOURCE_PEER_STATE='INDEPENDENT_CRYPTO_OWNER355_SECRET_ARTIFACT_TOOLING_SOURCE_REVIEW_PASSED_V3'))
++root=json.loads((OWN/'future-root-authority.template.json').read_text());root.update(schemaVersion=3,state='ROOT_REVIEWED_SECRET_OWNER355_ARTIFACT_TOOLING_PHASE_V3',toolingIndex=test_index)
+ for phase in ['export','bootstrap']:
+-    x=copy.deepcopy(root);out,external=runtime['outputs'](phase);x.update(phase=phase,exportAllowed=phase=='export',bootstrapAllowed=phase=='bootstrap',outputRoot=str(out),externalOutputRoot=str(external),jsOutputRoot=str(Path('/private/tmp/starling-node-compat/crypto-owner355-secret-artifact-tooling-v2'))+'-bootstrap-js-normal-off' if phase=='bootstrap' else None)
++    x=copy.deepcopy(root);out,external=runtime['outputs'](phase);x.update(phase=phase,exportAllowed=phase=='export',bootstrapAllowed=phase=='bootstrap',outputRoot=str(out),externalOutputRoot=str(external),jsOutputRoot=str(Path('/private/tmp/starling-node-compat/crypto-owner355-secret-artifact-tooling-v3'))+'-bootstrap-js-normal-off' if phase=='bootstrap' else None)
+     if phase=='bootstrap':x.update(actualExportCandidate=export_row,reviewedPins=reviewed_row,rootPinReview=export_row,independentExportReview=export_review)
+     runtime['validate_root'](x,test_index,refs,phase);checks.append('real '+phase+' Root model only')
+     for key in ['nativeSourceFiles','selectedManifestCount','nativeSourceIndex','verifierSourceIndex','actualVerifierReview','engine','metadata','freezeReceipt','configuredSourceRoot','frozenSourceRoot','outputRoot','externalOutputRoot','externalParentDeadlineSeconds','expectedCompleteVerifierCalls','metadataProjectionAllowed','engineExecutionAllowed','runtimeAuthority']:
+@@ -112,8 +112,53 @@
+ need('if(failure!==null)throw failure' in js and "'post-audit.json'"in js,'JS final/failure protection saved and enforced')
+ need('recheck does not call helper again' in json.loads((OWN/'api-contract.json').read_text())['returns'],'recheck semantics explicit')
+ 
++# M1: exercise the actual indexed-input loop and actual Capture.file/recheck
++# methods with memory-only fingerprints. Never mutate a real protected input.
++manifest=json.loads((OWN/'source-inputs.json').read_text())
++loop=next(n for n in authorize.body if isinstance(n,ast.For)and isinstance(n.iter,ast.Subscript)and isinstance(n.iter.value,ast.Name)and n.iter.value.id=='own_inputs')
++need(auth.index("own_inputs=capture.read")<auth.index('model=load_actual'),'own complete manifest authenticated before Python custom import')
++need(js.index("const ownInputs=await c.read")<js.index('result=await run(')and 'for(const input of ownInputs.files)await c.file(input);'in js,'own complete manifest before JS child action')
++donor_path=next(r['path']for r in manifest['files']if r['path'].endswith('/resource-pin-tooling-candidate-v1/pin_model.py'))
++def manifest_capture_model(mutation=None,late=False):
++    available={r['path']:({k:r[k]for k in ['path','sha256','bytes']},(1,i,r['bytes'],3,4),r['path'])for i,r in enumerate(manifest['files'])}
++    def fake_fingerprint(path):
++        if str(path)not in available:raise AssertionError('Pure missing input')
++        return copy.deepcopy(available[str(path)])
++    context=extracted(['descriptor','Capture'],source,dict(Path=Path,copy=copy,fingerprint=fake_fingerprint,exact_tree=lambda *args:None))
++    cap=context['Capture']()
++    def change():
++        if mutation=='missing':del available[donor_path]
++        if mutation=='bytes':
++            row,identity,physical=available[donor_path];row['sha256']='0'*64;available[donor_path]=(row,identity,physical)
++        if mutation=='identity':
++            row,identity,physical=available[donor_path];available[donor_path]=(row,(*identity[:-1],999),physical)
++    if mutation and not late:change()
++    local=dict(capture=cap,own_inputs=manifest)
++    exec(compile(ast.Module(body=[loop],type_ignores=[]),'<actual own input loop, memory fingerprints>','exec'),local)
++    need(len(cap.rows)==len(manifest['files'])and donor_path in cap.rows,'all complete declared rows captured')
++    if mutation and late:change()
++    cap.recheck()
++manifest_capture_model();checks.append('full current declared input capture and recheck, no filesystem seam')
++for mutation in ['missing','bytes','identity']:
++    if mutation!='identity':reject(lambda m=mutation:manifest_capture_model(m,False),'initial declared donor refusal '+mutation)
++    reject(lambda m=mutation:manifest_capture_model(m,True),'final/failure declared donor refusal '+mutation)
++manifest_capture_model('identity',False);checks.append('initial valid bytes capture current identity; later identity change refuses')
++
++# M2: independent DATA translation of the exact new terminal expressions.
++# This is not JS execution and does not manufacture an observed timeout cause.
++need('childKillReported:error===null?false:'in js and 'timedOut:error===null?false:null'in js and 'timeoutCauseEstablished:false'in js,'kill primitive and timeout cause are distinct')
++need('timedOut:error?.killed===true'not in js,'old broad timeout inference absent')
++terminal_models=[]
++for kind,error,stderr_bytes in [('success',None,0),('zero-with-stderr',None,1),('nonzero',dict(code=1,killed=False),0),('ambiguous-killed',dict(code=None,killed=True),0),('overflow-killed',dict(code='ERR_CHILD_PROCESS_STDIO_MAXBUFFER',killed=True),0),('spawn-error',dict(code='ENOENT'),0)]:
++    terminal=dict(rawExitCode=0 if error is None else error.get('code')if type(error.get('code'))is int else None,childKillReported=False if error is None else error.get('killed')if type(error.get('killed'))is bool else None,timedOut=False if error is None else None,timeoutCauseEstablished=False,rawStreamsComplete=error is None,exceptionCode=error.get('code')if error and type(error.get('code'))is str else None)
++    accepted=error is None and stderr_bytes==0
++    need(accepted==(kind=='success'),'all error/overflow/incomplete or stderr paths refused '+kind)
++    if error is not None:need(terminal['timedOut']is None and terminal['timeoutCauseEstablished']is False,'no invented timeout '+kind)
++    terminal_models.append(dict(kind=kind,errorData=error,stderrBytes=stderr_bytes,terminal=terminal,accepted=accepted,actualProcessExecuted=False))
++(OWN/'correction-models.json').write_text(json.dumps(dict(schemaVersion=1,manifestRows=len(manifest['files']),sourceDonorProtected=donor_path,actualCaptureMethodsAndLoopWithMemoryFingerprints=True,initialMissingOrBytesNegatives=2,finalFailureMissingBytesIdentityNegatives=3,initialValidByteIdentityCaptured=True,jsInputLoopSourceVerified=True,terminalModels=terminal_models,jsExecuted=False,ownerHelpersOrActionsInvoked=False),indent=2)+'\n')
++
+ for p in OWN.glob('*.py'):ast.parse(p.read_text());checks.append('Python AST '+p.name)
+ for p in OWN.glob('future-*.json'):
+     v=json.loads(p.read_text());need(v.get('actualProof')is None,'future proof NULL '+p.name)
+-result=dict(schemaVersion=1,state='SECRET_ARTIFACT_TOOLING_SOURCE_PURE_DATA_CHECKS_PASSED_V2',checks=len(checks),checkNames=checks,authenticatedDataRows=len(data),dataFiles=list(data.values()),pythonAstOnly=True,jsGrammarOrNodeExecuted=False,syntheticZeroDigestRowsConfinedToPureTests=True,operationalEntryBodiesInvoked=False,verifierOrMonitorInvoked=False,exportOrBootstrapInvoked=False,nodeOrEngineInvoked=False)
++result=dict(schemaVersion=1,state='SECRET_ARTIFACT_TOOLING_SOURCE_PURE_DATA_CHECKS_PASSED_V3',checks=len(checks),checkNames=checks,authenticatedDataRows=len(data),dataFiles=list(data.values()),pythonAstOnly=True,jsGrammarOrNodeExecuted=False,syntheticZeroDigestRowsConfinedToPureTests=True,operationalEntryBodiesInvoked=False,verifierOrMonitorInvoked=False,exportOrBootstrapInvoked=False,nodeOrEngineInvoked=False)
+ path=OWN/'pure-results.json';path.write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(dict(state=result['state'],checks=len(checks),rows=len(data))))
+--- a/api-contract.json
++++ b/api-contract.json
+@@ -1,11 +1,11 @@
+ {
+-  "schemaVersion": 2,
+-  "state": "SOURCE_ONLY_SECRET_OWNER355_ARTIFACT_TOOLING_API_V2",
++  "schemaVersion": 3,
++  "state": "SOURCE_ONLY_SECRET_OWNER355_ARTIFACT_TOOLING_API_V3",
+   "pythonCli": [
+     "<pinned-python>",
+     "-B",
+     "-I",
+-    "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-artifact-tooling-candidate-v2/artifact_tooling.py",
++    "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-artifact-tooling-candidate-v3/artifact_tooling.py",
+     "<parent|worker>",
+     "<export|bootstrap>",
+     "--config-descriptor",
+@@ -15,9 +15,9 @@
+   "returns": "Complete bootstrap DATA frame plus read-only recheck() that rehashes sources/proofs/retained output; recheck does not call helper again",
+   "helperApi": "Original e872 verifier.py: verify_frozen(original source-contract.json whole value)",
+   "monitorApi": "Original 0af monitor.monitor(argv,cwd,environment,output,600,rootAuthority)",
+-  "exportOutputRoot": "/private/tmp/starling-node-compat/crypto-owner355-secret-artifact-tooling-v2-export-normal-off",
+-  "bootstrapOutputRoot": "/private/tmp/starling-node-compat/crypto-owner355-secret-artifact-tooling-v2-bootstrap-normal-off",
+-  "jsOutputRoot": "/private/tmp/starling-node-compat/crypto-owner355-secret-artifact-tooling-v2-bootstrap-js-normal-off",
++  "exportOutputRoot": "/private/tmp/starling-node-compat/crypto-owner355-secret-artifact-tooling-v3-export-normal-off",
++  "bootstrapOutputRoot": "/private/tmp/starling-node-compat/crypto-owner355-secret-artifact-tooling-v3-bootstrap-normal-off",
++  "jsOutputRoot": "/private/tmp/starling-node-compat/crypto-owner355-secret-artifact-tooling-v3-bootstrap-js-normal-off",
+   "workerDeadlineSeconds": 600,
+   "jsParentTimeoutMilliseconds": 1200000,
+   "enclosingRootControllerAndIndependentCleanupReviewRequired": true,
+@@ -30,5 +30,23 @@
+   "actualExport": null,
+   "actualPins": null,
+   "actualBootstrap": null,
+-  "engineExecuted": false
++  "engineExecuted": false,
++  "completeOwnDeclaredInputProtection": {
++    "manifest": "Original own indexed source-inputs.json",
++    "rows": "Every files[] descriptor plus fixed protectedInputLedger expansion",
++    "python": "Before any custom import, retained in Capture for final/failure",
++    "javascript": "Before Python child action, retained in Capture for final/failure/returned recheck",
++    "cycles": "No own Source index or current family descriptor is listed as external input"
++  },
++  "jsParentTerminalCauseModel": {
++    "childKillReported": "Observed error.killed boolean if provided, else null; false on success",
++    "timedOut": "false on error-free return, null on ambiguous execFile error",
++    "timeoutCauseEstablished": false,
++    "exceptionCode": "Preserved actual string error code only; never invented from killed",
++    "errorsAccepted": false,
++    "rawStreamsComplete": "Only error-free captured parent streams; all error/overflow/incomplete paths unaccepted",
++    "enclosingRootControllerRequired": true
++  },
++  "sourceIndependentReview": null,
++  "rootAuthority": null
+ }
+--- a/future-source-review-contract.json
++++ b/future-source-review-contract.json
+@@ -1,6 +1,6 @@
+ {
+   "schemaVersion": 1,
+-  "state": "INDEPENDENT_CRYPTO_OWNER355_SECRET_ARTIFACT_TOOLING_SOURCE_REVIEW_PASSED_V2",
++  "state": "INDEPENDENT_CRYPTO_OWNER355_SECRET_ARTIFACT_TOOLING_SOURCE_REVIEW_PASSED_V3",
+   "toolingSourceIndexSha256": null,
+   "verifierSourceIndexSha256": "e8726a1c416afc48303faa1fd25dabed6a71872d6a65ae5ac438e2685aceb7ad",
+   "nativeSourceIndexSha256": "7eb863b94b3f65b8f19480d8e8a5f3a1dac62c65d5be241097c6a0f382d74108",
+--- a/future-export-review-contract.json
++++ b/future-export-review-contract.json
+@@ -1,6 +1,6 @@
+ {
+-  "schemaVersion": 2,
+-  "state": "INDEPENDENT_CRYPTO_OWNER355_SECRET_NORMAL_OFF_PIN_EXPORT_REVIEW_PASSED_V2",
++  "schemaVersion": 3,
++  "state": "INDEPENDENT_CRYPTO_OWNER355_SECRET_NORMAL_OFF_PIN_EXPORT_REVIEW_PASSED_V3",
+   "verifiedPassed": true,
+   "toolingSourceIndexSha256": null,
+   "candidate": null,
+--- a/future-config.template.json
++++ b/future-config.template.json
+@@ -1,5 +1,5 @@
+ {
+-  "schemaVersion": 2,
++  "schemaVersion": 3,
+   "state": null,
+   "phase": null,
+   "toolingIndex": null,
+--- a/future-reviewed-pins.template.json
++++ b/future-reviewed-pins.template.json
+@@ -1,5 +1,5 @@
+ {
+-  "schemaVersion": 2,
++  "schemaVersion": 3,
+   "state": null,
+   "reviewRequired": true,
+   "toolingIndex": null,
+--- a/future-root-pin-review.template.json
++++ b/future-root-pin-review.template.json
+@@ -1,5 +1,5 @@
+ {
+-  "schemaVersion": 2,
++  "schemaVersion": 3,
+   "state": null,
+   "toolingIndex": null,
+   "reviewedPins": null,
+--- a/future-root-authority.template.json
++++ b/future-root-authority.template.json
+@@ -1,5 +1,5 @@
+ {
+-  "schemaVersion": 2,
++  "schemaVersion": 3,
+   "state": null,
+   "phase": null,
+   "variant": "normal-off",
+--- a/references.json
++++ b/references.json
+@@ -97,9 +97,9 @@
+     "sha256": "d0d51496e4c17215398b47b3bb0528e967e62978c49dc689cc29378e873f2bda",
+     "bytes": 4193
+   },
+-  "schemaVersion": 2,
+-  "state": "SECRET_OWNER355_ARTIFACT_TOOLING_FIXED_REFERENCES_V2",
+-  "originalToolingRoot": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-artifact-tooling-candidate-v2",
++  "schemaVersion": 3,
++  "state": "SECRET_OWNER355_ARTIFACT_TOOLING_FIXED_REFERENCES_V3",
++  "originalToolingRoot": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-artifact-tooling-candidate-v3",
+   "verifierControllerIndex": {
+     "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-verifier-controller-candidate-v1/index.json",
+     "sha256": "0fc0082da7d9842bf9bd9e46a28760e2cea5f698eec62880f0150c572d94a78f",
+@@ -196,6 +196,45 @@
+       "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-secret-frozen-verifier-results-review-v1/index.json",
+       "sha256": "f894bf389eb26457e2b71e732d782ee910633853ec5c8be139bea9e59b5eb46b",
+       "bytes": 3740
+-    }
+-  ]
++    },
++    {
++      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-artifact-tooling-candidate-v2/index.json",
++      "sha256": "8ebec1f8dd19af71a64faefd9527263054445704ae7f6595c78156e4567d1259",
++      "bytes": 4659
++    },
++    {
++      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-secret-artifact-tooling-source-review-v2/index.json",
++      "sha256": "a682a56227daf43fcbafb7ff07bc81e350fbc8fcee2afc5f23015e9b201f9d55",
++      "bytes": 1798
++    }
++  ],
++  "heldPredecessor": {
++    "index": {
++      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-artifact-tooling-candidate-v2/index.json",
++      "sha256": "8ebec1f8dd19af71a64faefd9527263054445704ae7f6595c78156e4567d1259",
++      "bytes": 4659
++    },
++    "result": {
++      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-artifact-tooling-candidate-v2/results.json",
++      "sha256": "cd592c8987aa0b4b5d406457e11305c66b7c1a0ff2db4091bd8820803f889492",
++      "bytes": 4557
++    }
++  },
++  "sourceCorrectionHold": {
++    "index": {
++      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-secret-artifact-tooling-source-review-v2/index.json",
++      "sha256": "a682a56227daf43fcbafb7ff07bc81e350fbc8fcee2afc5f23015e9b201f9d55",
++      "bytes": 1798
++    },
++    "result": {
++      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-secret-artifact-tooling-source-review-v2/results.json",
++      "sha256": "66d8acd25ae18117635f87ac078e08903b7bc23cef8f7d0067397ac8e4223e50",
++      "bytes": 3010
++    }
++  },
++  "sourceCorrectionContract": {
++    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-secret-artifact-tooling-source-review-v2/required-correction-contract.json",
++    "sha256": "aec94f61716f86b10f1e097dd9c1b265e1ff448d5cde73ac64a663e1aa4cbca8",
++    "bytes": 2551
++  }
+ }
