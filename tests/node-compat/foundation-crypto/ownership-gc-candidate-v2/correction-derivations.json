@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-candidate-v1/guest.GC.UNEXECUTED.mjs",
+    "sha256": "4c84a07c2b9992bb9a4874181f081c5c50dc97eab720ad652f9c3c4f6ed10713",
+    "bytes": 14177
+  },
+  "afterimage": "guest.GC.UNEXECUTED.mjs",
+  "edits": [
+    {
+      "before": "const pressureRecords=[];",
+      "after": "const pressureRecords=[];let pressureRequests=0;\nfunction gcObservation(scope,recordsStart=0,requestsStart=0){return{version:'public-buffer-gc-pressure-v1',scope,publicGcPressureRequested:pressureRequests>requestsStart,publicGcPressureRequests:pressureRequests-requestsStart,publicGcPressureRecords:pressureRecords.length-recordsStart,entropyRequested:false,actualNativeGcCountObserved:false,strongApplicationOwnersCombined:true,isolatedTemporaryRootsProved:false,finalizerFreeWipeObserved:false};}",
+      "count": 1
+    },
+    {
+      "before": "function pressure(phase){",
+      "after": "function pressure(phase){pressureRequests++;",
+      "count": 1
+    },
+    {
+      "before": "export async function run(caseId){\n count.runCalls++;",
+      "after": "export async function run(caseId){\n const pressureStart=pressureRecords.length,pressureRequestsStart=pressureRequests;count.runCalls++;",
+      "count": 1
+    },
+    {
+      "before": "gcOrEntropyRequested:false",
+      "after": "gcObservation:gcObservation('this-run',pressureStart,pressureRequestsStart)",
+      "count": 1
+    },
+    {
+      "before": "semanticFailureNotNativeTrapProof:true",
+      "after": "gcObservation:gcObservation('this-run',pressureStart,pressureRequestsStart),semanticFailureNotNativeTrapProof:true",
+      "count": 1
+    },
+    {
+      "before": "schemaVersion:1,kind:'crypto-owner-within-export-gc-validation-v1',pressure:",
+      "after": "schemaVersion:2,kind:'crypto-owner-within-export-gc-validation-v2',gcObservation:gcObservation('outer-validate'),pressure:",
+      "count": 1
+    }
+  ],
+  "oldGcOrEntropyRequestedFieldRemoved": true,
+  "noDirectOnlyReinterpretation": true,
+  "countsTrackSourceRequestsNotNativeGcCollections": true
+}

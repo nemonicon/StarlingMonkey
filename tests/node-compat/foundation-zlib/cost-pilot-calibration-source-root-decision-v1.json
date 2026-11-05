@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "state": "ROOT_SELECTED_ZLIB_COST_PILOT_CALIBRATION_SOURCE_DESIGN_V1",
+  "sourceDesignSelected": true,
+  "executionAuthority": false,
+  "protocolIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-comparison-candidate-v1/index.json",
+    "sha256": "e29c596df3c809bab8fd3851b224a7ec4e84177d791c5d1f909072985f047ef8",
+    "bytes": 17728
+  },
+  "protocol": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-comparison-candidate-v1/protocol.json",
+    "sha256": "9a38da154975888abe9450bd308cfc30083e29215ecf3522bcd04ccf38967156",
+    "bytes": 13732
+  },
+  "decision": "Implement fresh owned paired workers for each geometric N candidate; three same-N untimed warmups precede one full public batch sample. This specifies the original positive full-unit pilot calibration without changing the timing sample population.",
+  "comparisons": [
+    "same-engine-provider",
+    "unused-profile"
+  ],
+  "caseCount": 30,
+  "candidateN": "powers of two from1 through original case-specific cap",
+  "maxNFirst18Cases": 32768,
+  "maxNLast12Cases": 128,
+  "candidateOrder": "A then B; both arms get fresh workers at every candidate N",
+  "warmupsPerPilotWorker": 3,
+  "samplesPerPilotWorker": 1,
+  "targetMsBothArms": 50,
+  "select": "first candidate for which both arms meet target; no case omission, clipping, cap increase or previous-run worker reuse",
+  "maxPilotCandidatePairs": 768,
+  "maxPilotWorkers": 1536,
+  "maxSeparatePilotControls": 9216,
+  "timingPopulationUnchanged": {
+    "comparisons": 2,
+    "cases": 30,
+    "freshRepetitions": 3,
+    "arms": 2,
+    "workers": 360,
+    "warmupsPerWorker": 3,
+    "samplesPerWorker": 7,
+    "codecBatchCalls": 3600,
+    "n1ControlCalls": 2160
+  },
+  "timingOrder": "AB/BA/AB",
+  "fullOutputFnvInsideEveryTimedBatch": true,
+  "controlsSubtracted": false,
+  "pilotAndPublicCallHardMs": 600000,
+  "workerHardMaxMs": 7200000,
+  "budgetRule": "Use unchanged protocol workerBudget formula with positive measured pilotPerOperationMs=pilot batch elapsed/N and actual pilot whole-process elapsed. Refuse over ceiling; no silent extension.",
+  "pilotTimer": "synchronous public batch call only, measured before parsing or validation; retain full typed return before assertions",
+  "phaseRequirements": [
+    "complete actual codec/control/cross-decode prerequisites",
+    "sealed source and independent source review",
+    "reviewed lifecycle successor for longer workers",
+    "bounded global pilot budget selected before launch",
+    "new Root phase and coordinated quiet window",
+    "separate actual pilot results review before timing"
+  ],
+  "pilotAllowed": false,
+  "timingAllowed": false,
+  "quietWindow": null,
+  "phaseAuthority": null,
+  "operationalAdmission": false,
+  "runtimeAcceptanceClaim": false
+}

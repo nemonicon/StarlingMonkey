@@ -27,9 +27,9 @@ export function compactCase(v){
 }
 export function decodeRetainedString(raw,receipt){
  need(receipt&&receipt.fullPrimitiveCaptured===true&&receipt.fsynced===true,'full primitive retained/fsynced BEFORE type/parse/assert');
- need(typeof receipt.path==='string'&&/^[a-f0-9]{64}$/.test(receipt.sha256)&&Number.isSafeInteger(receipt.bytes),'actual durable file descriptor');
+ need(typeof receipt.path==='string'&&/^[a-f0-9]{64}$/.test(receipt.sha256)&&Number.isSafeInteger(receipt.bytes)&&receipt.bytes>=0&&receipt.bytes<=64*1024*1024,'actual durable file descriptor');
  need(typeof raw==='string'&&raw.length<=2097152,'complete bounded primitive string, never clip');
- const v=JSON.parse(raw);const stack=[v];let nodes=0;
+ const v=JSON.parse(raw);need(JSON.stringify(v)===raw,'exact source wire JSON serialization; no duplicate keys or normalization');const stack=[v];let nodes=0;
  while(stack.length){const x=stack.pop();need(++nodes<=65536,'compact returned JSON bound');if(x===null||typeof x==='string'||typeof x==='boolean')continue;
   if(typeof x==='number'){need(Number.isFinite(x)&&!Object.is(x,-0),'finite exact JSON number');continue;}
   need(x&&typeof x==='object','ordinary JSON');for(const item of Object.values(x))stack.push(item);
@@ -47,10 +47,14 @@ export class CompactCollector{
   for(const n of[v.counters.publicFunctionEntries,v.counters.codecCalls,v.counters.controlOperations,...Object.values(v.counters.perExportEntries)])integer(n,0,Number.MAX_SAFE_INTEGER,'exact counter');
   equal(v.counters,want,'exact whole counters');equal(v.state,this.state(),'exact whole guest state');this.#counts=want;return v;}
  identity(v){const c=this.#case,want=this.#next('identity');need(v.schemaVersion===1&&v.kind==='codec-cost-identity-v1'&&v.version==='bounded-zlib-cost-guest-v1','identity version');
+  keys(v,['schemaVersion','kind','version','provider','providerSourceVersion','oracleSha256','primaryCases','controlCaseRanges','exports','snapshotState','counterMeaning','counters','state','codecPrewarmedAtSnapshot'],'identity');
   need(v.provider===(c.arm==='native-on'?'native':'fflate')&&v.oracleSha256===c.oracleSha256&&v.primaryCases===30,'identity provider/oracle');
+  need(v.providerSourceVersion===(c.arm==='native-on'?'registered-node-zlib-m0.13':'fflate-browser-0.8.3')&&v.counterMeaning==='named-function entries including internal validate calls; outer host calls are parent raw records','actual provider/counter source contract');
+  equal(v.controlCaseRanges,{consumeInput:[30,59],copyInputAndConsume:[60,89],harnessNoCodec:[90,119]},'exact original controls');
   equal(v.exports,NAMES,'same seven ordinary exports');equal(v.snapshotState,{prepared:false,staged:false,retainedOutput:false,codecCalls:0,resources:0},'empty snapshot');
   need(v.codecPrewarmedAtSnapshot===false,'no snapshot codec work');return this.#commit(v,want);}
  setup(v){const c=this.#case,want=this.#next('setup');need(v.schemaVersion===1&&v.kind==='codec-cost-setup-v1'&&v.caseId===c.caseId&&v.caseName===c.caseName,'exact setup');
+  keys(v,['schemaVersion','kind','caseId','caseName','inputSource','input','inputFNV1aU32','parentDeclaredInputSha256','oracleSha256','stagedValidationCleared','priorOutputCleared','counters','state'],'setup');
   need(v.inputSource===c.inputSource&&v.inputFNV1aU32===c.inputFNV&&v.parentDeclaredInputSha256===c.parentDeclaredInputSha256&&v.oracleSha256===c.oracleSha256,'actual expected input fingerprint');
   need(v.stagedValidationCleared===true&&v.priorOutputCleared===true,'setup clears validation state');equal(v.input,window(c.inputBytes),'fixed ordinary input window');this.#active=true;return this.#commit(v,want);}
  batch(v,n){const c=this.#case;nValue(c.caseId,n);need(this.#active,'active exact primary batch');const want=this.#next('batch',n);
@@ -66,6 +70,7 @@ export class CompactCollector{
   const expected=control==='harnessNoCodec'?{bytesConsumed:0,declaredInputBytes:c.inputBytes,tag:2166136261,copies:0,codecCalls:0}:
    {bytesConsumed:c.inputBytes,fnv:c.inputFNV,copies:control==='copyInputAndConsume'?1:0,codecCalls:0};equal(v.result,expected,'raw control result; no provider branch or subtraction');return this.#commit(v,want);}
  checkpoint(v){const c=this.#case,want=this.#next('checkpoint');need(v.schemaVersion===1&&v.kind==='codec-cost-checkpoint-v1'&&v.preparedAndStageAndPriorOutputCleared===true&&v.gcOrResetInvoked===false,'checkpoint clears without GC/reset');
+  keys(v,['schemaVersion','kind','before','input','preparedAndStageAndPriorOutputCleared','counters','state','gcOrResetInvoked'],'checkpoint');
   equal(v.before,this.state(),'exact pre-checkpoint state');equal(v.input,{...window(c.inputBytes),fnv1aU32:c.inputFNV,matchesSetupFNV:true,sentinelsUnchanged:true},'reported complete input fingerprint and sentinels');
   this.#active=false;return this.#commit(v,want);}
 }

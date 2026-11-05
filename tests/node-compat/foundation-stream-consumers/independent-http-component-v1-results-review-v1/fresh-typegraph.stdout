@@ -1,0 +1,2417 @@
+{
+  "worlds": [
+    {
+      "name": "root",
+      "imports": {
+        "interface-0": {
+          "interface": {
+            "id": 0
+          }
+        },
+        "interface-1": {
+          "interface": {
+            "id": 1
+          }
+        },
+        "interface-2": {
+          "interface": {
+            "id": 2
+          }
+        },
+        "interface-3": {
+          "interface": {
+            "id": 3
+          }
+        },
+        "interface-4": {
+          "interface": {
+            "id": 4
+          }
+        },
+        "interface-5": {
+          "interface": {
+            "id": 5
+          }
+        }
+      },
+      "exports": {
+        "interface-6": {
+          "interface": {
+            "id": 6
+          }
+        }
+      },
+      "package": 4
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "error",
+      "types": {
+        "error": 0
+      },
+      "functions": {
+        "[method]error.to-debug-string": {
+          "name": "[method]error.to-debug-string",
+          "kind": {
+            "method": 0
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 1
+            }
+          ],
+          "result": "string"
+        }
+      },
+      "package": 0
+    },
+    {
+      "name": "poll",
+      "types": {
+        "pollable": 2
+      },
+      "functions": {
+        "[method]pollable.ready": {
+          "name": "[method]pollable.ready",
+          "kind": {
+            "method": 2
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 3
+            }
+          ],
+          "result": "bool"
+        },
+        "[method]pollable.block": {
+          "name": "[method]pollable.block",
+          "kind": {
+            "method": 2
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 3
+            }
+          ]
+        },
+        "poll": {
+          "name": "poll",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "in",
+              "type": 4
+            }
+          ],
+          "result": 5
+        }
+      },
+      "package": 0
+    },
+    {
+      "name": "streams",
+      "types": {
+        "output-stream": 6,
+        "input-stream": 7,
+        "error": 8,
+        "stream-error": 10,
+        "pollable": 11
+      },
+      "functions": {
+        "[method]input-stream.read": {
+          "name": "[method]input-stream.read",
+          "kind": {
+            "method": 7
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 12
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "result": 14
+        },
+        "[method]input-stream.blocking-read": {
+          "name": "[method]input-stream.blocking-read",
+          "kind": {
+            "method": 7
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 12
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "result": 14
+        },
+        "[method]input-stream.skip": {
+          "name": "[method]input-stream.skip",
+          "kind": {
+            "method": 7
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 12
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "result": 15
+        },
+        "[method]input-stream.blocking-skip": {
+          "name": "[method]input-stream.blocking-skip",
+          "kind": {
+            "method": 7
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 12
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "result": 15
+        },
+        "[method]input-stream.subscribe": {
+          "name": "[method]input-stream.subscribe",
+          "kind": {
+            "method": 7
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 12
+            }
+          ],
+          "result": 16
+        },
+        "[method]output-stream.check-write": {
+          "name": "[method]output-stream.check-write",
+          "kind": {
+            "method": 6
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 17
+            }
+          ],
+          "result": 15
+        },
+        "[method]output-stream.write": {
+          "name": "[method]output-stream.write",
+          "kind": {
+            "method": 6
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 17
+            },
+            {
+              "name": "contents",
+              "type": 13
+            }
+          ],
+          "result": 18
+        },
+        "[method]output-stream.blocking-write-and-flush": {
+          "name": "[method]output-stream.blocking-write-and-flush",
+          "kind": {
+            "method": 6
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 17
+            },
+            {
+              "name": "contents",
+              "type": 13
+            }
+          ],
+          "result": 18
+        },
+        "[method]output-stream.flush": {
+          "name": "[method]output-stream.flush",
+          "kind": {
+            "method": 6
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 17
+            }
+          ],
+          "result": 18
+        },
+        "[method]output-stream.blocking-flush": {
+          "name": "[method]output-stream.blocking-flush",
+          "kind": {
+            "method": 6
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 17
+            }
+          ],
+          "result": 18
+        },
+        "[method]output-stream.subscribe": {
+          "name": "[method]output-stream.subscribe",
+          "kind": {
+            "method": 6
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 17
+            }
+          ],
+          "result": 16
+        },
+        "[method]output-stream.write-zeroes": {
+          "name": "[method]output-stream.write-zeroes",
+          "kind": {
+            "method": 6
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 17
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "result": 18
+        },
+        "[method]output-stream.blocking-write-zeroes-and-flush": {
+          "name": "[method]output-stream.blocking-write-zeroes-and-flush",
+          "kind": {
+            "method": 6
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 17
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "result": 18
+        },
+        "[method]output-stream.splice": {
+          "name": "[method]output-stream.splice",
+          "kind": {
+            "method": 6
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 17
+            },
+            {
+              "name": "src",
+              "type": 12
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "result": 15
+        },
+        "[method]output-stream.blocking-splice": {
+          "name": "[method]output-stream.blocking-splice",
+          "kind": {
+            "method": 6
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 17
+            },
+            {
+              "name": "src",
+              "type": 12
+            },
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "result": 15
+        }
+      },
+      "package": 0
+    },
+    {
+      "name": "monotonic-clock",
+      "types": {
+        "duration": 19
+      },
+      "functions": {},
+      "package": 1
+    },
+    {
+      "name": "types",
+      "types": {
+        "fields": 20,
+        "field-key": 21,
+        "field-name": 22,
+        "field-value": 23,
+        "header-error": 24,
+        "incoming-request": 25,
+        "method": 26,
+        "scheme": 27,
+        "headers": 28,
+        "incoming-body": 29,
+        "outgoing-request": 30,
+        "outgoing-body": 31,
+        "response-outparam": 32,
+        "outgoing-response": 33,
+        "DNS-error-payload": 36,
+        "TLS-alert-received-payload": 38,
+        "field-size-payload": 40,
+        "error-code": 43,
+        "incoming-response": 44,
+        "status-code": 45,
+        "input-stream": 46,
+        "output-stream": 47,
+        "trailers": 48,
+        "future-incoming-response": 49,
+        "pollable": 50,
+        "io-error": 51,
+        "request-options": 52,
+        "duration": 53,
+        "future-trailers": 54
+      },
+      "functions": {
+        "[constructor]fields": {
+          "name": "[constructor]fields",
+          "kind": {
+            "constructor": 20
+          },
+          "params": [],
+          "result": 55
+        },
+        "[static]fields.from-list": {
+          "name": "[static]fields.from-list",
+          "kind": {
+            "static": 20
+          },
+          "params": [
+            {
+              "name": "entries",
+              "type": 57
+            }
+          ],
+          "result": 58
+        },
+        "[method]fields.get": {
+          "name": "[method]fields.get",
+          "kind": {
+            "method": 20
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 59
+            },
+            {
+              "name": "name",
+              "type": 22
+            }
+          ],
+          "result": 60
+        },
+        "[method]fields.has": {
+          "name": "[method]fields.has",
+          "kind": {
+            "method": 20
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 59
+            },
+            {
+              "name": "name",
+              "type": 22
+            }
+          ],
+          "result": "bool"
+        },
+        "[method]fields.set": {
+          "name": "[method]fields.set",
+          "kind": {
+            "method": 20
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 59
+            },
+            {
+              "name": "name",
+              "type": 22
+            },
+            {
+              "name": "value",
+              "type": 60
+            }
+          ],
+          "result": 61
+        },
+        "[method]fields.delete": {
+          "name": "[method]fields.delete",
+          "kind": {
+            "method": 20
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 59
+            },
+            {
+              "name": "name",
+              "type": 22
+            }
+          ],
+          "result": 61
+        },
+        "[method]fields.append": {
+          "name": "[method]fields.append",
+          "kind": {
+            "method": 20
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 59
+            },
+            {
+              "name": "name",
+              "type": 22
+            },
+            {
+              "name": "value",
+              "type": 23
+            }
+          ],
+          "result": 61
+        },
+        "[method]fields.entries": {
+          "name": "[method]fields.entries",
+          "kind": {
+            "method": 20
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 59
+            }
+          ],
+          "result": 57
+        },
+        "[method]fields.clone": {
+          "name": "[method]fields.clone",
+          "kind": {
+            "method": 20
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 59
+            }
+          ],
+          "result": 55
+        },
+        "[method]incoming-request.method": {
+          "name": "[method]incoming-request.method",
+          "kind": {
+            "method": 25
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 62
+            }
+          ],
+          "result": 26
+        },
+        "[method]incoming-request.path-with-query": {
+          "name": "[method]incoming-request.path-with-query",
+          "kind": {
+            "method": 25
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 62
+            }
+          ],
+          "result": 34
+        },
+        "[method]incoming-request.scheme": {
+          "name": "[method]incoming-request.scheme",
+          "kind": {
+            "method": 25
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 62
+            }
+          ],
+          "result": 63
+        },
+        "[method]incoming-request.authority": {
+          "name": "[method]incoming-request.authority",
+          "kind": {
+            "method": 25
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 62
+            }
+          ],
+          "result": 34
+        },
+        "[method]incoming-request.headers": {
+          "name": "[method]incoming-request.headers",
+          "kind": {
+            "method": 25
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 62
+            }
+          ],
+          "result": 64
+        },
+        "[method]incoming-request.consume": {
+          "name": "[method]incoming-request.consume",
+          "kind": {
+            "method": 25
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 62
+            }
+          ],
+          "result": 66
+        },
+        "[constructor]outgoing-request": {
+          "name": "[constructor]outgoing-request",
+          "kind": {
+            "constructor": 30
+          },
+          "params": [
+            {
+              "name": "headers",
+              "type": 64
+            }
+          ],
+          "result": 67
+        },
+        "[method]outgoing-request.body": {
+          "name": "[method]outgoing-request.body",
+          "kind": {
+            "method": 30
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 68
+            }
+          ],
+          "result": 70
+        },
+        "[method]outgoing-request.method": {
+          "name": "[method]outgoing-request.method",
+          "kind": {
+            "method": 30
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 68
+            }
+          ],
+          "result": 26
+        },
+        "[method]outgoing-request.set-method": {
+          "name": "[method]outgoing-request.set-method",
+          "kind": {
+            "method": 30
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 68
+            },
+            {
+              "name": "method",
+              "type": 26
+            }
+          ],
+          "result": 71
+        },
+        "[method]outgoing-request.path-with-query": {
+          "name": "[method]outgoing-request.path-with-query",
+          "kind": {
+            "method": 30
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 68
+            }
+          ],
+          "result": 34
+        },
+        "[method]outgoing-request.set-path-with-query": {
+          "name": "[method]outgoing-request.set-path-with-query",
+          "kind": {
+            "method": 30
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 68
+            },
+            {
+              "name": "path-with-query",
+              "type": 34
+            }
+          ],
+          "result": 71
+        },
+        "[method]outgoing-request.scheme": {
+          "name": "[method]outgoing-request.scheme",
+          "kind": {
+            "method": 30
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 68
+            }
+          ],
+          "result": 63
+        },
+        "[method]outgoing-request.set-scheme": {
+          "name": "[method]outgoing-request.set-scheme",
+          "kind": {
+            "method": 30
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 68
+            },
+            {
+              "name": "scheme",
+              "type": 63
+            }
+          ],
+          "result": 71
+        },
+        "[method]outgoing-request.authority": {
+          "name": "[method]outgoing-request.authority",
+          "kind": {
+            "method": 30
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 68
+            }
+          ],
+          "result": 34
+        },
+        "[method]outgoing-request.set-authority": {
+          "name": "[method]outgoing-request.set-authority",
+          "kind": {
+            "method": 30
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 68
+            },
+            {
+              "name": "authority",
+              "type": 34
+            }
+          ],
+          "result": 71
+        },
+        "[method]outgoing-request.headers": {
+          "name": "[method]outgoing-request.headers",
+          "kind": {
+            "method": 30
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 68
+            }
+          ],
+          "result": 64
+        },
+        "[constructor]request-options": {
+          "name": "[constructor]request-options",
+          "kind": {
+            "constructor": 52
+          },
+          "params": [],
+          "result": 72
+        },
+        "[method]request-options.connect-timeout": {
+          "name": "[method]request-options.connect-timeout",
+          "kind": {
+            "method": 52
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 73
+            }
+          ],
+          "result": 74
+        },
+        "[method]request-options.set-connect-timeout": {
+          "name": "[method]request-options.set-connect-timeout",
+          "kind": {
+            "method": 52
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 73
+            },
+            {
+              "name": "duration",
+              "type": 74
+            }
+          ],
+          "result": 71
+        },
+        "[method]request-options.first-byte-timeout": {
+          "name": "[method]request-options.first-byte-timeout",
+          "kind": {
+            "method": 52
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 73
+            }
+          ],
+          "result": 74
+        },
+        "[method]request-options.set-first-byte-timeout": {
+          "name": "[method]request-options.set-first-byte-timeout",
+          "kind": {
+            "method": 52
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 73
+            },
+            {
+              "name": "duration",
+              "type": 74
+            }
+          ],
+          "result": 71
+        },
+        "[method]request-options.between-bytes-timeout": {
+          "name": "[method]request-options.between-bytes-timeout",
+          "kind": {
+            "method": 52
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 73
+            }
+          ],
+          "result": 74
+        },
+        "[method]request-options.set-between-bytes-timeout": {
+          "name": "[method]request-options.set-between-bytes-timeout",
+          "kind": {
+            "method": 52
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 73
+            },
+            {
+              "name": "duration",
+              "type": 74
+            }
+          ],
+          "result": 71
+        },
+        "[static]response-outparam.set": {
+          "name": "[static]response-outparam.set",
+          "kind": {
+            "static": 32
+          },
+          "params": [
+            {
+              "name": "param",
+              "type": 75
+            },
+            {
+              "name": "response",
+              "type": 77
+            }
+          ]
+        },
+        "[method]incoming-response.status": {
+          "name": "[method]incoming-response.status",
+          "kind": {
+            "method": 44
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 78
+            }
+          ],
+          "result": 45
+        },
+        "[method]incoming-response.headers": {
+          "name": "[method]incoming-response.headers",
+          "kind": {
+            "method": 44
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 78
+            }
+          ],
+          "result": 64
+        },
+        "[method]incoming-response.consume": {
+          "name": "[method]incoming-response.consume",
+          "kind": {
+            "method": 44
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 78
+            }
+          ],
+          "result": 66
+        },
+        "[method]incoming-body.stream": {
+          "name": "[method]incoming-body.stream",
+          "kind": {
+            "method": 29
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 79
+            }
+          ],
+          "result": 81
+        },
+        "[static]incoming-body.finish": {
+          "name": "[static]incoming-body.finish",
+          "kind": {
+            "static": 29
+          },
+          "params": [
+            {
+              "name": "this",
+              "type": 65
+            }
+          ],
+          "result": 82
+        },
+        "[method]future-trailers.subscribe": {
+          "name": "[method]future-trailers.subscribe",
+          "kind": {
+            "method": 54
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 83
+            }
+          ],
+          "result": 84
+        },
+        "[method]future-trailers.get": {
+          "name": "[method]future-trailers.get",
+          "kind": {
+            "method": 54
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 83
+            }
+          ],
+          "result": 89
+        },
+        "[constructor]outgoing-response": {
+          "name": "[constructor]outgoing-response",
+          "kind": {
+            "constructor": 33
+          },
+          "params": [
+            {
+              "name": "headers",
+              "type": 64
+            }
+          ],
+          "result": 76
+        },
+        "[method]outgoing-response.status-code": {
+          "name": "[method]outgoing-response.status-code",
+          "kind": {
+            "method": 33
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 90
+            }
+          ],
+          "result": 45
+        },
+        "[method]outgoing-response.set-status-code": {
+          "name": "[method]outgoing-response.set-status-code",
+          "kind": {
+            "method": 33
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 90
+            },
+            {
+              "name": "status-code",
+              "type": 45
+            }
+          ],
+          "result": 71
+        },
+        "[method]outgoing-response.headers": {
+          "name": "[method]outgoing-response.headers",
+          "kind": {
+            "method": 33
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 90
+            }
+          ],
+          "result": 64
+        },
+        "[method]outgoing-response.body": {
+          "name": "[method]outgoing-response.body",
+          "kind": {
+            "method": 33
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 90
+            }
+          ],
+          "result": 70
+        },
+        "[method]outgoing-body.write": {
+          "name": "[method]outgoing-body.write",
+          "kind": {
+            "method": 31
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 91
+            }
+          ],
+          "result": 93
+        },
+        "[static]outgoing-body.finish": {
+          "name": "[static]outgoing-body.finish",
+          "kind": {
+            "static": 31
+          },
+          "params": [
+            {
+              "name": "this",
+              "type": 69
+            },
+            {
+              "name": "trailers",
+              "type": 86
+            }
+          ],
+          "result": 94
+        },
+        "[method]future-incoming-response.subscribe": {
+          "name": "[method]future-incoming-response.subscribe",
+          "kind": {
+            "method": 49
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 95
+            }
+          ],
+          "result": 84
+        },
+        "[method]future-incoming-response.get": {
+          "name": "[method]future-incoming-response.get",
+          "kind": {
+            "method": 49
+          },
+          "params": [
+            {
+              "name": "self",
+              "type": 95
+            }
+          ],
+          "result": 99
+        },
+        "http-error-code": {
+          "name": "http-error-code",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "err",
+              "type": 100
+            }
+          ],
+          "result": 101
+        }
+      },
+      "package": 2
+    },
+    {
+      "name": "random",
+      "types": {},
+      "functions": {
+        "get-random-bytes": {
+          "name": "get-random-bytes",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "len",
+              "type": "u64"
+            }
+          ],
+          "result": 102
+        },
+        "get-random-u64": {
+          "name": "get-random-u64",
+          "kind": "freestanding",
+          "params": [],
+          "result": "u64"
+        }
+      },
+      "package": 3
+    },
+    {
+      "name": "incoming-handler",
+      "types": {
+        "incoming-request": 103,
+        "response-outparam": 104
+      },
+      "functions": {
+        "handle": {
+          "name": "handle",
+          "kind": "freestanding",
+          "params": [
+            {
+              "name": "request",
+              "type": 105
+            },
+            {
+              "name": "response-out",
+              "type": 106
+            }
+          ]
+        }
+      },
+      "package": 2
+    }
+  ],
+  "types": [
+    {
+      "name": "error",
+      "kind": "resource",
+      "owner": {
+        "interface": 0
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 0
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "pollable",
+      "kind": "resource",
+      "owner": {
+        "interface": 1
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 2
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 3
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "u32"
+      },
+      "owner": null
+    },
+    {
+      "name": "output-stream",
+      "kind": "resource",
+      "owner": {
+        "interface": 2
+      }
+    },
+    {
+      "name": "input-stream",
+      "kind": "resource",
+      "owner": {
+        "interface": 2
+      }
+    },
+    {
+      "name": "error",
+      "kind": {
+        "type": 0
+      },
+      "owner": {
+        "interface": 2
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 8
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "stream-error",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "last-operation-failed",
+              "type": 9
+            },
+            {
+              "name": "closed",
+              "type": null
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 2
+      }
+    },
+    {
+      "name": "pollable",
+      "kind": {
+        "type": 2
+      },
+      "owner": {
+        "interface": 2
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 7
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "u8"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 13,
+          "err": 10
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": "u64",
+          "err": 10
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 11
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 6
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": 10
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": "duration",
+      "kind": {
+        "type": "u64"
+      },
+      "owner": {
+        "interface": 3
+      }
+    },
+    {
+      "name": "fields",
+      "kind": "resource",
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "field-key",
+      "kind": {
+        "type": "string"
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "field-name",
+      "kind": {
+        "type": 21
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "field-value",
+      "kind": {
+        "list": "u8"
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "header-error",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "invalid-syntax",
+              "type": null
+            },
+            {
+              "name": "forbidden",
+              "type": null
+            },
+            {
+              "name": "immutable",
+              "type": null
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "incoming-request",
+      "kind": "resource",
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "method",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "get",
+              "type": null
+            },
+            {
+              "name": "head",
+              "type": null
+            },
+            {
+              "name": "post",
+              "type": null
+            },
+            {
+              "name": "put",
+              "type": null
+            },
+            {
+              "name": "delete",
+              "type": null
+            },
+            {
+              "name": "connect",
+              "type": null
+            },
+            {
+              "name": "options",
+              "type": null
+            },
+            {
+              "name": "trace",
+              "type": null
+            },
+            {
+              "name": "patch",
+              "type": null
+            },
+            {
+              "name": "other",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "scheme",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "HTTP",
+              "type": null
+            },
+            {
+              "name": "HTTPS",
+              "type": null
+            },
+            {
+              "name": "other",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "headers",
+      "kind": {
+        "type": 20
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "incoming-body",
+      "kind": "resource",
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "outgoing-request",
+      "kind": "resource",
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "outgoing-body",
+      "kind": "resource",
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "response-outparam",
+      "kind": "resource",
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "outgoing-response",
+      "kind": "resource",
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "string"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "u16"
+      },
+      "owner": null
+    },
+    {
+      "name": "DNS-error-payload",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "rcode",
+              "type": 34
+            },
+            {
+              "name": "info-code",
+              "type": 35
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "u8"
+      },
+      "owner": null
+    },
+    {
+      "name": "TLS-alert-received-payload",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "alert-id",
+              "type": 37
+            },
+            {
+              "name": "alert-message",
+              "type": 34
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "u32"
+      },
+      "owner": null
+    },
+    {
+      "name": "field-size-payload",
+      "kind": {
+        "record": {
+          "fields": [
+            {
+              "name": "field-name",
+              "type": 34
+            },
+            {
+              "name": "field-size",
+              "type": 39
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": "u64"
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 40
+      },
+      "owner": null
+    },
+    {
+      "name": "error-code",
+      "kind": {
+        "variant": {
+          "cases": [
+            {
+              "name": "DNS-timeout",
+              "type": null
+            },
+            {
+              "name": "DNS-error",
+              "type": 36
+            },
+            {
+              "name": "destination-not-found",
+              "type": null
+            },
+            {
+              "name": "destination-unavailable",
+              "type": null
+            },
+            {
+              "name": "destination-IP-prohibited",
+              "type": null
+            },
+            {
+              "name": "destination-IP-unroutable",
+              "type": null
+            },
+            {
+              "name": "connection-refused",
+              "type": null
+            },
+            {
+              "name": "connection-terminated",
+              "type": null
+            },
+            {
+              "name": "connection-timeout",
+              "type": null
+            },
+            {
+              "name": "connection-read-timeout",
+              "type": null
+            },
+            {
+              "name": "connection-write-timeout",
+              "type": null
+            },
+            {
+              "name": "connection-limit-reached",
+              "type": null
+            },
+            {
+              "name": "TLS-protocol-error",
+              "type": null
+            },
+            {
+              "name": "TLS-certificate-error",
+              "type": null
+            },
+            {
+              "name": "TLS-alert-received",
+              "type": 38
+            },
+            {
+              "name": "HTTP-request-denied",
+              "type": null
+            },
+            {
+              "name": "HTTP-request-length-required",
+              "type": null
+            },
+            {
+              "name": "HTTP-request-body-size",
+              "type": 41
+            },
+            {
+              "name": "HTTP-request-method-invalid",
+              "type": null
+            },
+            {
+              "name": "HTTP-request-URI-invalid",
+              "type": null
+            },
+            {
+              "name": "HTTP-request-URI-too-long",
+              "type": null
+            },
+            {
+              "name": "HTTP-request-header-section-size",
+              "type": 39
+            },
+            {
+              "name": "HTTP-request-header-size",
+              "type": 42
+            },
+            {
+              "name": "HTTP-request-trailer-section-size",
+              "type": 39
+            },
+            {
+              "name": "HTTP-request-trailer-size",
+              "type": 40
+            },
+            {
+              "name": "HTTP-response-incomplete",
+              "type": null
+            },
+            {
+              "name": "HTTP-response-header-section-size",
+              "type": 39
+            },
+            {
+              "name": "HTTP-response-header-size",
+              "type": 40
+            },
+            {
+              "name": "HTTP-response-body-size",
+              "type": 41
+            },
+            {
+              "name": "HTTP-response-trailer-section-size",
+              "type": 39
+            },
+            {
+              "name": "HTTP-response-trailer-size",
+              "type": 40
+            },
+            {
+              "name": "HTTP-response-transfer-coding",
+              "type": 34
+            },
+            {
+              "name": "HTTP-response-content-coding",
+              "type": 34
+            },
+            {
+              "name": "HTTP-response-timeout",
+              "type": null
+            },
+            {
+              "name": "HTTP-upgrade-failed",
+              "type": null
+            },
+            {
+              "name": "HTTP-protocol-error",
+              "type": null
+            },
+            {
+              "name": "loop-detected",
+              "type": null
+            },
+            {
+              "name": "configuration-error",
+              "type": null
+            },
+            {
+              "name": "internal-error",
+              "type": 34
+            }
+          ]
+        }
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "incoming-response",
+      "kind": "resource",
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "status-code",
+      "kind": {
+        "type": "u16"
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "input-stream",
+      "kind": {
+        "type": 7
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "output-stream",
+      "kind": {
+        "type": 6
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "trailers",
+      "kind": {
+        "type": 20
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "future-incoming-response",
+      "kind": "resource",
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "pollable",
+      "kind": {
+        "type": 2
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "io-error",
+      "kind": {
+        "type": 0
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "request-options",
+      "kind": "resource",
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "duration",
+      "kind": {
+        "type": 19
+      },
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": "future-trailers",
+      "kind": "resource",
+      "owner": {
+        "interface": 4
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 20
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "tuple": {
+          "types": [
+            22,
+            23
+          ]
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 56
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 55,
+          "err": 24
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 20
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": 23
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": 24
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 25
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 27
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 28
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 29
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 65,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 30
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 30
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 31
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 69,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 52
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 52
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 53
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 32
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 33
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 76,
+          "err": 43
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 44
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 29
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 46
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 80,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 54
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 54
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 50
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 48
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 85
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 86,
+          "err": 43
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 87,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 88
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 33
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 31
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 47
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 92,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": null,
+          "err": 43
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 49
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 44
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 96,
+          "err": 43
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "result": {
+          "ok": 97,
+          "err": null
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 98
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "borrow": 51
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "option": 43
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "list": "u8"
+      },
+      "owner": null
+    },
+    {
+      "name": "incoming-request",
+      "kind": {
+        "type": 25
+      },
+      "owner": {
+        "interface": 6
+      }
+    },
+    {
+      "name": "response-outparam",
+      "kind": {
+        "type": 32
+      },
+      "owner": {
+        "interface": 6
+      }
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 103
+        }
+      },
+      "owner": null
+    },
+    {
+      "name": null,
+      "kind": {
+        "handle": {
+          "own": 104
+        }
+      },
+      "owner": null
+    }
+  ],
+  "packages": [
+    {
+      "name": "wasi:io@0.2.10",
+      "interfaces": {
+        "error": 0,
+        "poll": 1,
+        "streams": 2
+      },
+      "worlds": {}
+    },
+    {
+      "name": "wasi:clocks@0.2.10",
+      "interfaces": {
+        "monotonic-clock": 3
+      },
+      "worlds": {}
+    },
+    {
+      "name": "wasi:http@0.2.10",
+      "interfaces": {
+        "types": 4,
+        "incoming-handler": 6
+      },
+      "worlds": {}
+    },
+    {
+      "name": "wasi:random@0.2.10",
+      "interfaces": {
+        "random": 5
+      },
+      "worlds": {}
+    },
+    {
+      "name": "root:component",
+      "interfaces": {},
+      "worlds": {
+        "root": 0
+      }
+    }
+  ]
+}

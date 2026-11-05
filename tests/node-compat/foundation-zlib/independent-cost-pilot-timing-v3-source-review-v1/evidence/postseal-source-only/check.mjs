@@ -1,0 +1,4 @@
+import {captureSourceFamilies,assertSourceFamilyAudit} from "file:///Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v3/source-families.mjs";
+const row={"path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v3/index.json", "sha256": "c2ce5f08134d0cd05b9d3f10fe5bf1b49f124b1d32c49bff977d7ddb7ab064e9", "bytes": 8574};
+const audit=await captureSourceFamilies(row);assertSourceFamilyAudit(audit,row);await audit.recheck();
+console.log(JSON.stringify({schemaVersion:1,state:'ACTUAL_V3_THREE_FAMILY_AND_RUNTIME_SOURCE_CAPSULE_READ_HASH_PASSED',sourceIndex:row,verifiedSourceFamilies:audit.verifiedSourceFamilies,verifiedRuntimeDependencies:audit.verifiedRuntimeDependencies,privateBrandAsserted:true,initialAndRecheckPassed:true,customImplementationBodyImported:false,operationalPreflightWorkerGuestProviderCodecNativeJcoWasmtimePilotTimingExecuted:false}));

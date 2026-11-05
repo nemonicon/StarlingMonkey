@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "sourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-candidate-v1/index.json",
+    "sha256": "4b7c36f2d50e2c3bee831d7c4681b62bea67fb667e5da10f227125e3dd860e70",
+    "bytes": 6608
+  },
+  "sourceDataReviewComplete": true,
+  "sourceMembers": 42,
+  "inputDescriptors": 12781,
+  "runtimeDependencyFiles": 26,
+  "moduleFiles": 26,
+  "declaredModuleEdges": 104,
+  "finiteLiteralEdgesIndependentlyReconstructed": 104,
+  "delegatedOriginalContextFiles": 12667,
+  "toolTrees": 2,
+  "toolLinks": 22,
+  "liveWitAdapterFiles": 8,
+  "exactStandardHelpers": 4,
+  "exactCommandForwardReverseEdits": 3,
+  "actualComponentReview": {
+    "index": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/independent-http-component-v1-results-review-v1/index.json",
+      "sha256": "da7a8d7937eec6a30eacf123312311313cae7d5affe7a1aa5ecff0460a496bad",
+      "bytes": 2549
+    },
+    "result": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/independent-http-component-v1-results-review-v1/results.json",
+      "sha256": "368c3d5a3070dda8a11dda2e61034b23e2909733526defa67e626319fd50bf61",
+      "bytes": 19212
+    },
+    "contract": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/independent-http-component-v1-results-review-v1/result-contract.json",
+      "sha256": "f371f4d6f6ac900d0832ccdb4dd49a7105d36942fa0cebc2b9dda21b121771c7",
+      "bytes": 19755
+    },
+    "scope": "Known actual independent construction DATA. Host action/phase/controller authority is still NULL and must be supplied explicitly after source review."
+  },
+  "component": {
+    "path": "/private/tmp/starling-node-compat/consumers355-http-component-v1/worker/native-profile-http.component.wasm",
+    "sha256": "2ce7d9903bb71b829f09fc82422d55f1ef748bfc7c81a73e3d532d050c535f33",
+    "bytes": 64098281
+  },
+  "engine": {
+    "path": "/tmp/starling-node-compat/production-consumers-v1/native-freeze/normal-runtime.engine.wasm",
+    "sha256": "b227a8d2e6fb6b83da556d3520dceec82d5e1978801ba3c607bc9a31aa28ad60",
+    "bytes": 10009523
+  },
+  "metadata": {
+    "path": "/tmp/starling-node-compat/production-consumers-v1/native-freeze/normal-runtime.engine.wasm.build.json",
+    "sha256": "9668b23dbac34f3e835b59f339f9a40504153eb03cdd149f0a761cb99ed77b49",
+    "bytes": 354424
+  },
+  "fullActualNativeMetadataAnd355SourceContextVerified": true,
+  "nativeSelectedManifests": 11,
+  "emittedImports": [
+    "wasi:clocks/monotonic-clock@0.2.10",
+    "wasi:http/types@0.2.10",
+    "wasi:io/error@0.2.10",
+    "wasi:io/poll@0.2.10",
+    "wasi:io/streams@0.2.10",
+    "wasi:random/random@0.2.10"
+  ],
+  "emittedExports": [
+    "wasi:http/incoming-handler@0.2.10"
+  ],
+  "clockTypeOnly": true,
+  "genuineUnchangedConstructionConfigBound": true,
+  "oldPureValidatorsOnlyThroughExplicitDataViews": true,
+  "homePathsPreserved": true,
+  "processesDirectoryCreatedBeforeCommandHelper": true,
+  "threeResponsesPerHostProposed": true,
+  "ownedGracefulShutdownAndStoppedCurl7ChecksPresent": true,
+  "finalAndFailureSourceAuditsPresent": true,
+  "pythonAstChecks": 2,
+  "storedOwnerChecksAuthenticatedOnly": {
+    "sourceData": 38812,
+    "pure": 86,
+    "grammar": 13,
+    "pythonAst": 2
+  },
+  "mandatorySourceFindings": 1,
+  "sourceReviewPassed": false,
+  "sourceOnly": true,
+  "ownerActionsInvoked": false,
+  "uniqueDeclaredInputs": 12848,
+  "physicalFilesHashed": 12846,
+  "checks": 90129,
+  "state": "INDEPENDENT_CONSUMERS355_HTTP_HOST_SOURCE_REVIEW_HELD_V1",
+  "sourceIndexSha256": "4b7c36f2d50e2c3bee831d7c4681b62bea67fb667e5da10f227125e3dd860e70",
+  "verifiedPassed": false,
+  "findings": [
+    {
+      "id": "HTTP-HOST-M1",
+      "disposition": "HOLD",
+      "severity": "mandatory-before-host-action",
+      "summary": "A read/abort/network failure after response headers or partial chunks loses available status/header/body data, while the failure text claims complete available raw retention.",
+      "citations": [
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-candidate-v1/run-body.mjs",
+          "line": 37,
+          "text": "async function request("
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-candidate-v1/run-body.mjs",
+          "line": 43,
+          "text": "const raw=Buffer.concat(chunks);await output.write(name+'-body.bin',raw)"
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-candidate-v1/run-body.mjs",
+          "line": 45,
+          "text": "}catch(error){const retry=readinessRetryAllowed"
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-candidate-v1/run-body.mjs",
+          "line": 74,
+          "text": "partialRawRetained:true"
+        }
+      ],
+      "correction": "Fresh immutable successor: durably retain actual status and public headers immediately after fetch; retain every available partial chunk on read/abort/network/reader failure before assertions. Record truthful complete/partial/capture-failure fields; do not claim a raw body exists when capture failed. Keep failed/partial responses unaccepted.",
+      "observedHostFailure": false,
+      "actualHostInvoked": false
+    }
+  ],
+  "findingLedger": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/independent-http-host-source-review-v1/findings.json",
+    "sha256": "beaa1e4195ce0ee2fe509946db5e68ed8f81f0d5f5fb8d89c38002f76e3a99f9",
+    "bytes": 2829
+  },
+  "inputClosure": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/independent-http-host-source-review-v1/rehashed-inputs.json",
+    "sha256": "c9aebc297bccfe875423fe6a750e2b2766942b9a96680f504bf210fffd68e57c",
+    "bytes": 5229717
+  },
+  "readerHistory": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/independent-http-host-source-review-v1/reader-history.json",
+    "sha256": "6bb3a59bd394e405600c31dc6a465760a7513bfd07c8a45bca6640d343ef40ce",
+    "bytes": 392
+  },
+  "actualServerPortCurlRequestPreflightHelperComponentGuestNativeOrHostActionsInvoked": false,
+  "sourceIndependentReview": null,
+  "rootAuthority": null,
+  "componentPhase": null,
+  "hostController": null,
+  "hostExecutionAllowed": false,
+  "operationalAdmission": false,
+  "runtimeAcceptanceClaim": false,
+  "sourcePromotionAllowed": false,
+  "scope": "One source failure-evidence defect blocks host action. No actual host failure or response was observed. Other bounded admission/context/lifecycle/source observations were checked as source and retained DATA only.",
+  "limitations": [
+    "The proposed servers, requests, returned355 response values and stopped-listener outcomes remain unexecuted. Source paths and stored pure fixtures establish no host behavior.",
+    "The available actual component proof establishes construction/initialization and its binary/native provenance. It supplies no host authority or request-reuse, isolation, GC, backend, wire-body or performance result.",
+    "Source preparation stored38812data/86pure/13grammar/2PythonAST checks were authenticated as owner evidence; the reviewer did not rerun owner tests or import owner code.",
+    "The reviewer inspected and rehashed original immutable contexts. The old pure validator modules are not engine admission; their declared ephemeral response/audit views preserve full new raw audit/body objects."
+  ]
+}

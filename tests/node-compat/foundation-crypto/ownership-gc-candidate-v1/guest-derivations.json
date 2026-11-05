@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-validation-candidate-v1/guest.UNEXECUTED.mjs",
+    "sha256": "26e48b2117eb232cb20c232f4c94b0bba1f359a9be0806629819e2caf9508c45",
+    "bytes": 13124
+  },
+  "afterimage": "guest.GC.UNEXECUTED.mjs",
+  "edits": [
+    {
+      "before": "// No imports, crypto/key operations, entropy, async work or key owners at INIT.",
+      "after": "// GC SOURCE successor: imports existing Buffer; no top-level key/crypto,\n// pressure/allocation/hex-conversion or async calls. Combined strong owners only.",
+      "count": 1
+    },
+    {
+      "before": "const EXPECTED=",
+      "after": "import {Buffer} from 'node:buffer';\nconst pressureRecords=[];\nfunction pressure(phase){const buffer=Buffer.alloc(64,0xa5),encoded=buffer.toString('hex');check(encoded==='a5'.repeat(64),'full public Buffer hex encode');const decoded=Buffer.from(encoded,'hex');check(decoded.length===64,'full public Buffer hex decode length');for(const byte of decoded)check(byte===0xa5,'full public Buffer decoded bytes');pressureRecords.push({sequence:pressureRecords.length+1,phase,bytes:64,encodedHex:encoded,decodedHex:decoded.toString('hex'),forcedGcCounterObserved:false,isolatedTemporaryRootProved:false});}\nconst EXPECTED=",
+      "count": 1
+    },
+    {
+      "before": "decodedHex:decoded.toString('hex')",
+      "after": "decodedHex:hex(decoded)",
+      "count": 1
+    },
+    {
+      "before": "const input=message(),before=hex(input.backing),firstBuffer=await sign('HMAC',key,input.view);",
+      "after": "const input=message(),before=hex(input.backing);pressure('before-first-sign');const firstBuffer=await sign('HMAC',key,input.view);",
+      "count": 1
+    },
+    {
+      "before": "const secondBuffer=await sign({name:'HMAC'},key,input.view);",
+      "after": "pressure('between-signs');const secondBuffer=await sign({name:'HMAC'},key,input.view);",
+      "count": 1
+    },
+    {
+      "before": "const signature=window(second),signatureBefore=hex(signature.backing),valid=await verify('HMAC',key,signature.view,input.view),bad=new Uint8Array(second);",
+      "after": "const signature=window(second),signatureBefore=hex(signature.backing);pressure('before-valid-verify');const valid=await verify('HMAC',key,signature.view,input.view),bad=new Uint8Array(second);",
+      "count": 1
+    },
+    {
+      "before": "check(valid===true&&invalid===false,'full correct/tampered verify booleans');",
+      "after": "check(valid===true&&invalid===false,'full correct/tampered verify booleans');pressure('after-verifies');",
+      "count": 1
+    },
+    {
+      "before": "kind:'crypto-owner-within-export-validation-v1',entryCounters",
+      "after": "kind:'crypto-owner-within-export-gc-validation-v1',pressure:{records:pressureRecords.map(row=>({...row})),scheduledRecordsPerFreshValidate:16,publicAllocBytesPerRecord:64,sourceForcedHookSitesPerRecord:6,actualNativeGcCountObserved:false,strongApplicationOwnersCombined:true,isolatedTemporaryRootsProved:false},entryCounters",
+      "count": 1
+    }
+  ],
+  "exactReverseToOriginalRequired": true,
+  "originalUnchanged": true
+}

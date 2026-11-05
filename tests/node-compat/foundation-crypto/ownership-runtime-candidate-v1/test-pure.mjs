@@ -1,0 +1,43 @@
+// Synthetic validation/real captured-source parsing only; no module/crypto call.
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {dirname,join} from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import {auditLoading,validateGlue,validateNamespace,scalarArguments,PARSER} from './loading.mjs';
+import {authorityModel,environment} from './guard.mjs';
+import {EXPECTED,zeroCounters,nextRun,runRecord,validateRecord} from './checks.mjs';
+const HERE=dirname(fileURLToPath(import.meta.url));let checks=0;
+const ck=(v,m)=>{assert(v,m);checks++;},refuse=fn=>{assert.throws(fn);checks++;};
+const refs=JSON.parse(await readFile(join(HERE,'references.json'))),a=await auditLoading(refs.artifacts);ck(a.rows.core.sha256===refs.artifacts.core.sha256,'Actual static loading tuple; no generated import');
+const {parse}=await import(pathToFileURL(PARSER.path)),text=await readFile(refs.artifacts.glue.path,'utf8');
+const parsed=()=>parse(text,{ecmaVersion:'latest',sourceType:'module'});ck(validateGlue(parsed()).names.length===5,'Actual emitted AST');
+for(const replacement of [text.replace('./crypto_owner.core.wasm','./old.core.wasm'),text+'\nawait $init;',"import 'other';\n"+text,text.replace("import('node:fs/promises')","import('other')"),text.replace('await $init;','await changed;')])refuse(()=>validateGlue(parse(replacement,{ecmaVersion:'latest',sourceType:'module'})));
+const namespace=()=>Object.assign(Object.create(null),{inspect(){},run(id){},clear(){},validate(){},_util:{}});ck(validateNamespace(namespace()),'Synthetic namespace baseline');
+for(const edit of [n=>n.then=()=>{},n=>n.extra=0,n=>n.run=()=>{},n=>n._util.then=()=>{},n=>delete n.clear]){const n=namespace();edit(n);refuse(()=>validateNamespace(n));}
+let reads=0;const n=namespace();Object.defineProperty(n,'then',{get(){reads++;throw Error('must not read');}});refuse(()=>validateNamespace(n));ck(reads===0,'Then name refuses before reading');
+for(const [name,args]of [['inspect',[]],['clear',[]],['validate',[]],['run',[0]],['run',[3]]])ck(scalarArguments(name,args),'Finite scalar positive');
+for(const [name,args]of [['then',[]],['run',[-0]],['run',[4]],['run',[-1]],['run',['0']],['run',[1n]],['run',[NaN]],['inspect',[0]],['run',[]]])refuse(()=>scalarArguments(name,args));
+const root=JSON.parse(await readFile(join(HERE,'future-root-authority.template.json')));refuse(()=>authorityModel(root,'a'.repeat(64)));ck(environment({}),'Ordinary override domain');for(const name of ['NODE_OPTIONS','NODE_PATH','JCO_DEBUG','PYTHONOPTIMIZE'])refuse(()=>environment({[name]:'override'}));
+function operation(extractable){return {firstSignatureHex:EXPECTED,secondSignatureHex:EXPECTED,signatureBytes:32,valid:true,invalid:false,priorFullBytesStable:true,independentNonemptyBacking:true,mutationRestored:true,key:{instanceOfGlobalCryptoKey:true,globalConstructorStable:true,type:'secret',extractable,algorithm:{length:160,name:'HMAC',hash:{name:'SHA-256'}},usages:['sign','verify']},inputBeforeHex:'a5'.repeat(8)+'4869205468657265'+'a5'.repeat(8),inputAfterHex:'a5'.repeat(8)+'4869205468657265'+'a5'.repeat(8),inputWindow:{byteOffset:8,byteLength:8,backingBytes:24},signatureBeforeHex:'a5'.repeat(8)+EXPECTED+'a5'.repeat(8),signatureAfterHex:'a5'.repeat(8)+EXPECTED+'a5'.repeat(8)};}
+function obsExercise(){return ['sign','sign','verify','verify'].flatMap((name,i)=>[{operation:name,phase:'before',returned:{type:'undefined'}},{operation:name,phase:'returned',returned:name==='sign'?{type:'ArrayBuffer',bytes:32,fullHex:EXPECTED,fullBytesRetained:true}:{type:'boolean',value:i===2}}]);}
+const initial={keyImportsAttempted:0,signCalls:0,verifyCalls:0,retainedKeys:0,pendingOperations:0},counter=nextRun(zeroCounters(),0),raw={schemaVersion:1,kind:'crypto-owner-run-v1',caseId:0,completed:true,result:{format:'raw',importInputPreserved:true,callerKeyBytesChangedAfterImport:true,callerBackingHex:'a5'.repeat(8)+'00'.repeat(20)+'a5'.repeat(8),operations:operation(false)},observations:[{operation:'importKey',phase:'before',returned:{type:'undefined'}},{operation:'importKey',phase:'returned',returned:{type:'object',opaque:true,fullOpaqueValueClaim:false}},...obsExercise()],initial,counters:counter,state:{rawRetained:true,jwkRetained:false,strongApplicationKeyOwners:1,pendingOperationsInstrumented:false,finalizersOrWipesObserved:false},gcOrEntropyRequested:false,finalizerCountOrWipeProof:false};
+ck(runRecord(raw,0,counter,{tagHex:EXPECTED}),'Synthetic raw observation baseline');
+for(const edit of [r=>r.result.operations.firstSignatureHex=EXPECTED.slice(0,-2)+'00',r=>r.result.operations.secondSignatureHex='00'+EXPECTED.slice(2),r=>r.result.operations.signatureAfterHex=r.result.operations.signatureAfterHex.replace(EXPECTED,'00'.repeat(32)),r=>r.result.operations.inputAfterHex='00'.repeat(24),r=>r.result.operations.key.algorithm.extra=true,r=>r.result.operations.key.extractable=true,r=>r.observations.pop(),r=>r.observations[3].returned.fullHex='00'.repeat(32),r=>r.observations[7].returned.value=false,r=>r.counters.keyImportsFulfilled=0,r=>r.state.jwkRetained=true,r=>r.completed=false]){const r=structuredClone(raw);edit(r);refuse(()=>runRecord(r,0,counter,{tagHex:EXPECTED}));}
+const absent={rawRetained:false,jwkRetained:false,strongApplicationKeyOwners:0,pendingOperationsInstrumented:false,finalizersOrWipesObserved:false},present={...absent,rawRetained:true,jwkRetained:true,strongApplicationKeyOwners:2};
+const inspection=c=>({schemaVersion:1,kind:'crypto-owner-inspect-v1',globalCryptoKeyInstalled:true,constructorStable:true,cryptoOperationsAtSnapshot:0,fullNativeOwnershipOrZeroizationObserved:false,initial,counters:{...c},state:{...absent}});
+let c={...zeroCounters(),validateCalls:1,inspectCalls:1};const before=inspection(c),records=[];
+for(let id=0;id<4;id++){
+ c=nextRun(c,id);const r=structuredClone(raw);r.caseId=id;r.counters={...c};r.state=id===0?structuredClone(raw.state):{...present};
+ if(id===1){r.result={format:'jwk',importInputPreserved:true,callerJwkChangedAfterImport:true,operations:operation(true)};}
+ if(id===2){r.result={format:'retained-pair',raw:operation(false),jwk:operation(true),strongApplicationOwners:true};r.observations=[...obsExercise(),...obsExercise()];}
+ if(id===3){
+  const refusal={kind:'native-promise-rejection',error:{thrownType:'object',typeError:true,name:'TypeError',message:'synthetic pure data'}},reads={algorithmName:0,dataByteLength:0,dataPrimitive:0,dataString:0,signatureByteLength:0,signaturePrimitive:0};
+  r.result={signRefusal:structuredClone(refusal),verifyRefusal:structuredClone(refusal),ordinaryInvalid:structuredClone(refusal),signConversionReads:{...reads},verifyConversionReads:{...reads},positiveAlgorithmReads:1,positiveVerifyAlgorithmReads:1,positiveFullSignatureHex:EXPECTED,constructorError:refusal.error,onlyNewGuardedArtifactAllowed:true,uniqueNativeErrorCauseInferred:false,getters:['algorithm','extractable','type','usages'].map(name=>({name,error:refusal.error}))};
+  r.observations=[{operation:'prototype-sign',phase:'returned',record:structuredClone(refusal),reads:{...reads}},{operation:'prototype-verify',phase:'returned',record:structuredClone(refusal),reads:{...reads}},...obsExercise().slice(0,2),...obsExercise().slice(4,6),{operation:'ordinary-invalid-key',phase:'returned',record:structuredClone(refusal)}];
+ }
+ ck(runRecord(r,id,c,{tagHex:EXPECTED}),'Synthetic complete case '+id);records.push(r);
+}
+c.clearCalls++;const released={kind:'crypto-owner-clear-v1',applicationReferencesReleased:true,collectionOrNativeFreeOrWipeObserved:false,initial,counters:{...c},state:{...absent}};c.inspectCalls++;
+const wrapper={schemaVersion:1,kind:'crypto-owner-within-export-validation-v1',withinOneOuterExport:true,separateHostCallInterleavingProved:false,finalizerOrWipeObserved:false,entryCounters:zeroCounters(),entryState:{...absent},before,records,released,after:inspection(c)};ck(validateRecord(wrapper,{tagHex:EXPECTED}),'All wrapper/counter transitions');
+for(const edit of [r=>r.records.pop(),r=>r.records[1].result.operations.key.extractable=false,r=>r.records[2].result.jwk.secondSignatureHex='00'.repeat(32),r=>r.records[3].result.signConversionReads.algorithmName=1,r=>r.records[3].result.ordinaryInvalid.kind='synchronous-throw',r=>r.entryCounters.signCalls=1,r=>r.after.state.rawRetained=true,r=>r.released.collectionOrNativeFreeOrWipeObserved=true]){const r=structuredClone(wrapper);edit(r);refuse(()=>validateRecord(r,{tagHex:EXPECTED}));}
+console.log(JSON.stringify({schemaVersion:1,state:'CRYPTO_RUNTIME_PURE_CAPTURED_SOURCE_AND_COUNTEREXAMPLES_PASSED',checks,generatedModuleImported:false,guestOrNodeKeyHmacOperationsInvoked:false,helpersPreflightWorkerNativeOrHostActionsInvoked:false}));

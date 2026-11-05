@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "observations": [
+    {
+      "attempt": 1,
+      "readerOutcome": "TypeError: expected str, bytes or os.PathLike object, not NoneType",
+      "scope": "Reader incorrectly treated every frozen copy as having an external original path.",
+      "actualContract": "1390 frozen copies contain1387 original references and three explicitly generated evidence files with original:null.",
+      "correction": "Authenticate every frozen copy, authenticate all1387 declared originals, and require the exact three generated-evidence names.",
+      "ownerSourceOrArtifactChanged": false,
+      "ownerActionInvoked": false
+    },
+    {
+      "attempt": 2,
+      "readerOutcome": "AssertionError: actual core has no binary import section",
+      "scope": "Reader incorrectly assumed zero imports require an absent core import section.",
+      "actualContract": "The core has one one-byte import section containing an exact zero-length vector.",
+      "correction": "Decode and require the whole actual import vector to contain zero entries; preserve section presence accurately.",
+      "ownerSourceOrArtifactChanged": false,
+      "ownerActionInvoked": false
+    }
+  ]
+}

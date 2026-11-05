@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "findingId": "ZLIB-COST-PILOT-TIMING-V1-M1",
+  "files": [
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v1/parent-guard.template.mjs",
+        "sha256": "f70dcc3d062d2fd8f0844c82ce1fa5d049619623dfa1aa28f28f3b8362859b1b",
+        "bytes": 10581
+      },
+      "afterimage": "parent-guard.template.mjs",
+      "afterSha256": "3a8c3eff281660de1d42b96552a71721737be0d7ad44118e7e3060674fa80023",
+      "edits": [
+        {
+          "old": "from './compact-plan.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/compact-plan.mjs'",
+          "afterOffsetAtEdit": 561,
+          "count": 1
+        },
+        {
+          "old": "from './planner.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/planner.mjs'",
+          "afterOffsetAtEdit": 405,
+          "count": 1
+        },
+        {
+          "old": "from './proof-model.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/proof-model.mjs'",
+          "afterOffsetAtEdit": 538,
+          "count": 1
+        },
+        {
+          "old": "const HERE=dirname(fileURLToPath(import.meta.url));",
+          "new": "import {verifyContractDescriptor,captureProofDescriptors} from './contract-descriptors.mjs';\nconst HERE=dirname(fileURLToPath(import.meta.url));",
+          "afterOffsetAtEdit": 684,
+          "count": 1
+        },
+        {
+          "old": "+'-v1';",
+          "new": "+'-v2';",
+          "afterOffsetAtEdit": 1044,
+          "count": 1
+        },
+        {
+          "old": "referenced=descriptorsIn([v,c.requiredExactDescriptors]);",
+          "new": "referenced=[...captureProofDescriptors(v,c)];",
+          "afterOffsetAtEdit": 4208,
+          "count": 1
+        },
+        {
+          "old": "for(const row of referenced)await regular(row,{maxBytes:64*1024*1024});\n let actualNames",
+          "new": "for(const row of referenced)await verifyContractDescriptor(row);\n let actualNames",
+          "afterOffsetAtEdit": 4255,
+          "count": 1
+        },
+        {
+          "old": "for(const row of referenced)await regular(row,{maxBytes:64*1024*1024});if(actualNames)",
+          "new": "for(const row of referenced)await verifyContractDescriptor(row);if(actualNames)",
+          "afterOffsetAtEdit": 5104,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v1/run.mjs",
+        "sha256": "b976071c7975a75f38cb9e4a3c2b8e65c6d6c417c8887523d330287b3864971b",
+        "bytes": 11292
+      },
+      "afterimage": "run.mjs",
+      "afterSha256": "847651bac71f040327d768ea727796b8a4700d2addf9196e1f4a2c0cea97814e",
+      "edits": [
+        {
+          "old": "from './lifecycle-policy.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/lifecycle-policy.mjs'",
+          "afterOffsetAtEdit": 781,
+          "count": 1
+        },
+        {
+          "old": "from './owned-lifecycle.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/owned-lifecycle.mjs'",
+          "afterOffsetAtEdit": 501,
+          "count": 1
+        },
+        {
+          "old": "from './planner.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/planner.mjs'",
+          "afterOffsetAtEdit": 766,
+          "count": 1
+        },
+        {
+          "old": "from './proof-model.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/proof-model.mjs'",
+          "afterOffsetAtEdit": 922,
+          "count": 1
+        },
+        {
+          "old": "from './result-collector.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/result-collector.mjs'",
+          "afterOffsetAtEdit": 1018,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v1/worker.mjs",
+        "sha256": "59b875122fb9cd99cd75d1bc5349ba0c3ce6fc257b8f57d03c7b2948025823f9",
+        "bytes": 8511
+      },
+      "afterimage": "worker.mjs",
+      "afterSha256": "7b52f9dc0b4278f2a3c7db1d77af7380a884c8e7b81731681f10ff99da3b6a15",
+      "edits": [
+        {
+          "old": "from './lifecycle-policy.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/lifecycle-policy.mjs'",
+          "afterOffsetAtEdit": 752,
+          "count": 1
+        },
+        {
+          "old": "from './loading.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/loading.mjs'",
+          "afterOffsetAtEdit": 943,
+          "count": 1
+        },
+        {
+          "old": "from './planner.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/planner.mjs'",
+          "afterOffsetAtEdit": 894,
+          "count": 1
+        },
+        {
+          "old": "from './proof-model.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/proof-model.mjs'",
+          "afterOffsetAtEdit": 701,
+          "count": 1
+        },
+        {
+          "old": "from './public-call-channel.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/public-call-channel.mjs'",
+          "afterOffsetAtEdit": 878,
+          "count": 1
+        },
+        {
+          "old": "from './worker.template.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/worker.template.mjs'",
+          "afterOffsetAtEdit": 1139,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v1/prepare-plan.mjs",
+        "sha256": "1de99adc4dac48d4ecc7b28862d0c3c76f7f20f2830486c5ef36b048a51b49a3",
+        "bytes": 2320
+      },
+      "afterimage": "prepare-plan.mjs",
+      "afterSha256": "cd7f29d66633e15707ad58b70c01cbfcfaa49c6cf7b9f632bf8b4109f5e71120",
+      "edits": [
+        {
+          "old": "from './planner.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/planner.mjs'",
+          "afterOffsetAtEdit": 370,
+          "count": 1
+        },
+        {
+          "old": "from './proof-model.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v1/proof-model.mjs'",
+          "afterOffsetAtEdit": 438,
+          "count": 1
+        },
+        {
+          "old": "zlib-cost-measurement-plan-v1'",
+          "new": "zlib-cost-measurement-plan-v2'",
+          "afterOffsetAtEdit": 556,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    }
+  ],
+  "protocolGuestNativeProvidersComponentsCapsLoaderCollectorOwnedLifecycleChanged": false,
+  "onlyReadBoundAndCoherentSiblingEntryContextsChanged": true
+}

@@ -1,0 +1,9 @@
+# Actual HTTP source publication review
+
+The [result](results.json) passes the actual source-copy review for source `dc98f465…` and publication index `37fe3e00…`. The retained external publisher terminal reports raw zero, no timeout, empty stderr and owned cleanup. The private publication contains exactly 32 indexed files and 34 ordinary files, with mode0700 directories, mode0600 single-link files and no symlinks.
+
+All 18 active payload copies match original source bytes and have distinct inodes. Proposal, Root/config and independent peer capsules also match their original bytes and remain separate files. The [copy provenance](copy-provenance.json) records each origin. The proposal index and copied peer readers are provenance data; they are not executed or interpreted as relocated preparation roots.
+
+The [reader](reader.py) freshly streamed 12,880 distinct physical files and verified 14,044 declared input paths. Repeated descriptors and explicit system `/tmp` aliases require the same unchanged identity and hash. This includes the complete 12,667-file external closure, original 12,789 preparation references, full snapshot and tool inventories, 22 links, LIVE8 and actual native355/frozen1164 provenance. Original a986, configured/frozen native, tool and packaging contexts remain external and unchanged. Published active local imports resolve in the new source root; the genuine native bridge still resolves at its original location.
+
+This is source-publication provenance only. Root ran the source publisher; the reviewer only read, hashed and decoded data. No genuine preflight/helper, bundler, componentizer, guest, native or HTTP host/request action ran in this review or publication. Bundle/component/host evidence and new Root authorities remain separate prerequisites. No metadata projection, source promotion, runtime/operational, performance, request-body adapter, reuse or GC acceptance follows.

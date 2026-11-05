@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "findings": [
+    {
+      "id": "HTTP-HOST-M1",
+      "disposition": "HOLD",
+      "severity": "mandatory-before-host-action",
+      "summary": "A read/abort/network failure after response headers or partial chunks loses available status/header/body data, while the failure text claims complete available raw retention.",
+      "citations": [
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-candidate-v1/run-body.mjs",
+          "line": 37,
+          "text": "async function request("
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-candidate-v1/run-body.mjs",
+          "line": 43,
+          "text": "const raw=Buffer.concat(chunks);await output.write(name+'-body.bin',raw)"
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-candidate-v1/run-body.mjs",
+          "line": 45,
+          "text": "}catch(error){const retry=readinessRetryAllowed"
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-candidate-v1/run-body.mjs",
+          "line": 74,
+          "text": "partialRawRetained:true"
+        }
+      ],
+      "correction": "Fresh immutable successor: durably retain actual status and public headers immediately after fetch; retain every available partial chunk on read/abort/network/reader failure before assertions. Record truthful complete/partial/capture-failure fields; do not claim a raw body exists when capture failed. Keep failed/partial responses unaccepted.",
+      "observedHostFailure": false,
+      "actualHostInvoked": false
+    }
+  ],
+  "staticCounterexamples": [
+    {
+      "case": "headers then read rejects",
+      "availableStatus": 503,
+      "availableHeaders": [
+        [
+          "content-type",
+          "application/json"
+        ]
+      ],
+      "availableBodyHex": "",
+      "currentCatchRetains": [
+        "receivedHeaders:true",
+        "partialBodyBytes:0",
+        "error name/message"
+      ],
+      "lost": [
+        "actual status",
+        "actual header values"
+      ]
+    },
+    {
+      "case": "two chunks then timeout",
+      "availableStatus": 200,
+      "availableHeaders": [
+        [
+          "content-type",
+          "application/json"
+        ]
+      ],
+      "availableBodyHex": "7b226f6b223a",
+      "currentCatchRetains": [
+        "receivedHeaders:true",
+        "partialBodyBytes:6",
+        "error name/message"
+      ],
+      "lost": [
+        "actual status",
+        "actual header values",
+        "all6 received body bytes"
+      ]
+    }
+  ],
+  "counterexampleScope": "Source/control-flow DATA only; no stream/network/helper executed."
+}

@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "findingId": "ZLIB-COST-PILOT-TIMING-V2-M2",
+  "files": [
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v2/parent-guard.template.mjs",
+        "sha256": "3a8c3eff281660de1d42b96552a71721737be0d7ad44118e7e3060674fa80023",
+        "bytes": 10744
+      },
+      "afterimage": "parent-guard.template.mjs",
+      "afterSha256": "99d3453eabd7616f6ff7091c60d8cf6f6e2fe16fb06a6f08f12ce8bb3d644fcb",
+      "edits": [
+        {
+          "old": "from './contract-descriptors.mjs'",
+          "new": "from '../cost-pilot-timing-candidate-v2/contract-descriptors.mjs'",
+          "afterOffsetAtEdit": 742,
+          "count": 1
+        },
+        {
+          "old": "const HERE=dirname(fileURLToPath(import.meta.url));",
+          "new": "import {captureSourceFamilies} from './source-families.mjs';\nconst HERE=dirname(fileURLToPath(import.meta.url));",
+          "afterOffsetAtEdit": 809,
+          "count": 1
+        },
+        {
+          "old": "+'-v2';",
+          "new": "+'-v3';",
+          "afterOffsetAtEdit": 1137,
+          "count": 1
+        },
+        {
+          "old": " const own=await sourceIndex(ownRow),sourcePeer=",
+          "new": " const inheritedFamilies=await captureSourceFamilies(ownRow);\n const own=await sourceIndex(ownRow),sourcePeer=",
+          "afterOffsetAtEdit": 5621,
+          "count": 1
+        },
+        {
+          "old": "const recheck=async()=>{await own.recheck();await sourcePeer.recheck();",
+          "new": "const recheck=async()=>{await inheritedFamilies.recheck();await own.recheck();await sourcePeer.recheck();",
+          "afterOffsetAtEdit": 8375,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v2/run.mjs",
+        "sha256": "847651bac71f040327d768ea727796b8a4700d2addf9196e1f4a2c0cea97814e",
+        "bytes": 11452
+      },
+      "afterimage": "run-body.mjs",
+      "afterSha256": "5c5097aaaca772805beb0e15b256032bc647f53c7df128c13562d726c71a37be",
+      "edits": [
+        {
+          "old": "export async function runPhase(options){",
+          "new": "export async function runPhase(options,sourceFamilyAudit){\n assertSourceFamilyAudit(sourceFamilyAudit,options.sourceIndex);",
+          "afterOffsetAtEdit": 1573,
+          "count": 1
+        },
+        {
+          "old": "import {dirname,join,relative,isAbsolute,resolve} from 'node:path';",
+          "new": "import {assertSourceFamilyAudit} from './source-families.mjs';\nimport {dirname,join,relative,isAbsolute,resolve} from 'node:path';",
+          "afterOffsetAtEdit": 66,
+          "count": 1
+        },
+        {
+          "old": "if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){\n need(process.argv.length===3,'one exact future Root config descriptor');const options=JSON.parse(await regular(JSON.parse(process.argv[2])));process.stdout.write(JSON.stringify(await runPhase(options))+'\\n');\n}\n",
+          "new": "",
+          "afterOffsetAtEdit": 11306,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v2/worker.mjs",
+        "sha256": "7b52f9dc0b4278f2a3c7db1d77af7380a884c8e7b81731681f10ff99da3b6a15",
+        "bytes": 8703
+      },
+      "afterimage": "worker-body.mjs",
+      "afterSha256": "a332235ba8902e16a511a6ac7714a09807cd6aea66ed8b0d5afc926ee612b012",
+      "edits": [
+        {
+          "old": "export async function runWorker(input){",
+          "new": "export async function runWorker(input,sourceFamilyAudit){",
+          "afterOffsetAtEdit": 1253,
+          "count": 1
+        },
+        {
+          "old": "import {join,dirname,resolve} from 'node:path';",
+          "new": "import {assertSourceFamilyAudit} from './source-families.mjs';\nimport {join,dirname,resolve} from 'node:path';",
+          "afterOffsetAtEdit": 82,
+          "count": 1
+        },
+        {
+          "old": ";workerDescriptorModel(v);",
+          "new": ";assertSourceFamilyAudit(sourceFamilyAudit,v.sourceIndex);workerDescriptorModel(v);",
+          "afterOffsetAtEdit": 1474,
+          "count": 1
+        },
+        {
+          "old": "const recheck=async()=>{await regular(inputRow);",
+          "new": "const recheck=async()=>{await sourceFamilyAudit.recheck();await regular(inputRow);",
+          "afterOffsetAtEdit": 5507,
+          "count": 1
+        },
+        {
+          "old": "if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){\n need(process.argv.length===3,'one exact private descriptor');runWorker(JSON.parse(process.argv[2])).then(value=>process.stdout.write(JSON.stringify({event:'cost-worker-complete',...value})+'\\n')).catch(()=>{process.exitCode=1;});\n}\n",
+          "new": "",
+          "afterOffsetAtEdit": 8562,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v2/prepare-plan.mjs",
+        "sha256": "cd7f29d66633e15707ad58b70c01cbfcfaa49c6cf7b9f632bf8b4109f5e71120",
+        "bytes": 2384
+      },
+      "afterimage": "prepare-plan-body.mjs",
+      "afterSha256": "073abd618c436c0db3b2247df952faed9e16a207d48baf13a4d6b69280f6d8ba",
+      "edits": [
+        {
+          "old": "export async function preparePlan({sourceIndex,sourceIndependentReview,planAuthority}={}){",
+          "new": "export async function preparePlan({sourceIndex,sourceIndependentReview,planAuthority}={},sourceFamilyAudit){\n assertSourceFamilyAudit(sourceFamilyAudit,sourceIndex);",
+          "afterOffsetAtEdit": 588,
+          "count": 1
+        },
+        {
+          "old": "import {join} from 'node:path';",
+          "new": "import {assertSourceFamilyAudit} from './source-families.mjs';\nimport {join} from 'node:path';",
+          "afterOffsetAtEdit": 72,
+          "count": 1
+        },
+        {
+          "old": "zlib-cost-measurement-plan-v2'",
+          "new": "zlib-cost-measurement-plan-v3'",
+          "afterOffsetAtEdit": 619,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    }
+  ],
+  "m1StreamedVerifierChanged": false,
+  "protocolGuestNativeProvidersComponentsCapsLoaderCollectorOwnedLifecycleChanged": false
+}

@@ -2,7 +2,7 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
-Latest experimental work: full codec Jco correctness, six stock-Wasmtime small/largest string validations and corrected control-v2 results pass independent review. The first control failure is preserved; control-v2 covers540 control operations and zero codecs. Pilot/timing tools remain an unsealed source draft and timing remains closed. Consumer v3 whole-release and all five follow-on observations pass independent review, with getter parity false and raw-output limits retained. Crypto normal-OFF native build/freeze provenance, normal-only pin derivation and genuine two-context JS bootstrap pass independent review. The sealed v3 component-source correction awaits independent review; actual HMAC component construction/runtime validation remains pending. [progress.md](../../progress.md) records completed gates, preserved failures and remaining work. Accepted production remains bounded foundations-v13.
+Latest experimental work: codec correctness, stock-Wasmtime string transport, corrected540-control results, v3 measurement source and the actual read-only90-row plan pass independent review. Actual pilots/timing remain pending. Consumer355 release/follow-ons and the new HTTP source publication, bundle and component pass review; HTTP host source is held on partial-response raw capture and no new host requests have run. Crypto no-import construction, normal-key results and three fresh stock-Wasmtime validations pass independent review. Corrected GC guest and isolated native source templates are sealed but await review; no GC workload ran. [progress.md](../../progress.md) records completed gates, preserved failures and outstanding work. Accepted production remains bounded foundations-v13.
 
 Goal: complete the [dependency-ordered roadmap](roadmap.md), documenting code,
 decisions, executed evidence and remaining gates. The goal is active. The
@@ -15,7 +15,7 @@ current work; **pending** means implementation or adequate evidence is absent.
 Historical engine/component hashes remain evidence for those exact artifacts,
 not automatic validation of a changed worktree.
 
-The latest accepted [v12 checkpoint](../../tests/node-compat/foundation-scheduler/production-acceptance-v12/README.md)
+The historical [v12 checkpoint](../../tests/node-compat/foundation-scheduler/production-acceptance-v12/README.md)
 contains the private scheduler layer and all completed diagnostic/production
 gates. Root independently rehashes4,150 indexed files and the unchanged v11
 parent; 60 current applications, one historical control and20 diagnostics are
@@ -343,11 +343,11 @@ Root receipt, preserving the archive's earlier pending construction labels.
 | 2.4 | Remaining UTF-8 allocation and Weval decision | partial | Corrected-clock64-byte UTF8 encode requests35.06MiB native versus9.06MiB JS, despite lower large-input memory. Private exact GC-owned U8 candidate passes77,769 codec checks and moving-GC variants; oldcontrol exposes missing Symbol TypeError. [Same-project ordinary Release pair](../../tests/node-compat/utf8-direct/README.md) now passes:64-byte RSS51.64→24.58MiB,+8.8%throughput;512KiB1.66x/sameRSS. Ordinary production change passes v5 codec/Buffer gates; newscalar OOM gate failed and furtherdiagnostics were automaticallyblocked; Weval v5 engine/cache and 58-check typed ABI/snapshot/strict-init smoke pass; [matched two-order Weval timing](../../tests/node-compat/weval-experiment/v5/RESULTS.md) passes240fresh instances/1,680batches; native byte codecs improve throughput, copying constructor and several memory cases remain counterexamples; full Weval release gates and new OOM remain unverified |
 | 3.1 | EventEmitter, string_decoder, assert, path, querystring and bounded util | partial | [Accepted v11](../../tests/node-compat/milestones/foundations-v11/results.json) replays the six earlier modules and bounded addAbortListener with 29 groups in both entropy modes and combined-owner GC. The historical m0.10 optional-OFF control remains separate from the three current engines. Node `1/1/0` versus native `0/0/0` getter reads and Symbol.dispose registry gap remain; once/on/AsyncResource and broader Events behavior stay deferred |
 | 3.2 | Native stream/web bridge with constructor/BYOB/encoding parity | verified, bounded | [Accepted v11](../../tests/node-compat/milestones/foundations-v11/results.json) replays installed m0.9 classes/codecs/iteration/DataView/aliases/CJS/snapshot and 7 initializer failures, plus prior modules/strict and both-host HTTP. The [v9](../../tests/node-compat/milestones/foundations-v9/README.md) direct native OFF/controller and module-denial proofs remain separate. UTF8/fixed-unshared/min1, signal/proxy/code/arity/lifecycle limits persist |
-| 3.3 | Classic Readable/Writable/Duplex/Transform/PassThrough, promises and consumers | in progress | Bounded classic streams are accepted in [foundations-v13](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md), including preservation and exact source promotion. Experimental consumer355 normal/GC/control component results pass independent review (207 returned strings); the fourth RuntimeOnly native build and four-variant read-only bootstraps pass. The new release/follow-on source family passes generated review, then fails its first read-only preflight on configured/frozen source-root mismatch. A fresh context correction and actual release/HTTP gates remain pending. Node/GC/ALS/reuse limits remain. |
+| 3.3 | Classic Readable/Writable/Duplex/Transform/PassThrough, promises and consumers | in progress | Bounded classic streams are accepted in [foundations-v13](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md), including exact source promotion and preservation. Experimental consumer355 normal/GC/control results pass review (207 returned strings); all four native variants and read-only bootstraps pass. The corrected [v3 release family](../../tests/node-compat/foundation-stream-consumers/release-gates-activated-v3/index.json), entire eight-stage release run and five follow-ons pass independent review. Earlier context/data-closure failures are preserved. The genuine355 HTTP source publication, whole-entry bundle and actual six-interface component pass their completed gates; independent artifact review passes. New both-host requests, cost and acceptance gates remain; Blob/File, getter parity, combined-GC, ALS and reuse limits remain explicit. |
 | 3.4 | Scheduler, request lifecycle and native AsyncLocalStorage propagation | in progress | Bounded private scheduler layer is accepted in [v12](../../tests/node-compat/foundation-scheduler/production-acceptance-v12/README.md), with all diagnostic, production, GC and both-host gates. [Reset audit](../../tests/node-compat/foundation-scheduler/reset-design-v1/README.md) finds unresolved timer/task/resource ownership; reset is not exercised. [Async-context probes](../../tests/node-compat/async-context/README.md) do not establish production ALS or request reuse |
-| 4.1 | Native gzip/deflate/deflateRaw and Node facade | in progress | [Reviewed bounded results](../../tests/node-compat/foundation-zlib/reviewed-codec-validation-results-v1.json): all three native variants and normal283/GC3/disabled5 actual observations pass independent reviews. Zero imports; full bytes, refusal/snapshot/counter/ownership checks. Twenty-two Node error-case differences remain explicit. Public VERNUM4880 is source-coupled inference; metadata backend proof stays false/null/null. Operational admission, matched cost, selected host/release regressions and archive gates remain open. |
+| 4.1 | Native gzip/deflate/deflateRaw and Node facade | in progress | [Bounded native codec results](../../tests/node-compat/foundation-zlib/reviewed-codec-validation-results-v1.json) pass normal/GC/disabled reviews. All three cost components have zero imports and independently reviewed ABI/artifacts. Full Jco correctness, stock Wasmtime small/largest string transport and [actual control-v2 results](../../tests/node-compat/foundation-zlib/independent-cost-jco-control-v2-results-review-v1/README.md) pass bounded independent review. Twenty-two Node error-case differences and source-coupled VERNUM remain explicit. The completed pilot/timing v1 source is held on its Node-binary descriptor size verifier; Actual v3 source review and read-only plan preparation pass; actual matched cost, operational admission, new-engine host/release and archive/acceptance gates remain open. |
 | 4.2 | Brotli inclusion decision | pending | Empirical size/throughput/API demand decision, rather than implicit full zlib support |
-| 4.3 | Matching native crypto, Node key/Hash/Hmac semantics | source work in progress | Existing web CryptoKey ownership gaps have a four-file unapplied repair passing [independent source review](../../tests/node-compat/foundation-crypto/independent-key-owner-source-review-v1/README.md) and SDK147 syntax. Prototype-key guards, native integration, lifetime/secret-copy/allocation work and Node API semantics remain; no Node crypto export support is added. |
+| 4.3 | Matching native crypto, Node key/Hash/Hmac semantics | in progress | Owner/prototype source, isolated native355 normal-OFF build/freeze, read-only bootstrap and [actual no-import component](../../tests/node-compat/foundation-crypto/independent-ownership-component-v3-results-review-v1/README.md) pass independent review. The [normal runtime source](../../tests/node-compat/foundation-crypto/ownership-runtime-candidate-v1/README.md) seals actual ESM loading and three ordinary sessions with61 pure/13,274 source-data checks; independent source review passes. The first actual normal phase finishes raw0 with23 complete strings/20 cases and passes independent result review. Three fresh stock-Wasmtime wrapper calls finish raw0 with byte-exact normal results and pass independent review. GC/secret-copy/allocation and Node Hash/Hmac/KeyObject APIs remain unverified or unimplemented. No Node crypto exports are added. |
 | 4.4 | RNG and entropy resumption policy | verified, bounded | [Entropy-v1](../../tests/node-compat/milestones/entropy-v1/README.md): OFF/runtime-only private entry barrier, P2/OpenSSL bridge, seven snapshot denials and eight owned-input Node cases per mode, repeated/fresh scalar instances; minimal HTTP and original233-subtest suite on both stock hosts. v2 scalar gate rerun passes; no Node crypto export support added |
 | 5.1 | Optional filesystem variant | pending | Explicit preopens/rights, bounded descriptors/read/write/stat, confinement/denial/close tests on both hosts |
 | 5.2 | Optional Node HTTP/HTTPS variant | pending | Existing HTTP test transport is not node:http; streaming/trailers/cancellation and rejected unsupported socket/TLS options required |
@@ -358,28 +358,29 @@ Root receipt, preserving the archive's earlier pending construction labels.
 
 ## Work sequence
 
-1. Preserve accepted v12, original failures/counterexamples and corrected
-   native/classic/replay/follow-on/full20+14 reviews. HTTP packaging, both hosts and independent result review pass;
-   retain the completed308-observation common-domain correctness and timing reviews;
-   finish the smaller-worker process RSS, artifact/archive and acceptance gates.
-2. Keep old90660 failure and separate controls distinct from fresh v2 correctness.
-   The measured protocol and independent timing reviews pass; targeted process RSS,
-   archive and acceptance gates remain. The61-case zlib corpus, GC and disabled
-   control result reviews pass. Operational admission, the explicit Node-difference
-   contract, matched codec cost and new-engine host/release regressions remain.
-   Consumer355 source/staging and all three native build/freeze reviews pass. Generated component-family review and three actual read-only preflights also pass; the first normal190-observation/11-initializer component run finishes at Root-observed raw0, imports[]. Independent normal-result review passes; GC4 and independent review pass behind the reviewed-normal gate. Separate consumer-OFF8+5 and independent review pass, imports[]. A separate RuntimeOnly build/freeze/read-only verification now passes using the existing producer; independent native review and the fresh four-variant pin overlay/read-only bootstraps also pass. Fresh355 host/release source families and their actual gates remain required.
-   Getter/Symbol/combined-GC, consumers/Blob, ALS and reset/reuse limits remain open.
-3. Retain [corrected-clock](../../tests/node-compat/bench-clock-v2/RESULTS.md),
-   [matched UTF8 allocation](../../tests/node-compat/utf8-direct/README.md) and
-   [Weval](../../tests/node-compat/weval-experiment/v5/RESULTS.md) measurements
-   with their exact engines. Keep Weval experimental until its broader release
-   gates pass, and measure minimal deployment variants separately. The stopped
-   new OOM branch remains unverified.
-4. Complete scheduler/lifecycle and production ALS resource ownership, including
-   actual native completions, cancellation and request teardown/reuse. Isolated
-   store-propagation evidence is not a complete ALS implementation.
-5. Continue native compression/crypto and independently selected capability
-   variants, keeping every gate explicit until proved.
+1. Preserve accepted foundations-v13 and its original failures, corrected
+   classic/runtime/HTTP/cost evidence, archive and exact five-file promotion.
+   New experimental source generations need their own gates and acceptance.
+2. Complete the consumer355 both-host HTTP construction and execution gate,
+   keeping protected29/classic19 bodies and Node oracles unchanged. Ordinary
+   iterable consumers are separate from an unresolved wire-body reader adapter.
+   Cost, preservation and acceptance follow; Blob/File, ALS and reuse remain open.
+3. Finish the matched codec pilot/timing implementation using the reviewed
+   correctness, stock-host transport and actual control proofs. Review its
+   loader/lifecycle and full source closure before any pilot. Keep original
+   360-worker timing math, control reporting and all22 Node error deviations.
+   Then finish codec host/release, preservation and adoption decisions.
+4. Preserve the reviewed crypto construction source and actual no-import ABI.
+   Review the new generated loading/runtime source before any key operation. Validate safe
+   HMAC/raw/JWK/retained-key behavior only on the guarded owner355 artifact;
+   complete ownership, allocation, other selected algorithms and Node semantics.
+5. Complete scheduler/resource cancellation, request teardown/reuse and correct
+   native AsyncLocalStorage propagation before exposing dependent APIs or adding
+   filesystem/network/process capability variants. Keep phase5 per-variant
+   standard interfaces, policy-denial tests and both-host gates explicit.
+6. Retain the exact corrected-clock, UTF8 and Weval measurements and their
+   counterexamples. Full untouched upstream/Weval release, minimal variant cost
+   and measured-demand expansion gates remain required by the roadmap.
 
 ## Accepted core m0.11 integration v11
 

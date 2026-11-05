@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "sourceDataReviewComplete": true,
+  "sourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-candidate-v1/index.json",
+    "sha256": "3b6f04806a8990e99dbda0a1292bbb559801f99f2d21b7b57e5fa6020fa03dcf",
+    "bytes": 2353
+  },
+  "indexedMembers": 14,
+  "inputDescriptors": 2845,
+  "uniqueDeclaredInputs": 4272,
+  "physicalFilesHashed": 2860,
+  "normalFrozenMembers": 1391,
+  "normalFrozenCopyEntries": 1390,
+  "normalOriginalReferenceEntries": 1387,
+  "normalDistinctOriginalPaths": 1378,
+  "normalMutableProjectOriginals": 2,
+  "allNormalOriginalAndFrozenBytesExact": true,
+  "realBuildRootOptionSupported": true,
+  "newRootsSeparateAndAbsent": true,
+  "oldBuildOneGcOffWouldReuseNormalProject": true,
+  "separateFreezeAndBootstrapSuccessorsRequired": true,
+  "publicBufferHexHookSourceVerified": true,
+  "bufferAllocIsAllocationPressureOnly": true,
+  "sourceStaticHookSitesPerPressure": 6,
+  "observedNativeGcCount": null,
+  "exactGuestEdits": 8,
+  "exactGuestForwardAndReverseBytesMatched": true,
+  "strongApplicationOwnersCombinedOnly": true,
+  "originalAbiUnchanged": true,
+  "topLevelKeyOperationIntroduced": false,
+  "pythonAstChecks": 3,
+  "concreteSourceBlockers": 1,
+  "sourceReviewPassed": false,
+  "proposalOnly": true,
+  "runnablePipeline": false,
+  "ownerActionsInvoked": false,
+  "checks": 31025,
+  "state": "INDEPENDENT_CRYPTO_OWNER355_GC_SOURCE_REVIEW_HELD_V1",
+  "verifiedPassed": false,
+  "sourceIndexSha256": "3b6f04806a8990e99dbda0a1292bbb559801f99f2d21b7b57e5fa6020fa03dcf",
+  "sourceOnly": true,
+  "newGuestSyntaxParsedByReviewer": true,
+  "syntaxTerminal": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-gc-source-review-v1/syntax-terminal.json",
+    "sha256": "13981a0a3d34a7049ab9ebe03d790cfc87d60dd0c85ed5b6abc9665a3c2c992c",
+    "bytes": 1414
+  },
+  "normalPreservationSourceDataVerified": true,
+  "isolatedWorkRootMechanismVerified": true,
+  "isolatedFreezeRootRequirementVerified": true,
+  "supportedPublicBufferPressurePathsVerified": true,
+  "sourceStaticHookSitesAreNotObservedCounts": true,
+  "newRootOrNativePinsIssued": false,
+  "nativePolicyOrRecipeChangedByProposal": false,
+  "guestOrNativeExecutedByReviewer": false,
+  "reviewerPinnedNodeCheckOnlyInvoked": true,
+  "reviewerOwnerPreflightProducerBuildFreezeBootstrapCompilerKeyCryptoPrototypeGcOrGuestActionsInvoked": false,
+  "separateNativeProducerDoesNotConsumeThisGuest": true,
+  "gcGuestCollectorSuccessorRequiresCorrection": true,
+  "findings": [
+    {
+      "id": "GC-PROPOSAL-M1",
+      "severity": "mandatory-source-correction-before-guest-successor",
+      "disposition": "HOLD",
+      "claim": "run() reports gcOrEntropyRequested:false after the new public pressure path deliberately reaches stress_gc in a future GC-stress engine.",
+      "returnCitation": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-candidate-v1/guest.GC.UNEXECUTED.mjs",
+        "line": 85,
+        "text": "gcOrEntropyRequested:false"
+      },
+      "pressureCitation": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-candidate-v1/guest.GC.UNEXECUTED.mjs",
+        "line": 7,
+        "text": "function pressure(phase)"
+      },
+      "nativeHookCitation": {
+        "path": "/private/tmp/starling-node-compat/crypto-owner-source-v2/builtins/node-compat/buffer.cpp",
+        "line": 59,
+        "text": "JS::NonIncrementalGC(cx, JS::GCOptions::Shrink, JS::GCReason::API)"
+      },
+      "correction": "Use a fresh immutable successor with explicit public-GC-pressure-requested true, entropy-requested false and actual-GC-count-unobserved semantics. Update the truthful full typed collector contract; do not reinterpret the inherited false as direct-only retroactively.",
+      "notRuntimeFailure": true,
+      "oldSourceMustRemainUnchanged": true
+    }
+  ],
+  "findingLedger": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-gc-source-review-v1/findings.json",
+    "sha256": "706e5a8b35deaeb5f6b75fb964018a78ff2b9d8ef1d449f6c5d89274ddc1de9c",
+    "bytes": 3168
+  },
+  "inputClosure": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-gc-source-review-v1/rehashed-inputs.json",
+    "sha256": "844f1be99fa35f70d1798c9c8ea3be498dd39d469295cc35eeab6db2c4d5e316",
+    "bytes": 1731362
+  },
+  "readerHistory": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-gc-source-review-v1/reader-history.json",
+    "sha256": "4f7605280a63377a422ab5fab029f2e86b8a4f2e3956596fd20d735f773f4723",
+    "bytes": 681
+  },
+  "proposalFollowOnContract": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-candidate-v1/follow-on-contract.json",
+    "sha256": "1685b171203387a54160c5c2e910126a9a395942b646f40a899b54c65610e506",
+    "bytes": 3698
+  },
+  "futureSourceReview": null,
+  "rootAuthority": null,
+  "gcEngine": null,
+  "gcNativeReview": null,
+  "gcComponent": null,
+  "gcResult": null,
+  "buildAllowed": false,
+  "freezeAllowed": false,
+  "bootstrapAllowed": false,
+  "componentAllowed": false,
+  "guestAllowed": false,
+  "keyOperationsAllowed": false,
+  "gcAllowed": false,
+  "operationalAdmission": false,
+  "runtimeAcceptanceClaim": false,
+  "timingAllowed": false,
+  "sourcePromotionAllowed": false,
+  "scope": "The isolation, preservation, public-hook source mapping and exact fixture derivation checks pass as bounded DATA observations. The proposal as a whole remains HOLD for GC-PROPOSAL-M1; it is not a runnable native/component/GC pipeline or runtime proof.",
+  "limitations": [
+    "Only a future actual GC-stress engine plus component and typed raw collector can establish the proposed observations. No such new artifact or action is supplied by this proposal.",
+    "All six hook-site counts are static source facts. No actual collection count, moving/compacting event, isolated native root, private heap, finalizer, free or wipe was observed.",
+    "Module holders, function arguments and other strong application owners remain combined. No GC inside a WebCrypto native call is claimed.",
+    "The future owned native controller must retain full source/tool admission, single-job Release/no-OOM policy, owned cleanup and the existing2GiB-start/800MiB-stop safeguards; that controller and freezer/bootstrap successors remain unimplemented here.",
+    "The normal1391 frozen-member inventory and1387 original-reference entries are strictly protected. Future native source work is separate; this HOLD does not approve a native build or mutate normal evidence."
+  ]
+}

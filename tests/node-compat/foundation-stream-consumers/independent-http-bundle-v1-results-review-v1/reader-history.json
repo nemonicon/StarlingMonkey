@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "observations": [
+    {
+      "attempt": 1,
+      "scope": "Private derived composer DATA format",
+      "failure": "Host parser saw a JSON string expression; no ExportNamedDeclaration existed.",
+      "cause": "Private reader wrote the composer through its JSON helper instead of plain UTF8 source text. The reconstructed source string hash already matched the actual graph.",
+      "correction": "Write that exact reconstructed string as plain text before AST parsing; archive original failed parser evidence and JSON-wrapped data.",
+      "ownerBytesChanged": false,
+      "ownerActionsInvoked": false
+    },
+    {
+      "attempt": 2,
+      "scope": "Private CJS AST native-reference normalization",
+      "failure": "AST comparison incorrectly rewrote original local __smBuiltin0 and nested __smBuiltin1 bindings as unrelated top-level native imports.",
+      "cause": "The prior profile plugin deliberately freshens inserted names against every original source identifier; the reader had not respected that lexical protection.",
+      "correction": "Preserve every original CJS identifier during native-reference comparison. Normalize only generated native import bindings proven fresh against that complete original identifier set. Retain exact full CJS body comparison.",
+      "ownerBytesChanged": false,
+      "ownerActionsInvoked": false
+    }
+  ]
+}

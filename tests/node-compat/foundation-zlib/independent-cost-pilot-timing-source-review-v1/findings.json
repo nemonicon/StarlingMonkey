@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "findings": [
+    {
+      "schemaVersion": 1,
+      "id": "ZLIB-COST-PILOT-TIMING-V1-M1",
+      "disposition": "CONCRETE_SOURCE_ADMISSION_BLOCKER",
+      "sourceIndex": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v1/index.json",
+        "sha256": "55db1fc3895a0dbd10ca07e08c59bd68da8edeb9793632c8e05cb41704c5135b",
+        "bytes": 15141
+      },
+      "function": "contractedProof in parent-guard.template.mjs",
+      "firstRead": "for(const row of referenced)await regular(row,{maxBytes:64*1024*1024})",
+      "recheck": "same referenced descriptor loop uses the same64MiB maximum",
+      "genuinePredicate": "regular in cost-jco-correctness-candidate-v2/authority.mjs requires row.bytes<=maxBytes before reading",
+      "actualProof": {
+        "state": "INDEPENDENT_ZLIB_COST_JCO_CORRECTNESS_V3_RESULTS_REVIEW_PASSED_V1",
+        "index": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/independent-cost-jco-correctness-v3-results-review-v1/index.json",
+          "sha256": "e03bb0db65f6009e86a6d55e4553e820d143c702128976efc5ef47e092548083",
+          "bytes": 3591
+        },
+        "result": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/independent-cost-jco-correctness-v3-results-review-v1/results.json",
+          "sha256": "24b5059339fa3a65b8e7e301b7d581be09badbcddb8e56f897ba876a6baebf69",
+          "bytes": 11014
+        },
+        "contract": {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/independent-cost-jco-correctness-v3-results-review-v1/result-contract.json",
+          "sha256": "25411f2ecb278c1eeda7b27a0aafa47b29cc3d9a53221a327e9e5c94002936f1",
+          "bytes": 10445
+        }
+      },
+      "actualOversizedDescriptor": {
+        "proof": "fullCorrectness",
+        "path": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "sha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+        "bytes": 108619024,
+        "sourceRegularMaxBytes": 67108864,
+        "actualSizePredicatePasses": false
+      },
+      "consequence": "Preparing the actual compact plan or a phase fails on the authenticated Node prerequisite before genuine correctnessPreflight or any phase worker. This is a source collector/admission bug, not an observed codec/runtime failure.",
+      "ownerGuardOrActionInvokedToEstablishFinding": false,
+      "status": "HOLD; preserve55db immutable; successor required"
+    }
+  ],
+  "additionalConcreteBlockersFound": []
+}

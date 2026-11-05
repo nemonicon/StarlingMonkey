@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "observations": [
+    {
+      "attempt": 1,
+      "readerOutcome": "AssertionError: Exact indexed count 31",
+      "scope": "Reader incorrectly inferred c3fb index count from the input-freeze's nonoverlapping role count.",
+      "actualPinnedIndexMembers": 32,
+      "correction": "Read actual authenticated c3fb index and require 32 members. One descriptor already had another preparation role.",
+      "ownerSourceChanged": false,
+      "ownerActionInvoked": false
+    },
+    {
+      "attempt": 2,
+      "readerOutcome": "AssertionError: Packaging row equals actual source publication row",
+      "scope": "Reader compared whole records although the publication index adds originalSource/sourceMode/outputMode/role provenance beyond the role map's four fields.",
+      "correction": "Require exact path, SHA, byte count and mode while retaining the full authenticated publication record as provenance.",
+      "ownerSourceChanged": false,
+      "ownerActionInvoked": false
+    }
+  ]
+}

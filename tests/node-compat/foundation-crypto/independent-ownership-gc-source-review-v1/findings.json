@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "findings": [
+    {
+      "id": "GC-PROPOSAL-M1",
+      "severity": "mandatory-source-correction-before-guest-successor",
+      "disposition": "HOLD",
+      "claim": "run() reports gcOrEntropyRequested:false after the new public pressure path deliberately reaches stress_gc in a future GC-stress engine.",
+      "returnCitation": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-candidate-v1/guest.GC.UNEXECUTED.mjs",
+        "line": 85,
+        "text": "gcOrEntropyRequested:false"
+      },
+      "pressureCitation": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-candidate-v1/guest.GC.UNEXECUTED.mjs",
+        "line": 7,
+        "text": "function pressure(phase)"
+      },
+      "nativeHookCitation": {
+        "path": "/private/tmp/starling-node-compat/crypto-owner-source-v2/builtins/node-compat/buffer.cpp",
+        "line": 59,
+        "text": "JS::NonIncrementalGC(cx, JS::GCOptions::Shrink, JS::GCReason::API)"
+      },
+      "correction": "Use a fresh immutable successor with explicit public-GC-pressure-requested true, entropy-requested false and actual-GC-count-unobserved semantics. Update the truthful full typed collector contract; do not reinterpret the inherited false as direct-only retroactively.",
+      "notRuntimeFailure": true,
+      "oldSourceMustRemainUnchanged": true
+    }
+  ],
+  "otherSourceFindings": [],
+  "citations": [
+    {
+      "path": "/private/tmp/starling-node-compat/crypto-owner-source-v2/tests/node-compat/build-engine.sh",
+      "line": 8,
+      "text": "work_root=\"${NODE_COMPAT_BUILD_ROOT:"
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/crypto-owner-source-v2/tests/node-compat/build-engine.sh",
+      "line": 129,
+      "text": "policy_suffix="
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/crypto-owner-source-v2/tests/node-compat/build-engine.sh",
+      "line": 133,
+      "text": "if [[ \"$stress\" == 1 ]]; then artifact_name="
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/crypto-owner-source-v2/cmake/builtins.cmake",
+      "line": 185,
+      "text": "target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_GC_STRESS=1)"
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/crypto-owner-source-v2/builtins/node-compat/buffer.cpp",
+      "line": 54,
+      "text": "static void stress_gc"
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/crypto-owner-source-v2/builtins/node-compat/buffer.cpp",
+      "line": 72,
+      "text": "static bool hex_decode"
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/crypto-owner-source-v2/builtins/node-compat/buffer.cpp",
+      "line": 115,
+      "text": "static bool hex_encode"
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/crypto-owner-source-v2/builtins/node-compat/buffer-facade.mjs",
+      "line": 149,
+      "text": "kernel.hexDecode(value)"
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/crypto-owner-source-v2/builtins/node-compat/buffer-facade.mjs",
+      "line": 191,
+      "text": "kernel.hexEncode(bytes)"
+    }
+  ]
+}

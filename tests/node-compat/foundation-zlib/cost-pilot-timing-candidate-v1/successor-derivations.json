@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_DERIVED_SUCCESSORS_ONLY_NO_ACTION",
+  "files": [
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-jco-control-correctness-candidate-v1/loading.mjs",
+        "sha256": "f7eeb451af35a4e6c1803f8cd1873f3ac58d5696e006eaf3d8f2caa737859b9c",
+        "bytes": 6644
+      },
+      "afterimage": "loading.mjs",
+      "afterSha256": "3656a4c3f0befeb90d03efdeb35d17c9660847590aa628fecc1edc1952b7d39d",
+      "edits": [
+        {
+          "old": "import {dirname,join} from 'node:path';",
+          "new": "import {dirname,join} from 'node:path';\nimport {nValue} from './planner.mjs';",
+          "afterOffsetAtEdit": 154,
+          "count": 1
+        },
+        {
+          "old": "export function scalarArguments(name,args){\n need(['identity','setup','batch','checkpoint'].includes(name)&&Array.isArray(args),'Control-only session exposes identity/setup/control-batch/checkpoint; no observe/stage/validate');const arity={identity:0,setup:1,observe:1,batch:2,checkpoint:0,stage:1,validate:1};need(args.length===arity[name],'Exact scalar arity');\n if(name==='stage'||name==='validate')need(typeof args[0]==='string'&&args[0].length<=2097152,'Whole bounded string argument; never clip');\n else{for(const value of args)need(Number.isSafeInteger(value)&&value>=0&&value<=0xffffffff&&!Object.is(value,-0),'Exact u32 number argument; no coercion');if(name==='setup')need(args[0]<30,'Exactly30 setup primary IDs');if(name==='batch')need(args[0]>=30&&args[0]<120&&args[1]===1,'Only three control ranges30..119 atN1; no codec/calibration/timing');}\n}\n",
+          "new": "export function scalarArguments(name,args){\n need(['identity','setup','batch','checkpoint'].includes(name)&&Array.isArray(args),'Measured worker exposes identity/setup/batch/checkpoint only; never observe/stage/validate');\n const arity={identity:0,setup:1,batch:2,checkpoint:0};need(args.length===arity[name],'Exact scalar arity');\n for(const value of args)need(Number.isSafeInteger(value)&&value>=0&&value<=0xffffffff&&!Object.is(value,-0),'Exact u32 scalar; no coercion');\n if(name==='setup')need(args[0]<30,'Thirty original primary IDs');\n if(name==='batch'){need(args[0]<120,'Original codec/control ranges');if(args[0]<30)nValue(args[0],args[1]);else need(args[1]===1,'Controls remain exactly N1');}\n}\n",
+          "afterOffsetAtEdit": 3298,
+          "count": 1
+        },
+        {
+          "old": "export async function loadControlSession(artifact){",
+          "new": "export async function loadTimingSession(artifact){",
+          "afterOffsetAtEdit": 4526,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    },
+    {
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-jco-correctness-candidate-v2/durable-host.mjs",
+        "sha256": "b7aec3e76348a246d89184e0f0d6e8155466ded50c41acfd5d265c3fa97bb8c2",
+        "bytes": 8880
+      },
+      "afterimage": "owned-lifecycle.mjs",
+      "afterSha256": "897a15a509a4b4873b8fcce4be61b2a44980378731c51bc74b9f362740cfdb65",
+      "edits": [
+        {
+          "old": "import assert from 'node:assert/strict';",
+          "new": "import assert from 'node:assert/strict';\nimport {MEASUREMENT_ENV,MEASUREMENT_CWD,lifecycleBounds,CallWatchdog} from './lifecycle-policy.mjs';",
+          "afterOffsetAtEdit": 72,
+          "count": 1
+        },
+        {
+          "old": "assert(Number.isSafeInteger(timeoutMs)&&timeoutMs>0&&timeoutMs<=600000);",
+          "new": "lifecycleBounds({timeoutMs,publicCallTimeoutMs:600000,maxOutputBytes});",
+          "afterOffsetAtEdit": 2716,
+          "count": 1
+        },
+        {
+          "old": "detachedOwnedSession:true,completed:false,startedAtUtc:new Date().toISOString(),runtimeAcceptanceClaim:false}",
+          "new": "detachedOwnedSession:true,completed:false,startedAtUtc:new Date().toISOString(),runtimeAcceptanceClaim:false,\n  exactEnvironment:MEASUREMENT_ENV,cwd:MEASUREMENT_CWD,publicCallTimeoutMs:600000}",
+          "afterOffsetAtEdit": 3249,
+          "count": 1
+        },
+        {
+          "old": "let timer,heartbeat,ceilingTimer,releaseClose;",
+          "new": "let timer,heartbeat,ceilingTimer,releaseClose,publicTimer;\n const watchdog=new CallWatchdog(),monotonicMs=()=>Number(process.hrtime.bigint()/1000000n);let stdoutPending='';\n function progressChunk(chunk){stdoutPending+=chunk.toString('utf8');assert(Buffer.byteLength(stdoutPending)<=8192,'Bounded pending progress line');let newline;while((newline=stdoutPending.indexOf('\\n'))>=0){const line=stdoutPending.slice(0,newline);stdoutPending=stdoutPending.slice(newline+1);assert(line.length>0&&Buffer.byteLength(line)<=4096,'Bounded whole progress marker');watchdog.accept(JSON.parse(line),monotonicMs());}}",
+          "afterOffsetAtEdit": 5077,
+          "count": 1
+        },
+        {
+          "old": "child=spawn(executable,args,{detached:true,stdio:['ignore','pipe','pipe']});",
+          "new": "child=spawn(executable,args,{detached:true,stdio:['ignore','pipe','pipe'],env:{...MEASUREMENT_ENV},cwd:MEASUREMENT_CWD});",
+          "afterOffsetAtEdit": 6017,
+          "count": 1
+        },
+        {
+          "old": "timer=setTimeout(()=>{timedOut=true;void terminate('deadline');},timeoutMs);",
+          "new": "timer=setTimeout(()=>{timedOut=true;void terminate('deadline');},timeoutMs);\n  publicTimer=setInterval(()=>{if(watchdog.expired(monotonicMs())){timedOut=true;void terminate('public-call-deadline',true);}},25);",
+          "afterOffsetAtEdit": 6490,
+          "count": 1
+        },
+        {
+          "old": "try{for await(const chunk of stream){await handle.writeFile(chunk);if(kind==='stdout')stdoutBytes+=chunk.length;else stderrBytes+=chunk.length;",
+          "new": "try{for await(const chunk of stream){await handle.writeFile(chunk);if(kind==='stdout'){stdoutBytes+=chunk.length;progressChunk(chunk);}else stderrBytes+=chunk.length;",
+          "afterOffsetAtEdit": 6965,
+          "count": 1
+        },
+        {
+          "old": "await Promise.all(pumps);\n  if(termination)await termination;",
+          "new": "await Promise.all(pumps);\n  if(!timedOut&&!spawnError&&!exitSignal&&exitCode===0){assert(stdoutPending.length===0,'No partial final progress marker');watchdog.finish();}\n  if(termination)await termination;",
+          "afterOffsetAtEdit": 8257,
+          "count": 1
+        },
+        {
+          "old": "clearTimeout(timer);clearInterval(heartbeat);clearTimeout(ceilingTimer);",
+          "new": "clearTimeout(timer);clearInterval(heartbeat);clearTimeout(ceilingTimer);clearInterval(publicTimer);",
+          "afterOffsetAtEdit": 8631,
+          "count": 1
+        },
+        {
+          "old": "const outcome={schemaVersion:1,name,executable,args,pid,status:exitCode",
+          "new": "const outcome={schemaVersion:1,name,executable,args,exactEnvironment:MEASUREMENT_ENV,cwd:MEASUREMENT_CWD,publicCallTimeoutMs:600000,pid,status:exitCode",
+          "afterOffsetAtEdit": 9178,
+          "count": 1
+        },
+        {
+          "old": "timeoutMs=600000,maxOutputBytes=16*1024*1024",
+          "new": "timeoutMs=600000,maxOutputBytes=1048576",
+          "afterOffsetAtEdit": 2536,
+          "count": 1
+        },
+        {
+          "old": "MEASUREMENT_ENV,MEASUREMENT_CWD,lifecycleBounds,CallWatchdog",
+          "new": "MEASUREMENT_ENV,MEASUREMENT_CWD,lifecycleBounds,CallWatchdog,armedAck",
+          "afterOffsetAtEdit": 121,
+          "count": 1
+        },
+        {
+          "old": "function progressChunk(chunk){",
+          "new": "async function progressChunk(chunk){",
+          "afterOffsetAtEdit": 5255,
+          "count": 1
+        },
+        {
+          "old": "watchdog.accept(JSON.parse(line),monotonicMs());}}",
+          "new": "const event=JSON.parse(line);watchdog.accept(event,monotonicMs());if(event.event==='cost-public-call-start'){await stdoutHandle.sync();child.stdin.write(JSON.stringify(armedAck(event))+'\\n');}}}",
+          "afterOffsetAtEdit": 5640,
+          "count": 1
+        },
+        {
+          "old": "stdio:['ignore','pipe','pipe'],env:",
+          "new": "stdio:['pipe','pipe','pipe'],env:",
+          "afterOffsetAtEdit": 6214,
+          "count": 1
+        },
+        {
+          "old": "progressChunk(chunk);}else stderrBytes",
+          "new": "await progressChunk(chunk);}else stderrBytes",
+          "afterOffsetAtEdit": 7230,
+          "count": 1
+        },
+        {
+          "old": "child.once('error',error=>{spawnError={name:error.name,code:error.code,message:error.message};});",
+          "new": "child.once('error',error=>{spawnError={name:error.name,code:error.code,message:error.message};});\n  child.stdin.on('error',error=>{errors.push({stage:'private-ack-pipe',code:error.code,message:error.message});void terminate('private-ack-pipe-error',true);});",
+          "afterOffsetAtEdit": 6370,
+          "count": 1
+        },
+        {
+          "old": "clearTimeout(timer);clearInterval(heartbeat);clearTimeout(ceilingTimer);clearInterval(publicTimer);",
+          "new": "clearTimeout(timer);clearInterval(heartbeat);clearTimeout(ceilingTimer);clearInterval(publicTimer);if(child?.stdin)child.stdin.destroy();",
+          "afterOffsetAtEdit": 8950,
+          "count": 1
+        },
+        {
+          "old": "publicCallTimeoutMs:600000}",
+          "new": "publicCallTimeoutMs:600000,parentFsyncBeforeCallAck:true}",
+          "afterOffsetAtEdit": 3418,
+          "count": 1
+        },
+        {
+          "old": "publicCallTimeoutMs:600000,pid,status:",
+          "new": "publicCallTimeoutMs:600000,parentFsyncBeforeCallAck:true,pid,status:",
+          "afterOffsetAtEdit": 9670,
+          "count": 1
+        },
+        {
+          "old": "timeoutMs=600000,maxOutputBytes=1048576,graceMs=5000,heartbeatMs=30000,onProgress=()=>{}})",
+          "new": "timeoutMs=600000,maxOutputBytes=1048576,graceMs=5000,heartbeatMs=30000,onProgress=()=>{},phaseDeadlineMonotonicMs})",
+          "afterOffsetAtEdit": 2545,
+          "count": 1
+        },
+        {
+          "old": "lifecycleBounds({timeoutMs,publicCallTimeoutMs:600000,maxOutputBytes});",
+          "new": "lifecycleBounds({timeoutMs,publicCallTimeoutMs:600000,maxOutputBytes});assert(Number.isSafeInteger(phaseDeadlineMonotonicMs)&&phaseDeadlineMonotonicMs>0,'Preselected independent global phase deadline required');",
+          "afterOffsetAtEdit": 2745,
+          "count": 1
+        },
+        {
+          "old": "let timer,heartbeat,ceilingTimer,releaseClose,publicTimer;",
+          "new": "let timer,heartbeat,ceilingTimer,releaseClose,publicTimer,phaseTimer;",
+          "afterOffsetAtEdit": 5276,
+          "count": 1
+        },
+        {
+          "old": "publicTimer=setInterval(()=>{if(watchdog.expired(monotonicMs())){timedOut=true;void terminate('public-call-deadline',true);}},25);",
+          "new": "publicTimer=setInterval(()=>{if(watchdog.expired(monotonicMs())){timedOut=true;void terminate('public-call-deadline',true);}},25);\n  phaseTimer=setTimeout(()=>{timedOut=true;void terminate('global-phase-deadline',true);},Math.max(1,phaseDeadlineMonotonicMs-monotonicMs()));",
+          "afterOffsetAtEdit": 7088,
+          "count": 1
+        },
+        {
+          "old": "clearInterval(publicTimer);if(child?.stdin)",
+          "new": "clearInterval(publicTimer);clearTimeout(phaseTimer);if(child?.stdin)",
+          "afterOffsetAtEdit": 9371,
+          "count": 1
+        },
+        {
+          "old": "publicCallTimeoutMs:600000,parentFsyncBeforeCallAck:true}",
+          "new": "publicCallTimeoutMs:600000,parentFsyncBeforeCallAck:true,phaseDeadlineMonotonicMs}",
+          "afterOffsetAtEdit": 3583,
+          "count": 1
+        },
+        {
+          "old": "publicCallTimeoutMs:600000,parentFsyncBeforeCallAck:true,pid,status:",
+          "new": "publicCallTimeoutMs:600000,parentFsyncBeforeCallAck:true,phaseDeadlineMonotonicMs,pid,status:",
+          "afterOffsetAtEdit": 10039,
+          "count": 1
+        },
+        {
+          "old": "onProgress=()=>{},phaseDeadlineMonotonicMs})",
+          "new": "onProgress=()=>{},phaseDeadlineMonotonicMs,publicCallTimeoutMs=600000})",
+          "afterOffsetAtEdit": 2616,
+          "count": 1
+        },
+        {
+          "old": "lifecycleBounds({timeoutMs,publicCallTimeoutMs:600000,maxOutputBytes})",
+          "new": "lifecycleBounds({timeoutMs,publicCallTimeoutMs,maxOutputBytes})",
+          "afterOffsetAtEdit": 2772,
+          "count": 1
+        },
+        {
+          "old": "const watchdog=new CallWatchdog(),",
+          "new": "const watchdog=new CallWatchdog({publicCallTimeoutMs}),",
+          "afterOffsetAtEdit": 5392,
+          "count": 1
+        },
+        {
+          "old": "publicCallTimeoutMs:600000,parentFsyncBeforeCallAck:true,phaseDeadlineMonotonicMs}",
+          "new": "publicCallTimeoutMs,parentFsyncBeforeCallAck:true,phaseDeadlineMonotonicMs}",
+          "afterOffsetAtEdit": 3603,
+          "count": 1
+        },
+        {
+          "old": "publicCallTimeoutMs:600000,parentFsyncBeforeCallAck:true,phaseDeadlineMonotonicMs,pid,status:",
+          "new": "publicCallTimeoutMs,parentFsyncBeforeCallAck:true,phaseDeadlineMonotonicMs,pid,status:",
+          "afterOffsetAtEdit": 10073,
+          "count": 1
+        }
+      ],
+      "forwardAndOffsetReverseExact": true
+    }
+  ],
+  "guestNativeHostCapabilityOrCodecPayloadChanged": false
+}
