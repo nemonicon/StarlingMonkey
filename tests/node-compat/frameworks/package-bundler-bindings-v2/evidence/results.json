@@ -1,0 +1,805 @@
+{
+  "schemaVersion": 1,
+  "state": "PURE_OXC_LEXICAL_BINDING_TESTS_PASSED",
+  "node": "v22.14.0",
+  "helperSha256": "f2cfb6e5e501572a1e68b345b45317f3f3cb521043e91181eaf70c10be26af14",
+  "syntheticCases": 60,
+  "cases": [
+    {
+      "id": "bare-global",
+      "source": "process;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 0,
+          "end": 7
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "provided-process-param",
+      "source": "function f(process){return process.value;}",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "provided-global-param",
+      "source": "function f(global){return global.value;}",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "local-does-not-protect-other-function",
+      "source": "function f(process){return process;}function g(){return process;}",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 56,
+          "end": 63
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "module-var-hoist",
+      "source": "process;var process=1;",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "module-let-tdz-is-bound",
+      "source": "process;let process=1;",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "nested-block-var-hoist",
+      "source": "function f(){return process;{var process=1;}}",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "block-let-no-leak",
+      "source": "{let process=1;process;}process;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 24,
+          "end": 31
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "block-function-no-leak",
+      "source": "{function process(){}process;}process;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 30,
+          "end": 37
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "function-declaration-hoist",
+      "source": "function f(){return process;function process(){}}process;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 49,
+          "end": 56
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "function-expression-self-only",
+      "source": "const x=function process(){return process;};process;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 44,
+          "end": 51
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "named-function-default",
+      "source": "const x=function process(a=process){return a;};",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "parameter-default-not-body-var",
+      "source": "function f(x=process){var process=1;return process;}",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 13,
+          "end": 20
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "parameter-default-not-body-function",
+      "source": "function f(x=process){function process(){}return process;}",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 13,
+          "end": 20
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "parameter-default-local-tdz",
+      "source": "function f(process=process){return process;}",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "destructuring-default-not-body-var",
+      "source": "function f({x=process}={}){var process;return x;}",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 14,
+          "end": 21
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "computed-binding-key",
+      "source": "const {[process]:p}=value;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 8,
+          "end": 15
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "pattern-key-is-not-binding",
+      "source": "const {process:local}=value;process;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 28,
+          "end": 35
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "pattern-shorthand-binding",
+      "source": "const {process}=value;process;",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "array-rest-binding",
+      "source": "const [process,...global]=value;process;global;",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "nested-object-rest-binding",
+      "source": "const {x:{process},...global}=value;process;global;",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "assignment-pattern-reference",
+      "source": "({process}=value);",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 2,
+          "end": 9
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "assignment-default-reference",
+      "source": "({x:process=global}=value);",
+      "expected": [
+        "process",
+        "global"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 4,
+          "end": 11
+        },
+        {
+          "name": "global",
+          "start": 12,
+          "end": 18
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "property-key-not-reference",
+      "source": "({process:1,method(){return process;}});",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 28,
+          "end": 35
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "property-shorthand-reference-once",
+      "source": "({process});",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 2,
+          "end": 9
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "computed-property-is-reference",
+      "source": "({[process]:global});",
+      "expected": [
+        "process",
+        "global"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 3,
+          "end": 10
+        },
+        {
+          "name": "global",
+          "start": 12,
+          "end": 18
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "member-key-versus-value",
+      "source": "obj.process;obj[process];",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 16,
+          "end": 23
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "import-default-binding",
+      "source": "import process from 'fixture';process;",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "import-aliased-name",
+      "source": "import {process as local} from 'fixture';process;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 41,
+          "end": 48
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "import-local-name",
+      "source": "import {value as process} from 'fixture';process;",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "import-namespace",
+      "source": "import * as global from 'fixture';global.process;",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "external-reexport-no-local-ref",
+      "source": "export {process as global} from 'fixture';",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "local-export-reference",
+      "source": "const process=1;export {process as global};",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "default-export-expression",
+      "source": "export default process;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 15,
+          "end": 22
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "catch-binding-no-leak",
+      "source": "try{}catch(process){process;}process;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 29,
+          "end": 36
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "catch-destructuring",
+      "source": "try{}catch({process:global}){global;}global;",
+      "expected": [
+        "global"
+      ],
+      "observed": [
+        {
+          "name": "global",
+          "start": 37,
+          "end": 43
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "for-let-no-leak",
+      "source": "for(let process of values){process;}process;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 36,
+          "end": 43
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "for-var-hoists",
+      "source": "for(var process of values){}process;",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "for-header-closure",
+      "source": "for(let process=0;process<1;process++){(()=>process)();}process;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 56,
+          "end": 63
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "for-assignment-reference",
+      "source": "for({process}of values){}",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 5,
+          "end": 12
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "switch-discriminant-outside-case-lexical",
+      "source": "switch(process){case 1:let process=1;break;}",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 7,
+          "end": 14
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "switch-var-hoist",
+      "source": "switch(process){case 1:var process=1;break;}",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "class-declaration-binding",
+      "source": "class process{method(){return process;}}process;",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "named-class-inner-only",
+      "source": "const X=class process extends process{[process](){return process;}};process;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 68,
+          "end": 75
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "class-keys-and-fields",
+      "source": "class X{process(){return process;}[global](){return global;}field=process;}",
+      "expected": [
+        "process",
+        "global",
+        "global",
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 25,
+          "end": 32
+        },
+        {
+          "name": "global",
+          "start": 35,
+          "end": 41
+        },
+        {
+          "name": "global",
+          "start": 52,
+          "end": 58
+        },
+        {
+          "name": "process",
+          "start": 66,
+          "end": 73
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "class-static-var-isolated",
+      "source": "class X{static{var process=1;process;}static{process;}}",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 45,
+          "end": 52
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "class-static-var-not-field-scope",
+      "source": "class X{static{var process;}static field=process;}",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 41,
+          "end": 48
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "private-property-not-identifier-ref",
+      "source": "class X{#process=1;method(){return this.#process;}}",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "label-not-identifier-ref",
+      "source": "process:for(;;){break process;}",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "normal-function-arguments",
+      "source": "function f(){return arguments;}arguments;",
+      "expected": [
+        "arguments"
+      ],
+      "observed": [
+        {
+          "name": "arguments",
+          "start": 31,
+          "end": 40
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "arrow-inherits-arguments",
+      "source": "function f(){return ()=>arguments;}",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "top-arrow-arguments-unbound",
+      "source": "const f=()=>arguments;",
+      "expected": [
+        "arguments"
+      ],
+      "observed": [
+        {
+          "name": "arguments",
+          "start": 12,
+          "end": 21
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "provided-require-is-lexically-bound",
+      "source": "function f(require){return require(\"fixture\");}",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "id": "computed-method-key-outer",
+      "source": "const x={ [process](process){return process;} };",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 11,
+          "end": 18
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "normal-getter-method",
+      "source": "const x={get process(){return process;}};",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 30,
+          "end": 37
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "unicode-ranges",
+      "source": "const π='€';process;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 12,
+          "end": 19
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "optional-member-key",
+      "source": "obj?.process;process?.value;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 13,
+          "end": 20
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "typeof-global-is-reference",
+      "source": "typeof process;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 7,
+          "end": 14
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "independent-nested-parameter",
+      "source": "function f(process){return()=>process;}process;",
+      "expected": [
+        "process"
+      ],
+      "observed": [
+        {
+          "name": "process",
+          "start": 39,
+          "end": 46
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "nested-var-does-not-bind-parent",
+      "source": "function f(){var global;}global;",
+      "expected": [
+        "global"
+      ],
+      "observed": [
+        {
+          "name": "global",
+          "start": 25,
+          "end": 31
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "realSourceCases": [
+    {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-run-20261105-02/application/node_modules/react/cjs/react.production.js",
+      "expectedProcessReferences": 3,
+      "sha256": "0b5529981841afa1b58c76ba85c29bb681ff5f07cd8cde6a10b967d3915b8e1c",
+      "bytes": 18040,
+      "observed": [
+        {
+          "name": "process",
+          "start": 10017,
+          "end": 10024
+        },
+        {
+          "name": "process",
+          "start": 10060,
+          "end": 10067
+        },
+        {
+          "name": "process",
+          "start": 10095,
+          "end": 10102
+        }
+      ],
+      "parsedOnly": true,
+      "moduleImported": false
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-run-20261105-02/application/node_modules/react-dom/cjs/react-dom-server.edge.production.js",
+      "expectedProcessReferences": 0,
+      "sha256": "4d43f4e5e78cce97b95c4704b5e3f7bdc142c2a9f9b58ea2702eeb7b6442d00c",
+      "bytes": 293012,
+      "observed": [],
+      "parsedOnly": true,
+      "moduleImported": false
+    }
+  ],
+  "realRendererLocalProcessClaim": false,
+  "realReactUnboundProcessPreserved": true,
+  "analyzedModulesExecuted": false,
+  "guestExecuted": false,
+  "nativeEngineExecuted": false,
+  "compilerInvoked": false
+}

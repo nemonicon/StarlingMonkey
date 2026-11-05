@@ -1,0 +1,1 @@
+class C{static{var process=1;}}export function o(){return process;}

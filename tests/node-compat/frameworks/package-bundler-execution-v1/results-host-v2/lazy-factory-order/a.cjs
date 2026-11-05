@@ -1,0 +1,1 @@
+const state=[];exports.state=state;exports.read=()=>require('./b.cjs')(state);state.push('a');

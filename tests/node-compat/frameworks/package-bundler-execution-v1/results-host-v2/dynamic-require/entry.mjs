@@ -1,0 +1,1 @@
+export function observe(name){return require(name);}

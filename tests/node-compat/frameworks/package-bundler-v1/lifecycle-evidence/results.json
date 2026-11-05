@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "node": "v22.14.0",
+  "cases": [
+    {
+      "name": "conditional-lazy-once",
+      "nativeEngineExecuted": false,
+      "frameworkPackageExecuted": false,
+      "imports": [],
+      "observations": {
+        "rawNode": {
+          "executable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+          "args": [
+            "--input-type=module",
+            "--eval",
+            "import{observe}from \"file:///Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v1/lifecycle-evidence/conditional-lazy-once/entry.mjs\";process.stdout.write(JSON.stringify(observe())+'\\n');"
+          ],
+          "status": 0,
+          "signal": null,
+          "error": null,
+          "value": {
+            "before": 0,
+            "skipped": "skip",
+            "afterSkip": 0,
+            "afterLoad": 1,
+            "afterAgain": 1,
+            "same": true
+          }
+        },
+        "bundledNode": {
+          "executable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+          "args": [
+            "--input-type=module",
+            "--eval",
+            "import{observe}from \"file:///Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v1/lifecycle-evidence/conditional-lazy-once/bundle.mjs\";process.stdout.write(JSON.stringify(observe())+'\\n');"
+          ],
+          "status": 0,
+          "signal": null,
+          "error": null,
+          "value": {
+            "before": 0,
+            "skipped": "skip",
+            "afterSkip": 0,
+            "afterLoad": 1,
+            "afterAgain": 1,
+            "same": true
+          }
+        }
+      },
+      "sameStructuredValue": true
+    },
+    {
+      "name": "cyclic-partial-exports",
+      "nativeEngineExecuted": false,
+      "frameworkPackageExecuted": false,
+      "imports": [],
+      "observations": {
+        "rawNode": {
+          "executable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+          "args": [
+            "--input-type=module",
+            "--eval",
+            "import{observe}from \"file:///Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v1/lifecycle-evidence/cyclic-partial-exports/entry.mjs\";process.stdout.write(JSON.stringify(observe())+'\\n');"
+          ],
+          "status": 0,
+          "signal": null,
+          "error": null,
+          "value": {
+            "a": {
+              "name": "a",
+              "b": "b"
+            },
+            "b": {
+              "name": "b",
+              "a": "a"
+            }
+          }
+        },
+        "bundledNode": {
+          "executable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+          "args": [
+            "--input-type=module",
+            "--eval",
+            "import{observe}from \"file:///Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v1/lifecycle-evidence/cyclic-partial-exports/bundle.mjs\";process.stdout.write(JSON.stringify(observe())+'\\n');"
+          ],
+          "status": 0,
+          "signal": null,
+          "error": null,
+          "value": {
+            "a": {
+              "name": "a",
+              "b": "b"
+            },
+            "b": {
+              "name": "b",
+              "a": "a"
+            }
+          }
+        }
+      },
+      "sameStructuredValue": true
+    },
+    {
+      "name": "mutable-cjs-named-import",
+      "nativeEngineExecuted": false,
+      "frameworkPackageExecuted": false,
+      "imports": [],
+      "observations": {
+        "rawNode": {
+          "executable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+          "args": [
+            "--input-type=module",
+            "--eval",
+            "import{observe}from \"file:///Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v1/lifecycle-evidence/mutable-cjs-named-import/entry.mjs\";process.stdout.write(JSON.stringify(observe())+'\\n');"
+          ],
+          "status": 0,
+          "signal": null,
+          "error": null,
+          "value": {
+            "before": 1,
+            "after": 1
+          }
+        },
+        "bundledNode": {
+          "executable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+          "args": [
+            "--input-type=module",
+            "--eval",
+            "import{observe}from \"file:///Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v1/lifecycle-evidence/mutable-cjs-named-import/bundle.mjs\";process.stdout.write(JSON.stringify(observe())+'\\n');"
+          ],
+          "status": 0,
+          "signal": null,
+          "error": null,
+          "value": {
+            "before": 1,
+            "after": 2
+          }
+        }
+      },
+      "sameStructuredValue": false
+    }
+  ],
+  "hostToyModulesOnly": true,
+  "nativeEngineExecuted": false,
+  "guestExecuted": false
+}

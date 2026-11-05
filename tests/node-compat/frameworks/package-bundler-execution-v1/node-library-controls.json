@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "scope": "Corrected stock Node CJS library controls; no Wasm/runtime action",
+  "node": "v22.14.0",
+  "nodeEnvironment": "production",
+  "application": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-run-20261105-02/application",
+  "cases": [
+    {
+      "specifier": "next/server",
+      "resolvedEntry": {
+        "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-run-20261105-02/application/node_modules/next/server.js",
+        "sha256": "27af9ff1b48943de6597072ec7dc563edafbc33833f5e8f030e50459d6de862c",
+        "bytes": 1328
+      },
+      "value": {
+        "library": "next/server",
+        "path": "/hello",
+        "requestHeader": "next-wasm",
+        "status": 200,
+        "contentType": "application/json",
+        "body": "{\"path\":\"/hello\",\"name\":\"wasm\"}",
+        "cookie": "wasm"
+      },
+      "status": "passed"
+    },
+    {
+      "specifier": "next/headers",
+      "resolvedEntry": {
+        "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-run-20261105-02/application/node_modules/next/headers.js",
+        "sha256": "02f369940f45251aab7a8cacf678349e0bb26f99c5f32ff56d85d1e7575ac6ac",
+        "bytes": 229
+      },
+      "status": "threw",
+      "error": {
+        "name": "Error",
+        "code": null,
+        "message": "`headers` was called outside a request scope. Read more: https://nextjs.org/docs/messages/next-dynamic-api-wrong-context"
+      }
+    }
+  ]
+}

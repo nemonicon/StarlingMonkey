@@ -1,0 +1,1 @@
+const m=module;export function o(){return m.exports;}

@@ -1,0 +1,1 @@
+import value from 'condition-fixture';export function observe(){return value;}

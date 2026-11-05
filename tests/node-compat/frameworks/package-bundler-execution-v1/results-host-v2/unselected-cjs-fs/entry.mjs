@@ -1,0 +1,1 @@
+import fs from './a.cjs';export function observe(){return fs;}

@@ -1,0 +1,1 @@
+import load from './pkg.cjs';export function observe(){const before=globalThis.__auditCount??0;const skipped=load(false);const afterSkip=globalThis.__auditCount??0;const a=load(true);const afterLoad=globalThis.__auditCount;const b=load(true);return {before,skipped,afterSkip,afterLoad,afterAgain:globalThis.__auditCount,same:a===b};}

@@ -1,0 +1,1 @@
+const x={require:7,process:8,global:9};export function observe(){return[x.require,x.process,x.global];}

@@ -15,7 +15,8 @@ def fingerprint(path):
 def main():
     assert not(HERE/'index.json').exists(),'Sealed Source is immutable; use a new successor'
     refs=json.loads((HERE/'references.json').read_bytes());pure=json.loads((HERE/'pure-results.json').read_bytes())
-    assert pure['checks']>=307 and pure['redirectCases']==35 and pure['responseCloseFailureCases']==5
+    assert pure['checks']>=325 and pure['redirectCases']==35 and pure['responseCloseFailureCases']==5
+    assert pure['manifestIntakeCases']==9 and pure['descriptorAndFamilyRecheckCases']==4 and pure['preimportProtectionCases']==2
     captured={};identities={};families=[]
     def capture(r):
         d={k:r[k]for k in ['path','sha256','bytes']}
@@ -69,8 +70,15 @@ def main():
         p=Path(path);s=p.stat();assert(s.st_dev,s.st_ino,s.st_size,s.st_mtime_ns,s.st_ctime_ns,str(p.resolve()))==identity
     for f in families:
         base=Path(f['index']['path']).parent;assert{p.relative_to(base).as_posix()for p in base.rglob('*')if p.is_file()}==set(f['memberNames'])and not any(p.is_symlink()for p in base.rglob('*'))
+    assert set(r['path']for r in predecessor_inputs['files']).issubset(captured)
+    assert str(HERE/'index.json')not in captured and str(HERE/'source-inputs.json')not in captured
+    for f in families:
+        base=Path(f['index']['path']).parent
+        assert all(str(base/name)in captured for name in f['memberNames'])
+    for name in ['import-abi-clock-io-v1-source','import-abi-clock-io-v1-build','import-abi-clock-io-v1-package','import-abi-clock-io-v1-build-v2-external-root']:
+        future=Path('/private/tmp/starling-node-compat')/name;assert not future.exists()and not future.is_symlink()
     write('source-inputs.json',dict(schemaVersion=1,files=list(captured.values()),families=families,links=aliases,predecessorDeclaredInputs=5606,allRowsRuntimeCapturedBeforeCustomImportAndOnRecheck=True,originalModesVerified=True,fullContentHashThenFinalIdentityStability=True,readOnlyData=True,operationalHelpersOrToolsInvoked=False))
-    result=dict(schemaVersion=1,state='CLOCK_IO_BUILD_CONTROLLER_SOURCE_SEALED_UNREVIEWED_V2',sourceOnly=True,sourceIndex=refs['sourceIndex'],proposalSourceReview=refs['sourceReviewData'],predecessor=refs['predecessorIndex'],redirectSourceHold=refs['redirectHoldIndex'],pureDataChecks=pure['checks'],redirectStatusTargetCases=35,responseCloseFailureCases=5,realOpenerErrorDispatchCases=5,localNoProxyFactoryConstructedWithoutRequests=True,isolatedRawStepCases=9,isolatedPreworkFailureCases=2,isolatedMainCallerCases=2,cachedArchiveHeadersParsed=118,missingArchivesFetched=0,fullSourceInputsHashed=len(captured),predecessorDeclaredInputsPreserved=5606,logicalInputBytes=sum(r['bytes']for r in captured.values()),originalJsAliasesVerified=len(aliases),exactForwardInverseFiles=len(comparisons),exactForwardInverseEdits=sum(len(r['edits'])for r in comparisons),pythonAstFiles=astfiles,sourceCopies=0,vendorExtractions=0,networkOrMonitorOrCompilerOrNodeOrJcoActionsInvoked=False,actualStage=None,actualBuild=None,actualUnitResults=None,prunerFunctionInvokedByRefusalUnitTest=None,validAdapterPruningRun=False,adapterArtifactPublished=False,adapterCliPruneCommandInvoked=False,sourcePeer=None,rootAuthority=None,operationalAdmission=False,runtimeAcceptanceClaim=False)
+    result=dict(schemaVersion=1,state='CLOCK_IO_BUILD_CONTROLLER_SOURCE_SEALED_UNREVIEWED_V2',sourceOnly=True,sourceIndex=refs['sourceIndex'],proposalSourceReview=refs['sourceReviewData'],predecessor=refs['predecessorIndex'],redirectSourceHold=refs['redirectHoldIndex'],pureDataChecks=pure['checks'],redirectStatusTargetCases=35,responseCloseFailureCases=5,realOpenerErrorDispatchCases=5,manifestIntakeCases=9,descriptorAndFamilyRecheckCases=4,preimportProtectionCases=2,localNoProxyFactoryConstructedWithoutRequests=True,isolatedRawStepCases=9,isolatedPreworkFailureCases=2,isolatedMainCallerCases=2,cachedArchiveHeadersParsed=118,missingArchivesFetched=0,fullSourceInputsHashed=len(captured),predecessorDeclaredInputsPreserved=5606,logicalInputBytes=sum(r['bytes']for r in captured.values()),originalJsAliasesVerified=len(aliases),exactForwardInverseFiles=len(comparisons),exactForwardInverseEdits=sum(len(r['edits'])for r in comparisons),pythonAstFiles=astfiles,sourceCopies=0,vendorExtractions=0,networkOrMonitorOrCompilerOrNodeOrJcoActionsInvoked=False,actualStage=None,actualBuild=None,actualUnitResults=None,prunerFunctionInvokedByRefusalUnitTest=None,validAdapterPruningRun=False,adapterArtifactPublished=False,adapterCliPruneCommandInvoked=False,sourcePeer=None,rootAuthority=None,operationalAdmission=False,runtimeAcceptanceClaim=False)
     write('results.json',result)
     write('source-receipt.json',dict(schemaVersion=1,state='SOURCE_ONLY_CLOCK_IO_BUILD_CONTROLLER_RECEIPT_V2',sourceRoot=str(HERE),sourceIndex=refs['sourceIndex'],fullInputs=len(captured),pureChecks=pure['checks'],reversibleFiles=len(comparisons),actualActionsInvoked=False,allFutureEffectiveActionsNull=True))
     rows=[]

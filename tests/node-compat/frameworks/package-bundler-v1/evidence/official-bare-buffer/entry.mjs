@@ -1,0 +1,1 @@
+import expected from "buffer";import value from './pkg.cjs';export function observe(){return {sameDefault:value===expected,hasOwnDefault:Object.hasOwn(value,'default'),type:typeof value,keys:Object.keys(value).sort(),streamSelf:value.Stream===value};}

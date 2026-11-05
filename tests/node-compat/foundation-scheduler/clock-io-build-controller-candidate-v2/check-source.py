@@ -217,5 +217,88 @@ check('with client.open(url, timeout=60)'in source and 'urllib.request.urlopen('
 check("need(response.geturl()==url,'no unknown download redirect')"in source,'post URL assertion retained')
 check('for entry in declared[\'files\']'in auth and auth.index('declared = read(row(HERE / \'source-inputs.json\'))')<auth.index("root = read(config['rootAuthority'])"),'all own declared rows authenticated before Root/action/customimport')
 
-result=dict(schemaVersion=1,state='CLOCK_IO_BUILD_CONTROLLER_PURE_DATA_CHECKS_PASSED_V2',checks=len(checks),redirectCases=redirect_cases,responseCloseFailureCases=5,noProxyLocalFactoryChecks=True,checkNames=checks,cachedArchiveHeaderData=crate_data,isolatedRawStepCases=9,isolatedPreworkFailureCases=2,isolatedMainCallerCases=2,actualSourcePlanOnly=True,actualSourceCopiesPerformed=False,actualVendorExtractionPerformed=False,networkPerformed=False,monitorOrBuildToolInvoked=False,rawStepExecutedOnlyAgainstInjectedMemoryModel=True,rootAuthority=None)
+# Exercise the actual own-manifest intake block and exact descriptor verifier
+# with injected immutable descriptor DATA. No physical input or owner import is
+# performed by this model; the separate sealer hashes all real input bytes.
+auth_node=next(n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=='authorize')
+start=next(i for i,n in enumerate(auth_node.body)if isinstance(n,ast.Assign)and any(isinstance(t,ast.Name)and t.id=='declared'for t in n.targets))
+intake_nodes=auth_node.body[start:start+3]
+check(isinstance(intake_nodes[2],ast.For),'actual complete own-manifest intake shape')
+intake_code=compile(ast.Module(body=intake_nodes,type_ignores=[]),'<actual Source manifest intake>','exec')
+original_inputs=json.loads((Path(refs['predecessorIndex']['path']).parent/'source-inputs.json').read_text())['files']
+expected={r['path']:r for r in original_inputs}
+manifest_row=dict(path='/PURE/own/source-inputs.json',sha256='0'*64,bytes=0)
+def intake_case(manifest):
+    seen=[]
+    def actual_row(path):
+        return copy.deepcopy(manifest_row if str(path)==manifest_row['path']else expected[str(path)])
+    context=dict(Path=Path,re=re,HERE=Path('/PURE/own'),row=actual_row,read=lambda r:copy.deepcopy(manifest))
+    extract(['need','verify'],context)
+    def capture(r):context['verify'](r);seen.append(copy.deepcopy(r))
+    context['capture']=capture
+    exec(intake_code,context)
+    return seen
+manifest=dict(schemaVersion=1,files=copy.deepcopy(original_inputs))
+check(intake_case(manifest)==original_inputs,'every5606 actual declared row reaches real descriptor verifier before action')
+intake_mutations=[]
+for name in ['schema','missing-last','first-sha','last-sha','bool-bytes','extra-descriptor-field','missing-sha','over-finite-cap']:
+    bad=copy.deepcopy(manifest)
+    if name=='schema':bad['schemaVersion']=0
+    elif name=='missing-last':bad['files'].pop()
+    elif name in ['first-sha','last-sha']:bad['files'][0 if name=='first-sha'else-1]['sha256']='f'*64
+    elif name=='bool-bytes':bad['files'][0]['bytes']=True
+    elif name=='extra-descriptor-field':bad['files'][0]['projected']=True
+    elif name=='missing-sha':del bad['files'][0]['sha256']
+    else:bad['files']=[copy.deepcopy(original_inputs[0])for _ in range(8193)]
+    refuses(lambda:intake_case(bad),'real manifest intake refuses '+name);intake_mutations.append(name)
+
+# The first two actual recheck loops must revisit every captured descriptor and
+# every complete indexed family. Only filesystem/identity lookups are injected.
+recheck_node=next(n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=='recheck')
+recheck_code=compile(ast.Module(body=recheck_node.body[:2],type_ignores=[]),'<actual descriptor/family recheck loops>','exec')
+probe_rows=copy.deepcopy(original_inputs[:2]+original_inputs[-1:])
+class IdentityPath:
+    state={}
+    def __init__(self,value):self.value=str(value)
+    def __str__(self):return self.value
+    def stat(self):return types.SimpleNamespace(**self.state[self.value])
+    def resolve(self):return self.value
+def recheck_case(change=None):
+    disk={r['path']:copy.deepcopy(r)for r in probe_rows};identities={};seen=[];families=[{'PURE_FAMILY':1},{'PURE_FAMILY':2}];family_calls=[]
+    IdentityPath.state={}
+    for i,r in enumerate(probe_rows):
+        IdentityPath.state[r['path']]=dict(st_dev=1,st_ino=i+1,st_size=r['bytes'],st_mtime_ns=11,st_ctime_ns=12)
+        identities[r['path']]=(1,i+1,r['bytes'],11,12,r['path'])
+    if change=='bytes':disk[probe_rows[-1]['path']]['sha256']='f'*64
+    if change=='inode':IdentityPath.state[probe_rows[-1]['path']]['st_ino']=999
+    def actual_row(path):seen.append(str(path));return copy.deepcopy(disk[str(path)])
+    def family_model(index):
+        if change=='family':raise ValueError('injected changed complete family')
+        family_calls.append(index)
+    context=dict(Path=IdentityPath,re=re,row=actual_row,family=family_model,frame=dict(captured={r['path']:r for r in probe_rows},identities=identities,families=families))
+    extract(['need','verify'],context);exec(recheck_code,context)
+    return seen,family_calls
+seen,families_seen=recheck_case()
+check(seen==[r['path']for r in probe_rows]and len(families_seen)==2,'actual final loops visit all descriptors and all families')
+for change in ['bytes','inode','family']:refuses(lambda:recheck_case(change),'actual final loops refuse '+change)
+
+# Execute the genuine custom-import caller with a fake importlib endpoint only.
+# A failed preimport recheck must prevent even the fake module creation.
+for reject_recheck in [False,True]:
+    trace=[];entry=Path('/PURE/monitor/monitor.py')
+    def preimport_recheck(frame):
+        trace.append('recheck')
+        if reject_recheck:raise ValueError('injected full Source change')
+    fake_spec=types.SimpleNamespace(loader=types.SimpleNamespace(exec_module=lambda m:trace.append('exec-module-in-memory')))
+    fake_importlib=types.SimpleNamespace(util=types.SimpleNamespace(spec_from_file_location=lambda name,path:(trace.append('spec')or fake_spec),module_from_spec=lambda spec:(trace.append('module')or object())))
+    context=dict(Path=Path,MONITOR=entry.parent,importlib=fake_importlib,verify=lambda r:trace.append('verify-entry'),recheck=preimport_recheck)
+    extract(['need','load_monitor'],context)
+    if reject_recheck:
+        refuses(lambda:context['load_monitor'](dict(captured={str(entry):{'PURE':True}})),'changed full Source refuses before custom import')
+        check(trace==['verify-entry','recheck'],'no fake import endpoint reached after failed protection')
+    else:
+        context['load_monitor'](dict(captured={str(entry):{'PURE':True}}))
+        check(trace==['verify-entry','recheck','spec','module','exec-module-in-memory'],'genuine caller authenticates before only injected import')
+
+result=dict(schemaVersion=1,state='CLOCK_IO_BUILD_CONTROLLER_PURE_DATA_CHECKS_PASSED_V2',checks=len(checks),manifestIntakeCases=9,descriptorAndFamilyRecheckCases=4,preimportProtectionCases=2,redirectCases=redirect_cases,responseCloseFailureCases=5,noProxyLocalFactoryChecks=True,checkNames=checks,cachedArchiveHeaderData=crate_data,isolatedRawStepCases=9,isolatedPreworkFailureCases=2,isolatedMainCallerCases=2,actualSourcePlanOnly=True,actualSourceCopiesPerformed=False,actualVendorExtractionPerformed=False,networkPerformed=False,monitorOrBuildToolInvoked=False,rawStepExecutedOnlyAgainstInjectedMemoryModel=True,rootAuthority=None)
 (HERE/'pure-results.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(dict(state=result['state'],checks=len(checks),cachedArchives=len(crate_data))))

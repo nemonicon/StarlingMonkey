@@ -1,0 +1,1 @@
+import value from './value.cjs';import buffer from 'node:buffer';export function observe(){return {same:value===buffer,constructor:value.Buffer===buffer.Buffer};}

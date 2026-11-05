@@ -1,0 +1,1 @@
+import x from './x.cjs';export function o(){return x;}

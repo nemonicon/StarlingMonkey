@@ -8,6 +8,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { loadToolchain } from '../../toolchain.mjs';
 import { loadComponentizer } from '../../componentizer.mjs';
 import { bundleProfile } from '../../profile-bundler.mjs';
+import { bundlePackages } from '../../framework-package-bundler.mjs';
+import { bundlePackages as bundlePackagesV2 } from '../../framework-package-bundler-v2.mjs';
 import { selectedManifestsForEngine } from '../../module-selection.mjs';
 import { runOwnedCommand } from '../../foundation-zlib/cost-jco-correctness-candidate-v2/durable-host.mjs';
 import { parseScalarStringOutput } from '../../foundation-zlib/cost-wasmtime-transport-candidate-v1/scalar-transport.mjs';
@@ -16,7 +18,7 @@ const HERE = dirname(fileURLToPath(import.meta.url)), REPOSITORY = resolve(HERE,
 const EXPECTED_ENGINE = 'd54446dcd4071fe2c2b1db4984ead78d2fe61ceb0a0396822df8416a26921a92';
 const EXPECTED_METADATA = 'bfaec95ee0058edf587ebbf1cb020d7871759e896aa0d809e1af788a300531d6';
 const EXPECTED_ADAPTER = '988224282d03fe0bd3c25b62344aef265b1a8e1f5804bdbc34d6442507fabcc0';
-const CASES = new Set(['compat', 'compat-caught', 'native-modules', 'react-element', 'react-dom-edge', 'react-dom-string', 'next-server', 'next-headers', 'next-standalone', 'next-page', 'next-route', 'import-fs-promises', 'import-crypto', 'import-async-hooks', 'import-http', 'import-net', 'import-url', 'import-process', 'import-timers', 'child-process-call', 'buffer-unsupported']);
+const CASES = new Set(['compat', 'compat-caught', 'native-modules', 'native-cjs-interop', 'react-element', 'react-dom-edge', 'react-dom-string', 'next-server', 'next-headers', 'next-standalone', 'next-page', 'next-route', 'import-fs-promises', 'import-crypto', 'import-async-hooks', 'import-http', 'import-net', 'import-url', 'import-process', 'import-timers', 'child-process-call', 'buffer-unsupported']);
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const descriptor = async path => { const bytes = await readFile(path); return { path: resolve(path), sha256: hash(bytes), bytes: bytes.length }; };
 async function durable(path, data) {
@@ -40,10 +42,11 @@ function errorData(error) {
 function options(argv) {
   assert(argv.length % 2 === 0); const result = {};
   for (let i = 0; i < argv.length; i += 2) {
-    assert(['--case', '--application', '--output', '--engine', '--source-root'].includes(argv[i]));
+    assert(['--case', '--application', '--output', '--engine', '--source-root', '--bundler'].includes(argv[i]));
     assert(!Object.hasOwn(result, argv[i])); result[argv[i]] = argv[i + 1];
   }
   for (const name of ['--case', '--application', '--output', '--engine', '--source-root']) assert(result[name]);
+  assert(['profile','packages-v1','packages-v2'].includes(result['--bundler']??'profile'));
   return result;
 }
 async function preflight(engine, sourceRoot) {
@@ -68,7 +71,7 @@ async function preflight(engine, sourceRoot) {
 }
 async function toolingEvidence(toolchain, packaging = null) {
   const inputs = [];
-  for (const name of ['toolchain.mjs', 'componentizer.mjs', 'profile-bundler.mjs', 'module-selection.mjs',
+  for (const name of ['toolchain.mjs', 'componentizer.mjs', 'profile-bundler.mjs', 'framework-package-bundler.mjs', 'framework-package-bundler-v2.mjs', 'package-environment-guards.mjs', 'frameworks/package-bundler-bindings-v2/bindings.mjs', 'module-selection.mjs',
     'private-ticks-admission.mjs', 'classic-streams-admission.mjs', 'capability-policy.mjs', 'wasi-0.2.10-interfaces.json']) inputs.push(await descriptor(resolve(HERE, '../..', name)));
   const packages = {};
   for (const name of ['@bytecodealliance/componentize-js', '@bytecodealliance/jco', 'rolldown']) packages[name] = await descriptor(join(toolchain.directory, 'node_modules', name, 'package.json'));
@@ -106,6 +109,10 @@ async function componentChild(configPath) {
   }
 }
 async function probeSource(name, application) {
+  if (name === 'native-cjs-interop') {
+    const original=join(HERE,'probes/native-cjs-interop.mjs');
+    return {source:`export {run} from ${JSON.stringify(original)};\n`,original};
+  }
   if (name === 'compat') return { source: `import {runCompat} from './lib/compat.mjs';\nexport async function run(){return JSON.stringify(await runCompat());}\n`, original: join(application, 'lib/compat.mjs') };
   if (name === 'compat-caught') return { source: `import {runCompat} from './lib/compat.mjs';\nexport async function run(){try{return JSON.stringify({passed:true,value:await runCompat()});}catch(e){return JSON.stringify({caught:true,name:e.name,code:e.code,message:e.message,stack:e.stack});}}\n`, original: join(application, 'lib/compat.mjs'), diagnosticOnly: true };
   if (name.startsWith('import-')) {
@@ -120,7 +127,7 @@ async function probeSource(name, application) {
     let original = null;
     for (const path of candidates) if (await lstat(path).then(s => s.isFile(), e => { if (e.code === 'ENOENT') return false; throw e; })) { original = path; break; }
     if (!original) return { missing: true, candidates };
-    return { original, candidates, source: `import * as actual from ${JSON.stringify('./' + relative(application, original))};\nexport function run(){return JSON.stringify({generatedModule:${JSON.stringify(relative(application, original))},exports:Object.keys(actual),serverListenInvokedByProbe:false,routeHandlerInvokedByProbe:false});}\n` };
+    return { original, candidates, source: `import * as actual from ${JSON.stringify('./' + relative(application, original))};\nexport function run(){return JSON.stringify({generatedModule:${JSON.stringify(relative(application, original))},exports:Object.keys(actual),topLevelSideEffectsPossible:true,routeHandlerExplicitlyInvoked:false});}\n` };
   }
   const path = join(HERE, 'probes', name + '.mjs');
   return { source: await readFile(path, 'utf8'), original: path };
@@ -134,6 +141,7 @@ async function main() {
   assert(CASES.has(name), 'Unknown finite framework case');
   assert(!output.startsWith(REPOSITORY + '/')); await mkdir(output, { mode: 0o700 }); await mkdir(join(output, 'processes'), { mode: 0o700 });
   const report = { schemaVersion: 1, case: name, stage: 'preflight', status: 'pending',
+    bundler:args['--bundler']??'profile',
     source: 'genuine accepted foundations-v13', selectedInterfaces: [], experimentalEngineUsed: false,
     builtinAdaptersUsed: false, fullNextServerClaim: false, failures: [], output };
   const save = async () => {
@@ -151,10 +159,13 @@ async function main() {
     if (probe.original) report.originalSource = await descriptor(probe.original);
     const entry = join(application, '.sm-wasm-' + name + '-' + hash(Buffer.from(output)).slice(0, 12) + '.mjs'); await durable(entry, probe.source); await durable(join(output, 'entry-source.txt'), probe.source);
     report.stage = 'bundling'; await save();
-    const bundled = await bundleProfile({ ...toolchain, builtinManifests: native.builtinManifests, input: entry });
+    const packageBuilder=report.bundler==='packages-v2'?bundlePackagesV2:report.bundler==='packages-v1'?bundlePackages:bundleProfile;
+    const bundled = await packageBuilder({ ...toolchain, builtinManifests: native.builtinManifests, input: entry });
     report.bundle = await durable(join(output, 'bundle.mjs'), bundled.code);
     await durable(join(output, 'bundle-source.txt'), bundled.code);
-    await json(join(output, 'bundle-graph.json'), { imports: bundled.imports, moduleIds: bundled.moduleIds, admittedBuiltins: bundled.admittedBuiltins, globalBufferPolicy: bundled.globalBufferPolicy });
+    await json(join(output, 'bundle-graph.json'), { imports: bundled.imports, moduleIds: bundled.moduleIds, admittedBuiltins: bundled.admittedBuiltins,
+      globalBufferPolicy: bundled.globalBufferPolicy, packageBundlerVersion:bundled.version??null,
+      packagePolicy:bundled.policy??null, sourceInputs:bundled.sourceInputs??null, nativeDecisions:bundled.decisions??null });
     report.stage = 'componentization'; await save();
     const configPath = join(output, 'component-config.json'); await json(configPath, { engine: native.engine.path, sourceRoot: native.sourceRoot, output, source: report.bundle });
     const component = await runOwnedCommand({ output, name: 'componentize', executable: process.execPath,

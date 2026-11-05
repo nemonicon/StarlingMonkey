@@ -1,0 +1,1 @@
+export function o(){return globalThis['module'];}

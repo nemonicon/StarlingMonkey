@@ -4,6 +4,102 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-05. Overall roadmap: **in progress**.
 
+Commit/push and framework validation checkpoint (2026-11-05):
+
+- The user requested a complete Git checkpoint and push, followed by a
+  comprehensive, reusable Next.js/Wasm experiment. All current repository work,
+  including unfinished source candidates and retained failures, is included in
+  the checkpoint. Referenced external build products are not Git contents.
+- Precommit checks pass: 572 nonempty JSON documents, 30 Python AST parses,
+  248 Node 22.14.0 syntax checks, 544 member hashes across 14 new sealed indices,
+  1,355 local documentation links, and 43 regression-comparator synthetic checks.
+  The independent read-only audit found no credential material, compiled binaries
+  or installed dependency caches in the pending files. Small `node_modules`
+  fixture paths are deliberate resolver test inputs.
+  Staged whitespace checking finds one final blank line in a retained raw
+  Wasmtime error log; its evidence bytes are preserved.
+- Retained crypto-bootstrap source is now sealed at `c47ac2f9…`, with 29 pure
+  checks and all 28,208 declared inputs checked. Its API, fresh recheck and
+  component construction remain unexecuted; independent source review is open.
+- Valid clock-adapter phase source is sealed at `dc08495d…`: 24 members,
+  24,359 inputs and 35 pure checks. Independent source review, actual adapter
+  normalization/pruning, metadata decoding and selected-clock runtime tests
+  remain outstanding. No adapter has been published or promoted.
+- The accepted runtime remains foundations-v13. Existing real Next production
+  build/browser controls and optional-package component results are retained.
+  A fresh post-checkpoint framework run and regression comparison are next;
+  a driver that records known failures does not establish Next.js compatibility.
+
+
+Roadmap continuation after pushed Next.js checkpoint `d1f8d524`:
+
+- Previous goal turn classification: concrete progress. Real clock-tool builds,
+  crypto pin/bootstrap actions, source/actual-result reviews and new package
+  component tests completed. These new experimental changes are uncommitted;
+  the last pushed checkpoint remains `d1f8d524`. Accepted foundations-v13 stays
+  unchanged and the full roadmap remains in progress.
+- [Optional production-package execution](tests/node-compat/frameworks/package-bundler-execution-v1/README.md)
+  preserves the original finite bundler. V1's real CommonJS/native interop and
+  React element components pass, but its [bounded Source review](tests/node-compat/frameworks/package-bundler-implementation-review-v1/README.md)
+  holds six denial-policy gaps/two local-binding false refusals. V1 and all raw
+  evidence remain unchanged. The genuine v2 successor provides no process or
+  runtime-loader shim, respects lexical bindings and preserves React's optional
+  typeof/process error branch as ordinary JavaScript.
+- V2 passes [28 host differential/refusal cases](tests/node-compat/frameworks/package-bundler-execution-v1/results-host-v2/results.json)
+  and [bounded Source review](tests/node-compat/frameworks/package-bundler-v2-source-review/results.json)
+  `d8663d5f…55eb` (45 expected outcomes). Its lexical helper has60 synthetic/two
+  real-source parse checks. The [actual ten-case v2 component matrix](tests/node-compat/frameworks/package-bundler-execution-v1/results-component-matrix-v2/results.json)
+  finishes exit0 with three required complete Node/Jco/Wasmtime differentials:
+  nested native CJS identity, supported modules and real React elements.
+  ReactDOM edge now builds a15,685,392-byte zero-import component but traps on
+  both hosts at a named subscribe-instant frame. Its production startWork really
+  schedules setTimeout(0); selected-clock construction/runtime is the next gate.
+  Six other Next/Node-renderer inputs remain refused. No full Next HTTP/Wasm
+  component or secondary-host result is claimed.
+- Direct Next library Node controls initially had an extensionless ESM resolver
+  error. [Corrected real-CJS controls](tests/node-compat/frameworks/package-bundler-execution-v1/node-library-controls.json)
+  confirm NextRequest/NextResponse success and the expected headers-outside-
+  request-scope error; original observations are retained. Future runner controls
+  resolve the same actual .js entries. The v2 driver's initial default-binding
+  setup error is separately retained; it occurred before output/worker creation.
+- Crypto [normal-only export DATA review](tests/node-compat/foundation-crypto/independent-ownership-secret-artifact-export-v3-results-review-v1/results.json)
+  seals `a4c3eba3…d8fe` (31,979 checks). Genuine derive-pins phase6189 exits0;
+  [Root full recursive review](tests/node-compat/foundation-crypto/ownership-secret-artifact-bootstrap-v3-derived-pins-root-review.json)
+  confirms exactly four state/flag edits, all other DATA unchanged and three
+  other variants NULL. Reviewed pins are727323af…11c9.
+- New bootstrap-controller SOURCE d99/Source review34839 pass. The actual
+  one-shot JS API phase26525 exits0 with clean retained process levels and
+  [Root observation7a620cb7](tests/node-compat/foundation-crypto/ownership-secret-artifact-bootstrap-v3-js-root-results.json).
+  [Actual DATA review8298edf6](tests/node-compat/foundation-crypto/independent-ownership-secret-bootstrap-v3-results-review-v1/results.json)
+  passes32,260 checks/28,193 paths: complete41-field2,030,522-byte JS DATA equals
+  Python framefc86; all42 own properties/callable descriptor,75 metadata fields,
+  11 manifests and current frozen/old-normal protection agree. One API/helper
+  launch and one returned read-only recheck remain distinct. No engine, key or
+  guest ran. One-shot roots now exist and must not be reused. A genuinely new
+  historical-reference/current-read-only preflight is being implemented before
+  any component construction; no serialized callable is treated as live.
+- Clock controller41b/Source review9027 pass. Actual Root30831 exits0 after
+  private staging/vendor and all eight Rust/Jco commands, including four exact
+  one-test Rust passes. [Root result6844e920](tests/node-compat/foundation-scheduler/clock-io-tools-build-v2-root-results.json)
+  preserves raw2+9 JSONL joins, cleanup and actual before/after space checks.
+  [BUILD/DATA reviewcc5edbc1](tests/node-compat/foundation-scheduler/independent-clock-io-tools-build-v2-results-review-v1/results.json)
+  passes436,062 checks over24,332 files,121 exact archives/three private downloads,
+  21 aliases and all produced artifacts. Invalid-input pruner-unit invocation
+  is verified; valid adapter normalization/pruning/publication never ran.
+  A separate actual-adapter phase is being authored with all grants NULL;
+  exact output/WIT/reference and selected-host gates remain required.
+- Combined355 stage/controller [SOURCEb1a21da1](tests/node-compat/foundation-scheduler/combined-native-stage-controller-candidate-v1/README.md)
+  is sealed:16 members/1,637 inputs,6,611 checks and exact1,613 copies
+  (355 native+1,226 tool+32 integration-family files), inherited54b baseline.
+  Independent integration/stage Source reviews, actual stage/build/freeze and
+  all subsequent runtime gates are still open. No Source or count projection
+  from the old342 artifacts is used.
+- Model capacity briefly interrupted the three source writers; their missing/
+  unsealed outputs were rechecked and the same tasks resumed without changing
+  models or restarting an operational job. All Root operational jobs above are
+  terminal. Current work is source preparation/review. No native production
+  source, optional host selection or accepted checkpoint was promoted.
+
 
 Next.js framework experiment after pushed checkpoint `9c426444`:
 

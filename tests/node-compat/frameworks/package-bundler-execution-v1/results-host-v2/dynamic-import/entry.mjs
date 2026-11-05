@@ -1,0 +1,1 @@
+export async function observe(name){return import(name);}

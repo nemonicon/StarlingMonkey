@@ -1,0 +1,1 @@
+import value from './a.cjs';export function observe(){return value;}

@@ -1,0 +1,1 @@
+export function o(){const module={x:1};return module.x;}

@@ -2,6 +2,16 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
+The [optional package-bundler follow-on](../../tests/node-compat/frameworks/package-bundler-execution-v1/README.md)
+now runs nested native CommonJS interop, supported modules and real React
+creation with complete Node/Jco/Wasmtime agreement. V2 passes bounded Source
+review; ReactDOM edge gets through component construction but fails on the
+zero-capability clock-subscription path. The clock tools have an actual reviewed
+eight-command build, while valid adapter pruning and selected-clock runtime
+remain open. Crypto's new normal-only pins and one-shot read-only bootstrap
+pass actual review; new retained preflight/component/runtime gates remain open.
+These experimental steps do not change accepted foundations-v13.
+
 The [Next.js application experiment](../../tests/node-compat/frameworks/nextjs/README.md)
 now has two real Node production builds,24 HTTP and two browser checks per run,
 and19 isolated Wasm attempts. Full Next/React entries fail at the current CommonJS
@@ -13,7 +23,7 @@ Node-equal values on Jco and fresh Wasmtime. These findings add repeatable
 regression checks and demand priorities, not complete Next.js compatibility or
 new API support.
 
-Latest experimental evidence: [codec timing DATA](../../tests/node-compat/foundation-zlib/independent-cost-timing-v5-results-review-v1/README.md) passes for the exact360-worker workload; the [cost decision](codec-cost-decision.md) continues the bounded native candidate through remaining compatibility/release/adoption gates. It establishes neither universal speedup nor reduced guest memory. Crypto's new frozen-only verifier has an actual exit0 complete-helper observation, with independent result review passing; corrected v3 export/pin/bootstrap source passes review and its actual normal-only export exits0; independent export review, reviewed pins and bootstrap remain open. The [clock-profile proposal](clock-capability-decision.md) remains uncompiled source work. These results do not promote API support statuses or change foundations-v13.
+Latest experimental evidence: [codec timing DATA](../../tests/node-compat/foundation-zlib/independent-cost-timing-v5-results-review-v1/README.md) passes for the exact360-worker workload; the [cost decision](codec-cost-decision.md) continues the bounded native candidate through remaining compatibility/release/adoption gates. It establishes neither universal speedup nor reduced guest memory. Crypto's new frozen-only verifier has an actual exit0 complete-helper observation, with independent result review passing; corrected v3 source, normal-only export DATA, reviewed pins and one-shot read-only bootstrap pass; retained preflight/component/runtime remain open. The [clock-profile proposal](clock-capability-decision.md) now has a reviewed actual Rust/Jco tool build; valid adapter pruning and selected-clock runtime remain open. These results do not promote API support statuses or change foundations-v13.
 
 The machine-readable [API matrix](api-matrix.csv) is the per-API record: each row has module, API, type, inventory origin, status, implementation strategy, required capability, deviation and validation plan. [Node export inventory](node-v22.14.0-exports.json) contains the exact 72 module namespaces obtained from Node v22.14.0 on macOS arm64. [Policy](policy.json) defines dispositions and overrides; [generator](scripts/inventory.mjs) checks the oracle version and documentation hash. Documented overload/event/property records supplement reflection and can duplicate reflected API records.
 

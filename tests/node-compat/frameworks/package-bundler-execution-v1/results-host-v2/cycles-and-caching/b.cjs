@@ -1,0 +1,1 @@
+exports.name='b';exports.partial=require('./a.cjs').name;

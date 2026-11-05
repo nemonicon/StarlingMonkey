@@ -1,0 +1,1 @@
+import value from './node_modules/buffer/index.js';export function observe(){return value;}

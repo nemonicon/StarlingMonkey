@@ -1,0 +1,1 @@
+import value from 'test';export function observe(){return value;}

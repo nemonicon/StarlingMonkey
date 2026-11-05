@@ -1,0 +1,76 @@
+{
+  "version": "sm-production-package-bundler-v2",
+  "imports": [
+    "node:buffer"
+  ],
+  "moduleIds": [
+    "\u0000rolldown/runtime.js",
+    "builtin:esm-external-require-node:buffer",
+    "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v2-source-review/cases/native-default/x.cjs",
+    "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v2-source-review/cases/native-default/entry.mjs"
+  ],
+  "admittedBuiltins": [
+    "node:assert",
+    "node:assert/strict",
+    "node:buffer",
+    "node:child_process",
+    "node:events",
+    "node:path",
+    "node:path/posix",
+    "node:path/win32",
+    "node:querystring",
+    "node:stream",
+    "node:stream/promises",
+    "node:stream/web",
+    "node:string_decoder",
+    "node:sys",
+    "node:util",
+    "node:util/types"
+  ],
+  "sourceInputs": [
+    {
+      "id": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v2-source-review/cases/native-default/entry.mjs",
+      "kind": "filesystem-module-transform-input",
+      "transformInputSha256": "e622e3f1c9c32a8d3805f1e74ebe0a055425152174bb59fcdc8f012e1a914149",
+      "transformInputBytes": 54
+    },
+    {
+      "id": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v2-source-review/cases/native-default/x.cjs",
+      "kind": "filesystem-module-transform-input",
+      "transformInputSha256": "e1fe0bedaf01cff7900ed86bbc92868b084341a033ac37a52a1688b5333bd6dc",
+      "transformInputBytes": 33
+    },
+    {
+      "id": "builtin:esm-external-require-node:buffer",
+      "kind": "generated-module-transform-input",
+      "transformInputSha256": "4147dd982e935223855a7f312cd8d35dc881e8b165b0ede58ad959ea3278f089",
+      "transformInputBytes": 60,
+      "transformInputCode": "import * as m from 'node:buffer';module.exports = m.default;"
+    }
+  ],
+  "decisions": [
+    {
+      "source": "buffer",
+      "importer": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v2-source-review/cases/native-default/x.cjs",
+      "canonical": "node:buffer",
+      "kind": "native-require-default"
+    }
+  ],
+  "policy": {
+    "nodeEnv": "production",
+    "platform": "neutral",
+    "conditions": [
+      "node"
+    ],
+    "nativeRequire": "canonical ESM default",
+    "runtimeRequireProvided": false,
+    "processShimProvided": false,
+    "builtinAdapters": false,
+    "filenameGlobalsProvided": false,
+    "hostCapabilitiesAdded": false,
+    "optionalEnvironmentGuards": "original typeof/recognized if-and-or branches, lexical bindings respected",
+    "reflection": "ordinary JS property access; no exhaustive static loader-alias analysis or security-sandbox claim",
+    "packageNamedBindings": "Rolldown live binding behavior may differ from Node CJS snapshots",
+    "sourceLedger": "plugin transform input hashes, not complete physical dependency or package-resolution closure"
+  }
+}

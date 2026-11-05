@@ -1,0 +1,1 @@
+import value from './pkg.cjs'; import original,{number,change} from './external.mjs'; export function observe(){const before=value.number;change(2);return {sameDefault:value===original,extraDefault:Object.hasOwn(value,'default'),before,requiredAfter:value.number,esmAfter:number};}

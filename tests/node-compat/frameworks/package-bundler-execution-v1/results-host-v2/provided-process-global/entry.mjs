@@ -1,0 +1,1 @@
+export function observe(){const process={env:{NODE_ENV:'local',OTHER_ENV:'value'}},global={value:7};return[process.env.NODE_ENV,process.env.OTHER_ENV,global.value];}

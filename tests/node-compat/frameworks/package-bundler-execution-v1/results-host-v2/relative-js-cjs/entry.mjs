@@ -1,0 +1,1 @@
+import value from './value.js';export function observe(){return value;}

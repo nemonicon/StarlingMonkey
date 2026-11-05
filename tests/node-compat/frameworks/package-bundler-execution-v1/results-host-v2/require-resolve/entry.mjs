@@ -1,0 +1,1 @@
+export function observe(){return require.resolve('buffer');}

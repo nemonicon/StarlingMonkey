@@ -1,0 +1,1 @@
+export function o(x=process){var process;return x;}

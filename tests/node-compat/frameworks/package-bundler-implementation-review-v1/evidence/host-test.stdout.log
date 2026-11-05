@@ -1,0 +1,299 @@
+{
+  "schemaVersion": 1,
+  "node": "v22.14.0",
+  "scope": "Host-only source/bundle differential; not guest acceptance",
+  "output": "/private/tmp/starling-node-compat/package-bundler-independent-host-v1-20261105",
+  "cases": [
+    {
+      "id": "relative-js-cjs",
+      "expectedRefusal": false,
+      "passed": true,
+      "original": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "bundled": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "value": {
+        "answer": 42
+      }
+    },
+    {
+      "id": "native-aliases",
+      "expectedRefusal": false,
+      "passed": true,
+      "original": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "bundled": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "value": {
+        "buffer": true,
+        "stream": true,
+        "hasDefault": false,
+        "callable": "function",
+        "streamSelf": true
+      }
+    },
+    {
+      "id": "native-canonical",
+      "expectedRefusal": false,
+      "passed": true,
+      "original": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "bundled": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "value": {
+        "same": true,
+        "constructor": true
+      }
+    },
+    {
+      "id": "cycles-and-caching",
+      "expectedRefusal": false,
+      "passed": true,
+      "original": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "bundled": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "value": {
+        "a": "a",
+        "b": "b",
+        "partial": "a",
+        "once": 1,
+        "same": true
+      }
+    },
+    {
+      "id": "lazy-factory-order",
+      "expectedRefusal": false,
+      "passed": true,
+      "original": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "bundled": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "value": {
+        "before": "a",
+        "value": 7,
+        "after": "a,b"
+      }
+    },
+    {
+      "id": "json-dependency",
+      "expectedRefusal": false,
+      "passed": true,
+      "original": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "bundled": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "value": {
+        "x": 42,
+        "text": "π"
+      }
+    },
+    {
+      "id": "production-constant",
+      "expectedRefusal": false,
+      "passed": true,
+      "original": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "bundled": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "value": {
+        "mode": "production"
+      }
+    },
+    {
+      "id": "node-package-condition",
+      "expectedRefusal": false,
+      "passed": true,
+      "original": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "bundled": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "value": {
+        "selected": "node"
+      }
+    },
+    {
+      "id": "property-names",
+      "expectedRefusal": false,
+      "passed": true,
+      "original": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "bundled": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "value": [
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "bare-prefix-only-package",
+      "expectedRefusal": false,
+      "passed": true,
+      "original": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "bundled": {
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      "value": {
+        "npmPackage": true
+      }
+    },
+    {
+      "id": "dynamic-require",
+      "expectedRefusal": true,
+      "passed": true,
+      "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v1] /private/tmp/starling-node-compat/package-bundler-independent-host-v1-20261105/dynamic-require/entry.mjs\nError: Only literal package or native require is supported: /private/tmp/starling-node-compat/package-bundler-independent-host-v1-20261105/dynamic-require/entry.mjs\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:13:41)\n    at file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:73:112\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:16:34)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:19:54)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:19:54)\n    at TransformPluginContextImpl.transform (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:64:7)\n    at plugin (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:1758:30)",
+      "code": null
+    },
+    {
+      "id": "shadowed-require",
+      "expectedRefusal": true,
+      "passed": true,
+      "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v1] /private/tmp/starling-node-compat/package-bundler-independent-host-v1-20261105/shadowed-require/entry.mjs\nError: require aliases, resolution and runtime loader state are unsupported: /private/tmp/starling-node-compat/package-bundler-independent-host-v1-20261105/shadowed-require/entry.mjs\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:13:41)\n    at file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:80:64\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:16:34)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:19:54)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:19:54)\n    at TransformPluginContextImpl.transform (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:64:7)\n    at plugin (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:1758:30)\n    at file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2146:21\n    at plugin.<computed> (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2343:18)",
+      "code": null
+    },
+    {
+      "id": "require-alias",
+      "expectedRefusal": true,
+      "passed": true,
+      "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v1] /private/tmp/starling-node-compat/package-bundler-independent-host-v1-20261105/require-alias/entry.mjs\nError: require aliases, resolution and runtime loader state are unsupported: /private/tmp/starling-node-compat/package-bundler-independent-host-v1-20261105/require-alias/entry.mjs\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:13:41)\n    at file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:80:64\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:16:34)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:19:54)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:19:54)\n    at TransformPluginContextImpl.transform (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:64:7)\n    at plugin (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:1758:30)\n    at file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2146:21\n    at plugin.<computed> (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2343:18)",
+      "code": null
+    },
+    {
+      "id": "require-resolve",
+      "expectedRefusal": true,
+      "passed": true,
+      "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v1] /private/tmp/starling-node-compat/package-bundler-independent-host-v1-20261105/require-resolve/entry.mjs\nError: require aliases, resolution and runtime loader state are unsupported: /private/tmp/starling-node-compat/package-bundler-independent-host-v1-20261105/require-resolve/entry.mjs\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:13:41)\n    at file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:80:64\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:16:34)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:19:54)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:19:54)",
+      "code": null
+    },
+    {
+      "id": "module-require",
+      "expectedRefusal": true,
+      "passed": true,
+      "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v1] /private/tmp/starling-node-compat/package-bundler-independent-host-v1-20261105/module-require/entry.mjs\nError: module.require has no runtime loader policy: /private/tmp/starling-node-compat/package-bundler-independent-host-v1-20261105/module-require/entry.mjs\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:13:41)\n    at file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:83:11\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:16:34)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:19:54)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:19:54)\n    at TransformPluginContextImpl.transform (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:64:7)",
+      "code": null
+    },
+    {
+      "id": "filename-global",
+      "expectedRefusal": true,
+      "passed": true,
+      "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v1] /private/tmp/starling-node-compat/package-bundler-independent-host-v1-20261105/filename-global/entry.mjs\nError: CommonJS filename globals have no guest filesystem policy: /private/tmp/starling-node-compat/package-bundler-independent-host-v1-20261105/filename-global/entry.mjs\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:13:41)\n    at file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:84:120\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:16:34)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:19:54)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:20:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:19:54)\n    at TransformPluginContextImpl.transform (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:64:7)\n    at plugin (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:1758:30)",
+      "code": null
+    },
+    {
+      "id": "other-environment",
+      "expectedRefusal": true,
+      "passed": true,
+      "message": "Unprovided runtime loader/environment references: process",
+      "code": "ERR_SM_PACKAGE_BUNDLE_UNSUPPORTED"
+    },
+    {
+      "id": "unselected-esm-fs",
+      "expectedRefusal": true,
+      "passed": true,
+      "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v1]\nError: Node builtin is not admitted by this profile: node:fs\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:13:41)\n    at PluginContextImpl.resolveId (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:53:65)\n    at plugin (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:1678:30)\n    at file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2146:21\n    at plugin.<computed> (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2343:18)",
+      "code": null
+    },
+    {
+      "id": "unselected-cjs-fs",
+      "expectedRefusal": true,
+      "passed": true,
+      "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v1]\nError: Node builtin is not admitted by this profile: fs\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:13:41)\n    at PluginContextImpl.resolveId (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:53:65)\n    at plugin (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:1678:30)\n    at file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2146:21\n    at plugin.<computed> (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2343:18)",
+      "code": null
+    },
+    {
+      "id": "nonstandard-host",
+      "expectedRefusal": true,
+      "passed": true,
+      "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v1]\nError: Nonstandard host adapter is not admitted: jco:fs\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:13:41)\n    at PluginContextImpl.resolveId (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs:54:46)\n    at plugin (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:1678:30)\n    at file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2146:21\n    at plugin.<computed> (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2343:18)",
+      "code": null
+    },
+    {
+      "id": "builtin-adapter",
+      "expectedRefusal": true,
+      "passed": true,
+      "message": "JavaScript builtin adapter leaked into package graph",
+      "code": "ERR_SM_PACKAGE_BUNDLE_UNSUPPORTED"
+    },
+    {
+      "id": "dynamic-import",
+      "expectedRefusal": true,
+      "passed": true,
+      "message": "Unprovided runtime loader/environment references: dynamic-import",
+      "code": "ERR_SM_PACKAGE_BUNDLE_UNSUPPORTED"
+    }
+  ],
+  "passed": true,
+  "sources": [
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-execution-v1/host-test.mjs",
+      "sha256": "a4f79951cc00424e5471ec2b331d1b8fcfa8d0dc86fadef01879736fdc354c41",
+      "bytes": 8241
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler.mjs",
+      "sha256": "5761731ca00f146f836e75d00bf72dc591789748d0100c271b10502abd6d28b7",
+      "bytes": 8354
+    }
+  ]
+}

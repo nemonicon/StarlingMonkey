@@ -1,0 +1,4307 @@
+{
+  "schemaVersion": 1,
+  "predecessor": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v1/index.json",
+    "sha256": "064003004505c71b5cc28aef92fd929a0165d6cf3b69eb73bd935f9932dc72c8",
+    "bytes": 4822
+  },
+  "files": [
+    {
+      "path": "controller.py",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v1/controller.py",
+        "sha256": "cd2e5327e67cd90fbe0850231689f5954669d65f47268524a7423cc242e03a73",
+        "bytes": 42528
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v2/controller.py",
+        "sha256": "40d938c7a8d8631d821fa605032175bc687d873cff688b59eada8a3f7cc9afed",
+        "bytes": 44702
+      },
+      "edits": [
+        {
+          "beforeStart": 362,
+          "beforeEnd": 362,
+          "afterStart": 362,
+          "afterEnd": 382,
+          "old": "",
+          "new": "\nimport urllib.error"
+        },
+        {
+          "beforeStart": 903,
+          "beforeEnd": 903,
+          "afterStart": 923,
+          "afterEnd": 926,
+          "old": "",
+          "new": "v2-"
+        },
+        {
+          "beforeStart": 1148,
+          "beforeEnd": 1149,
+          "afterStart": 1171,
+          "afterEnd": 1172,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 3803,
+          "beforeEnd": 3804,
+          "afterStart": 3826,
+          "afterEnd": 3827,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 6870,
+          "beforeEnd": 6871,
+          "afterStart": 6893,
+          "afterEnd": 6894,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 7039,
+          "beforeEnd": 7039,
+          "afterStart": 7062,
+          "afterEnd": 7772,
+          "old": "",
+          "new": ")\n    # The own family authenticates this finite manifest; its rows deliberately\n    # exclude this manifest/index, avoiding a descriptor cycle. Every external\n    # input is captured before any custom import or operation and rechecked.\n    fixed = read(row(HERE / 'references.json'))\n    capture_family(fixed['predecessorIndex'])\n    capture_family(fixed['redirectHoldIndex'])\n    capture_family(fixed['sourceReviewData']['index'])\n    declared = read(row(HERE / 'source-inputs.json'))\n    need(declared['schemaVersion'] == 1 and type(declared['files']) is list\n         and 5606 <= len(declared['files']) <= 8192, 'finite complete own Source inputs')\n    for entry in declared['files']:\n        capture(entry"
+        },
+        {
+          "beforeStart": 7263,
+          "beforeEnd": 7263,
+          "afterStart": 7996,
+          "afterEnd": 8103,
+          "old": "",
+          "new": "')\n    need(root['sourceReview'] == fixed['sourceReviewData'], 'exact already-reviewed proposal Source peer"
+        },
+        {
+          "beforeStart": 7642,
+          "beforeEnd": 7643,
+          "afterStart": 8482,
+          "afterEnd": 8483,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 26277,
+          "beforeEnd": 26277,
+          "afterStart": 27117,
+          "afterEnd": 28431,
+          "old": "",
+          "new": "class RejectDownloadRedirects(urllib.request.HTTPRedirectHandler):\n    \"\"\"Reject every redirect before followup; close the unused response body.\"\"\"\n\n    def redirect_request(self, req, fp, code, msg, headers, newurl):\n        # Reject even absent/malformed Location. No target is opened or parsed.\n        # Closing here matters: the base handler would close only AFTER this\n        # callback, and an exception bypasses its read/close sequence.\n        try:\n            fp.close()\n        finally:\n            raise urllib.error.HTTPError(req.full_url, code,\n                                         'locked archive redirects refused', headers, None)\n\n    def http_error_302(self, req, fp, code, msg, headers):\n        return self.redirect_request(req, fp, code, msg, headers, None)\n\n    http_error_301 = http_error_302\n    http_error_303 = http_error_302\n    http_error_307 = http_error_302\n    # Pinned Python3.9 has no default308 alias. Cover it explicitly.\n    http_error_308 = http_error_302\n\n\ndef download_opener():\n    # Local opener only: no install_opener/global mutation. An empty proxy\n    # map disables environment/system proxy discovery for these three URLs.\n    return urllib.request.build_opener(urllib.request.ProxyHandler({}),\n                                       RejectDownloadRedirects())\n\n\n"
+        },
+        {
+          "beforeStart": 27604,
+          "beforeEnd": 27604,
+          "afterStart": 29758,
+          "afterEnd": 29789,
+          "old": "",
+          "new": "client = download_opener()\n    "
+        },
+        {
+          "beforeStart": 27878,
+          "beforeEnd": 27881,
+          "afterStart": 30063,
+          "afterEnd": 30064,
+          "old": "url",
+          "new": "c"
+        },
+        {
+          "beforeStart": 27883,
+          "beforeEnd": 27886,
+          "afterStart": 30066,
+          "afterEnd": 30066,
+          "old": "b.r",
+          "new": ""
+        },
+        {
+          "beforeStart": 27887,
+          "beforeEnd": 27891,
+          "afterStart": 30067,
+          "afterEnd": 30068,
+          "old": "ques",
+          "new": "n"
+        },
+        {
+          "beforeStart": 27893,
+          "beforeEnd": 27896,
+          "afterStart": 30070,
+          "afterEnd": 30070,
+          "old": "url",
+          "new": ""
+        },
+        {
+          "beforeStart": 35852,
+          "beforeEnd": 35853,
+          "afterStart": 38026,
+          "afterEnd": 38027,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 35932,
+          "beforeEnd": 35933,
+          "afterStart": 38106,
+          "afterEnd": 38107,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 39296,
+          "beforeEnd": 39297,
+          "afterStart": 41470,
+          "afterEnd": 41471,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 41233,
+          "beforeEnd": 41234,
+          "afterStart": 43407,
+          "afterEnd": 43408,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 41296,
+          "beforeEnd": 41297,
+          "afterStart": 43470,
+          "afterEnd": 43471,
+          "old": "1",
+          "new": "2"
+        }
+      ],
+      "forwardAndInverseExact": true
+    },
+    {
+      "path": "check-source.py",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v1/check-source.py",
+        "sha256": "cb26ec69063475c287dd422d3a4f950e7823ddf451d9144c4ac7dda6c2f7903a",
+        "bytes": 17692
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v2/check-source.py",
+        "sha256": "789fa8385caf154eeff2037e51a4c64f6904c9060326c567343adc3bd28823f2",
+        "bytes": 28044
+      },
+      "edits": [
+        {
+          "beforeStart": 1445,
+          "beforeEnd": 1445,
+          "afterStart": 1445,
+          "afterEnd": 1448,
+          "old": "",
+          "new": "-v2"
+        },
+        {
+          "beforeStart": 3886,
+          "beforeEnd": 3887,
+          "afterStart": 3889,
+          "afterEnd": 3890,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 13878,
+          "beforeEnd": 13879,
+          "afterStart": 13881,
+          "afterEnd": 13882,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 17059,
+          "beforeEnd": 17059,
+          "afterStart": 17062,
+          "afterEnd": 27240,
+          "old": "",
+          "new": "# Actual Source redirect handler against injected response/parent endpoints.\nimport urllib.request,urllib.error\nfrom email.message import Message\nredirect_env=dict(urllib=urllib)\nredirect_nodes=[n for n in tree.body if isinstance(n,(ast.ClassDef,ast.FunctionDef))and n.name in ['RejectDownloadRedirects','download_opener']]\ncheck(len(redirect_nodes)==2,'genuine rejecting subclass and local factory present')\nexec(compile(ast.Module(body=redirect_nodes,type_ignores=[]),'<actual redirect Source only>','exec'),redirect_env)\nRedirect=redirect_env['RejectDownloadRedirects']\nclass FakeParent:\n    def __init__(self):self.calls=[]\n    def open(self,*args,**kwargs):self.calls.append((args,kwargs));raise AssertionError('forbidden redirect followup')\nclass FakeBody:\n    def __init__(self,fail=False):self.closed=False;self.fail=fail\n    def close(self):\n        self.closed=True\n        if self.fail:raise OSError('injected response close failure')\nurl='https://static.crates.io/crates/windows-sys/windows-sys-0.61.2.crate'\nredirect_cases=0\nfor code in [301,302,303,307,308]:\n    for location in [url,'/same-host','https://example.invalid/other','http://example.invalid/downgrade','file:///private/not-opened','not a URL',None]:\n        handler=Redirect();parent=FakeParent();handler.add_parent(parent);body=FakeBody();headers=Message()\n        if location is not None:headers['Location']=location\n        req=urllib.request.Request(url);req.timeout=60\n        try:getattr(handler,'http_error_'+str(code))(req,body,code,'redirect',headers)\n        except urllib.error.HTTPError as error:\n            check(error.code==code and error.filename==url and error.fp is None,'actual reject error carries original URL/status, no body owner '+str(code)+'/'+str(location))\n        else:raise AssertionError('redirect accepted')\n        check(parent.calls==[] and body.closed,'no fake parent.open and response closed '+str(code)+'/'+str(location));redirect_cases+=1\n    handler=Redirect();parent=FakeParent();handler.add_parent(parent);body=FakeBody(fail=True)\n    try:handler.redirect_request(urllib.request.Request(url),body,code,'redirect',Message(),url)\n    except urllib.error.HTTPError:check(body.closed and not parent.calls,'close failure still refuses redirect '+str(code))\n    else:raise AssertionError('close failure accepted')\n# Local opener can be constructed without opening a request. Assert that the\n# default redirect handler is replaced, no proxy handlers are installed, and\n# the global default opener is not mutated. No getproxies/open call is used.\nbefore_opener=urllib.request._opener\nclient=redirect_env['download_opener']()\ncheck(sum(isinstance(h,Redirect)for h in client.handlers)==1,'actual build_opener installs one rejecting handler')\ncheck(not any(type(h)is urllib.request.HTTPRedirectHandler for h in client.handlers),'default following handler removed')\ncheck(not any(isinstance(h,urllib.request.ProxyHandler)for h in client.handlers),'empty explicit proxy map installs no proxy handlers')\ncheck(urllib.request._opener is before_opener,'local factory preserves global opener')\nfor code in [301,302,303,307,308]:\n    body=FakeBody();headers=Message();headers['Location']=url;req=urllib.request.Request(url)\n    try:client.error('http',req,body,code,'redirect',headers)\n    except urllib.error.HTTPError as error:check(body.closed and error.fp is None and error.code==code,'actual local opener error dispatch refuses and closes '+str(code))\n    else:raise AssertionError('local opener dispatch accepted redirect')\n\nfactory=ast.get_source_segment(source,next(n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=='download_opener'))\ncheck('ProxyHandler({})'in factory and not any(isinstance(n,ast.Call)and isinstance(n.func,ast.Attribute)and n.func.attr=='install_opener'for n in ast.walk(ast.parse(factory))),'explicit no-proxy factory and no global installer')\ncheck('with client.open(url, timeout=60)'in source and 'urllib.request.urlopen('not in source,'genuine stage consumes rejecting opener')\ncheck(\"need(response.geturl()==url,'no unknown download redirect')\"in source,'post URL assertion retained')\ncheck('for entry in declared[\\'files\\']'in auth and auth.index('declared = read(row(HERE / \\'source-inputs.json\\'))')<auth.index(\"root = read(config['rootAuthority'])\"),'all own declared rows authenticated before Root/action/customimport')\n\n# Exercise the actual own-manifest intake block and exact descriptor verifier\n# with injected immutable descriptor DATA. No physical input or owner import is\n# performed by this model; the separate sealer hashes all real input bytes.\nauth_node=next(n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=='authorize')\nstart=next(i for i,n in enumerate(auth_node.body)if isinstance(n,ast.Assign)and any(isinstance(t,ast.Name)and t.id=='declared'for t in n.targets))\nintake_nodes=auth_node.body[start:start+3]\ncheck(isinstance(intake_nodes[2],ast.For),'actual complete own-manifest intake shape')\nintake_code=compile(ast.Module(body=intake_nodes,type_ignores=[]),'<actual Source manifest intake>','exec')\noriginal_inputs=json.loads((Path(refs['predecessorIndex']['path']).parent/'source-inputs.json').read_text())['files']\nexpected={r['path']:r for r in original_inputs}\nmanifest_row=dict(path='/PURE/own/source-inputs.json',sha256='0'*64,bytes=0)\ndef intake_case(manifest):\n    seen=[]\n    def actual_row(path):\n        return copy.deepcopy(manifest_row if str(path)==manifest_row['path']else expected[str(path)])\n    context=dict(Path=Path,re=re,HERE=Path('/PURE/own'),row=actual_row,read=lambda r:copy.deepcopy(manifest))\n    extract(['need','verify'],context)\n    def capture(r):context['verify'](r);seen.append(copy.deepcopy(r))\n    context['capture']=capture\n    exec(intake_code,context)\n    return seen\nmanifest=dict(schemaVersion=1,files=copy.deepcopy(original_inputs))\ncheck(intake_case(manifest)==original_inputs,'every5606 actual declared row reaches real descriptor verifier before action')\nintake_mutations=[]\nfor name in ['schema','missing-last','first-sha','last-sha','bool-bytes','extra-descriptor-field','missing-sha','over-finite-cap']:\n    bad=copy.deepcopy(manifest)\n    if name=='schema':bad['schemaVersion']=0\n    elif name=='missing-last':bad['files'].pop()\n    elif name in ['first-sha','last-sha']:bad['files'][0 if name=='first-sha'else-1]['sha256']='f'*64\n    elif name=='bool-bytes':bad['files'][0]['bytes']=True\n    elif name=='extra-descriptor-field':bad['files'][0]['projected']=True\n    elif name=='missing-sha':del bad['files'][0]['sha256']\n    else:bad['files']=[copy.deepcopy(original_inputs[0])for _ in range(8193)]\n    refuses(lambda:intake_case(bad),'real manifest intake refuses '+name);intake_mutations.append(name)\n\n# The first two actual recheck loops must revisit every captured descriptor and\n# every complete indexed family. Only filesystem/identity lookups are injected.\nrecheck_node=next(n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=='recheck')\nrecheck_code=compile(ast.Module(body=recheck_node.body[:2],type_ignores=[]),'<actual descriptor/family recheck loops>','exec')\nprobe_rows=copy.deepcopy(original_inputs[:2]+original_inputs[-1:])\nclass IdentityPath:\n    state={}\n    def __init__(self,value):self.value=str(value)\n    def __str__(self):return self.value\n    def stat(self):return types.SimpleNamespace(**self.state[self.value])\n    def resolve(self):return self.value\ndef recheck_case(change=None):\n    disk={r['path']:copy.deepcopy(r)for r in probe_rows};identities={};seen=[];families=[{'PURE_FAMILY':1},{'PURE_FAMILY':2}];family_calls=[]\n    IdentityPath.state={}\n    for i,r in enumerate(probe_rows):\n        IdentityPath.state[r['path']]=dict(st_dev=1,st_ino=i+1,st_size=r['bytes'],st_mtime_ns=11,st_ctime_ns=12)\n        identities[r['path']]=(1,i+1,r['bytes'],11,12,r['path'])\n    if change=='bytes':disk[probe_rows[-1]['path']]['sha256']='f'*64\n    if change=='inode':IdentityPath.state[probe_rows[-1]['path']]['st_ino']=999\n    def actual_row(path):seen.append(str(path));return copy.deepcopy(disk[str(path)])\n    def family_model(index):\n        if change=='family':raise ValueError('injected changed complete family')\n        family_calls.append(index)\n    context=dict(Path=IdentityPath,re=re,row=actual_row,family=family_model,frame=dict(captured={r['path']:r for r in probe_rows},identities=identities,families=families))\n    extract(['need','verify'],context);exec(recheck_code,context)\n    return seen,family_calls\nseen,families_seen=recheck_case()\ncheck(seen==[r['path']for r in probe_rows]and len(families_seen)==2,'actual final loops visit all descriptors and all families')\nfor change in ['bytes','inode','family']:refuses(lambda:recheck_case(change),'actual final loops refuse '+change)\n\n# Execute the genuine custom-import caller with a fake importlib endpoint only.\n# A failed preimport recheck must prevent even the fake module creation.\nfor reject_recheck in [False,True]:\n    trace=[];entry=Path('/PURE/monitor/monitor.py')\n    def preimport_recheck(frame):\n        trace.append('recheck')\n        if reject_recheck:raise ValueError('injected full Source change')\n    fake_spec=types.SimpleNamespace(loader=types.SimpleNamespace(exec_module=lambda m:trace.append('exec-module-in-memory')))\n    fake_importlib=types.SimpleNamespace(util=types.SimpleNamespace(spec_from_file_location=lambda name,path:(trace.append('spec')or fake_spec),module_from_spec=lambda spec:(trace.append('module')or object())))\n    context=dict(Path=Path,MONITOR=entry.parent,importlib=fake_importlib,verify=lambda r:trace.append('verify-entry'),recheck=preimport_recheck)\n    extract(['need','load_monitor'],context)\n    if reject_recheck:\n        refuses(lambda:context['load_monitor'](dict(captured={str(entry):{'PURE':True}})),'changed full Source refuses before custom import')\n        check(trace==['verify-entry','recheck'],'no fake import endpoint reached after failed protection')\n    else:\n        context['load_monitor'](dict(captured={str(entry):{'PURE':True}}))\n        check(trace==['verify-entry','recheck','spec','module','exec-module-in-memory'],'genuine caller authenticates before only injected import')\n\n"
+        },
+        {
+          "beforeStart": 17145,
+          "beforeEnd": 17146,
+          "afterStart": 27326,
+          "afterEnd": 27327,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 17166,
+          "beforeEnd": 17166,
+          "afterStart": 27347,
+          "afterEnd": 27518,
+          "old": "",
+          "new": ",manifestIntakeCases=9,descriptorAndFamilyRecheckCases=4,preimportProtectionCases=2,redirectCases=redirect_cases,responseCloseFailureCases=5,noProxyLocalFactoryChecks=True"
+        }
+      ],
+      "forwardAndInverseExact": true
+    },
+    {
+      "path": "seal-source.py",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v1/seal-source.py",
+        "sha256": "ac6bf721124ab2fe0cdf63d141d4ef1a053528cec0fa81ef365e15d165099956",
+        "bytes": 6620
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v2/seal-source.py",
+        "sha256": "c773b9bebe5ac2aa494427b4e48b70e0d53fde0c45aaa122fd25f2aaca177179",
+        "bytes": 9289
+      },
+      "edits": [
+        {
+          "beforeStart": 3,
+          "beforeEnd": 3,
+          "afterStart": 3,
+          "afterEnd": 10,
+          "old": "",
+          "new": "Finite "
+        },
+        {
+          "beforeStart": 9,
+          "beforeEnd": 20,
+          "afterStart": 16,
+          "afterEnd": 17,
+          "old": "-only closu",
+          "new": "/"
+        },
+        {
+          "beforeStart": 22,
+          "beforeEnd": 22,
+          "afterStart": 19,
+          "afterEnd": 30,
+          "old": "",
+          "new": "ad/hash/AST"
+        },
+        {
+          "beforeStart": 31,
+          "beforeEnd": 33,
+          "afterStart": 39,
+          "afterEnd": 40,
+          "old": "Do",
+          "new": "N"
+        },
+        {
+          "beforeStart": 34,
+          "beforeEnd": 39,
+          "afterStart": 41,
+          "afterEnd": 44,
+          "old": "s not",
+          "new": "ver"
+        },
+        {
+          "beforeStart": 46,
+          "beforeEnd": 46,
+          "afterStart": 51,
+          "afterEnd": 52,
+          "old": "",
+          "new": "s"
+        },
+        {
+          "beforeStart": 61,
+          "beforeEnd": 63,
+          "afterStart": 67,
+          "afterEnd": 68,
+          "old": "ru",
+          "new": "i"
+        },
+        {
+          "beforeStart": 64,
+          "beforeEnd": 68,
+          "afterStart": 69,
+          "afterEnd": 74,
+          "old": " any",
+          "new": "vokes"
+        },
+        {
+          "beforeStart": 73,
+          "beforeEnd": 73,
+          "afterStart": 79,
+          "afterEnd": 80,
+          "old": "",
+          "new": "s"
+        },
+        {
+          "beforeStart": 114,
+          "beforeEnd": 114,
+          "afterStart": 121,
+          "afterEnd": 129,
+          "old": "",
+          "new": "difflib,"
+        },
+        {
+          "beforeStart": 134,
+          "beforeEnd": 135,
+          "afterStart": 149,
+          "afterEnd": 149,
+          "old": "\n",
+          "new": ""
+        },
+        {
+          "beforeStart": 172,
+          "beforeEnd": 172,
+          "afterStart": 186,
+          "afterEnd": 187,
+          "old": "",
+          "new": "\n"
+        },
+        {
+          "beforeStart": 302,
+          "beforeEnd": 303,
+          "afterStart": 317,
+          "afterEnd": 320,
+          "old": "n",
+          "new": "ass"
+        },
+        {
+          "beforeStart": 304,
+          "beforeEnd": 307,
+          "afterStart": 321,
+          "afterEnd": 324,
+          "old": "ed=",
+          "new": "rt "
+        },
+        {
+          "beforeStart": 340,
+          "beforeEnd": 352,
+          "afterStart": 357,
+          "afterEnd": 357,
+          "old": ";assert need",
+          "new": ""
+        },
+        {
+          "beforeStart": 707,
+          "beforeEnd": 707,
+          "afterStart": 712,
+          "afterEnd": 805,
+          "old": "",
+          "new": "assert not(HERE/'index.json').exists(),'Sealed Source is immutable; use a new successor'\n    "
+        },
+        {
+          "beforeStart": 753,
+          "beforeEnd": 753,
+          "afterStart": 851,
+          "afterEnd": 853,
+          "old": "",
+          "new": "by"
+        },
+        {
+          "beforeStart": 755,
+          "beforeEnd": 757,
+          "afterStart": 855,
+          "afterEnd": 856,
+          "old": "xt",
+          "new": "s"
+        },
+        {
+          "beforeStart": 809,
+          "beforeEnd": 809,
+          "afterStart": 908,
+          "afterEnd": 910,
+          "old": "",
+          "new": "by"
+        },
+        {
+          "beforeStart": 811,
+          "beforeEnd": 813,
+          "afterStart": 912,
+          "afterEnd": 913,
+          "old": "xt",
+          "new": "s"
+        },
+        {
+          "beforeStart": 816,
+          "beforeEnd": 817,
+          "afterStart": 916,
+          "afterEnd": 921,
+          "old": ";",
+          "new": "\n    "
+        },
+        {
+          "beforeStart": 840,
+          "beforeEnd": 840,
+          "afterStart": 944,
+          "afterEnd": 945,
+          "old": "",
+          "new": "3"
+        },
+        {
+          "beforeStart": 841,
+          "beforeEnd": 842,
+          "afterStart": 946,
+          "afterEnd": 1059,
+          "old": "1",
+          "new": "5 and pure['redirectCases']==35 and pure['responseCloseFailureCases']==5\n    assert pure['manifestIntakeCases']=="
+        },
+        {
+          "beforeStart": 843,
+          "beforeEnd": 843,
+          "afterStart": 1060,
+          "afterEnd": 1147,
+          "old": "",
+          "new": " and pure['descriptorAndFamilyRecheckCases']==4 and pure['preimportProtectionCases']==2"
+        },
+        {
+          "beforeStart": 1784,
+          "beforeEnd": 1784,
+          "afterStart": 2088,
+          "afterEnd": 2267,
+          "old": "",
+          "new": "# Full exact predecessor and HOLD are DATA, not Source approval/action.\n    for key in ['predecessorIndex','redirectHoldIndex','sourceIndex','monitorIndex']:family(refs[key])\n    "
+        },
+        {
+          "beforeStart": 1803,
+          "beforeEnd": 1804,
+          "afterStart": 2286,
+          "afterEnd": 2301,
+          "old": "I",
+          "new": "ReviewData']['i"
+        },
+        {
+          "beforeStart": 1812,
+          "beforeEnd": 1819,
+          "afterStart": 2309,
+          "afterEnd": 2312,
+          "old": "family(",
+          "new": "pee"
+        },
+        {
+          "beforeStart": 1820,
+          "beforeEnd": 1851,
+          "afterStart": 2313,
+          "afterEnd": 2313,
+          "old": "efs['monitorIndex'])\n    inputs",
+          "new": ""
+        },
+        {
+          "beforeStart": 1869,
+          "beforeEnd": 1869,
+          "afterStart": 2331,
+          "afterEnd": 2382,
+          "old": "",
+          "new": "ReviewData']['result'])\n    assert peer['state']=='"
+        },
+        {
+          "beforeStart": 1870,
+          "beforeEnd": 1870,
+          "afterStart": 2383,
+          "afterEnd": 2682,
+          "old": "",
+          "new": "NDEPENDENT_SCHEDULER_CLOCK_IO_PRUNING_SOURCE_REVIEW_PASSED_V1'and peer['sourceOnly']is peer['sourceReviewPassed']is True\n    assert peer['sourceIndexSha256']==refs['sourceIndex']['sha256']and peer['ownerActionsInvoked']is False\n    old=Path(refs['predecessorIndex']['path']).parent\n    predecessor_i"
+        },
+        {
+          "beforeStart": 1875,
+          "beforeEnd": 1875,
+          "afterStart": 2687,
+          "afterEnd": 2776,
+          "old": "",
+          "new": "=json.loads((old/'source-inputs.json').read_bytes());assert len(predecessor_inputs['files"
+        },
+        {
+          "beforeStart": 1878,
+          "beforeEnd": 1878,
+          "afterStart": 2779,
+          "afterEnd": 2785,
+          "old": "",
+          "new": "==5606"
+        },
+        {
+          "beforeStart": 1892,
+          "beforeEnd": 1892,
+          "afterStart": 2799,
+          "afterEnd": 2811,
+          "old": "",
+          "new": "predecessor_"
+        },
+        {
+          "beforeStart": 1917,
+          "beforeEnd": 1917,
+          "afterStart": 2836,
+          "afterEnd": 3340,
+          "old": "",
+          "new": ")\n    # No own manifest/index/result descriptor cycle. Own family separately\n    # authenticates those bytes; this static row is safe and independently fixed.\n    capture(refs['hostContext']);capture(refs['pinnedHttpRequestImplementation'])\n    for name in ['error.py','response.py']:\n        r,_=fingerprint(Path(refs['pinnedHttpRequestImplementation']['path']).with_name(name));capture(r)\n    for key in ['sourceInputs','sourceCut','toolReferences','originalBuildPlan','monitorEntry']:capture(refs[key]"
+        },
+        {
+          "beforeStart": 2178,
+          "beforeEnd": 2183,
+          "afterStart": 3601,
+          "afterEnd": 3602,
+          "old": "\n    ",
+          "new": ";"
+        },
+        {
+          "beforeStart": 2730,
+          "beforeEnd": 2731,
+          "afterStart": 4149,
+          "afterEnd": 4164,
+          "old": "#",
+          "new": "comparisons=[]\n"
+        },
+        {
+          "beforeStart": 2732,
+          "beforeEnd": 2734,
+          "afterStart": 4165,
+          "afterEnd": 4173,
+          "old": "Ex",
+          "new": "   for n"
+        },
+        {
+          "beforeStart": 2735,
+          "beforeEnd": 2735,
+          "afterStart": 4174,
+          "afterEnd": 4182,
+          "old": "",
+          "new": "me in ['"
+        },
+        {
+          "beforeStart": 2736,
+          "beforeEnd": 2736,
+          "afterStart": 4183,
+          "afterEnd": 4185,
+          "old": "",
+          "new": "on"
+        },
+        {
+          "beforeStart": 2737,
+          "beforeEnd": 2738,
+          "afterStart": 4186,
+          "afterEnd": 4204,
+          "old": " ",
+          "new": "roller.py','check-"
+        },
+        {
+          "beforeStart": 2739,
+          "beforeEnd": 2754,
+          "afterStart": 4205,
+          "afterEnd": 4206,
+          "old": "aved draft -> c",
+          "new": "o"
+        },
+        {
+          "beforeStart": 2756,
+          "beforeEnd": 2756,
+          "afterStart": 4208,
+          "afterEnd": 4224,
+          "old": "",
+          "new": "ce.py','seal-sou"
+        },
+        {
+          "beforeStart": 2757,
+          "beforeEnd": 2757,
+          "afterStart": 4225,
+          "afterEnd": 4226,
+          "old": "",
+          "new": "c"
+        },
+        {
+          "beforeStart": 2758,
+          "beforeEnd": 2758,
+          "afterStart": 4227,
+          "afterEnd": 4240,
+          "old": "",
+          "new": ".py','host-co"
+        },
+        {
+          "beforeStart": 2759,
+          "beforeEnd": 2761,
+          "afterStart": 4241,
+          "afterEnd": 4241,
+          "old": "t ",
+          "new": ""
+        },
+        {
+          "beforeStart": 2765,
+          "beforeEnd": 2767,
+          "afterStart": 4245,
+          "afterEnd": 4256,
+          "old": " d",
+          "new": ".json','ref"
+        },
+        {
+          "beforeStart": 2769,
+          "beforeEnd": 2769,
+          "afterStart": 4258,
+          "afterEnd": 4289,
+          "old": "",
+          "new": "ences.json','future-root-author"
+        },
+        {
+          "beforeStart": 2770,
+          "beforeEnd": 2770,
+          "afterStart": 4290,
+          "afterEnd": 4355,
+          "old": "",
+          "new": "ty.template.json','future-config.template.json','future-source-re"
+        },
+        {
+          "beforeStart": 2771,
+          "beforeEnd": 2771,
+          "afterStart": 4356,
+          "afterEnd": 4417,
+          "old": "",
+          "new": "iew-contract.json','action-contract.json','README.md','prepar"
+        },
+        {
+          "beforeStart": 2776,
+          "beforeEnd": 2782,
+          "afterStart": 4422,
+          "afterEnd": 4424,
+          "old": ", expl",
+          "new": "-h"
+        },
+        {
+          "beforeStart": 2783,
+          "beforeEnd": 2785,
+          "afterStart": 4425,
+          "afterEnd": 4426,
+          "old": "ci",
+          "new": "s"
+        },
+        {
+          "beforeStart": 2786,
+          "beforeEnd": 2789,
+          "afterStart": 4427,
+          "afterEnd": 4428,
+          "old": " pe",
+          "new": "o"
+        },
+        {
+          "beforeStart": 2790,
+          "beforeEnd": 2796,
+          "afterStart": 4429,
+          "afterEnd": 4433,
+          "old": "-edit ",
+          "new": "y.js"
+        },
+        {
+          "beforeStart": 2797,
+          "beforeEnd": 2804,
+          "afterStart": 4434,
+          "afterEnd": 4438,
+          "old": "ffsets.",
+          "new": "n']:"
+        },
+        {
+          "beforeStart": 2809,
+          "beforeEnd": 2824,
+          "afterStart": 4443,
+          "afterEnd": 4443,
+          "old": "import difflib\n",
+          "new": ""
+        },
+        {
+          "beforeStart": 2836,
+          "beforeEnd": 2840,
+          "afterStart": 4455,
+          "afterEnd": 4458,
+          "old": "HERE",
+          "new": "old"
+        },
+        {
+          "beforeStart": 2841,
+          "beforeEnd": 2857,
+          "afterStart": 4459,
+          "afterEnd": 4460,
+          "old": "'history/root-dr",
+          "new": "n"
+        },
+        {
+          "beforeStart": 2858,
+          "beforeEnd": 2864,
+          "afterStart": 4461,
+          "afterEnd": 4463,
+          "old": "ft.py'",
+          "new": "me"
+        },
+        {
+          "beforeStart": 2890,
+          "beforeEnd": 2893,
+          "afterStart": 4489,
+          "afterEnd": 4489,
+          "old": "'co",
+          "new": ""
+        },
+        {
+          "beforeStart": 2894,
+          "beforeEnd": 2899,
+          "afterStart": 4490,
+          "afterEnd": 4492,
+          "old": "troll",
+          "new": "am"
+        },
+        {
+          "beforeStart": 2900,
+          "beforeEnd": 2905,
+          "afterStart": 4493,
+          "afterEnd": 4493,
+          "old": "r.py'",
+          "new": ""
+        },
+        {
+          "beforeStart": 2928,
+          "beforeEnd": 2928,
+          "afterStart": 4516,
+          "afterEnd": 4520,
+          "old": "",
+          "new": "    "
+        },
+        {
+          "beforeStart": 3024,
+          "beforeEnd": 3024,
+          "afterStart": 4616,
+          "afterEnd": 4620,
+          "old": "",
+          "new": "    "
+        },
+        {
+          "beforeStart": 3153,
+          "beforeEnd": 3153,
+          "afterStart": 4749,
+          "afterEnd": 4753,
+          "old": "",
+          "new": "    "
+        },
+        {
+          "beforeStart": 3167,
+          "beforeEnd": 3167,
+          "afterStart": 4767,
+          "afterEnd": 4781,
+          "old": "",
+          "new": ";reverse=after"
+        },
+        {
+          "beforeStart": 3168,
+          "beforeEnd": 3168,
+          "afterStart": 4782,
+          "afterEnd": 4786,
+          "old": "",
+          "new": "    "
+        },
+        {
+          "beforeStart": 3197,
+          "beforeEnd": 3197,
+          "afterStart": 4815,
+          "afterEnd": 4828,
+          "old": "",
+          "new": "\n            "
+        },
+        {
+          "beforeStart": 3328,
+          "beforeEnd": 3342,
+          "afterStart": 4959,
+          "afterEnd": 4959,
+          "old": "reverse=after\n",
+          "new": ""
+        },
+        {
+          "beforeStart": 3346,
+          "beforeEnd": 3349,
+          "afterStart": 4963,
+          "afterEnd": 4963,
+          "old": "for",
+          "new": ""
+        },
+        {
+          "beforeStart": 3350,
+          "beforeEnd": 3351,
+          "afterStart": 4964,
+          "afterEnd": 4964,
+          "old": "e",
+          "new": ""
+        },
+        {
+          "beforeStart": 3352,
+          "beforeEnd": 3354,
+          "afterStart": 4965,
+          "afterEnd": 4965,
+          "old": "in",
+          "new": ""
+        },
+        {
+          "beforeStart": 3355,
+          "beforeEnd": 3371,
+          "afterStart": 4966,
+          "afterEnd": 4967,
+          "old": "reversed(edits):",
+          "new": " "
+        },
+        {
+          "beforeStart": 3498,
+          "beforeEnd": 3498,
+          "afterStart": 5094,
+          "afterEnd": 5098,
+          "old": "",
+          "new": "    "
+        },
+        {
+          "beforeStart": 3539,
+          "beforeEnd": 3539,
+          "afterStart": 5139,
+          "afterEnd": 5320,
+          "old": "",
+          "new": "\n        donor,_=fingerprint(old/name);current,_=fingerprint(HERE/name)\n        comparisons.append(dict(path=name,donor=donor,after=current,edits=edits,forwardAndInverseExact=True))"
+        },
+        {
+          "beforeStart": 3590,
+          "beforeEnd": 3590,
+          "afterStart": 5371,
+          "afterEnd": 5374,
+          "old": "",
+          "new": "pre"
+        },
+        {
+          "beforeStart": 3591,
+          "beforeEnd": 3593,
+          "afterStart": 5375,
+          "afterEnd": 5380,
+          "old": "on",
+          "new": "ecess"
+        },
+        {
+          "beforeStart": 3596,
+          "beforeEnd": 3596,
+          "afterStart": 5383,
+          "afterEnd": 5388,
+          "old": "",
+          "new": "refs["
+        },
+        {
+          "beforeStart": 3597,
+          "beforeEnd": 3598,
+          "afterStart": 5389,
+          "afterEnd": 5420,
+          "old": "h",
+          "new": "predecessorIndex'],files=compar"
+        },
+        {
+          "beforeStart": 3600,
+          "beforeEnd": 3601,
+          "afterStart": 5422,
+          "afterEnd": 5433,
+          "old": "t",
+          "new": "ons,sourceW"
+        },
+        {
+          "beforeStart": 3603,
+          "beforeEnd": 3606,
+          "afterStart": 5435,
+          "afterEnd": 5444,
+          "old": "y/r",
+          "new": "kPackageR"
+        },
+        {
+          "beforeStart": 3607,
+          "beforeEnd": 3621,
+          "afterStart": 5445,
+          "afterEnd": 5446,
+          "old": "ot-draft.py',b",
+          "new": "l"
+        },
+        {
+          "beforeStart": 3622,
+          "beforeEnd": 3627,
+          "afterStart": 5447,
+          "afterEnd": 5451,
+          "old": "foreS",
+          "new": "sUnc"
+        },
+        {
+          "beforeStart": 3629,
+          "beforeEnd": 3656,
+          "afterStart": 5453,
+          "afterEnd": 5453,
+          "old": "256=hashlib.sha256(before.e",
+          "new": ""
+        },
+        {
+          "beforeStart": 3657,
+          "beforeEnd": 3670,
+          "afterStart": 5454,
+          "afterEnd": 5454,
+          "old": "code()).hexdi",
+          "new": ""
+        },
+        {
+          "beforeStart": 3672,
+          "beforeEnd": 3714,
+          "afterStart": 5456,
+          "afterEnd": 5456,
+          "old": "st(),afterSha256=hashlib.sha256(after.enco",
+          "new": ""
+        },
+        {
+          "beforeStart": 3715,
+          "beforeEnd": 3766,
+          "afterStart": 5457,
+          "afterEnd": 5457,
+          "old": "e()).hexdigest(),edits=edits,forwardAndReverseExact",
+          "new": ""
+        },
+        {
+          "beforeStart": 3836,
+          "beforeEnd": 3841,
+          "afterStart": 5527,
+          "afterEnd": 5534,
+          "old": ",comm",
+          "new": "))\n    "
+        },
+        {
+          "beforeStart": 3842,
+          "beforeEnd": 3850,
+          "afterStart": 5535,
+          "afterEnd": 5536,
+          "old": "ndDeriva",
+          "new": "s"
+        },
+        {
+          "beforeStart": 3851,
+          "beforeEnd": 3893,
+          "afterStart": 5537,
+          "afterEnd": 5537,
+          "old": "ion='Four original plans +four named unit ",
+          "new": ""
+        },
+        {
+          "beforeStart": 3896,
+          "beforeEnd": 3971,
+          "afterStart": 5540,
+          "afterEnd": 5540,
+          "old": "ters; two Jco entry paths explicitly rebased to declared private node_modul",
+          "new": ""
+        },
+        {
+          "beforeStart": 3973,
+          "beforeEnd": 3994,
+          "afterStart": 5542,
+          "afterEnd": 5542,
+          "old": "',toolRootMetadataMap",
+          "new": ""
+        },
+        {
+          "beforeStart": 3995,
+          "beforeEnd": 4108,
+          "afterStart": 5543,
+          "afterEnd": 5545,
+          "old": "{'package.json':'.toolchain-metadata/package.json','package-lock.json':'.toolchain-metadata/package-lock.json'}))",
+          "new": "[]"
+        },
+        {
+          "beforeStart": 4162,
+          "beforeEnd": 4162,
+          "afterStart": 5599,
+          "afterEnd": 5647,
+          "old": "",
+          "new": "());astfiles.append(p.relative_to(HERE).as_posix"
+        },
+        {
+          "beforeStart": 4557,
+          "beforeEnd": 4557,
+          "afterStart": 6042,
+          "afterEnd": 6644,
+          "old": "",
+          "new": "assert set(r['path']for r in predecessor_inputs['files']).issubset(captured)\n    assert str(HERE/'index.json')not in captured and str(HERE/'source-inputs.json')not in captured\n    for f in families:\n        base=Path(f['index']['path']).parent\n        assert all(str(base/name)in captured for name in f['memberNames'])\n    for name in ['import-abi-clock-io-v1-source','import-abi-clock-io-v1-build','import-abi-clock-io-v1-package','import-abi-clock-io-v1-build-v2-external-root']:\n        future=Path('/private/tmp/starling-node-compat')/name;assert not future.exists()and not future.is_symlink()\n    "
+        },
+        {
+          "beforeStart": 4666,
+          "beforeEnd": 4666,
+          "afterStart": 6753,
+          "afterEnd": 6842,
+          "old": "",
+          "new": ",predecessorDeclaredInputs=5606,allRowsRuntimeCapturedBeforeCustomImportAndOnRecheck=True"
+        },
+        {
+          "beforeStart": 4891,
+          "beforeEnd": 4892,
+          "afterStart": 7067,
+          "afterEnd": 7068,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 4943,
+          "beforeEnd": 4943,
+          "afterStart": 7119,
+          "afterEnd": 7247,
+          "old": "",
+          "new": "roposalSourceReview=refs['sourceReviewData'],predecessor=refs['predecessorIndex'],redirectSourceHold=refs['redirectHoldIndex'],p"
+        },
+        {
+          "beforeStart": 4971,
+          "beforeEnd": 4971,
+          "afterStart": 7275,
+          "afterEnd": 7497,
+          "old": "",
+          "new": ",redirectStatusTargetCases=35,responseCloseFailureCases=5,realOpenerErrorDispatchCases=5,manifestIntakeCases=9,descriptorAndFamilyRecheckCases=4,preimportProtectionCases=2,localNoProxyFactoryConstructedWithoutRequests=True"
+        },
+        {
+          "beforeStart": 5144,
+          "beforeEnd": 5144,
+          "afterStart": 7670,
+          "afterEnd": 7710,
+          "old": "",
+          "new": "predecessorDeclaredInputsPreserved=5606,"
+        },
+        {
+          "beforeStart": 5248,
+          "beforeEnd": 5249,
+          "afterStart": 7814,
+          "afterEnd": 7816,
+          "old": "D",
+          "new": "Fo"
+        },
+        {
+          "beforeStart": 5250,
+          "beforeEnd": 5250,
+          "afterStart": 7817,
+          "afterEnd": 7818,
+          "old": "",
+          "new": "w"
+        },
+        {
+          "beforeStart": 5251,
+          "beforeEnd": 5255,
+          "afterStart": 7819,
+          "afterEnd": 7823,
+          "old": "ftRe",
+          "new": "rdIn"
+        },
+        {
+          "beforeStart": 5259,
+          "beforeEnd": 5259,
+          "afterStart": 7827,
+          "afterEnd": 7842,
+          "old": "",
+          "new": "eFiles=len(comp"
+        },
+        {
+          "beforeStart": 5260,
+          "beforeEnd": 5261,
+          "afterStart": 7843,
+          "afterEnd": 7870,
+          "old": "l",
+          "new": "risons),exactForwardInverse"
+        },
+        {
+          "beforeStart": 5267,
+          "beforeEnd": 5267,
+          "afterStart": 7876,
+          "afterEnd": 7880,
+          "old": "",
+          "new": "sum("
+        },
+        {
+          "beforeStart": 5271,
+          "beforeEnd": 5271,
+          "afterStart": 7884,
+          "afterEnd": 7887,
+          "old": "",
+          "new": "r['"
+        },
+        {
+          "beforeStart": 5275,
+          "beforeEnd": 5275,
+          "afterStart": 7891,
+          "afterEnd": 7914,
+          "old": "",
+          "new": "s'])for r in comparison"
+        },
+        {
+          "beforeStart": 5293,
+          "beforeEnd": 5293,
+          "afterStart": 7932,
+          "afterEnd": 7937,
+          "old": "",
+          "new": "astfi"
+        },
+        {
+          "beforeStart": 5295,
+          "beforeEnd": 5299,
+          "afterStart": 7939,
+          "afterEnd": 7939,
+          "old": "n(li",
+          "new": ""
+        },
+        {
+          "beforeStart": 5300,
+          "beforeEnd": 5322,
+          "afterStart": 7940,
+          "afterEnd": 7940,
+          "old": "t(HERE.rglob('*.py')))",
+          "new": ""
+        },
+        {
+          "beforeStart": 5845,
+          "beforeEnd": 5846,
+          "afterStart": 8463,
+          "afterEnd": 8464,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 5952,
+          "beforeEnd": 5953,
+          "afterStart": 8570,
+          "afterEnd": 8570,
+          "old": "d",
+          "new": ""
+        },
+        {
+          "beforeStart": 5954,
+          "beforeEnd": 5958,
+          "afterStart": 8571,
+          "afterEnd": 8571,
+          "old": "aftR",
+          "new": ""
+        },
+        {
+          "beforeStart": 5963,
+          "beforeEnd": 5964,
+          "afterStart": 8576,
+          "afterEnd": 8578,
+          "old": "a",
+          "new": "ib"
+        },
+        {
+          "beforeStart": 5965,
+          "beforeEnd": 5965,
+          "afterStart": 8579,
+          "afterEnd": 8584,
+          "old": "",
+          "new": "eFile"
+        },
+        {
+          "beforeStart": 5971,
+          "beforeEnd": 5973,
+          "afterStart": 8590,
+          "afterEnd": 8596,
+          "old": "ed",
+          "new": "compar"
+        },
+        {
+          "beforeStart": 5974,
+          "beforeEnd": 5975,
+          "afterStart": 8597,
+          "afterEnd": 8600,
+          "old": "t",
+          "new": "son"
+        },
+        {
+          "beforeStart": 6585,
+          "beforeEnd": 6585,
+          "afterStart": 9210,
+          "afterEnd": 9254,
+          "old": "",
+          "new": ",results=fingerprint(HERE/'results.json')[0]"
+        }
+      ],
+      "forwardAndInverseExact": true
+    },
+    {
+      "path": "host-context.json",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v1/host-context.json",
+        "sha256": "ca1521adcee625540272837e63a6e82d1667683d19ab13812e7b9cc0303c686e",
+        "bytes": 2250
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v2/host-context.json",
+        "sha256": "ca1521adcee625540272837e63a6e82d1667683d19ab13812e7b9cc0303c686e",
+        "bytes": 2250
+      },
+      "edits": [],
+      "forwardAndInverseExact": true
+    },
+    {
+      "path": "references.json",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v1/references.json",
+        "sha256": "cb0544e2a95030c151c15e075d910225803cf388cee9159f2ac39a9df4af917a",
+        "bytes": 2283
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v2/references.json",
+        "sha256": "4c00a8dbb284b71fdd75a186eba9aab4159cc11bcba1107883370862ee045e39",
+        "bytes": 3681
+      },
+      "edits": [
+        {
+          "beforeStart": 81,
+          "beforeEnd": 82,
+          "afterStart": 81,
+          "afterEnd": 82,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 2044,
+          "beforeEnd": 2045,
+          "afterStart": 2044,
+          "afterEnd": 2045,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 2280,
+          "beforeEnd": 2280,
+          "afterStart": 2280,
+          "afterEnd": 3678,
+          "old": "",
+          "new": ",\n  \"predecessorIndex\": {\n    \"path\": \"/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v1/index.json\",\n    \"sha256\": \"064003004505c71b5cc28aef92fd929a0165d6cf3b69eb73bd935f9932dc72c8\",\n    \"bytes\": 4822\n  },\n  \"redirectHoldIndex\": {\n    \"path\": \"/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/independent-clock-io-build-controller-source-review-v1/index.json\",\n    \"sha256\": \"ef1f1d89b6a1324590a8eff07a87d99f44d9e36dfc502af9796ee5416f4d9b59\",\n    \"bytes\": 1100\n  },\n  \"sourceReviewData\": {\n    \"index\": {\n      \"path\": \"/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/independent-clock-io-pruning-source-review-v1/index.json\",\n      \"sha256\": \"c9fa3ef3d25804b04c44747a45dbb547d4c6df39391e826e57a053474c735805\",\n      \"bytes\": 3032\n    },\n    \"result\": {\n      \"path\": \"/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/independent-clock-io-pruning-source-review-v1/results.json\",\n      \"sha256\": \"895305875e6769f3d7eecadb816b53d949b4b61158216e737a96bf9878b7715a\",\n      \"bytes\": 5117\n    }\n  },\n  \"pinnedHttpRequestImplementation\": {\n    \"path\": \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/urllib/request.py\",\n    \"sha256\": \"8d1a5f86334c468df202969a87df233dc25c1449f8696f24a986e922b2cfdefd\",\n    \"bytes\": 101280\n  }"
+        }
+      ],
+      "forwardAndInverseExact": true
+    },
+    {
+      "path": "future-root-authority.template.json",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v1/future-root-authority.template.json",
+        "sha256": "bcfe59c6f64043c6adc747f9bd401b55f2f6b1cb2fcc3f736cdbbd0ff56264d0",
+        "bytes": 1685
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v2/future-root-authority.template.json",
+        "sha256": "b207c294262450933ee308f83e482c2d05e46f7838931763f161f482ce2df065",
+        "bytes": 1688
+      },
+      "edits": [
+        {
+          "beforeStart": 742,
+          "beforeEnd": 742,
+          "afterStart": 742,
+          "afterEnd": 745,
+          "old": "",
+          "new": "-v2"
+        }
+      ],
+      "forwardAndInverseExact": true
+    },
+    {
+      "path": "future-config.template.json",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v1/future-config.template.json",
+        "sha256": "96ea6e2fc3a4b7d46c9ac177c283ad8a5589f41ee8b52a88651dc1bde7d4451f",
+        "bytes": 94
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v2/future-config.template.json",
+        "sha256": "96ea6e2fc3a4b7d46c9ac177c283ad8a5589f41ee8b52a88651dc1bde7d4451f",
+        "bytes": 94
+      },
+      "edits": [],
+      "forwardAndInverseExact": true
+    },
+    {
+      "path": "future-source-review-contract.json",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v1/future-source-review-contract.json",
+        "sha256": "5574a270321f36d430e1aa53fff1c2216e1cb3020be2531c70c82de756cb380e",
+        "bytes": 401
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v2/future-source-review-contract.json",
+        "sha256": "134397545086691768e747d43be519bc5c10c5d9697078e7ca45613f5de0ea46",
+        "bytes": 401
+      },
+      "edits": [
+        {
+          "beforeStart": 96,
+          "beforeEnd": 97,
+          "afterStart": 96,
+          "afterEnd": 97,
+          "old": "1",
+          "new": "2"
+        }
+      ],
+      "forwardAndInverseExact": true
+    },
+    {
+      "path": "action-contract.json",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v1/action-contract.json",
+        "sha256": "a08e77d67596f154dafaef6ece903c5f40be408d8256371e3418abfd067e2a87",
+        "bytes": 1868
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v2/action-contract.json",
+        "sha256": "131c0f93bc3a2282b5487d046b0fe49f24699dfe880f371add26c21f17c97873",
+        "bytes": 2202
+      },
+      "edits": [
+        {
+          "beforeStart": 84,
+          "beforeEnd": 85,
+          "afterStart": 84,
+          "afterEnd": 85,
+          "old": "1",
+          "new": "2"
+        },
+        {
+          "beforeStart": 1865,
+          "beforeEnd": 1865,
+          "afterStart": 1865,
+          "afterEnd": 2199,
+          "old": "",
+          "new": ",\n  \"redirectPolicy\": \"Local explicit no-proxy opener rejects301/302/303/307/308 before any followup; closes response even without usable Location; final URL/SHA/size/private guards remain\",\n  \"proxyPolicy\": \"ProxyHandler({}): no environment/system proxy discovery for three literal HTTPS URLs\",\n  \"tlsOrCaOrOsAttestationClaim\": false"
+        }
+      ],
+      "forwardAndInverseExact": true
+    },
+    {
+      "path": "README.md",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v1/README.md",
+        "sha256": "b45badb0fe7e95dca71033ac41b4378a556e159b6ac52032bde61cedc31743f8",
+        "bytes": 8598
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v2/README.md",
+        "sha256": "1d0db496451605d4cc141de5e3ca22d6ddeab074b3eb31b3202fdade2d123d62",
+        "bytes": 4480
+      },
+      "edits": [
+        {
+          "beforeStart": 8,
+          "beforeEnd": 48,
+          "afterStart": 8,
+          "afterEnd": 8,
+          "old": "a dormant Source candidate for building ",
+          "new": ""
+        },
+        {
+          "beforeStart": 52,
+          "beforeEnd": 66,
+          "afterStart": 12,
+          "afterEnd": 12,
+          "old": "**clock/I/O pr",
+          "new": ""
+        },
+        {
+          "beforeStart": 68,
+          "beforeEnd": 68,
+          "afterStart": 14,
+          "afterEnd": 17,
+          "old": "",
+          "new": "rev"
+        },
+        {
+          "beforeStart": 69,
+          "beforeEnd": 71,
+          "afterStart": 18,
+          "afterEnd": 39,
+          "old": "ng",
+          "new": "ewed SOURCE successor"
+        },
+        {
+          "beforeStart": 74,
+          "beforeEnd": 76,
+          "afterStart": 42,
+          "afterEnd": 42,
+          "old": "ol",
+          "new": ""
+        },
+        {
+          "beforeStart": 77,
+          "beforeEnd": 162,
+          "afterStart": 43,
+          "afterEnd": 43,
+          "old": "cut**, not for publishing or using an application adapter. The original proposal is `",
+          "new": ""
+        },
+        {
+          "beforeStart": 171,
+          "beforeEnd": 172,
+          "afterStart": 52,
+          "afterEnd": 62,
+          "old": "p",
+          "new": "build-cont"
+        },
+        {
+          "beforeStart": 173,
+          "beforeEnd": 178,
+          "afterStart": 63,
+          "afterEnd": 68,
+          "old": "uning",
+          "new": "oller"
+        },
+        {
+          "beforeStart": 191,
+          "beforeEnd": 192,
+          "afterStart": 81,
+          "afterEnd": 107,
+          "old": "/",
+          "new": " (064003), correcting its "
+        },
+        {
+          "beforeStart": 196,
+          "beforeEnd": 199,
+          "afterStart": 111,
+          "afterEnd": 143,
+          "old": "x.j",
+          "new": "pendently recorded redirect-tran"
+        },
+        {
+          "beforeStart": 200,
+          "beforeEnd": 200,
+          "afterStart": 144,
+          "afterEnd": 145,
+          "old": "",
+          "new": "p"
+        },
+        {
+          "beforeStart": 201,
+          "beforeEnd": 203,
+          "afterStart": 146,
+          "afterEnd": 148,
+          "old": "n`",
+          "new": "rt"
+        },
+        {
+          "beforeStart": 204,
+          "beforeEnd": 214,
+          "afterStart": 149,
+          "afterEnd": 153,
+          "old": "(`55338\u2026`)",
+          "new": "HOLD"
+        },
+        {
+          "beforeStart": 218,
+          "beforeEnd": 218,
+          "afterStart": 157,
+          "afterEnd": 187,
+          "old": "",
+          "new": "e predecessor and its entire h"
+        },
+        {
+          "beforeStart": 220,
+          "beforeEnd": 220,
+          "afterStart": 189,
+          "afterEnd": 350,
+          "old": "",
+          "new": "tory remain immutable. No build, download, stage, vendor extraction, monitor, Node, Jco, pruner, adapter, engine or guest action has run during preparation.\n\nThe"
+        },
+        {
+          "beforeStart": 232,
+          "beforeEnd": 248,
+          "afterStart": 362,
+          "afterEnd": 362,
+          "old": "stages its decla",
+          "new": ""
+        },
+        {
+          "beforeStart": 250,
+          "beforeEnd": 260,
+          "afterStart": 364,
+          "afterEnd": 365,
+          "old": "d sources ",
+          "new": "m"
+        },
+        {
+          "beforeStart": 261,
+          "beforeEnd": 261,
+          "afterStart": 366,
+          "afterEnd": 367,
+          "old": "",
+          "new": "i"
+        },
+        {
+          "beforeStart": 262,
+          "beforeEnd": 268,
+          "afterStart": 368,
+          "afterEnd": 368,
+          "old": "d tool",
+          "new": ""
+        },
+        {
+          "beforeStart": 272,
+          "beforeEnd": 457,
+          "afterStart": 372,
+          "afterEnd": 372,
+          "old": "to fresh private roots, builds two Rust tool targets, runs four separately selected Rust unit tests, and packages the new splicer with the existing Jco CLI. No operation has been run by",
+          "new": ""
+        },
+        {
+          "beforeStart": 463,
+          "beforeEnd": 621,
+          "afterStart": 378,
+          "afterEnd": 378,
+          "old": "packet's author.\n\nThe only future invocation is the pinned canonical Python interpreter with `-B -I controller.py parent '<exact config descriptor JSON>'`. A ",
+          "new": ""
+        },
+        {
+          "beforeStart": 624,
+          "beforeEnd": 713,
+          "afterStart": 381,
+          "afterEnd": 381,
+          "old": " Root build authority and two separate independent Source peers are required: one for the",
+          "new": ""
+        },
+        {
+          "beforeStart": 723,
+          "beforeEnd": 724,
+          "afterStart": 391,
+          "afterEnd": 393,
+          "old": "p",
+          "new": "di"
+        },
+        {
+          "beforeStart": 725,
+          "beforeEnd": 738,
+          "afterStart": 394,
+          "afterEnd": 394,
+          "old": "oposal and on",
+          "new": ""
+        },
+        {
+          "beforeStart": 739,
+          "beforeEnd": 741,
+          "afterStart": 395,
+          "afterEnd": 397,
+          "old": " f",
+          "new": "ct"
+        },
+        {
+          "beforeStart": 743,
+          "beforeEnd": 759,
+          "afterStart": 399,
+          "afterEnd": 400,
+          "old": " this controller",
+          "new": "y"
+        },
+        {
+          "beforeStart": 761,
+          "beforeEnd": 770,
+          "afterStart": 402,
+          "afterEnd": 403,
+          "old": "The paren",
+          "new": "I"
+        },
+        {
+          "beforeStart": 771,
+          "beforeEnd": 787,
+          "afterStart": 404,
+          "afterEnd": 404,
+          "old": " and worker both",
+          "new": ""
+        },
+        {
+          "beforeStart": 800,
+          "beforeEnd": 800,
+          "afterStart": 417,
+          "afterEnd": 418,
+          "old": "",
+          "new": "s"
+        },
+        {
+          "beforeStart": 801,
+          "beforeEnd": 801,
+          "afterStart": 419,
+          "afterEnd": 420,
+          "old": "",
+          "new": "i"
+        },
+        {
+          "beforeStart": 802,
+          "beforeEnd": 804,
+          "afterStart": 421,
+          "afterEnd": 422,
+          "old": "he",
+          "new": "s"
+        },
+        {
+          "beforeStart": 805,
+          "beforeEnd": 814,
+          "afterStart": 423,
+          "afterEnd": 423,
+          "old": "full curr",
+          "new": ""
+        },
+        {
+          "beforeStart": 817,
+          "beforeEnd": 817,
+          "afterStart": 426,
+          "afterEnd": 433,
+          "old": "",
+          "new": "ire own"
+        },
+        {
+          "beforeStart": 831,
+          "beforeEnd": 832,
+          "afterStart": 447,
+          "afterEnd": 456,
+          "old": "i",
+          "new": "y, predec"
+        },
+        {
+          "beforeStart": 834,
+          "beforeEnd": 834,
+          "afterStart": 458,
+          "afterEnd": 468,
+          "old": "",
+          "new": "sor family"
+        },
+        {
+          "beforeStart": 836,
+          "beforeEnd": 838,
+          "afterStart": 470,
+          "afterEnd": 476,
+          "old": "ex",
+          "new": "HOLD f"
+        },
+        {
+          "beforeStart": 839,
+          "beforeEnd": 846,
+          "afterStart": 477,
+          "afterEnd": 479,
+          "old": "ct resu",
+          "new": "mi"
+        },
+        {
+          "beforeStart": 847,
+          "beforeEnd": 859,
+          "afterStart": 480,
+          "afterEnd": 481,
+          "old": "t membership",
+          "new": "y"
+        },
+        {
+          "beforeStart": 862,
+          "beforeEnd": 864,
+          "afterStart": 484,
+          "afterEnd": 496,
+          "old": "ll",
+          "new": "ccepted55338"
+        },
+        {
+          "beforeStart": 865,
+          "beforeEnd": 865,
+          "afterStart": 497,
+          "afterEnd": 499,
+          "old": "",
+          "new": "pr"
+        },
+        {
+          "beforeStart": 866,
+          "beforeEnd": 871,
+          "afterStart": 500,
+          "afterEnd": 503,
+          "old": "rigin",
+          "new": "pos"
+        },
+        {
+          "beforeStart": 874,
+          "beforeEnd": 874,
+          "afterStart": 506,
+          "afterEnd": 555,
+          "old": "",
+          "new": "peer c9fa and every row of its own finite source-"
+        },
+        {
+          "beforeStart": 879,
+          "beforeEnd": 879,
+          "afterStart": 560,
+          "afterEnd": 561,
+          "old": "",
+          "new": "s"
+        },
+        {
+          "beforeStart": 880,
+          "beforeEnd": 881,
+          "afterStart": 562,
+          "afterEnd": 567,
+          "old": "d",
+          "new": "manif"
+        },
+        {
+          "beforeStart": 883,
+          "beforeEnd": 887,
+          "afterStart": 569,
+          "afterEnd": 569,
+          "old": "crip",
+          "new": ""
+        },
+        {
+          "beforeStart": 888,
+          "beforeEnd": 950,
+          "afterStart": 570,
+          "afterEnd": 570,
+          "old": "ors and physical identities, original modes and JS alias texts",
+          "new": ""
+        },
+        {
+          "beforeStart": 957,
+          "beforeEnd": 957,
+          "afterStart": 577,
+          "afterEnd": 581,
+          "old": "",
+          "new": " any"
+        },
+        {
+          "beforeStart": 971,
+          "beforeEnd": 971,
+          "afterStart": 595,
+          "afterEnd": 690,
+          "old": "",
+          "new": " or operation. These captured hashes/identities/family memberships repeat on final/failure path"
+        },
+        {
+          "beforeStart": 990,
+          "beforeEnd": 997,
+          "afterStart": 709,
+          "afterEnd": 709,
+          "old": "module ",
+          "new": ""
+        },
+        {
+          "beforeStart": 1004,
+          "beforeEnd": 1004,
+          "afterStart": 716,
+          "afterEnd": 720,
+          "old": "",
+          "new": "rema"
+        },
+        {
+          "beforeStart": 1005,
+          "beforeEnd": 1005,
+          "afterStart": 721,
+          "afterEnd": 722,
+          "old": "",
+          "new": "n"
+        },
+        {
+          "beforeStart": 1027,
+          "beforeEnd": 1029,
+          "afterStart": 744,
+          "afterEnd": 744,
+          "old": " `",
+          "new": ""
+        },
+        {
+          "beforeStart": 1032,
+          "beforeEnd": 1034,
+          "afterStart": 747,
+          "afterEnd": 748,
+          "old": "\u2026/",
+          "new": " "
+        },
+        {
+          "beforeStart": 1041,
+          "beforeEnd": 1046,
+          "afterStart": 755,
+          "afterEnd": 755,
+          "old": ".py`;",
+          "new": ""
+        },
+        {
+          "beforeStart": 1049,
+          "beforeEnd": 1056,
+          "afterStart": 758,
+          "afterEnd": 758,
+          "old": "e calle",
+          "new": ""
+        },
+        {
+          "beforeStart": 1057,
+          "beforeEnd": 1061,
+          "afterStart": 759,
+          "afterEnd": 759,
+          "old": " inv",
+          "new": ""
+        },
+        {
+          "beforeStart": 1062,
+          "beforeEnd": 1065,
+          "afterStart": 760,
+          "afterEnd": 763,
+          "old": "kes",
+          "new": "ugh"
+        },
+        {
+          "beforeStart": 1093,
+          "beforeEnd": 1122,
+          "afterStart": 791,
+          "afterEnd": 791,
+          "old": " and never its unrelated main",
+          "new": ""
+        },
+        {
+          "beforeStart": 1126,
+          "beforeEnd": 1143,
+          "afterStart": 795,
+          "afterEnd": 795,
+          "old": " monitor state or",
+          "new": ""
+        },
+        {
+          "beforeStart": 1150,
+          "beforeEnd": 1150,
+          "afterStart": 802,
+          "afterEnd": 820,
+          "old": "",
+          "new": "s or metadata role"
+        },
+        {
+          "beforeStart": 1165,
+          "beforeEnd": 1169,
+          "afterStart": 835,
+          "afterEnd": 836,
+          "old": "Full",
+          "new": "A"
+        },
+        {
+          "beforeStart": 1170,
+          "beforeEnd": 1172,
+          "afterStart": 837,
+          "afterEnd": 840,
+          "old": "ha",
+          "new": "fre"
+        },
+        {
+          "beforeStart": 1174,
+          "beforeEnd": 1480,
+          "afterStart": 842,
+          "afterEnd": 842,
+          "old": ", identity, family-membership and alias checks repeat after commands and on final/failure paths.\n\nThe finite stage contains 271 source files, five new componentize package files, 4,860 declared node_modules files, two original tool-root metadata files and 21 declared internal JS aliases. These are **5,138",
+          "new": ""
+        },
+        {
+          "beforeStart": 1493,
+          "beforeEnd": 1493,
+          "afterStart": 855,
+          "afterEnd": 859,
+          "old": "",
+          "new": "cont"
+        },
+        {
+          "beforeStart": 1494,
+          "beforeEnd": 1497,
+          "afterStart": 860,
+          "afterEnd": 861,
+          "old": "egu",
+          "new": "o"
+        },
+        {
+          "beforeStart": 1498,
+          "beforeEnd": 1503,
+          "afterStart": 862,
+          "afterEnd": 862,
+          "old": "ar-fi",
+          "new": ""
+        },
+        {
+          "beforeStart": 1505,
+          "beforeEnd": 1505,
+          "afterStart": 864,
+          "afterEnd": 865,
+          "old": "",
+          "new": "r"
+        },
+        {
+          "beforeStart": 1506,
+          "beforeEnd": 1574,
+          "afterStart": 866,
+          "afterEnd": 867,
+          "old": "copies**, plus 21 aliases. Every copy preserves the exact original s",
+          "new": "S"
+        },
+        {
+          "beforeStart": 1580,
+          "beforeEnd": 1581,
+          "afterStart": 873,
+          "afterEnd": 880,
+          "old": "i",
+          "new": "peer an"
+        },
+        {
+          "beforeStart": 1582,
+          "beforeEnd": 1582,
+          "afterStart": 881,
+          "afterEnd": 883,
+          "old": "",
+          "new": " n"
+        },
+        {
+          "beforeStart": 1583,
+          "beforeEnd": 1584,
+          "afterStart": 884,
+          "afterEnd": 892,
+          "old": "n",
+          "new": "w V2 Roo"
+        },
+        {
+          "beforeStart": 1585,
+          "beforeEnd": 1585,
+          "afterStart": 893,
+          "afterEnd": 900,
+          "old": "",
+          "new": " author"
+        },
+        {
+          "beforeStart": 1589,
+          "beforeEnd": 1592,
+          "afterStart": 904,
+          "afterEnd": 913,
+          "old": "byt",
+          "new": "config ar"
+        },
+        {
+          "beforeStart": 1593,
+          "beforeEnd": 1601,
+          "afterStart": 914,
+          "afterEnd": 914,
+          "old": "s in its",
+          "new": ""
+        },
+        {
+          "beforeStart": 1604,
+          "beforeEnd": 1605,
+          "afterStart": 917,
+          "afterEnd": 921,
+          "old": "c",
+          "new": "quir"
+        },
+        {
+          "beforeStart": 1606,
+          "beforeEnd": 1609,
+          "afterStart": 922,
+          "afterEnd": 923,
+          "old": "ipt",
+          "new": "d"
+        },
+        {
+          "beforeStart": 1615,
+          "beforeEnd": 1615,
+          "afterStart": 929,
+          "afterEnd": 936,
+          "old": "",
+          "new": "ld cont"
+        },
+        {
+          "beforeStart": 1616,
+          "beforeEnd": 1621,
+          "afterStart": 937,
+          "afterEnd": 938,
+          "old": "igina",
+          "new": "o"
+        },
+        {
+          "beforeStart": 1622,
+          "beforeEnd": 1625,
+          "afterStart": 939,
+          "afterEnd": 939,
+          "old": " fi",
+          "new": ""
+        },
+        {
+          "beforeStart": 1627,
+          "beforeEnd": 1628,
+          "afterStart": 941,
+          "afterEnd": 942,
+          "old": ",",
+          "new": "r"
+        },
+        {
+          "beforeStart": 1631,
+          "beforeEnd": 1652,
+          "afterStart": 945,
+          "afterEnd": 945,
+          "old": "ckage, cache or permi",
+          "new": ""
+        },
+        {
+          "beforeStart": 1654,
+          "beforeEnd": 1657,
+          "afterStart": 947,
+          "afterEnd": 947,
+          "old": "ion",
+          "new": ""
+        },
+        {
+          "beforeStart": 1661,
+          "beforeEnd": 1661,
+          "afterStart": 951,
+          "afterEnd": 952,
+          "old": "",
+          "new": "a"
+        },
+        {
+          "beforeStart": 1662,
+          "beforeEnd": 1662,
+          "afterStart": 953,
+          "afterEnd": 963,
+          "old": "",
+          "new": "cepted.\n\nT"
+        },
+        {
+          "beforeStart": 1663,
+          "beforeEnd": 1663,
+          "afterStart": 964,
+          "afterEnd": 1012,
+          "old": "",
+          "new": "e download client is a local build_opener(ProxyH"
+        },
+        {
+          "beforeStart": 1665,
+          "beforeEnd": 1666,
+          "afterStart": 1014,
+          "afterEnd": 1039,
+          "old": "g",
+          "new": "dler({}), RejectDownloadR"
+        },
+        {
+          "beforeStart": 1668,
+          "beforeEnd": 1668,
+          "afterStart": 1041,
+          "afterEnd": 1128,
+          "old": "",
+          "new": "irects()). It installs no global opener and disables environment/system proxy discovery"
+        },
+        {
+          "beforeStart": 1674,
+          "beforeEnd": 1674,
+          "afterStart": 1134,
+          "afterEnd": 1136,
+          "old": "",
+          "new": "ac"
+        },
+        {
+          "beforeStart": 1675,
+          "beforeEnd": 1684,
+          "afterStart": 1137,
+          "afterEnd": 1138,
+          "old": "wo origin",
+          "new": "u"
+        },
+        {
+          "beforeStart": 1687,
+          "beforeEnd": 1690,
+          "afterStart": 1141,
+          "afterEnd": 1145,
+          "old": "too",
+          "new": "subc"
+        },
+        {
+          "beforeStart": 1691,
+          "beforeEnd": 1699,
+          "afterStart": 1146,
+          "afterEnd": 1146,
+          "old": "-root `p",
+          "new": ""
+        },
+        {
+          "beforeStart": 1700,
+          "beforeEnd": 1707,
+          "afterStart": 1147,
+          "afterEnd": 1147,
+          "old": "ckage.j",
+          "new": ""
+        },
+        {
+          "beforeStart": 1708,
+          "beforeEnd": 1727,
+          "afterStart": 1148,
+          "afterEnd": 1148,
+          "old": "on`/`package-lock.j",
+          "new": ""
+        },
+        {
+          "beforeStart": 1728,
+          "beforeEnd": 1741,
+          "afterStart": 1149,
+          "afterEnd": 1149,
+          "old": "on` files are",
+          "new": ""
+        },
+        {
+          "beforeStart": 1753,
+          "beforeEnd": 1757,
+          "afterStart": 1161,
+          "afterEnd": 1162,
+          "old": "copi",
+          "new": "r"
+        },
+        {
+          "beforeStart": 1758,
+          "beforeEnd": 1854,
+          "afterStart": 1163,
+          "afterEnd": 1163,
+          "old": "d to `PACKAGE/.toolchain-metadata/` as DATA. They never overwrite the new componentize `package.",
+          "new": ""
+        },
+        {
+          "beforeStart": 1855,
+          "beforeEnd": 1864,
+          "afterStart": 1164,
+          "afterEnd": 1164,
+          "old": "son` or b",
+          "new": ""
+        },
+        {
+          "beforeStart": 1866,
+          "beforeEnd": 1882,
+          "afterStart": 1166,
+          "afterEnd": 1167,
+          "old": "ome a package-re",
+          "new": "t"
+        },
+        {
+          "beforeStart": 1883,
+          "beforeEnd": 1969,
+          "afterStart": 1168,
+          "afterEnd": 1187,
+          "old": "olution root. A genuine pure actual-plan check caught that collision in the Root draft",
+          "new": "301/302/303/307/308"
+        },
+        {
+          "beforeStart": 1981,
+          "beforeEnd": 1982,
+          "afterStart": 1199,
+          "afterEnd": 1204,
+          "old": "s",
+          "new": "paren"
+        },
+        {
+          "beforeStart": 1983,
+          "beforeEnd": 1987,
+          "afterStart": 1205,
+          "afterEnd": 1206,
+          "old": "age ",
+          "new": "."
+        },
+        {
+          "beforeStart": 1990,
+          "beforeEnd": 1990,
+          "afterStart": 1209,
+          "afterEnd": 1239,
+          "old": "",
+          "new": "n followup, even missing/malfo"
+        },
+        {
+          "beforeStart": 1991,
+          "beforeEnd": 1991,
+          "afterStart": 1240,
+          "afterEnd": 1256,
+          "old": "",
+          "new": "med/same-URL Loc"
+        },
+        {
+          "beforeStart": 2002,
+          "beforeEnd": 2007,
+          "afterStart": 1267,
+          "afterEnd": 1267,
+          "old": "failu",
+          "new": ""
+        },
+        {
+          "beforeStart": 2008,
+          "beforeEnd": 2008,
+          "afterStart": 1268,
+          "afterEnd": 1274,
+          "old": "",
+          "new": "espons"
+        },
+        {
+          "beforeStart": 2013,
+          "beforeEnd": 2019,
+          "afterStart": 1279,
+          "afterEnd": 1283,
+          "old": "retain",
+          "new": "clos"
+        },
+        {
+          "beforeStart": 2021,
+          "beforeEnd": 2030,
+          "afterStart": 1285,
+          "afterEnd": 1285,
+          "old": ".\n\nSource",
+          "new": ""
+        },
+        {
+          "beforeStart": 2031,
+          "beforeEnd": 2046,
+          "afterStart": 1286,
+          "afterEnd": 1286,
+          "old": "and package mem",
+          "new": ""
+        },
+        {
+          "beforeStart": 2048,
+          "beforeEnd": 2055,
+          "afterStart": 1288,
+          "afterEnd": 1290,
+          "old": "rship a",
+          "new": "fo"
+        },
+        {
+          "beforeStart": 2058,
+          "beforeEnd": 2061,
+          "afterStart": 1293,
+          "afterEnd": 1306,
+          "old": "exa",
+          "new": "HTTPError, in"
+        },
+        {
+          "beforeStart": 2062,
+          "beforeEnd": 2062,
+          "afterStart": 1307,
+          "afterEnd": 1314,
+          "old": "",
+          "new": "luding "
+        },
+        {
+          "beforeStart": 2063,
+          "beforeEnd": 2066,
+          "afterStart": 1315,
+          "afterEnd": 1315,
+          "old": ". T",
+          "new": ""
+        },
+        {
+          "beforeStart": 2069,
+          "beforeEnd": 2069,
+          "afterStart": 1318,
+          "afterEnd": 1332,
+          "old": "",
+          "new": "close-error re"
+        },
+        {
+          "beforeStart": 2070,
+          "beforeEnd": 2072,
+          "afterStart": 1333,
+          "afterEnd": 1335,
+          "old": "in",
+          "new": "us"
+        },
+        {
+          "beforeStart": 2077,
+          "beforeEnd": 2205,
+          "afterStart": 1340,
+          "afterEnd": 1340,
+          "old": "ckage may additionally contain at most 128 newly generated `lib/` JS/Wasm/type files totalling at most 256 MiB; it must contain ",
+          "new": ""
+        },
+        {
+          "beforeStart": 2207,
+          "beforeEnd": 2208,
+          "afterStart": 1342,
+          "afterEnd": 1343,
+          "old": "e",
+          "new": "."
+        },
+        {
+          "beforeStart": 2209,
+          "beforeEnd": 2214,
+          "afterStart": 1344,
+          "afterEnd": 1346,
+          "old": "new s",
+          "new": "Ex"
+        },
+        {
+          "beforeStart": 2218,
+          "beforeEnd": 2218,
+          "afterStart": 1350,
+          "afterEnd": 1360,
+          "old": "",
+          "new": "it308 matt"
+        },
+        {
+          "beforeStart": 2220,
+          "beforeEnd": 2220,
+          "afterStart": 1362,
+          "afterEnd": 1363,
+          "old": "",
+          "new": "s"
+        },
+        {
+          "beforeStart": 2221,
+          "beforeEnd": 2224,
+          "afterStart": 1364,
+          "afterEnd": 1367,
+          "old": "JS ",
+          "new": "bec"
+        },
+        {
+          "beforeStart": 2225,
+          "beforeEnd": 2244,
+          "afterStart": 1368,
+          "afterEnd": 1369,
+          "old": "nd a core Wasm. The",
+          "new": "u"
+        },
+        {
+          "beforeStart": 2247,
+          "beforeEnd": 2247,
+          "afterStart": 1372,
+          "afterEnd": 1383,
+          "old": "",
+          "new": "pinned Pyth"
+        },
+        {
+          "beforeStart": 2248,
+          "beforeEnd": 2253,
+          "afterStart": 1384,
+          "afterEnd": 1391,
+          "old": "utput",
+          "new": "n3.9 ha"
+        },
+        {
+          "beforeStart": 2255,
+          "beforeEnd": 2255,
+          "afterStart": 1393,
+          "afterEnd": 1399,
+          "old": "",
+          "new": "no def"
+        },
+        {
+          "beforeStart": 2256,
+          "beforeEnd": 2258,
+          "afterStart": 1400,
+          "afterEnd": 1406,
+          "old": "re",
+          "new": "ult308"
+        },
+        {
+          "beforeStart": 2259,
+          "beforeEnd": 2264,
+          "afterStart": 1407,
+          "afterEnd": 1407,
+          "old": "captu",
+          "new": ""
+        },
+        {
+          "beforeStart": 2267,
+          "beforeEnd": 2304,
+          "afterStart": 1410,
+          "afterEnd": 1410,
+          "old": " as actual construction DATA and requ",
+          "new": ""
+        },
+        {
+          "beforeStart": 2307,
+          "beforeEnd": 2334,
+          "afterStart": 1413,
+          "afterEnd": 1413,
+          "old": " a later independent artifa",
+          "new": ""
+        },
+        {
+          "beforeStart": 2335,
+          "beforeEnd": 2376,
+          "afterStart": 1414,
+          "afterEnd": 1414,
+          "old": "t/physical dependency review. They are no",
+          "new": ""
+        },
+        {
+          "beforeStart": 2380,
+          "beforeEnd": 2382,
+          "afterStart": 1418,
+          "afterEnd": 1419,
+          "old": "re",
+          "new": "i"
+        },
+        {
+          "beforeStart": 2383,
+          "beforeEnd": 2384,
+          "afterStart": 1420,
+          "afterEnd": 1426,
+          "old": "d",
+          "new": "s. Onl"
+        },
+        {
+          "beforeStart": 2386,
+          "beforeEnd": 2391,
+          "afterStart": 1428,
+          "afterEnd": 1428,
+          "old": "accep",
+          "new": ""
+        },
+        {
+          "beforeStart": 2392,
+          "beforeEnd": 2431,
+          "afterStart": 1429,
+          "afterEnd": 1429,
+          "old": "ed artifacts or a production package. T",
+          "new": ""
+        },
+        {
+          "beforeStart": 2442,
+          "beforeEnd": 2638,
+          "afterStart": 1440,
+          "afterEnd": 1440,
+          "old": " toolchain/package source is never silently substituted for the new five-file package.\n\nRegistry preparation is explicit: copy the 118 declared cached archives into private WORK; fetch exactly the",
+          "new": ""
+        },
+        {
+          "beforeStart": 2653,
+          "beforeEnd": 2681,
+          "afterStart": 1455,
+          "afterEnd": 1455,
+          "old": "name/version/SHA rows from `",
+          "new": ""
+        },
+        {
+          "beforeStart": 2697,
+          "beforeEnd": 2698,
+          "afterStart": 1471,
+          "afterEnd": 1471,
+          "old": "`",
+          "new": ""
+        },
+        {
+          "beforeStart": 2699,
+          "beforeEnd": 2703,
+          "afterStart": 1472,
+          "afterEnd": 1477,
+          "old": "into",
+          "new": "HTTPS"
+        },
+        {
+          "beforeStart": 2704,
+          "beforeEnd": 2706,
+          "afterStart": 1478,
+          "afterEnd": 1479,
+          "old": "WO",
+          "new": "U"
+        },
+        {
+          "beforeStart": 2707,
+          "beforeEnd": 2724,
+          "afterStart": 1480,
+          "afterEnd": 1482,
+          "old": "K only. No global",
+          "new": "Ls"
+        },
+        {
+          "beforeStart": 2727,
+          "beforeEnd": 2781,
+          "afterStart": 1485,
+          "afterEnd": 1485,
+          "old": "che or lockfile is changed, no automatic latest/versio",
+          "new": ""
+        },
+        {
+          "beforeStart": 2783,
+          "beforeEnd": 2818,
+          "afterStart": 1487,
+          "afterEnd": 1488,
+          "old": "resolution occurs, and redirects ar",
+          "new": "b"
+        },
+        {
+          "beforeStart": 2822,
+          "beforeEnd": 2823,
+          "afterStart": 1492,
+          "afterEnd": 1493,
+          "old": "f",
+          "new": "q"
+        },
+        {
+          "beforeStart": 2824,
+          "beforeEnd": 2824,
+          "afterStart": 1494,
+          "afterEnd": 1495,
+          "old": "",
+          "new": "e"
+        },
+        {
+          "beforeStart": 2825,
+          "beforeEnd": 2825,
+          "afterStart": 1496,
+          "afterEnd": 1497,
+          "old": "",
+          "new": "t"
+        },
+        {
+          "beforeStart": 2829,
+          "beforeEnd": 2830,
+          "afterStart": 1501,
+          "afterEnd": 1504,
+          "old": "E",
+          "new": "Fin"
+        },
+        {
+          "beforeStart": 2831,
+          "beforeEnd": 2833,
+          "afterStart": 1505,
+          "afterEnd": 1506,
+          "old": "ch",
+          "new": "l"
+        },
+        {
+          "beforeStart": 2834,
+          "beforeEnd": 2838,
+          "afterStart": 1507,
+          "afterEnd": 1512,
+          "old": "down",
+          "new": "getur"
+        },
+        {
+          "beforeStart": 2839,
+          "beforeEnd": 2840,
+          "afterStart": 1513,
+          "afterEnd": 1517,
+          "old": "o",
+          "new": " equ"
+        },
+        {
+          "beforeStart": 2841,
+          "beforeEnd": 2868,
+          "afterStart": 1518,
+          "afterEnd": 1519,
+          "old": "d is bounded to 16 MiB and ",
+          "new": "l"
+        },
+        {
+          "beforeStart": 2870,
+          "beforeEnd": 2871,
+          "afterStart": 1521,
+          "afterEnd": 1523,
+          "old": "s",
+          "new": "y,"
+        },
+        {
+          "beforeStart": 2888,
+          "beforeEnd": 3058,
+          "afterStart": 1540,
+          "afterEnd": 1540,
+          "old": " is required. All Cargo operations then use the private vendor directory and private offline CARGO_HOME. Crate metadata permits regular files/directories only: no symlink",
+          "new": ""
+        },
+        {
+          "beforeStart": 3059,
+          "beforeEnd": 3189,
+          "afterStart": 1541,
+          "afterEnd": 1541,
+          "old": " hardlink, device, traversal, duplicate, conflicting path or supplied checksum file. Each file is capped at 32 MiB, each crate at ",
+          "new": ""
+        },
+        {
+          "beforeStart": 3190,
+          "beforeEnd": 3193,
+          "afterStart": 1542,
+          "afterEnd": 1543,
+          "old": "28 ",
+          "new": "6"
+        },
+        {
+          "beforeStart": 3197,
+          "beforeEnd": 3207,
+          "afterStart": 1547,
+          "afterEnd": 1550,
+          "old": "and all un",
+          "new": "com"
+        },
+        {
+          "beforeStart": 3208,
+          "beforeEnd": 3215,
+          "afterStart": 1551,
+          "afterEnd": 1551,
+          "old": "acked c",
+          "new": ""
+        },
+        {
+          "beforeStart": 3216,
+          "beforeEnd": 3218,
+          "afterStart": 1552,
+          "afterEnd": 1552,
+          "old": "at",
+          "new": ""
+        },
+        {
+          "beforeStart": 3220,
+          "beforeEnd": 3238,
+          "afterStart": 1554,
+          "afterEnd": 1555,
+          "old": " at 512 MiB, check",
+          "new": "s"
+        },
+        {
+          "beforeStart": 3242,
+          "beforeEnd": 3244,
+          "afterStart": 1559,
+          "afterEnd": 1559,
+          "old": "ef",
+          "new": ""
+        },
+        {
+          "beforeStart": 3245,
+          "beforeEnd": 3247,
+          "afterStart": 1560,
+          "afterEnd": 1564,
+          "old": "re",
+          "new": "und,"
+        },
+        {
+          "beforeStart": 3248,
+          "beforeEnd": 3265,
+          "afterStart": 1565,
+          "afterEnd": 1566,
+          "old": "the next extracti",
+          "new": "s"
+        },
+        {
+          "beforeStart": 3266,
+          "beforeEnd": 3280,
+          "afterStart": 1567,
+          "afterEnd": 1567,
+          "old": "n. `.cargo-che",
+          "new": ""
+        },
+        {
+          "beforeStart": 3282,
+          "beforeEnd": 3296,
+          "afterStart": 1569,
+          "afterEnd": 1569,
+          "old": "sum.json` valu",
+          "new": ""
+        },
+        {
+          "beforeStart": 3297,
+          "beforeEnd": 3300,
+          "afterStart": 1570,
+          "afterEnd": 1572,
+          "old": "s a",
+          "new": "t/"
+        },
+        {
+          "beforeStart": 3301,
+          "beforeEnd": 3370,
+          "afterStart": 1573,
+          "afterEnd": 1573,
+          "old": "e generated from the actual private bytes. The 118 existing archive h",
+          "new": ""
+        },
+        {
+          "beforeStart": 3373,
+          "beforeEnd": 3375,
+          "afterStart": 1576,
+          "afterEnd": 1583,
+          "old": "er",
+          "new": "-loop60"
+        },
+        {
+          "beforeStart": 3377,
+          "beforeEnd": 3409,
+          "afterStart": 1585,
+          "afterEnd": 1586,
+          "old": "were parsed as DATA in preparati",
+          "new": "b"
+        },
+        {
+          "beforeStart": 3410,
+          "beforeEnd": 3423,
+          "afterStart": 1587,
+          "afterEnd": 1587,
+          "old": "n; the three ",
+          "new": ""
+        },
+        {
+          "beforeStart": 3425,
+          "beforeEnd": 3442,
+          "afterStart": 1589,
+          "afterEnd": 1590,
+          "old": "available archive",
+          "new": "d"
+        },
+        {
+          "beforeStart": 3443,
+          "beforeEnd": 3679,
+          "afterStart": 1591,
+          "afterEnd": 1591,
+          "old": "' contents have not been fetched or inspected.\n\nThe tool environment has a small explicit inherited-key list, preserves existing HOME and CODEX_HOME values, and selects the exact pinned Rust1.96.1 tools, host Clang, wasm rust-lld, SDK27",
+          "new": ""
+        },
+        {
+          "beforeStart": 3689,
+          "beforeEnd": 3706,
+          "afterStart": 1601,
+          "afterEnd": 1601,
+          "old": "tmp and Cargo-hom",
+          "new": ""
+        },
+        {
+          "beforeStart": 3707,
+          "beforeEnd": 3712,
+          "afterStart": 1602,
+          "afterEnd": 1606,
+          "old": " path",
+          "new": "xclu"
+        },
+        {
+          "beforeStart": 3713,
+          "beforeEnd": 3717,
+          "afterStart": 1607,
+          "afterEnd": 1607,
+          "old": ". Bu",
+          "new": ""
+        },
+        {
+          "beforeStart": 3718,
+          "beforeEnd": 3754,
+          "afterStart": 1608,
+          "afterEnd": 1609,
+          "old": "ld jobs, Rayon and Binaryen cores ar",
+          "new": "v"
+        },
+        {
+          "beforeStart": 3757,
+          "beforeEnd": 3765,
+          "afterStart": 1612,
+          "afterEnd": 1617,
+          "old": "ne. Ance",
+          "new": "utput"
+        },
+        {
+          "beforeStart": 3766,
+          "beforeEnd": 3814,
+          "afterStart": 1618,
+          "afterEnd": 1618,
+          "old": "tor `.cargo/config` overrides are refused before",
+          "new": ""
+        },
+        {
+          "beforeStart": 3820,
+          "beforeEnd": 3823,
+          "afterStart": 1624,
+          "afterEnd": 1628,
+          "old": "fte",
+          "new": "ll a"
+        },
+        {
+          "beforeStart": 3824,
+          "beforeEnd": 3842,
+          "afterStart": 1629,
+          "afterEnd": 1629,
+          "old": " operations. Host ",
+          "new": ""
+        },
+        {
+          "beforeStart": 3843,
+          "beforeEnd": 3856,
+          "afterStart": 1630,
+          "afterEnd": 1630,
+          "old": "ontext pins t",
+          "new": ""
+        },
+        {
+          "beforeStart": 3857,
+          "beforeEnd": 3883,
+          "afterStart": 1631,
+          "afterEnd": 1631,
+          "old": "e selected SDKSettings, dr",
+          "new": ""
+        },
+        {
+          "beforeStart": 3886,
+          "beforeEnd": 3887,
+          "afterStart": 1634,
+          "afterEnd": 1634,
+          "old": "r",
+          "new": ""
+        },
+        {
+          "beforeStart": 3888,
+          "beforeEnd": 3890,
+          "afterStart": 1635,
+          "afterEnd": 1637,
+          "old": "li",
+          "new": "ve"
+        },
+        {
+          "beforeStart": 3891,
+          "beforeEnd": 3893,
+          "afterStart": 1638,
+          "afterEnd": 1640,
+          "old": "ke",
+          "new": "do"
+        },
+        {
+          "beforeStart": 3895,
+          "beforeEnd": 3898,
+          "afterStart": 1642,
+          "afterEnd": 1650,
+          "old": "byt",
+          "new": "guards r"
+        },
+        {
+          "beforeStart": 3899,
+          "beforeEnd": 3912,
+          "afterStart": 1651,
+          "afterEnd": 1653,
+          "old": "s, Xcode vers",
+          "new": "ma"
+        },
+        {
+          "beforeStart": 3913,
+          "beforeEnd": 3973,
+          "afterStart": 1654,
+          "afterEnd": 1654,
+          "old": "on plist, canonical Python and SDK lexical/physical selectio",
+          "new": ""
+        },
+        {
+          "beforeStart": 3976,
+          "beforeEnd": 3980,
+          "afterStart": 1657,
+          "afterEnd": 1661,
+          "old": "**It",
+          "new": "This"
+        },
+        {
+          "beforeStart": 3990,
+          "beforeEnd": 3990,
+          "afterStart": 1671,
+          "afterEnd": 1689,
+          "old": "",
+          "new": "attest TLS/CA poli"
+        },
+        {
+          "beforeStart": 3991,
+          "beforeEnd": 3997,
+          "afterStart": 1690,
+          "afterEnd": 1692,
+          "old": "apture",
+          "new": "y,"
+        },
+        {
+          "beforeStart": 4002,
+          "beforeEnd": 4002,
+          "afterStart": 1697,
+          "afterEnd": 1700,
+          "old": "",
+          "new": "OS/"
+        },
+        {
+          "beforeStart": 4005,
+          "beforeEnd": 4017,
+          "afterStart": 1703,
+          "afterEnd": 1703,
+          "old": " headers, OS",
+          "new": ""
+        },
+        {
+          "beforeStart": 4025,
+          "beforeEnd": 4025,
+          "afterStart": 1711,
+          "afterEnd": 1713,
+          "old": "",
+          "new": "ab"
+        },
+        {
+          "beforeStart": 4026,
+          "beforeEnd": 4028,
+          "afterStart": 1714,
+          "afterEnd": 1724,
+          "old": "ys",
+          "new": "ence of in"
+        },
+        {
+          "beforeStart": 4030,
+          "beforeEnd": 4030,
+          "afterStart": 1726,
+          "afterEnd": 1727,
+          "old": "",
+          "new": "r"
+        },
+        {
+          "beforeStart": 4031,
+          "beforeEnd": 4031,
+          "afterStart": 1728,
+          "afterEnd": 1734,
+          "old": "",
+          "new": "ediary"
+        },
+        {
+          "beforeStart": 4032,
+          "beforeEnd": 4035,
+          "afterStart": 1735,
+          "afterEnd": 1736,
+          "old": "lib",
+          "new": "t"
+        },
+        {
+          "beforeStart": 4037,
+          "beforeEnd": 4037,
+          "afterStart": 1738,
+          "afterEnd": 1742,
+          "old": "",
+          "new": "nspo"
+        },
+        {
+          "beforeStart": 4038,
+          "beforeEnd": 4039,
+          "afterStart": 1743,
+          "afterEnd": 1751,
+          "old": "i",
+          "new": "t, DNS r"
+        },
+        {
+          "beforeStart": 4041,
+          "beforeEnd": 4041,
+          "afterStart": 1753,
+          "afterEnd": 1760,
+          "old": "",
+          "new": "olution"
+        },
+        {
+          "beforeStart": 4046,
+          "beforeEnd": 4047,
+          "afterStart": 1765,
+          "afterEnd": 1766,
+          "old": "i",
+          "new": "o"
+        },
+        {
+          "beforeStart": 4049,
+          "beforeEnd": 4049,
+          "afterStart": 1768,
+          "afterEnd": 1782,
+          "old": "",
+          "new": "ile-parser mem"
+        },
+        {
+          "beforeStart": 4051,
+          "beforeEnd": 4055,
+          "afterStart": 1784,
+          "afterEnd": 1785,
+          "old": "ical",
+          "new": "y"
+        },
+        {
+          "beforeStart": 4056,
+          "beforeEnd": 4056,
+          "afterStart": 1786,
+          "afterEnd": 1788,
+          "old": "",
+          "new": "us"
+        },
+        {
+          "beforeStart": 4057,
+          "beforeEnd": 4079,
+          "afterStart": 1789,
+          "afterEnd": 1789,
+          "old": "xecutable attestations",
+          "new": ""
+        },
+        {
+          "beforeStart": 4080,
+          "beforeEnd": 4083,
+          "afterStart": 1790,
+          "afterEnd": 1792,
+          "old": "** ",
+          "new": "\n\n"
+        },
+        {
+          "beforeStart": 4086,
+          "beforeEnd": 4169,
+          "afterStart": 1795,
+          "afterEnd": 1795,
+          "old": " Rust tool bytes are authenticated from the proposal; the version role remains that",
+          "new": ""
+        },
+        {
+          "beforeStart": 4181,
+          "beforeEnd": 6645,
+          "afterStart": 1807,
+          "afterEnd": 1807,
+          "old": "retained prior-build evidence until an actual build records new results.\n\nThe eight commands are the two original locked/offline/release Cargo builds with jobs1, four explicit `clock_io_policy_tests::<name>` Cargo test filters, then Jco `new --wasi-reactor` and `transpile` through the declared private Jco CLI. There is no npm/prepack/convenience build target. Each filter must have exactly one matching actual test result; a zero-match or ignored-test success is refused. One test calls `prune_clock_adapter_io` on invalid vectors to prove input size/SHA refusal. An actual successful result must therefore report `prunerFunctionInvokedByRefusalUnitTest:true`, separately from `validAdapterPruningRun:false`, `adapterCliPruneCommandInvoked:false` and `adapterArtifactPublished:false`. No valid adapter pruning/publication is authorized.\n\nEvery command uses the genuine owned monitor, raw stdout/stderr, terminal and all observed descendant/group cleanup semantics. An actual post-space observation is recorded **before** the command summary and semantic success checks, including nonzero/timeout/monitor-error paths. Unavailable observations remain NULL with a separate observation error; they are never labelled checked. Summary-writer failure cannot yield success. The before/after disk policy is deliberate: start at 2 GiB, require 800 MiB at stage boundaries and immediately before/after commands. **Disk free space is not monitored during a command.** Root must explicitly authorize that policy. The owned worker has a 7,200-second execution deadline including its stage/hash/tool work; the eight per-command maxima sum to 7,200 and do not grant extra time. The genuine monitor may then spend its bounded grace/cleanup waits, and parent authentication/final collection is outside that worker timer. This is not a strict all-inclusive wall-time cap. Failure, disk exhaustion, timeout or cleanup intervention remains unaccepted.\n\nThe worker writes a failure record under the already owned external root if WORK does not yet exist. Authorization failures instead remain in the parent's actual raw worker streams; no worker result is invented. The parent durably records completion or failure and, when possible, a bounded partial names/sizes inventory. That partial inventory does not claim all bytes hashed or all available evidence durably captured if writing itself fails. Primary operation and final-protection errors are kept separately.\n\nFresh roots are ",
+          "new": ""
+        },
+        {
+          "beforeStart": 6650,
+          "beforeEnd": 6679,
+          "afterStart": 1812,
+          "afterEnd": 1812,
+          "old": " by the original proposal:\n\n-",
+          "new": ""
+        },
+        {
+          "beforeStart": 6687,
+          "beforeEnd": 6688,
+          "afterStart": 1820,
+          "afterEnd": 1820,
+          "old": "`",
+          "new": ""
+        },
+        {
+          "beforeStart": 6751,
+          "beforeEnd": 6754,
+          "afterStart": 1883,
+          "afterEnd": 1884,
+          "old": "`\n-",
+          "new": ","
+        },
+        {
+          "beforeStart": 6760,
+          "beforeEnd": 6794,
+          "afterStart": 1890,
+          "afterEnd": 1893,
+          "old": "`/private/tmp/starling-node-compat",
+          "new": "..."
+        },
+        {
+          "beforeStart": 6823,
+          "beforeEnd": 6826,
+          "afterStart": 1922,
+          "afterEnd": 1927,
+          "old": "`\n-",
+          "new": ", and"
+        },
+        {
+          "beforeStart": 6835,
+          "beforeEnd": 6869,
+          "afterStart": 1936,
+          "afterEnd": 1939,
+          "old": "`/private/tmp/starling-node-compat",
+          "new": "..."
+        },
+        {
+          "beforeStart": 6900,
+          "beforeEnd": 6903,
+          "afterStart": 1970,
+          "afterEnd": 1970,
+          "old": "`\n-",
+          "new": ""
+        },
+        {
+          "beforeStart": 6904,
+          "beforeEnd": 6905,
+          "afterStart": 1971,
+          "afterEnd": 2020,
+          "old": "E",
+          "new": "are unchanged and must still be absent. The new e"
+        },
+        {
+          "beforeStart": 6924,
+          "beforeEnd": 6927,
+          "afterStart": 2039,
+          "afterEnd": 2039,
+          "old": "`/p",
+          "new": ""
+        },
+        {
+          "beforeStart": 6928,
+          "beforeEnd": 6928,
+          "afterStart": 2040,
+          "afterEnd": 2044,
+          "old": "",
+          "new": "oot "
+        },
+        {
+          "beforeStart": 6929,
+          "beforeEnd": 6938,
+          "afterStart": 2045,
+          "afterEnd": 2045,
+          "old": "vate/tmp/",
+          "new": ""
+        },
+        {
+          "beforeStart": 6939,
+          "beforeEnd": 6958,
+          "afterStart": 2046,
+          "afterEnd": 2050,
+          "old": "tarling-node-compat",
+          "new": " ..."
+        },
+        {
+          "beforeStart": 6988,
+          "beforeEnd": 6988,
+          "afterStart": 2080,
+          "afterEnd": 2083,
+          "old": "",
+          "new": "v2-"
+        },
+        {
+          "beforeStart": 7001,
+          "beforeEnd": 7007,
+          "afterStart": 2096,
+          "afterEnd": 2097,
+          "old": "`\n\nAll",
+          "new": "."
+        },
+        {
+          "beforeStart": 7008,
+          "beforeEnd": 7009,
+          "afterStart": 2098,
+          "afterEnd": 2102,
+          "old": "m",
+          "new": "No o"
+        },
+        {
+          "beforeStart": 7010,
+          "beforeEnd": 7011,
+          "afterStart": 2103,
+          "afterEnd": 2106,
+          "old": "s",
+          "new": "tpu"
+        },
+        {
+          "beforeStart": 7013,
+          "beforeEnd": 7021,
+          "afterStart": 2108,
+          "afterEnd": 2111,
+          "old": "be absen",
+          "new": "roo"
+        },
+        {
+          "beforeStart": 7023,
+          "beforeEnd": 7027,
+          "afterStart": 2113,
+          "afterEnd": 2117,
+          "old": "befo",
+          "new": "is c"
+        },
+        {
+          "beforeStart": 7029,
+          "beforeEnd": 7029,
+          "afterStart": 2119,
+          "afterEnd": 2123,
+          "old": "",
+          "new": "ated"
+        },
+        {
+          "beforeStart": 7030,
+          "beforeEnd": 7032,
+          "afterStart": 2124,
+          "afterEnd": 2126,
+          "old": "an",
+          "new": "by"
+        },
+        {
+          "beforeStart": 7033,
+          "beforeEnd": 7035,
+          "afterStart": 2127,
+          "afterEnd": 2127,
+          "old": "ac",
+          "new": ""
+        },
+        {
+          "beforeStart": 7036,
+          "beforeEnd": 7048,
+          "afterStart": 2128,
+          "afterEnd": 2128,
+          "old": "ual phase. T",
+          "new": ""
+        },
+        {
+          "beforeStart": 7058,
+          "beforeEnd": 7058,
+          "afterStart": 2138,
+          "afterEnd": 2139,
+          "old": "",
+          "new": "."
+        },
+        {
+          "beforeStart": 7059,
+          "beforeEnd": 7081,
+          "afterStart": 2140,
+          "afterEnd": 2141,
+          "old": "stages nothing and cre",
+          "new": "M"
+        },
+        {
+          "beforeStart": 7084,
+          "beforeEnd": 7252,
+          "afterStart": 2144,
+          "afterEnd": 2144,
+          "old": "s none of those paths. Root config, own/source peers, phase state and effective action slots remain NULL in the templates. A future build requires exact new issued desc",
+          "new": ""
+        },
+        {
+          "beforeStart": 7254,
+          "beforeEnd": 7376,
+          "afterStart": 2146,
+          "afterEnd": 2146,
+          "old": "ptors after Source review; successful construction remains unreviewed until a separate actual artifact proof. Adapter norm",
+          "new": ""
+        },
+        {
+          "beforeStart": 7385,
+          "beforeEnd": 7387,
+          "afterStart": 2155,
+          "afterEnd": 2163,
+          "old": "/p",
+          "new": " is5138 "
+        },
+        {
+          "beforeStart": 7388,
+          "beforeEnd": 7388,
+          "afterStart": 2164,
+          "afterEnd": 2166,
+          "old": "",
+          "new": "eg"
+        },
+        {
+          "beforeStart": 7389,
+          "beforeEnd": 7397,
+          "afterStart": 2167,
+          "afterEnd": 2167,
+          "old": "ning/pub",
+          "new": ""
+        },
+        {
+          "beforeStart": 7398,
+          "beforeEnd": 7400,
+          "afterStart": 2168,
+          "afterEnd": 2168,
+          "old": "ic",
+          "new": ""
+        },
+        {
+          "beforeStart": 7401,
+          "beforeEnd": 7420,
+          "afterStart": 2169,
+          "afterEnd": 2170,
+          "old": "tion, native engine",
+          "new": "r"
+        },
+        {
+          "beforeStart": 7423,
+          "beforeEnd": 7424,
+          "afterStart": 2173,
+          "afterEnd": 2173,
+          "old": "m",
+          "new": ""
+        },
+        {
+          "beforeStart": 7426,
+          "beforeEnd": 7478,
+          "afterStart": 2175,
+          "afterEnd": 2175,
+          "old": "lation, application componentization, application gu",
+          "new": ""
+        },
+        {
+          "beforeStart": 7480,
+          "beforeEnd": 7495,
+          "afterStart": 2177,
+          "afterEnd": 2177,
+          "old": "t/crypto/key/GC",
+          "new": ""
+        },
+        {
+          "beforeStart": 7496,
+          "beforeEnd": 7504,
+          "afterStart": 2178,
+          "afterEnd": 2182,
+          "old": "actions,",
+          "new": "(271"
+        },
+        {
+          "beforeStart": 7511,
+          "beforeEnd": 7639,
+          "afterStart": 2189,
+          "afterEnd": 2191,
+          "old": " promotion and runtime adoption are closed. Jco builds a **tool component**, not an application component; no claim is made that",
+          "new": "+5"
+        },
+        {
+          "beforeStart": 7646,
+          "beforeEnd": 7646,
+          "afterStart": 2198,
+          "afterEnd": 2224,
+          "old": "",
+          "new": "e+4860 dependencies+2 orig"
+        },
+        {
+          "beforeStart": 7648,
+          "beforeEnd": 7649,
+          "afterStart": 2226,
+          "afterEnd": 2228,
+          "old": "g",
+          "new": "al"
+        },
+        {
+          "beforeStart": 7650,
+          "beforeEnd": 7650,
+          "afterStart": 2229,
+          "afterEnd": 2250,
+          "old": "",
+          "new": "root metadata under ."
+        },
+        {
+          "beforeStart": 7654,
+          "beforeEnd": 7656,
+          "afterStart": 2254,
+          "afterEnd": 2262,
+          "old": "s ",
+          "new": "chain-me"
+        },
+        {
+          "beforeStart": 7657,
+          "beforeEnd": 7667,
+          "afterStart": 2263,
+          "afterEnd": 2263,
+          "old": "hemselves ",
+          "new": ""
+        },
+        {
+          "beforeStart": 7668,
+          "beforeEnd": 7671,
+          "afterStart": 2264,
+          "afterEnd": 2264,
+          "old": "voi",
+          "new": ""
+        },
+        {
+          "beforeStart": 7672,
+          "beforeEnd": 7673,
+          "afterStart": 2265,
+          "afterEnd": 2265,
+          "old": " ",
+          "new": ""
+        },
+        {
+          "beforeStart": 7674,
+          "beforeEnd": 7676,
+          "afterStart": 2266,
+          "afterEnd": 2272,
+          "old": "ll",
+          "new": "ta),21"
+        },
+        {
+          "beforeStart": 7686,
+          "beforeEnd": 7687,
+          "afterStart": 2282,
+          "afterEnd": 2285,
+          "old": "W",
+          "new": "ali"
+        },
+        {
+          "beforeStart": 7689,
+          "beforeEnd": 7690,
+          "afterStart": 2287,
+          "afterEnd": 2290,
+          "old": "m",
+          "new": "es;"
+        },
+        {
+          "beforeStart": 7691,
+          "beforeEnd": 7707,
+          "afterStart": 2291,
+          "afterEnd": 2292,
+          "old": "computation.\n\nPr",
+          "new": "s"
+        },
+        {
+          "beforeStart": 7713,
+          "beforeEnd": 7714,
+          "afterStart": 2298,
+          "afterEnd": 2306,
+          "old": "i",
+          "new": "ely118 l"
+        },
+        {
+          "beforeStart": 7715,
+          "beforeEnd": 7742,
+          "afterStart": 2307,
+          "afterEnd": 2307,
+          "old": "n uses Python AST, authenti",
+          "new": ""
+        },
+        {
+          "beforeStart": 7743,
+          "beforeEnd": 7745,
+          "afterStart": 2308,
+          "afterEnd": 2309,
+          "old": "at",
+          "new": "k"
+        },
+        {
+          "beforeStart": 7748,
+          "beforeEnd": 7762,
+          "afterStart": 2312,
+          "afterEnd": 2312,
+          "old": "original JSON/",
+          "new": ""
+        },
+        {
+          "beforeStart": 7769,
+          "beforeEnd": 7769,
+          "afterStart": 2319,
+          "afterEnd": 2325,
+          "old": "",
+          "new": " copie"
+        },
+        {
+          "beforeStart": 7775,
+          "beforeEnd": 7779,
+          "afterStart": 2331,
+          "afterEnd": 2333,
+          "old": "isol",
+          "new": "ex"
+        },
+        {
+          "beforeStart": 7780,
+          "beforeEnd": 7788,
+          "afterStart": 2334,
+          "afterEnd": 2334,
+          "old": "ted inje",
+          "new": ""
+        },
+        {
+          "beforeStart": 7790,
+          "beforeEnd": 7790,
+          "afterStart": 2336,
+          "afterEnd": 2344,
+          "old": "",
+          "new": "ly3 lock"
+        },
+        {
+          "beforeStart": 7794,
+          "beforeEnd": 7794,
+          "afterStart": 2348,
+          "afterEnd": 2356,
+          "old": "",
+          "new": "issing d"
+        },
+        {
+          "beforeStart": 7795,
+          "beforeEnd": 7795,
+          "afterStart": 2357,
+          "afterEnd": 2377,
+          "old": "",
+          "new": "wnloads. Manual boun"
+        },
+        {
+          "beforeStart": 7797,
+          "beforeEnd": 7797,
+          "afterStart": 2379,
+          "afterEnd": 2385,
+          "old": "",
+          "new": "d regu"
+        },
+        {
+          "beforeStart": 7798,
+          "beforeEnd": 7800,
+          "afterStart": 2386,
+          "afterEnd": 2389,
+          "old": "s ",
+          "new": "ar-"
+        },
+        {
+          "beforeStart": 7804,
+          "beforeEnd": 8023,
+          "afterStart": 2393,
+          "afterEnd": 2393,
+          "old": ". The real raw-step function is exercised with an in-memory monitor/filesystem/space seam; the real pre-WORK worker failure and parent argv/main join use injected endpoints. No live monitor, child workload, source copy,",
+          "new": ""
+        },
+        {
+          "beforeStart": 8041,
+          "beforeEnd": 8041,
+          "afterStart": 2411,
+          "afterEnd": 2440,
+          "old": "",
+          "new": " is private/offline121 crates"
+        },
+        {
+          "beforeStart": 8042,
+          "beforeEnd": 8042,
+          "afterStart": 2441,
+          "afterEnd": 2491,
+          "old": "",
+          "new": " each128MiB/all512MiB; no original cache writes or"
+        },
+        {
+          "beforeStart": 8045,
+          "beforeEnd": 8045,
+          "afterStart": 2494,
+          "afterEnd": 2513,
+          "old": "",
+          "new": "w dependency resolu"
+        },
+        {
+          "beforeStart": 8046,
+          "beforeEnd": 8047,
+          "afterStart": 2514,
+          "afterEnd": 2515,
+          "old": "w",
+          "new": "i"
+        },
+        {
+          "beforeStart": 8048,
+          "beforeEnd": 8050,
+          "afterStart": 2516,
+          "afterEnd": 2523,
+          "old": "rk",
+          "new": "n.\n\nThe"
+        },
+        {
+          "beforeStart": 8051,
+          "beforeEnd": 8052,
+          "afterStart": 2524,
+          "afterEnd": 2527,
+          "old": "f",
+          "new": "sam"
+        },
+        {
+          "beforeStart": 8053,
+          "beforeEnd": 8053,
+          "afterStart": 2528,
+          "afterEnd": 2533,
+          "old": "",
+          "new": " eigh"
+        },
+        {
+          "beforeStart": 8054,
+          "beforeEnd": 8054,
+          "afterStart": 2534,
+          "afterEnd": 2536,
+          "old": "",
+          "new": " a"
+        },
+        {
+          "beforeStart": 8055,
+          "beforeEnd": 8057,
+          "afterStart": 2537,
+          "afterEnd": 2541,
+          "old": "h,",
+          "new": "tual"
+        },
+        {
+          "beforeStart": 8061,
+          "beforeEnd": 8062,
+          "afterStart": 2545,
+          "afterEnd": 2555,
+          "old": "p",
+          "new": "mands rema"
+        },
+        {
+          "beforeStart": 8063,
+          "beforeEnd": 8063,
+          "afterStart": 2556,
+          "afterEnd": 2580,
+          "old": "",
+          "new": "n: two locked/offline re"
+        },
+        {
+          "beforeStart": 8065,
+          "beforeEnd": 8067,
+          "afterStart": 2582,
+          "afterEnd": 2585,
+          "old": "r,",
+          "new": "ase"
+        },
+        {
+          "beforeStart": 8073,
+          "beforeEnd": 8073,
+          "afterStart": 2591,
+          "afterEnd": 2626,
+          "old": "",
+          "new": "builds, four individually selected "
+        },
+        {
+          "beforeStart": 8077,
+          "beforeEnd": 8077,
+          "afterStart": 2630,
+          "afterEnd": 2638,
+          "old": "",
+          "new": " filters"
+        },
+        {
+          "beforeStart": 8079,
+          "beforeEnd": 8081,
+          "afterStart": 2640,
+          "afterEnd": 2642,
+          "old": "No",
+          "new": "an"
+        },
+        {
+          "beforeStart": 8082,
+          "beforeEnd": 8084,
+          "afterStart": 2643,
+          "afterEnd": 2643,
+          "old": "e,",
+          "new": ""
+        },
+        {
+          "beforeStart": 8088,
+          "beforeEnd": 8089,
+          "afterStart": 2647,
+          "afterEnd": 2647,
+          "old": ",",
+          "new": ""
+        },
+        {
+          "beforeStart": 8090,
+          "beforeEnd": 8090,
+          "afterStart": 2648,
+          "afterEnd": 2667,
+          "old": "",
+          "new": "new/transpile for t"
+        },
+        {
+          "beforeStart": 8092,
+          "beforeEnd": 8092,
+          "afterStart": 2669,
+          "afterEnd": 2673,
+          "old": "",
+          "new": " too"
+        },
+        {
+          "beforeStart": 8093,
+          "beforeEnd": 8093,
+          "afterStart": 2674,
+          "afterEnd": 2675,
+          "old": "",
+          "new": " "
+        },
+        {
+          "beforeStart": 8094,
+          "beforeEnd": 8094,
+          "afterStart": 2676,
+          "afterEnd": 2722,
+          "old": "",
+          "new": "ackage. The invalid-vector unit calls the prun"
+        },
+        {
+          "beforeStart": 8096,
+          "beforeEnd": 8097,
+          "afterStart": 2724,
+          "afterEnd": 2753,
+          "old": ",",
+          "new": " only to prove refusal; valid"
+        },
+        {
+          "beforeStart": 8105,
+          "beforeEnd": 8106,
+          "afterStart": 2761,
+          "afterEnd": 2761,
+          "old": ",",
+          "new": ""
+        },
+        {
+          "beforeStart": 8107,
+          "beforeEnd": 8127,
+          "afterStart": 2762,
+          "afterEnd": 2763,
+          "old": "engine or guest was ",
+          "new": "p"
+        },
+        {
+          "beforeStart": 8130,
+          "beforeEnd": 8130,
+          "afterStart": 2766,
+          "afterEnd": 2865,
+          "old": "",
+          "new": "ing/CLI/publication remain false. Actual tool output requires later independent artifact acceptance"
+        },
+        {
+          "beforeStart": 8134,
+          "beforeEnd": 8134,
+          "afterStart": 2869,
+          "afterEnd": 3287,
+          "old": "",
+          "new": "e7200s worker cap includes its staging/hash/tool work; command maxima sum7200, cleanup grace and parent auth/collection can extend elapsed time. Start2GiB and800MiB checks occur at stage and before/after command boundaries, never continuously during a command. Private package membership, immutable vendor files, original source modes, tool aliases, all streams/status/cleanup capture and pre-WORK/failure fallbacks ar"
+        },
+        {
+          "beforeStart": 8145,
+          "beforeEnd": 8145,
+          "afterStart": 3298,
+          "afterEnd": 3614,
+          "old": "",
+          "new": ".\n\nPreparation checks only Source, exact derivation reversals, JSON/AST, cached archive headers, injected raw lifecycle/main seams and pure actual redirect methods with fake response/parent. Local stdlib opener construction does not open requests. The host/SDK context remains deliberately partial. All effective new"
+        },
+        {
+          "beforeStart": 8150,
+          "beforeEnd": 8150,
+          "afterStart": 3619,
+          "afterEnd": 3633,
+          "old": "",
+          "new": "/action/actual"
+        },
+        {
+          "beforeStart": 8151,
+          "beforeEnd": 8151,
+          "afterStart": 3634,
+          "afterEnd": 3638,
+          "old": "",
+          "new": "buil"
+        },
+        {
+          "beforeStart": 8152,
+          "beforeEnd": 8152,
+          "afterStart": 3639,
+          "afterEnd": 3674,
+          "old": "",
+          "new": "/peer/result slots are NULL and ope"
+        },
+        {
+          "beforeStart": 8154,
+          "beforeEnd": 8154,
+          "afterStart": 3676,
+          "afterEnd": 3710,
+          "old": "",
+          "new": "tional/runtime acceptance remains "
+        },
+        {
+          "beforeStart": 8155,
+          "beforeEnd": 8155,
+          "afterStart": 3711,
+          "afterEnd": 3722,
+          "old": "",
+          "new": "alse. No ac"
+        },
+        {
+          "beforeStart": 8156,
+          "beforeEnd": 8156,
+          "afterStart": 3723,
+          "afterEnd": 3736,
+          "old": "",
+          "new": "ion authority"
+        },
+        {
+          "beforeStart": 8160,
+          "beforeEnd": 8161,
+          "afterStart": 3740,
+          "afterEnd": 3741,
+          "old": "a",
+          "new": "i"
+        },
+        {
+          "beforeStart": 8162,
+          "beforeEnd": 8163,
+          "afterStart": 3742,
+          "afterEnd": 3743,
+          "old": "c",
+          "new": "f"
+        },
+        {
+          "beforeStart": 8164,
+          "beforeEnd": 8166,
+          "afterStart": 3744,
+          "afterEnd": 3744,
+          "old": "st",
+          "new": ""
+        },
+        {
+          "beforeStart": 8167,
+          "beforeEnd": 8180,
+          "afterStart": 3745,
+          "afterEnd": 3745,
+          "old": "y, not an app",
+          "new": ""
+        },
+        {
+          "beforeStart": 8181,
+          "beforeEnd": 8183,
+          "afterStart": 3746,
+          "afterEnd": 3746,
+          "old": "ov",
+          "new": ""
+        },
+        {
+          "beforeStart": 8186,
+          "beforeEnd": 8189,
+          "afterStart": 3749,
+          "afterEnd": 3750,
+          "old": "ent",
+          "new": "f"
+        },
+        {
+          "beforeStart": 8190,
+          "beforeEnd": 8192,
+          "afterStart": 3751,
+          "afterEnd": 3751,
+          "old": "yp",
+          "new": ""
+        },
+        {
+          "beforeStart": 8193,
+          "beforeEnd": 8197,
+          "afterStart": 3752,
+          "afterEnd": 3753,
+          "old": "int.",
+          "new": "m"
+        },
+        {
+          "beforeStart": 8205,
+          "beforeEnd": 8219,
+          "afterStart": 3761,
+          "afterEnd": 3761,
+          "old": "approval is no",
+          "new": ""
+        },
+        {
+          "beforeStart": 8220,
+          "beforeEnd": 8229,
+          "afterStart": 3762,
+          "afterEnd": 3762,
+          "old": " action p",
+          "new": ""
+        },
+        {
+          "beforeStart": 8230,
+          "beforeEnd": 8279,
+          "afterStart": 3763,
+          "afterEnd": 3763,
+          "old": "rmission.\n\nProspective own peer: schemaVersion1, ",
+          "new": ""
+        },
+        {
+          "beforeStart": 8281,
+          "beforeEnd": 8398,
+          "afterStart": 3765,
+          "afterEnd": 3765,
+          "old": "ate `INDEPENDENT_CLOCK_IO_BUILD_CONTROLLER_SOURCE_REVIEW_PASSED_V1`, final `controllerSourceIndexSha256`, exact propo",
+          "new": ""
+        },
+        {
+          "beforeStart": 8399,
+          "beforeEnd": 8528,
+          "afterStart": 3766,
+          "afterEnd": 3766,
+          "old": "al `sourceIndexSha256`, `sourceOnly:true`, `sourceReviewPassed:true`, `ownerActionsInvoked:false` (and explicit host/build false)",
+          "new": ""
+        },
+        {
+          "beforeStart": 8540,
+          "beforeEnd": 8544,
+          "afterStart": 3778,
+          "afterEnd": 3778,
+          "old": "all ",
+          "new": ""
+        },
+        {
+          "beforeStart": 8550,
+          "beforeEnd": 8550,
+          "afterStart": 3784,
+          "afterEnd": 3803,
+          "old": "",
+          "new": "activation and inde"
+        },
+        {
+          "beforeStart": 8551,
+          "beforeEnd": 8551,
+          "afterStart": 3804,
+          "afterEnd": 4015,
+          "old": "",
+          "new": "endent review.\n\nFinal pure preparation additionally executes the genuine own-manifest intake block over all5606 predecessor descriptors with injected immutable byte identities, refuses schema/missing/first-last-"
+        },
+        {
+          "beforeStart": 8554,
+          "beforeEnd": 8554,
+          "afterStart": 4018,
+          "afterEnd": 4130,
+          "old": "",
+          "new": "h/type/field/cap mutations, exercises real final descriptor/family loops against injected changes, and proves th"
+        },
+        {
+          "beforeStart": 8556,
+          "beforeEnd": 8556,
+          "afterStart": 4132,
+          "afterEnd": 4155,
+          "old": "",
+          "new": "genuine custom-import c"
+        },
+        {
+          "beforeStart": 8557,
+          "beforeEnd": 8557,
+          "afterStart": 4156,
+          "afterEnd": 4368,
+          "old": "",
+          "new": "ller stops before even a fake import endpoint after failed protection. These models do not import the controller or monitor, or run a provider. The separate Source sealer stream-hashes every declared physical inp"
+        },
+        {
+          "beforeStart": 8559,
+          "beforeEnd": 8561,
+          "afterStart": 4370,
+          "afterEnd": 4377,
+          "old": "ho",
+          "new": " and ve"
+        },
+        {
+          "beforeStart": 8563,
+          "beforeEnd": 8564,
+          "afterStart": 4379,
+          "afterEnd": 4380,
+          "old": "t",
+          "new": "f"
+        },
+        {
+          "beforeStart": 8565,
+          "beforeEnd": 8565,
+          "afterStart": 4381,
+          "afterEnd": 4396,
+          "old": "",
+          "new": "es modes, alias"
+        },
+        {
+          "beforeStart": 8572,
+          "beforeEnd": 8572,
+          "afterStart": 4403,
+          "afterEnd": 4414,
+          "old": "",
+          "new": "full origin"
+        },
+        {
+          "beforeStart": 8573,
+          "beforeEnd": 8575,
+          "afterStart": 4415,
+          "afterEnd": 4425,
+          "old": "cc",
+          "new": "l-family m"
+        },
+        {
+          "beforeStart": 8576,
+          "beforeEnd": 8576,
+          "afterStart": 4426,
+          "afterEnd": 4450,
+          "old": "",
+          "new": "mbership. Raw pure-attem"
+        },
+        {
+          "beforeStart": 8578,
+          "beforeEnd": 8578,
+          "afterStart": 4452,
+          "afterEnd": 4455,
+          "old": "",
+          "new": "1 f"
+        },
+        {
+          "beforeStart": 8579,
+          "beforeEnd": 8581,
+          "afterStart": 4456,
+          "afterEnd": 4460,
+          "old": "nc",
+          "new": "ilur"
+        },
+        {
+          "beforeStart": 8583,
+          "beforeEnd": 8584,
+          "afterStart": 4462,
+          "afterEnd": 4463,
+          "old": "d",
+          "new": "r"
+        },
+        {
+          "beforeStart": 8585,
+          "beforeEnd": 8586,
+          "afterStart": 4464,
+          "afterEnd": 4466,
+          "old": "c",
+          "new": "ma"
+        },
+        {
+          "beforeStart": 8587,
+          "beforeEnd": 8590,
+          "afterStart": 4467,
+          "afterEnd": 4467,
+          "old": "sio",
+          "new": ""
+        },
+        {
+          "beforeStart": 8592,
+          "beforeEnd": 8592,
+          "afterStart": 4469,
+          "afterEnd": 4478,
+          "old": "",
+          "new": " retained"
+        }
+      ],
+      "forwardAndInverseExact": true
+    },
+    {
+      "path": "preparation-history.json",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v1/preparation-history.json",
+        "sha256": "4ce93743aa6ca2fd8c56b71c4d4cc112cb40f19c9c53b42c3147ab46c781266a",
+        "bytes": 513
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-build-controller-candidate-v2/preparation-history.json",
+        "sha256": "3b08e67fa67d407a151652e54bd60366882e093890eabc3e3a76ebb376f6504f",
+        "bytes": 1263
+      },
+      "edits": [
+        {
+          "beforeStart": 27,
+          "beforeEnd": 27,
+          "afterStart": 27,
+          "afterEnd": 104,
+          "old": "",
+          "new": "predecessor\": {\n    \"path\": \"/Users/dan/dev/StarlingMonkey/tests/node-compat/"
+        },
+        {
+          "beforeStart": 28,
+          "beforeEnd": 28,
+          "afterStart": 105,
+          "afterEnd": 887,
+          "old": "",
+          "new": "oundation-scheduler/clock-io-build-controller-candidate-v1/index.json\",\n    \"sha256\": \"064003004505c71b5cc28aef92fd929a0165d6cf3b69eb73bd935f9932dc72c8\",\n    \"bytes\": 4822\n  },\n  \"sourceHold\": {\n    \"path\": \"/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/independent-clock-io-build-controller-source-review-v1/index.json\",\n    \"sha256\": \"ef1f1d89b6a1324590a8eff07a87d99f44d9e36dfc502af9796ee5416f4d9b59\",\n    \"bytes\": 1100\n  },\n  \"finding\": \"M1 post-geturl is refusal after contact, not redirect prevention\",\n  \"actualOperationalFailure\": false,\n  \"correction\": \"new local no-proxy rejecting opener; uniform explicit308 plus response close\",\n  \"allPriorEvidencePreservedAtOriginalPaths\": true,\n  \"sourcePeer\": null,\n  \"rootAuthority\": null,\n  \"purePreparationF"
+        },
+        {
+          "beforeStart": 53,
+          "beforeEnd": 56,
+          "afterStart": 912,
+          "afterEnd": 912,
+          "old": "att",
+          "new": ""
+        },
+        {
+          "beforeStart": 57,
+          "beforeEnd": 60,
+          "afterStart": 913,
+          "afterEnd": 920,
+          "old": "mpt",
+          "new": "vidence"
+        },
+        {
+          "beforeStart": 121,
+          "beforeEnd": 122,
+          "afterStart": 981,
+          "afterEnd": 981,
+          "old": "l",
+          "new": ""
+        },
+        {
+          "beforeStart": 123,
+          "beforeEnd": 123,
+          "afterStart": 982,
+          "afterEnd": 983,
+          "old": "",
+          "new": "u"
+        },
+        {
+          "beforeStart": 124,
+          "beforeEnd": 134,
+          "afterStart": 984,
+          "afterEnd": 985,
+          "old": "sification",
+          "new": "e"
+        },
+        {
+          "beforeStart": 138,
+          "beforeEnd": 139,
+          "afterStart": 989,
+          "afterEnd": 990,
+          "old": "R",
+          "new": "T"
+        },
+        {
+          "beforeStart": 140,
+          "beforeEnd": 140,
+          "afterStart": 991,
+          "afterEnd": 1043,
+          "old": "",
+          "new": "st incorrectly read HTTPError.url with fp=None; actu"
+        },
+        {
+          "beforeStart": 143,
+          "beforeEnd": 143,
+          "afterStart": 1046,
+          "afterEnd": 1051,
+          "old": "",
+          "new": "pinne"
+        },
+        {
+          "beforeStart": 144,
+          "beforeEnd": 148,
+          "afterStart": 1052,
+          "afterEnd": 1055,
+          "old": "raft",
+          "new": "3.9"
+        },
+        {
+          "beforeStart": 151,
+          "beforeEnd": 153,
+          "afterStart": 1058,
+          "afterEnd": 1060,
+          "old": "ag",
+          "new": "or"
+        },
+        {
+          "beforeStart": 154,
+          "beforeEnd": 168,
+          "afterStart": 1061,
+          "afterEnd": 1061,
+          "old": " package colli",
+          "new": ""
+        },
+        {
+          "beforeStart": 169,
+          "beforeEnd": 173,
+          "afterStart": 1062,
+          "afterEnd": 1062,
+          "old": "ion:",
+          "new": ""
+        },
+        {
+          "beforeStart": 183,
+          "beforeEnd": 244,
+          "afterStart": 1072,
+          "afterEnd": 1075,
+          "old": "JS tool cut contains tool-root package.json/package-lock.json",
+          "new": "URL"
+        },
+        {
+          "beforeStart": 248,
+          "beforeEnd": 248,
+          "afterStart": 1079,
+          "afterEnd": 1088,
+          "old": "",
+          "new": "filename "
+        },
+        {
+          "beforeStart": 249,
+          "beforeEnd": 250,
+          "afterStart": 1089,
+          "afterEnd": 1102,
+          "old": "e",
+          "new": "ithout initia"
+        },
+        {
+          "beforeStart": 251,
+          "beforeEnd": 252,
+          "afterStart": 1103,
+          "afterEnd": 1108,
+          "old": "l",
+          "new": "izing"
+        },
+        {
+          "beforeStart": 254,
+          "beforeEnd": 259,
+          "afterStart": 1110,
+          "afterEnd": 1110,
+          "old": "s4860",
+          "new": ""
+        },
+        {
+          "beforeStart": 260,
+          "beforeEnd": 263,
+          "afterStart": 1111,
+          "afterEnd": 1113,
+          "old": "epe",
+          "new": "di"
+        },
+        {
+          "beforeStart": 264,
+          "beforeEnd": 271,
+          "afterStart": 1114,
+          "afterEnd": 1119,
+          "old": "dencies",
+          "new": "fourl"
+        },
+        {
+          "beforeStart": 281,
+          "beforeEnd": 285,
+          "afterStart": 1129,
+          "afterEnd": 1129,
+          "old": "sour",
+          "new": ""
+        },
+        {
+          "beforeStart": 286,
+          "beforeEnd": 288,
+          "afterStart": 1130,
+          "afterEnd": 1130,
+          "old": "eC",
+          "new": ""
+        },
+        {
+          "beforeStart": 301,
+          "beforeEnd": 301,
+          "afterStart": 1143,
+          "afterEnd": 1159,
+          "old": "",
+          "new": "Assert real HTTP"
+        },
+        {
+          "beforeStart": 302,
+          "beforeEnd": 311,
+          "afterStart": 1160,
+          "afterEnd": 1161,
+          "old": "xplicit2-",
+          "new": "r"
+        },
+        {
+          "beforeStart": 313,
+          "beforeEnd": 315,
+          "afterStart": 1163,
+          "afterEnd": 1171,
+          "old": "w ",
+          "new": "r.filena"
+        },
+        {
+          "beforeStart": 317,
+          "beforeEnd": 328,
+          "afterStart": 1173,
+          "afterEnd": 1174,
+          "old": "tadata-only",
+          "new": ";"
+        },
+        {
+          "beforeStart": 329,
+          "beforeEnd": 335,
+          "afterStart": 1175,
+          "afterEnd": 1175,
+          "old": ".toolc",
+          "new": ""
+        },
+        {
+          "beforeStart": 337,
+          "beforeEnd": 338,
+          "afterStart": 1177,
+          "afterEnd": 1177,
+          "old": "i",
+          "new": ""
+        },
+        {
+          "beforeStart": 339,
+          "beforeEnd": 341,
+          "afterStart": 1178,
+          "afterEnd": 1180,
+          "old": "-m",
+          "new": "dl"
+        },
+        {
+          "beforeStart": 342,
+          "beforeEnd": 374,
+          "afterStart": 1181,
+          "afterEnd": 1183,
+          "old": "tadata destination; new package ",
+          "new": "r/"
+        },
+        {
+          "beforeStart": 381,
+          "beforeEnd": 381,
+          "afterStart": 1190,
+          "afterEnd": 1193,
+          "old": "",
+          "new": "beh"
+        },
+        {
+          "beforeStart": 382,
+          "beforeEnd": 389,
+          "afterStart": 1194,
+          "afterEnd": 1196,
+          "old": "nd4860n",
+          "new": "vi"
+        },
+        {
+          "beforeStart": 390,
+          "beforeEnd": 400,
+          "afterStart": 1197,
+          "afterEnd": 1198,
+          "old": "de_modules",
+          "new": "r"
+        },
+        {
+          "beforeStart": 462,
+          "beforeEnd": 510,
+          "afterStart": 1260,
+          "afterEnd": 1260,
+          "old": ",\n  \"rootDraftRetained\": \"history/root-draft.py\"",
+          "new": ""
+        }
+      ],
+      "forwardAndInverseExact": true
+    }
+  ],
+  "sourceWorkPackageRolesUnchanged": true,
+  "monitorSourceCopiedOrChanged": false,
+  "originalProposalMutated": false
+}

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "failures": [
+    {
+      "attempt": "evidence/reader-attempt1",
+      "rawExitCode": 1,
+      "classification": "Reviewer expectation error: outer final JSONL is observation/completeUnreviewed envelope, not a bare descriptor",
+      "correction": "Compare complete actual two-field envelope, preserving original raw JSONL",
+      "actualBuildFailure": false,
+      "ownerActionRerun": false
+    },
+    {
+      "attempt": "evidence/reader-attempt2",
+      "rawExitCode": 1,
+      "classification": "Reviewer schema assumption: final inventory alias rows carry relative path and resolvedPath string, not an absolute path plus nested descriptor",
+      "correction": "Keep actual relative row unchanged; independently hash its separately recorded absolute target",
+      "actualBuildFailure": false,
+      "ownerActionRerun": false
+    },
+    {
+      "attempt": "evidence/reader-attempt3",
+      "rawExitCode": 1,
+      "classification": "Reviewer local variable shadowing: ancestor-loop parent name replaced the decoded parent frame during final report construction, after all verification checks",
+      "correction": "Use distinct ancestor loop variable and keep decoded parent object",
+      "actualBuildFailure": false,
+      "ownerActionRerun": false
+    }
+  ]
+}

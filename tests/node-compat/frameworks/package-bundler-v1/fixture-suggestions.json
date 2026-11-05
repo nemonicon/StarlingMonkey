@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "scope": "Finite tests for the actual optional bundler; suggestions do not assert they ran",
+  "positive": [
+    "CommonJS .js under package type:commonjs with package-relative and bare package dependencies",
+    "CommonJS .cjs nested dependencies, once-only lazy conditional execution and partial cyclic exports",
+    "require(node:buffer)/require(buffer) equals selected native ESM default; global Buffer equals its Buffer member",
+    "require(node:stream)/require(stream) equals callable selected Stream default, Stream.Stream identity, promises namespace identity",
+    "Production NODE_ENV constant with no residual process object or unrelated environment access",
+    "JSON package data through actual resolver and one full ESM output",
+    "Real React/ReactDOM production entry and explicit server.edge entry without JS native adapters"
+  ],
+  "negative": [
+    "Every unselected node: and bare builtin, including fs/promises/crypto/async_hooks/http/net/url/process/timers",
+    "Computed require, aliased require, require.resolve and module.require including computed property syntax",
+    "Unresolved computed dynamic import, dirname/filename and unknown process.env keys",
+    "Duplicate external ownership or early resolver external:true leaves a runtime loader even if chunk.imports is empty",
+    "Builtin adapter package/alias or nonstandard jco:/wasmcloud: service replacement",
+    "Unsupported native addon or executable asset imports",
+    "Unknown virtual helper origin or missing actual facade-source provenance"
+  ],
+  "separateSemanticControls": [
+    "Keep mutable package CJS named-export snapshot difference explicit; never describe it as full Node module parity",
+    "Keep native frozen/default/ESM binding relationships separate from generic nonbuiltin ESM namespace-copy fallback",
+    "Test source guards against ordinary __commonJSMin wrappers so they are not confused with an unavailable runtime require",
+    "Test plugin transform ordering before built-in define/lowering and final AST after lowering",
+    "Test each chosen package exports condition against a fixture with distinct import/require/node/default branches"
+  ],
+  "actualComponentGates": [
+    "Capture complete component bytes before strict emitted-interface audit",
+    "Keep actual selected native engine/metadata/manifests and standard WASI capability selection exact",
+    "Retain full Node/Jco/stock-Wasmtime outputs and original failures before assertions",
+    "Do not transfer host-only toy namespace results or Next Node HTTP/browser success into Wasm compatibility"
+  ],
+  "actualTestsExecutedByThisSuggestionFile": false
+}

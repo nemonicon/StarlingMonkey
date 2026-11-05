@@ -1,0 +1,654 @@
+{
+  "schemaVersion": 1,
+  "scope": "Independent host-only parser/bundler source review; no analyzed module execution",
+  "cases": [
+    {
+      "kind": "lexical",
+      "id": "plain-ambient",
+      "expected": 1,
+      "actual": 1,
+      "code": "export function o(){return process;}",
+      "passed": true
+    },
+    {
+      "kind": "lexical",
+      "id": "parameter-bound",
+      "expected": 0,
+      "actual": 0,
+      "code": "export function o(process){return process;}",
+      "passed": true
+    },
+    {
+      "kind": "lexical",
+      "id": "forward-lexical-bound",
+      "expected": 0,
+      "actual": 0,
+      "code": "export function o(){return process;let process;}",
+      "passed": true
+    },
+    {
+      "kind": "lexical",
+      "id": "default-before-body-var",
+      "expected": 1,
+      "actual": 1,
+      "code": "export function o(x=process){var process;return x;}",
+      "passed": true
+    },
+    {
+      "kind": "lexical",
+      "id": "computed-pattern-key",
+      "expected": 1,
+      "actual": 1,
+      "code": "const {[process]:value}=obj;",
+      "passed": true
+    },
+    {
+      "kind": "lexical",
+      "id": "noncomputed-pattern-bound",
+      "expected": 0,
+      "actual": 0,
+      "code": "const {process}=obj;export {process};",
+      "passed": true
+    },
+    {
+      "kind": "lexical",
+      "id": "static-var-isolated",
+      "expected": 1,
+      "actual": 1,
+      "code": "class C{static{var process=1;}}export function o(){return process;}",
+      "passed": true
+    },
+    {
+      "kind": "lexical",
+      "id": "loop-lexical-isolated",
+      "expected": 1,
+      "actual": 1,
+      "code": "for(let process of []){}export function o(){return process;}",
+      "passed": true
+    },
+    {
+      "kind": "lexical",
+      "id": "switch-lexical-isolated",
+      "expected": 1,
+      "actual": 1,
+      "code": "switch(0){case 1:let process;}export function o(){return process;}",
+      "passed": true
+    },
+    {
+      "kind": "lexical",
+      "id": "class-name-inner-only",
+      "expected": 1,
+      "actual": 1,
+      "code": "const C=class process {field=process;};export function o(){return process;}",
+      "passed": true
+    },
+    {
+      "kind": "lexical",
+      "id": "shorthand-is-reference",
+      "expected": 1,
+      "actual": 1,
+      "code": "const x={process};",
+      "passed": true
+    },
+    {
+      "kind": "lexical",
+      "id": "assignment-is-reference",
+      "expected": 1,
+      "actual": 1,
+      "code": "({process}=obj);",
+      "passed": true
+    },
+    {
+      "kind": "lexical",
+      "id": "property-key-not-reference",
+      "expected": 0,
+      "actual": 0,
+      "code": "const x={process:1};x.process;",
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "unguarded",
+      "code": "export function o(){return process;}",
+      "expected": 1,
+      "actual": 1,
+      "blocked": [
+        "process"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "typeof-only",
+      "code": "export function o(){return typeof process;}",
+      "expected": 0,
+      "actual": 0,
+      "blocked": [],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "if-present",
+      "code": "export function o(){if(typeof process!==\"undefined\")return process.env;return null;}",
+      "expected": 0,
+      "actual": 0,
+      "blocked": [],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "if-absent-wrong-branch",
+      "code": "export function o(){if(typeof process===\"undefined\")return process.env;}",
+      "expected": 1,
+      "actual": 1,
+      "blocked": [
+        "process"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "and-present",
+      "code": "export function o(){return typeof process!==\"undefined\"&&process.env;}",
+      "expected": 0,
+      "actual": 0,
+      "blocked": [],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "and-absent-wrong",
+      "code": "export function o(){return typeof process===\"undefined\"&&process.env;}",
+      "expected": 1,
+      "actual": 1,
+      "blocked": [
+        "process"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "or-present",
+      "code": "export function o(){return typeof process===\"undefined\"||process.env;}",
+      "expected": 0,
+      "actual": 0,
+      "blocked": [],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "or-wrong",
+      "code": "export function o(){return typeof process!==\"undefined\"||process.env;}",
+      "expected": 1,
+      "actual": 1,
+      "blocked": [
+        "process"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "conditional",
+      "code": "export function o(){return typeof process===\"undefined\"?null:process.env;}",
+      "expected": 0,
+      "actual": 0,
+      "blocked": [],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "negated-conditional",
+      "code": "export function o(){return !(typeof process===\"undefined\")?process.env:null;}",
+      "expected": 0,
+      "actual": 0,
+      "blocked": [],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "closure-not-authorized",
+      "code": "if(typeof process!==\"undefined\"){const f=()=>process;}",
+      "expected": 1,
+      "actual": 1,
+      "blocked": [
+        "process"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "local-provided",
+      "code": "export function o(process){return process.env;}",
+      "expected": 0,
+      "actual": 0,
+      "blocked": [],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "two-variables-union",
+      "code": "export function o(){if(typeof process!==\"undefined\"&&typeof global!==\"undefined\")return [process,global];}",
+      "expected": 0,
+      "actual": 0,
+      "blocked": [],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "or-not-enough",
+      "code": "export function o(){if(typeof process!==\"undefined\"||typeof global!==\"undefined\")return [process,global];}",
+      "expected": 2,
+      "actual": 2,
+      "blocked": [
+        "process",
+        "global"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "reflection-ordinary",
+      "code": "export function o(){return globalThis.process;}",
+      "expected": 0,
+      "actual": 0,
+      "blocked": [],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "module-final-denied",
+      "code": "export function o(){return typeof module;}",
+      "expected": 1,
+      "actual": 1,
+      "blocked": [
+        "module"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "environment",
+      "id": "require-typeof-final-denied",
+      "code": "export function o(){return typeof require;}",
+      "expected": 1,
+      "actual": 1,
+      "blocked": [
+        "require"
+      ],
+      "passed": true
+    },
+    {
+      "kind": "bundle",
+      "id": "cjs-exports",
+      "expectedRefusal": false,
+      "accepted": true,
+      "passed": true,
+      "imports": [],
+      "policy": {
+        "nodeEnv": "production",
+        "platform": "neutral",
+        "conditions": [
+          "node"
+        ],
+        "nativeRequire": "canonical ESM default",
+        "runtimeRequireProvided": false,
+        "processShimProvided": false,
+        "builtinAdapters": false,
+        "filenameGlobalsProvided": false,
+        "hostCapabilitiesAdded": false,
+        "optionalEnvironmentGuards": "original typeof/recognized if-and-or branches, lexical bindings respected",
+        "reflection": "ordinary JS property access; no exhaustive static loader-alias analysis or security-sandbox claim",
+        "packageNamedBindings": "Rolldown live binding behavior may differ from Node CJS snapshots",
+        "sourceLedger": "plugin transform input hashes, not complete physical dependency or package-resolution closure"
+      }
+    },
+    {
+      "kind": "bundle",
+      "id": "cjs-typeof-module",
+      "expectedRefusal": false,
+      "accepted": true,
+      "passed": true,
+      "imports": [],
+      "policy": {
+        "nodeEnv": "production",
+        "platform": "neutral",
+        "conditions": [
+          "node"
+        ],
+        "nativeRequire": "canonical ESM default",
+        "runtimeRequireProvided": false,
+        "processShimProvided": false,
+        "builtinAdapters": false,
+        "filenameGlobalsProvided": false,
+        "hostCapabilitiesAdded": false,
+        "optionalEnvironmentGuards": "original typeof/recognized if-and-or branches, lexical bindings respected",
+        "reflection": "ordinary JS property access; no exhaustive static loader-alias analysis or security-sandbox claim",
+        "packageNamedBindings": "Rolldown live binding behavior may differ from Node CJS snapshots",
+        "sourceLedger": "plugin transform input hashes, not complete physical dependency or package-resolution closure"
+      }
+    },
+    {
+      "kind": "bundle",
+      "id": "local-module",
+      "expectedRefusal": false,
+      "accepted": true,
+      "passed": true,
+      "imports": [],
+      "policy": {
+        "nodeEnv": "production",
+        "platform": "neutral",
+        "conditions": [
+          "node"
+        ],
+        "nativeRequire": "canonical ESM default",
+        "runtimeRequireProvided": false,
+        "processShimProvided": false,
+        "builtinAdapters": false,
+        "filenameGlobalsProvided": false,
+        "hostCapabilitiesAdded": false,
+        "optionalEnvironmentGuards": "original typeof/recognized if-and-or branches, lexical bindings respected",
+        "reflection": "ordinary JS property access; no exhaustive static loader-alias analysis or security-sandbox claim",
+        "packageNamedBindings": "Rolldown live binding behavior may differ from Node CJS snapshots",
+        "sourceLedger": "plugin transform input hashes, not complete physical dependency or package-resolution closure"
+      }
+    },
+    {
+      "kind": "bundle",
+      "id": "native-default",
+      "expectedRefusal": false,
+      "accepted": true,
+      "passed": true,
+      "imports": [
+        "node:buffer"
+      ],
+      "policy": {
+        "nodeEnv": "production",
+        "platform": "neutral",
+        "conditions": [
+          "node"
+        ],
+        "nativeRequire": "canonical ESM default",
+        "runtimeRequireProvided": false,
+        "processShimProvided": false,
+        "builtinAdapters": false,
+        "filenameGlobalsProvided": false,
+        "hostCapabilitiesAdded": false,
+        "optionalEnvironmentGuards": "original typeof/recognized if-and-or branches, lexical bindings respected",
+        "reflection": "ordinary JS property access; no exhaustive static loader-alias analysis or security-sandbox claim",
+        "packageNamedBindings": "Rolldown live binding behavior may differ from Node CJS snapshots",
+        "sourceLedger": "plugin transform input hashes, not complete physical dependency or package-resolution closure"
+      }
+    },
+    {
+      "kind": "bundle",
+      "id": "optional-process",
+      "expectedRefusal": false,
+      "accepted": true,
+      "passed": true,
+      "imports": [],
+      "policy": {
+        "nodeEnv": "production",
+        "platform": "neutral",
+        "conditions": [
+          "node"
+        ],
+        "nativeRequire": "canonical ESM default",
+        "runtimeRequireProvided": false,
+        "processShimProvided": false,
+        "builtinAdapters": false,
+        "filenameGlobalsProvided": false,
+        "hostCapabilitiesAdded": false,
+        "optionalEnvironmentGuards": "original typeof/recognized if-and-or branches, lexical bindings respected",
+        "reflection": "ordinary JS property access; no exhaustive static loader-alias analysis or security-sandbox claim",
+        "packageNamedBindings": "Rolldown live binding behavior may differ from Node CJS snapshots",
+        "sourceLedger": "plugin transform input hashes, not complete physical dependency or package-resolution closure"
+      }
+    },
+    {
+      "kind": "bundle",
+      "id": "local-process",
+      "expectedRefusal": false,
+      "accepted": true,
+      "passed": true,
+      "imports": [],
+      "policy": {
+        "nodeEnv": "production",
+        "platform": "neutral",
+        "conditions": [
+          "node"
+        ],
+        "nativeRequire": "canonical ESM default",
+        "runtimeRequireProvided": false,
+        "processShimProvided": false,
+        "builtinAdapters": false,
+        "filenameGlobalsProvided": false,
+        "hostCapabilitiesAdded": false,
+        "optionalEnvironmentGuards": "original typeof/recognized if-and-or branches, lexical bindings respected",
+        "reflection": "ordinary JS property access; no exhaustive static loader-alias analysis or security-sandbox claim",
+        "packageNamedBindings": "Rolldown live binding behavior may differ from Node CJS snapshots",
+        "sourceLedger": "plugin transform input hashes, not complete physical dependency or package-resolution closure"
+      }
+    },
+    {
+      "kind": "bundle",
+      "id": "default-ambient-process",
+      "expectedRefusal": true,
+      "accepted": false,
+      "passed": true,
+      "error": {
+        "code": "ERR_SM_PACKAGE_BUNDLE_UNSUPPORTED",
+        "message": "Unprovided runtime loader/environment references: process"
+      }
+    },
+    {
+      "kind": "bundle",
+      "id": "static-ambient-process",
+      "expectedRefusal": true,
+      "accepted": false,
+      "passed": true,
+      "error": {
+        "code": "ERR_SM_PACKAGE_BUNDLE_UNSUPPORTED",
+        "message": "Unprovided runtime loader/environment references: process"
+      }
+    },
+    {
+      "kind": "bundle",
+      "id": "module-alias",
+      "expectedRefusal": true,
+      "accepted": false,
+      "passed": false,
+      "error": {
+        "code": null,
+        "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v2] /Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v2-source-review/cases/module-alias/entry.mjs\nError: CommonJS module aliases and loader state are unsupported: /Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v2-source-review/cases/module-alias/entry.mjs\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:15:41)\n    at file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:88:43\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:18:34)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:22:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:21:54)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:21:54)\n    at TransformPluginContextImpl.transform (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:67:7)\n    at plugin (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:1758:30)\n    at file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2146:21\n    at plugin.<computed> (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2343:18)"
+      }
+    },
+    {
+      "kind": "bundle",
+      "id": "computed-loader",
+      "expectedRefusal": true,
+      "accepted": false,
+      "passed": false,
+      "error": {
+        "code": null,
+        "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v2] /Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v2-source-review/cases/computed-loader/entry.mjs\nError: CommonJS module aliases and loader state are unsupported: /Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v2-source-review/cases/computed-loader/entry.mjs\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:15:41)\n    at file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:88:43\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:18:34)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:22:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:22:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:22:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:21:54)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:22:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:22:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:21:54)"
+      }
+    },
+    {
+      "kind": "bundle",
+      "id": "require-empty",
+      "expectedRefusal": true,
+      "accepted": false,
+      "passed": false,
+      "error": {
+        "code": null,
+        "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v2] /Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v2-source-review/cases/require-empty/entry.mjs\nError: Only literal package or native require is supported: /Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v2-source-review/cases/require-empty/entry.mjs\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:15:41)\n    at file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:76:112\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:18:34)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:22:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:21:54)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:22:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:22:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:21:54)\n    at TransformPluginContextImpl.transform (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:67:7)\n    at plugin (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:1758:30)"
+      }
+    },
+    {
+      "kind": "bundle",
+      "id": "require-dynamic",
+      "expectedRefusal": true,
+      "accepted": false,
+      "passed": false,
+      "error": {
+        "code": null,
+        "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v2] /Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v2-source-review/cases/require-dynamic/entry.mjs\nError: Only literal package or native require is supported: /Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v2-source-review/cases/require-dynamic/entry.mjs\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:15:41)\n    at file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:76:112\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:18:34)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:22:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:21:54)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:22:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:22:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:21:54)\n    at TransformPluginContextImpl.transform (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:67:7)\n    at plugin (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:1758:30)"
+      }
+    },
+    {
+      "kind": "bundle",
+      "id": "unselected-native",
+      "expectedRefusal": true,
+      "accepted": false,
+      "passed": false,
+      "error": {
+        "code": null,
+        "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v2]\nError: Node builtin is not admitted by this profile: node:fs\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:15:41)\n    at PluginContextImpl.resolveId (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:55:65)\n    at plugin (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:1678:30)\n    at file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2146:21\n    at plugin.<computed> (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2343:18)"
+      }
+    },
+    {
+      "kind": "bundle",
+      "id": "residual-dynamic-import",
+      "expectedRefusal": true,
+      "accepted": false,
+      "passed": true,
+      "error": {
+        "code": "ERR_SM_PACKAGE_BUNDLE_UNSUPPORTED",
+        "message": "Unprovided runtime loader/environment references: dynamic-import"
+      }
+    },
+    {
+      "kind": "bundle",
+      "id": "ordinary-reflection",
+      "expectedRefusal": false,
+      "accepted": true,
+      "passed": true,
+      "imports": [],
+      "policy": {
+        "nodeEnv": "production",
+        "platform": "neutral",
+        "conditions": [
+          "node"
+        ],
+        "nativeRequire": "canonical ESM default",
+        "runtimeRequireProvided": false,
+        "processShimProvided": false,
+        "builtinAdapters": false,
+        "filenameGlobalsProvided": false,
+        "hostCapabilitiesAdded": false,
+        "optionalEnvironmentGuards": "original typeof/recognized if-and-or branches, lexical bindings respected",
+        "reflection": "ordinary JS property access; no exhaustive static loader-alias analysis or security-sandbox claim",
+        "packageNamedBindings": "Rolldown live binding behavior may differ from Node CJS snapshots",
+        "sourceLedger": "plugin transform input hashes, not complete physical dependency or package-resolution closure"
+      }
+    }
+  ],
+  "passed": false,
+  "sources": [
+    {
+      "path": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+      "sha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+      "bytes": 108619024
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs",
+      "sha256": "86194e116e612ae26e295d3031c20474c5d1bd32968e6b7e08c63a9590f51c2c",
+      "bytes": 8992
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/package-environment-guards.mjs",
+      "sha256": "95deacde18a84cf4cb81eedf819d687540a391bda0ccead4ab399032aa9bab30",
+      "bytes": 3902
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-bindings-v2/index.json",
+      "sha256": "59f8cc2c8281a3670539ed57536fa435e36e5bb50038197c7c1eec7e770b21e4",
+      "bytes": 1450
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/toolchain.mjs",
+      "sha256": "488a1a4489419415754c144d9f81874a8e5539160b76eb523d88400be9c95543",
+      "bytes": 1078
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/module-selection.mjs",
+      "sha256": "57968dc834e9f9efa90e8e26eb1ace60dff182b816f33e36fea15e1fee22ef85",
+      "bytes": 11884
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-bindings-v2/README.md",
+      "sha256": "2150d656794161ae6ea0247d1700b8b7282a37d3ad63052330549a75c6060660",
+      "bytes": 2997
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-bindings-v2/bindings.mjs",
+      "sha256": "f2cfb6e5e501572a1e68b345b45317f3f3cb521043e91181eaf70c10be26af14",
+      "bytes": 8579
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-bindings-v2/evidence/results.json",
+      "sha256": "26906fb8f160effc04773da9344bc00dcc1c9cb14f92603b651b93ccede8a24f",
+      "bytes": 17489
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-bindings-v2/input-hashes.json",
+      "sha256": "76c147c8b72a527abe2e61a3773fe275b0fbf51db557a81fc54fd6b78049ce8c",
+      "bytes": 1536
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-bindings-v2/results.json",
+      "sha256": "3e8d53fef580ecc6798abb09dd469f82f8512c199688182a42e9505cec36da04",
+      "bytes": 1052
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-bindings-v2/seal-source.py",
+      "sha256": "46ab74c235f1f9c13f8146a60852579c5c6bae5cc6f757b50716ec6d2ebbc65e",
+      "bytes": 2956
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-bindings-v2/source-contract.json",
+      "sha256": "b5b319fd30081263cc561fa85be484381338bed3cc39c4c8d1d6c14a023793d7",
+      "bytes": 1753
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-bindings-v2/source-receipt.json",
+      "sha256": "d92b7ad78270fd83fab48da8c6303043c1f7353ed3eb6024fb76118f1eb8084f",
+      "bytes": 1340
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-bindings-v2/test.mjs",
+      "sha256": "90c5eab74ddf1b10e4694dff7f24415673a09762d82421a691fc2df1975f9a09",
+      "bytes": 8247
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs",
+      "sha256": "86194e116e612ae26e295d3031c20474c5d1bd32968e6b7e08c63a9590f51c2c",
+      "bytes": 8992
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/package-environment-guards.mjs",
+      "sha256": "95deacde18a84cf4cb81eedf819d687540a391bda0ccead4ab399032aa9bab30",
+      "bytes": 3902
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-bindings-v2/index.json",
+      "sha256": "59f8cc2c8281a3670539ed57536fa435e36e5bb50038197c7c1eec7e770b21e4",
+      "bytes": 1450
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/toolchain.mjs",
+      "sha256": "488a1a4489419415754c144d9f81874a8e5539160b76eb523d88400be9c95543",
+      "bytes": 1078
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/module-selection.mjs",
+      "sha256": "57968dc834e9f9efa90e8e26eb1ace60dff182b816f33e36fea15e1fee22ef85",
+      "bytes": 11884
+    }
+  ],
+  "lexicalCases": 13,
+  "environmentCases": 17,
+  "bundleCases": 15,
+  "generatedOrAnalyzedModuleExecuted": false,
+  "nativeManifestDataReadOnly": true,
+  "nativePreflightOrHelperOrComponentOrGuestInvoked": false
+}

@@ -1,0 +1,1 @@
+export function observe(){return process.env.OTHER_ENV;}

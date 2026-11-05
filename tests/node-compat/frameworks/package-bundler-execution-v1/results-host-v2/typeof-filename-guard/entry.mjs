@@ -1,0 +1,1 @@
+export function observe(){return typeof __dirname==='undefined'?'absent':__dirname;}

@@ -1,0 +1,1 @@
+import fs from 'node:fs';export function observe(){return fs;}

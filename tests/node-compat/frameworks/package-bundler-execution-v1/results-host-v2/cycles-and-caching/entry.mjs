@@ -1,0 +1,1 @@
+import a from './a.cjs';import b from './b.cjs';export function observe(){return{a:a.name,b:b.name,partial:b.partial,once:a.count,same:a.b===b};}

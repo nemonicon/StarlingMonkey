@@ -1,0 +1,1 @@
+export function observe(){if('object'===typeof process && 'function'===typeof process.emit){return typeof process.emit;}return 'absent';}

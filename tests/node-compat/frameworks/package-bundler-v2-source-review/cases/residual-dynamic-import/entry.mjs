@@ -1,0 +1,1 @@
+export function o(x){return import(x);}

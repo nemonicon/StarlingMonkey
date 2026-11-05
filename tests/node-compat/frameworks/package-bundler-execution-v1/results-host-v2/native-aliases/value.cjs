@@ -1,0 +1,1 @@
+module.exports={buffer:require('buffer'),stream:require('stream')};

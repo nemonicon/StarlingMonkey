@@ -1,0 +1,1 @@
+export function o(){return typeof process==='undefined'?null:process.emit;}

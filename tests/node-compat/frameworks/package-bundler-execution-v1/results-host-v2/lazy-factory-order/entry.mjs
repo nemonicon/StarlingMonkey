@@ -1,0 +1,1 @@
+import a from './a.cjs';export function observe(){return{before:a.state.join(','),value:a.read(),after:a.state.join(',')};}

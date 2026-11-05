@@ -1,0 +1,1 @@
+import value from './value.cjs';import buffer from 'node:buffer';import stream from 'node:stream';export function observe(){return {buffer:value.buffer===buffer,stream:value.stream===stream,hasDefault:Object.hasOwn(value.buffer,'default'),callable:typeof value.stream,streamSelf:value.stream.Stream===value.stream};}

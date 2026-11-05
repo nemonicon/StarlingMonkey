@@ -1,0 +1,1 @@
+import value from 'jco:fs';export function observe(){return value;}

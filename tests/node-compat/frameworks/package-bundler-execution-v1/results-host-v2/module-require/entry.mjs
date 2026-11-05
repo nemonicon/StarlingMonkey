@@ -1,0 +1,1 @@
+export function observe(){return module.require('buffer');}

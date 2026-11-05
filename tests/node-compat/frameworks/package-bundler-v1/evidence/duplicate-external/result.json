@@ -1,0 +1,52 @@
+{
+  "name": "duplicate-external",
+  "input": [
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v1/evidence/duplicate-external/package.json",
+      "sha256": "1239d4d885dcad42201a27ed9324f8f0f760b78700d8db9ced39a511cffe7eae",
+      "bytes": 18
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v1/evidence/duplicate-external/entry.mjs",
+      "sha256": "a63549172b45d9e61305b360ccd4d51a63e3eb6f3c22841f6ea1ca60e16e145d",
+      "bytes": 257
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v1/evidence/duplicate-external/pkg.cjs",
+      "sha256": "031b7063dc87c1a62c92fbb1b5c847f84719ca0a3c6dd5ddcce17a2f8fe55882",
+      "bytes": 39
+    }
+  ],
+  "fixture": {
+    "name": "duplicate-external",
+    "builtin": "node:buffer",
+    "plugins": "official",
+    "duplicate": true,
+    "execute": false
+  },
+  "logs": [
+    {
+      "level": "warn",
+      "message": "Found 1 duplicate external: `node:buffer`. Remove them from top-level `external` as they're already handled by `builtin:esm-external-require` plugin. To disable this check, set `skipDuplicateCheck: true`."
+    }
+  ],
+  "generatedBundleExecuted": false,
+  "nativeEngineExecuted": false,
+  "frameworkPackageExecuted": false,
+  "bundle": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v1/evidence/duplicate-external/bundle.mjs",
+    "sha256": "f3ee4d755fc785cce9f7978c7f17d617b7e0f0d44cb9f7f57eed54da3162e178",
+    "bytes": 2219
+  },
+  "imports": [
+    "node:buffer"
+  ],
+  "moduleIds": [
+    "\u0000rolldown/runtime.js",
+    "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v1/evidence/duplicate-external/pkg.cjs",
+    "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-v1/evidence/duplicate-external/entry.mjs"
+  ],
+  "containsResidualRequire": true,
+  "containsProcess": false,
+  "bundleGenerated": true
+}

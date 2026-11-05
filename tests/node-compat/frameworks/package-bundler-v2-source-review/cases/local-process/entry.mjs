@@ -1,0 +1,1 @@
+export function o(process){return process.env.OTHER;}

@@ -1,0 +1,1 @@
+const load=require;export function observe(){return load('buffer');}
