@@ -2,6 +2,17 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
+The [Next.js application experiment](../../tests/node-compat/frameworks/nextjs/README.md)
+now has two real Node production builds,24 HTTP and two browser checks per run,
+and19 isolated Wasm attempts. Full Next/React entries fail at the current CommonJS
+bundler boundary; eight unavailable Node module imports refuse explicitly. The
+shared application function builds a zero-import component but fails on deferred
+`util.format`; a caught-error diagnostic identifies that refusal. A separate
+supported Buffer/foundations/web/classic-stream fixture returns complete
+Node-equal values on Jco and fresh Wasmtime. These findings add repeatable
+regression checks and demand priorities, not complete Next.js compatibility or
+new API support.
+
 Latest experimental work: consumer355 HTTP and older crypto normal/GC host gates retain their bounded passes. Scheduler resource pure construction and timer-policy rejection pass artifact/graph review; the selector native build and freezer SOURCE pass independent reviews, and its actual762-copy freeze exits0 and passes independent frozen-artifact review, with pins/runtime open. Codec timing passes independent DATA review for360 workers/7,200 returns; the [Root cost decision](codec-cost-decision.md) continues the native candidate through remaining compatibility, host, preservation and adoption gates. Crypto's complete original-context frozen verifier finishes exit0 and passes actual-result review. Corrected v3 export/pin/bootstrap source passes review and its normal-only export finishes exit0; independent review/pins/bootstrap remain open. Clock IO pruning passes bounded SOURCE review and remains uncompiled work with explicit adapter index/random prerequisites. Accepted production remains foundations-v13.
 
 The requested all-work Git checkpoint preserves current source proposals, results, retained failures and unfinished drafts. [progress.md](../../progress.md) records exact evidence, external artifact locations and outstanding gates.

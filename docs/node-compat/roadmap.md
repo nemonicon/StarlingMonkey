@@ -2,6 +2,16 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
+Measured application demand now includes the [Next16.4.5 regression project](../../tests/node-compat/frameworks/nextjs/README.md).
+Two real Node builds/HTTP/browser baselines pass. The unchanged profile refuses
+Next/React general CommonJS packaging and eight unselected Node modules; the
+shared guest application fails on explicitly deferred `util.format`. A separate
+supported native-module differential passes Node/Jco/Wasmtime. Preserve these
+known failures as future checks. Prioritize audited package CommonJS bundling,
+bounded formatting semantics, genuine request async context and standard WASI
+HTTP integration under the existing phase dependencies. A static export or a
+passing library slice does not close the full Next server gate.
+
 Each phase has a measurable gate. The initial deliverable supplies templates and source evidence; these phases describe the work required to turn them into a shipped profile.
 
 The user has authorized execution of the full roadmap. The active

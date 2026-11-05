@@ -1,0 +1,1 @@
+Exact executed harness inputs from the results harnessFiles descriptors. Retained before subsequent diagnostic/checker changes; operational result JSON is unchanged. browser package manifest is stored as package.json.

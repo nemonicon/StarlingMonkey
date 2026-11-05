@@ -5,6 +5,73 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 Last updated: 2026-11-05. Overall roadmap: **in progress**.
 
 
+Next.js framework experiment after pushed checkpoint `9c426444`:
+
+- All earlier repository work is committed and pushed to `origin/main` at
+  `9c426444`. No force push/history rewriting was used. Referenced external
+  artifacts remain external.
+- [Reusable Next.js project and report](tests/node-compat/frameworks/nextjs/README.md)
+  pin Next16.4.5, React/ReactDOM19.3.1 and exact app/browser npm locks. The real
+  App Router fixture has28 application files plus its lock and23 HTTP contract
+  cases: layouts/metadata/static/dynamic/query SSR, JSON GET/POST/bad input,
+  cookies/headers, redirects/not-found, cache invalidation, actions, hydration,
+  Suspense, assets, bounded Node operations and deliberate filesystem/crypto.
+- [First preparation attempt](tests/node-compat/frameworks/nextjs/results/2026-11-05-v13-attempt1/harness-failure.json)
+  retains build exit0 followed by harness tracing-root/path and recorder-parent
+  mistakes before Wasm execution. The fixture now selects its real tracing root
+  and the reporting paths are corrected. These are harness issues, not native
+  runtime findings.
+- [Actual full run](tests/node-compat/frameworks/nextjs/results/2026-11-05-v13/results.json)
+  and [fresh replay](tests/node-compat/frameworks/nextjs/results/2026-11-05-v13-replay/results.json)
+  both finish with complete19-case observations. Each has a real production
+  build0, genuine standalone server,24 passing HTTP checks including an actual
+  build-derived action POST, and two passing Chrome156 hydration/action tests
+  without recorded browser errors. Cache generations1/repeat1/invalidate2 and
+  actual raw stream chunk boundaries are retained. First-run shell is in chunk0
+  and ready in chunk2 of five. These are Node controls, not Wasm Next results.
+- On the exact accepted normal-OFF v13 engine, eight real React/Next/generated
+  entries fail at the unchanged CommonJS bundler policy. Eight unselected Node
+  module imports fail admission explicitly. The shared application function
+  builds a zero-import component but traps on both Jco and fresh Wasmtime;
+  child-process and unsupported Buffer probes pass their refusal checks on
+  three retained Jco calls and fresh Wasmtime. Main driver exits1 because the
+  shared Node/Wasm differential cannot pass. All emitted components have only
+  `run()->string` and no imports; no full Next server component is emitted.
+- [Supplemental native differential and diagnostic](tests/node-compat/frameworks/nextjs/results/2026-11-05-v13-supplement/results.json)
+  finish exit0. The caught original error is `ERR_SM_NODE_UNSUPPORTED` from
+  deferred `node:util.format`. The distinct supported probe covers Buffer
+  UTF8/hex/copy/ArrayBuffer+slice sharing/zero allocation, path, events, decoder,
+  scalar asserts, query strings, util type predicates, web streams and classic
+  pipeline. Its complete strings and structured values equal Node on all
+  three Jco calls and fresh Wasmtime. This does not replace the original failure.
+- Future checks use the executable full runner, exact source/engine preflights,
+  browser worker, supplemental differential and known-failure comparator.
+  The first fresh comparison flags only reversed order of two identical parallel
+  Rolldown diagnostics. Its raw comparison is preserved; a bounded exact-block
+  multiset reader correction passes43 synthetic checks. [Actual fresh comparison](tests/node-compat/frameworks/nextjs/results/2026-11-05-v13-replay/comparison.json)
+  now exits0: no regressions, improvements or changed blockers, with17 known
+  failures still explicit and framework compatibility false. Source snapshots, all HTTP bodies,
+  browser screenshots/errors, raw terminals/typed returns, WIT and external
+  artifact descriptors are retained. The replay worker snapshot is reconstructed
+  from one documented later filename-only edit and cryptographically matches its
+  actual executed descriptor; current worker is unchanged by reconstruction.
+- [Bounded retained-evidence validation](tests/node-compat/frameworks/nextjs/results/2026-11-05-v13/evidence-validation.json)
+  passes1,673 checks across505 files, including native inputs, all HTTP bodies,
+  browser screenshots/errors, full raw stream reassembly, clean worker terminals,
+  component hashes/WIT and complete successful typed returns. All workers and
+  Root operational jobs are terminal. Syntax validation passes45 JS/MJS files;
+  both real Next builds separately compile the fixture's JSX. The observation
+  comparator passes43 injected checks and an actual fresh-run comparison.
+  Precommit whitespace findings are confined to16 original progress/blank-line
+  sequences in six raw Next/Wasmtime log files; those bytes remain unchanged.
+  Whitespace validation passes for all other staged files.
+- Findings prioritize audited package CommonJS bundling, bounded util formatting,
+  real ALS/request context and a selected standard WASI HTTP integration. No
+  native source, bundler policy, custom host service or selected capability was
+  added. Full Next.js compatibility, new host results, performance and request
+  reuse remain unestablished. Accepted production stays foundations-v13.
+
+
 Current all-work commit checkpoint (2026-11-05):
 
 - All three parallel workers have stopped writes; their tools and all Root

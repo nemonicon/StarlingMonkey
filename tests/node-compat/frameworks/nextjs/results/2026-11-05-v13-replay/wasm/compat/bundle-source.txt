@@ -1,0 +1,101 @@
+import { Buffer } from "node:buffer";
+import path from "node:path";
+import { EventEmitter } from "node:events";
+import { StringDecoder } from "node:string_decoder";
+import assert from "node:assert/strict";
+import querystring from "node:querystring";
+import { format } from "node:util";
+import { isUint8Array } from "node:util/types";
+import { Readable, Transform, Writable } from "node:stream";
+import { pipeline } from "node:stream/promises";
+// ../../../../private/tmp/starling-node-compat/nextjs-16.4.5-v13-replay-20261105-01/application/lib/compat.mjs
+async function run$1() {
+	const input = new Uint8Array([
+		0,
+		104,
+		101,
+		108,
+		108,
+		111,
+		255
+	]);
+	const copied = Buffer.from(input.subarray(1, 6));
+	input[1] = 120;
+	assert.equal(copied.toString("utf8"), "hello");
+	const parent = Buffer.from(new Uint8Array([
+		10,
+		20,
+		30,
+		40
+	]));
+	const shared = parent.subarray(1, 3);
+	shared[0] = 99;
+	assert.equal(parent[1], 99);
+	const emitter = new EventEmitter();
+	const events = [];
+	emitter.once("value", (value) => events.push(value));
+	emitter.emit("value", 7);
+	emitter.emit("value", 9);
+	assert.equal(events.length, 1);
+	assert.equal(events[0], 7);
+	const decoder = new StringDecoder("utf8");
+	const first = decoder.write(Buffer.from(new Uint8Array([226, 130])));
+	const last = decoder.end(Buffer.from(new Uint8Array([172])));
+	assert.equal(first, "");
+	assert.equal(last, "€");
+	const pieces = [];
+	const upper = new Transform({ transform(chunk, encoding, callback) {
+		callback(null, chunk.toString("utf8").toUpperCase());
+	} });
+	const sink = new Writable({ write(chunk, encoding, callback) {
+		pieces.push(chunk.toString("utf8"));
+		callback();
+	} });
+	await pipeline(Readable.from(["a", "b"]), upper, sink);
+	const streamText = pieces.join("");
+	assert.equal(streamText, "AB");
+	const parsed = querystring.parse("q=a%20b&count=2");
+	assert.equal(parsed.q, "a b");
+	return {
+		marker: "NEXT_COMPAT_OK",
+		buffer: {
+			utf8: copied.toString("utf8"),
+			hex: copied.toString("hex"),
+			fromViewCopies: copied[0] === 104 && input[1] === 120,
+			subarrayShares: parent[1] === 99,
+			windowHex: shared.toString("hex")
+		},
+		path: {
+			normalized: path.posix.normalize("/a/../b/./c"),
+			basename: path.posix.basename("/b/c.txt", ".txt")
+		},
+		events,
+		decoder: {
+			first,
+			last
+		},
+		query: {
+			q: parsed.q,
+			count: parsed.count,
+			encoded: querystring.stringify({
+				q: "a b",
+				count: "2"
+			})
+		},
+		util: {
+			formatted: format("value:%s:%d", "ok", 7),
+			uint8Array: isUint8Array(input),
+			array: isUint8Array([])
+		},
+		stream: {
+			text: streamText,
+			chunks: pieces.length
+		},
+		assertions: true
+	};
+}
+// ../../../../private/tmp/starling-node-compat/nextjs-16.4.5-v13-replay-20261105-01/application/.sm-wasm-compat.mjs
+async function run() {
+	return JSON.stringify(await run$1());
+}
+export { run };

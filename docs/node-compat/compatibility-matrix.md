@@ -2,6 +2,17 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
+The [Next.js application experiment](../../tests/node-compat/frameworks/nextjs/README.md)
+now has two real Node production builds,24 HTTP and two browser checks per run,
+and19 isolated Wasm attempts. Full Next/React entries fail at the current CommonJS
+bundler boundary; eight unavailable Node module imports refuse explicitly. The
+shared application function builds a zero-import component but fails on deferred
+`util.format`; a caught-error diagnostic identifies that refusal. A separate
+supported Buffer/foundations/web/classic-stream fixture returns complete
+Node-equal values on Jco and fresh Wasmtime. These findings add repeatable
+regression checks and demand priorities, not complete Next.js compatibility or
+new API support.
+
 Latest experimental evidence: [codec timing DATA](../../tests/node-compat/foundation-zlib/independent-cost-timing-v5-results-review-v1/README.md) passes for the exact360-worker workload; the [cost decision](codec-cost-decision.md) continues the bounded native candidate through remaining compatibility/release/adoption gates. It establishes neither universal speedup nor reduced guest memory. Crypto's new frozen-only verifier has an actual exit0 complete-helper observation, with independent result review passing; corrected v3 export/pin/bootstrap source passes review and its actual normal-only export exits0; independent export review, reviewed pins and bootstrap remain open. The [clock-profile proposal](clock-capability-decision.md) remains uncompiled source work. These results do not promote API support statuses or change foundations-v13.
 
 The machine-readable [API matrix](api-matrix.csv) is the per-API record: each row has module, API, type, inventory origin, status, implementation strategy, required capability, deviation and validation plan. [Node export inventory](node-v22.14.0-exports.json) contains the exact 72 module namespaces obtained from Node v22.14.0 on macOS arm64. [Policy](policy.json) defines dispositions and overrides; [generator](scripts/inventory.mjs) checks the oracle version and documentation hash. Documented overload/event/property records supplement reflection and can duplicate reflected API records.

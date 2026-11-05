@@ -2,6 +2,17 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
+The [Next.js application experiment](../../tests/node-compat/frameworks/nextjs/README.md)
+now has two real Node production builds,24 HTTP and two browser checks per run,
+and19 isolated Wasm attempts. Full Next/React entries fail at the current CommonJS
+bundler boundary; eight unavailable Node module imports refuse explicitly. The
+shared application function builds a zero-import component but fails on deferred
+`util.format`; a caught-error diagnostic identifies that refusal. A separate
+supported Buffer/foundations/web/classic-stream fixture returns complete
+Node-equal values on Jco and fresh Wasmtime. These findings add repeatable
+regression checks and demand priorities, not complete Next.js compatibility or
+new API support.
+
 Current results and outstanding work are maintained in [progress.md](../../progress.md). Consumer355 HTTP passes its bounded both-host review. Crypto normal-key/stock-Wasmtime validation and the isolated GC native build, freeze, bootstrap and component artifact reviews pass. The first GC runtime attempt failed before guest execution on17 relative input paths; the corrected v2 source passes independent review and the new runtime finishes raw0, retaining23 complete public strings and45 Node-oracle-matching signatures. Independent actual-result review passes, and three stock-Wasmtime GC calls finish raw0 with entire results equal to Jco; their independent result review passes.
 
 The scheduler resource pure component and retained timer-policy failure pass independent artifact/graph review. The all-invalid selector's native build and freezer source pass their reviews; its actual normal freeze exits0 with762 copies and passes independent artifact review; pins/runtime remain open. Codec timing now passes [independent DATA review](../../tests/node-compat/foundation-zlib/independent-cost-timing-v5-results-review-v1/README.md); the [bounded cost decision](codec-cost-decision.md) continues the native candidate through remaining compatibility/release/adoption gates without claiming universal speed or guest-memory benefit. Crypto's complete frozen verifier passes actual-result review. Corrected export/pin/bootstrap v3 source passes review; its normal-only export finishes exit0, with independent candidate review/pins/bootstrap still open. The proposed [clock profile](clock-capability-decision.md) has independently reviewed, uncompiled selective-IO/adapter source; its first build controller is held on redirects, and the corrected v2 is unsealed work in progress. No new adapter/package/component runs. [progress.md](../../progress.md) records exact evidence and outstanding work. Accepted production remains bounded foundations-v13.
