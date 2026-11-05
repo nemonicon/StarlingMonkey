@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "donorIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/independent-cost-pilot-v4-results-review-v1/index.json",
+    "sha256": "64472b266c9546136fda6602c5aefb15bd44497a043d5f8c2857f2e76c6137a8",
+    "bytes": 5306
+  },
+  "donorModel": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/independent-cost-pilot-v4-results-review-v1/model.py",
+    "sha256": "0f9b1dbe05557da16e7c1cb6548c184e0a86719aa977a246259c08ca2a6cb9f7",
+    "bytes": 14182
+  },
+  "afterimage": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/independent-cost-timing-v5-results-review-v1/model.py",
+    "sha256": "4cdfcfd111f76e6a56b973918337c35861c501a7ddf2a60c91154ce76caeb611",
+    "bytes": 14195
+  },
+  "edits": [
+    {
+      "before": "Independent compact-return and calibration DATA models.",
+      "after": "Independent timing compact-return DATA replay models.",
+      "count": 1
+    },
+    {
+      "before": "rows += [('batch',[id,n],'sample-0')]",
+      "after": "rows += [('batch',[id,n],'sample-'+str(i))for i in range(7)]",
+      "count": 1
+    },
+    {
+      "before": "repetition=None,side=job['side'],comparison=job['comparison']",
+      "after": "repetition=job['repetition'],side=job['side'],comparison=job['comparison']",
+      "count": 1
+    },
+    {
+      "before": "len(rows)==14,'all14 full primitive records'",
+      "after": "len(rows)==20,'all20 full primitive records'",
+      "count": 1
+    },
+    {
+      "before": "c.counts['codecCalls']==job['n']*4",
+      "after": "c.counts['codecCalls']==job['n']*10",
+      "count": 1
+    },
+    {
+      "before": "repetition=None,side=job['side'],arm=e['arm']",
+      "after": "repetition=job['repetition'],side=job['side'],arm=e['arm']",
+      "count": 1
+    },
+    {
+      "before": "warmups=3,samples=1,freshOwnedProcess=True,sampleMs=float(int(samples[0]['elapsedNs']))/1e6",
+      "after": "warmups=3,samples=7,freshOwnedProcess=True,sampleMs=None",
+      "count": 1
+    }
+  ],
+  "pureDataOnly": true,
+  "oldPilotSourceAndProofUnchanged": true
+}

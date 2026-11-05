@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "exactPrimitiveExtractions": [
+    {
+      "name": "checked",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/resource-build-controller-candidate-v1/guard.py",
+        "sha256": "24e131ba4681f289ec3d5ba7855fcf488445452c488a5ade05a91849b1ed10a1",
+        "bytes": 10496
+      },
+      "source": "def checked(row):\n    assert type(row)is dict and set(row)=={'path','sha256','bytes'}\n    assert type(row['path'])is str and type(row['bytes'])is int and row['bytes']>=0\n    assert type(row['sha256'])is str and len(row['sha256'])==64 and all(c in '0123456789abcdef'for c in row['sha256'])\n    path=Path(row['path']);assert path.is_absolute()and '..'not in path.parts\n    physical=Path('/private'+str(path))if str(path).startswith('/tmp/')else path\n    for p in (physical,*physical.parents):assert not p.is_symlink()\n    a=physical.stat();assert stat.S_ISREG(a.st_mode);digest=hashlib.sha256()\n    with physical.open('rb')as stream:\n        for block in iter(lambda:stream.read(4*1024*1024),b''):digest.update(block)\n    b=physical.stat();assert(a.st_dev,a.st_ino,a.st_size,a.st_mtime_ns,a.st_ctime_ns)==(b.st_dev,b.st_ino,b.st_size,b.st_mtime_ns,b.st_ctime_ns)\n    assert a.st_size==row['bytes']and digest.hexdigest()==row['sha256'];return path"
+    },
+    {
+      "name": "read",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/resource-build-controller-candidate-v1/guard.py",
+        "sha256": "24e131ba4681f289ec3d5ba7855fcf488445452c488a5ade05a91849b1ed10a1",
+        "bytes": 10496
+      },
+      "source": "def read(row):\n    assert row['bytes']<=32*1024*1024\n    raw=checked(row).read_bytes();assert len(raw)==row['bytes']and hashlib.sha256(raw).hexdigest()==row['sha256'];return json.loads(raw)"
+    },
+    {
+      "name": "family",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/resource-build-controller-candidate-v1/guard.py",
+        "sha256": "24e131ba4681f289ec3d5ba7855fcf488445452c488a5ade05a91849b1ed10a1",
+        "bytes": 10496
+      },
+      "source": "def family(row):\n    index=read(row);root=Path(row['path']).parent;rows=[row];names=set()\n    assert index['schemaVersion']==1 and type(index['files'])is list and 0<len(index['files'])<=2048\n    for item in index['files']:\n        n=item['path'];assert n and not n.startswith('/')and '\\\\'not in n and all(x not in('','.','..')for x in n.split('/'))and n not in names;names.add(n)\n        r=dict(path=str(root/n),sha256=item['sha256'],bytes=item['bytes']);checked(r);rows.append(r)\n    assert not any(p.is_symlink()for p in root.rglob('*'))\n    assert{p.relative_to(root).as_posix()for p in root.rglob('*')if p.is_file()}==names|{'index.json'}\n    return rows"
+    }
+  ],
+  "importedUnchangedOriginalModules": [
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-build-controller-candidate-v1/monitor.py",
+      "sha256": "86913867251bc889701859ca6a361ccf9c17288a6a3bfc7a5c8d8e5bbe5c4cbe",
+      "bytes": 15094
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/resource-build-controller-candidate-v1/lifecycle.py",
+      "sha256": "54557e22b4cd1c99cdc67c6dc8ff55826fae0d47a6b6481b72019c9480e5293d",
+      "bytes": 9198
+    }
+  ],
+  "newSourceGuardAndCallerAuthoredAgainstActualApi": true,
+  "originalContextsRetained": true,
+  "donorGlobalsRebound": false,
+  "nativeRecipeUnchanged": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/task-selection-integration-candidate-v1/proposed/tests/node-compat/build-engine.sh",
+    "sha256": "e62b6b8e6bec5f28b6d87c5e47a27ae377a4496d37e3227760c88a548eb2b691",
+    "bytes": 47292
+  }
+}

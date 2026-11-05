@@ -1,0 +1,17 @@
+# Whole actual publication boundary, rechecked as DATA from its typed ledger.
+tooltrees=data(row(Z/'cost-tooling-candidate-v3/tool-trees.json'));publication=Path('/private/tmp/starling-node-compat/zlib-cost-source-v3');ix=data(row(publication/'index.json'));need(len(tooltrees['trees'])==2 and len(tooltrees['links'])==len(ix['links'])==22,'two tool trees/22 typed links')
+need(publication.stat().st_ino==ix['rootIdentity']['inode']and publication.stat().st_dev==ix['rootIdentity']['device'],'same actual publication root inode')
+actual_files=set();actual_dirs=set();actual_links=set()
+for parent,dirs,files in os.walk(publication,followlinks=False):
+ for n in dirs+files:
+  p=Path(parent)/n;relative=p.relative_to(publication).as_posix()
+  if p.is_symlink():actual_links.add(relative)
+  elif p.is_dir():actual_dirs.add(relative)
+  else:need(p.is_file(),'ordinary actual publication member');actual_files.add(relative)
+need(actual_files=={r['path']for r in ix['files']}|{'index.json','completion.json'}and actual_dirs==set(ix['directories'])and actual_links=={r['destination']for r in tooltrees['links']},'whole actual publication membership')
+for r in tooltrees['links']:
+ p=publication/r['destination'];need(os.readlink(p)==r['newLinkText']and p.resolve()==publication/r['mappedTarget'],'all exact link texts and mapped targets')
+for tree in tooltrees['trees']:
+ actual={n for n in actual_files|actual_links|actual_dirs if n.startswith(tree['publicationRoot']+'/')};wanted={r['destination']if'destination'in r else tree['publicationRoot']+'/'+r['path']for r in tree['entries']};need(actual==wanted,'full typed tool-tree membership')
+ for r in tree['entries']:
+  if r['kind']=='file':verify(dict(path=str(publication/r['destination']),sha256=r['sha256'],bytes=r['bytes']))

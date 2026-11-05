@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "state": "REVIEWER_ONLY_COMMENT_SUBSTRING_ASSUMPTION_CORRECTED",
+  "beforeReaderSha256": "4aa29f31e21b1e7d9e894e984950c25c4d86f1b22ba1de4104f97cb98b452519",
+  "before": "need('subprocess' not in text and 'importlib' not in text and \"open('w\" not in text and \"open('x\" not in text and 'write_bytes(' not in text, 'no helper imports, process launch or writes')",
+  "after": "need(not any(isinstance(v, ast.Call) and ((isinstance(v.func, ast.Name) and v.func.id in ['__import__', 'eval', 'exec']) or (isinstance(v.func, ast.Attribute) and v.func.attr in ['write_text', 'write_bytes', 'Popen', 'run', 'system'])) for v in ast.walk(tree)) and all(not any(isinstance(a, ast.Constant) and isinstance(a.value, str) and any(c in a.value for c in 'wax+') for a in v.args[1:]) for v in ast.walk(tree) if isinstance(v, ast.Call) and isinstance(v.func, ast.Attribute) and v.func.attr == 'open'), 'AST has no dynamic imports, process calls or write-mode opens')",
+  "count": 1,
+  "cause": "The module docstring contains subprocesses; substring matching mistook commentary for an operation.",
+  "sealedCandidateChanged": false,
+  "completeVerifierInvoked": false,
+  "afterReaderSha256": "7d2bcfad691d1165015122c24c033f78b5f111ded417cdb74af08bdcbcb01473"
+}

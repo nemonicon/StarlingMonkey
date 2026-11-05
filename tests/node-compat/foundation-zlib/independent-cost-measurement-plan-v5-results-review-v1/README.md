@@ -1,0 +1,11 @@
+# Actual V5 read-only plan review
+
+DATA PASS for the fresh V5 plan `7f019952…fdfb14`, source e799 and independent source review 553b. Actual Node PID8510 exited zero with empty stderr, no timeout/signals/forced cleanup and all observed groups gone. The exact three-file private publication, relative stdout/completion rows and separate confined absolute descriptors were checked. Original Root observations remain unchanged.
+
+All 90 expected rows were reconstructed from five complete deterministic raw fixtures, 60 actual retained encoder streams and the 15 Node stream associations. Whole bytes, SHA-256 and FNV were recomputed as DATA; no codec ran. All three artifact maps match the existing full correctness, stock Wasmtime transport, separate 540-control and independently reviewed construction proofs. The two physical tool trees retain all 22 links and exact source-publication membership.
+
+The original B5 calibration remains B5: actual review 64472, complete actual 7df index/2d96 results, cases8cd and e545 matched plan are explicit separate DATA roles. All 60 calibration records reproduce all 120 actual matched N/budget rows. The new plan's source identity is V5; no old V4 plan was relabelled or used to derive expected values. Full finite source/proof/native/tool provenance covers 59,878 physical inputs and 900,991 data checks.
+
+Only standard read/hash/base64/FNV/arithmetic and Python AST work ran in this review. Genuine owner admission/preflight functions, generated code, codecs, workers, guests and measurement did not run. Prior reader utilities and reconstruction source were copied into this review's explicit current context; old action states or globals were not rebound. Three reviewer-only preparation/reader mistakes are retained in `reader-history.json`.
+
+This verdict grants no timing authority. Fresh exact Root timing phase, quiet-window and global-budget files remain required. Historical pending-control fields remain literal, alongside the separate actual-control proof. Root helper completion is source/control-flow and terminal supported, without separate internal helper traces. The existing pilot review remains the authority for its raw-call analysis; this review rehashed those inputs rather than rerunning the pilot. No performance, significance, guest heap/capacity, cold startup, reuse or adoption conclusion follows.

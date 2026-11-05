@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "state": "RESOURCE_CLOCK_IMPORT_GRAPH_SOURCE_WORK_PROPOSAL_NOT_AUTHORITY_V1",
+  "currentSelectedInterfaces": [
+    "wasi:clocks/monotonic-clock@0.2.10",
+    "wasi:io/poll@0.2.10"
+  ],
+  "currentPolicyWidened": false,
+  "currentTimerComponentAdmitted": false,
+  "removeOrWeakenSevenGuestCases": false,
+  "reason": "The extra bindings are retained by selected packaging/core/adapter structure. Editing away assertions or guest cases would not establish the intended native clock/resource boundary.",
+  "actualGraphFindings": [
+    "Pure component has one core, no component/core imports, one public run() -> string export; no ordinary call observed.",
+    "Timer component has four cores. Engine core0 retains thirteen function imports: poll/stream resource operations, three monotonic functions and Preview1 clock_time_get.",
+    "Preview1 clock_time_get resolves via generated core2 table slot5 and core3 element fixup to core1.clock_time_get.",
+    "Core1 has callable wall-clock.now, monotonic.now, stderr.get-stderr, streams.blocking-write-and-flush and resource-drop bindings. Wall-clock and stream write pass through generated table slots6/7 to canonical root functions.",
+    "Root io/error has no explicit function exports, but its error resource is used by a canonical resource-drop import. Resource-only does not justify calling the interface absent or behavior-free.",
+    "The actual Rust Clocks feature retains all combined IO by has_io. stub_stdio affects the engine's imports before later adapter wiring; core0 has no get-stderr import, while core1 does.",
+    "Native clock_gettime explicitly routes both CLOCK_REALTIME and CLOCK_MONOTONIC through Preview1 clock_time_get, and wizen also uses that import. This is source evidence, not a runtime Date/clock observation."
+  ],
+  "recommendedDependencyOrder": [
+    {
+      "step": 1,
+      "work": "Keep the captured failure and strict2 selector unchanged. Preserve the original7-case resource guest, native Buffer resolver, all9 manifests and native20e/fec7 frame."
+    },
+    {
+      "step": 2,
+      "work": "Specify the clock semantic profile before a source correction. Full Date/realtime support can justify an explicit separately reviewed wall-clock requirement; do not freeze or disable that broader roadmap merely to fit2 interfaces. No new expected set is granted here."
+    },
+    {
+      "step": 3,
+      "work": "For a bounded clock-only packaging profile, derive a new immutable splicer source cut from the actual a8bd stub_wasi.rs. Audit splitting combined stub_io handling so Clocks preserves required poll/resource operations without automatically retaining unused stream transport. Use genuine module rewriting APIs and preserve other Stdio/HTTP/world-import profiles. Do not set has_io false wholesale because that also stubs required poll operations."
+    },
+    {
+      "step": 4,
+      "work": "Separately inspect the real selected Preview1 adapter clock/error path before pruning its stderr/streams/error dependencies. The import graph proves bindings, not internal branch reachability or that diagnostic calls are dead. Engine-only stub_stdio cannot remove the later adapter's imports. Any adapter/source correction requires its own exact source/tool derivation and failure semantics review; no custom host or helper interception."
+    },
+    {
+      "step": 5,
+      "work": "Only after source review and a new explicit Root construction phase, capture full new component bytes before admission and independently decode the entire resulting root/core/type graph. Fail unexpected interfaces; do not automatically accept all6. New packaging/source/artifact identities remain distinct from these historical outputs."
+    },
+    {
+      "step": 6,
+      "work": "A later genuine asynchronous guest execution gate must test timer/resource order, cancellation/error propagation, realtime/monotonic semantics and any selected capability contract. No runtime or host action follows from this DATA review."
+    }
+  ],
+  "futureExpectedInterfaces": null,
+  "futureSourceIndex": null,
+  "futureRootAuthority": null,
+  "futureComponent": null,
+  "runtimeAuthority": null,
+  "operationalAdmission": false,
+  "runtimeAcceptanceClaim": false,
+  "sourceOnlyFutureProposal": true
+}

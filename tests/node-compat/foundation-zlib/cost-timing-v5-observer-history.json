@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "state": "ROOT_TIMING_V5_OBSERVER_SAMPLE_CLASSIFICATION_CORRECTION_V1",
+  "beforeObserverSha256": "9a9c704bd0f4a69c3bd363e32bee313393f6964bf2d523902f3d1210a6815fb4",
+  "before": "calls += len(value['records']); samples += sum(r['timed'] is True for r in value['records'])",
+  "after": "assert len(value['codec']) == 10 and len(value['controls']) == 6\n        calls += len(value['records']); samples += sum(r['timed'] is True for r in value['codec'])",
+  "count": 1,
+  "initialObserverExitCode": 1,
+  "cause": "Timed flags also mark six N1 control operations per worker; measured codec samples must be counted within the ten codec records.",
+  "actualOriginalTimedFlagsIncludeControls": true,
+  "actualTimingSourceOrOutputChanged": false,
+  "workerOrCodecOrTimingActionsRepeated": false,
+  "secondaryInspection": "A one-off schema inspection spacing typo was corrected before reading the retained JSON.",
+  "afterObserverSha256": "5de02d2a6b4ba9beafbbd42d7f82ceddae4db1558e57a6a81ff8acc99cdfd200"
+}

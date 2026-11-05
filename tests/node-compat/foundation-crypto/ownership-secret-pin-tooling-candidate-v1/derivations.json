@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "donor": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-secret-freezer-candidate-v1/artifact-tools/artifact_common.py",
+    "sha256": "7f4e941e35cdd1f65ed1ff4ab9dbb4400001e04aa7cfa91dcf4b4a1fddd2c461",
+    "bytes": 9376
+  },
+  "exactPureFunctions": [
+    {
+      "name": "manifest",
+      "source": "def manifest(rows, count):\n    assert isinstance(rows, list) and len(rows) == count\n    seen = set()\n    for row in rows:\n        assert set(row) == {'path', 'sha256'}\n        name = row['path']\n        assert isinstance(name, str) and name and '\\0' not in name and '\\\\' not in name\n        assert not Path(name).is_absolute() and all(p not in ('', '.', '..') for p in name.split('/'))\n        assert name not in seen and re.fullmatch(r'[a-f0-9]{64}', row['sha256'])\n        seen.add(name)\n    return rows",
+      "exact": true
+    },
+    {
+      "name": "exact_release",
+      "source": "def exact_release(words):\n    assert [word for word in words if word.startswith('-O')]==['-O3'],'Exactly one Release optimization flag required'\n    assert [word for word in words if word=='-DNDEBUG'or word.startswith('-DNDEBUG=')]==['-DNDEBUG'],'Exact NDEBUG definition required'\n    assert '-UNDEBUG'not in words and '-UDEBUG'not in words and not any(word.startswith('-DDEBUG')for word in words)\n    assert not any(word=='-DNODE_COMPAT_OOM_TESTING'or word.startswith('-DNODE_COMPAT_OOM_TESTING=')for word in words)\n    assert '-UNODE_COMPAT_OOM_TESTING'not in words",
+      "exact": true
+    },
+    {
+      "name": "compile_command",
+      "source": "def compile_command(command, runtime, source=None, classic=True, gc=False, zlib=True, consumers=True):\n    args = shlex.split(command)\n    assert args.count('-c') == 1 and '-fsyntax-only' not in args\n    assert '-D' not in args and '-U' not in args, 'Need captured joined macro arguments'\n    exact_release(args)\n    for flag in ('NODE_COMPAT_INTERNAL_TICKS', 'NODE_COMPAT_STRICT_INITIALIZATION',\n                 'NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER', 'NODE_COMPAT_ENTROPY_POLICY'):\n        definitions = [x for x in args if x == '-D' + flag or x.startswith('-D' + flag + '=')]\n        assert definitions == ['-D' + flag + '=1'], flag\n        assert '-U' + flag not in args, flag\n    runtime_definitions = [x for x in args if x == '-DNODE_COMPAT_ENTROPY_RUNTIME_ONLY' or x.startswith('-DNODE_COMPAT_ENTROPY_RUNTIME_ONLY=')]\n    assert runtime_definitions == (['-DNODE_COMPAT_ENTROPY_RUNTIME_ONLY=1'] if runtime else [])\n    assert '-UNODE_COMPAT_ENTROPY_RUNTIME_ONLY' not in args\n    if source is not None:\n        assert args[args.index('-c') + 1].endswith('/' + source), 'Compiler input disagrees with recorded native source'\n        for flag, enabled in (\n                ('NODE_COMPAT_STREAM_CONSUMERS', consumers and source.startswith('builtins/node-compat/')),\n                ('NODE_COMPAT_ZLIB', zlib and source.startswith('builtins/node-compat/')),\n                ('NODE_COMPAT_CLASSIC_STREAMS', classic and source.startswith('builtins/node-compat/')),\n                ('NODE_COMPAT_STREAM_WEB', source.startswith('builtins/node-compat/')),\n                ('NODE_COMPAT_GC_STRESS', gc and source.startswith('builtins/node-compat/'))):\n            definitions = [x for x in args if x == '-D' + flag or x.startswith('-D' + flag + '=')]\n            assert definitions == (['-D' + flag + '=1'] if enabled else []), flag\n            assert '-U' + flag not in args, flag\n    return args",
+      "exact": true
+    },
+    {
+      "name": "embedding_command",
+      "source": "def embedding_command(raw, source):\n    selected = []\n    for line in raw.decode('utf-8').splitlines():\n        if ' -c ' not in line:\n            continue\n        args = shlex.split(line)\n        if args.count('-c') == 1 and args[args.index('-c') + 1] == source:\n            selected.append(line)\n    assert len(selected) == 1, 'Need exactly one actual parent embedding compile command'\n    return selected",
+      "exact": true
+    }
+  ],
+  "metadataPredicate": {
+    "donorFunction": "classify",
+    "edits": [
+      {
+        "before": "SOURCE_POLICY",
+        "after": "source_policy",
+        "count": 4
+      },
+      {
+        "before": "==RECIPE",
+        "after": "==recipe_sha256",
+        "count": 1
+      },
+      {
+        "before": "label in LABELS",
+        "after": "label in ('normal-off',)",
+        "count": 1
+      },
+      {
+        "before": "def classify(metadata,label):",
+        "after": "def validate_metadata(metadata,label,source_policy,recipe_sha256):",
+        "count": 1
+      }
+    ],
+    "newFunction": "validate_metadata"
+  },
+  "oldCommonModuleImportedOrGlobalsRebound": false
+}

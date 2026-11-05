@@ -66,10 +66,16 @@ refs['actualPilotIndex']=actual['actualIndex'];refs['actualPilotResults']=actual
 data=D/'actual-pilot-review.DATA.json'
 refs['actualCalibrationReview']=json.loads(data.read_bytes())if data.exists()else None
 write('references.json',refs)
-write('source-derivations.json',dict(schemaVersion=1,donorIndex=old_index,files=proof,oldActualCalibrationUnchanged=True,oldCalibrationSourceNotRelabelled=True,newScope='read-only-plan-and-timing-only'))
 future=json.loads((OLD/'future-authority.template.json').read_bytes());future['state']='ROOT_REVIEWED_ZLIB_COST_PILOT_TIMING_PHASE_V1';future['calibrationSourceIndex']=None
 write('future-authority.template.json',future)
-write('future-plan-authority.template.json',json.loads((OLD/'future-plan-authority.template.json').read_bytes()))
+future_plan=json.loads((OLD/'future-plan-authority.template.json').read_bytes());future_plan['outputRoot']='/private/tmp/starling-node-compat/zlib-cost-measurement-plan-v5'
+write('future-plan-authority.template.json',future_plan)
 write('future-source-review-contract.json',json.loads((OLD/'future-source-review-contract.json').read_bytes()))
-write('preparation-history.json',dict(schemaVersion=1,oldSourceAndActualRecordsUnchanged=True,oldDefects=['Actual33066 pilot output rows exceed the old contractedProof cap16384.','Old timing run body incorrectly demanded calibration proof sourceIndexSha256 equal the new own source SHA.'],sourceOnly=True,helperOrPreflightOrWorkerOrLoaderOrGuestOrMeasurementInvoked=False))
+templates=[]
+for name in('future-authority.template.json','future-plan-authority.template.json','future-source-review-contract.json'):
+ templates.append(dict(donor=row(OLD/name),afterimage=name,donorValue=json.loads((OLD/name).read_bytes()),afterValue=json.loads((D/name).read_bytes()),dataOnlyUnissued=True))
+write('source-derivations.json',dict(schemaVersion=1,donorIndex=old_index,files=proof,templates=templates,oldActualCalibrationUnchanged=True,oldCalibrationSourceNotRelabelled=True,newScope='read-only-plan-and-timing-only'))
+history_file=D/'preparation-history.json';history=json.loads(history_file.read_bytes())if history_file.exists()else dict(schemaVersion=1)
+history.update(oldSourceAndActualRecordsUnchanged=True,oldDefects=['Actual33066 pilot output rows exceed the old contractedProof cap16384.','Old timing run body incorrectly demanded calibration proof sourceIndexSha256 equal the new own source SHA.'],sourceOnly=True,helperOrPreflightOrWorkerOrLoaderOrGuestOrMeasurementInvoked=False,currentPreparationState='UNSEALED_TIMING_ONLY_SOURCE_RESUMED',inheritedPlanTemplateCorrectedToV5=True,actualPilotReviewBound=refs['actualCalibrationReview']is not None)
+write('preparation-history.json',history)
 print(json.dumps(dict(derivedFiles=len(proof),edits=sum(len(p['edits'])for p in proof),pilotReviewDataBound=refs['actualCalibrationReview']is not None,sourceOnly=True)))
