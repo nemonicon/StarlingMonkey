@@ -82,6 +82,7 @@ def rejects(call, note):
 
 
 def main():
+    assert not (HERE/'index.json').exists(), 'Use an independent read-only review after seal'
     refs = read(HERE/'references.json')
     for row in refs['families']:
         indexed(row['index'])
@@ -146,6 +147,12 @@ def main():
     check('"$stress" == 0 && "$entropy_mode" == OFF' in recipe,'normal-OFF first refusal')
     check('"$repo_root" == "'+refs['configuredSourceRoot']+'"' in recipe,'exact configured source context')
     check('"$work_root" == "'+refs['workRoot']+'"' in recipe,'exact work context')
+    helper=(HERE/'layer-policy.py').read_text()
+    admission=(HERE/'build-admission.mjs').read_text()
+    check("assert metadata['gcStress']is False and metadata['entropyPolicy']=='off'" in helper,'actual decorator refuses future variants')
+    check("assert.equal(metadata.gcStress,false,'Initial secret producer is normal-OFF only')" in admission,'build source validator normal-only')
+    check("assert.equal(metadata.entropyPolicy,'off','Later runtime-entropy source is not implemented')" in admission,'build source validator OFF-only')
+    check('return Object.freeze({cryptoSecretFailureSourcePolicy:policy.cryptoSecretFailureSourcePolicy,' in admission,'source validator returns exact new source identity')
     check('consumers_layer_root="$repo_root/tests/node-compat/foundation-crypto/ownership-secret-integration-candidate-v1"' in recipe,'genuine new helper location')
     # Parse only embedded Python from the actual derived shell source.
     lines=recipe.splitlines();embedded=0;i=0
@@ -210,12 +217,62 @@ def main():
     check("after_refs, after_rows = inputs(expected)" in stage and "failureInputRecheckPassed" in stage,'final and failure input rechecks present')
     check('normal_protection(refs)' in stage and 'requiredNormalFreezeMembership' in stage,'normal protection authentic source seam')
     check('endswith(' not in stage and 'importlib' not in stage,'no suffix/custom helper import seam')
+    check(stage.index("target = regular(dict(path=str(DEST/row['path'])")>stage.index('assert after_refs == refs and after_rows == rows'),'full destination recheck after final input authentication')
     check('HERE =' not in (HERE/'layer-policy.py').read_text().split('def decorate')[1],'no helper global root rebinding')
     for key,value in read(HERE/'future-authority.json').items():
         if key not in ['schemaVersion','state']:
             check(value is None or value is False,'unissued activation '+key)
     for key in ['configuredSourceRoot','workRoot','freezeRoot','stageJournal']:
         check(not Path(read(HERE/'phase-plan.json')[key]).exists(),'no action destination '+key)
+
+    # Finite actual custom-module dependency closure; no module is imported.
+    by_path={r['path']:r for r in tools}
+    own_prefix=str(HERE.relative_to(REPO))
+    module_roles={
+        own_prefix+'/stage.py':'standalone standard-library stage entry; no custom imports',
+        'tests/node-compat/build-engine.sh':'new configured recipe, four embedded Python blocks',
+        own_prefix+'/layer-policy.py':'new exact355 helper used for source capture/decorate',
+        'tests/node-compat/foundation-scheduler/integration-candidate-v1/layer-policy.py':'actual unchanged private scheduler306 parent',
+        'tests/node-compat/foundation-zlib/native-integration-candidate-v4/codec-evidence.py':'actual selected-codec source/compile/link witness helper',
+        own_prefix+'/build-admission.mjs':'new explicit build-only source validator; operational entry closed',
+        'tests/node-compat/foundation-zlib/native-integration-candidate-v4/compile-input.mjs':'actual pure selected-codec captured-command grammar'
+    }
+    module_rows=[]
+    for name,role in module_roles.items():
+        if name==own_prefix+'/stage.py':
+            path=HERE/'stage.py';raw=path.read_bytes()
+            row=dict(path=name,original=str(path),sha256=hashlib.sha256(raw).hexdigest(),bytes=len(raw))
+        else:
+            check(name in by_path,'actual custom dependency in finite tool closure '+name)
+            row=by_path[name]
+        regular(dict(path=row['original'],sha256=row['sha256'],bytes=row['bytes']))
+        module_rows.append(dict(**row,role=role))
+    parent_helper=Path(by_path['tests/node-compat/foundation-scheduler/integration-candidate-v1/layer-policy.py']['original']).read_text()
+    check('importlib' not in parent_helper and 'spec_from_file_location' not in parent_helper,'actual lower helper custom-import terminal')
+    codec_helper=Path(by_path['tests/node-compat/foundation-zlib/native-integration-candidate-v4/codec-evidence.py']['original']).read_text()
+    check('importlib' not in codec_helper and 'spec_from_file_location' not in codec_helper,'actual codec helper custom-import terminal')
+    check('PARENT_ROOT=HERE.parents[1]/\'foundation-scheduler/integration-candidate-v1\'' in helper,'new helper imports genuine lower parent context')
+    check("'foundation-zlib/native-integration-candidate-v4/codec-evidence.py'" in helper,'new helper imports exact codec path')
+    check("from '../../foundation-zlib/native-integration-candidate-v4/compile-input.mjs'" in admission,'admission actual import path resolves to declared module')
+    check('spec_from_file_location' not in parent_helper,'no inherited owner layer dynamically imported')
+    check('native-integration-candidate-v2/artifact-tools/artifact_common.py' not in recipe+helper+admission+stage,'old owner common absent from executable caller paths')
+    phase=read(HERE/'phase-plan.json')
+    for role in ['sourceStage','normalOffBuild','normalOffFreeze','laterGcBuild','laterRuntimeEntropy']:
+        check(phase[role]['launchAllowed'] is False,'all current phase launch slots closed')
+    put('caller-bindings.json',dict(schemaVersion=1,sourceOnly=True,ownerModulesImported=False,
+        finiteActualCustomCodeModules=module_rows,
+        edges=[['stage.py','standard-library only'],['configured build-engine.sh','layer-policy.py'],
+               ['layer-policy.py','foundation-scheduler/integration-candidate-v1/layer-policy.py'],
+               ['layer-policy.py','foundation-zlib/native-integration-candidate-v4/codec-evidence.py'],
+               ['build-admission.mjs','foundation-zlib/native-integration-candidate-v4/compile-input.mjs']],
+        metadataIdentity=dict(sourceManifest='complete exact current355',
+            inheritedOwnerPolicy='cryptoKeyOwnershipPolicy ancestry DATA',
+            currentSecretPolicy='cryptoSecretFailureSourcePolicy',
+            changedActualCompileCommands='cryptoSecretFailureBuildEvidence.changedNativeCompileCommands, two CPPs',
+            initialVariant='normal-off'),
+        activeArtifactCommon=None,activeFreezeHelper=None,activeBuildController=None,
+        noGlobalContextRebinding=True,noOldMetadataProjection=True,
+        scope='Finite explicit custom-module source closure; external compiler/build dependencies still need genuine future controller/runtime capture'))
     # Finite stage-plan DATA: own-family rows/index are added by stage only after seal.
     plan={}
     for r in rows+tools:
@@ -234,6 +291,7 @@ def main():
         sourceOnly=True,checks=checks,uniqueReadHashInputs=len(inputs),nativeSourceFiles=355,
         unchangedNativeSources=352,correctedAfterimages=3,toolRows=len(tools),baseStageRows=len(plan),
         exactTextDerivations=3,exactTextEdits=edits,policyReversal=True,pythonAstFiles=pyfiles,
+        actualCustomCodeModules=len(module_rows),
         embeddedPythonAstBlocks=embedded,pureExtractedFunctions=['source_manifest','_macro','_release','authority_model'],
         sourcePeerActivation=None,rootActivation=None,helperImported=False,ownerActionsInvoked=False,
         compilerInvoked=False,nodeInvoked=False,stageExecuted=False,nativeBuildExecuted=False,

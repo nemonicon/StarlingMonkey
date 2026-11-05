@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "checks": 24904,
+  "uniqueReadHashInputs": 575,
+  "sourceMembers": 32,
+  "preparationInputs": 540,
+  "nativePaths": 342,
+  "unchangedResourceSources": 339,
+  "nativeReplacements": 3,
+  "baseStageRows": 533,
+  "dynamicStageTargets": 566,
+  "exactDerivations": [
+    {
+      "kind": "helper",
+      "edits": 5
+    },
+    {
+      "kind": "recipe",
+      "edits": 7
+    },
+    {
+      "kind": "model",
+      "edits": 3
+    },
+    {
+      "kind": "stage",
+      "edits": 10
+    }
+  ],
+  "expectedFunctionCases": 342,
+  "commandParserOldDataPositive": 1,
+  "commandParserNegatives": 11,
+  "oldMetadataRejected": true,
+  "positiveMetadataFabricated": false,
+  "pythonAst": [
+    "check-source.py",
+    "layer-policy.py",
+    "native-admission-model.py",
+    "prepare-source.py",
+    "seal.py",
+    "stage.py"
+  ],
+  "embeddedPythonAst": [
+    "PY",
+    "PYINPUT",
+    "PYEMBED",
+    "PY"
+  ],
+  "producerBashParseStored": true,
+  "reviewerBashOrNodeOrCompilerInvoked": false,
+  "actualNativeSelectorUses": [
+    {
+      "path": "host-apis/wasi-0.2.0/host_api.cpp",
+      "line": 22,
+      "text": "std::optional<size_t> api::AsyncTask::select(std::vector<RefPtr<AsyncTask>> &tasks) {"
+    },
+    {
+      "path": "runtime/event_loop.cpp",
+      "line": 291,
+      "text": "    auto selected = api::AsyncTask::select(*tasks);"
+    }
+  ],
+  "actualOptionalDeclaration": [
+    {
+      "path": "include/extension-api.h",
+      "line": 222,
+      "text": "  static std::optional<size_t> select(std::vector<RefPtr<AsyncTask>> &handles);"
+    }
+  ],
+  "externalEmbeddingSourcesRehashed": 3
+}

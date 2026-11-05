@@ -192,6 +192,11 @@ def main():
         after_refs, after_rows = inputs(expected)
         assert after_refs == refs and after_rows == rows
         authorize(descriptor, expected, refs)
+        for row in rows:
+            target = regular(dict(path=str(DEST/row['path']),sha256=row['sha256'],bytes=row['bytes']))
+            original = regular(dict(path=row['original'],sha256=row['sha256'],bytes=row['bytes']))
+            assert stat.S_IMODE(target.stat().st_mode) == row['sourceMode']
+            assert target.stat().st_ino != original.stat().st_ino or target.stat().st_dev != original.stat().st_dev
         result.update(state='SECRET_NATIVE355_SOURCE_STAGED_NOT_BUILT', copies=rows,
                       nativeSourceFiles=355, metadataProjected=False)
     except BaseException as error:

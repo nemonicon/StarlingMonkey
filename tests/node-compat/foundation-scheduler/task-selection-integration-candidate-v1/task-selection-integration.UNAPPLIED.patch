@@ -1,0 +1,59 @@
+--- a/include/extension-api.h
++++ b/include/extension-api.h
+@@ -1,5 +1,6 @@
+ #ifndef EXTENSION_API_H
+ #define EXTENSION_API_H
++#include <optional>
+ #include <vector>
+ 
+ #include "builtin.h"
+@@ -215,9 +216,10 @@
+   virtual void trace(JSTracer *trc) = 0;
+ 
+   /**
+-   * Select for the next available ready task, providing the oldest ready first.
+-   */
+-  static size_t select(std::vector<RefPtr<AsyncTask>> &handles);
++   * Select the oldest ready task after removing invalid tasks.
++   * Returns nullopt if pruning leaves no task; never polls an empty list.
++   */
++  static std::optional<size_t> select(std::vector<RefPtr<AsyncTask>> &handles);
+ };
+ 
+ } // namespace api
+--- a/host-apis/wasi-0.2.0/host_api.cpp
++++ b/host-apis/wasi-0.2.0/host_api.cpp
+@@ -19,11 +19,15 @@
+   return ready_index;
+ }
+ 
+-size_t api::AsyncTask::select(std::vector<RefPtr<AsyncTask>> &tasks) {
++std::optional<size_t> api::AsyncTask::select(std::vector<RefPtr<AsyncTask>> &tasks) {
+   // Remove tasks whose pollable handles have been invalidated (e.g. by abort).
+   std::erase_if(tasks, [](const RefPtr<AsyncTask> &task) {
+     return task->id() == INVALID_POLLABLE_HANDLE;
+   });
++
++  if (tasks.empty()) {
++    return std::nullopt;
++  }
+ 
+   auto count = tasks.size();
+   std::vector<WASIHandle<host_api::Pollable>::Borrowed> handles;
+--- a/runtime/event_loop.cpp
++++ b/runtime/event_loop.cpp
+@@ -288,7 +288,13 @@
+     }
+ 
+     // Select the next task to run according to event-loop semantics of oldest-first.
+-    size_t task_idx = api::AsyncTask::select(*tasks);
++    auto selected = api::AsyncTask::select(*tasks);
++    if (!selected) {
++      // Pruning invalidated tasks can empty the queue after the earlier test.
++      // Recheck jobs, failures and interest through the ordinary loop boundary.
++      continue;
++    }
++    const size_t task_idx = *selected;
+ 
+     JS::Rooted<TracedAsyncTask> running(cx);
+     running.get().task = tasks->at(task_idx);

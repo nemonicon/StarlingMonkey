@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "state": "UNAPPLIED_RESOURCE_TASK_SELECTION_SOURCE_V1",
+  "parentIntegrationIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/resource-integration-candidate-v1/index.json",
+    "sha256": "20e6bab4c34da81c6657341f4ae917e78614e9503d689d4b046fb14b980fc414",
+    "bytes": 5390
+  },
+  "parentFrozenReviewIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/independent-resource-normal-off-frozen-artifact-review-v1/index.json",
+    "sha256": "80b7174ebd968442fca77f465394d32d34fe583ecac01c159510c0b6c8b91794",
+    "bytes": 1582
+  },
+  "parentFrozenSourceRoot": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source",
+  "changes": [
+    {
+      "path": "include/extension-api.h",
+      "original": {
+        "path": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source/include/extension-api.h",
+        "sha256": "d743a7fcc0566eb85f382fec2f82b4c768a1043ca29b26e9fdef6f576e6789b8",
+        "bytes": 7219
+      },
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/task-selection-candidate-v1/before/include/extension-api.h",
+        "sha256": "d743a7fcc0566eb85f382fec2f82b4c768a1043ca29b26e9fdef6f576e6789b8",
+        "bytes": 7219
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/task-selection-candidate-v1/afterimages/include/extension-api.h",
+        "sha256": "6ffda8f2028cb214a18a2dd7faa4ab4d841ca6a214713c0dd1b5317fe9282804",
+        "bytes": 7312
+      },
+      "edits": [
+        {
+          "before": "#include <vector>",
+          "after": "#include <optional>\n#include <vector>",
+          "count": 1
+        },
+        {
+          "before": "   * Select for the next available ready task, providing the oldest ready first.\n   */\n  static size_t select(std::vector<RefPtr<AsyncTask>> &handles);",
+          "after": "   * Select the oldest ready task after removing invalid tasks.\n   * Returns nullopt if pruning leaves no task; never polls an empty list.\n   */\n  static std::optional<size_t> select(std::vector<RefPtr<AsyncTask>> &handles);",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "path": "host-apis/wasi-0.2.0/host_api.cpp",
+      "original": {
+        "path": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source/host-apis/wasi-0.2.0/host_api.cpp",
+        "sha256": "10ccb1f84f659195eddc1dab5f8152cdfaa21da660345d07563fa867e87e0a4c",
+        "bytes": 36424
+      },
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/task-selection-candidate-v1/before/host-apis/wasi-0.2.0/host_api.cpp",
+        "sha256": "10ccb1f84f659195eddc1dab5f8152cdfaa21da660345d07563fa867e87e0a4c",
+        "bytes": 36424
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/task-selection-candidate-v1/afterimages/host-apis/wasi-0.2.0/host_api.cpp",
+        "sha256": "e2594bf5f1ada6a941c7a8fec71ca86ce3f62c6f209bc913a701985bf7627631",
+        "bytes": 36492
+      },
+      "edits": [
+        {
+          "before": "size_t api::AsyncTask::select(std::vector<RefPtr<AsyncTask>> &tasks)",
+          "after": "std::optional<size_t> api::AsyncTask::select(std::vector<RefPtr<AsyncTask>> &tasks)",
+          "count": 1
+        },
+        {
+          "before": "  auto count = tasks.size();\n  std::vector<WASIHandle<host_api::Pollable>::Borrowed> handles;",
+          "after": "  if (tasks.empty()) {\n    return std::nullopt;\n  }\n\n  auto count = tasks.size();\n  std::vector<WASIHandle<host_api::Pollable>::Borrowed> handles;",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "path": "runtime/event_loop.cpp",
+      "original": {
+        "path": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source/runtime/event_loop.cpp",
+        "sha256": "d8be6e450c1f8566161db30f2736d883bc3953ec965fd6abee1bcfe961ec5e1a",
+        "bytes": 13028
+      },
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/task-selection-candidate-v1/before/runtime/event_loop.cpp",
+        "sha256": "d8be6e450c1f8566161db30f2736d883bc3953ec965fd6abee1bcfe961ec5e1a",
+        "bytes": 13028
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/task-selection-candidate-v1/afterimages/runtime/event_loop.cpp",
+        "sha256": "b7c374f2b35391bf194858eb5368fe4f867ce107b5ce890a1dca0a3547f127d1",
+        "bytes": 13268
+      },
+      "edits": [
+        {
+          "before": "    size_t task_idx = api::AsyncTask::select(*tasks);\n\n    JS::Rooted<TracedAsyncTask> running(cx);",
+          "after": "    auto selected = api::AsyncTask::select(*tasks);\n    if (!selected) {\n      // Pruning invalidated tasks can empty the queue after the earlier test.\n      // Recheck jobs, failures and interest through the ordinary loop boundary.\n      continue;\n    }\n    const size_t task_idx = *selected;\n\n    JS::Rooted<TracedAsyncTask> running(cx);",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "changedNativeFiles": 3,
+  "embeddingApiChange": "Existing api::AsyncTask::select return contract changes size_t to std::optional<size_t>; no new method. All native dependents must be rebuilt.",
+  "hostCapabilityChange": false,
+  "sourceApplied": false,
+  "nativeBuildExecuted": false,
+  "componentExecuted": false,
+  "operationalAdmission": false
+}

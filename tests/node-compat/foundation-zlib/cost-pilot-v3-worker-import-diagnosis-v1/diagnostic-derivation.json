@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "before": "check-pre-output-guards.mjs",
+  "after": "check-pre-output-guards-after-environment-model.mjs",
+  "prefixAdded": "import {measurementEnvironmentModel} from './darwin-environment-proposal.mjs';\n",
+  "replacements": [
+    {
+      "before": "stage='execution-environment';need(process.version==='v22.14.0'&&process.execArgv.length===0&&same(Object.fromEntries(Object.entries(process.env).sort()),Object.fromEntries(Object.entries(MEASUREMENT_ENV).sort())),'pinned Node and exact environment');",
+      "after": "stage='proposed-execution-environment';need(process.version==='v22.14.0'&&process.execArgv.length===0&&measurementEnvironmentModel(process.env,{platform:process.platform,uid:process.getuid?.()}),'pinned Node and narrow proposed environment model');"
+    }
+  ],
+  "modelOnly": true,
+  "genuineWorkerChanged": false
+}

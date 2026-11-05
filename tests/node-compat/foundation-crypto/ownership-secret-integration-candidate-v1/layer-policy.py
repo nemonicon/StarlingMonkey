@@ -9,7 +9,7 @@ import sys
 sys.dont_write_bytecode=True
 if not __debug__:raise RuntimeError('Source policy checks require assertions')
 HERE=Path(__file__).resolve().parent
-POLICY_SHA256='b64378980f64db7c7602a296e584c18ee003d284f2a3e929be25fb08c16a0497'
+POLICY_SHA256='cb35fec0a5628110a046cef0a51ffed058ffd31b2a732d94711fabda08b4a612'
 PARENT_POLICY_SHA256='98e80d36b8eb9b7ac99de54832288bd8eec148fa1b9fe0b27b3bada4d12b2cd0'
 PARENT_HELPER_SHA256='78521feeefe299360228e5db76bfde0b11e6eeee93bd2374cd39b2fe695b610c'
 def digest(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -153,6 +153,7 @@ def validate_classic_compilation(entries,embedding,repo,metadata):
     assert len(embedding)==1 and len(private)==(5 if web else 4)+int(metadata['zlibEnabled'])
     return [row['command']for row in rows],queue,private
 def decorate(metadata,repo,source_dir,entries,embedding_commands,enabled):
+    assert metadata['gcStress']is False and metadata['entropyPolicy']=='off','Only initial normal-OFF secret source producer is implemented'
     validate_sources(repo,metadata['sourceManifest'])
     assert type(enabled)is bool and metadata['internalTicksEnabled']is enabled
     choice='ON'if metadata['classicStreamsEnabled']else'OFF'

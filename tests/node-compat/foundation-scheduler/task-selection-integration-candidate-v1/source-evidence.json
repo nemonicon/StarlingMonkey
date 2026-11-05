@@ -1,0 +1,189 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "relativePath": "CMakeLists.txt",
+      "descriptor": {
+        "path": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source/CMakeLists.txt",
+        "sha256": "880dbef157355efd97802fc630e5d61ffd97940ea9b7dbba42f1f0d077454df9",
+        "bytes": 5686
+      },
+      "lines": [
+        {
+          "line": 49,
+          "text": "add_library(extension_api INTERFACE include/extension-api.h runtime/encode.h runtime/decode.h)"
+        },
+        {
+          "line": 73,
+          "text": "    runtime/event_loop.cpp"
+        },
+        {
+          "line": 84,
+          "text": "target_link_libraries(starling-raw.wasm PRIVATE host_api extension_api builtins spidermonkey rust-crates)"
+        }
+      ]
+    },
+    {
+      "relativePath": "cmake/build-crates.cmake",
+      "descriptor": {
+        "path": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source/cmake/build-crates.cmake",
+        "sha256": "b4f4a71a07f484f5d76abf6b1f63671e6c2a378a281b36e79c506afcf6b14798",
+        "bytes": 3094
+      },
+      "lines": [
+        {
+          "line": 30,
+          "text": "corrosion_import_crate("
+        },
+        {
+          "line": 48,
+          "text": "add_rust_lib(rust-hooks \"${CMAKE_CURRENT_SOURCE_DIR}/crates/rust-hooks\")"
+        },
+        {
+          "line": 57,
+          "text": "add_rust_lib(rust-url \"${CMAKE_CURRENT_SOURCE_DIR}/crates/rust-url\")"
+        }
+      ]
+    },
+    {
+      "relativePath": "cmake/builtins.cmake",
+      "descriptor": {
+        "path": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source/cmake/builtins.cmake",
+        "sha256": "a618223e12d63b698062747f11ba047ec84f858bea752466730712817b3edac2",
+        "bytes": 10521
+      },
+      "lines": []
+    },
+    {
+      "relativePath": "cmake/add_builtin.cmake",
+      "descriptor": {
+        "path": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source/cmake/add_builtin.cmake",
+        "sha256": "f6400ac768b555d08dcc29255fd1b9f6d170a434917fa4de74ee2b308aa9b03a",
+        "bytes": 4419
+      },
+      "lines": []
+    },
+    {
+      "relativePath": "host-apis/wasi-0.2.10/host_api.cmake",
+      "descriptor": {
+        "path": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source/host-apis/wasi-0.2.10/host_api.cmake",
+        "sha256": "2762ac595ee3cfab7e3975ddbe62b6ac5bbccbd99952c8362a0d3e823bce1e1b",
+        "bytes": 809
+      },
+      "lines": [
+        {
+          "line": 4,
+          "text": "add_library(host_api STATIC"
+        },
+        {
+          "line": 5,
+          "text": "        ${WASI_0_2_0}/host_api.cpp"
+        }
+      ]
+    },
+    {
+      "relativePath": "runtime/crates/staticlib-template/Cargo.lock",
+      "descriptor": {
+        "path": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source/runtime/crates/staticlib-template/Cargo.lock",
+        "sha256": "46a469ce88f8334da3cd64872191b927eb969c84f8c08b58c8ec2501b205b30a",
+        "bytes": 11081
+      },
+      "lines": []
+    },
+    {
+      "relativePath": "crates/rust-hooks/src/lib.rs",
+      "descriptor": {
+        "path": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source/crates/rust-hooks/src/lib.rs",
+        "sha256": "63e0f2aa294128bd1515c276bd96969324bda7f12732cf2611e4b5c128631d1a",
+        "bytes": 3707
+      },
+      "lines": []
+    },
+    {
+      "relativePath": "crates/rust-hooks/src/wrappers.cpp",
+      "descriptor": {
+        "path": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source/crates/rust-hooks/src/wrappers.cpp",
+        "sha256": "5305ee87ba0d01dda2b73f22793080a3ca46366e61720183d95f499048ef1b0b",
+        "bytes": 954
+      },
+      "lines": []
+    },
+    {
+      "relativePath": "runtime/event_loop.cpp",
+      "descriptor": {
+        "path": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source/runtime/event_loop.cpp",
+        "sha256": "d8be6e450c1f8566161db30f2736d883bc3953ec965fd6abee1bcfe961ec5e1a",
+        "bytes": 13028
+      },
+      "lines": [
+        {
+          "line": 191,
+          "text": "inline bool interest_complete() { return queue.get().interest_cnt == 0; }"
+        },
+        {
+          "line": 277,
+          "text": "    if (interest_complete()) {"
+        },
+        {
+          "line": 284,
+          "text": "    if (tasks_size == 0) {"
+        },
+        {
+          "line": 286,
+          "text": "      MOZ_ASSERT(!interest_complete());"
+        },
+        {
+          "line": 291,
+          "text": "    size_t task_idx = api::AsyncTask::select(*tasks);"
+        }
+      ]
+    },
+    {
+      "relativePath": "include/extension-api.h",
+      "descriptor": {
+        "path": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source/include/extension-api.h",
+        "sha256": "d743a7fcc0566eb85f382fec2f82b4c768a1043ca29b26e9fdef6f576e6789b8",
+        "bytes": 7219
+      },
+      "lines": [
+        {
+          "line": 220,
+          "text": "  static size_t select(std::vector<RefPtr<AsyncTask>> &handles);"
+        }
+      ]
+    },
+    {
+      "relativePath": "host-apis/wasi-0.2.0/host_api.cpp",
+      "descriptor": {
+        "path": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source/host-apis/wasi-0.2.0/host_api.cpp",
+        "sha256": "10ccb1f84f659195eddc1dab5f8152cdfaa21da660345d07563fa867e87e0a4c",
+        "bytes": 36424
+      },
+      "lines": [
+        {
+          "line": 22,
+          "text": "size_t api::AsyncTask::select(std::vector<RefPtr<AsyncTask>> &tasks) {"
+        }
+      ]
+    },
+    {
+      "relativePath": "builtins/web/timers.cpp",
+      "descriptor": {
+        "path": "/private/tmp/starling-node-compat/scheduler-resource-v1-freeze/source/builtins/web/timers.cpp",
+        "sha256": "0024d009d11aab0705789f5d72fd8ec87deec9c44bdd8b913d970257aaadc9e4",
+        "bytes": 9077
+      },
+      "lines": [
+        {
+          "line": 38,
+          "text": "class TimerTask final : public api::AsyncTask {"
+        },
+        {
+          "line": 189,
+          "text": "  REQUEST_HANDLER_ONLY(repeat ? \"setInterval\" : \"setTimeout\");"
+        }
+      ]
+    }
+  ],
+  "scope": "Pinned source citations; no CMake/Rust/native action, registration or packaging validation executed."
+}

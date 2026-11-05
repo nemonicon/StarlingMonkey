@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "donor": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/resource-pin-tooling-candidate-v1/data_io.py",
+    "sha256": "4a70858570d873b2f9712a59c8766e5dedac2d1b9535dafac9aa64df65780432",
+    "bytes": 1968
+  },
+  "functions": [
+    {
+      "name": "descriptor",
+      "text": "def descriptor(row):\n assert type(row)is dict and set(row)=={'path','sha256','bytes'}\n assert type(row['path'])is str and row['path'].startswith('/')and not row['path'].startswith('//')and str(Path(row['path']))==row['path']and '\\\\'not in row['path']and '\\0'not in row['path']and '..'not in row['path'].split('/')\n assert type(row['bytes'])is int and row['bytes']>=0 and type(row['sha256'])is str and len(row['sha256'])==64 and all(c in'0123456789abcdef'for c in row['sha256'])\n return dict(row)",
+      "sha256": "bcd48404f98a9943a353f8b147fde9088fd8351a16ce79c1595087ea1000cf9b"
+    },
+    {
+      "name": "checked",
+      "text": "def checked(row):\n row=descriptor(row);p=Path(row['path']);physical=Path('/private'+str(p))if str(p).startswith('/tmp/')else p\n for q in(physical,*physical.parents):assert not q.is_symlink()\n a=physical.stat();assert stat.S_ISREG(a.st_mode);d=hashlib.sha256()\n with physical.open('rb')as f:\n  for chunk in iter(lambda:f.read(4*1024*1024),b''):d.update(chunk)\n b=physical.stat();assert(a.st_dev,a.st_ino,a.st_size,a.st_mtime_ns,a.st_ctime_ns)==(b.st_dev,b.st_ino,b.st_size,b.st_mtime_ns,b.st_ctime_ns)\n assert a.st_size==row['bytes']and d.hexdigest()==row['sha256'];return p",
+      "sha256": "67c13f473d82ae99dee5c0dc3719f28ad267c845a637473d77b4a235b7cd5f01"
+    },
+    {
+      "name": "read",
+      "text": "def read(row):\n assert row['bytes']<=32*1024*1024;raw=checked(row).read_bytes();assert len(raw)==row['bytes']and hashlib.sha256(raw).hexdigest()==row['sha256'];return json.loads(raw)",
+      "sha256": "f117b9ce2cb5f8e01a1f23d6b2ea56a82c9d72bb60d5ef895a6dc4d4b9f6742c"
+    },
+    {
+      "name": "family",
+      "text": "def family(row):\n x=read(row);base=Path(row['path']).parent;rows=[row];names=set()\n assert x['schemaVersion']==1 and 0<len(x['files'])<=2048\n for r in x['files']:\n  n=r['path'];assert n and not n.startswith('/')and '\\\\'not in n and all(p not in('','.','..')for p in n.split('/'))and n not in names;names.add(n);d=dict(path=str(base/n),sha256=r['sha256'],bytes=r['bytes']);checked(d);rows.append(d)\n assert not any(p.is_symlink()for p in base.rglob('*'))\n assert{p.relative_to(base).as_posix()for p in base.rglob('*')if p.is_file()}==names|{'index.json'};return rows",
+      "sha256": "446d2e3e6f63c89f002a7bd7d415bc87cf49e92226bb8054fa40d239a403d359"
+    }
+  ],
+  "inlineByteExact": true,
+  "noDonorModuleImported": true
+}

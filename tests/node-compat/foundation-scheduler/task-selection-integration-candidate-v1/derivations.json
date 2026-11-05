@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "helper": {
+    "donor": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/resource-integration-candidate-v1/layer-policy.py",
+      "sha256": "7fb23b7137686de85e488aebaed39fb50ff893ac8fd792c621bc9dd6fdebdeea",
+      "bytes": 13713
+    },
+    "afterimage": "layer-policy.py",
+    "edits": [
+      {
+        "before": "POLICY_SHA256='1f9d7de1115955c2fca5c171197eb85f5298f135dd9ea3bb5703412074aac842'",
+        "after": "POLICY_SHA256='32e8b5f61b0ad869a051ee317f02db7525af4e773c438e4203b26f07dd3babe6'",
+        "count": 1
+      },
+      {
+        "before": "def verify_resource_ancestry():\n    previous=HERE.parents[1]/'foundation-classic-streams/trace-integration-candidate-v1'\n    source=POLICY['resourceOwnershipSourcePolicy']\n    assert digest(previous/'policy.json')==source['parentPolicySha256']\n    assert digest(previous/'layer-policy.py')==source['parentHelperSha256']\n    old=json.loads((previous/'policy.json').read_bytes())\n    before={r['path']:r['sha256']for r in old['expectedNativeSourceManifest']}\n    after={r['path']:r['sha256']for r in POLICY['expectedNativeSourceManifest']}\n    assert len(before)==len(after)==342 and set(before)==set(after)\n    assert sum(before[p]==after[p]for p in before)==340\n    assert {r['path']for r in source['changes']}=={'builtins/web/timers.cpp','runtime/event_loop.cpp'}\n    for r in source['changes']:assert before[r['path']]==r['beforeSha256']and after[r['path']]==r['afterSha256']\n    assert POLICY['classicTraceSourcePolicy']==old['classicTraceSourcePolicy']\n    assert POLICY['embedding']==old['embedding']and POLICY['nativePatchSha256']==old['nativePatchSha256']\n    proposal=HERE.parent/'resource-ownership-candidate-v1'\n    assert digest(proposal/'index.json')==source['sourceCandidateIndexSha256']\n    for r in json.loads((proposal/'index.json').read_bytes())['files']:\n        path=proposal/r['path'];assert not path.is_symlink()and path.stat().st_size==r['bytes']and digest(path)==r['sha256']\n    peer=HERE.parent/'independent-resource-ownership-source-review-v1'\n    assert digest(peer/'index.json')==source['sourceReviewIndexSha256']\n    for r in json.loads((peer/'index.json').read_bytes())['files']:\n        path=peer/r['path'];assert not path.is_symlink()and path.stat().st_size==r['bytes']and digest(path)==r['sha256']\n    reviewed=json.loads((peer/'results.json').read_bytes())\n    assert reviewed['state']=='INDEPENDENT_SCHEDULER_RESOURCE_OWNERSHIP_SOURCE_REVIEW_PASSED_V1'and reviewed['sourceIndexSha256']==source['sourceCandidateIndexSha256']and reviewed['sourceOnly']is True and reviewed['sourceReviewPassed']is True and reviewed['ownerActionsInvoked']is False\n    return True\nverify_resource_ancestry()",
+        "after": "def checked_family(root, expected_index_sha256):\n    assert digest(root/'index.json')==expected_index_sha256\n    index=json.loads((root/'index.json').read_bytes());names=set()\n    for row in index['files']:\n        name=row['path'];assert name and not name.startswith('/') and all(p not in('','.','..')for p in name.split('/'))and name not in names;names.add(name)\n        path=root/name;assert path.is_file()and not path.is_symlink()and path.stat().st_size==row['bytes']and digest(path)==row['sha256']\n    assert not any(p.is_symlink()for p in root.rglob('*'))\n    assert {p.relative_to(root).as_posix()for p in root.rglob('*')if p.is_file()}==names|{'index.json'}\n    return index\ndef verify_task_selection_ancestry():\n    source=POLICY['taskSelectionSourcePolicy'];previous=HERE.parent/'resource-integration-candidate-v1'\n    checked_family(previous,source['parentIntegrationIndexSha256'])\n    assert digest(previous/'policy.json')==source['parentPolicySha256']\n    assert digest(previous/'layer-policy.py')==source['parentHelperSha256']\n    assert digest(previous/'proposed/tests/node-compat/build-engine.sh')==source['parentRecipeSha256']\n    old=json.loads((previous/'policy.json').read_bytes())\n    before={r['path']:r['sha256']for r in old['expectedNativeSourceManifest']}\n    after={r['path']:r['sha256']for r in POLICY['expectedNativeSourceManifest']}\n    assert len(before)==len(after)==342 and set(before)==set(after)\n    assert sum(before[p]==after[p]for p in before)==339\n    assert {r['path']for r in source['changes']}=={'include/extension-api.h','host-apis/wasi-0.2.0/host_api.cpp','runtime/event_loop.cpp'}\n    for r in source['changes']:assert before[r['path']]==r['beforeSha256']and after[r['path']]==r['afterSha256']\n    assert before['builtins/web/timers.cpp']==after['builtins/web/timers.cpp']==source['timerOwnershipSourceSha256']\n    for field in('resourceOwnershipSourcePolicy','classicTraceSourcePolicy','embedding','nativePatchSha256','strictPolicyVersion','protectedPolicyVersion','classicPolicyVersion','profileVersion'):\n        assert POLICY[field]==old[field]\n    proposal=HERE.parent/'task-selection-candidate-v1';checked_family(proposal,source['sourceCandidateIndexSha256'])\n    contract=json.loads((proposal/'source-contract.json').read_bytes())\n    assert [{k:r[k]for k in('path','beforeSha256','afterSha256','bytes')}for r in source['changes']]==[dict(path=r['path'],beforeSha256=r['before']['sha256'],afterSha256=r['after']['sha256'],bytes=r['after']['bytes'])for r in contract['changes']]\n    peer=HERE.parent/'independent-task-selection-source-review-v1';checked_family(peer,source['sourceReviewIndexSha256'])\n    reviewed=json.loads((peer/'results.json').read_bytes())\n    assert reviewed['state']=='INDEPENDENT_SCHEDULER_TASK_SELECTION_SOURCE_REVIEW_PASSED_V1'and reviewed['sourceIndexSha256']==source['sourceCandidateIndexSha256']and reviewed['sourceOnly']is True and reviewed['sourceReviewPassed']is True and reviewed['ownerActionsInvoked']is False\n    return True\nverify_task_selection_ancestry()",
+        "count": 1
+      },
+      {
+        "before": "def decorate(metadata,repo,source_dir,entries,embedding_commands,enabled):",
+        "after": "def task_selection_commands(entries,repo,metadata):\n    repo=Path(repo);paths=['host-apis/wasi-0.2.0/host_api.cpp','runtime/event_loop.cpp'];found={}\n    for name in paths:\n        rows=[row for row in entries if row['file']==str(repo/name)]\n        assert len(rows)==1,'Exactly one actual selector implementation/caller command required: '+name\n        words=shlex.split(rows[0]['command']);assert words.count('-c')==1 and words[words.index('-c')+1]==str(repo/name)and '-fsyntax-only'not in words\n        _release(words);_macro(words,'NODE_COMPAT_ENTROPY_POLICY',True)\n        _macro(words,'NODE_COMPAT_ENTROPY_RUNTIME_ONLY',metadata['entropyPolicy']=='runtime-only')\n        if name.startswith('host-apis/'):\n            for macro in('NODE_COMPAT_INTERNAL_TICKS','NODE_COMPAT_CLASSIC_STREAMS','NODE_COMPAT_STRICT_INITIALIZATION','NODE_COMPAT_GC_STRESS'):_macro(words,macro,False)\n        found[name]=rows[0]['command']\n    return found\ndef decorate(metadata,repo,source_dir,entries,embedding_commands,enabled):",
+        "count": 1
+      },
+      {
+        "before": "    native,queue,private=validate_classic_compilation(entries,embedding_commands,repo,metadata)",
+        "after": "    native,queue,private=validate_classic_compilation(entries,embedding_commands,repo,metadata)\n    selection_commands=task_selection_commands(entries,repo,metadata)",
+        "count": 1
+      },
+      {
+        "before": "    metadata['classicStreamsPolicy']={",
+        "after": "    metadata['taskSelectionPolicy']={'sourcePolicy':copy.deepcopy(POLICY['taskSelectionSourcePolicy']),'policyFileSha256':POLICY_SHA256,'helperSha256':digest(__file__),'actualHostApiCompileCommands':[selection_commands['host-apis/wasi-0.2.0/host_api.cpp']],'actualEventLoopCompileCommands':[selection_commands['runtime/event_loop.cpp']],'allNativeDependentsRequireRebuild':True,'nativeAllInvalidRuntimeValidation':None,'fullResetOrReuse':False}\n    metadata['classicStreamsPolicy']={",
+        "count": 1
+      }
+    ]
+  },
+  "recipe": {
+    "donor": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/resource-integration-candidate-v1/proposed/tests/node-compat/build-engine.sh",
+      "sha256": "be43e88a99fc2ce0ac8f546404b90813856df1964befcbad4977630ce01a6527",
+      "bytes": 46542
+    },
+    "afterimage": "proposed/tests/node-compat/build-engine.sh",
+    "edits": [
+      {
+        "before": "/private/tmp/starling-node-compat/scheduler-resource-v1-build",
+        "after": "/private/tmp/starling-node-compat/scheduler-resource-selection-v1-build",
+        "count": 1
+      },
+      {
+        "before": "tests/node-compat/foundation-scheduler/resource-integration-candidate-v1",
+        "after": "tests/node-compat/foundation-scheduler/task-selection-integration-candidate-v1",
+        "count": 3
+      },
+      {
+        "before": "7fb23b7137686de85e488aebaed39fb50ff893ac8fd792c621bc9dd6fdebdeea",
+        "after": "f2520cdd714bede80fd89fa9e510d94974dc848ffddd32dadfe1bf4f0fb1c6a0",
+        "count": 5
+      },
+      {
+        "before": "1f9d7de1115955c2fca5c171197eb85f5298f135dd9ea3bb5703412074aac842",
+        "after": "32e8b5f61b0ad869a051ee317f02db7525af4e773c438e4203b26f07dd3babe6",
+        "count": 2
+      },
+      {
+        "before": "resource-v1.$entropy_mode",
+        "after": "resource-selection-v1.$entropy_mode",
+        "count": 2
+      },
+      {
+        "before": "Resource source candidate requires one build job",
+        "after": "Resource task-selection candidate requires one build job",
+        "count": 1
+      },
+      {
+        "before": "layer_root=\"$repo_root/tests/node-compat/foundation-scheduler/task-selection-integration-candidate-v1\"",
+        "after": "[[ \"$repo_root\" == /private/tmp/starling-node-compat/scheduler-resource-selection-v1-source && \"$work_root\" == /private/tmp/starling-node-compat/scheduler-resource-selection-v1-build ]] || { echo \"Task-selection source/work context mismatch\" >&2; exit 1; }\n[[ \"$stress\" == 0 && \"$entropy_mode\" == OFF ]] || { echo \"This integration source cut selects normal-OFF only\" >&2; exit 1; }\nfor selected in \"$path_enabled\" \"$events_enabled\" \"$string_decoder_enabled\" \"$assert_enabled\" \"$querystring_enabled\" \"$util_enabled\" \"$stream_web_enabled\" \"$ticks_enabled\" \"$classic_enabled\"; do\n  [[ \"$selected\" == 1 ]] || { echo \"Task-selection source cut requires the complete342 profile\" >&2; exit 1; }\ndone\nlayer_root=\"$repo_root/tests/node-compat/foundation-scheduler/task-selection-integration-candidate-v1\"",
+        "count": 1
+      }
+    ]
+  },
+  "model": {
+    "donor": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/resource-integration-candidate-v1/native-admission-model.py",
+      "sha256": "7fe55a5d31c3af87f3fde9bb7cfa375be823af9ca832a6eae8564e119ed5808b",
+      "bytes": 2593
+    },
+    "afterimage": "native-admission-model.py",
+    "edits": [
+      {
+        "before": "assert variant in ('normal-off', 'gc-off')",
+        "after": "assert variant == 'normal-off'",
+        "count": 1
+      },
+      {
+        "before": "    # Actual independent native/freezer proof still must verify each captured",
+        "after": "    selected = metadata['taskSelectionPolicy']\n    assert selected['sourcePolicy'] == policy['taskSelectionSourcePolicy']\n    assert selected['policyFileSha256'] == policy_sha256 and selected['helperSha256'] == helper_sha256\n    assert selected['allNativeDependentsRequireRebuild'] is True and selected['nativeAllInvalidRuntimeValidation'] is None and selected['fullResetOrReuse'] is False\n    for field in ('actualHostApiCompileCommands','actualEventLoopCompileCommands'):\n        assert type(selected[field]) is list and len(selected[field]) == 1 and type(selected[field][0]) is str\n    # Actual independent native/freezer proof still must verify each captured",
+        "count": 1
+      },
+      {
+        "before": "FINITE_RESOURCE342_METADATA_SHAPE_ONLY",
+        "after": "FINITE_RESOURCE_TASK_SELECTION342_METADATA_SHAPE_ONLY",
+        "count": 1
+      }
+    ]
+  },
+  "stage": {
+    "donor": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/resource-integration-candidate-v1/stage.py",
+      "sha256": "dc4cba468030cd656b8000fb473a337d6e67e8838b0ad1a7c138a63a3466eb0d",
+      "bytes": 4940
+    },
+    "afterimage": "stage.py",
+    "edits": [
+      {
+        "before": "Dormant exact accepted342 reconstruction and two-source overlay",
+        "after": "Dormant resource342 reconstruction and three-source task-selection overlay",
+        "count": 1
+      },
+      {
+        "before": "scheduler-resource-v1-source",
+        "after": "scheduler-resource-selection-v1-source",
+        "count": 1
+      },
+      {
+        "before": "scheduler-resource-v1-stage.json",
+        "after": "scheduler-resource-selection-v1-stage.json",
+        "count": 1
+      },
+      {
+        "before": "tests/node-compat/foundation-scheduler/resource-integration-candidate-v1",
+        "after": "tests/node-compat/foundation-scheduler/task-selection-integration-candidate-v1",
+        "count": 1
+      },
+      {
+        "before": "ROOT_REVIEWED_SCHEDULER_RESOURCE342_SOURCE_STAGE_V1",
+        "after": "ROOT_REVIEWED_SCHEDULER_RESOURCE_TASK_SELECTION342_SOURCE_STAGE_V1",
+        "count": 1
+      },
+      {
+        "before": "INDEPENDENT_SCHEDULER_RESOURCE_INTEGRATION_SOURCE_REVIEW_PASSED_V1",
+        "after": "INDEPENDENT_SCHEDULER_TASK_SELECTION_INTEGRATION_SOURCE_REVIEW_PASSED_V1",
+        "count": 1
+      },
+      {
+        "before": " captured=[config_descriptor,config['rootAuthority'],*own,*peers]",
+        "after": " captured=[config_descriptor,config['rootAuthority'],*own,*peers]\n preparation=read(next(r for r in own if r['path']==str(OWN/'input-freeze.json')))\n for d in preparation['files']:checked(d);captured.append(d)\n assert root['workRoot']=='/private/tmp/starling-node-compat/scheduler-resource-selection-v1-build'and root['freezeRoot']=='/private/tmp/starling-node-compat/scheduler-resource-selection-v1-freeze'\n assert not Path(root['workRoot']).exists()and not Path(root['freezeRoot']).exists()",
+        "count": 1
+      },
+      {
+        "before": " assert not DEST.exists()and not DEST.is_symlink()and not JOURNAL.exists()and not JOURNAL.is_symlink()",
+        "after": " assert plan['sourceRoot']==str(DEST)and plan['workRoot']==root['workRoot']and plan['freezeRoot']==root['freezeRoot']and plan['nativeCount']==342\n assert not DEST.exists()and not DEST.is_symlink()and not JOURNAL.exists()and not JOURNAL.is_symlink()",
+        "count": 1
+      },
+      {
+        "before": "state='RESOURCE342_SOURCE_STAGED_UNREVIEWED_V1'",
+        "after": "state='RESOURCE_TASK_SELECTION342_SOURCE_STAGED_UNREVIEWED_V1'",
+        "count": 1
+      },
+      {
+        "before": "nativeReplacements=2,copies=copied",
+        "after": "nativeReplacements=3,workRoot=root['workRoot'],freezeRoot=root['freezeRoot'],copies=copied",
+        "count": 1
+      }
+    ]
+  },
+  "nativeChanges": [
+    {
+      "path": "include/extension-api.h",
+      "beforeSha256": "d743a7fcc0566eb85f382fec2f82b4c768a1043ca29b26e9fdef6f576e6789b8",
+      "afterSha256": "6ffda8f2028cb214a18a2dd7faa4ab4d841ca6a214713c0dd1b5317fe9282804",
+      "bytes": 7312
+    },
+    {
+      "path": "host-apis/wasi-0.2.0/host_api.cpp",
+      "beforeSha256": "10ccb1f84f659195eddc1dab5f8152cdfaa21da660345d07563fa867e87e0a4c",
+      "afterSha256": "e2594bf5f1ada6a941c7a8fec71ca86ce3f62c6f209bc913a701985bf7627631",
+      "bytes": 36492
+    },
+    {
+      "path": "runtime/event_loop.cpp",
+      "beforeSha256": "d8be6e450c1f8566161db30f2736d883bc3953ec965fd6abee1bcfe961ec5e1a",
+      "afterSha256": "b7c374f2b35391bf194858eb5368fe4f867ce107b5ce890a1dca0a3547f127d1",
+      "bytes": 13268
+    }
+  ],
+  "nativeSourceEdits": 5,
+  "boundaryTagsPreserved": true
+}

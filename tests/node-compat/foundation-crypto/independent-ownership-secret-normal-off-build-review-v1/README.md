@@ -1,0 +1,13 @@
+# Independent secret-owner355 normal-OFF BUILD review
+
+Bounded **BUILD-only PASS** for actual engine901c7…/10,003,155B and untouched sidecarcbf930…/393,125B from source7eb8/controllerc957. No owner helper, compiler, Node, Git, monitor, engine, crypto, GC or guest action was rerun. Freeze, pins, bootstrap, components/runtime and acceptance remain separate closed gates.
+
+Outer parent48796 and worker48852 returned0; all2,348/718 retained process observations reconcile with raw inventories and all groups gone, without timeout, forced cleanup, signal or error. Inner Bash48915 returned0 with no cleanup event. Both whole stdout envelopes, Root/config/source modes, launch/log/result and one-job/Release/noOOM/entropyOFF/GCoff match. Ninja ends108/108; no standalone CMake/per-compiler terminal is invented.2GiB/800MiB bounds are disk-space guards.
+
+All355current sources=352unchanged+3corrections,1,051current tool rows and1,424staged copies/originals/modes/inodes pass. Protected normal1391membership/1387original references/cache/compileDB remain unchanged. Raw metadata binds actual new recipe8350/policy/helper/current secret source contract; the inherited owner5-file policy remains ancestry. No old owner/GC admission or metadata/state projection is used.
+
+Actual DB68=62policy native+5other sources covered by355+1generated null; embedding is separate1command/3fresh inputs. All68object bytes were checked. Strict-policy subset4/private6/normalGC macro absent/all11manifests/two secret C++ commands and installation witnesses match. Full raw compiler→cd→wasm-opt mapping and final optimizer/engine-copy whole equality pass.30ordered archive arguments/29unique archives preserve legitimate libhost_api.a repetition.
+
+The full SDK30/SM147/external ComponentizeJS distributions match pinned archives, with external3afterimages and generated lib engine separately classified. All4650patched OpenSSL sources, selected codec headers/archive/forced include/first search/seven prefixed symbols, locked Rust inputs, selected tools and archive/object data pass. Backend runtime proof remainsfalse/null/null; no runtime version, frees/wipes/fault/finalizer/erasure or crypto correctness follows.
+
+input-hashes.json is schema1/files:[{path,sha256,bytes}], with observed sizes even where metadata configureRecipe/configdata omit bytes. SDK/host aliases remain separate reference DATA, not copied-path authority. Exact BUILD-only fields are in results/result-contract. Reader mistakes and raw failed attempts are retained in reader-history; none are owner/native failures. Preparation files remain historical NULL-slot DATA, not current verdicts.

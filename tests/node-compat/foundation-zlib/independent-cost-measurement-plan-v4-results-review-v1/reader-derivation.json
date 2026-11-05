@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "donor": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/independent-cost-measurement-plan-v3-results-review-v1/reader.py",
+    "sha256": "10b2c7497695d99d8a05ccb16c7091952a97d7df7e2d1e9ca6e6c53857900bbd",
+    "bytes": 17953
+  },
+  "donorReviewIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/independent-cost-measurement-plan-v3-results-review-v1/index.json",
+    "sha256": "5e81da01611fa0d8b6081d495487d13e37c8351b75a70384d9905d956e12b73c",
+    "bytes": 1941
+  },
+  "genericDataFunctions": [
+    {
+      "name": "need",
+      "text": "def need(ok,msg):\n global checks\n if not ok:raise AssertionError(msg)\n checks+=1"
+    },
+    {
+      "name": "identity",
+      "text": "def identity(s):return(s.st_dev,s.st_ino,s.st_size,s.st_mtime_ns,s.st_ctime_ns)"
+    },
+    {
+      "name": "row",
+      "text": "def row(p):\n p=Path(p);h=hashlib.sha256();size=0\n with p.open('rb')as f:\n  for b in iter(lambda:f.read(1048576),b''):h.update(b);size+=len(b)\n return dict(path=str(p),sha256=h.hexdigest(),bytes=size)"
+    },
+    {
+      "name": "verify",
+      "text": "def verify(r,role):\n p=Path(r['path']);need(p.is_absolute() and p.is_file() and not p.is_symlink(),'ordinary absolute input '+str(p))\n real=str(p.resolve());a=p.stat()\n if real not in physical:\n  got=row(p);b=p.stat();need(identity(a)==identity(b),'stable full streamed bytes');physical[real]=dict(sha256=got['sha256'],bytes=got['bytes'],identity=identity(b))\n else:need(identity(a)==physical[real]['identity'],'stable repeated input')\n got=physical[real];need(got['sha256']==r['sha256'] and got['bytes']==r['bytes'],'exact bytes '+str(p))\n if str(p)not in seen:seen[str(p)]={k:r[k]for k in ['path','sha256','bytes']};seen[str(p)]['roles']=set()\n seen[str(p)]['roles'].add(role);return r"
+    },
+    {
+      "name": "data",
+      "text": "def data(r,role='JSON'):verify(r,role);return json.loads(Path(r['path']).read_bytes())"
+    },
+    {
+      "name": "descriptors",
+      "text": "def descriptors(v):\n result=[]\n def visit(x):\n  if isinstance(x,dict):\n   if isinstance(x.get('path'),str) and Path(x['path']).is_absolute() and isinstance(x.get('sha256'),str) and type(x.get('bytes'))is int:result.append({k:x[k]for k in ['path','sha256','bytes']})\n   for y in x.values():visit(y)\n  elif isinstance(x,list):\n   for y in x:visit(y)\n visit(v);return result"
+    },
+    {
+      "name": "local",
+      "text": "def local(n):need(isinstance(n,str) and n and not n.startswith('/') and '\\\\'not in n and all(x not in ['', '.', '..']for x in n.split('/')),'safe local member');return n"
+    },
+    {
+      "name": "indexed",
+      "text": "def indexed(r,count=None):\n x=data(r,'index');need(x['schemaVersion']==1 and isinstance(x['files'],list),'finite schema1 index')\n if count is not None:need(len(x['files'])==count,'exact indexed count '+str(count))\n rows=[];names=set()\n for v in x['files']:\n  n=local(v['path']);need(n not in names,'unique member');names.add(n);a=dict(path=str(Path(r['path']).parent/n),sha256=v['sha256'],bytes=v['bytes']);verify(a,'indexed-member');rows.append(a)\n return x,rows"
+    },
+    {
+      "name": "ledger",
+      "text": "def ledger(r,role):\n x=data(r,role);rs=x['files']if isinstance(x,dict)else x\n need(isinstance(rs,list),'finite retained input ledger')\n for v in rs:verify(v,role+'-input')\n return len(rs)"
+    },
+    {
+      "name": "membership",
+      "text": "def membership(root,names):\n actual=set()\n for p in root.rglob('*'):\n  need(not p.is_symlink(),'no symlink evidence member')\n  if p.is_file():actual.add(str(p.relative_to(root)))\n need(actual==set(names),'whole exact physical membership '+str(root))"
+    },
+    {
+      "name": "contracted",
+      "text": "def contracted(p,state):\n ix,rs=indexed(p['index']);v=data(p['result'],'actual-sealed-proof-result');c=data(p['contract'],'actual-stable-proof-contract')\n need(sum(r==p['result']for r in rs)==sum(r==p['contract']for r in rs)==1,'result/contract uniquely indexed')\n need(v['verifiedPassed'] is True and v['state']==state==c['requiredReviewState'],'actual proof state')\n for k,w in c.get('requiredFixedValues',{}).items():need(v[k]==w,'whole fixed proof field '+k)\n for k,w in c.get('requiredCoverage',{}).items():need(v['coverage'][k]==w,'whole proof coverage '+k)\n bound=descriptors(v)+rs\n for k,r in c['requiredExactDescriptors'].items():need(r in bound,'exact contract descriptor bound '+k);verify(r,'contract-'+k)\n components=v.get('components',v.get('requiredComponents'));need(components==c['requiredComponents'],'exact three actual components')\n for r in descriptors(v)+descriptors(c):verify(r,'complete-contracted-proof-descriptor')\n # Actual output membership/bytes were also consumed by the real parent guards.\n if v.get('actualIndex'):\n  actual,ars=indexed(v['actualIndex']);membership(Path(v['actualIndex']['path']).parent,[r['path']for r in actual['files']]+['index.json','completion.json'])\n for r in rs:\n  if r['path'].endswith(('rehashed-inputs.json','bindings-rehashed-inputs.json','peer-bytes-inputs.json','peer-raw-inputs.json')):ledger(r,'retained-complete-proof-inputs')\n return v,c,rs"
+    }
+  ],
+  "wholeByteReconstructionSectionStart": "correct,cc,crs=contracted(",
+  "reconstructionSectionSha256": "86cafcb7ad3eebe1a585d2aa9add0c603f7eec285f209119f0dc8f12e7c3e975",
+  "sectionByteExact": true,
+  "newV4RootBinding": "Explicit new actual Root report835666/inner0/outer1/relative raw rows + exact confined output descriptors. No old Root/state projection or original module import.",
+  "ownerHelpersOrActionsInvoked": false
+}

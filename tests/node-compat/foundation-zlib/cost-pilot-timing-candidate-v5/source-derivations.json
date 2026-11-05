@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "donorIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v4/index.json",
+    "sha256": "b5b4c9e9279022f63dc72f20bf9a44c831ba277017d9dc72867eafd6a24f89d1",
+    "bytes": 9952
+  },
+  "files": [
+    {
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v4/source-families.mjs",
+        "sha256": "1d856b48f58aa36e423c97bbd1e8fca87e85803a1fba9f0a173cce8877533e86",
+        "bytes": 6364
+      },
+      "afterimage": "source-families.mjs",
+      "edits": [
+        {
+          "before": "bytes:8574})\n]);",
+          "after": "bytes:8574}),\n Object.freeze({path:join(HERE,'../cost-pilot-timing-candidate-v4/index.json'),sha256:'b5b4c9e9279022f63dc72f20bf9a44c831ba277017d9dc72867eafd6a24f89d1',bytes:9952})\n]);",
+          "count": 1
+        },
+        {
+          "before": "actual v4 own source index",
+          "after": "actual v5 own timing source index",
+          "count": 1
+        },
+        {
+          "before": "verifiedSourceFamilies:4",
+          "after": "verifiedSourceFamilies:5",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v4/run.mjs",
+        "sha256": "ec689b61dfbe311a4a6790a44de83b9bd315a7f886d6c12f45fdfc8626532cc6",
+        "bytes": 941
+      },
+      "afterimage": "run.mjs",
+      "edits": []
+    },
+    {
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v4/prepare-plan.mjs",
+        "sha256": "637b4a52fd61a508e1e5bbdf2d8a6a36f96c36dd8917d6cd6ecaad3424dd6cf3",
+        "bytes": 643
+      },
+      "afterimage": "prepare-plan.mjs",
+      "edits": [
+        {
+          "before": "zlib-cost-measurement-plan-v4",
+          "after": "zlib-cost-measurement-plan-v5",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v4/worker.mjs",
+        "sha256": "cc201e95ff5fb4f946de35242660455d2acccd11858da6bccf4255a82fa585c9",
+        "bytes": 3224
+      },
+      "afterimage": "worker.mjs",
+      "edits": []
+    },
+    {
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v4/environment.mjs",
+        "sha256": "5ebc8805de2f7c9bb12736e25c6d178458133e7b78026d8488804c747b9faec4",
+        "bytes": 1243
+      },
+      "afterimage": "environment.mjs",
+      "edits": []
+    },
+    {
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v4/parent-guard.template.mjs",
+        "sha256": "3e78ecff1c5a0baffd85e346d4a8fe27bc0a7de2681f618d892c908994245039",
+        "bytes": 10933
+      },
+      "afterimage": "parent-guard.template.mjs",
+      "edits": [
+        {
+          "before": "import {captureSourceFamilies} from './source-families.mjs';",
+          "after": "import {captureSourceFamilies} from './source-families.mjs';\nimport {ORIGINAL_PILOT_SOURCE_INDEX,ORIGINAL_MATCHED_PLAN,actualIndexLimit,assertCompleteIndexCount,calibrationRoleModel,calibrationResultModel} from './calibration-model.mjs';",
+          "count": 1
+        },
+        {
+          "before": "export const outputRoot=phase=>'/private/tmp/starling-node-compat/zlib-cost-'+(phase==='timing'?'timing':'pilot')+'-v4';",
+          "after": "export const outputRoot=phase=>{need(phase==='timing','V5 has no pilot launch action');return '/private/tmp/starling-node-compat/zlib-cost-timing-v5';};",
+          "count": 1
+        },
+        {
+          "before": "&&['pilot-candidate','timing'].includes(v.phase)",
+          "after": "&&v.phase==='timing'",
+          "count": 1
+        },
+        {
+          "before": " need(v.calibrationDecisionSha256===CALIBRATION_DECISION,'Root selected fresh paired calibration source design');",
+          "after": " need(v.calibrationDecisionSha256===CALIBRATION_DECISION,'Root selected original paired calibration design');calibrationRoleModel(v);",
+          "count": 1
+        },
+        {
+          "before": "need(index.schemaVersion===1&&Array.isArray(index.files)&&index.files.length>0&&index.files.length<=16384,'bounded actual output index');",
+          "after": "need(index.schemaVersion===1&&Array.isArray(index.files),'actual output index schema');assertCompleteIndexCount(index.files.length,actualIndexLimit(expectedState,v));",
+          "count": 1
+        },
+        {
+          "before": " const recheck=async()=>{await inheritedFamilies.recheck();",
+          "after": " const calibration=await contractedProof(refs.actualCalibrationReview,'INDEPENDENT_ZLIB_COST_PILOT_RESULTS_REVIEW_PASSED_V1');\n calibrationResultModel(calibration.data,calibration.contract,{components:Object.fromEntries(Object.entries(artifacts).map(([arm,a])=>[arm,a.component])),cases:refs.cases,calibrationDecisionSha256:CALIBRATION_DECISION});\n const recheck=async()=>{await calibration.recheck();await inheritedFamilies.recheck();",
+          "count": 1
+        },
+        {
+          "before": "return Object.freeze({frame,own,refs,expected,artifacts,recheck});",
+          "after": "return Object.freeze({frame,own,refs,expected,artifacts,calibration,recheck});",
+          "count": 1
+        },
+        {
+          "before": " const planRow=descriptor(root.preparedPlan)",
+          "after": " need(same(root.warmNPlan,admitted.refs.actualCalibrationReview),'Root binds the exact original independently reviewed b5 calibration');\n const planRow=descriptor(root.preparedPlan)",
+          "count": 1
+        },
+        {
+          "before": " need(same(plan.expected,admitted.expected)&&same(plan.artifacts,admitted.artifacts),'entire compact plan matches parent full proof admission');",
+          "after": " need(same(plan.expected,admitted.expected)&&same(plan.artifacts,admitted.artifacts),'entire compact plan matches parent full proof admission');\n need(same(plan.calibrationSourceIndex,ORIGINAL_PILOT_SOURCE_INDEX)&&same(plan.calibrationReview,admitted.refs.actualCalibrationReview)&&same(plan.calibrationMatchedPlan,ORIGINAL_MATCHED_PLAN),'New genuine plan keeps original calibration DATA roles');",
+          "count": 1
+        },
+        {
+          "before": "&&same(phase.preparedPlan,planRow)",
+          "after": "&&same(phase.calibrationSourceIndex,root.calibrationSourceIndex)&&same(phase.preparedPlan,planRow)",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v4/prepare-plan-body.mjs",
+        "sha256": "92f132882e5b14e9d6fb777699b125175b36832f81df4dbc7954cfb3adaa6213",
+        "bytes": 2522
+      },
+      "afterimage": "prepare-plan-body.mjs",
+      "edits": [
+        {
+          "before": "import {same} from '../cost-pilot-timing-candidate-v1/proof-model.mjs';",
+          "after": "import {same} from '../cost-pilot-timing-candidate-v1/proof-model.mjs';\nimport {ORIGINAL_PILOT_SOURCE_INDEX,ORIGINAL_MATCHED_PLAN} from './calibration-model.mjs';",
+          "count": 1
+        },
+        {
+          "before": "zlib-cost-measurement-plan-v4",
+          "after": "zlib-cost-measurement-plan-v5",
+          "count": 1
+        },
+        {
+          "before": "calibrationDecisionSha256:CALIBRATION_DECISION,expected:admitted.expected,artifacts:admitted.artifacts,",
+          "after": "calibrationDecisionSha256:CALIBRATION_DECISION,calibrationSourceIndex:ORIGINAL_PILOT_SOURCE_INDEX,calibrationReview:admitted.refs.actualCalibrationReview,calibrationMatchedPlan:ORIGINAL_MATCHED_PLAN,expected:admitted.expected,artifacts:admitted.artifacts,",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v4/run-body.mjs",
+        "sha256": "5c5097aaaca772805beb0e15b256032bc647f53c7df128c13562d726c71a37be",
+        "bytes": 11306
+      },
+      "afterimage": "run-body.mjs",
+      "edits": [
+        {
+          "before": "import {need,COMPARISONS,candidateNs,chooseMatchedN,matchedPlan,timingSchedule} from '../cost-pilot-timing-candidate-v1/planner.mjs';",
+          "after": "import {need,matchedPlan,timingSchedule} from '../cost-pilot-timing-candidate-v1/planner.mjs';\nimport {ORIGINAL_PILOT_SOURCE_INDEX,INDEX_BOUNDS,calibrationResultModel,assertCompleteIndexCount} from './calibration-model.mjs';",
+          "count": 1
+        },
+        {
+          "before": "  need(warm.data.sourceIndexSha256===options.sourceIndex.sha256&&warm.data.calibrationDecisionSha256===CALIBRATION_DECISION&&warm.data.allMatchedNReviewed===true&&warm.data.allOwnedWorkersRawZeroClean===true&&warm.data.pilotOnly===true&&warm.data.timingAllowed===false,'separate actual pilot review with complete60case calibration');",
+          "after": "  calibrationResultModel(warm.data,warm.contract,{components:Object.fromEntries(Object.entries(admitted.artifacts).map(([arm,a])=>[arm,a.component])),cases:admitted.refs.cases,calibrationDecisionSha256:CALIBRATION_DECISION});\n  need(same(root.calibrationSourceIndex,ORIGINAL_PILOT_SOURCE_INDEX),'Original pilot source is distinct from new timing source');",
+          "count": 1
+        },
+        {
+          "before": "rootAuthority:admitted.rootAction,sourceIndependentReviewIndex:",
+          "after": "calibrationSourceIndex:root.calibrationSourceIndex,rootAuthority:admitted.rootAction,sourceIndependentReviewIndex:",
+          "count": 1
+        },
+        {
+          "before": "  if(root.phase==='pilot-candidate'){\n   for(const comparison of COMPARISONS)for(let caseId=0;caseId<30;caseId++){\n    const curve=[];let selected=null;\n    for(const n of candidateNs(caseId)){\n     const arms=[];for(const side of['A','B']){const arm=comparison[side];arms.push(await execute({comparison:comparison.id,caseId,arm,n,side,jobId:'pilot-'+(comparison.id==='same-engine-provider'?'provider':'profile')+'-c'+caseId+'-n'+n+'-'+arm,workerTimeoutMs:600000}));}\n     curve.push({comparison:comparison.id,caseId,n,arms});\n     if(arms.every(v=>v.sampleMs>=50)){selected=chooseMatchedN(curve,caseId,comparison.id);break;}\n    }\n    need(selected,'entire phase refuses if either arm cannot reach target at case cap');calibrations.push(selected);await write('calibration/'+comparison.id+'-c'+caseId+'.json',{curve,selected});\n   }\n   need(calibrations.length===60,'all original cases/comparisons before warmN publication');await write('matched-n-plan.json',{schemaVersion:1,state:'ACTUAL_MATCHED_N_PLAN_DATA_V1',rows:matchedPlan(calibrations),independentReviewStillRequired:true});\n  }else{\n",
+          "after": "  {\n",
+          "count": 1
+        },
+        {
+          "before": "phase:root.phase,sourceIndexSha256:options.sourceIndex.sha256,calibrationDecisionSha256:",
+          "after": "phase:root.phase,sourceIndexSha256:options.sourceIndex.sha256,calibrationSourceIndex:ORIGINAL_PILOT_SOURCE_INDEX,actualCalibrationReview:root.warmNPlan,actualMatchedPlan:root.warmNMatchedPlan,calibrationDecisionSha256:",
+          "count": 1
+        },
+        {
+          "before": "  const index=await write('index.json'",
+          "after": "  assertCompleteIndexCount(output.rows.size,INDEX_BOUNDS.timing);\n  const index=await write('index.json'",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v4/worker-body.mjs",
+        "sha256": "2cda15b67a49acf90c07bdd1a73d3eed544278e43452b8c4ae7e7f000efce5af",
+        "bytes": 9481
+      },
+      "afterimage": "worker-body.mjs",
+      "edits": [
+        {
+          "before": "same(v.preparedPlan,root.preparedPlan)&&same(v.warmNPlan,root.warmNMatchedPlan)",
+          "after": "same(v.preparedPlan,root.preparedPlan)&&same(v.calibrationSourceIndex,root.calibrationSourceIndex)&&same(v.warmNPlan,root.warmNMatchedPlan)",
+          "count": 1
+        },
+        {
+          "before": "need(plan.sourceIndexSha256===ownIx.sha256&&plan.state==='PREPARED_COMPACT_CODEC_MEASUREMENT_PLAN_DATA_ONLY_V1','actual parent-prepared compact DATA');",
+          "after": "need(plan.sourceIndexSha256===ownIx.sha256&&plan.state==='PREPARED_COMPACT_CODEC_MEASUREMENT_PLAN_DATA_ONLY_V1','actual parent-prepared compact DATA');\n need(same(plan.calibrationSourceIndex,root.calibrationSourceIndex)&&same(plan.calibrationReview,root.warmNPlan)&&same(plan.calibrationMatchedPlan,root.warmNMatchedPlan),'Original calibration roles in new timing plan');",
+          "count": 1
+        },
+        {
+          "before": "&&same(phase.preparedPlan,planRow)",
+          "after": "&&same(phase.calibrationSourceIndex,root.calibrationSourceIndex)&&same(phase.preparedPlan,planRow)",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "oldActualCalibrationUnchanged": true,
+  "oldCalibrationSourceNotRelabelled": true,
+  "newScope": "read-only-plan-and-timing-only"
+}

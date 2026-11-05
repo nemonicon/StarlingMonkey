@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "donor": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/independent-ownership-gc-v2-native-build-review-v1/reader.py",
+    "sha256": "a19105896bccdcbdc0f96acc5c626c54258296e8e0e70e4e9f04778ff524bc6a",
+    "bytes": 25527
+  },
+  "donorContext": "Original independent GC BUILD-only reader inspected as DATA; never imported or rebound.",
+  "functions": [
+    {
+      "name": "need",
+      "text": "def need(ok,msg):\n global checks\n if not ok:raise AssertionError(msg)\n checks+=1"
+    },
+    {
+      "name": "identity",
+      "text": "def identity(s):return(s.st_dev,s.st_ino,s.st_size,s.st_mtime_ns,s.st_ctime_ns)"
+    },
+    {
+      "name": "alias",
+      "text": "def alias(p):return Path('/private'+str(p))if str(p).startswith('/tmp/')else Path(p)"
+    },
+    {
+      "name": "read",
+      "text": "def read(p,h=None,size=None,capture=True):\n p=Path(p);need(p.is_absolute()and p.is_file()and not p.is_symlink(),'ordinary absolute input');a=p.stat();real=str(p.resolve());digest=hashlib.sha256();parts=[]if capture else None\n with p.open('rb')as f:\n  for b in iter(lambda:f.read(1048576),b''):\n   digest.update(b)\n   if capture:parts.append(b)\n b=p.stat();need(identity(a)==identity(b),'stable input during stream');need(h is None or digest.hexdigest()==h,'exact SHA '+str(p));need(size is None or b.st_size==size,'exact bytes '+str(p))\n v=dict(path=str(p),sha256=digest.hexdigest(),bytes=b.st_size);need(str(p)not in seen or seen[str(p)]==v,'one exact descriptor per path');seen[str(p)]=v;cache[real]=identity(b)\n return b''.join(parts)if capture else v"
+    },
+    {
+      "name": "verify",
+      "text": "def verify(r):return read(r['path'],r['sha256'],r['bytes'],False)"
+    },
+    {
+      "name": "data",
+      "text": "def data(r):return json.loads(read(r['path'],r['sha256'],r['bytes']))"
+    },
+    {
+      "name": "descriptor",
+      "text": "def descriptor(p):return read(p,capture=False)"
+    },
+    {
+      "name": "family",
+      "text": "def family(r):\n x=data(r);names=set()\n for e in x['files']:\n  n=e['path'];need(n and not n.startswith('/')and all(q not in ('','.','..')for q in n.split('/'))and n not in names,'safe unique source family member');names.add(n);read(Path(r['path']).parent/n,e['sha256'],e['bytes'],False)\n need({str(p.relative_to(Path(r['path']).parent))for p in Path(r['path']).parent.rglob('*')if p.is_file()}==names|{'index.json'},'complete source family membership')\n return x"
+    },
+    {
+      "name": "macro",
+      "text": "def macro(words,name,enabled):\n actual=[w for w in words if w=='-D'+name or w.startswith('-D'+name+'=')];need(actual==(['-D'+name+'=1']if enabled else[]),'exact macro '+name);need('-U'+name not in words,'no undef '+name)"
+    },
+    {
+      "name": "no_second_codec",
+      "text": "def no_second_codec(words,include=None):\n flat=[]\n for w in words:flat.extend(w[4:].split(',')if w.startswith('-Wl,')else[w])\n for i,w in enumerate(flat):\n  need(w not in ['-lz','-lzlib','-l:libz.a','-l:libzlib.a','--library=z','--library=zlib'],'no second zlib link')\n  if w in ['-l','--library']:need(i+1<len(flat)and flat[i+1]not in ['z','zlib',':libz.a',':libzlib.a'],'no split second zlib link')\n  need(not re.search(r'(?:^|/)libz(?:lib)?\\.(?:a|so|dylib)$',w),'no second zlib archive')\n for w in words:\n  need(not w.startswith(('-DZ_PREFIX','-UZ_PREFIX','-imacros','-Wp,','-Xclang','-Xpreprocessor')),'no compile context injection')\n  if w=='-include'and include is not None:continue\n  need(not w.startswith('-include'),'no unknown forced include')\n if include is not None:need(words.count('-include')==1 and words[words.index('-include')+1]==include,'exact selected header forced include')"
+    },
+    {
+      "name": "strip_deps",
+      "text": "def strip_deps(w):\n out=[];i=0\n while i<len(w):\n  if w[i]in ['-MD','-MMD']:i+=1\n  elif w[i]in ['-MT','-MF','-MQ']:i+=2\n  else:out.append(w[i]);i+=1\n return out"
+    }
+  ],
+  "excluded": [
+    "compiled (old GC policy differs)",
+    "audit (old metadata/source/Root schemas differ)",
+    "old module globals and main"
+  ],
+  "operationalModuleImported": false
+}

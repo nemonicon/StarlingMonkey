@@ -4,7 +4,201 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-05. Overall roadmap: **in progress**.
 
-All-work Git checkpoint requested again on 2026-11-05. Writers are stopped. This
+All-work Git checkpoint requested on 2026-11-05: this checkpoint preserves the
+completed work and unfinished drafts since `3dcd49d`. Writers stop before staging.
+Native engines, generated components and external build/runtime trees remain
+outside Git; their retained receipts identify exact artifacts. Nothing is pushed.
+The historical baseline and accepted production checkpoint remain unchanged.
+
+Checkpoint checks parse345 JSON files,77 Python files,51 JavaScript modules and
+two shell scripts, and resolve1,383 local tracker/documentation links without
+missing targets. Five additional `.mjs` files are deliberately invalid tamper
+fixtures created by `test-source-families.mjs`; their exact evidence bytes are
+preserved. Staged whitespace checks report the exact sealed freezer-body final
+blank line and context-space lines in two unapplied patch artifacts; those bytes
+are retained to preserve their hashes. The changed-file credential/artifact screen
+finds no concrete blocker. This checkpoint contains632 changed files.
+No runtime suite, native build or timing action is repeated for this Git checkpoint.
+
+Latest continuation after Git checkpoint `3dcd49d`:
+
+- The [codec worker diagnosis](tests/node-compat/foundation-zlib/cost-pilot-v3-worker-import-diagnosis-v1/README.md)
+  seals24 members at `cb9ade31…3063`. Complete source authentication and worker
+  module linking pass without a worker/loader/guest call. A retrospective DATA
+  check rejects the exact environment guard: pinned Node receives the eight
+  requested entries plus macOS `__CF_USER_TEXT_ENCODING=0x1F5:0x0:0x0`.
+  A benign Node child reproduces this extra key. A proposed exact Darwin
+  uid/zero/zero exception lets the inspected pre-output models pass, while other
+  keys/values remain forbidden. The original worker discarded its exception;
+  its exact error and actual environment were not captured. Independent failure
+  review now passes at [index231ad982](tests/node-compat/foundation-zlib/independent-cost-pilot-v3-failure-review-v1/README.md),
+  preserving that limit. The subsequent [v4 source](tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v4/README.md)
+  seals59 members at `b5b4c9e9…f89d1`: narrow Darwin environment handling,
+  observed-environment recording and bounded fixed-stage stderr diagnostics
+  preserve all original cases/caps/FNV and360-worker timing protocol. Its
+  [independent source review](tests/node-compat/foundation-zlib/independent-cost-pilot-timing-v4-source-review-v1/README.md)
+  passes at `19594c59…33b7`, with4,702 source checks/1,080 physical paths,
+  69 pure cases and nine parser checks. The model's input domain is the actual
+  fresh enumerable `process.env` snapshot, not arbitrary non-enumerable objects.
+  New read-only [plan authority](tests/node-compat/foundation-zlib/cost-measurement-plan-v4-root-authority.json)
+  starts Root37441/Node45086 under the genuine900-second owned monitor.
+  The genuine read-only parent45086 finishes raw0 in158.473 operational seconds,
+  with clean owned-group cleanup. Root caller37441 then exits1 while resolving
+  three relative publication rows from the repository directory. A separate
+  [read-only collector](tests/node-compat/foundation-zlib/cost-measurement-plan-v4-observe.py)
+  finishes raw0 and writes [result83566613](tests/node-compat/foundation-zlib/cost-measurement-plan-v4-root-results.json),
+  preserving original relative rows and separately verified confined absolute
+  descriptors. No action is repeated. Actual plan `297f8fbb…6838` is53,862 bytes.
+  Its [independent DATA review](tests/node-compat/foundation-zlib/independent-cost-measurement-plan-v4-results-review-v1/README.md)
+  passes at `f7ec29c0…d20b`:307,437 checks/25,719 physical files reconstruct all90
+  rows,60 encoded streams/15 Node-oracle matches and three artifact tuples.
+  A [future v4 calibration caller](tests/node-compat/foundation-zlib/cost-pilot-v4-root-controller-source-derivation.json)
+  is prepared. Its first overlapping text-reversal check
+  fails after writing unlaunched source; exact offset reconstruction and AST
+  checks then pass, with no authority, worker or guest action.
+  After the native build and all three agent audit/source jobs are terminal,
+  new [v4 calibration authority](tests/node-compat/foundation-zlib/cost-pilot-v4-root-authority.json)
+  starts Root2880/Node80579 under the genuine7200-second owned monitor. The
+  preselected90-minute budget/two-hour coordinated window preserve all60 pairs,
+  original geometric caps, both arms at50ms and full raw controls/FNV. All three
+  agents explicitly hold writes/checks/audits until Root releases them after the
+  actual terminal outcome. Unrelated workstation activity remains uncontrolled.
+  The actual pilot finishes raw0 in1,850.192 operational seconds, with clean
+  owned-group cleanup and no timeout, signals or forced cleanup. The
+  [Root observer](tests/node-compat/foundation-zlib/cost-pilot-v4-root-results.json)
+  records60 calibration curves,892 fresh workers,5,352 separate controls,
+  3,568 codec batches and120 matched-N rows. It hashes33,066 indexed files;
+  33,068 files exist including the index and completion receipt. The
+  [window completion receipt](tests/node-compat/foundation-zlib/cost-pilot-v4-quiet-window-completion.json)
+  closes the coordinated hold and agents resume. This is calibration only;
+  actual timing and any performance advantage remain unverified. Independent
+  actual-result review is preserved as [unsealed work in progress](tests/node-compat/foundation-zlib/independent-cost-pilot-v4-results-review-v1/checkpoint-status.json):
+  391,060 output-replay checks and125,930 prerequisite checks pass, but final
+  outer-process provenance checks and the formal result/contract/seal remain open.
+  The timing consumer's16,384-file proof limit cannot
+  admit this pilot's full index. A separate
+  [v5 draft history](tests/node-compat/foundation-zlib/cost-pilot-timing-candidate-v5/preparation-history.json)
+  records an unsealed, unvalidated source correction: finite protocol-derived
+  bounds and distinct original-pilot/new-timing source identities. Its actual
+  calibration-review binding, dependency manifests, source/pure/parser checks,
+  template correction and seal remain open; all new action authorities are NULL.
+- The [crypto secret integration source](tests/node-compat/foundation-crypto/ownership-secret-integration-candidate-v1/README.md)
+  is now sealed at `7eb863b9…4108` (24 members), superseding its draft status at
+  the Git checkpoint. Its [independent source review](tests/node-compat/foundation-crypto/independent-ownership-secret-integration-source-review-v1/README.md)
+  passes at `8665997e…ca45`:44,751 finite data/pure/AST checks rehash4,176 inputs,
+  validate355 paths=352 unchanged+three corrected afterimages, reverse the three
+  exact derivations/22 edits, and preserve normal1391/1387 protection. Actual
+  bash/Node parser-only checks finish0. No helper, stage, native build, freezer,
+  engine, guest, crypto or fault action runs in that source scope. The
+  [owned stage controller source](tests/node-compat/foundation-crypto/ownership-secret-stage-controller-candidate-v1/README.md)
+  seals14 members at `7758e1a7…0a12`. Its [independent source review](tests/node-compat/foundation-crypto/independent-ownership-secret-stage-controller-source-review-v1/README.md)
+  passes at `ec9df97a…5804`, with27,298 read/hash/pure checks over4,189 inputs and
+  the actual1,424-copy merger. A Root reader guessed a monitor parameter name;
+  the retained history corrects that to the source-indexed actual binding,
+  without an owner action. New [source-stage authority](tests/node-compat/foundation-crypto/ownership-secret-stage-v1-root-authority.json)
+  starts Root35883/controller42623 with the genuine nested owned monitor and
+  a900-second outer/600-second stage deadline. Actual controller42623 and
+  stage42671 finish raw0 in15.275/7.675 operational seconds, with both observed
+  groups gone and no timeout, signals or forced cleanup. The Root caller then
+  exits1 because its report reader treats two monitor/result JSON lines as one
+  document. A separate [read-only observer](tests/node-compat/foundation-crypto/ownership-secret-stage-v1-observe.py)
+  finishes Root53448 raw0 and writes [result417fbe74](tests/node-compat/foundation-crypto/ownership-secret-stage-v1-root-results.json).
+  It rehashes all1,424 copy/original pairs, modes and distinct inodes, checks355
+  final sources, detached54b/no alternates/disjoint Git object inodes and normal
+  1,391/1,387 protection. Staging is not repeated; work/freeze remain absent.
+  [Independent actual-stage review](tests/node-compat/foundation-crypto/independent-ownership-secret-stage-results-review-v1/README.md)
+  passes at `41f8a49f…2ffec`, with97,074 data checks/5,636 files and complete
+  envelope/copy/normal/Git-isolation verification. The [normal-OFF build controller](tests/node-compat/foundation-crypto/ownership-secret-build-controller-candidate-v1/README.md)
+  seals15 members at `c9573e41…3643`; its [independent source review](tests/node-compat/foundation-crypto/independent-ownership-secret-build-controller-source-review-v1/README.md)
+  passes at `65caf5b0…bd3a` (43,510 finite checks/5,631 inputs). New build-only
+  [Root authority](tests/node-compat/foundation-crypto/ownership-secret-normal-off-build-v1-root-authority.json)
+  starts Root95352/controller48796 under the genuine owned monitors. The one-job
+  ordinary Release normal-OFF [build finishes raw0](tests/node-compat/foundation-crypto/ownership-secret-normal-off-build-v1-root-results.json),
+  completing all108 Ninja steps and clean owned-group cleanup in508.722 outer/
+  491.549 inner operational seconds. Fresh engine `901c7ba5…a1a7` is10,003,155
+  bytes; raw metadata `cbf93013…15c8` is393,125 bytes. The [independent BUILD-only review](tests/node-compat/foundation-crypto/independent-ownership-secret-normal-off-build-review-v1/README.md)
+  passes at `6a0ce53a…d32c`:125,165 main+705 witness+55,727 distribution checks,
+  with68 compile-DB rows=62 native+five other native-manifest sources+one null,
+  four strict/six private commands, one separate embedding command,11 manifests
+  and29 unique archives (30 ordered archive arguments). Compiler/SDK/SM/Rust/
+  OpenSSL/codec/link provenance and normal1,391/1,387 protection are verified.
+  A duplicate-link-argument reader assumption is corrected without rerunning
+  the build. No freeze, engine/runtime or production acceptance follows yet.
+  Start2GiB/stop800MiB are disk-space bounds, not memory bounds. Independent
+  BUILD-only review uses the actual terminal/result evidence.
+  New [freezer tooling SOURCE](tests/node-compat/foundation-crypto/ownership-secret-freezer-candidate-v1/README.md)
+  seals26 members at `d0d51496…f2bda`, bound to the actual BUILD review and
+  its complete input ledger. It records1,055,466 finite checks,64 pure models,
+  seven Python AST parses and24,306 canonical input paths. No helper, Ninja,
+  copy, freezer, compiler, engine or guest action runs in that source scope.
+  Independent source review, actual normal freeze and frozen-artifact review
+  remain required. Frozen-only verifier/export/pin/bootstrap tooling is explicitly
+  absent; no later variant, runtime or adoption authority is issued.
+- Scheduler [resource pin tooling](tests/node-compat/foundation-scheduler/resource-pin-tooling-candidate-v1/README.md)
+  seals39 members at `c55fd0fc…6238`. Its [independent source review](tests/node-compat/foundation-scheduler/independent-resource-pin-tooling-source-review-v1/README.md)
+  passes at `78376ab0…e07a` with7,518 finite checks/1,294 inputs. New export-only
+  Root authority starts Root38261/Python44303; the [actual export](tests/node-compat/foundation-scheduler/resource-normal-off-pin-export-v1-root-results.json)
+  finishes raw0 with clean owned-group cleanup. Candidate `93879925…5256`
+  is259,618 bytes and remains explicitly UNREVIEWED, normal-OFF only with the
+  other three variants NULL. Its [independent export review](tests/node-compat/foundation-scheduler/independent-resource-normal-off-pin-export-review-v1/README.md)
+  passes at `b552683c…fcc0`, with38,074 DATA checks/1,453 paths. New validation-only
+  [pins](tests/node-compat/foundation-scheduler/reviewed-resource-normal-off-native-pins-v1.json)
+  and a separate Root review/bootstrap authority precede Root15190. Actual CLI
+  Python46587 and API Node46632 finish raw0; the [Root result](tests/node-compat/foundation-scheduler/resource-normal-off-bootstrap-v1-root-results.json)
+  `8e1f250f…07c1` compares whole CLI/API frames with nine full manifests and
+  unchanged enginefec7/metadata51fb. Four Python calls and one Node process are
+  observed across two clean groups. The [independent bootstrap review](tests/node-compat/foundation-scheduler/independent-resource-normal-off-bootstrap-review-v1/README.md)
+  passes at `e9a798cc…3175`, with64,504 checks/1,917 hashes. Two full public frames
+  are retained; intermediate API-return equality is authenticated-code/clean-exit
+  supported rather than four separately retained frames. No engine/component/guest
+  executes. Separate [component construction source](tests/node-compat/foundation-scheduler/resource-component-candidate-v1/README.md)
+  seals99 members at `74413aa9…0055`, with33,033 source/data checks,110 pure cases,
+  ten Node parser/four Python AST checks and5,399 preparation inputs. It binds
+  the genuine c55 API/whole bootstrap frame,4,934 packaging files and22 link
+  witnesses, preserving complete callback capture before strict two-interface
+  admission. Independent source review and all construction/runtime phases remain
+  unissued. Root's independent source review is unfinished and has no sealed
+  result. Accepted production remains foundations-v13.
+- The [all-invalid task-selection source proposal](tests/node-compat/foundation-scheduler/task-selection-candidate-v1/README.md)
+  seals22 members at `d41686ae…fffb`. The existing `AsyncTask::select` changes
+  its return contract to `std::optional<size_t>`; pruning an empty queue returns
+  nullopt and its sole event-loop caller rechecks the ordinary checkpoint and
+  interest boundary before indexing. Three exact source reversals,12 standalone
+  instrumented selector cases and two actual SDK frontend calls pass, with1,031
+  dependency paths retained. No engine/component is built or run. Its
+  [independent source review](tests/node-compat/foundation-scheduler/independent-task-selection-source-review-v1/README.md)
+  passes at `f0a91441…503a`, checking37,952 predicates/1,782 hashes and1,325
+  independent scalar cases. EventLoop/interest/rooting/JS/WASI behavior is not
+  executed by those models. Native integration and real component behavior
+  remain unverified. A [new integration source](tests/node-compat/foundation-scheduler/task-selection-integration-candidate-v1/README.md)
+  seals32 members at `88af5db1…74f1`, composing342 paths=339 resource sources
+  unchanged+three selector afterimages, preserving the timer patch. Its10,007
+  source/data/pure checks, parser evidence and533-row stage plan establish no
+  actual staging/build/runtime result. Its [independent source review](tests/node-compat/foundation-scheduler/independent-task-selection-integration-source-review-v1/README.md)
+  passes at `145e3ad2…c985`, with24,904 finite checks/575 inputs, all four exact
+  derivations/25 edits and566 dynamic stage targets. The dormant publisher still
+  needs a separately reviewed owned controller and complete partial-failure
+  capture. The [new controller source](tests/node-compat/foundation-scheduler/task-selection-stage-controller-candidate-v1/README.md)
+  seals12 members at `959b3e73…fb46`:17,395 read/hash/pure/AST checks over1,933
+  inputs reconstruct566 targets and eight owned filesystem models. Original
+  modes are captured before launch; truncated/mismatched/symlink/nonregular/shared
+  inode targets remain partial observations, with raw stderr retained for normal
+  Git progress. Source/normal protection and durable failure observation are
+  explicit. No real controller, Git, stage, compiler, engine or guest executes.
+  [Independent controller source review](tests/node-compat/foundation-scheduler/independent-task-selection-stage-controller-source-review-v1/README.md)
+  passes at `8c288dc1…20dc`, with86,191 finite checks/2,375 files and33 pure
+  negative cases. New Root authority starts the actual source stage under
+  Root50545/controller95581; both finish raw0 with clean owned-group cleanup.
+  The [Root stage result](tests/node-compat/foundation-scheduler/task-selection-stage-v1-root-results.json)
+  `9c7403b0…b949` records all566 planned targets matching retained observations
+  and the final protection recheck. Independent actual-stage review and the
+  complete ABI-changing native rebuild remain required. No new engine, freeze,
+  pins or runtime gate is accepted for this selector change.
+  Fallible enqueue, cached-pollable lifetime, cancellation,
+  reset/reuse and ALS remain open.
+
+At Git checkpoint `3dcd49d`, all-work preservation was requested again on
+2026-11-05 and writers stopped. That
 checkpoint includes the subsequent crypto GC component/runtime/stock-Wasmtime
 results and independent reviews, preserved failures and corrections, scheduler
 normal build/freeze evidence and reviews, source fixes, and current documentation.

@@ -64,6 +64,7 @@ def derived(name, source, edits):
 
 
 def main():
+    assert not (HERE/'index.json').exists(), 'Sealed source family is immutable'
     parent = load(PARENT / 'policy.json')
     payload = load(PAYLOAD / 'source-contract.json')
     peer = load(PEER / 'results.json')
@@ -86,6 +87,7 @@ def main():
         payloadSourcePeer=dict(index=desc(PEER / 'index.json'), result=desc(PEER / 'results.json'),
                                contract=desc(PEER / 'result-contract.json')),
         sourceFiles=355, unchangedParentFiles=352, changedSourceFiles=3, changes=changes,
+        selectedInitialVariant='normal-off', laterVariantsImplemented=False,
         inheritedOwnerPolicyRole='Immutable owner/prototype ancestry; current355 bytes are the complete sourceManifest plus this three-file layer',
         addsHostInterfaces=False, addsNodeApi=False, algorithmSurfaceChanged=False,
         lengthPolicyChanged=False, secretCopyPolicyChanged=False, runtimeValidation=None,
@@ -135,6 +137,8 @@ verify_secret_failure_ancestry()
         ("POLICY_SHA256='" + sha((PARENT / 'policy.json').read_bytes()) + "'", "POLICY_SHA256='" + policy_desc['sha256'] + "'"),
         (old, new),
         ('verify_crypto_ancestry()\nverify_consumers_ancestry()', extra + 'verify_crypto_ancestry()\nverify_consumers_ancestry()'),
+        ('def decorate(metadata,repo,source_dir,entries,embedding_commands,enabled):\n',
+         "def decorate(metadata,repo,source_dir,entries,embedding_commands,enabled):\n    assert metadata['gcStress']is False and metadata['entropyPolicy']=='off','Only initial normal-OFF secret source producer is implemented'\n"),
         ("    metadata['cryptoKeyOwnershipPolicy']=copy.deepcopy(POLICY['cryptoKeyOwnershipSourcePolicy'])\n    return metadata",
          "    metadata['cryptoKeyOwnershipPolicy']=copy.deepcopy(POLICY['cryptoKeyOwnershipSourcePolicy'])\n" + decoration + '    return metadata'),
         ('Exact355 consumer source policy verified; no compiler or guest ran',
@@ -174,8 +178,12 @@ verify_secret_failure_ancestry()
         ('validateCryptoOwnerSourceModel', 'validateCryptoSecretFailureSourceModel'),
         ('validateCryptoOwnerSourceAdmission', 'validateCryptoSecretFailureSourceAdmission'),
         ('validateCryptoOwnerBuildSourceAdmission', 'validateCryptoSecretFailureBuildSourceAdmission'),
+        (" assert(['off','runtime-only'].includes(metadata.entropyPolicy));",
+         " assert.equal(metadata.gcStress,false,'Initial secret producer is normal-OFF only');assert.equal(metadata.entropyPolicy,'off','Later runtime-entropy source is not implemented');\n assert(['off','runtime-only'].includes(metadata.entropyPolicy));"),
         (" assert.deepEqual(metadata.cryptoKeyOwnershipPolicy,policy.cryptoKeyOwnershipSourcePolicy,'Exact new ownership layer; same355 count is not authority');",
          new_check + " assert.deepEqual(metadata.cryptoKeyOwnershipPolicy,policy.cryptoKeyOwnershipSourcePolicy,'Exact inherited ownership ancestry required');"),
+        (' return Object.freeze({cryptoKeyOwnershipSourcePolicy:policy.cryptoKeyOwnershipSourcePolicy,',
+         ' return Object.freeze({cryptoSecretFailureSourcePolicy:policy.cryptoSecretFailureSourcePolicy,cryptoKeyOwnershipSourcePolicy:policy.cryptoKeyOwnershipSourcePolicy,'),
         ('CryptoOwner355 operational admission CLOSED:', 'CryptoSecretFailure355 operational admission CLOSED:')])
 
     frozen_source = Path('/private/tmp/starling-node-compat/crypto-owner355-gc-v2-freeze/source')

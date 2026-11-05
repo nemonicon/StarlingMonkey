@@ -6,8 +6,8 @@ import {createHash} from 'node:crypto';
 import {readFileSync,lstatSync} from 'node:fs';
 import {resolve,join} from 'node:path';
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
-const PINS_SHA='d8b50ec3a9bac74a59a9c0b05821ba18654dc0cae59b311ffe91deb7631b140f';
-const RECIPE_SHA='298f227ac9aa96122624b3b7600c746f73c6c35b003df2479dcea0c2568c837e';
+const PINS_SHA='9e2c58b4e63e46a72294e009f61fdb2cdbdbdea74c10b3d57d40f88034798156';
+const RECIPE_SHA='8350aea747bbb5df6b49a3882a08eb6a874aebd600ba08ce58c86909844b254f';
 function entries(value) {
   assert(Array.isArray(value), 'Need an explicit source inventory');
   const seen = new Set();
@@ -120,6 +120,7 @@ export function validateCryptoSecretFailureSourceModel(metadata,{sourceRoot,pare
  if(enabled)for(const field of['eventsEnabled','stringDecoderEnabled','internalTicksEnabled'])assert.equal(metadata[field],true,'Classic prerequisite '+field);
  for(const[option,value]of Object.entries({CMAKE_BUILD_TYPE:'Release',WEVAL:'OFF',USE_WASM_OPT:'ON',ENABLE_BUILTIN_NODE_COMPAT:'ON',ENABLE_JS_DEBUGGER:'OFF',
   ENABLE_BUILTIN_WPT_SUPPORT:'OFF',NODE_COMPAT_LOCKED_RUST:'ON',NODE_COMPAT_OOM_TESTING:'OFF'}))for(const field of['requestedCMakeOptions','observedCMakeOptions'])assert.equal(metadata[field]?.[option],value);
+ assert.equal(metadata.gcStress,false,'Initial secret producer is normal-OFF only');assert.equal(metadata.entropyPolicy,'off','Later runtime-entropy source is not implemented');
  assert(['off','runtime-only'].includes(metadata.entropyPolicy));for(const field of['requestedCMakeOptions','observedCMakeOptions'])assert.equal(metadata[field].NODE_COMPAT_ENTROPY_MODE,metadata.entropyPolicy==='off'?'OFF':'RUNTIME_ONLY');
  assert(!(metadata.gcStress&&metadata.entropyPolicy==='runtime-only'),'RuntimeOnly+GC is outside this finite producer');
  assert.equal(metadata.hostApi,'wasi-0.2.10');assert.equal(metadata.generatedRustProject?.cargoBuildLocked,true);assert.equal(metadata.generatedRustProject?.manifestAndLockCheckedBeforeAndAfterBuild,true);
@@ -195,7 +196,7 @@ export function validateCryptoSecretFailureSourceModel(metadata,{sourceRoot,pare
  assert.deepEqual([...secretEvidence.changedNativeCompileCommands].sort(),policy.cryptoSecretFailureSourcePolicy.changes.filter(row=>row.path.endsWith('.cpp')).map(row=>layout.get(row.path)).sort());
  assert.deepEqual(metadata.cryptoKeyOwnershipPolicy,policy.cryptoKeyOwnershipSourcePolicy,'Exact inherited ownership ancestry required');
  const cryptoEvidence=metadata.cryptoKeyOwnershipBuildEvidence;assert.equal(cryptoEvidence?.cryptoBuiltinEnabled,true);assert.equal(cryptoEvidence.cachePath,metadata.cmakeCachePath);assert.equal(cryptoEvidence.cacheSha256,metadata.cmakeCacheSha256);assert.equal(cryptoEvidence.installationSource.namespace,'NS_DEF(builtins::web::crypto)');assert.equal(cryptoEvidence.installationSource.count,1);assert.equal(cryptoEvidence.installationSource.sha256,consumers.installationOrder.sha256);assert.deepEqual([...cryptoEvidence.changedNativeCompileCommands].sort(),policy.cryptoKeyOwnershipSourcePolicy.changes.filter(row=>row.path.endsWith('.cpp')).map(row=>layout.get(row.path)).sort());
- return Object.freeze({cryptoKeyOwnershipSourcePolicy:policy.cryptoKeyOwnershipSourcePolicy,streamConsumersEnabled:metadata.streamConsumersEnabled,zlibEnabled:metadata.zlibEnabled,branch:policy.version,classicStreamsEnabled:enabled,internalTicksEnabled:ticksEnabled,sourceInputs:355,
+ return Object.freeze({cryptoSecretFailureSourcePolicy:policy.cryptoSecretFailureSourcePolicy,cryptoKeyOwnershipSourcePolicy:policy.cryptoKeyOwnershipSourcePolicy,streamConsumersEnabled:metadata.streamConsumersEnabled,zlibEnabled:metadata.zlibEnabled,branch:policy.version,classicStreamsEnabled:enabled,internalTicksEnabled:ticksEnabled,sourceInputs:355,
   selectedClassicManifest:enabled?policy.classicManifest:null,runtimeOrGuestExecutionProof:false,resetSafeReuse:'OPEN'});
 }
 // Operational admission stays closed until a separately reviewed runtime-evidence
