@@ -2,7 +2,7 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
-Last updated: 2026-11-06. Overall roadmap: **in progress**.
+Last updated: 2026-11-07. Overall roadmap: **in progress**.
 
 
 **Latest actual Next result:24/24 HTTP,2/2 browser; full selected contract passes.**
@@ -24,6 +24,55 @@ and [matched Node reader](tests/node-compat/frameworks/nextjs/next-intl-runtime-
 both pass Root readback. Full raw process, HTTP, stream, browser, decoded body
 and screenshot evidence is retained; generated action RSC bodies retain their
 distinct hashes. These DATA readers validate evidence without executing targets.
+
+**Next phase in progress:** the [native signal-pipe regression](tests/node-compat/frameworks/nextjs/native-pipe-root-results-v1/README.md)
+now has an actual pinned Node reference: three complete calls ×12 cases,
+36 captured records, raw0/clean and empty stderr. Complete monitor/stdout records
+are retained. These are reference records, not Node/guest comparisons. A
+reporting-label mistake in the original observation is preserved and clarified.
+The [strict real-component collector](tests/node-compat/frameworks/nextjs/native-pipe-wasmtime-collector-v1/README.md)
+now runs successfully: all36 actual guest records match Node exactly, runtime
+and constructor parents0/clean with inputs preserved. Component1c711297 is
+37,162,665 bytes and emits exactly13 selected standard0.2.10 imports. This tests
+the guest facade over actual native streams, not a replacement C++ pipeTo or
+native teardown/resource-count proof. The [portable actual review](tests/node-compat/frameworks/nextjs/native-pipe-root-results-v1/actual-review/README.md)
+retains169 raw/source records and passes Root's DATA readback; its optional
+current check covers188 selected descriptors, not a recursive SDK audit.
+The collector's42 pure retained-DATA/
+mutation checks and27 Source joins remain separate. Root's wrapper checks
+the referenced8025 WIT family, exact file/directory membership and all8 WIT
+descriptors before/finally, with independent source review. The earlier
+unexecuted grant lacking that explicit whole-family guard is retained.
+The [request-context/lifecycle audit](docs/node-compat/nextjs-context-lifecycle-plan.md)
+identifies the nonreentrant embedding, cross-owner Promise coverage, surviving
+unref-task policy and missing peer-disconnect→Request.signal mapping. These are
+coverage/design boundaries, not newly observed native failures. A five-control
+same-export native A/B differential Source now passes918 host assertions across
+six collections (original Node and sealed facade); this is not native proof.
+It constructs as component938e6913/37,207,968 bytes, three phases plus parent0/
+clean, same13standardimports and unchanged whole-world guard. The actual V2
+runtime now passes all459 native assertions across three HTTP calls, with29
+required event edges per call and exact original-Node public projections.
+Runtime/parent0, clean owned shutdown and input preservation pass. These are
+genuine native logical branches within an export; actual same-Store HTTP
+concurrency, unref-across-calls and peer-disconnect teardown remain open.
+Independent review found that the first
+collector's positive self-report gate could reuse a structurally unknown
+collection before later strict validation rejected it. No runtime was launched
+with that collector or its grant. Both are retained; a successor will require
+strict schema/assertion/edge validation after saving each body and before any
+reuse, while preserving the all-three-before-Node-comparison fence. The V2
+successor implements that correction and passes85 inert DATA checks, including
+four actual old-pass/new-refuse cases and stop-before-next-request controls.
+Only V2 was executed. Its [portable actual review](tests/node-compat/async-context/context-interleaving-root-results-v1/actual-review/README.md)
+is sealed and passes Root's DATA readback:154 retained records, all459 native
+assertions/87 edges and15 original-Node public projections, with918 host checks
+kept separate. The next separate Source workload tests preserving unref work across
+ordinary component calls and cancellation from a later request.
+Earlier811–996MiB capacity holds ended
+when free space rose above the unchanged1,024MiB construction start guard; both
+constructors then ran. No proof or shared binary was deleted and no guard was
+lowered. Temporary disk peak remains unmeasured.
 
 The prior24/24 HTTP,1/2 browser failure remains preserved. Its counter click
 preceded client scripts by about2.15s. The new worker waits for load and the

@@ -152,9 +152,10 @@ replace the runtime command above.
 
 1. Package the exact working generation into a reproducible build/release path;
    application mounting and local artifact inventories currently remain explicit.
-2. Run the prepared native pipe cancellation/backpressure/error/lock regression,
-   then broaden meaningful context, cancellation, overlapping-request and teardown
-   checks. The passing sequential smoke is not exhaustive lifetime evidence.
+2. The follow-up [native pipe regression](../../tests/node-compat/frameworks/nextjs/native-pipe-root-results-v1/actual-review/README.md)
+   now passes all36 selected records on2026-11-07. Broaden context, cancellation,
+   overlapping-request and teardown checks. The passing sequential smoke and
+   selected stream cases are not exhaustive lifetime evidence.
 3. Integrate or retain each audited facade through an explicit production
    decision, preserving error semantics, native roots/ownership and named ESM
    bindings. Run the required production suites before changing the accepted

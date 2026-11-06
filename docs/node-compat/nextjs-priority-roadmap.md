@@ -1,6 +1,6 @@
 # Next.js execution priority
 
-Updated 2026-11-06. The complete existing **Next 16.4.5 / React 19.3.1 App Router
+Updated 2026-11-07. The complete existing **Next 16.4.5 / React 19.3.1 App Router
 application now passes the selected experimental Wasmtime smoke contract**:
 24/24 HTTP checks, cache generation 1 → 2, five incremental Suspense chunks,
 and both browser interactions, with zero recorded browser or observer errors.
@@ -84,8 +84,8 @@ substitutes for this application contract.
 | Priority | Work | Completion gate |
 | --- | --- | --- |
 | 1 | Make the passing generation reproducible | The [retained-artifact runner](../../tests/node-compat/frameworks/nextjs/run-native-next-regression.py) supplies fresh run IDs and the existing pinned path; the first run and a fresh repeat both pass. Keep complete raw evidence and DATA checks. Portable clean-machine bootstrap remains open; historical failures remain unchanged. |
-| 2 | Regress response and compression semantics | Retain the actual JSON/action/static/cache/Suspense/browser pass. Expand meaningful pipeTo cancellation, abort, backpressure, throw, close and listener-cleanup controls; decide native integration versus the audited facade with a new tested generation. Encoded-wire diagnostics are optional evidence, not an assumed missing fix. |
-| 3 | Close context and resource boundaries | Concurrent first preparation, overlapping requests, native Promise/task/tick/timer restoration, disable/re-enable, cancellation and teardown. AsyncResource currently supports only the selected constructor/runInAsyncScope path; IDs, hooks, emitDestroy, bind and ESM rebinding are not inferred. |
+| 2 | Regress response and compression semantics | The [twelve-case native-stream probe](../../tests/node-compat/frameworks/nextjs/native-pipe-root-results-v1/README.md) now matches all36 actual Node records in a real component, raw0/clean. It covers cancellation, abort, falsy errors, backpressure, final chunks and locks without expected-gap allowances. This validates the audited guest facade over native streams, not a new C++ pipeTo path or native resource-count/teardown proof. Broader cancellation/compression boundaries remain open. |
+| 3 | Close context and resource boundaries | The [five-control workload](../../tests/node-compat/async-context/context-interleaving-candidate-v1/README.md) now passes459 actual native assertions and original-Node public projections across three calls. This covers same-export A/B interleaving, cross-owner Promises, logical readiness, disable/captures and normal timer abort. Next are unref across ordinary calls, tagged real HTTP and peer disconnect in the [lifecycle plan](nextjs-context-lifecycle-plan.md). Pooled HTTP is not same-Store proof; native counts/teardown and broader AsyncResource remain open. |
 | 4 | Prepare production promotion | Review exact selected manifests, defaults, build inputs, INIT barriers, facade limits and host rights; run the required release and compatibility suites before any profile/API promotion. Keep foundations-v13 accepted until this decision is explicit. |
 | 5 | Measure the working profile | Reproducible component size, cold/warm startup, memory and throughput against declared controls. The functional pass establishes no performance advantage or memory bound. |
 | 6 | Report other hosts honestly | Separate cold-instance wasmCloud observations from retained Wasmtime behavior. No host changes or P3 substitution to manufacture the selected P2 retained-server contract. |

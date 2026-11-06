@@ -1,22 +1,29 @@
 # Dependency ordered implementation roadmap
 
 **Current execution priority:** follow the [Next.js priority roadmap](nextjs-priority-roadmap.md)
-to run the complete existing application in a real component. It defines the
-dependency order, success gate, verified controls and remaining work. Generic
+after the first complete application pass in a real component. Two fresh
+Wasmtime runs and a matched Node control now pass24/24 HTTP, cache invalidation,
+incremental Suspense and both hydrated browser interactions. The next gates
+are native stream semantics, request context/lifetime, reproducible packaging
+and explicit production promotion. See the [milestone](nextjs-wasm-milestone-2026-11-06.md)
+and [context/lifecycle plan](nextjs-context-lifecycle-plan.md). Generic
 diagnostics and unrelated compatibility expansion move behind Next dependencies;
 the chronological evidence below remains historical context.
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
-Measured application demand now includes the [Next16.4.5 regression project](../../tests/node-compat/frameworks/nextjs/README.md).
-Two real Node builds/HTTP/browser baselines pass. The unchanged profile refuses
+Measured application demand includes the [Next16.4.5 regression project](../../tests/node-compat/frameworks/nextjs/README.md).
+The experimental native loader/entry route now passes its selected full app
+contract on stock Wasmtime42.0.1 with declared instance reuse. It has thirteen
+standard WASI0.2.10 imports; complete Node/Buffer support and production
+promotion remain open. The original foundations-v13 bundler profile refuses
 Next/React general CommonJS packaging and eight unselected Node modules; the
 shared guest application fails on explicitly deferred `util.format`. A separate
 supported native-module differential passes Node/Jco/Wasmtime. Preserve these
-known failures as future checks. Prioritize audited package CommonJS bundling,
-bounded formatting semantics, genuine request async context and standard WASI
-HTTP integration under the existing phase dependencies. A static export or a
-passing library slice does not close the full Next server gate.
+known failures as separate future checks. They are historical regression
+baselines rather than the status of the new working generation. The first full
+app pass does not substitute for deeper native context, resource, lifecycle,
+measurement and release gates under the original phase dependencies.
 
 The [optional package-bundler follow-on](../../tests/node-compat/frameworks/package-bundler-execution-v1/README.md)
 now passes real native CommonJS interop, supported-module and React-element
