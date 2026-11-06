@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 1,
+  "suite": "ACTUAL_WASMCLOUD_STANDARD_WASI_DEPLOYMENT_PROBE_V1",
+  "component": {
+    "path": "/private/tmp/starling-node-compat/deployment-probe-v3/probe.component.wasm",
+    "sha256": "32830d393ceccc7aaf7f399bd6816ab54928cc240db9b228352b3f16d2f1d720",
+    "bytes": 93929
+  },
+  "imports": [
+    "wasi:cli/environment@0.2.10",
+    "wasi:clocks/monotonic-clock@0.2.10",
+    "wasi:clocks/wall-clock@0.2.10",
+    "wasi:filesystem/preopens@0.2.10",
+    "wasi:filesystem/types@0.2.10",
+    "wasi:http/types@0.2.10",
+    "wasi:io/error@0.2.10",
+    "wasi:io/poll@0.2.10",
+    "wasi:io/streams@0.2.10",
+    "wasi:random/random@0.2.10"
+  ],
+  "exports": [
+    "wasi:http/incoming-handler@0.2.10"
+  ],
+  "command": [
+    "/private/tmp/starling-node-compat/wasmcloud/bin/wash-2.11.0-aarch64-apple-darwin",
+    "--user-config",
+    "/private/tmp/starling-node-compat/deployment-host-wasmcloud-v1/empty-user-config.json",
+    "-C",
+    "/private/tmp/starling-node-compat/deployment-host-wasmcloud-v1/project",
+    "--log-level",
+    "info",
+    "--meters",
+    "duration",
+    "dev"
+  ],
+  "effectiveConfiguration": {
+    "build": {
+      "command": "test -f \"$WASH_COMPONENT_PATH\"",
+      "component_path": "/private/tmp/starling-node-compat/deployment-probe-v3/probe.component.wasm"
+    },
+    "dev": {
+      "address": "127.0.0.1:58901",
+      "allow_insecure_registries": false,
+      "command": "test -f \"$WASH_COMPONENT_PATH\"",
+      "component_path": "/private/tmp/starling-node-compat/deployment-probe-v3/probe.component.wasm",
+      "service": false,
+      "volumes": [
+        {
+          "guest_path": "/app",
+          "host_path": "/private/tmp/starling-node-compat/deployment-host-wasmcloud-v1/app"
+        },
+        {
+          "guest_path": "/cache",
+          "host_path": "/private/tmp/starling-node-compat/deployment-host-wasmcloud-v1/cache"
+        }
+      ],
+      "wasi_otel": false,
+      "wasi_webgpu": false,
+      "wasm_proposals": []
+    },
+    "version": "2.11.0",
+    "wit": {
+      "registries": [],
+      "skip_fetch": true,
+      "sources": {},
+      "wit_dir": null
+    },
+    "workload": {
+      "allowedHostLoopbackPorts": [],
+      "allowedHosts": [],
+      "allowedIpNameLookups": [],
+      "environment": {
+        "config": {
+          "STARLING_NEXT_PROBE": "capabilities-v1"
+        }
+      }
+    }
+  },
+  "responses": [
+    {
+      "status": 200,
+      "body": {
+        "schemaVersion": 1,
+        "probe": "standard-wasi-deployment-v1",
+        "counter": 1,
+        "monotonicBefore": "1027917",
+        "monotonicAfter": "3376333",
+        "wallSeconds": 1793968193,
+        "wallNanoseconds": 260323000,
+        "randomHex": "6a3faad58b8544ff",
+        "environmentMarker": "capabilities-v1",
+        "argumentCount": 0,
+        "initialCwd": null,
+        "preopens": [
+          {
+            "name": "/app",
+            "descriptorFlags": 33,
+            "readFixture": true,
+            "createAllowed": false,
+            "createError": 0
+          },
+          {
+            "name": "/cache",
+            "descriptorFlags": 33,
+            "create": true,
+            "write": true,
+            "read": true,
+            "link": true,
+            "secondLink": false,
+            "secondLinkError": 7,
+            "rename": true,
+            "unlink": true
+          }
+        ]
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "schemaVersion": 1,
+        "probe": "standard-wasi-deployment-v1",
+        "counter": 1,
+        "monotonicBefore": "78209",
+        "monotonicAfter": "2391167",
+        "wallSeconds": 1793968193,
+        "wallNanoseconds": 273069000,
+        "randomHex": "daa16a36016f68bc",
+        "environmentMarker": "capabilities-v1",
+        "argumentCount": 0,
+        "initialCwd": null,
+        "preopens": [
+          {
+            "name": "/app",
+            "descriptorFlags": 33,
+            "readFixture": true,
+            "createAllowed": false,
+            "createError": 0
+          },
+          {
+            "name": "/cache",
+            "descriptorFlags": 33,
+            "create": true,
+            "write": true,
+            "read": true,
+            "link": true,
+            "secondLink": false,
+            "secondLinkError": 7,
+            "rename": true,
+            "unlink": true
+          }
+        ]
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "schemaVersion": 1,
+        "probe": "standard-wasi-deployment-v1",
+        "counter": 1,
+        "monotonicBefore": "96125",
+        "monotonicAfter": "2613458",
+        "wallSeconds": 1793968193,
+        "wallNanoseconds": 279413000,
+        "randomHex": "303ed954fdd852c0",
+        "environmentMarker": "capabilities-v1",
+        "argumentCount": 0,
+        "initialCwd": null,
+        "preopens": [
+          {
+            "name": "/app",
+            "descriptorFlags": 33,
+            "readFixture": true,
+            "createAllowed": false,
+            "createError": 0
+          },
+          {
+            "name": "/cache",
+            "descriptorFlags": 33,
+            "create": true,
+            "write": true,
+            "read": true,
+            "link": true,
+            "secondLink": false,
+            "secondLinkError": 7,
+            "rename": true,
+            "unlink": true
+          }
+        ]
+      }
+    }
+  ],
+  "readinessFailures": [
+    {
+      "name": "TypeError",
+      "message": "fetch failed"
+    }
+  ],
+  "errors": [],
+  "realComponentExecuted": true,
+  "starlingMonkeyExecuted": false,
+  "nextExecuted": false,
+  "forcedCleanup": false,
+  "limitations": [
+    "wash dev main component is configured with UNSET_LIMIT/ephemeral policy; warm-instance deployment is a separate unexecuted gate.",
+    "Read-only app uses owned Unix permissions; no per-mount narrowed WASI rights claimed."
+  ],
+  "origin": "http://127.0.0.1:58901",
+  "passed": true,
+  "process": {
+    "code": 0,
+    "signal": null
+  }
+}

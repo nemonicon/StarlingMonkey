@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "privateManifestVersion": "starling-node-startup-v1",
+  "specifier": "starling:node-startup",
+  "exports": {
+    "bootstrap": "() -> actual process object"
+  },
+  "nativeRegistration": "actual engine.define_builtin_module, guest factory binding only; not a host import/service",
+  "publicNodeManifest": false,
+  "deployedOnly": true,
+  "requiredOrder": [
+    "neutral deployed server-root entry",
+    "bootstrap()",
+    "Module require of actual standalone app",
+    "app.prepare()",
+    "fresh request/ALS boundary before request/body construction"
+  ],
+  "allowedDuringINIT": false,
+  "implicitProfilePluginSelection": false,
+  "bundlerSelection": "Must be explicit diagnostic/bootstrap native specifier selection; do not pass this non-node manifest to existing public validateManifest/builtinMap. Public three manifests remain schema-valid node: only.",
+  "operationalAuthority": null
+}

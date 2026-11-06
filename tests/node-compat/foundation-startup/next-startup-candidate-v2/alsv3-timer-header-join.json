@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "alsV2": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/native-als-candidate-v2/after/include/extension-api.h",
+    "sha256": "43c6f47a78d0babbd178c7c3cb63c6a83fd5f82afb285c37916a1344b8e53e71",
+    "bytes": 8109
+  },
+  "alsV3": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/native-als-candidate-v3/after/include/extension-api.h",
+    "sha256": "9c5f463ece0c94789e0b42b02b365bca646dce63eb1ca023c5fbff1334c76b70",
+    "bytes": 8096
+  },
+  "timerHeader": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-timers/node-timers-candidate-v1/after/include/extension-api.h",
+    "sha256": "bebe7a0af2d399c7af7880448c89e646485192dc5e5f374ded12350adb522f3f",
+    "bytes": 8335
+  },
+  "editsOnCorrectedV3": [
+    {
+      "before": "andle_;\n  }\n\n  [[nodiscard]] virtual uint64_t deadline() {\n    return 0;\n  }\n\n  virtual void trace(JSTracer *trc) = 0;\n\n  /**\n   * Select the oldest ready task ",
+      "after": "andle_;\n  }\n\n  [[nodiscard]] virtual uint64_t deadline() {\n    return 0;\n  }\n\n  // Node unref tasks stay owned/traceable, but cannot by themselves justify\n  // blocking the component event loop. Legacy task kinds retain true.\n  [[nodiscard]] virtual bool keeps_event_loop_alive() const { return true; }\n\n  virtual void trace(JSTracer *trc) = 0;\n\n  /**\n   * Select the oldest ready task ",
+      "inserted": "// Node unref tasks stay owned/traceable, but cannot by themselves justify\n  // blocking the component event loop. Legacy task kinds retain true.\n  [[nodiscard]] virtual bool keeps_event_loop_alive() const { return true; }\n\n  "
+    }
+  ],
+  "after": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-startup/next-startup-candidate-v2/syntax-overlay/include/extension-api.h",
+    "sha256": "e7d7c52c5509f5bc8aab6b95e82350b41ec3dabed41209173f39ae1bbb0eb5f3",
+    "bytes": 8322
+  },
+  "preservesActualNullableCtorFix": true,
+  "vmChangesIncluded": false
+}

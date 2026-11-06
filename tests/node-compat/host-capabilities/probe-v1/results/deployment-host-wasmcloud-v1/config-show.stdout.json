@@ -1,0 +1,47 @@
+{
+  "message": "version: 2.11.0\nbuild:\n  command: test -f \"$WASH_COMPONENT_PATH\"\n  component_path: /private/tmp/starling-node-compat/deployment-probe-v3/probe.component.wasm\ndev:\n  command: test -f \"$WASH_COMPONENT_PATH\"\n  component_path: /private/tmp/starling-node-compat/deployment-probe-v3/probe.component.wasm\n  address: 127.0.0.1:58901\n  service: false\n  allow_insecure_registries: false\n  volumes:\n  - host_path: /private/tmp/starling-node-compat/deployment-host-wasmcloud-v1/app\n    guest_path: /app\n  - host_path: /private/tmp/starling-node-compat/deployment-host-wasmcloud-v1/cache\n    guest_path: /cache\n  wasi_webgpu: false\n  wasi_otel: false\n  wasm_proposals: []\nworkload:\n  environment:\n    config:\n      STARLING_NEXT_PROBE: capabilities-v1\n  allowedHosts: []\n  allowedIpNameLookups: []\n  allowedHostLoopbackPorts: []\nwit:\n  registries: []\n  skip_fetch: true\n  wit_dir: null\n  sources: {}\n",
+  "success": true,
+  "data": {
+    "build": {
+      "command": "test -f \"$WASH_COMPONENT_PATH\"",
+      "component_path": "/private/tmp/starling-node-compat/deployment-probe-v3/probe.component.wasm"
+    },
+    "dev": {
+      "address": "127.0.0.1:58901",
+      "allow_insecure_registries": false,
+      "command": "test -f \"$WASH_COMPONENT_PATH\"",
+      "component_path": "/private/tmp/starling-node-compat/deployment-probe-v3/probe.component.wasm",
+      "service": false,
+      "volumes": [
+        {
+          "guest_path": "/app",
+          "host_path": "/private/tmp/starling-node-compat/deployment-host-wasmcloud-v1/app"
+        },
+        {
+          "guest_path": "/cache",
+          "host_path": "/private/tmp/starling-node-compat/deployment-host-wasmcloud-v1/cache"
+        }
+      ],
+      "wasi_otel": false,
+      "wasi_webgpu": false,
+      "wasm_proposals": []
+    },
+    "version": "2.11.0",
+    "wit": {
+      "registries": [],
+      "skip_fetch": true,
+      "sources": {},
+      "wit_dir": null
+    },
+    "workload": {
+      "allowedHostLoopbackPorts": [],
+      "allowedHosts": [],
+      "allowedIpNameLookups": [],
+      "environment": {
+        "config": {
+          "STARLING_NEXT_PROBE": "capabilities-v1"
+        }
+      }
+    }
+  }
+}

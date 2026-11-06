@@ -1,0 +1,41 @@
+{
+  "workloadId": "wasi-probe-normal-v1",
+  "workload": {
+    "namespace": "isolated-local-probe",
+    "name": "standard-wasi-p2-probe",
+    "witWorld": {
+      "components": [{
+        "image": "$ROOT_OCI_DIGEST_REFERENCE",
+        "name": "probe",
+        "imagePullPolicy": "IMAGE_PULL_POLICY_ALWAYS",
+        "poolSize": 1,
+        "maxInvocations": 32,
+        "maxConcurrency": 1,
+        "reclaimWindowSeconds": 0,
+        "reclaimMinInstances": 0,
+        "localResources": {
+          "environment": {"STARLING_NEXT_PROBE": "normal-p2-private-v1"},
+          "volumeMounts": [
+            {"name": "app", "mountPath": "/app", "readOnly": true},
+            {"name": "cache", "mountPath": "/cache", "readOnly": false},
+            {"name": "cache", "mountPath": "/app/.next/cache", "readOnly": false}
+          ],
+          "allowedHosts": [],
+          "allowedIpNameLookups": [],
+          "allowedHostLoopbackPorts": []
+        }
+      }],
+      "hostInterfaces": [{
+        "namespace": "wasi",
+        "package": "http",
+        "version": "0.2.10",
+        "interfaces": ["incoming-handler"],
+        "config": {"host": "probe.invalid"}
+      }]
+    },
+    "volumes": [
+      {"name": "app", "hostPath": {"localPath": "$ROOT_PRIVATE_APP"}},
+      {"name": "cache", "hostPath": {"localPath": "$ROOT_PRIVATE_CACHE"}}
+    ]
+  }
+}

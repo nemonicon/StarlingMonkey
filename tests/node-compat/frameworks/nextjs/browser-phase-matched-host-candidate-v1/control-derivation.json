@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "selectedDonor": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/native-profile-host-v2/run-next-host.mjs",
+    "sha256": "3a666cefdf965f6594a917aced3b9ef00494107a1c73e42f7d691978624c8d75",
+    "bytes": 13335
+  },
+  "selectedEdits": [
+    {
+      "before": "import {createHostProfile} from './module-host-provider.mjs';",
+      "after": "import {createHostProfile} from '../native-profile-host-v2/module-host-provider.mjs';"
+    },
+    {
+      "before": "assert(root.startsWith('/private/tmp/starling-node-compat/next-native-profile-host-'));",
+      "after": "assert.equal(root,'/private/tmp/starling-node-compat/next-browser-phase-selected-v1');"
+    },
+    {
+      "before": "FULL_NEXT_SELECTED_HTTP_CLASSIC_TOWEB_IMPORTS_PRIVATE_VM_HOST_V2",
+      "after": "FULL_NEXT_SELECTED_TOWEB_INSTRUMENTED_BROWSER_CONTROL_V1"
+    },
+    {
+      "before": "join(here, 'module-host-provider.mjs')",
+      "after": "join(here, '../native-profile-host-v2/module-host-provider.mjs')"
+    },
+    {
+      "before": "join(here, '../browser-check.mjs')",
+      "after": "join(here, 'browser-check.mjs')"
+    }
+  ],
+  "stockDonor": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/http-bridge-candidate-v1/run-module-host.mjs",
+    "sha256": "3f60f6a85508f4b879ac932e1a0c58b945e93edb6dde118aaf5782b55ebf8974",
+    "bytes": 10587
+  },
+  "stockEdits": [
+    {
+      "before": "import {createRequestBridge} from './bridge.mjs';",
+      "after": "import {createRequestBridge} from '../http-bridge-candidate-v1/bridge.mjs';"
+    },
+    {
+      "before": "import {createHostModuleRequire} from './module-host-provider.mjs';",
+      "after": "import {createHostModuleRequire} from '../http-bridge-candidate-v1/module-host-provider.mjs';"
+    },
+    {
+      "before": "assert(root.startsWith('/private/tmp/starling-node-compat/next-http-bridge-'));",
+      "after": "assert.equal(process.argv.length,5);assert(browserTools,'Both browser checks mandatory');\nassert.equal(root,'/private/tmp/starling-node-compat/next-browser-phase-stock-v1');"
+    },
+    {
+      "before": "FULL_NEXT_NODE_HOST_MODULE_CORE_HTTP_BRIDGE_V1",
+      "after": "FULL_NEXT_STOCK_ORIGINAL_MODULE_BRIDGE_INSTRUMENTED_BROWSER_CONTROL_V1"
+    },
+    {
+      "before": "join(here, 'bridge.mjs')",
+      "after": "join(here, '../http-bridge-candidate-v1/bridge.mjs')"
+    },
+    {
+      "before": "join(here, 'module-host-provider.mjs')",
+      "after": "join(here, '../http-bridge-candidate-v1/module-host-provider.mjs')"
+    },
+    {
+      "before": "join(here, '../browser-check.mjs')",
+      "after": "join(here, 'browser-check.mjs')"
+    },
+    {
+      "before": "&& result.cacheInvalidation?.passed === true && result.streaming?.complete === true\n    && (!browserTools || result.browserExit?.code === 0)",
+      "after": "&& result.cacheInvalidation?.passed === true && result.streaming?.complete === true && result.streaming?.incrementalDeliveryObserved === true\n    && result.browserExit?.code === 0 && result.browser?.passed === true"
+    }
+  ],
+  "stockGatesStrengthenedToMatchedMandatoryStrictBrowser": true,
+  "selectedProfileUnchanged": true,
+  "hostOnly": true
+}

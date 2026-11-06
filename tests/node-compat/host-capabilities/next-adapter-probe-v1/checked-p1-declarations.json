@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "sourceHeader": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasi-sdk/85e6/share/wasi-sysroot/include/wasm32-wasi/wasi/wasip1.h",
+  "declarations": {
+    "__wasi_fd_write": "__wasi_errno_t\n__wasi_fd_write(__wasi_fd_t fd,\n                /**\n                 * List of scatter/gather vectors from which to retrieve data.\n                 */\n                const __wasi_ciovec_t *iovs,\n                /**\n                 * The length of the array pointed to by `iovs`.\n                 */\n                size_t iovs_len, __wasi_size_t *retptr0)\n    __attribute__((__warn_unused_result__));",
+    "__wasi_fd_fdstat_get": "__wasi_errno_t __wasi_fd_fdstat_get(__wasi_fd_t fd, __wasi_fdstat_t *retptr0)\n    __attribute__((__warn_unused_result__));",
+    "__wasi_fd_read": "__wasi_errno_t\n__wasi_fd_read(__wasi_fd_t fd,\n               /**\n                * List of scatter/gather vectors to which to store data.\n                */\n               const __wasi_iovec_t *iovs,\n               /**\n                * The length of the array pointed to by `iovs`.\n                */\n               size_t iovs_len, __wasi_size_t *retptr0)\n    __attribute__((__warn_unused_result__));",
+    "__wasi_clock_time_get": "__wasi_errno_t __wasi_clock_time_get(\n    /**\n     * The clock for which to return the time.\n     */\n    __wasi_clockid_t id,\n    /**\n     * The maximum lag (exclusive) that the returned time value may have,\n     * compared to its actual value.\n     */\n    __wasi_timestamp_t precision, __wasi_timestamp_t *retptr0)\n    __attribute__((__warn_unused_result__));",
+    "__wasi_clock_res_get": "__wasi_errno_t __wasi_clock_res_get(\n    /**\n     * The clock for which to return the resolution.\n     */\n    __wasi_clockid_t id, __wasi_timestamp_t *retptr0)\n    __attribute__((__warn_unused_result__));",
+    "__wasi_random_get": "__wasi_errno_t __wasi_random_get(\n    /**\n     * The buffer to fill with random data.\n     */\n    uint8_t *buf, __wasi_size_t buf_len)\n    __attribute__((__warn_unused_result__));",
+    "__wasi_fd_prestat_get": "__wasi_errno_t __wasi_fd_prestat_get(__wasi_fd_t fd, __wasi_prestat_t *retptr0)\n    __attribute__((__warn_unused_result__));",
+    "__wasi_fd_prestat_dir_name": "__wasi_errno_t __wasi_fd_prestat_dir_name(\n    __wasi_fd_t fd,\n    /**\n     * A buffer into which to write the preopened directory name.\n     */\n    uint8_t *path, __wasi_size_t path_len)\n    __attribute__((__warn_unused_result__));",
+    "__wasi_path_open": "__wasi_errno_t __wasi_path_open(\n    __wasi_fd_t fd,\n    /**\n     * Flags determining the method of how the path is resolved.\n     */\n    __wasi_lookupflags_t dirflags,\n    /**\n     * The relative path of the file or directory to open, relative to the\n     * `path_open::fd` directory.\n     */\n    const char *path,\n    /**\n     * The method by which to open the file.\n     */\n    __wasi_oflags_t oflags,\n    /**\n     * The initial rights of the newly created file descriptor. The\n     * implementation is allowed to return a file descriptor with fewer rights\n     * than specified, if and only if those rights do not apply to the type of\n     * file being opened.\n     * The *base* rights are rights that will apply to operations using the file\n     * descriptor itself, while the *inheriting* rights are rights that apply to\n     * file descriptors derived from it.\n     */\n    __wasi_rights_t fs_rights_base, __wasi_rights_t fs_rights_inheriting,\n    __wasi_fdflags_t fdflags, __wasi_fd_t *retptr0)\n    __attribute__((__warn_unused_result__));",
+    "__wasi_fd_close": "__wasi_errno_t __wasi_fd_close(__wasi_fd_t fd)\n    __attribute__((__warn_unused_result__));"
+  },
+  "badfMacro": "__WASI_ERRNO_BADF=8",
+  "pathOpenPublicHelperHasPathLengthArgument": false,
+  "noGuestExecuted": true
+}

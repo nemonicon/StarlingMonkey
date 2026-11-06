@@ -1,0 +1,103 @@
+[
+  {
+    "argv": [
+      "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasi-sdk/85e6/bin/clang",
+      "--target=wasm32-wasi",
+      "-std=c17",
+      "-O2",
+      "-DNDEBUG",
+      "-Wall",
+      "-Werror",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-nostartfiles",
+      "-Wl,--no-entry",
+      "-Wl,--gc-sections",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/source/probe.c",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/source/bindings.c",
+      "-o",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.core.wasm"
+    ],
+    "terminal": {
+      "path": "/private/tmp/starling-node-compat/deployment-probe-v2/step-0/terminal.json",
+      "sha256": "56e77059a4d39260f8ad7bacea0e076de0c53146a4146334302be5b2f7a04f46",
+      "bytes": 1855
+    },
+    "passed": true
+  },
+  {
+    "argv": [
+      "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+      "component",
+      "embed",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/wit",
+      "--world",
+      "profile",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.core.wasm",
+      "-o",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.embedded.wasm"
+    ],
+    "terminal": {
+      "path": "/private/tmp/starling-node-compat/deployment-probe-v2/step-1/terminal.json",
+      "sha256": "eddd81bfd82e9598f545464ef2b58ac467e1b2e4fde7611951fc29ef315225aa",
+      "bytes": 1298
+    },
+    "passed": true
+  },
+  {
+    "argv": [
+      "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+      "component",
+      "new",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.embedded.wasm",
+      "-o",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.component.wasm"
+    ],
+    "terminal": {
+      "path": "/private/tmp/starling-node-compat/deployment-probe-v2/step-2/terminal.json",
+      "sha256": "f920a8421e1225aee5eb76a2c125be7ce3e2fe798c0aec371488ea2b8ae62d6a",
+      "bytes": 1305
+    },
+    "passed": true
+  },
+  {
+    "argv": [
+      "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+      "validate",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.component.wasm"
+    ],
+    "terminal": {
+      "path": "/private/tmp/starling-node-compat/deployment-probe-v2/step-3/terminal.json",
+      "sha256": "2ec5c23e87bca5bef3a2670dcc69ece9936a31c4b44365da08af72bcf4f9bfbb",
+      "bytes": 1306
+    },
+    "passed": true
+  },
+  {
+    "argv": [
+      "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+      "component",
+      "wit",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.component.wasm"
+    ],
+    "terminal": {
+      "path": "/private/tmp/starling-node-compat/deployment-probe-v2/step-4/terminal.json",
+      "sha256": "58d3bac965bb41ca941ddcf8422eeb6540df9667a650912d8c80c8d004716146",
+      "bytes": 1308
+    },
+    "passed": true
+  },
+  {
+    "argv": [
+      "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+      "print",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.core.wasm"
+    ],
+    "terminal": {
+      "path": "/private/tmp/starling-node-compat/deployment-probe-v2/step-5/terminal.json",
+      "sha256": "5bb05a33e0ced309ac99ee497bf1a18ab6addf090c5f94c12d8368550a461606",
+      "bytes": 1395
+    },
+    "passed": true
+  }
+]

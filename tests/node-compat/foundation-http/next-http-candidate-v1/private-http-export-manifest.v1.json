@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "privateManifestVersion": "starling-node-http-v1",
+  "specifier": "starling:node-http",
+  "publicNodeManifest": false,
+  "exports": [
+    "createServerHandler",
+    "runFreshRequest",
+    "runNeutralServer"
+  ],
+  "registration": "api::Engine::define_builtin_module, real guest JS/native bindings; not a host service",
+  "lifecycle": "createServerHandler must run in deployed neutral server root before HTTP admission. The WASI entry invokes actual runFreshRequest before body/Request creation; the same resource owns readiness continuation and app dispatch.",
+  "requiresNativeALS": true
+}

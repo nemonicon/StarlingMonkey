@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "state": "NATIVE_ALS_V5_ACTUAL_TARGET_GUARD_SOURCE_AND_POLICY_FIXTURES_PASSED",
+  "sourceOnly": true,
+  "sourcePrepared": true,
+  "sourceReviewPassed": false,
+  "rootAuthority": null,
+  "actualNativeBuild": null,
+  "actualRuntime": null,
+  "allActionsAllowed": false,
+  "baseComposedCMake": {
+    "path": "/private/tmp/starling-node-compat/next-native-profile-v3/source/cmake/builtins.cmake",
+    "sha256": "cf9927f2b96cff1be16c1477de59cf886a8e27343e48877f21771ff11f662df0",
+    "bytes": 24053
+  },
+  "afterimage": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/native-als-candidate-v5/after/cmake/builtins.cmake",
+    "sha256": "4c7dcb1e8dee9c15772f2ad634306c7ba07dc3eaf9359a81df0f056113ec6708",
+    "bytes": 24548
+  },
+  "localizedEdit": {
+    "path": "cmake/builtins.cmake",
+    "before": "    if(NOT TARGET builtin_node_compat OR NOT NODE_COMPAT_INTERNAL_TICKS OR NOT NODE_COMPAT_STRICT_INITIALIZATION)\n        message(FATAL_ERROR \"Native ALS requires Node compatibility and private tick checkpoints\")\n    endif()\n",
+    "after": "    if(NOT TARGET builtin_node_compat OR NOT TARGET extension_api OR NOT NODE_COMPAT_INTERNAL_TICKS)\n        message(FATAL_ERROR \"Native ALS requires Node compatibility and private tick checkpoints\")\n    endif()\n    # Strict initialization is an INTERFACE compile definition, not a CMake\n    # option. Check the actual producer target rather than an unset variable.\n    get_target_property(NODE_COMPAT_ALS_EXTENSION_DEFINITIONS extension_api INTERFACE_COMPILE_DEFINITIONS)\n    if(NOT \"NODE_COMPAT_STRICT_INITIALIZATION=1\" IN_LIST NODE_COMPAT_ALS_EXTENSION_DEFINITIONS)\n        message(FATAL_ERROR \"Native ALS requires strict initialization on extension_api\")\n    endif()\n    unset(NODE_COMPAT_ALS_EXTENSION_DEFINITIONS)\n"
+  },
+  "parentAlsV4Index": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/native-als-candidate-v4/index.json",
+    "sha256": "c0c560ab0bc0b6bed2ae43fbb931cb9e3e3476a450be6816ac066bf57127db6c",
+    "bytes": 2048
+  },
+  "nativeCppChanged": false,
+  "jsOrManifestChanged": false,
+  "nativeInputPathCountChanged": false,
+  "changedExistingPathCount": 1,
+  "strictInitializationPolicyStillRequired": true,
+  "actualPolicyTarget": "extension_api",
+  "actualPolicyProperty": "INTERFACE_COMPILE_DEFINITIONS",
+  "requiredLiteral": "NODE_COMPAT_STRICT_INITIALIZATION=1",
+  "policyTestSummary": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/native-als-candidate-v5/policy-test-summary.json",
+    "sha256": "9c44bc0e9b8ba5ed98cb716088cb0dedbf968074484e6dc027aa640ceee3ebb0",
+    "bytes": 15407
+  },
+  "actualNoLanguageCmakeFixtures": 10,
+  "fixtureRawResultsRetained": true,
+  "nativeProjectConfigured": false,
+  "nativeCompilerOrBuildInvokedByAuthor": false,
+  "originalMonitorOrHelperInvoked": false,
+  "engineOrGuestExecuted": false,
+  "oldFailureObservation": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/native-als-candidate-v5/failed-build-attempt2/observation.json",
+    "sha256": "de955f774e76a7f333fa7ebef3fb0d5a419192f5ae621ec13eb8b7cef858ed44",
+    "bytes": 5250
+  },
+  "oldFailureAccepted": false,
+  "oldWorkModified": false,
+  "rootBuildRunnerUnchanged": "next-native-build-candidate-v3;386support;71c7runner",
+  "diskObservation": {
+    "availableBytes": 7771111424,
+    "startRequirementBytes": 2147483648,
+    "noCleanupPerformed": true
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "state": "UNAPPLIED_READABLE_TOWEB_LOCALIZED_INTEGRATION",
+  "files": [
+    {
+      "path": "builtins/node-compat/register.cpp",
+      "edits": [
+        {
+          "before": "#include \"classic-streams/factories.generated.h\"",
+          "after": "#ifdef NODE_COMPAT_CLASSIC_STREAMS_TOWEB\n#include \"classic-streams/toweb-factories.generated.h\"\n#else\n#include \"classic-streams/factories.generated.h\"\n#endif"
+        },
+        {
+          "before": "  if (!JS_GetProperty(cx, engine->global(), \"Symbol\", &value) || !value.isObject()) return false;",
+          "after": "#ifdef NODE_COMPAT_CLASSIC_STREAMS_TOWEB\n  // Existing web builtin initialization precedes node-compat registration.\n  if (!JS_GetProperty(cx, engine->global(), \"ReadableStream\", &value) ||\n      !value.isObject() || !JS::IsCallable(&value.toObject()) ||\n      !JS_DefineProperty(cx, argument, \"ReadableStream\", value, 0)) return false;\n#endif\n  if (!JS_GetProperty(cx, engine->global(), \"Symbol\", &value) || !value.isObject()) return false;"
+        }
+      ]
+    },
+    {
+      "path": "cmake/builtins.cmake",
+      "edits": [
+        {
+          "before": "    # The Events prerequisite already links/initializes web Event/Abort. This\n    # feature does not select web streams, clocks, stdio or new WASI imports.\nendif()\n",
+          "after": "    # The Events prerequisite already links/initializes web Event/Abort. This\n    # feature does not select web streams, clocks, stdio or new WASI imports.\nendif()\n\n# Optional m0.23 bridge uses the genuine existing guest ReadableStream.\noption(NODE_COMPAT_CLASSIC_STREAMS_TOWEB \"Enable bounded Readable.toWeb byte bridge\" OFF)\nif(NODE_COMPAT_CLASSIC_STREAMS_TOWEB AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT NODE_COMPAT_CLASSIC_STREAMS OR NOT TARGET builtin_node_compat OR NOT TARGET builtin_web_streams)\n        message(FATAL_ERROR \"NODE_COMPAT_CLASSIC_STREAMS_TOWEB requires CLASSIC_STREAMS and native web streams\")\n    endif()\n    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_CLASSIC_STREAMS_TOWEB=1)\n    # Earlier add_builtin(web/streams) declaration provides initialization order;\n    # this link/dependency is not itself an initializer topology assertion.\n    add_dependencies(builtin_node_compat builtin_web_streams)\n    target_link_libraries(builtin_node_compat PRIVATE builtin_web_streams)\nendif()\n"
+        }
+      ]
+    }
+  ],
+  "nativeFiles": [
+    {
+      "source": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/readable-toweb-candidate-v1/toweb-factories.generated.h",
+      "path": "builtins/node-compat/classic-streams/toweb-factories.generated.h"
+    }
+  ],
+  "manifestReplacement": {
+    "replace": "/Users/dan/dev/StarlingMonkey/builtins/node-compat/classic-streams/export-manifest.classic-streams.node-v22.14.0.json",
+    "with": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/readable-toweb-candidate-v1/export-manifest.classic-toweb.node-v22.14.0.json",
+    "duplicateAliasesAllowed": false
+  },
+  "flag": "NODE_COMPAT_CLASSIC_STREAMS_TOWEB",
+  "default": false,
+  "nativeOrGuestExecuted": false
+}

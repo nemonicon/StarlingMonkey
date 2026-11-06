@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "parentSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-build-candidate-v1/index.json",
+    "sha256": "84aa71179f695941ced1b5d777df895efe3137a929938020d1e5a15197232f10",
+    "bytes": 2947
+  },
+  "parentRunner": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-build-candidate-v1/run.py",
+    "sha256": "502919ea384209f1dfafba81f16c0df9ed116336cb4eb0a802b35f1de05b4d20",
+    "bytes": 21594
+  },
+  "runnerEdits": [
+    {
+      "before": " env.update(PATH=str(work/'tools/bin')",
+      "after": " env.update(CARGO_BUILD_JOBS='1',MAKEFLAGS='-j1',CARGO_INCREMENTAL='0',CCACHE_DISABLE='1',SCCACHE_DISABLE='1',PATH=str(work/'tools/bin')"
+    },
+    {
+      "before": "\ndef cache_values(path):",
+      "after": "\ndef phase_succeeded(record):\n # Actual original0af terminal arrays are mandatory, including a raw0 command\n # that was signaled/interrupted and recovered before its terminal receipt.\n return record['rawExitCode']==record['outerRawExitCode']==0 and record['ownedGone']is True and record['innerOwnedClean']is True and record['timeout']is False and record['forcedCleanup']is False and record['errors']==[] and record['signals']==[] and record['interruptedSignals']==[] and record['remainingObservedPids']==[]\n\ndef cache_values(path):"
+    },
+    {
+      "before": "timeout=terminal['timeout'],forcedCleanup=terminal['forcedCleanup'],errors=terminal['errors'])",
+      "after": "timeout=terminal['timeout'],forcedCleanup=terminal['forcedCleanup'],errors=terminal['errors'],signals=terminal['signals'],interruptedSignals=terminal['interruptedSignals'],remainingObservedPids=terminal['remainingObservedPids'])"
+    },
+    {
+      "before": "assert record['rawExitCode']==record['outerRawExitCode']==0 and record['ownedGone']and record['innerOwnedClean']and not record['timeout']and not record['forcedCleanup']and not record['errors'],label+' failed'",
+      "after": "assert phase_succeeded(record),label+' failed'"
+    },
+    {
+      "before": "assert record['rawExitCode']==record['outerRawExitCode']==0 and record['ownedGone']and record['innerOwnedClean']and not record['errors']and not record['timeout']and not record['forcedCleanup'],'whole Ninja capture failed'",
+      "after": "assert phase_succeeded(record),'whole Ninja capture failed'"
+    }
+  ],
+  "parentPlan": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-build-candidate-v1/plan.json",
+    "sha256": "f1d22da6c3851235eacbd091bf329bee9f838871c89873f189dcf6a3ac1add9c",
+    "bytes": 200246
+  },
+  "planEdits": [
+    {
+      "path": [
+        "state"
+      ],
+      "before": "DORMANT_EXPERIMENTAL_NEXT_NATIVE_BUILD_PLAN_V1",
+      "after": "DORMANT_EXPERIMENTAL_NEXT_NATIVE_BUILD_PLAN_V2"
+    },
+    {
+      "path": [
+        "cmakeFlags",
+        "NODE_COMPAT_CLASSIC_STREAMS_TOWEB"
+      ],
+      "beforeAbsent": true,
+      "after": "ON"
+    }
+  ],
+  "allOtherPlanValuesUnchanged": true,
+  "rootAuthorityTemplateUnchanged": true,
+  "sourceOnly": true
+}

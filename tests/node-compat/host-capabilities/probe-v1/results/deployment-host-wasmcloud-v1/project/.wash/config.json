@@ -1,0 +1,40 @@
+{
+  "version": "2.11.0",
+  "build": {
+    "command": "test -f \"$WASH_COMPONENT_PATH\"",
+    "component_path": "/private/tmp/starling-node-compat/deployment-probe-v3/probe.component.wasm"
+  },
+  "dev": {
+    "address": "127.0.0.1:58901",
+    "command": "test -f \"$WASH_COMPONENT_PATH\"",
+    "component_path": "/private/tmp/starling-node-compat/deployment-probe-v3/probe.component.wasm",
+    "service": false,
+    "components": [],
+    "plugins": [],
+    "host_plugins": [],
+    "volumes": [
+      {
+        "host_path": "/private/tmp/starling-node-compat/deployment-host-wasmcloud-v1/app",
+        "guest_path": "/app"
+      },
+      {
+        "host_path": "/private/tmp/starling-node-compat/deployment-host-wasmcloud-v1/cache",
+        "guest_path": "/cache"
+      }
+    ]
+  },
+  "workload": {
+    "allowedHosts": [],
+    "allowedIpNameLookups": [],
+    "allowedHostLoopbackPorts": [],
+    "config": {},
+    "environment": {
+      "config": {
+        "STARLING_NEXT_PROBE": "capabilities-v1"
+      }
+    }
+  },
+  "wit": {
+    "skip_fetch": true
+  }
+}

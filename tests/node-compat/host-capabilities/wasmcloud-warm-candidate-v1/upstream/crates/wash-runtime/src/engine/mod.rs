@@ -1,0 +1,2431 @@
+//! WebAssembly component engine for executing workloads.
+//!
+//! This module provides the core engine functionality for compiling and executing
+//! WebAssembly components. The [`Engine`] is responsible for:
+//!
+//! - Compiling WebAssembly components using wasmtime
+//! - Initializing workloads with their components and dependencies
+//! - Managing volume mounts and resource configurations
+//! - Setting up WASI and HTTP interfaces for components
+//!
+//! # Key Types
+//!
+//! - [`Engine`] - The main engine for WebAssembly execution
+//! - [`EngineBuilder`] - Builder for configuring engine settings
+//! - [`WorkloadComponent`] - Individual components within a workload
+//!
+//! # Example
+//!
+//! ```no_run
+//! use wash_runtime::engine::Engine;
+//! use wash_runtime::types::Workload;
+//!
+//! # async fn example() -> anyhow::Result<()> {
+//! let engine = Engine::builder().build()?;
+//! let workload = Workload {
+//!     namespace: "default".to_string(),
+//!     name: "my-workload".to_string(),
+//!     // ... other fields
+//! #   annotations: std::collections::HashMap::new(),
+//! #   service: None,
+//! #   components: vec![],
+//! #   host_interfaces: vec![],
+//! #   volumes: vec![],
+//! };
+//!
+//! let unresolved = engine.initialize_workload("workload-1", workload)?;
+//! // ... bind to plugins and resolve
+//! # Ok(())
+//! # }
+//! ```
+
+use std::hash::Hash;
+use std::time::Duration;
+
+use crate::sockets::loopback;
+use anyhow::{Context, bail};
+use moka::sync::Cache;
+use tracing::{instrument, warn};
+use wasmtime::PoolingAllocationConfig;
+use wasmtime::component::{Component, Linker};
+
+use crate::engine::ctx::SharedCtx;
+#[cfg(feature = "wasi-tls")]
+use crate::engine::ctx::SharedTlsProvider;
+use crate::engine::workload::{UnresolvedWorkload, WorkloadComponent, WorkloadService};
+use crate::types::{EmptyDirVolume, HostPathVolume, VolumeType, Workload};
+use std::env;
+use std::str::FromStr;
+use std::{
+    path::PathBuf,
+    sync::{Arc, OnceLock},
+};
+use wasmtime_wasi::WasiView;
+
+// Exact instance versions registered by the Wasmtime bindings below. Keep
+// these aligned when upgrading Wasmtime: partial overrides must reopen those
+// instances, since Linker::instance does not apply semver matching. The override
+// integration tests check both exact and compatible guest imports.
+pub(crate) const WASI_LINKER_VERSIONS: [semver::Version; 2] = [
+    semver::Version::new(0, 2, 12),
+    semver::Version::new(0, 3, 0),
+];
+
+/// Add all WASI interfaces to the linker, using upstream for non-socket interfaces
+/// and our custom socket implementation (with loopback support) for socket interfaces.
+/// Both P2 and P3 bindings are registered.
+fn add_wasi_to_linker(linker: &mut Linker<SharedCtx>) -> anyhow::Result<()> {
+    use wasmtime_wasi::p2::bindings::{cli, clocks, filesystem, random, sockets};
+
+    // IO interfaces (error, poll, streams)
+    wasmtime_wasi_io::add_to_linker_async(linker)?;
+
+    // Filesystem (async version)
+    filesystem::types::add_to_linker::<SharedCtx, wasmtime_wasi::filesystem::WasiFilesystem>(
+        linker,
+        <SharedCtx as wasmtime_wasi::filesystem::WasiFilesystemView>::filesystem,
+    )?;
+    filesystem::preopens::add_to_linker::<SharedCtx, SharedCtx>(linker, ctx::extract_active_ctx)?;
+
+    // Clocks
+    clocks::wall_clock::add_to_linker::<SharedCtx, wasmtime_wasi::clocks::WasiClocks>(
+        linker,
+        <SharedCtx as wasmtime_wasi::clocks::WasiClocksView>::clocks,
+    )?;
+    clocks::monotonic_clock::add_to_linker::<SharedCtx, wasmtime_wasi::clocks::WasiClocks>(
+        linker,
+        <SharedCtx as wasmtime_wasi::clocks::WasiClocksView>::clocks,
+    )?;
+
+    // Random
+    random::random::add_to_linker::<SharedCtx, wasmtime_wasi::random::WasiRandom>(linker, |t| {
+        t.ctx().ctx.random()
+    })?;
+    random::insecure::add_to_linker::<SharedCtx, wasmtime_wasi::random::WasiRandom>(linker, |t| {
+        t.ctx().ctx.random()
+    })?;
+    random::insecure_seed::add_to_linker::<SharedCtx, wasmtime_wasi::random::WasiRandom>(
+        linker,
+        |t| t.ctx().ctx.random(),
+    )?;
+
+    // CLI
+    cli::exit::add_to_linker::<SharedCtx, wasmtime_wasi::cli::WasiCli>(
+        linker,
+        <SharedCtx as wasmtime_wasi::cli::WasiCliView>::cli,
+    )?;
+    cli::environment::add_to_linker::<SharedCtx, wasmtime_wasi::cli::WasiCli>(
+        linker,
+        <SharedCtx as wasmtime_wasi::cli::WasiCliView>::cli,
+    )?;
+    cli::stdin::add_to_linker::<SharedCtx, wasmtime_wasi::cli::WasiCli>(
+        linker,
+        <SharedCtx as wasmtime_wasi::cli::WasiCliView>::cli,
+    )?;
+    cli::stdout::add_to_linker::<SharedCtx, wasmtime_wasi::cli::WasiCli>(
+        linker,
+        <SharedCtx as wasmtime_wasi::cli::WasiCliView>::cli,
+    )?;
+    cli::stderr::add_to_linker::<SharedCtx, wasmtime_wasi::cli::WasiCli>(
+        linker,
+        <SharedCtx as wasmtime_wasi::cli::WasiCliView>::cli,
+    )?;
+    cli::terminal_input::add_to_linker::<SharedCtx, wasmtime_wasi::cli::WasiCli>(
+        linker,
+        <SharedCtx as wasmtime_wasi::cli::WasiCliView>::cli,
+    )?;
+    cli::terminal_output::add_to_linker::<SharedCtx, wasmtime_wasi::cli::WasiCli>(
+        linker,
+        <SharedCtx as wasmtime_wasi::cli::WasiCliView>::cli,
+    )?;
+    cli::terminal_stdin::add_to_linker::<SharedCtx, wasmtime_wasi::cli::WasiCli>(
+        linker,
+        <SharedCtx as wasmtime_wasi::cli::WasiCliView>::cli,
+    )?;
+    cli::terminal_stdout::add_to_linker::<SharedCtx, wasmtime_wasi::cli::WasiCli>(
+        linker,
+        <SharedCtx as wasmtime_wasi::cli::WasiCliView>::cli,
+    )?;
+    cli::terminal_stderr::add_to_linker::<SharedCtx, wasmtime_wasi::cli::WasiCli>(
+        linker,
+        <SharedCtx as wasmtime_wasi::cli::WasiCliView>::cli,
+    )?;
+
+    // Socket interfaces — use OUR implementation with loopback support
+    sockets::tcp::add_to_linker::<SharedCtx, crate::sockets::WasiSockets>(
+        linker,
+        ctx::extract_sockets,
+    )?;
+    sockets::udp::add_to_linker::<SharedCtx, crate::sockets::WasiSockets>(
+        linker,
+        ctx::extract_sockets,
+    )?;
+    sockets::tcp_create_socket::add_to_linker::<SharedCtx, crate::sockets::WasiSockets>(
+        linker,
+        ctx::extract_sockets,
+    )?;
+    sockets::udp_create_socket::add_to_linker::<SharedCtx, crate::sockets::WasiSockets>(
+        linker,
+        ctx::extract_sockets,
+    )?;
+    sockets::instance_network::add_to_linker::<SharedCtx, crate::sockets::WasiSockets>(
+        linker,
+        ctx::extract_sockets,
+    )?;
+    let net_options = sockets::network::LinkOptions::default();
+    sockets::network::add_to_linker::<SharedCtx, crate::sockets::WasiSockets>(
+        linker,
+        &net_options,
+        ctx::extract_sockets,
+    )?;
+    sockets::ip_name_lookup::add_to_linker::<SharedCtx, crate::sockets::WasiSockets>(
+        linker,
+        ctx::extract_sockets,
+    )?;
+
+    // CLI, clocks, filesystem, random — upstream P3 add_to_linker
+    wasmtime_wasi::p3::cli::add_to_linker(linker)?;
+    wasmtime_wasi::p3::clocks::add_to_linker(linker)?;
+    wasmtime_wasi::p3::bindings::filesystem::types::add_to_linker::<
+        SharedCtx,
+        wasmtime_wasi::filesystem::WasiFilesystem,
+    >(
+        linker,
+        <SharedCtx as wasmtime_wasi::filesystem::WasiFilesystemView>::filesystem,
+    )?;
+    wasmtime_wasi::p3::bindings::filesystem::preopens::add_to_linker::<SharedCtx, SharedCtx>(
+        linker,
+        ctx::extract_active_ctx,
+    )?;
+    wasmtime_wasi::p3::random::add_to_linker(linker)?;
+
+    // Sockets with our custom P3 implementation (with loopback)
+    crate::sockets::add_p3_to_linker(linker)?;
+
+    // wasi:tls@0.3.0-draft (p3).
+    #[cfg(feature = "wasi-tls")]
+    wasmtime_wasi_tls::p3::add_to_linker(linker)?;
+
+    Ok(())
+}
+
+/// Detect whether a component targets WASIP3 by checking for `@0.3` in WASI imports/exports.
+/// This is a pure detection function used to pick the P2 vs P3 dispatch path; P3 bindings
+/// are always registered on the linker.
+pub fn targets_wasip3(component: &Component) -> bool {
+    let ty = component.component_type();
+    let engine = component.engine();
+    ty.imports(engine)
+        .any(|(import, _)| import.starts_with("wasi:") && import.contains("@0.3"))
+        || ty
+            .exports(engine)
+            .any(|(export, _)| export.starts_with("wasi:") && export.contains("@0.3"))
+}
+
+/// Detect whether a component targets WASIP3 HTTP specifically by checking for
+/// `wasi:http` imports/exports with `@0.3`. Used for HTTP dispatch to avoid
+/// routing a component that imports `wasi:cli@0.3` but exports `wasi:http@0.2`
+/// through the P3 HTTP handler.
+pub fn targets_wasip3_http(component: &Component) -> bool {
+    let ty = component.component_type();
+    let engine = component.engine();
+    ty.imports(engine)
+        .any(|(name, _)| name.starts_with("wasi:http") && name.contains("@0.3"))
+        || ty
+            .exports(engine)
+            .any(|(name, _)| name.starts_with("wasi:http") && name.contains("@0.3"))
+}
+
+pub mod abandon;
+pub mod command;
+pub mod ctx;
+pub mod dispatch;
+pub mod guest_memory;
+pub(crate) mod instance_driver;
+pub(crate) mod instance_pool;
+pub mod stream_payload;
+pub use instance_pool::{InstancePolicy, ReclaimPolicy};
+pub mod host_memory;
+pub(crate) mod linked_call;
+pub mod pool_usage;
+pub mod process_memory;
+mod scratch;
+pub(crate) mod store;
+pub(crate) mod trap_remediation;
+mod value;
+mod volumes;
+pub mod workload;
+
+/// How often the engine's epoch advances.
+///
+/// This is the resolution of the deadline checks compiled into every guest, not
+/// how often any store is interrupted: what a store does when its deadline
+/// passes is [`crate::engine::abandon::arm_epoch_deadline`]'s decision. It
+/// bounds how promptly an abandoned call can be noticed.
+pub(crate) const EPOCH_TICK: Duration = Duration::from_millis(10);
+
+/// What the pooling allocator was configured with, read back from the installed
+/// [`PoolingAllocationConfig`].
+///
+/// [`host_memory::HostMemoryBudgets`] holds what was asked for. The environment
+/// moves each of these three independently, so the two can disagree.
+#[derive(Debug, Clone, Copy)]
+struct InstalledPool {
+    core_instances: u32,
+    memories: u32,
+    max_memory_size: u64,
+    totals: pool_usage::PoolTotals,
+}
+
+impl InstalledPool {
+    /// Address space the pool reserves. Keyed on the memory count, not the
+    /// instance count, and never less than wasmtime's reservation per slot.
+    fn reservation(&self) -> u64 {
+        host_memory::pool_slab_bytes(self.max_memory_size, self.memories)
+    }
+}
+
+/// Start the thread that advances `engine`'s epoch every [`EPOCH_TICK`].
+///
+/// Holds a [`wasmtime::Engine::weak`] handle rather than the engine itself, so
+/// the ticker does not keep a dropped engine alive: the next tick after the last
+/// strong reference goes away fails to upgrade and the thread ends. One ticker
+/// per engine, started at construction — an engine built with
+/// `epoch_interruption` whose epoch never advances would hang any store that
+/// armed a deadline.
+fn spawn_epoch_ticker(engine: &wasmtime::Engine) -> anyhow::Result<()> {
+    let weak = engine.weak();
+    std::thread::Builder::new()
+        .name("wasmtime-epoch-ticker".to_string())
+        .spawn(move || {
+            while let Some(engine) = weak.upgrade() {
+                engine.increment_epoch();
+                // Drop the strong reference before sleeping, so a dropped
+                // engine is not kept alive for a whole tick.
+                drop(engine);
+                std::thread::sleep(EPOCH_TICK);
+            }
+        })
+        .context("failed to spawn the epoch ticker thread")?;
+    Ok(())
+}
+
+/// The core WebAssembly engine for executing components and workloads.
+///
+/// The `Engine` is responsible for compiling WebAssembly components, managing
+/// their lifecycle, and providing the runtime environment for execution.
+/// It wraps a wasmtime engine with additional functionality for workload management.
+#[derive(Clone)]
+pub struct Engine {
+    stream_payloads: Arc<stream_payload::StreamPayloads>,
+    // wasmtime engine
+    pub(crate) inner: wasmtime::Engine,
+    pub(crate) cache: Cache<CacheKey, CacheValue>,
+    /// Compiles running workloads hold, consulted before the cache so a live
+    /// compile can be reused after cache eviction. See [`LiveCompiles`].
+    live_compiles: Arc<LiveCompiles>,
+    /// Compiles that actually ran on this engine.
+    ///
+    /// Test-only, and there is no way to do without it: what the digest-keyed
+    /// cache buys is that a herd of replicas shares one compile, and from
+    /// outside, one compile and fifteen racing to insert the same key leave
+    /// exactly the same single cache entry.
+    #[cfg(test)]
+    pub(crate) compiles: Arc<std::sync::atomic::AtomicUsize>,
+    /// Host-level socket policy every workload on this engine inherits:
+    /// enforcement mode, address ranges, whether the host-loopback door is open,
+    /// the host's port table, and the connection budget. The workload-level half
+    /// (`allowedHosts`, `allowedHostLoopbackPorts`) is layered over it per component.
+    pub(crate) socket_policy: Arc<crate::sockets::policy::SocketPolicy>,
+    /// Which host paths a workload's `hostPath` volume may name.
+    host_paths: volumes::HostPathPolicy,
+    /// Where `emptyDir` volumes live. An error when the root could not be
+    /// claimed, reported to the first workload that asks for one.
+    scratch: Result<Arc<scratch::ScratchRoot>, Arc<str>>,
+    pub(crate) host_memory: host_memory::HostMemoryBudgets,
+    /// The host-wide counter of guest linear-memory bytes that
+    /// [`host_memory::HostMemoryBudgets::max_guest_memory`] is the cap on.
+    /// Every store this engine builds carries a limiter drawing on it.
+    pub(crate) guest_memory: Arc<guest_memory::GuestMemoryBudget>,
+    /// The whole process's footprint against `max_process_memory`, sampled on
+    /// its own thread. The guest budget refuses growth while it is over.
+    /// `None` when the guard was switched off.
+    process_memory: Option<Arc<process_memory::ProcessMemoryGuard>>,
+    /// TLS provider override for `wasi:tls` client connections.
+    #[cfg(feature = "wasi-tls")]
+    pub(crate) tls_provider: Option<SharedTlsProvider>,
+    /// Core instances the pooling allocator was configured to admit, captured
+    /// from the [`PoolingAllocationConfig`] actually installed — so it reflects
+    /// the `WASMTIME_POOLING_TOTAL_CORE_INSTANCES` override and a
+    /// caller-supplied pooling config alike. `None` when pooling is off or
+    /// unsupported, i.e. when there is no pool budget to divide.
+    ///
+    /// Recorded rather than recomputed: re-deriving `max_instances.unwrap_or(…)`
+    /// somewhere else would miss the env override (applied inside
+    /// [`new_pooling_config`]) and drift the moment either side changed.
+    total_core_instances: Option<u32>,
+    /// Linear memory the pooling allocator actually admits per memory, read
+    /// back from the installed [`PoolingAllocationConfig`]. `None` when
+    /// pooling is off, i.e. when no ceiling is enforced.
+    ///
+    /// Captured for the same reason as `total_core_instances`:
+    /// `--default-heap-memory` is only the *requested* size, and
+    /// `WASMTIME_POOLING_MAX_MEMORY_SIZE` or a caller-supplied pooling config
+    /// replaces it outright. Quoting the flag in a refusal that the installed
+    /// ceiling caused produces advice that cannot work.
+    installed_heap_memory: Option<u64>,
+    /// Every total the installed pool was built with, for
+    /// [`Engine::pool_usage`]. `None` when pooling is off.
+    pool_totals: Option<pool_usage::PoolTotals>,
+    /// The linkers every workload component starts from, built once and
+    /// shared (see [`BaseLinkers`]).
+    base_linkers: Arc<BaseLinkers>,
+}
+
+/// The WASI linker, with and without `wasi:http`, that every workload
+/// component starts from.
+///
+/// Building one is the largest part of what an idle workload costs the host:
+/// about 140 KiB for WASI and 180 KiB with `wasi:http`, most of a
+/// scale-to-zero workload. What goes into them depends on nothing about the
+/// workload, so each is built once per engine and shared; a component's
+/// [`workload::WorkloadMetadata::linker`] copies its own only when a plugin
+/// or a link writes to it.
+#[derive(Default)]
+struct BaseLinkers {
+    wasi: OnceLock<Arc<Linker<SharedCtx>>>,
+    wasi_http: OnceLock<Arc<Linker<SharedCtx>>>,
+}
+
+impl std::fmt::Debug for Engine {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = f.debug_struct("Engine");
+        #[cfg(feature = "wasi-tls")]
+        s.field("tls_provider", &self.tls_provider.is_some());
+        s.finish_non_exhaustive()
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+pub struct CacheKey(String);
+
+#[derive(Clone)]
+pub struct CacheValue(Component);
+
+impl std::fmt::Debug for CacheValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("CacheValue").finish()
+    }
+}
+
+/// Compiles that running workloads still hold, by digest.
+///
+/// The compile cache is bounded and forgets idle entries, but a workload
+/// keeps its `Component` for as long as it runs. Without this, a digest the
+/// cache let go of would be compiled again by the next workload to start
+/// from it, holding a second copy of the machine code beside the first.
+/// Consulting the live set first keeps one copy per digest while any
+/// workload holds it, however small the cache.
+type LiveCompiles =
+    std::sync::Mutex<std::collections::HashMap<String, std::sync::Weak<LiveCompile>>>;
+
+/// One digest's compile, held by every workload loaded from it. The entry in
+/// [`LiveCompiles`] lives exactly as long as some workload holds this.
+pub(crate) struct LiveCompile {
+    digest: String,
+    component: Component,
+    live: std::sync::Weak<LiveCompiles>,
+}
+
+impl Drop for LiveCompile {
+    fn drop(&mut self) {
+        let Some(live) = self.live.upgrade() else {
+            return;
+        };
+        let mut live = live
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        // A workload that started after this one's last holder let go has
+        // recorded a fresh compile under the same digest; leave that one.
+        if live
+            .get(&self.digest)
+            .is_some_and(|entry| entry.strong_count() == 0)
+        {
+            live.remove(&self.digest);
+        }
+    }
+}
+
+/// A cached compile failure, shared by every caller that raced for the same key.
+///
+/// `moka` hands a failed `try_get_with` back as `Arc<anyhow::Error>`, and an
+/// `Arc` is not `Into<anyhow::Error>` — so `anyhow!(arc)` takes the *adhoc*
+/// branch and builds a fresh error whose whole content is the `Arc`'s `Display`.
+/// `anyhow::Error`'s `Display` prints only its outermost context, so every cause
+/// under it is dropped: a component that fails to compile reports
+/// "failed to compile component from bytes" and never the wasmtime diagnostic
+/// saying *why*, which is the only part worth reading.
+///
+/// Wrapping instead of reformatting keeps the chain walkable — `source()` steps
+/// straight into the original error, since `anyhow::Error` derefs to
+/// `dyn StdError`.
+#[derive(Debug)]
+pub(crate) struct SharedError(pub(crate) Arc<anyhow::Error>);
+
+impl std::fmt::Display for SharedError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(&*self.0, f)
+    }
+}
+
+impl std::error::Error for SharedError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        self.0.source()
+    }
+}
+
+/// Turns a compile failure into something an operator can act on.
+///
+/// The pooling allocator refuses a component whose minimum linear memory
+/// exceeds `--default-heap-memory` with a message that is precise and useless:
+/// it mixes decimal and hex, names no flag, and — once it has been re-wrapped
+/// on the way up and truncated at the CRD boundary — reaches a `kubectl`-only
+/// operator as nothing at all. The refusal is correct; only the explanation is
+/// missing, and every number it needs is already here.
+fn explain_compile_failure(e: wasmtime::Error, default_heap_memory: u64) -> anyhow::Error {
+    use host_memory::render_bytes;
+
+    let text = format!("{e:#}");
+    let Some(required) = parse_pooling_minimum(&text) else {
+        return anyhow::Error::from(e);
+    };
+    // Round up to the next power of two at or above the requirement: the pool
+    // sizes slots in whole memories, so the next size that certainly fits is
+    // the useful advice, not the bare minimum.
+    let suggested = required
+        .checked_next_power_of_two()
+        .unwrap_or(required)
+        .max(4 * host_memory::MIB);
+    anyhow::Error::from(e).context(format!(
+        "the component needs {} of linear memory but --default-heap-memory is {}. \
+         Raise it to at least {} (chart: runtime.resources.defaultHeapMemory).",
+        render_bytes(required),
+        render_bytes(default_heap_memory),
+        render_bytes(suggested),
+    ))
+}
+
+/// Reads the minimum byte size out of the pooling allocator's refusal.
+///
+/// Matching on the message is unpleasant, but wasmtime offers no typed form of
+/// it and the alternative is discarding the only number that makes the failure
+/// actionable.
+fn parse_pooling_minimum(text: &str) -> Option<u64> {
+    let tail = text.split_once("minimum byte size of")?.1;
+    let digits: String = tail
+        .trim_start()
+        .chars()
+        .take_while(char::is_ascii_digit)
+        .collect();
+    // A zero-length run, or a leading `0`, means the size was not printed as
+    // plain decimal — wasmtime already renders the limit half of this message
+    // in hex. Fall back to the original error rather than reporting 0 bytes.
+    match digits.parse().ok()? {
+        0 => None,
+        required => Some(required),
+    }
+}
+
+impl Engine {
+    /// Register application-defined stream/future payloads before resolving workloads.
+    pub fn stream_payloads(&self) -> &Arc<stream_payload::StreamPayloads> {
+        &self.stream_payloads
+    }
+
+    /// host_memory has the memory budgets this engine was built with including max host
+    /// memory available, default component heap limit, and number of core instances available.
+    /// Read back rather than recomputed, so what a caller reports is what the engine actually
+    /// installed — including an embedder's `max_instances` winning over the flag-driven count.
+    pub fn host_memory(&self) -> host_memory::HostMemoryBudgets {
+        self.host_memory
+    }
+
+    /// The host-wide guest memory budget, for reporting what guests are
+    /// holding and what the budget has refused.
+    pub fn guest_memory(&self) -> &Arc<guest_memory::GuestMemoryBudget> {
+        &self.guest_memory
+    }
+
+    /// The process's memory footprint against `max_process_memory`, for an
+    /// embedder to report, or to stop taking on work while
+    /// [`process_memory::ProcessMemoryGuard::is_over`].
+    /// `None` when the engine was built
+    /// [`without_max_process_memory`](EngineBuilder::without_max_process_memory).
+    pub fn process_memory(&self) -> Option<&Arc<process_memory::ProcessMemoryGuard>> {
+        self.process_memory.as_ref()
+    }
+
+    /// Inject admission state without the process sampler overwriting it.
+    #[cfg(all(test, feature = "washlet"))]
+    pub(crate) fn with_unsampled_admission_guard(
+        mut self,
+        guard: Arc<process_memory::ProcessMemoryGuard>,
+    ) -> Self {
+        self.process_memory = Some(guard);
+        self
+    }
+
+    /// Core instances the pooling allocator was configured to admit, captured
+    /// from the [`PoolingAllocationConfig`] actually installed — so it reflects
+    /// the `WASMTIME_POOLING_TOTAL_CORE_INSTANCES` override and a
+    /// caller-supplied pooling config alike. `None` when pooling is off or
+    /// unsupported, i.e. when there is no pool budget to divide.
+    ///
+    /// Recorded rather than recomputed: re-deriving `max_instances.unwrap_or(…)`
+    /// somewhere else would miss the env override (applied inside
+    /// [`new_pooling_config`]) and drift the moment either side changed.
+    pub fn total_core_instances(&self) -> Option<u32> {
+        self.total_core_instances
+    }
+
+    /// Every pooling allocator total against what is in use now, so an
+    /// embedder can report a host whose pool is full: its workloads still say
+    /// running while every instantiation is refused. `None` when pooling is
+    /// off. See [`pool_usage::pool_refusals`] for refusals between readings.
+    pub fn pool_usage(&self) -> Option<pool_usage::PoolUsage> {
+        let totals = self.pool_totals.as_ref()?;
+        let metrics = self.inner.pooling_allocator_metrics()?;
+        Some(pool_usage::PoolUsage::read(&metrics, totals))
+    }
+
+    /// Creates a new [`EngineBuilder`] for configuring an engine.
+    ///
+    /// # Returns
+    /// A default `EngineBuilder` that can be customized with additional configuration.
+    pub fn builder() -> EngineBuilder {
+        EngineBuilder::default()
+    }
+
+    /// Gets a reference to the inner wasmtime engine.
+    pub fn inner(&self) -> &wasmtime::Engine {
+        &self.inner
+    }
+
+    /// Whether this engine compiles fuel counters into its guests, and so
+    /// whether a store it builds can be metered by fuel at all.
+    ///
+    /// Read back from the config wasmtime resolved rather than from
+    /// [`EngineBuilder::with_fuel_consumption`], so a base config supplied
+    /// through [`EngineBuilder::with_config`] is answered for too.
+    pub fn consumes_fuel(&self) -> bool {
+        self.inner.get_consume_fuel()
+    }
+
+    /// Initializes a workload by validating and preparing all its components.
+    ///
+    /// This function takes a workload definition and prepares it for execution by:
+    /// - Validating service components (if present)
+    /// - Setting up volumes (both host path and empty directory types)
+    /// - Initializing all components with their resource configurations
+    ///
+    /// # Arguments
+    /// * `id` - Unique identifier for this workload instance
+    /// * `workload` - The workload configuration containing components, services, and volumes
+    ///
+    /// # Returns
+    /// An `UnresolvedWorkload` that still needs to be bound to plugins and resolved
+    /// before execution.
+    ///
+    /// # Errors
+    /// Returns an error if:
+    /// - Service component validation fails
+    /// - Volume paths don't exist or aren't accessible
+    /// - Component initialization fails
+    pub fn initialize_workload(
+        &self,
+        id: impl AsRef<str>,
+        workload: Workload,
+    ) -> anyhow::Result<UnresolvedWorkload> {
+        let Workload {
+            namespace,
+            name,
+            components,
+            service,
+            volumes,
+            host_interfaces,
+            annotations,
+            ..
+        } = workload;
+        let annotations_arc = Arc::new(annotations);
+
+        // Process and validate volumes - create a lookup map from volume name to validated host path
+        let mut validated_volumes = std::collections::HashMap::new();
+        // Created on the first `emptyDir`, and removed when the workload is
+        // released or, for a start that fails before then, when this drops.
+        let mut workload_scratch: Option<Arc<scratch::ScratchDir>> = None;
+
+        for v in volumes {
+            let host_path = match v.volume_type {
+                VolumeType::HostPath(HostPathVolume { local_path }) => {
+                    let path = PathBuf::from(&local_path);
+                    if !path.is_dir() {
+                        anyhow::bail!(
+                            "HostPath volume '{local_path}' does not exist or is not a directory",
+                        );
+                    }
+                    self.host_paths.open(&path)?
+                }
+                VolumeType::EmptyDir(EmptyDirVolume {}) => {
+                    let workload_scratch = match &mut workload_scratch {
+                        Some(dir) => dir,
+                        None => {
+                            let root = self.scratch.as_ref().map_err(|e| {
+                                anyhow::anyhow!("emptyDir volumes are unavailable: {e}")
+                            })?;
+                            workload_scratch.insert(root.workload_dir()?)
+                        }
+                    };
+                    // Kept on disk: the workload's scratch directory owns it.
+                    let volume_dir = tempfile::Builder::new()
+                        .prefix("volume-")
+                        .tempdir_in(workload_scratch.path())
+                        .context("failed to create an emptyDir volume")?
+                        .keep();
+                    tracing::debug!(path = ?volume_dir, "created emptyDir volume");
+                    volumes::ReservedHostPaths::default().open(&volume_dir)?
+                }
+            };
+
+            // Store the validated volume for later lookup
+            validated_volumes.insert(v.name.clone(), host_path);
+        }
+
+        let loopback = Arc::default();
+        // One per deploy, shared by every component in it.
+        let trap_hint_logged = Arc::default();
+
+        // Iniitalize service
+        let service = if let Some(svc) = service {
+            match self.initialize_service(
+                id.as_ref(),
+                &name,
+                &namespace,
+                svc,
+                &validated_volumes,
+                Arc::clone(&loopback),
+            ) {
+                Ok(handle) => {
+                    tracing::debug!("successfully initialized service component");
+                    Some(
+                        handle
+                            .with_annotations(Arc::clone(&annotations_arc))
+                            .with_trap_hint_flag(&trap_hint_logged),
+                    )
+                }
+                Err(e) => {
+                    tracing::error!(err = ?e, "failed to initialize service component");
+                    bail!(e);
+                }
+            }
+        } else {
+            None
+        };
+
+        // Initialize all components
+        let mut workload_components = Vec::new();
+        for component in components.into_iter() {
+            match self.initialize_workload_component(
+                id.as_ref(),
+                &name,
+                &namespace,
+                component,
+                &validated_volumes,
+                Arc::clone(&loopback),
+            ) {
+                Ok(handle) => {
+                    tracing::debug!("successfully initialized workload component");
+                    workload_components.push(
+                        handle
+                            .with_annotations(Arc::clone(&annotations_arc))
+                            .with_trap_hint_flag(&trap_hint_logged),
+                    );
+                }
+                Err(e) => {
+                    tracing::error!(err = ?e, "failed to initialize component");
+                    bail!(e);
+                }
+            }
+        }
+
+        let workload = UnresolvedWorkload::new(
+            id.as_ref(),
+            name,
+            namespace,
+            service,
+            workload_components,
+            host_interfaces,
+        )
+        .with_scratch(workload_scratch)
+        .with_stream_payloads(Arc::clone(&self.stream_payloads));
+
+        #[cfg(feature = "wasi-tls")]
+        let workload = workload.maybe_with_tls_provider(self.tls_provider.clone());
+
+        Ok(workload)
+    }
+
+    #[instrument(name = "initialize_service", skip_all)]
+    fn initialize_service(
+        &self,
+        workload_id: impl AsRef<str>,
+        workload_name: impl AsRef<str>,
+        workload_namespace: impl AsRef<str>,
+        service: crate::types::Service,
+        validated_volumes: &std::collections::HashMap<String, volumes::OpenedVolume>,
+        loopback: Arc<std::sync::Mutex<loopback::Network>>,
+    ) -> anyhow::Result<WorkloadService> {
+        // Create a wasmtime component from the bytes
+        let (wasmtime_component, compiled) = self
+            .load_live_component(service.bytes, service.digest)
+            .context("failed to create component from bytes")?;
+
+        // Create a linker for this component
+        let mut linker: Linker<SharedCtx> = Linker::new(&self.inner);
+
+        // Add WASI interfaces to the linker (with custom socket implementation)
+        add_wasi_to_linker(&mut linker).context("failed to add WASI to linker")?;
+
+        // Add HTTP interfaces to the linker if the component uses them
+        if uses_wasi_http(&wasmtime_component) {
+            wasmtime_wasi_http::p2::add_only_http_to_linker_async(&mut linker)
+                .map_err(anyhow::Error::from)
+                .context("failed to add wasi:http/types to linker")?;
+            wasmtime_wasi_http::p3::add_to_linker(&mut linker)
+                .map_err(|e| anyhow::anyhow!(e).context("failed to add wasi:http p3 to linker"))?;
+        }
+
+        // Build volume mounts for this component by looking up validated volumes
+        let mut component_volume_mounts = Vec::new();
+        let mut resolved_volume_mounts = Vec::new();
+        for vm in &service.local_resources.volume_mounts {
+            if let Some(host_path) = validated_volumes.get(&vm.name) {
+                component_volume_mounts.push((host_path.path.clone(), vm.clone()));
+                resolved_volume_mounts
+                    .push(volumes::ResolvedVolumeMount::from_opened(host_path, vm)?);
+            } else {
+                tracing::warn!(
+                    volume = %vm.name,
+                    "component references volume that was not found in workload volumes",
+                );
+            }
+        }
+
+        let mut service = WorkloadService::new(
+            workload_id.as_ref(),
+            workload_name.as_ref(),
+            workload_namespace.as_ref(),
+            wasmtime_component,
+            linker,
+            component_volume_mounts,
+            service.local_resources,
+            service.max_restarts,
+            loopback,
+        );
+        service.metadata.resolved_volume_mounts = resolved_volume_mounts;
+        service.metadata.socket_policy = Arc::clone(&self.socket_policy);
+        service.metadata.guest_memory = Arc::clone(&self.guest_memory);
+        service.metadata.compiled = compiled;
+
+        let world = service.world();
+
+        if !world.exports.iter().any(|iface| {
+            iface.namespace == "wasi" && iface.package == "cli" && iface.interfaces.contains("run")
+        }) && world.exports.len() != 1
+        {
+            bail!("Service must export a single interface with the 'run' function");
+        }
+
+        // Create the WorkloadService with volume mounts
+        Ok(service)
+    }
+
+    /// See [`explain_compile_failure`].
+    fn explain_compile_failure(&self, e: wasmtime::Error) -> anyhow::Error {
+        explain_compile_failure(e, self.effective_heap_memory())
+    }
+
+    /// The linear-memory ceiling a compile failure was actually measured
+    /// against: the installed pool's, falling back to the flag when there is
+    /// no pool to have overridden it.
+    fn effective_heap_memory(&self) -> u64 {
+        self.installed_heap_memory
+            .unwrap_or(self.host_memory.default_heap_memory)
+    }
+
+    /// [`Self::load_component_bytes`] for a workload, which holds the returned
+    /// [`LiveCompile`] while it runs: a digest some running workload was
+    /// loaded from is served from that workload's compile, whether or not the
+    /// cache still has it.
+    fn load_live_component(
+        &self,
+        bytes: impl AsRef<[u8]>,
+        digest: Option<impl AsRef<str>>,
+    ) -> anyhow::Result<(Component, Option<Arc<LiveCompile>>)> {
+        let Some(digest) = digest else {
+            return Ok((self.load_component_bytes(bytes, None::<&str>)?, None));
+        };
+        let digest = digest.as_ref();
+        if let Some(live) = self.live_compile(digest) {
+            return Ok((live.component.clone(), Some(live)));
+        }
+        let component = self.load_component_bytes(bytes, Some(digest))?;
+        let mut live = self
+            .live_compiles
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        // Another start may have recorded this digest since the check above;
+        // share its compile rather than keep a second.
+        if let Some(existing) = live.get(digest).and_then(std::sync::Weak::upgrade) {
+            return Ok((existing.component.clone(), Some(existing)));
+        }
+        let entry = Arc::new(LiveCompile {
+            digest: digest.to_string(),
+            component: component.clone(),
+            live: Arc::downgrade(&self.live_compiles),
+        });
+        live.insert(digest.to_string(), Arc::downgrade(&entry));
+        Ok((component, Some(entry)))
+    }
+
+    fn live_compile(&self, digest: &str) -> Option<Arc<LiveCompile>> {
+        self.live_compiles
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .get(digest)
+            .and_then(std::sync::Weak::upgrade)
+    }
+
+    /// Load a WebAssembly component from raw bytes or yields a previously compiled one.
+    #[instrument(name = "load_component_bytes", skip_all, fields(digest = %digest.as_ref().map(|d| d.as_ref()).unwrap_or("none")))]
+    fn load_component_bytes(
+        &self,
+        bytes: impl AsRef<[u8]>,
+        digest: Option<impl AsRef<str>>,
+    ) -> anyhow::Result<Component> {
+        match digest {
+            None => {
+                tracing::debug!("no digest provided, compiling component without caching");
+                let compiled = Component::new(&self.inner, bytes.as_ref())
+                    .map_err(|e| self.explain_compile_failure(e))
+                    .context("failed to compile component from bytes")?;
+                Ok(compiled)
+            }
+            Some(digest) => {
+                let key = CacheKey(digest.as_ref().to_string());
+                let inner = &self.inner;
+                let bytes_ref = bytes.as_ref();
+                let heap = self.effective_heap_memory();
+
+                #[cfg(test)]
+                let compiles = Arc::clone(&self.compiles);
+                self.cache
+                    .try_get_with(key, || {
+                        #[cfg(test)]
+                        compiles.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                        Component::new(inner, bytes_ref)
+                            .map_err(|e| explain_compile_failure(e, heap))
+                            .context("failed to compile component from bytes")
+                            .map(CacheValue)
+                    })
+                    .map_err(|e: Arc<anyhow::Error>| {
+                        anyhow::Error::new(SharedError(e)).context("compilation cache error")
+                    })
+                    .map(|v| v.0)
+            }
+        }
+    }
+
+    /// Initialize a component that is a part of a workload, add wasi@0.2 interfaces (and
+    /// wasi:http if the `http` feature is enabled) to the linker.
+    #[instrument(name = "initialize_workload_component", skip_all, fields(component.name = %component.name))]
+    fn initialize_workload_component(
+        &self,
+        workload_id: impl AsRef<str>,
+        workload_name: impl AsRef<str>,
+        workload_namespace: impl AsRef<str>,
+        component: crate::types::Component,
+        validated_volumes: &std::collections::HashMap<String, volumes::OpenedVolume>,
+        loopback: Arc<std::sync::Mutex<loopback::Network>>,
+    ) -> anyhow::Result<WorkloadComponent> {
+        // Read before the component's fields are moved out below.
+        let instances = InstancePolicy::from_component(&component);
+
+        // Create a wasmtime component from the bytes
+        let (wasmtime_component, compiled) = self
+            .load_live_component(component.bytes, component.digest)
+            .context("failed to create component from bytes")?;
+
+        let linker = self.base_linker(uses_wasi_http(&wasmtime_component))?;
+
+        // Build volume mounts for this component by looking up validated volumes
+        let mut component_volume_mounts = Vec::new();
+        let mut resolved_volume_mounts = Vec::new();
+        for vm in &component.local_resources.volume_mounts {
+            if let Some(host_path) = validated_volumes.get(&vm.name) {
+                component_volume_mounts.push((host_path.path.clone(), vm.clone()));
+                resolved_volume_mounts
+                    .push(volumes::ResolvedVolumeMount::from_opened(host_path, vm)?);
+            } else {
+                tracing::warn!(
+                    volume = %vm.name,
+                    "component references volume that was not found in workload volumes",
+                );
+            }
+        }
+
+        // Create the WorkloadComponent with volume mounts
+        let mut workload_component = WorkloadComponent::new(
+            workload_id.as_ref(),
+            workload_name.as_ref(),
+            workload_namespace.as_ref(),
+            component.name,
+            wasmtime_component,
+            linker,
+            component_volume_mounts,
+            component.local_resources,
+            loopback,
+            instances,
+        );
+        workload_component.metadata.resolved_volume_mounts = resolved_volume_mounts;
+        workload_component.metadata.socket_policy = Arc::clone(&self.socket_policy);
+        workload_component.metadata.guest_memory = Arc::clone(&self.guest_memory);
+        workload_component.metadata.compiled = compiled;
+        Ok(workload_component)
+    }
+
+    /// The shared linker a workload component starts from: WASI (with our
+    /// socket implementation), plus `wasi:http` when the component uses it.
+    /// See [`BaseLinkers`].
+    fn base_linker(&self, with_http: bool) -> anyhow::Result<Arc<Linker<SharedCtx>>> {
+        let slot = if with_http {
+            &self.base_linkers.wasi_http
+        } else {
+            &self.base_linkers.wasi
+        };
+        if let Some(linker) = slot.get() {
+            return Ok(Arc::clone(linker));
+        }
+        let mut linker: Linker<SharedCtx> = Linker::new(&self.inner);
+        add_wasi_to_linker(&mut linker).context("failed to add WASI to linker")?;
+        if with_http {
+            wasmtime_wasi_http::p2::add_only_http_to_linker_async(&mut linker)
+                .map_err(anyhow::Error::from)
+                .context("failed to add wasi:http/types to linker")?;
+            wasmtime_wasi_http::p3::add_to_linker(&mut linker)
+                .map_err(|e| anyhow::anyhow!(e).context("failed to add wasi:http p3 to linker"))?;
+        }
+        // Concurrent first starts may each build one; all but one are dropped.
+        Ok(Arc::clone(slot.get_or_init(|| Arc::new(linker))))
+    }
+
+    /// Compile a host component plugin and build a linker with WASI (and
+    /// `wasi:http` if the component uses it) added.
+    ///
+    /// Unlike a workload component, a host component plugin is host-scoped: it is
+    /// instantiated once at host start into its own long-lived store. The caller
+    /// may install additional shims on the returned [`Linker`] (e.g. to route a
+    /// plugin's own capability imports back to itself) before calling
+    /// [`Linker::instantiate_pre`]; the [`Component`] is returned alongside for
+    /// exported- and imported-type introspection.
+    pub fn prepare_host_component(
+        &self,
+        bytes: &[u8],
+    ) -> anyhow::Result<(Component, Linker<SharedCtx>)> {
+        let component = Component::new(&self.inner, bytes)
+            .map_err(anyhow::Error::from)
+            .context("failed to compile host component plugin")?;
+
+        let mut linker: Linker<SharedCtx> = Linker::new(&self.inner);
+        add_wasi_to_linker(&mut linker).context("failed to add WASI to plugin linker")?;
+        if uses_wasi_http(&component) {
+            wasmtime_wasi_http::p2::add_only_http_to_linker_async(&mut linker)
+                .map_err(anyhow::Error::from)
+                .context("failed to add wasi:http/types to plugin linker")?;
+            wasmtime_wasi_http::p3::add_to_linker(&mut linker).map_err(|e| {
+                anyhow::anyhow!(e).context("failed to add wasi:http p3 to plugin linker")
+            })?;
+        }
+
+        Ok((component, linker))
+    }
+}
+
+/// A wasmtime WebAssembly proposal that can be opted into on the engine.
+///
+/// Each variant maps to one or more `wasmtime::Config` feature flags. Use it
+/// with [`EngineBuilder::with_wasm_proposal`] to enable a bundle of related
+/// settings without having to replace the entire config via
+/// [`EngineBuilder::with_config`].
+///
+/// ```no_run
+/// # use wash_runtime::engine::{Engine, WasmProposal};
+/// # fn example() -> anyhow::Result<()> {
+/// let engine = Engine::builder()
+///     .with_wasm_proposal(WasmProposal::Gc)
+///     .with_wasm_proposal(WasmProposal::Threads)
+///     .build()?;
+/// # Ok(())
+/// # }
+/// ```
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[non_exhaustive]
+pub enum WasmProposal {
+    /// Component model async ABI (`stream`/`future`/`error-context` types).
+    /// Enables `wasm_component_model_async`. Required for WASIP3.
+    ComponentModelAsync,
+    /// Component model `(implements ..)` named imports, letting a component
+    /// import the same interface multiple times under distinct names so host
+    /// plugins can route each independently. Enables
+    /// `wasm_component_model_implements`. Available with the
+    /// `wasm_component_model_implements` crate feature, which is on by default
+    /// and carries the plugin-side routing this proposal is useful for.
+    #[cfg(feature = "wasm_component_model_implements")]
+    WasmComponentModelImplements,
+    /// Component model `map<k, v>` type. Enables `wasm_component_model_map`,
+    /// which is what lets a component whose WIT uses `map` types be validated
+    /// and instantiated. Enabled by default, like [`Self::ComponentModelAsync`].
+    ComponentModelMap,
+    /// Garbage collection (with its `wasm_function_references` prerequisite).
+    /// Enabled by default in wasmtime >= 47; accepted for compatibility.
+    Gc,
+    /// Exception handling. Enabled by default in wasmtime >= 47; accepted for
+    /// compatibility.
+    ExceptionHandling,
+    /// 128-bit wide arithmetic. Enabled by default in wasmtime >= 47; accepted
+    /// for compatibility.
+    WideArithmetic,
+    /// Shared-memory threads. Enables `wasm_threads`.
+    Threads,
+    /// Tail calls. Enables `wasm_tail_call`.
+    TailCall,
+}
+
+impl WasmProposal {
+    /// Apply this proposal's wasmtime feature flags onto `cfg`.
+    fn apply(self, cfg: &mut wasmtime::Config) {
+        match self {
+            WasmProposal::ComponentModelAsync => {
+                cfg.wasm_component_model_async(true);
+            }
+            #[cfg(feature = "wasm_component_model_implements")]
+            WasmProposal::WasmComponentModelImplements => {
+                cfg.wasm_component_model_implements(true);
+            }
+            WasmProposal::ComponentModelMap => {
+                cfg.wasm_component_model_map(true);
+            }
+            // GC (with its `wasm_function_references` prerequisite), exception
+            // handling, and wide arithmetic are all enabled by default in
+            // wasmtime >= 47, so opting into them needs no config change. The
+            // variants stay accepted for CLI/config compatibility.
+            WasmProposal::Gc | WasmProposal::ExceptionHandling | WasmProposal::WideArithmetic => {}
+            // Threads and tail calls are also on by default in wasmtime >= 47,
+            // but only conditionally — `wasm_threads` follows the `threads`
+            // crate feature and `wasm_tail_call` is off under the Winch compiler
+            // — so these set their flag explicitly to stay correct regardless of
+            // build or config.
+            WasmProposal::Threads => {
+                cfg.wasm_threads(true);
+            }
+            WasmProposal::TailCall => {
+                cfg.wasm_tail_call(true);
+            }
+        }
+    }
+}
+
+/// Error returned when a string cannot be parsed into a [`WasmProposal`].
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ParseWasmProposalError(String);
+
+impl std::fmt::Display for ParseWasmProposalError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "unknown wasm proposal {:?}; expected one of: component-model-async, \
+             component-model-map, gc, exception-handling, wide-arithmetic, threads, \
+             tail-call",
+            self.0
+        )
+    }
+}
+
+impl std::error::Error for ParseWasmProposalError {}
+
+impl FromStr for WasmProposal {
+    type Err = ParseWasmProposalError;
+
+    /// Parse a proposal from its kebab-case name. Matching is case-insensitive
+    /// and treats `_` and `-` interchangeably, so `gc`, `GC`,
+    /// `exception_handling`, and `exception-handling` all parse.
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.trim().to_ascii_lowercase().replace('_', "-").as_str() {
+            "component-model-async" => Ok(Self::ComponentModelAsync),
+            "component-model-map" => Ok(Self::ComponentModelMap),
+            "gc" => Ok(Self::Gc),
+            "exception-handling" => Ok(Self::ExceptionHandling),
+            "wide-arithmetic" => Ok(Self::WideArithmetic),
+            "threads" => Ok(Self::Threads),
+            "tail-call" => Ok(Self::TailCall),
+            _ => Err(ParseWasmProposalError(s.to_string())),
+        }
+    }
+}
+
+/// Builder for constructing an [`Engine`] with custom configuration.
+///
+/// The builder pattern allows for flexible configuration of the engine
+/// before creation. By default, it enables async support which is required
+/// for component execution.
+///
+/// Settings configured through the builder ([`with_pooling_allocator`],
+/// [`with_fuel_consumption`], [`with_wasm_proposal`], …) are layered on top of
+/// any base config supplied via [`with_config`], so a custom config can be
+/// combined with pooling and proposal flags rather than replacing them.
+///
+/// [`with_pooling_allocator`]: EngineBuilder::with_pooling_allocator
+/// [`with_fuel_consumption`]: EngineBuilder::with_fuel_consumption
+/// [`with_wasm_proposal`]: EngineBuilder::with_wasm_proposal
+/// [`with_config`]: EngineBuilder::with_config
+#[derive(Default)]
+pub struct EngineBuilder {
+    config: Option<wasmtime::Config>,
+    use_pooling_allocator: Option<bool>,
+    max_instances: Option<u32>,
+    pooling_config: Option<PoolingAllocationConfig>,
+    proposals: std::collections::BTreeSet<WasmProposal>,
+    compilation_cache_size: Option<u64>,
+    compilation_cache_ttl: Option<Duration>,
+    fuel_consumption: Option<bool>,
+    parallel_compilation: Option<bool>,
+    native_unwind_info: Option<bool>,
+    socket_policy: Option<Arc<crate::sockets::policy::SocketPolicy>>,
+    reserved_host_paths: Vec<PathBuf>,
+    allowed_host_paths: Vec<PathBuf>,
+    scratch_root: Option<PathBuf>,
+    host_memory: Option<host_memory::HostMemoryBudgets>,
+    max_process_memory_bytes: Option<u64>,
+    max_process_memory_off: bool,
+    guest_memory_mode: guest_memory::GuestMemoryMode,
+    /// Optional TLS provider override for wasi:tls client connections.
+    #[cfg(feature = "wasi-tls")]
+    tls_provider: Option<SharedTlsProvider>,
+}
+
+impl EngineBuilder {
+    /// Reserve paths that no workload volume may equal, contain, or lie
+    /// inside. The scratch root (see [`Self::with_scratch_root`]) is always
+    /// reserved.
+    #[must_use]
+    pub fn with_reserved_host_paths(mut self, paths: impl IntoIterator<Item = PathBuf>) -> Self {
+        self.reserved_host_paths.extend(paths);
+        self
+    }
+
+    /// Permit `hostPath` volumes within these directories. Adds to any
+    /// permitted before; with none, no `hostPath` volume is permitted.
+    ///
+    /// This is a host-wide guardrail for a trusted embedder, and for migrating
+    /// hosts whose workloads already mount host directories. It is not a
+    /// multi-tenant storage policy: any workload on the engine may mount any
+    /// directory permitted here. Where tenants author workloads, disable their
+    /// raw `hostPath` volumes in the control plane, and have it give each
+    /// workload a directory of its own instead.
+    #[must_use]
+    pub fn with_allowed_host_paths(mut self, paths: impl IntoIterator<Item = PathBuf>) -> Self {
+        self.allowed_host_paths.extend(paths);
+        self
+    }
+
+    /// Where `emptyDir` volumes live. Unset, `wasmcloud-scratch` under the
+    /// system temporary directory.
+    ///
+    /// The engine claims a directory of its own here, and removes what hosts
+    /// that are no longer running left behind. The root is reserved: no
+    /// `hostPath` volume may equal it, contain it, or lie inside it, whatever
+    /// [`Self::with_allowed_host_paths`] permits.
+    #[must_use]
+    pub fn with_scratch_root(mut self, root: impl Into<PathBuf>) -> Self {
+        self.scratch_root = Some(root.into());
+        self
+    }
+
+    /// Install the host-level socket policy every workload on this engine
+    /// inherits.
+    ///
+    /// The workload-level half (`allowedHosts`, `allowedHostLoopbackPorts`) comes
+    /// from each component's `LocalResources` and is layered over this, so a
+    /// workload can only ever narrow what the host permits.
+    #[must_use]
+    pub fn with_socket_policy(mut self, policy: Arc<crate::sockets::policy::SocketPolicy>) -> Self {
+        self.socket_policy = Some(policy);
+        self
+    }
+
+    /// Cap the whole process's memory footprint, guests and host together.
+    ///
+    /// Past it, guest memory growth and new instances are refused until the
+    /// footprint falls back (see [`process_memory`]). Unset, it is derived:
+    /// 90% of the cgroup limit, or of physical memory where there is none, so
+    /// a host never sets out to use more memory than the machine has.
+    ///
+    /// Overrides an earlier [`Self::without_max_process_memory`].
+    #[must_use]
+    pub fn with_max_process_memory_bytes(mut self, bytes: u64) -> Self {
+        self.max_process_memory_bytes = Some(bytes);
+        self.max_process_memory_off = false;
+        self
+    }
+
+    /// Hold the process to no footprint at all: no sampler runs, and only the
+    /// guest budget and the kernel limit memory. For an embedder that bounds
+    /// the process some other way, or a host whose footprint reading cannot
+    /// be trusted.
+    ///
+    /// Overrides an earlier [`Self::with_max_process_memory_bytes`].
+    #[must_use]
+    pub fn without_max_process_memory(mut self) -> Self {
+        self.max_process_memory_bytes = None;
+        self.max_process_memory_off = true;
+        self
+    }
+
+    /// Set the host's memory budget, per-memory ceiling and instance count.
+    /// Unset, the pool knobs are wasmtime's defaults and the budget is derived
+    /// from this process's memory limit — and enforced, unless
+    /// [`Self::with_guest_memory_mode`] says otherwise.
+    pub fn with_host_memory(mut self, host_memory: host_memory::HostMemoryBudgets) -> Self {
+        self.host_memory = Some(host_memory);
+        self
+    }
+
+    /// Whether `max_guest_memory` is enforced or only accounted.
+    ///
+    /// Unset, it is [`guest_memory::GuestMemoryMode::Enforce`]: growth past
+    /// the budget is refused. `max_guest_memory` is derived when an operator
+    /// sets nothing, so every engine has a ceiling unless it opts into
+    /// [`guest_memory::GuestMemoryMode::Count`].
+    #[must_use]
+    pub fn with_guest_memory_mode(mut self, mode: guest_memory::GuestMemoryMode) -> Self {
+        self.guest_memory_mode = mode;
+        self
+    }
+
+    /// Creates a new `EngineBuilder` with default configuration.
+    ///
+    /// # Returns
+    /// A new builder instance with default wasmtime configuration.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Enables or disables the pooling allocator for instance allocation.
+    pub fn with_pooling_allocator(mut self, enable: bool) -> Self {
+        self.use_pooling_allocator = Some(enable);
+        self
+    }
+
+    /// Sets the maximum number of instances for the pooling allocator.
+    /// This is a 'hint' and can be overridden by environment variables.
+    ///
+    /// Ignored when a full [`PoolingAllocationConfig`] is supplied via
+    /// [`with_pooling_config`](Self::with_pooling_config).
+    pub fn with_max_instances(mut self, max: u32) -> Self {
+        self.max_instances = Some(max);
+        self
+    }
+
+    /// Sets a fully-customized [`PoolingAllocationConfig`] for the pooling
+    /// allocator, giving callers control over every pooling knob rather than
+    /// only the `WASMTIME_POOLING_*` environment variables.
+    ///
+    /// Supplying a pooling config implies the pooling allocator is enabled and
+    /// takes precedence over [`with_max_instances`](Self::with_max_instances).
+    /// It is still only applied when the host supports the pooling allocator.
+    pub fn with_pooling_config(mut self, config: PoolingAllocationConfig) -> Self {
+        self.pooling_config = Some(config);
+        self.use_pooling_allocator = Some(true);
+        self
+    }
+
+    /// Enables an additional WebAssembly proposal on the engine.
+    ///
+    /// Each [`WasmProposal`] maps to one or more `wasmtime::Config` feature
+    /// flags (see the variant docs for the exact flags). Proposals are layered
+    /// on top of any base config from [`with_config`](Self::with_config), so a
+    /// single extra proposal can be enabled without replacing the whole config.
+    /// Calling this repeatedly accumulates proposals; duplicates are ignored.
+    pub fn with_wasm_proposal(mut self, proposal: WasmProposal) -> Self {
+        self.proposals.insert(proposal);
+        self
+    }
+
+    /// Enables or disables fuel consumption for the engine.
+    ///
+    /// When unset, fuel consumption is left at whatever the base config (from
+    /// [`with_config`](Self::with_config), or the wasmtime default of disabled)
+    /// specifies, rather than being forced off.
+    pub fn with_fuel_consumption(mut self, enable: bool) -> Self {
+        self.fuel_consumption = Some(enable);
+        self
+    }
+
+    /// Whether Cranelift compiles a component's functions on several threads.
+    ///
+    /// Enabled unless this or `WASMTIME_PARALLEL_COMPILATION` turns it off.
+    /// The threads come from rayon's process-wide pool, which sizes itself to
+    /// every core the process can see — not to `max_concurrent_starts`, and
+    /// not to the CPU a container is requested at. Two ways to hold a host
+    /// down: `RAYON_NUM_THREADS` caps how wide one compile goes, and this
+    /// makes it single-threaded again.
+    pub fn with_parallel_compilation(mut self, enable: bool) -> Self {
+        self.parallel_compilation = Some(enable);
+        self
+    }
+
+    /// Whether compiled code registers unwind tables with the system unwinder,
+    /// which only native debuggers and profilers that unwind by DWARF read.
+    ///
+    /// On, as in wasmtime, unless this or `WASMTIME_NATIVE_UNWIND_INFO` turns
+    /// it off. Under LLVM's libunwind (macOS; musl and zig-built Linux
+    /// binaries) every component drop scans a process-wide table of them, so
+    /// a host holding many components wants it off. Windows requires them.
+    pub fn with_native_unwind_info(mut self, enable: bool) -> Self {
+        self.native_unwind_info = Some(enable);
+        self
+    }
+
+    /// Sets a custom wasmtime configuration to use as the *base* for the engine.
+    ///
+    /// This config is used as the starting point, and any other builder
+    /// settings — pooling allocator, fuel consumption, and
+    /// [`WasmProposal`]s — are layered on top of it. This means a custom config
+    /// can be combined with [`with_pooling_allocator`](Self::with_pooling_allocator),
+    /// [`with_max_instances`](Self::with_max_instances), and
+    /// [`with_wasm_proposal`](Self::with_wasm_proposal) rather than being
+    /// mutually exclusive with them.
+    ///
+    /// Unlike the default-config path, the pooling allocator is *not* enabled
+    /// by default on top of a custom config. A base config's allocation
+    /// strategy is preserved unless pooling is explicitly requested via
+    /// [`with_pooling_allocator`](Self::with_pooling_allocator),
+    /// [`with_pooling_config`](Self::with_pooling_config), or the
+    /// `WASMTIME_POOLING` environment variable.
+    ///
+    /// # Arguments
+    /// * `config` - A wasmtime `Config` object with custom settings
+    ///
+    /// # Returns
+    /// The builder instance for method chaining.
+    pub fn with_config(mut self, config: wasmtime::Config) -> Self {
+        self.config = Some(config);
+        self
+    }
+
+    /// Configures a compilation cache for the engine.
+    pub fn with_compilation_cache(mut self, size: u64, ttl: Duration) -> Self {
+        self.compilation_cache_size = Some(size);
+        self.compilation_cache_ttl = Some(ttl);
+        self
+    }
+
+    /// Override the TLS provider used for `wasi:tls` client connections.
+    ///
+    /// Use this to plug in an alternative TLS backend, install a custom root
+    /// certificate store (corporate CAs, certificate pinning), or integrate
+    /// with HSM-backed key material.
+    #[cfg(feature = "wasi-tls")]
+    pub fn with_tls_provider(mut self, provider: SharedTlsProvider) -> Self {
+        self.tls_provider = Some(provider);
+        self
+    }
+}
+
+impl EngineBuilder {
+    /// Builds and returns a configured [`Engine`].
+    ///
+    /// This method finalizes the configuration and creates the engine.
+    /// It automatically enables async support which is required for
+    /// component execution.
+    ///
+    /// # Returns
+    /// A new `Engine` instance configured with the builder's settings.
+    ///
+    /// # Errors
+    /// Returns an error if the wasmtime engine creation fails.
+    pub fn build(mut self) -> anyhow::Result<Engine> {
+        #[cfg(feature = "wasi-tls")]
+        {
+            crate::init_crypto();
+            if self.tls_provider.is_none() {
+                tracing::warn!(
+                    "wasi-tls is enabled but no TLS provider was set; \
+                     falling back to wasmtime-wasi-tls default — \
+                     set one via EngineBuilder::with_tls_provider"
+                );
+            }
+        }
+
+        // Start from the caller-supplied base config (or wasmtime's default) and
+        // layer the builder-managed settings on top of it.
+        let has_custom_config = self.config.is_some();
+        let mut config = self.config.take().unwrap_or_default();
+
+        // Default the pooling allocator on only when starting from wasmtime's
+        // default config. With a caller-supplied base config, leave its
+        // allocation strategy untouched unless pooling was explicitly requested
+        // (via with_pooling_allocator/with_pooling_config or WASMTIME_POOLING),
+        // so a custom strategy is not silently overridden.
+        let use_pooling_allocator = self
+            .use_pooling_allocator
+            .or_else(|| getenv::<bool>("WASMTIME_POOLING"))
+            .unwrap_or(!has_custom_config);
+
+        // Read once: each of the derivations and checks below needs it, and
+        // where there is no cgroup it means asking the OS for physical memory.
+        let memory_limit = host_memory::detected_memory_limit();
+        // Resolved before the pooling config, which both of its knobs feed.
+        let host_memory = self
+            .host_memory
+            .unwrap_or_else(|| host_memory::HostMemoryBudgets::derived_within(memory_limit));
+        // Reads the resolved budgets, not the installed pool: it advises on the
+        // knobs as configured. What the pool reserves is judged below, once
+        // the pool that is actually installed is known.
+        if let Some(advisory) = host_memory.advisory() {
+            tracing::warn!("{advisory}");
+        }
+        // Only when the budget is a real ceiling: an over-large budget the host
+        // merely counts against costs nothing.
+        if self.guest_memory_mode == guest_memory::GuestMemoryMode::Enforce
+            && let Some(advisory) = host_memory.enforcement_advisory_within(memory_limit)
+        {
+            tracing::warn!("{advisory}");
+        }
+        let max_process_memory_bytes = (!self.max_process_memory_off).then(|| {
+            self.max_process_memory_bytes.unwrap_or_else(|| {
+                host_memory::derive_max_process_memory_bytes_within(memory_limit)
+            })
+        });
+        // Only for a limit the operator named: a derived one is a share of the
+        // very limit this checks against.
+        if !self.max_process_memory_off
+            && let Some(bytes) = self.max_process_memory_bytes
+            && let Some(advisory) = host_memory::process_memory_advisory_within(bytes, memory_limit)
+        {
+            tracing::warn!("{advisory}");
+        }
+        // What the startup line says the process is held to.
+        let max_process_memory =
+            max_process_memory_bytes.map_or_else(|| "off".to_string(), host_memory::render_bytes);
+
+        // The pooling allocator can be more efficient for workloads with many short-lived instances.
+        // Read back from the installed pool: the environment and a
+        // caller-supplied config both override what was asked for.
+        let mut installed_pool: Option<InstalledPool> = None;
+        if use_pooling_allocator && let Ok(true) = is_pooling_allocator_supported() {
+            tracing::debug!("using pooling allocator by default");
+            let pooling = self.pooling_config.take().unwrap_or_else(|| {
+                new_pooling_config(
+                    self.max_instances.unwrap_or(host_memory.core_instances),
+                    host_memory.default_heap_memory,
+                )
+            });
+            installed_pool = Some(InstalledPool {
+                core_instances: pooling.get_total_core_instances(),
+                memories: pooling.get_total_memories(),
+                max_memory_size: u64::try_from(pooling.get_max_memory_size()).unwrap_or(u64::MAX),
+                totals: pool_usage::PoolTotals::of(&pooling),
+            });
+            config.allocation_strategy(wasmtime::InstanceAllocationStrategy::Pooling(pooling));
+        } else if use_pooling_allocator {
+            tracing::warn!("pooling allocator requested but not supported");
+        }
+        let total_core_instances = installed_pool.map(|pool| pool.core_instances);
+        let installed_heap_memory = installed_pool.map(|pool| pool.max_memory_size);
+        let pool_totals = installed_pool.map(|pool| pool.totals);
+        // Against the pool that was installed, not the knobs: the environment
+        // or a caller's own pooling config can move its memory count and slot
+        // size, and with no pool there is no reservation to warn about.
+        if let Some(pool) = installed_pool {
+            for advisory in host_memory::pool_advisories(&pool.totals, pool.max_memory_size) {
+                tracing::warn!("{advisory}");
+            }
+        }
+
+        // Reported here so every embedder says what it built. The reservation
+        // is `total_memories x slot_size`, not the instance count, and the slot
+        // does not shrink with the heap ceiling.
+        match installed_pool {
+            Some(pool) => tracing::info!(
+                %max_process_memory,
+                max_guest_memory = %host_memory::render_bytes(host_memory.max_guest_memory),
+                guest_memory_mode = self.guest_memory_mode.as_str(),
+                default_heap_memory = %host_memory::render_bytes(pool.max_memory_size),
+                core_instances = pool.core_instances,
+                memories = pool.memories,
+                slot_size = %host_memory::render_bytes(host_memory::pool_slot_bytes(pool.max_memory_size)),
+                pool_reservation = %host_memory::render_bytes(pool.reservation()),
+                "host memory resolved"
+            ),
+            // No pool, so no reservation and no installed ceiling to name.
+            None => tracing::info!(
+                %max_process_memory,
+                max_guest_memory = %host_memory::render_bytes(host_memory.max_guest_memory),
+                guest_memory_mode = self.guest_memory_mode.as_str(),
+                pooling = false,
+                "host memory resolved"
+            ),
+        }
+
+        // Only override fuel consumption when the caller explicitly set it, so a
+        // custom base config's setting is otherwise preserved.
+        if let Some(fuel) = self.fuel_consumption {
+            config.consume_fuel(fuel);
+        }
+
+        // Compiling in parallel is wasmtime's own default, so this only has to
+        // carry an explicit "off" through to the config.
+        if let Some(parallel) = self
+            .parallel_compilation
+            .or_else(|| getenv::<bool>("WASMTIME_PARALLEL_COMPILATION"))
+        {
+            config.parallel_compilation(parallel);
+        }
+
+        // WASIP3's async ABI requires the component-model async proposal.
+        self.proposals.insert(WasmProposal::ComponentModelAsync);
+
+        // Accept components whose WIT uses `map<k, v>` types.
+        self.proposals.insert(WasmProposal::ComponentModelMap);
+
+        // Accept components that import an interface multiple times via the
+        // component-model `(implements ..)` annotation, so host plugins can
+        // route each named import (e.g. two `wasi:keyvalue/store` imports
+        // backed by redis vs NATS) independently. Gated on the
+        // `wasm_component_model_implements` feature, which is on by default and
+        // also brings in the plugin-side routing.
+        #[cfg(feature = "wasm_component_model_implements")]
+        self.proposals
+            .insert(WasmProposal::WasmComponentModelImplements);
+
+        // Name the collector rather than taking `Collector::Auto`. `wasm_gc` is
+        // on by default, so a guest can allocate GC objects on any build, and
+        // `Auto` resolves to whichever collector was compiled in — reaching the
+        // null one, which reclaims nothing, when it is all that is left. Naming
+        // it turns that into an `Engine::new` error naming the missing feature.
+        config.collector(wasmtime::Collector::Copying);
+
+        // Compile a deadline check into every guest's loop back-edges, so guest
+        // work that never yields can still be ended. Every store must then set a
+        // deadline of its own — see [`crate::engine::abandon::arm_epoch_deadline`],
+        // which is what decides when one is acted on.
+        config.epoch_interruption(true);
+
+        // Unwind tables are wasmtime's own default, so this only carries an
+        // explicit choice through. Windows refuses to drop them, so an "off"
+        // is ignored there instead of failing `build`.
+        if let Some(unwind) = self
+            .native_unwind_info
+            .or_else(|| getenv::<bool>("WASMTIME_NATIVE_UNWIND_INFO"))
+        {
+            config.native_unwind_info(unwind || cfg!(windows));
+        }
+
+        for proposal in &self.proposals {
+            proposal.apply(&mut config);
+        }
+
+        // The pool maps its whole slab here, so a pool too large for the
+        // address space fails now, with wasmtime naming only the mapping. Say
+        // which numbers produced it. A heap ceiling past the reservation is
+        // refused here too, whatever the slot count, so that is named instead.
+        let inner = wasmtime::Engine::new(&config).map_err(|e| match installed_pool {
+            Some(pool) if pool.max_memory_size > host_memory::WASMTIME_MEMORY_RESERVATION => e
+                .context(format!(
+                    "building the engine failed with a pooling allocator whose heap ceiling \
+                     (default-heap-memory) of {} is past wasmtime's {} memory reservation, \
+                     which the pooling allocator refuses; set default-heap-memory to {} or less",
+                    host_memory::render_bytes(pool.max_memory_size),
+                    host_memory::render_bytes(host_memory::WASMTIME_MEMORY_RESERVATION),
+                    host_memory::render_bytes(host_memory::WASMTIME_MEMORY_RESERVATION),
+                )),
+            Some(pool) => e.context(format!(
+                "building the engine failed with a pooling allocator reserving {} of address \
+                 space ({} memories of {} each) out of the {} this process can map; if the \
+                 pool is the cause, lower core-instances or WASMTIME_POOLING_TOTAL_MEMORIES",
+                host_memory::render_bytes(pool.reservation()),
+                pool.memories,
+                host_memory::render_bytes(host_memory::pool_slot_bytes(pool.max_memory_size)),
+                host_memory::render_bytes(host_memory::usable_address_space()),
+            )),
+            None => e,
+        })?;
+        spawn_epoch_ticker(&inner)?;
+        let process_memory = match max_process_memory_bytes {
+            Some(limit) => {
+                let guard = Arc::new(process_memory::ProcessMemoryGuard::new(limit));
+                guard.spawn_sampler()?;
+                process_memory::ProcessMemoryGuard::register_metrics(
+                    &opentelemetry::global::meter("wash-runtime"),
+                );
+                Some(guard)
+            }
+            None => None,
+        };
+        let cache = Cache::builder()
+            .max_capacity(self.compilation_cache_size.unwrap_or(100))
+            .time_to_idle(
+                self.compilation_cache_ttl
+                    .unwrap_or(Duration::from_secs(600)),
+            )
+            .build();
+        let socket_policy = self.socket_policy.unwrap_or_default();
+        let scratch_root = self
+            .scratch_root
+            .unwrap_or_else(|| std::env::temp_dir().join("wasmcloud-scratch"));
+        let scratch = scratch::ScratchRoot::open(&scratch_root).map_err(|e| {
+            tracing::warn!(root = %scratch_root.display(), err = %e, "cannot claim the scratch root; emptyDir volumes will be refused");
+            Arc::from(format!("{e:#}"))
+        });
+        Ok(Engine {
+            stream_payloads: Arc::default(),
+            base_linkers: Arc::default(),
+            inner,
+            cache,
+            live_compiles: Arc::default(),
+            #[cfg(test)]
+            compiles: Arc::new(std::sync::atomic::AtomicUsize::new(0)),
+            host_paths: volumes::HostPathPolicy::new(
+                self.reserved_host_paths,
+                self.allowed_host_paths,
+                Some(scratch_root.clone()),
+                // The socket policy's counters, so an operator reads every
+                // policy figure in one place.
+                socket_policy.meters.clone(),
+            ),
+            socket_policy,
+            scratch,
+            host_memory,
+            guest_memory: {
+                let budget = guest_memory::GuestMemoryBudget::from_budgets(
+                    &host_memory,
+                    self.guest_memory_mode,
+                );
+                // The ceiling the pool actually installed, not the knob that
+                // asked for it: the budget must not charge for growth the pool
+                // is going to refuse. The same figure `explain_compile_failure`
+                // measures against, so they cannot drift apart.
+                let budget = match installed_heap_memory {
+                    Some(ceiling) => budget.with_heap_ceiling(ceiling),
+                    None => budget,
+                };
+                match &process_memory {
+                    Some(guard) => budget.with_process_guard(Arc::clone(guard)),
+                    None => budget,
+                }
+                .into_metered()
+            },
+            process_memory,
+            #[cfg(feature = "wasi-tls")]
+            tls_provider: self.tls_provider,
+            total_core_instances,
+            installed_heap_memory,
+            pool_totals,
+        })
+    }
+}
+
+/// Helper function to determine if a component uses wasi:http interfaces
+pub fn uses_wasi_http(component: &Component) -> bool {
+    imports_wasi_http(component) || exports_wasi_http(component)
+}
+
+pub fn exports_wasi_http(component: &Component) -> bool {
+    let ty: wasmtime::component::types::Component = component.component_type();
+    let engine = component.engine();
+
+    ty.exports(engine)
+        .any(|(export, _item)| export.starts_with("wasi:http"))
+}
+
+/// Whether a component exports the `wasmcloud:messaging/handler` interface (the
+/// inbound message handler the host invokes).
+pub fn exports_messaging_handler(component: &Component) -> bool {
+    let ty: wasmtime::component::types::Component = component.component_type();
+    let engine = component.engine();
+
+    ty.exports(engine)
+        .any(|(export, _item)| export.starts_with("wasmcloud:messaging/handler"))
+}
+
+pub fn imports_wasi_http(component: &Component) -> bool {
+    let ty: wasmtime::component::types::Component = component.component_type();
+    let engine = component.engine();
+
+    ty.imports(engine)
+        .any(|(import, _item)| import.starts_with("wasi:http"))
+}
+
+// TL;DR this is likely best for machines that can handle the large virtual memory requirement of the pooling allocator
+// https://github.com/bytecodealliance/wasmtime/blob/b943666650696f1eb7ff8b217762b58d5ef5779d/src/commands/serve.rs#L641-L656
+fn is_pooling_allocator_supported() -> anyhow::Result<bool> {
+    const BITS_TO_TEST: u32 = 42;
+    let mut config = wasmtime::Config::new();
+    config.wasm_memory64(true);
+    config.memory_reservation(1 << BITS_TO_TEST);
+    let engine = wasmtime::Engine::new(&config)?;
+    let mut store = wasmtime::Store::new(&engine, ());
+    // NB: the maximum size is in wasm pages to take out the 16-bits of wasm
+    // page size here from the maximum size.
+    let ty = wasmtime::MemoryType::new64(0, Some(1 << (BITS_TO_TEST - 16)));
+    Ok(wasmtime::Memory::new(&mut store, ty).is_ok())
+}
+
+fn getenv<T>(key: &str) -> Option<T>
+where
+    T: FromStr,
+    T::Err: core::fmt::Debug,
+{
+    match env::var(key).as_deref().map(FromStr::from_str) {
+        Ok(Ok(v)) => Some(v),
+        Ok(Err(err)) => {
+            warn!(?err, "failed to parse `{key}` value, ignoring");
+            None
+        }
+        Err(std::env::VarError::NotPresent) => None,
+        Err(std::env::VarError::NotUnicode(..)) => {
+            warn!("`{key}` value is not valid UTF-8, ignoring");
+            None
+        }
+    }
+}
+
+/// Reports a `WASMTIME_POOLING_*` value that overrides a resolved flag.
+///
+/// The flags are what an operator set and what every sizing rule is derived
+/// against; these envs are applied on top of them, here. Where the two differ
+/// the host runs on the env, and an operator reading back the flag they set
+/// has no way to tell — so this says which one won, once, at startup.
+///
+/// It does not say `host memory resolved` is wrong. That line is read back
+/// from the pool that was actually built ([`InstalledPool`]), so for the three
+/// knobs it names it already prints the overridden number; the other four it
+/// does not mention at all.
+///
+/// Also refuses a zero. Every one of these knobs means "this host runs
+/// nothing" at zero, which is never what an operator meant, and the flags they
+/// shadow are already rejected for exactly that.
+fn pooling_env_override<T>(key: &str, resolved: T, render: impl Fn(T) -> String) -> Option<T>
+where
+    T: FromStr + PartialEq + Default + std::fmt::Display + Copy,
+    T::Err: core::fmt::Debug,
+{
+    let value: T = getenv(key)?;
+    if value == T::default() {
+        warn!(
+            "`{key}` is 0, which would leave this host unable to instantiate anything; \
+             ignoring it and keeping {}",
+            render(resolved)
+        );
+        return None;
+    }
+    if value != resolved {
+        // Rendered, not raw: the byte-sized knobs go through `render_bytes`,
+        // and an operator cannot compare 4294967296 to 256MiB.
+        let (resolved, value) = (render(resolved), render(value));
+        warn!(
+            resolved = %resolved,
+            override_value = %value,
+            "`{key}` overrides the flag it shadows: this host runs with {value}, not the \
+             {resolved} it was configured with"
+        );
+    }
+    Some(value)
+}
+
+/// [`pooling_env_override`] for the knobs that are plain instance counts.
+///
+/// All of them default to the same resolved `--core-instances` and all of them
+/// mean "this host runs nothing" at zero, so all of them want the same guard.
+fn pooling_env_instances(key: &str, resolved: u32) -> u32 {
+    pooling_env_override(key, resolved, |v| v.to_string()).unwrap_or(resolved)
+}
+
+fn new_pooling_config(instances: u32, default_heap_memory: u64) -> PoolingAllocationConfig {
+    let mut config = PoolingAllocationConfig::default();
+    if let Some(v) = getenv("WASMTIME_POOLING_MAX_UNUSED_WASM_SLOTS") {
+        config.max_unused_warm_slots(v);
+    }
+    if let Some(v) = getenv("WASMTIME_POOLING_DECOMMIT_BATCH_SIZE") {
+        config.decommit_batch_size(v);
+    }
+    if let Some(v) = getenv("WASMTIME_POOLING_ASYNC_STACK_KEEP_RESIDENT") {
+        config.async_stack_keep_resident(v);
+    }
+    if let Some(v) = getenv("WASMTIME_POOLING_LINEAR_MEMORY_KEEP_RESIDENT") {
+        config.linear_memory_keep_resident(v);
+    }
+    if let Some(v) = getenv("WASMTIME_POOLING_TABLE_KEEP_RESIDENT") {
+        config.table_keep_resident(v);
+    }
+    config.total_component_instances(pooling_env_instances(
+        "WASMTIME_POOLING_TOTAL_COMPONENT_INSTANCES",
+        instances,
+    ));
+    if let Some(v) = getenv("WASMTIME_POOLING_MAX_COMPONENT_INSTANCE_SIZE") {
+        config.max_component_instance_size(v);
+    }
+    if let Some(v) = getenv("WASMTIME_POOLING_MAX_CORE_INSTANCES_PER_COMPONENT") {
+        config.max_core_instances_per_component(v);
+    }
+    if let Some(v) = getenv("WASMTIME_POOLING_MAX_MEMORIES_PER_COMPONENT") {
+        config.max_memories_per_component(v);
+    }
+    if let Some(v) = getenv("WASMTIME_POOLING_MAX_TABLES_PER_COMPONENT") {
+        config.max_tables_per_component(v);
+    }
+    config.total_memories(pooling_env_instances(
+        "WASMTIME_POOLING_TOTAL_MEMORIES",
+        instances,
+    ));
+    config.total_tables(pooling_env_instances(
+        "WASMTIME_POOLING_TOTAL_TABLES",
+        instances,
+    ));
+    config.total_stacks(pooling_env_instances(
+        "WASMTIME_POOLING_TOTAL_STACKS",
+        instances,
+    ));
+    // `--core-instances` is what `host memory resolved` reports, and this is
+    // what actually sizes the pool.
+    config.total_core_instances(pooling_env_instances(
+        "WASMTIME_POOLING_TOTAL_CORE_INSTANCES",
+        instances,
+    ));
+    if let Some(v) = getenv("WASMTIME_POOLING_MAX_CORE_INSTANCE_SIZE") {
+        config.max_core_instance_size(v);
+    }
+    if let Some(v) = getenv("WASMTIME_POOLING_MAX_TABLES_PER_MODULE") {
+        config.max_tables_per_module(v);
+    }
+    if let Some(v) = getenv("WASMTIME_POOLING_TABLE_ELEMENTS") {
+        config.table_elements(v);
+    }
+    if let Some(v) = getenv("WASMTIME_POOLING_MAX_MEMORIES_PER_MODULE") {
+        config.max_memories_per_module(v);
+    }
+    // Unlike every other knob in this function this one had no `else` branch,
+    // so wasmtime's default stood on every host and nothing named it. The
+    // fallback is that same default unless an operator set the flag, so this
+    // changes no behaviour by itself — it only makes the number reachable.
+    // It is also the number a component's minimum linear memory is checked
+    // against, so an env that shadows `--default-heap-memory` here is worth
+    // saying out loud.
+    let resolved_heap = usize::try_from(default_heap_memory).unwrap_or(usize::MAX);
+    config.max_memory_size(
+        pooling_env_override("WASMTIME_POOLING_MAX_MEMORY_SIZE", resolved_heap, |v| {
+            host_memory::render_bytes(u64::try_from(v).unwrap_or(u64::MAX))
+        })
+        .unwrap_or(resolved_heap),
+    );
+    #[cfg(not(windows))]
+    config.total_gc_heaps(pooling_env_instances(
+        "WASMTIME_POOLING_TOTAL_GC_HEAPS",
+        instances,
+    ));
+    config
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The refusal is correct and its text is the only place the number
+    /// appears; discarding it is what left a `kubectl`-only operator with
+    /// "ready=0 unavailable=1" and nothing else.
+    #[test]
+    fn a_heap_floor_refusal_names_the_flag_and_both_sizes() {
+        let raw = wasmtime::Error::msg(
+            "module memory does not fit in pooling allocator requirements: memory has a \
+             minimum byte size of 2424832 which exceeds the limit of 0x100000",
+        );
+        let explained = format!("{:#}", explain_compile_failure(raw, 1024 * 1024));
+        assert!(explained.contains("2.3MiB"), "{explained}");
+        assert!(
+            explained.contains("--default-heap-memory is 1MiB"),
+            "{explained}"
+        );
+        assert!(
+            explained.contains("Raise it to at least 4MiB"),
+            "{explained}"
+        );
+        // And the original text is still underneath it.
+        assert!(explained.contains("pooling allocator"), "{explained}");
+    }
+
+    /// wasmtime renders the limit half of this message in hex, and a size it
+    /// did not print as plain decimal used to parse as `0` — advising an
+    /// operator to raise the flag to 4MiB for a component needing 0 bytes.
+    #[test]
+    fn a_refusal_without_a_decimal_size_is_left_alone() {
+        for text in [
+            "memory has a minimum byte size of 0x250000 which exceeds the limit of 0x100000",
+            "memory has a minimum byte size of 0 which exceeds the limit of 0x100000",
+        ] {
+            let explained = format!(
+                "{:#}",
+                explain_compile_failure(wasmtime::Error::msg(text), 1024 * 1024,)
+            );
+            assert_eq!(explained, text, "should not have been annotated");
+        }
+    }
+
+    /// `next_power_of_two` panics under `debug_assertions` and wraps to zero in
+    /// release, so a refusal quoting a size near `u64::MAX` used to take the
+    /// host out rather than explain itself.
+    #[test]
+    fn an_unroundable_requirement_does_not_panic() {
+        let raw = wasmtime::Error::msg(format!(
+            "memory has a minimum byte size of {} which exceeds the limit of 0x100000",
+            u64::MAX
+        ));
+        let explained = format!("{:#}", explain_compile_failure(raw, 1024 * 1024));
+        assert!(explained.contains("Raise it to at least"), "{explained}");
+    }
+
+    #[test]
+    fn an_unrelated_compile_failure_is_left_alone() {
+        let raw = wasmtime::Error::msg("expected a WebAssembly component");
+        let explained = format!("{:#}", explain_compile_failure(raw, 1024 * 1024));
+        assert_eq!(explained, "expected a WebAssembly component");
+    }
+
+    fn volume_only_workload(volumes: Vec<crate::types::Volume>) -> Workload {
+        Workload {
+            namespace: "ns".into(),
+            name: "volumes".into(),
+            annotations: Default::default(),
+            service: None,
+            components: vec![],
+            host_interfaces: vec![],
+            volumes,
+        }
+    }
+
+    fn host_path(path: &std::path::Path) -> crate::types::Volume {
+        crate::types::Volume {
+            name: "data".into(),
+            volume_type: VolumeType::HostPath(HostPathVolume {
+                local_path: path.to_string_lossy().into_owned(),
+            }),
+        }
+    }
+
+    #[test]
+    fn an_engine_refuses_a_host_path_outside_its_allowlist() {
+        let root = tempfile::tempdir().unwrap();
+        let allowed = root.path().join("allowed");
+        let other = root.path().join("other");
+        std::fs::create_dir_all(&allowed).unwrap();
+        std::fs::create_dir_all(&other).unwrap();
+        let meters = Arc::new(crate::host::quota::PolicyMeters::default());
+        let engine = Engine::builder()
+            .with_socket_policy(Arc::new(crate::sockets::policy::SocketPolicy {
+                meters: Some(Arc::clone(&meters)),
+                ..Default::default()
+            }))
+            .with_allowed_host_paths([allowed.clone()])
+            .build()
+            .unwrap();
+
+        let Err(err) =
+            engine.initialize_workload("w", volume_only_workload(vec![host_path(&other)]))
+        else {
+            panic!("a host path outside the allowlist should be refused");
+        };
+        assert!(
+            format!("{err:#}").contains("--allowed-host-path"),
+            "{err:#}"
+        );
+        assert_eq!(meters.host_path_denied(), 1);
+        engine
+            .initialize_workload("w", volume_only_workload(vec![host_path(&allowed)]))
+            .unwrap();
+        // An empty directory is the host's own, never a path a workload named.
+        engine
+            .initialize_workload(
+                "w",
+                volume_only_workload(vec![crate::types::Volume {
+                    name: "scratch".into(),
+                    volume_type: VolumeType::EmptyDir(EmptyDirVolume {}),
+                }]),
+            )
+            .unwrap();
+    }
+
+    fn empty_dir(name: &str) -> crate::types::Volume {
+        crate::types::Volume {
+            name: name.into(),
+            volume_type: VolumeType::EmptyDir(EmptyDirVolume {}),
+        }
+    }
+
+    /// Scratch lives under the root the engine owns, and a workload that goes
+    /// away takes its scratch with it.
+    #[test]
+    fn empty_dir_scratch_lives_under_the_root_and_leaves_with_its_workload() {
+        let root = tempfile::tempdir().unwrap();
+        let engine = Engine::builder()
+            .with_scratch_root(root.path())
+            .build()
+            .unwrap();
+        let scratch_files = || {
+            walkdir(root.path())
+                .into_iter()
+                .filter(|p| !p.ends_with(".lock"))
+                .count()
+        };
+        let before = scratch_files();
+        let Ok(workload) = engine.initialize_workload(
+            "w",
+            volume_only_workload(vec![empty_dir("a"), empty_dir("b")]),
+        ) else {
+            panic!("a workload with emptyDir volumes should initialize");
+        };
+        // One workload directory holding a directory per volume.
+        assert_eq!(scratch_files(), before + 3);
+        drop(workload);
+        assert_eq!(scratch_files(), before);
+    }
+
+    /// A volume around the scratch root, as `/tmp` is around the default one,
+    /// the root itself, or a workload's scratch inside it would expose other
+    /// workloads' scratch, so each is refused even when the allowlist names it.
+    #[test]
+    fn a_host_path_exposing_scratch_is_refused_even_when_allowed() {
+        let root = tempfile::tempdir().unwrap();
+        let scratch = root.path().join("scratch");
+        let meters = Arc::new(crate::host::quota::PolicyMeters::default());
+        let engine = Engine::builder()
+            .with_socket_policy(Arc::new(crate::sockets::policy::SocketPolicy {
+                meters: Some(Arc::clone(&meters)),
+                ..Default::default()
+            }))
+            .with_scratch_root(&scratch)
+            .with_allowed_host_paths([root.path().to_path_buf(), scratch.clone()])
+            .build()
+            .unwrap();
+        let workload = engine
+            .initialize_workload("w", volume_only_workload(vec![empty_dir("a")]))
+            .unwrap();
+        let inside = walkdir(&scratch)
+            .into_iter()
+            .find(|p| p.is_dir())
+            .expect("the workload's scratch directory");
+        for (what, path) in [
+            ("around", root.path()),
+            ("equal to", scratch.as_path()),
+            ("inside", inside.as_path()),
+        ] {
+            assert!(
+                engine
+                    .initialize_workload("w2", volume_only_workload(vec![host_path(path)]))
+                    .is_err(),
+                "{what} the scratch root"
+            );
+        }
+        assert_eq!(meters.host_path_denied(), 3);
+        drop(workload);
+    }
+
+    fn walkdir(dir: &std::path::Path) -> Vec<PathBuf> {
+        let mut found = Vec::new();
+        for entry in std::fs::read_dir(dir).unwrap().flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                found.extend(walkdir(&path));
+            }
+            found.push(path);
+        }
+        found
+    }
+
+    /// With no allowed host paths configured, no `hostPath` volume is permitted.
+    #[test]
+    fn a_default_engine_refuses_every_host_path() {
+        let root = tempfile::tempdir().unwrap();
+        let meters = Arc::new(crate::host::quota::PolicyMeters::default());
+        let engine = Engine::builder()
+            .with_socket_policy(Arc::new(crate::sockets::policy::SocketPolicy {
+                meters: Some(Arc::clone(&meters)),
+                ..Default::default()
+            }))
+            .build()
+            .unwrap();
+        assert!(
+            engine
+                .initialize_workload("w", volume_only_workload(vec![host_path(root.path())]))
+                .is_err()
+        );
+        assert_eq!(meters.host_path_denied(), 1);
+    }
+
+    // Compiling is parallel unless a host says otherwise, and saying so
+    // reaches the engine rather than being dropped on the builder.
+    #[test]
+    fn parallel_compilation_is_on_and_can_be_turned_off() {
+        let engine = Engine::builder().build().expect("default should build");
+        assert!(engine.inner().get_parallel_compilation());
+
+        let engine = Engine::builder()
+            .with_parallel_compilation(false)
+            .build()
+            .expect("serial compilation should build");
+        assert!(!engine.inner().get_parallel_compilation());
+    }
+
+    // Unwind tables are on unless a host turns them off, and turning them off
+    // reaches the engine everywhere but Windows, which requires them.
+    #[test]
+    fn native_unwind_info_is_on_and_can_be_turned_off() {
+        let engine = Engine::builder().build().expect("default should build");
+        assert_eq!(engine.inner().get_native_unwind_info(), Some(true));
+
+        let engine = Engine::builder()
+            .with_native_unwind_info(false)
+            .build()
+            .expect("turning unwind info off should build");
+        assert_eq!(engine.inner().get_native_unwind_info(), Some(cfg!(windows)));
+    }
+
+    // A custom base config can now be combined with the pooling allocator and
+    // instance limits, which previously errored out of `build()`.
+    #[test]
+    fn custom_config_layers_with_pooling() {
+        let mut cfg = wasmtime::Config::default();
+        cfg.cranelift_opt_level(wasmtime::OptLevel::Speed);
+
+        Engine::builder()
+            .with_config(cfg)
+            .with_pooling_allocator(true)
+            .with_max_instances(64)
+            .build()
+            .expect("custom config + pooling should build");
+    }
+
+    // A single extra proposal can be enabled on top of a custom config without
+    // replacing the whole config.
+    #[test]
+    fn wasm_proposal_layers_with_custom_config() {
+        Engine::builder()
+            .with_config(wasmtime::Config::default())
+            .with_wasm_proposal(WasmProposal::Gc)
+            .build()
+            .expect("custom config + GC proposal should build");
+    }
+
+    // An externally-supplied pooling config is accepted and applied.
+    #[test]
+    fn external_pooling_config_builds() {
+        let mut pool = PoolingAllocationConfig::default();
+        pool.total_component_instances(32);
+
+        Engine::builder()
+            .with_pooling_config(pool)
+            .build()
+            .expect("external pooling config should build");
+    }
+
+    // Proposal names parse case-insensitively and accept `_`/`-` interchangeably;
+    // unknown names are rejected.
+    #[test]
+    fn wasm_proposal_from_str() {
+        assert_eq!("gc".parse(), Ok(WasmProposal::Gc));
+        assert_eq!("GC".parse(), Ok(WasmProposal::Gc));
+        assert_eq!(" threads ".parse(), Ok(WasmProposal::Threads));
+        assert_eq!(
+            "exception_handling".parse(),
+            Ok(WasmProposal::ExceptionHandling)
+        );
+        assert_eq!(
+            "component-model-async".parse(),
+            Ok(WasmProposal::ComponentModelAsync)
+        );
+        assert_eq!(
+            "component-model-map".parse(),
+            Ok(WasmProposal::ComponentModelMap)
+        );
+        assert!("nonsense".parse::<WasmProposal>().is_err());
+    }
+
+    // A component whose type section uses `map<k, v>` fails validation unless
+    // the component-model map proposal is on, so compiling one on a
+    // default-built engine is what proves the proposal is enabled by default.
+    #[test]
+    fn default_engine_accepts_component_model_map() {
+        let bytes = wat::parse_str(
+            r#"(component
+                 (type $m (map string string))
+                 (import "test:map/iface" (instance
+                   (export "take" (func (param "m" $m)))
+                 ))
+               )"#,
+        )
+        .expect("map component should assemble");
+
+        let engine = Engine::builder().build().expect("engine should build");
+        Component::new(&engine.inner, &bytes).expect("map component should compile");
+    }
+
+    /// A component built against a newer WASI patch than the host links still
+    /// resolves, provided it only uses what the host's version defines.
+    #[test]
+    fn a_newer_compatible_wasi_import_links_against_the_host() {
+        let engine = Engine::builder().build().expect("engine should build");
+        let mut linker: Linker<SharedCtx> = Linker::new(&engine.inner);
+        add_wasi_to_linker(&mut linker).expect("WASI should link");
+        let importing = |version: &str| {
+            let wat = format!(
+                r#"(component (import "wasi:random/random@{version}"
+                    (instance (export "get-random-u64" (func (result u64))))))"#
+            );
+            let bytes = wat::parse_str(wat).expect("component should assemble");
+            Component::new(&engine.inner, &bytes).expect("component should compile")
+        };
+
+        for version in ["0.2.0", "0.2.99", "0.3.0", "0.3.3"] {
+            linker
+                .instantiate_pre(&importing(version))
+                .unwrap_or_else(|e| panic!("wasi:random@{version} should link: {e:#}"));
+        }
+        assert!(linker.instantiate_pre(&importing("0.4.0")).is_err());
+    }
+
+    /// A digest a running workload holds is never compiled again, even once
+    /// the cache has let it go; once nothing holds it, it is forgotten.
+    #[test]
+    fn a_digest_in_use_is_not_recompiled_after_cache_eviction() {
+        use std::sync::atomic::Ordering;
+        const DIGEST: &str = "sha256:held-image";
+
+        let bytes = wat::parse_str("(component)").expect("component should assemble");
+        let engine = Engine::builder().build().expect("engine should build");
+
+        let (_, first) = engine
+            .load_live_component(&bytes, Some(DIGEST))
+            .expect("first load");
+        engine.cache.invalidate_all();
+        engine.cache.run_pending_tasks();
+        let (_, second) = engine
+            .load_live_component(&bytes, Some(DIGEST))
+            .expect("second load");
+        assert_eq!(engine.compiles.load(Ordering::SeqCst), 1);
+        assert!(Arc::ptr_eq(
+            first.as_ref().expect("a digest is tracked"),
+            second.as_ref().expect("a digest is tracked"),
+        ));
+
+        drop((first, second));
+        assert!(engine.live_compiles.lock().unwrap().is_empty());
+        engine.cache.invalidate_all();
+        engine.cache.run_pending_tasks();
+        let (_, third) = engine
+            .load_live_component(&bytes, Some(DIGEST))
+            .expect("third load");
+        assert_eq!(engine.compiles.load(Ordering::SeqCst), 2);
+        assert!(third.is_some());
+
+        let (_, untracked) = engine
+            .load_live_component(&bytes, None::<&str>)
+            .expect("load without a digest");
+        assert!(untracked.is_none(), "nothing to share without a digest");
+    }
+
+    // A scheduler placing N replicas of one image sends N starts carrying one
+    // digest, and the herd is affordable only because they share a compile.
+    // Keying the cache on anything that differs between replicas — a workload
+    // id, a component name — would put a Cranelift compile behind every one of
+    // them, and nothing in a deployment's behaviour would say so.
+    #[test]
+    fn a_herd_of_replicas_shares_one_compiled_component() {
+        const HERD: usize = 15;
+        const DIGEST: &str = "sha256:one-image";
+
+        let bytes = wat::parse_str("(component)").expect("component should assemble");
+        let engine = Engine::builder().build().expect("engine should build");
+
+        std::thread::scope(|scope| {
+            for _ in 0..HERD {
+                scope.spawn(|| {
+                    engine
+                        .load_component_bytes(&bytes, Some(DIGEST))
+                        .map(|_| ())
+                        .expect("every member of the herd should load");
+                });
+            }
+        });
+
+        // The claim is that the herd shares a compile, not merely that it ends
+        // up with one entry: a loader that compiled per caller and let them
+        // race to insert the same key would leave one entry too, and this test
+        // would have said nothing about the cost it exists to prevent.
+        assert_eq!(
+            engine.compiles.load(std::sync::atomic::Ordering::SeqCst),
+            1,
+            "{HERD} replicas of one image ran more than one compile"
+        );
+
+        engine.cache.run_pending_tasks();
+        assert_eq!(
+            engine.cache.entry_count(),
+            1,
+            "{HERD} replicas of one image left more than one cache entry"
+        );
+
+        // A hit is served without looking at the bytes, so bytes that could
+        // never compile are what prove the entry came back from the cache
+        // rather than from a compile of its own.
+        engine
+            .load_component_bytes(b"definitely not a wasm component", Some(DIGEST))
+            .map(|_| ())
+            .expect("a digest the herd already compiled should be served from the cache");
+    }
+
+    // A compile failure that goes through the cache reports everything the
+    // uncached path reports. `try_get_with` returns its error as
+    // `Arc<anyhow::Error>`, which is easy to collapse into its outermost message
+    // alone — leaving logs that say a component failed to compile and never why.
+    #[test]
+    fn cached_compile_failure_keeps_the_cause_chain() {
+        let engine = Engine::builder().build().expect("engine should build");
+        let garbage = b"definitely not a wasm component";
+
+        // `Component` is not `Debug`, so `expect_err` is unavailable here.
+        let Err(uncached) = engine.load_component_bytes(garbage, None::<&str>) else {
+            panic!("garbage bytes should not compile");
+        };
+        let Err(cached) = engine.load_component_bytes(garbage, Some("sha256:not-a-real-digest"))
+        else {
+            panic!("garbage bytes should not compile");
+        };
+
+        let kept: Vec<String> = cached.chain().map(|c| c.to_string()).collect();
+        for cause in uncached.chain() {
+            let cause = cause.to_string();
+            assert!(
+                kept.contains(&cause),
+                "cached path dropped {cause:?}; it kept only {kept:?}"
+            );
+        }
+    }
+}

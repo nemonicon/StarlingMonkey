@@ -1,0 +1,89 @@
+--- export-manifest.node-v22.14.0.json.before
++++ export-manifest.node-v22.14.0.json.after
+@@ -1,8 +1,8 @@
+ {
+   "schemaVersion": 1,
+-  "profileVersion": "sm-node-22.14.0-m0.18",
++  "profileVersion": "sm-node-22.14.0-m0.22",
+   "nodeVersion": "v22.14.0",
+-  "status": "UNCOMPILED isolated Buffer.concat Source successor; no native runtime/adoption claim.",
++  "status": "UNCOMPILED Next-source-driven byte codecs/copy/search/write/validation candidate; host controls only.",
+   "moduleContract": "ESM with explicit named exports and default data-property object; no dynamic CommonJS require or syncBuiltinESMExports",
+   "modules": {
+     "node:child_process": {
+@@ -58,19 +58,35 @@
+         "isEncoding: profile encodings only",
+         "byteLength(string|Uint8Array|ArrayBuffer, encoding?)",
+         "allocUnsafe(finite nonnegative number <=16777216): truncate length; fresh zeroed owned Buffer; no pool",
+-        "concat(dense Array<fixed Buffer|Uint8Array>, integerTotalLength?): copy visible windows; truncate/zero-pad; empty ignores length"
++        "concat(dense Array<fixed Buffer|Uint8Array>, integerTotalLength?): copy visible windows; truncate/zero-pad; empty ignores length",
++        "from(string,base64|base64url|latin1|binary|ascii|utf16le|ucs2 aliases)",
++        "byteLength supported encodings (base64 uses Node estimated length)",
++        "compare(fixed Uint8Array, fixed Uint8Array)",
++        "isAscii/isUtf8(fixed Uint8Array|ArrayBuffer)"
+       ],
+       "supportedPrototype": [
+-        "toString(utf8|utf-8|hex, integerStart?, integerEnd?)",
+-        "subarray",
+-        "slice: shared view",
+-        "parent",
+-        "offset"
++        "toString supported encodings/integer ranges",
++        "copy with numeric finite indices; overlap memmove",
++        "equals,compare,indexOf,includes",
++        "fill bounded strings/numbers/fixed Uint8Array",
++        "write using actual native TextEncoder.encodeInto for UTF8",
++        "utf8Slice/latin1Slice/asciiSlice/ucs2Slice/hexSlice/base64Slice/base64urlSlice",
++        "corresponding encoding Write methods",
++        "slice/subarray shared views"
+       ],
+       "encodingNames": [
+         "utf8",
+         "utf-8",
+-        "hex"
++        "hex",
++        "base64",
++        "base64url",
++        "latin1",
++        "binary",
++        "ascii",
++        "utf16le",
++        "utf-16le",
++        "ucs2",
++        "ucs-2"
+       ],
+       "limits": {
+         "MAX_LENGTH": 16777216,
+@@ -90,16 +106,13 @@
+         "SlowBuffer",
+         "atob",
+         "btoa",
+-        "isAscii",
+-        "isUtf8",
+         "resolveObjectURL",
+         "transcode"
+       ],
+       "unsupportedStatic": [
+         "copyBytesFrom",
+         "of",
+-        "allocUnsafeSlow",
+-        "compare"
++        "allocUnsafeSlow"
+       ],
+       "unsupportedPrototypePolicy": "Every other own Node Buffer prototype function is explicitly installed as a throwing function; inventory checked against pinned Node at test time",
+       "deviations": [
+@@ -117,7 +130,13 @@
+         "concat output and every visible input are bounded to16MiB; at most65536 dense own-data items.",
+         "concat rejects sparse/accessor lists, shadowed typed metadata, shared/resizable/detached backing. Proxy/custom prototype/metadata getter timing is not Node parity.",
+         "concat snapshots validated input references before allocation; Node list access/allocation/error-message timing and caller-replaced allocUnsafe semantics are not reproduced.",
+-        "concat preserves its existing constructor property slot; output is fresh exact zeroed fixed backing, never Node slab storage."
++        "concat preserves its existing constructor property slot; output is fresh exact zeroed fixed backing, never Node slab storage.",
++        "16MiB visible/output byte cap;1MiB source UTF16 unit cap;no shared/resizable/detached backing or shadowed typed metadata",
++        "64Mi comparison budget for native search; explicit ERR_SM_NODE_LIMIT",
++        "Numeric finite index subset; unsupported legacy coercions stay explicit rather than full Node parity",
++        "Only fixed Uint8Array and ArrayBuffer validation inputs; other views deferred",
++        "UTF16LE search, lastIndexOf, numeric read/write and general Array/from iterable deferred",
++        "No guarantee of Node message text, warning/pooling/unsafe-memory behavior"
+       ]
+     }
+   },

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "scope": "Exact ALS registrar/CMake deltas composed over held startup afterimages, then own timer edits; parent families untouched",
+  "ALSRegistrationEdits": [
+    {
+      "offset": 21428,
+      "old": "",
+      "new": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n  if (!install_async_local_storage(engine)) return false;\n#endif\n"
+    },
+    {
+      "offset": 5329,
+      "old": "",
+      "new": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\nstatic bool install_async_local_storage(api::Engine* engine) {\n  auto* cx = engine->cx();\n  JS::RootedObject kernel(cx, core::async_context::create_kernel(cx));\n  if (!kernel) return false;\n  JS::RootedValue argument(cx, JS::ObjectValue(*kernel)), module(cx);\n  if (!evaluate_factory(cx, kAsyncLocalStorageFactorySource, argument, &module)) return false;\n  return engine->define_builtin_module(\"node:async_hooks\", module) &&\n         engine->define_builtin_module(\"async_hooks\", module);\n}\n#endif\n"
+    },
+    {
+      "offset": 1548,
+      "old": "",
+      "new": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n#include \"async-hooks-factory.generated.h\"\n#include \"async_context_runtime.h\"\n#endif\n"
+    }
+  ],
+  "ALSCMakeEdits": [
+    {
+      "offset": 11007,
+      "old": "",
+      "new": "# Experimental native ALS: no JS stack emulation or new host imports.\noption(NODE_COMPAT_ASYNC_LOCAL_STORAGE \"Enable experimental native AsyncLocalStorage\" OFF)\nif(NODE_COMPAT_ASYNC_LOCAL_STORAGE AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat OR NOT NODE_COMPAT_INTERNAL_TICKS OR NOT NODE_COMPAT_STRICT_INITIALIZATION)\n        message(FATAL_ERROR \"Native ALS requires Node compatibility and private tick checkpoints\")\n    endif()\n    if(ENABLE_JS_DEBUGGER)\n        message(FATAL_ERROR \"Native ALS does not share its allocation metadata builder with Debugger\")\n    endif()\n    target_compile_definitions(extension_api INTERFACE NODE_COMPAT_ASYNC_LOCAL_STORAGE=1)\n    target_include_directories(builtin_node_compat PRIVATE ${CMAKE_SOURCE_DIR}/runtime)\nendif()\n\n"
+    }
+  ],
+  "ALSIndex": "7e4265c2278d7872d0eee610a1975b6d5750a9615cc5a526fca8266a32a9aabc",
+  "startupIndex": "969e172d02000a36201b50baae01ba8e291d672cc37cfe5de8b324d864f22ca1"
+}

@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 1,
+  "suite": "ACTUAL_WASMTIME_STANDARD_WASI_DEPLOYMENT_PROBE_V1",
+  "component": {
+    "path": "/private/tmp/starling-node-compat/deployment-probe-v3/probe.component.wasm",
+    "sha256": "32830d393ceccc7aaf7f399bd6816ab54928cc240db9b228352b3f16d2f1d720",
+    "bytes": 93929
+  },
+  "imports": [
+    "wasi:cli/environment@0.2.10",
+    "wasi:clocks/monotonic-clock@0.2.10",
+    "wasi:clocks/wall-clock@0.2.10",
+    "wasi:filesystem/preopens@0.2.10",
+    "wasi:filesystem/types@0.2.10",
+    "wasi:http/types@0.2.10",
+    "wasi:io/error@0.2.10",
+    "wasi:io/poll@0.2.10",
+    "wasi:io/streams@0.2.10",
+    "wasi:random/random@0.2.10"
+  ],
+  "exports": [
+    "wasi:http/incoming-handler@0.2.10"
+  ],
+  "modes": [
+    {
+      "id": "default-lifetime",
+      "command": [
+        "/private/tmp/starling-node-compat/bin/wasmtime-v42.0.1-aarch64-macos/wasmtime",
+        "serve",
+        "--addr",
+        "127.0.0.1:0",
+        "-S",
+        "cli=y,tcp=n,udp=n,allow-ip-name-lookup=n",
+        "--env",
+        "STARLING_NEXT_PROBE=capabilities-v1",
+        "--dir",
+        "/private/tmp/starling-node-compat/deployment-host-wasmtime-v1/app::/app",
+        "--dir",
+        "/private/tmp/starling-node-compat/deployment-host-wasmtime-v1/cache::/cache",
+        "/private/tmp/starling-node-compat/deployment-probe-v3/probe.component.wasm"
+      ],
+      "log": "/private/tmp/starling-node-compat/deployment-host-wasmtime-v1/default-lifetime.log",
+      "responses": [
+        {
+          "status": 200,
+          "body": {
+            "schemaVersion": 1,
+            "probe": "standard-wasi-deployment-v1",
+            "counter": 1,
+            "monotonicBefore": "618375",
+            "monotonicAfter": "3434500",
+            "wallSeconds": 1793968052,
+            "wallNanoseconds": 309066000,
+            "randomHex": "eca1383a9bc07a59",
+            "environmentMarker": "capabilities-v1",
+            "argumentCount": 0,
+            "initialCwd": null,
+            "preopens": [
+              {
+                "name": "/app",
+                "descriptorFlags": 33,
+                "readFixture": true,
+                "createAllowed": false,
+                "createError": 0
+              },
+              {
+                "name": "/cache",
+                "descriptorFlags": 33,
+                "create": true,
+                "write": true,
+                "read": true,
+                "link": true,
+                "secondLink": false,
+                "secondLinkError": 7,
+                "rename": true,
+                "unlink": true
+              }
+            ]
+          }
+        },
+        {
+          "status": 200,
+          "body": {
+            "schemaVersion": 1,
+            "probe": "standard-wasi-deployment-v1",
+            "counter": 1,
+            "monotonicBefore": "82792",
+            "monotonicAfter": "2602792",
+            "wallSeconds": 1793968052,
+            "wallNanoseconds": 321275000,
+            "randomHex": "5b968b7b1282d097",
+            "environmentMarker": "capabilities-v1",
+            "argumentCount": 0,
+            "initialCwd": null,
+            "preopens": [
+              {
+                "name": "/app",
+                "descriptorFlags": 33,
+                "readFixture": true,
+                "createAllowed": false,
+                "createError": 0
+              },
+              {
+                "name": "/cache",
+                "descriptorFlags": 33,
+                "create": true,
+                "write": true,
+                "read": true,
+                "link": true,
+                "secondLink": false,
+                "secondLinkError": 7,
+                "rename": true,
+                "unlink": true
+              }
+            ]
+          }
+        },
+        {
+          "status": 200,
+          "body": {
+            "schemaVersion": 1,
+            "probe": "standard-wasi-deployment-v1",
+            "counter": 1,
+            "monotonicBefore": "64541",
+            "monotonicAfter": "2576625",
+            "wallSeconds": 1793968052,
+            "wallNanoseconds": 326455000,
+            "randomHex": "19b5f1c02e905e84",
+            "environmentMarker": "capabilities-v1",
+            "argumentCount": 0,
+            "initialCwd": null,
+            "preopens": [
+              {
+                "name": "/app",
+                "descriptorFlags": 33,
+                "readFixture": true,
+                "createAllowed": false,
+                "createError": 0
+              },
+              {
+                "name": "/cache",
+                "descriptorFlags": 33,
+                "create": true,
+                "write": true,
+                "read": true,
+                "link": true,
+                "secondLink": false,
+                "secondLinkError": 7,
+                "rename": true,
+                "unlink": true
+              }
+            ]
+          }
+        }
+      ],
+      "forcedCleanup": false,
+      "origin": "http://127.0.0.1:58671",
+      "passed": true,
+      "process": {
+        "code": 0,
+        "signal": null
+      }
+    },
+    {
+      "id": "explicit-reuse",
+      "command": [
+        "/private/tmp/starling-node-compat/bin/wasmtime-v42.0.1-aarch64-macos/wasmtime",
+        "serve",
+        "--addr",
+        "127.0.0.1:0",
+        "-S",
+        "cli=y,tcp=n,udp=n,allow-ip-name-lookup=n",
+        "--env",
+        "STARLING_NEXT_PROBE=capabilities-v1",
+        "--dir",
+        "/private/tmp/starling-node-compat/deployment-host-wasmtime-v1/app::/app",
+        "--dir",
+        "/private/tmp/starling-node-compat/deployment-host-wasmtime-v1/cache::/cache",
+        "--max-instance-reuse-count",
+        "32",
+        "--idle-instance-timeout",
+        "60s",
+        "/private/tmp/starling-node-compat/deployment-probe-v3/probe.component.wasm"
+      ],
+      "log": "/private/tmp/starling-node-compat/deployment-host-wasmtime-v1/explicit-reuse.log",
+      "responses": [
+        {
+          "status": 200,
+          "body": {
+            "schemaVersion": 1,
+            "probe": "standard-wasi-deployment-v1",
+            "counter": 1,
+            "monotonicBefore": "270250",
+            "monotonicAfter": "2822750",
+            "wallSeconds": 1793968052,
+            "wallNanoseconds": 395052000,
+            "randomHex": "02904ccf9ea27a40",
+            "environmentMarker": "capabilities-v1",
+            "argumentCount": 0,
+            "initialCwd": null,
+            "preopens": [
+              {
+                "name": "/app",
+                "descriptorFlags": 33,
+                "readFixture": true,
+                "createAllowed": false,
+                "createError": 0
+              },
+              {
+                "name": "/cache",
+                "descriptorFlags": 33,
+                "create": true,
+                "write": true,
+                "read": true,
+                "link": true,
+                "secondLink": false,
+                "secondLinkError": 7,
+                "rename": true,
+                "unlink": true
+              }
+            ]
+          }
+        },
+        {
+          "status": 200,
+          "body": {
+            "schemaVersion": 1,
+            "probe": "standard-wasi-deployment-v1",
+            "counter": 2,
+            "monotonicBefore": "6266292",
+            "monotonicAfter": "8682625",
+            "wallSeconds": 1793968052,
+            "wallNanoseconds": 400905000,
+            "randomHex": "a5531252d7232ec9",
+            "environmentMarker": "capabilities-v1",
+            "argumentCount": 0,
+            "initialCwd": null,
+            "preopens": [
+              {
+                "name": "/app",
+                "descriptorFlags": 33,
+                "readFixture": true,
+                "createAllowed": false,
+                "createError": 0
+              },
+              {
+                "name": "/cache",
+                "descriptorFlags": 33,
+                "create": true,
+                "write": true,
+                "read": true,
+                "link": true,
+                "secondLink": false,
+                "secondLinkError": 7,
+                "rename": true,
+                "unlink": true
+              }
+            ]
+          }
+        },
+        {
+          "status": 200,
+          "body": {
+            "schemaVersion": 1,
+            "probe": "standard-wasi-deployment-v1",
+            "counter": 3,
+            "monotonicBefore": "11208792",
+            "monotonicAfter": "13722459",
+            "wallSeconds": 1793968052,
+            "wallNanoseconds": 405945000,
+            "randomHex": "373eb7522855db6a",
+            "environmentMarker": "capabilities-v1",
+            "argumentCount": 0,
+            "initialCwd": null,
+            "preopens": [
+              {
+                "name": "/app",
+                "descriptorFlags": 33,
+                "readFixture": true,
+                "createAllowed": false,
+                "createError": 0
+              },
+              {
+                "name": "/cache",
+                "descriptorFlags": 33,
+                "create": true,
+                "write": true,
+                "read": true,
+                "link": true,
+                "secondLink": false,
+                "secondLinkError": 7,
+                "rename": true,
+                "unlink": true
+              }
+            ]
+          }
+        }
+      ],
+      "forcedCleanup": false,
+      "origin": "http://127.0.0.1:58675",
+      "passed": true,
+      "process": {
+        "code": 0,
+        "signal": null
+      }
+    }
+  ],
+  "realComponentExecuted": true,
+  "starlingMonkeyExecuted": false,
+  "nextExecuted": false,
+  "errors": [],
+  "passed": true
+}

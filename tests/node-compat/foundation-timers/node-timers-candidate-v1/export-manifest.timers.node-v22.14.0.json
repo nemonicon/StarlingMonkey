@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "profileVersion": "sm-node-22.14.0-m0.21",
+  "nodeVersion": "v22.14.0",
+  "status": "UNCOMPILED native Node timer/immediate Source; production defaultOFF. No engine/runtime/queue/drop/Store proof supplied.",
+  "moduleContract": "Exact pinned namespace names, mutable CJS defaults/globals, native Engine queue and owned TimerTask. Immediate uses actual IMMEDIATE_TASK_HANDLE, not Promise or setTimeout alias.",
+  "modules": {
+    "node:timers": {
+      "aliases": [
+        "timers"
+      ],
+      "status": "partial",
+      "exports": [
+        "_unrefActive",
+        "active",
+        "clearImmediate",
+        "clearInterval",
+        "clearTimeout",
+        "default",
+        "enroll",
+        "promises",
+        "setImmediate",
+        "setInterval",
+        "setTimeout",
+        "unenroll"
+      ],
+      "globals": [
+        "setTimeout",
+        "clearTimeout",
+        "setInterval",
+        "clearInterval",
+        "setImmediate",
+        "clearImmediate"
+      ],
+      "callablePolicy": "Real native guest task ownership/refcounts/ALS capture; declared unsupported functions throw immediate own ERR_SM_NODE_UNSUPPORTED on call or construction.",
+      "supportedStatic": [
+        "clearImmediate",
+        "clearInterval",
+        "clearTimeout",
+        "promises",
+        "setImmediate",
+        "setInterval",
+        "setTimeout"
+      ],
+      "unsupportedStatic": [
+        "_unrefActive",
+        "active",
+        "enroll",
+        "unenroll"
+      ],
+      "supportedPrototype": [
+        "ref",
+        "unref",
+        "hasRef",
+        "dispose",
+        "refresh(active Timeout only)",
+        "close"
+      ],
+      "limits": {
+        "activeNodeTasks": 4096,
+        "argumentsPerTask": 1024,
+        "totalNodeArguments": 65536,
+        "nodeCallbacksPerEventLoopEntry": 65536
+      },
+      "deviations": [
+        "Source-only: no native frontend/ABI/link/Engine/guest/snapshot/drop/Storedeath result.",
+        "Uses actual Engine oldest-ready selector with native immediate marker and per-callback tick/Promise checkpoint, not full libuv poll/check/timer phase parity. Existing immediately-ready poll-cache ownership/snapshot gates remain open.",
+        "Refed active Node tasks own real Engine interest; unref releases it. Zero-interest return leaves unref tasks owned for later activity. Only-unref pollables behind unresolved unrelated interest fail ERR_SM_NODE_UNREF_ONLY_PENDING rather than blocking forever. A ready immediate may run while another component/request interest exists. This is not Node process-exit semantics.",
+        "Timeout refresh is implemented only while active and retains original ALS registration cell; fired/closed reactivation refuses. No new context is fabricated on unref/ref/active refresh.",
+        "Timeout inactive hasRef retains reference-policy flag like Node; inactive Immediate ref cannot revive it. Active methods always change/query native interest.",
+        "setTimeout delay clamps to1..2147483647 and truncates; Node overflow warnings are not emitted. Per-task/private fields, constructor metadata and all exotic coercions are not full Node parity.",
+        "Promise timeout/immediate support native AbortSignal, ref option, cancellation and promisify.custom; promise interval async iteration is explicitly deferred. Foreign structural signals/general Scheduler receiver metadata are outside scope.",
+        "Mutable CJS objects are shared. Named ESM references capture initial bindings; syncBuiltinESMExports is not implemented.",
+        "Existing strict fatal/discard policy remains; no Node uncaught-exception recovery, DEBUG/OOM/reset/GC-pressure or custom host service is introduced."
+      ]
+    },
+    "node:timers/promises": {
+      "aliases": [
+        "timers/promises"
+      ],
+      "status": "partial",
+      "exports": [
+        "default",
+        "scheduler",
+        "setImmediate",
+        "setInterval",
+        "setTimeout"
+      ],
+      "globals": [],
+      "callablePolicy": "Real native guest task ownership/refcounts/ALS capture; declared unsupported functions throw immediate own ERR_SM_NODE_UNSUPPORTED on call or construction.",
+      "supportedStatic": [
+        "scheduler",
+        "setImmediate",
+        "setTimeout"
+      ],
+      "unsupportedStatic": [
+        "setInterval"
+      ],
+      "supportedPrototype": [
+        "ref",
+        "unref",
+        "hasRef",
+        "dispose"
+      ],
+      "limits": {
+        "activeNodeTasks": 4096,
+        "argumentsPerTask": 1024,
+        "totalNodeArguments": 65536,
+        "nodeCallbacksPerEventLoopEntry": 65536
+      },
+      "deviations": [
+        "Source-only: no native frontend/ABI/link/Engine/guest/snapshot/drop/Storedeath result.",
+        "Uses actual Engine oldest-ready selector with native immediate marker and per-callback tick/Promise checkpoint, not full libuv poll/check/timer phase parity. Existing immediately-ready poll-cache ownership/snapshot gates remain open.",
+        "Refed active Node tasks own real Engine interest; unref releases it. Zero-interest return leaves unref tasks owned for later activity. Only-unref pollables behind unresolved unrelated interest fail ERR_SM_NODE_UNREF_ONLY_PENDING rather than blocking forever. A ready immediate may run while another component/request interest exists. This is not Node process-exit semantics.",
+        "Timeout refresh is implemented only while active and retains original ALS registration cell; fired/closed reactivation refuses. No new context is fabricated on unref/ref/active refresh.",
+        "Timeout inactive hasRef retains reference-policy flag like Node; inactive Immediate ref cannot revive it. Active methods always change/query native interest.",
+        "setTimeout delay clamps to1..2147483647 and truncates; Node overflow warnings are not emitted. Per-task/private fields, constructor metadata and all exotic coercions are not full Node parity.",
+        "Promise timeout/immediate support native AbortSignal, ref option, cancellation and promisify.custom; promise interval async iteration is explicitly deferred. Foreign structural signals/general Scheduler receiver metadata are outside scope.",
+        "Mutable CJS objects are shared. Named ESM references capture initial bindings; syncBuiltinESMExports is not implemented.",
+        "Existing strict fatal/discard policy remains; no Node uncaught-exception recovery, DEBUG/OOM/reset/GC-pressure or custom host service is introduced."
+      ]
+    }
+  },
+  "requiredHostInterfaces": [
+    "wasi:clocks/monotonic-clock@0.2.10",
+    "wasi:io/poll@0.2.10"
+  ]
+}

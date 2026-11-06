@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "profileVersion": "sm-node-22.14.0-m0.22",
+  "nodeVersion": "v22.14.0",
+  "status": "Uncompiled experimental Node-shaped message HTTP profile, optional NODE_COMPAT_NEXT_HTTP; no TCP or TLS.",
+  "moduleContract": "Real named ESM bindings and mutable CommonJS defaults. Both aliases select one registry record. Private starling:node-http bindings are declared separately. Agents are configuration-only objects, never socket pools.",
+  "modules": {
+    "node:http": {
+      "aliases": [
+        "http"
+      ],
+      "status": "partial",
+      "exports": [
+        "Agent",
+        "ClientRequest",
+        "CloseEvent",
+        "IncomingMessage",
+        "METHODS",
+        "MessageEvent",
+        "OutgoingMessage",
+        "STATUS_CODES",
+        "Server",
+        "ServerResponse",
+        "WebSocket",
+        "_connectionListener",
+        "createServer",
+        "default",
+        "get",
+        "globalAgent",
+        "maxHeaderSize",
+        "request",
+        "setMaxIdleHTTPParsers",
+        "validateHeaderName",
+        "validateHeaderValue"
+      ],
+      "supportedStatic": [
+        "Agent",
+        "globalAgent",
+        "IncomingMessage",
+        "ServerResponse",
+        "METHODS",
+        "STATUS_CODES",
+        "maxHeaderSize",
+        "validateHeaderName",
+        "validateHeaderValue"
+      ],
+      "unsupportedStatic": [
+        "ClientRequest",
+        "CloseEvent",
+        "MessageEvent",
+        "OutgoingMessage",
+        "Server",
+        "WebSocket",
+        "_connectionListener",
+        "createServer",
+        "get",
+        "request",
+        "setMaxIdleHTTPParsers"
+      ],
+      "callablePolicy": "Every deferred callable throws ERR_SM_NODE_UNSUPPORTED on call/new, including INIT. Message classes implement the exact bridge subset. Agent network methods throw; no socket/TLS operation is simulated.",
+      "deviations": [
+        "IncomingMessage constructor accepts a Web Request for this transport, not a net.Socket. ServerResponse accepts the paired message. These are bridge classes; the exported deferred OutgoingMessage base does not establish Node inheritance parity.",
+        "Agent pure configuration and getName only; HTTPS getName with TLS options is deferred. Pooling, DNS, sockets, TLS, ClientRequest, server listen and HTTP2 are absent.",
+        "The WIT adapter separately selects standard wasi:http/types plus IO poll/streams/error. Native registration adds no host import.",
+        "No process-wide HTTP monkeypatch or syncBuiltinESMExports synchronization. Header validation details and all unlisted methods are not parity claims."
+      ]
+    },
+    "node:https": {
+      "aliases": [
+        "https"
+      ],
+      "status": "partial",
+      "exports": [
+        "Agent",
+        "Server",
+        "createServer",
+        "default",
+        "get",
+        "globalAgent",
+        "request"
+      ],
+      "supportedStatic": [
+        "Agent",
+        "globalAgent"
+      ],
+      "unsupportedStatic": [
+        "Server",
+        "createServer",
+        "get",
+        "request"
+      ],
+      "callablePolicy": "Every deferred callable throws ERR_SM_NODE_UNSUPPORTED on call/new, including INIT. Message classes implement the exact bridge subset. Agent network methods throw; no socket/TLS operation is simulated.",
+      "deviations": [
+        "IncomingMessage constructor accepts a Web Request for this transport, not a net.Socket. ServerResponse accepts the paired message. These are bridge classes; the exported deferred OutgoingMessage base does not establish Node inheritance parity.",
+        "Agent pure configuration and getName only; HTTPS getName with TLS options is deferred. Pooling, DNS, sockets, TLS, ClientRequest, server listen and HTTP2 are absent.",
+        "The WIT adapter separately selects standard wasi:http/types plus IO poll/streams/error. Native registration adds no host import.",
+        "No process-wide HTTP monkeypatch or syncBuiltinESMExports synchronization. Header validation details and all unlisted methods are not parity claims."
+      ]
+    }
+  },
+  "requiredHostInterfaces": []
+}

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "sourceOnly": true,
+  "checks": 21,
+  "outcomes": [
+    {
+      "id": "old-installed-layout-refuses-missing-external-inventory",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96/installation/builtins/node-compat/generate-async-hooks-factory.mjs",
+        "--check"
+      ],
+      "cwd": "/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96",
+      "rawExitCode": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "node:internal/fs/promises:638\n  return new FileHandle(await PromisePrototypeThen(\n                        ^\n\nError: ENOENT: no such file or directory, open '/private/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96/node22-surface.json'\n    at async open (node:internal/fs/promises:638:25)\n    at async readFile (node:internal/fs/promises:1242:14)\n    at async file:///private/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96/installation/builtins/node-compat/generate-async-hooks-factory.mjs:7:19 {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'open',\n  path: '/private/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96/node22-surface.json'\n}\n\nNode.js v22.14.0\n"
+    },
+    {
+      "id": "same-sibling-installed-layout-check-passes",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96/installation/builtins/node-compat/generate-async-hooks-factory.mjs",
+        "--check"
+      ],
+      "cwd": "/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96",
+      "rawExitCode": 0,
+      "signal": null,
+      "stdout": "{\"generatedBytes\":5734,\"canonicalSourceSha256\":\"7247c5dae6784dd94851b5929b9a1bc267bfcd7a362164950da8ed40e15746cb\",\"sourceOnly\":true,\"nativeActions\":false}\n",
+      "stderr": ""
+    },
+    {
+      "id": "corrupt-inventory-refuses",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96/installation/builtins/node-compat/generate-async-hooks-factory.mjs",
+        "--check"
+      ],
+      "cwd": "/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96",
+      "rawExitCode": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "node:internal/modules/run_main:122\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'AsyncLocalStorage',\n+   'AsyncResource',\n+   'asyncWrapProviders',\n+   'createHook',\n+   'default',\n+   'executionAsyncId',\n+   'executionAsyncResource',\n+   'triggerAsyncId'\n+ ]\n- undefined\n\n    at file:///private/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96/installation/builtins/node-compat/generate-async-hooks-factory.mjs:11:8 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: [\n    'AsyncLocalStorage',\n    'AsyncResource',\n    'asyncWrapProviders',\n    'createHook',\n    'default',\n    'executionAsyncId',\n    'executionAsyncResource',\n    'triggerAsyncId'\n  ],\n  expected: undefined,\n  operator: 'deepStrictEqual'\n}\n\nNode.js v22.14.0\n"
+    },
+    {
+      "id": "mismatched-manifest-refuses",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96/installation/builtins/node-compat/generate-async-hooks-factory.mjs",
+        "--check"
+      ],
+      "cwd": "/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96",
+      "rawExitCode": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "node:internal/modules/run_main:122\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'invalid-profile'\n- 'sm-node-22.14.0-m1.0'\n\n    at file:///private/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96/installation/builtins/node-compat/generate-async-hooks-factory.mjs:10:8 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 'invalid-profile',\n  expected: 'sm-node-22.14.0-m1.0',\n  operator: 'strictEqual'\n}\n\nNode.js v22.14.0\n"
+    },
+    {
+      "id": "restored-installed-layout-check-passes",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96/installation/builtins/node-compat/generate-async-hooks-factory.mjs",
+        "--check"
+      ],
+      "cwd": "/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96",
+      "rawExitCode": 0,
+      "signal": null,
+      "stdout": "{\"generatedBytes\":5734,\"canonicalSourceSha256\":\"7247c5dae6784dd94851b5929b9a1bc267bfcd7a362164950da8ed40e15746cb\",\"sourceOnly\":true,\"nativeActions\":false}\n",
+      "stderr": ""
+    }
+  ],
+  "nativeOrAlsWorkloadExecuted": false,
+  "privateTemporaryRoot": "/var/folders/sf/0ct_45kj20d6y2jvh2jtk7x00000gn/T/als-v4-installed-generator-rH0t96"
+}

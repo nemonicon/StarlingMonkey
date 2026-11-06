@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "sourceOnly": true,
+  "packageEntry": {
+    "path": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-package/src/componentize.js",
+    "sha256": "e58ef4f3b126f4a3fd07c61b368930bbf02dd0029f0f03e4c6928528e994e559",
+    "bytes": 18901
+  },
+  "privateSplicer": {
+    "path": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-package/lib/spidermonkey-embedding-splicer.core.wasm",
+    "sha256": "61685a01168e4f3ed12cf701bcde1a568992ea16d4a33266cbd2784fc1532abb",
+    "bytes": 5583293
+  },
+  "splicerSource": {
+    "path": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-source/crates/spidermonkey-embedding-splicer/src/stub_wasi.rs",
+    "sha256": "fdb3d26bb2da9a64a9d6e888872d61a203a912ba11f0bb0f297a5df14f3a62e2",
+    "bytes": 49958
+  },
+  "witParserSource": {
+    "path": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-source/crates/spidermonkey-embedding-splicer/src/lib.rs",
+    "sha256": "69dde2fc5f0421885cfcecaece645f5332dc6d3c343aac8c4fdf70699603b7cf",
+    "bytes": 2221
+  },
+  "clockOnlyPrunedAdapter": {
+    "path": "/private/tmp/starling-node-compat/clock-io-valid-adapter-v1/pruned-adapter.wasm",
+    "sha256": "87777d4e02ee58a753f1ead050516e612619466e77165a2ab109c1d1cbff6aba",
+    "bytes": 48808
+  },
+  "unprunedNormalizedAdapter": {
+    "path": "/private/tmp/starling-node-compat/clock-io-valid-adapter-v1/normalized-adapter.wasm",
+    "sha256": "667907826ed62123beb0c1817969dcf32527a02b4bcbbbb10dc1dcafaba12ecc",
+    "bytes": 53512
+  },
+  "decisions": {
+    "disableFeatures": [
+      "fetch-event"
+    ],
+    "enableFeatures": [],
+    "stdioRandomClocksHttpRetained": true,
+    "worldDirectoryRequired": true,
+    "directNativeRngRequiresRuntimeOnly": true,
+    "clockOnly87777AdmittedForNext": false,
+    "normalized667AdmittedForNext": false,
+    "adapterPromotion": false,
+    "newActualAdapter": null,
+    "actualFinalComponentImports": null
+  },
+  "sourceFindings": [
+    {
+      "path": "src/componentize.js",
+      "lines": "123-148,391-410",
+      "finding": "Default stdio/random/clocks/http retained, incomingHandler disables fetch-event; stubWasi transforms engine, componentNew links the supplied P1 reactor adapter separately."
+    },
+    {
+      "path": "src/stub_wasi.rs",
+      "lines": "218-256,464-481",
+      "finding": "Clock-only adapter prune applies stub_stdio and stub_io_streams to adapter; P2 get-stdin/get-stdout/get-stderr become unreachable. P1-import stub attempts are separate and need not match imports of this adapter. Retained native P1 stdio cannot be assumed functional through87777."
+    },
+    {
+      "path": "src/lib.rs",
+      "lines": "65-80",
+      "finding": "witPath directory calls Resolve.push_dir and loads deps; witWorld/file only push_str and does not load the selected dependency tree."
+    },
+    {
+      "path": "runtime native core",
+      "finding": "Actual new engine core imports and necessary adapter exports must be inspected after build; old9aec imports alone do not attest new native bytes."
+    }
+  ],
+  "remainingGate": "Genuine standard13-compatible adapter: prove normalized adapter dead-import pruning or produce a separately reviewed selective adapter preserving P1 stdout/stderr/streams/FS while excluding unselected stdin/terminal; do not widen world or rewrite version names. Final binary graph/type/ABI and emitted0.2.10 imports remain mandatory."
+}

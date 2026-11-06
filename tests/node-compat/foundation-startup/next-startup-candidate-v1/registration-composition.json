@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "scope": "Exact authored FS registrar changes composed into Module+startup afterimage. FS remains a separate uncompiled dependency.",
+  "commonSource": {
+    "path": "builtins/node-compat/register.cpp",
+    "sha256": "2848f059fb5693aa37c54945bff685444c8431007ceaec59d3335d01f7aced4a"
+  },
+  "fsDonor": {
+    "path": "tests/node-compat/foundation-fs/next-fs-candidate-v2/after/builtins/node-compat/register.cpp",
+    "sha256": "7faf507befa65c0b13830034e219d7ae43b6d13e74d882756fbcd5567fcd1d33"
+  },
+  "preFSCompositionSha256": "a26b42f057f9eb3f459b5b51cac1bb0050cbf565c3f7dec59ab708b7b7974ad1",
+  "resultSha256": "ddf3cdaa7f49d01eeb8bf7da8b09f097ece5f75a2a5bb9be25aa14de869f59f8",
+  "exactReversibleEdits": [
+    {
+      "offsetBeforeEdit": 18900,
+      "old": "  if (!install_classic_streams(engine, buffer_constructor, events_module, decoder_module)) return false;\n",
+      "new": "  JS::RootedValue streams_module(cx);\n  if (!install_classic_streams(engine, buffer_constructor, events_module, decoder_module, &streams_module)) return false;\n#endif\n#ifdef NODE_COMPAT_FS\n  if(!install_fs(engine,buffer_constructor,streams_module))return false;\n"
+    },
+    {
+      "offsetBeforeEdit": 12399,
+      "old": "",
+      "new": "}\n#endif\n\n#ifdef NODE_COMPAT_FS\nstatic bool install_fs(api::Engine* engine, JS::HandleValue buffer_constructor,\n                       JS::HandleValue streams_module) {\n  auto* cx=engine->cx();\n  JS::RootedObject argument(cx,JS_NewPlainObject(cx));\n  JS::RootedObject kernel(cx,next_fs::create_kernel(cx));\n  JS::RootedObject tick(cx,core::EventLoop::create_internal_next_tick(cx));\n  if(!argument||!kernel||!tick)return false;\n  JS::RootedObject streams(cx,&streams_module.toObject());JS::RootedValue readable(cx);\n  if(!JS_GetProperty(cx,streams,\"Readable\",&readable))return false;\n  JS::RootedValue kernel_value(cx,JS::ObjectValue(*kernel)),tick_value(cx,JS::ObjectValue(*tick));\n  if(!JS_DefineProperty(cx,argument,\"kernel\",kernel_value,0)||\n     !JS_DefineProperty(cx,argument,\"Buffer\",buffer_constructor,0)||\n     !JS_DefineProperty(cx,argument,\"Readable\",readable,0)||\n     !JS_DefineProperty(cx,argument,\"nextTick\",tick_value,0))return false;\n  JS::RootedValue value(cx,JS::ObjectValue(*argument)),graph_value(cx);\n  if(!evaluate_factory(cx,kFsFactorySource,value,&graph_value))return false;\n  JS::RootedObject graph(cx,&graph_value.toObject());JS::RootedValue root(cx),promises(cx);\n  if(!JS_GetProperty(cx,graph,\"root\",&root)||!JS_GetProperty(cx,graph,\"promises\",&promises))return false;\n  return engine->define_builtin_module(\"node:fs\",root)&&engine->define_builtin_module(\"fs\",root)&&\n         engine->define_builtin_module(\"node:fs/promises\",promises)&&engine->define_builtin_module(\"fs/promises\",promises);\n"
+    },
+    {
+      "offsetBeforeEdit": 12133,
+      "old": "",
+      "new": "  installed_module.set(root);\n"
+    },
+    {
+      "offsetBeforeEdit": 10092,
+      "old": "                                    JS::HandleValue events_module, JS::HandleValue decoder_module) {\n",
+      "new": "                                    JS::HandleValue events_module, JS::HandleValue decoder_module,\n                                    JS::MutableHandleValue installed_module) {\n"
+    },
+    {
+      "offsetBeforeEdit": 217,
+      "old": "",
+      "new": "#ifdef NODE_COMPAT_FS\n#include \"fs-factories.generated.h\"\n#include \"next-fs-native.h\"\n#endif\n"
+    }
+  ],
+  "authoringNote": "Initial three-context-line composition was refused before writing, because startup and FS both insert at the same include anchor; exact nonoverlapping opcode/anchor composition followed."
+}

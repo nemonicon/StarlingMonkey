@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "scope": "Own exact performance/startup v2 transformations; Source text/data only",
+  "files": [
+    {
+      "path": "builtins/web/performance.cpp",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/builtins/web/performance.cpp",
+        "sha256": "18a962f8811544882f7cc02237c7afdbfb0878c1107225fd9eb6812bf0dca2ed",
+        "bytes": 2340
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-startup/next-startup-candidate-v2/after/builtins/web/performance.cpp",
+        "sha256": "fbb5189b14a0a73845f50ac5e797bd742c1e9355a5e1d78f5f6ce32fe1426924",
+        "bytes": 6372
+      },
+      "edits": [
+        {
+          "offset": 42,
+          "old": "",
+          "new": "\n#ifdef NODE_COMPAT_NEXT_PERFORMANCE\n#include \"node-compat-entropy.h\"\n#include \"host-apis/wasi-0.2.10/bindings/bindings.h\"\n#include \"js/BigInt.h\"\n#endif"
+        },
+        {
+          "offset": 281,
+          "old": "",
+          "new": "#ifdef NODE_COMPAT_NEXT_PERFORMANCE\nnamespace {\n// Per-Wasm-instance state. Install/INIT reads no clock. A deployed resnapshot\n// is not admitted: there is deliberately no reset, setter or inherited origin.\nbool startup_origin_ready=false;\nuint64_t startup_mono_origin=0,startup_last_monotonic=0;\ndouble startup_unix_origin_ms=0;\nDEF_ERR(StartupPerformanceState,JSEXN_ERR,\"Deployed performance bootstrap is required\",0)\nDEF_ERR(StartupPerformanceClock,JSEXN_ERR,\"Invalid bounded performance clock sample\",0)\nbool clock_error(JSContext* cx,const JSErrorFormatString& format,const char* code){\n api::throw_error(cx,format);JS::RootedValue ex(cx);if(!JS_GetPendingException(cx,&ex)||!ex.isObject())return false;JS_ClearPendingException(cx);JS::RootedObject error(cx,&ex.toObject());JS::RootedString text(cx,JS_NewStringCopyZ(cx,code));if(!text)return false;JS::RootedValue v(cx,JS::StringValue(text));if(!JS_DefineProperty(cx,error,\"code\",v,JSPROP_ENUMERATE))return false;JS_SetPendingException(cx,ex);return false;\n}\nbool require_deployed(JSContext* cx){auto* engine=api::Engine::get(cx);if(engine&&engine->state()==api::EngineState::Initialized&&builtins::node_compat::entropy::deployed_execution_started())return true;return clock_error(cx,StartupPerformanceState,\"ERR_SM_NODE_PERFORMANCE_INITIALIZATION\");}\nbool require_started(JSContext* cx){if(!require_deployed(cx))return false;if(!startup_origin_ready)return clock_error(cx,StartupPerformanceState,\"ERR_SM_NODE_STARTUP_REQUIRED\");return true;}\n}\n// This genuine new JSNative is installed ONLY on the private startup kernel.\n// No public method can supply an epoch, reset an origin or mark startup ready.\nbool Performance::start_deployed(JSContext* cx,unsigned argc,JS::Value* vp){\n auto args=JS::CallArgsFromVp(argc,vp);if(!require_deployed(cx))return false;\n if(startup_origin_ready){JS::Rooted<JS::BigInt*> n(cx,JS::NumberToBigInt(cx,startup_mono_origin));if(!n)return false;args.rval().setBigInt(n);return true;}\n const uint64_t before=wasi_clocks_monotonic_clock_now();\n wasi_clocks_wall_clock_datetime_t wall{};wasi_clocks_wall_clock_now(&wall);\n const uint64_t after=wasi_clocks_monotonic_clock_now();\n // Standard wall-clock is Unix seconds+nanos. Date's finite epoch range is a\n // declared bound, not an invented host epoch for the monotonic counter.\n if(after<before||wall.nanoseconds>=1000000000||wall.seconds>8640000000000ULL||(wall.seconds==8640000000000ULL&&wall.nanoseconds!=0))return clock_error(cx,StartupPerformanceClock,\"ERR_SM_NODE_PERFORMANCE_CLOCK\");\n const uint64_t midpoint=before+(after-before)/2;\n const double epoch_ms=static_cast<double>(wall.seconds)*1000.0+static_cast<double>(wall.nanoseconds)/1000000.0;\n if(epoch_ms>8640000000000000.0)return clock_error(cx,StartupPerformanceClock,\"ERR_SM_NODE_PERFORMANCE_CLOCK\");\n JS::Rooted<JS::BigInt*> n(cx,JS::NumberToBigInt(cx,midpoint));if(!n)return false;\n // Commit only after validation and the fallible return-value allocation.\n startup_mono_origin=midpoint;startup_last_monotonic=midpoint;\n startup_unix_origin_ms=epoch_ms;startup_origin_ready=true;\n args.rval().setBigInt(n);return true;\n}\n#endif\n\n\n"
+        },
+        {
+          "offset": 423,
+          "old": "",
+          "new": "\n#ifdef NODE_COMPAT_NEXT_PERFORMANCE\n  if(!require_started(cx))return false;\n  const uint64_t current=wasi_clocks_monotonic_clock_now();\n  if(current<startup_last_monotonic)return clock_error(cx,StartupPerformanceClock,\"ERR_SM_NODE_PERFORMANCE_CLOCK\");\n  // Subtract in integer space first: large absolute nanoseconds never pass\n  // through float32 or lose a small elapsed delta in double cancellation.\n  const double elapsed=static_cast<double>(current-startup_mono_origin)/1000000.0;\n  startup_last_monotonic=current;args.rval().setNumber(elapsed);return true;\n#else"
+        },
+        {
+          "offset": 722,
+          "old": "",
+          "new": "#endif\n"
+        },
+        {
+          "offset": 804,
+          "old": "",
+          "new": "\n#ifdef NODE_COMPAT_NEXT_PERFORMANCE\n  METHOD_HEADER(0);\n  if(!require_started(cx))return false;\n  args.rval().setNumber(startup_unix_origin_ms);return true;\n#else"
+        },
+        {
+          "offset": 1063,
+          "old": "",
+          "new": "\n#endif"
+        }
+      ]
+    },
+    {
+      "path": "builtins/web/performance.h",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/builtins/web/performance.h",
+        "sha256": "675c7d94c76a543a7e997846403adead00d5bb6bb9010d40aada1987215dc8a0",
+        "bytes": 976
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-startup/next-startup-candidate-v2/after/builtins/web/performance.h",
+        "sha256": "2eba4ec8c806b923a6d286e3f3cfe75a97057b6ceb2a2531ca5d9eecad21e153",
+        "bytes": 1092
+      },
+      "edits": [
+        {
+          "offset": 680,
+          "old": "",
+          "new": "#ifdef NODE_COMPAT_NEXT_PERFORMANCE\n  static bool start_deployed(JSContext *cx,unsigned argc,JS::Value *vp);\n#endif\n"
+        }
+      ]
+    },
+    {
+      "path": "builtins/node-compat/next-startup.cpp",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-startup/next-startup-candidate-v1/after/builtins/node-compat/next-startup.cpp",
+        "sha256": "f9c4578fa7264271fdb2a4ccd29ead43dea7671e0e830649af18c198b03d209a",
+        "bytes": 9883
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-startup/next-startup-candidate-v2/after/builtins/node-compat/next-startup.cpp",
+        "sha256": "3e6bb3f67df0fd41cf6a16e307d0f42ce1e001fd330af6e299501fec3fe483f0",
+        "bytes": 10116
+      },
+      "edits": [
+        {
+          "offset": 207,
+          "old": "",
+          "new": "\n#include \"../web/performance.h\"\n#ifndef NODE_COMPAT_NEXT_PERFORMANCE\n#error Startup v2 requires genuine deployed performance origin support\n#endif"
+        },
+        {
+          "offset": 8773,
+          "old": "",
+          "new": "startPerformance\",builtins::web::performance::Performance::start_deployed,0,0),JS_FN(\""
+        }
+      ]
+    },
+    {
+      "path": "cmake/builtins.cmake",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/node-crypto-rng-candidate-v1/after/cmake/builtins.cmake",
+        "sha256": "4cdcb231f355ea1e6e6c798fd49b0b73048e5b40bd8079634998ce954053fc73",
+        "bytes": 19009
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-startup/next-startup-candidate-v2/after/cmake/builtins.cmake",
+        "sha256": "006eb41f4937ce3879db42ae999b76aa232cf508798231bd5a4492252ce10d3f",
+        "bytes": 19867
+      },
+      "edits": [
+        {
+          "offset": 19009,
+          "old": "",
+          "new": "\n# Source v2 startup has an explicit, deployed-only epoch/monotonic backend.\noption(NODE_COMPAT_NEXT_PERFORMANCE \"Deployed Unix performance origin and double elapsed clock\" OFF)\nif(NODE_COMPAT_NEXT_STARTUP AND NOT NODE_COMPAT_NEXT_PERFORMANCE AND NOT CMAKE_SCRIPT_MODE_FILE)\n    message(FATAL_ERROR \"Startup v2 requires NODE_COMPAT_NEXT_PERFORMANCE=ON\")\nendif()\nif(NODE_COMPAT_NEXT_PERFORMANCE AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT NODE_COMPAT_NEXT_STARTUP OR NOT TARGET builtin_web_performance)\n        message(FATAL_ERROR \"NODE_COMPAT_NEXT_PERFORMANCE requires startup and real native performance\")\n    endif()\n    target_compile_definitions(extension_api INTERFACE NODE_COMPAT_NEXT_PERFORMANCE=1)\n    add_dependencies(builtin_node_compat builtin_web_performance)\n    target_link_libraries(builtin_node_compat PRIVATE builtin_web_performance)\nendif()\n"
+        }
+      ]
+    },
+    {
+      "path": "builtins/node-compat/startup-core.mjs",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-startup/next-startup-candidate-v1/startup-core.mjs",
+        "sha256": "8190ae0f508ce9a083aec5831d4960a86fbf06f646b18b96b434e5c7d43dad22",
+        "bytes": 12991
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-startup/next-startup-candidate-v2/startup-core.mjs",
+        "sha256": "d33b0ad8a49f6e44ad8b4ace7c00def1952b295ef7e03cdbfcecc181dbb6ae48",
+        "bytes": 13185
+      },
+      "edits": [
+        {
+          "offset": 247,
+          "old": "0",
+          "new": "4"
+        },
+        {
+          "offset": 2450,
+          "old": "",
+          "new": "\n    // Finish fallible user-visible writes before the native clock commits an\n    // origin. After a real BigInt return only local primitive writes remain.\n    for(const [n,v]of entries)define(env,n,{value:v,writable:true,enumerable:true,configurable:true});argv.push(...args);\n    p.argv0=args[0]??'';processRecord.argv0=p.argv0;\n    "
+        },
+        {
+          "offset": 2464,
+          "old": "",
+          "new": "startPerfor"
+        },
+        {
+          "offset": 2465,
+          "old": "o",
+          "new": "a"
+        },
+        {
+          "offset": 2467,
+          "old": "otoni",
+          "new": ""
+        },
+        {
+          "offset": 2473,
+          "old": "",
+          "new": "e"
+        },
+        {
+          "offset": 2598,
+          "old": "for(const [n,v]of entries)define(env,n,{value:v,writable:true,enumerable:true,configurable:true});argv.push(...args);",
+          "new": ""
+        },
+        {
+          "offset": 2738,
+          "old": ";\n    p.argv0=args[0]??'';processRecord.argv0=p.argv0",
+          "new": ""
+        },
+        {
+          "offset": 4568,
+          "old": "",
+          "new": "-v2-performance-epoch"
+        }
+      ]
+    }
+  ],
+  "alsV3TimerHeaderJoin": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-startup/next-startup-candidate-v2/alsv3-timer-header-join.json",
+    "sha256": "dc443bbcfda2c12c0530cbe00e37dc998a02b49963cd25531da90adb7d399488",
+    "bytes": 2023
+  },
+  "oldSourceAndBaseEngineUnchanged": true,
+  "newNativePaths": [],
+  "newFlag": "NODE_COMPAT_NEXT_PERFORMANCE",
+  "defaultFlag": false,
+  "syntaxPlan": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-startup/next-startup-candidate-v2/sdk-syntax-plan.json",
+    "sha256": "f1292843caca167a796ecbc2546e8fdc495eb51ad809efd18610e7ef19fad7a6",
+    "bytes": 116226
+  }
+}

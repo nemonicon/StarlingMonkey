@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "privateManifestVersion": "starling-node-startup-v1",
+  "specifier": "starling:node-startup",
+  "exports": {
+    "bootstrap": "() -> actual process object"
+  },
+  "nativeRegistration": "actual engine.define_builtin_module, guest factory binding only; not a host import/service",
+  "publicNodeManifest": false,
+  "deployedOnly": true,
+  "requiredOrder": [
+    "neutral deployed server-root entry",
+    "bootstrap()",
+    "process.chdir('/app') with actual shared FS directory/preopen rights",
+    "Module require of actual standalone app",
+    "app.prepare()",
+    "fresh request/ALS boundary before request/body construction"
+  ],
+  "allowedDuringINIT": false,
+  "implicitProfilePluginSelection": false,
+  "bundlerSelection": "Must be explicit diagnostic/bootstrap native specifier selection; do not pass this non-node manifest to existing public validateManifest/builtinMap. Public three manifests remain schema-valid node: only.",
+  "operationalAuthority": null,
+  "implementationVersion": "next-startup-v2-performance-epoch-v1",
+  "originPolicy": "New private native Performance.start_deployed; no INIT clock IO; Unix wall sample anchored at raw monotonic midpoint; process.uptime shares exact origin",
+  "requiredNativeFlag": "NODE_COMPAT_NEXT_PERFORMANCE=ON",
+  "newOperationalAuthority": null
+}

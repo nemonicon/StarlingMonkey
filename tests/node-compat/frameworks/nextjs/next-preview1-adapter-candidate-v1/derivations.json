@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "cli": [
+    {
+      "before": "    /// Stub WASI imports in a WebAssembly module\n    StubWasi {",
+      "after": "    /// Selective standard13 Next adapter policy from exact normalized667\n    PruneNextHttpAdapter {\n        #[arg(short, long)]\n        input: PathBuf,\n        #[arg(short, long)]\n        output: PathBuf,\n    },\n    /// Stub WASI imports in a WebAssembly module\n    StubWasi {"
+    },
+    {
+      "before": "        Commands::StubWasi {\n            input,",
+      "after": "        Commands::PruneNextHttpAdapter { input, output } => {\n            let wasm = fs::read(&input)\n                .with_context(|| format!(\"Failed to read adapter: {}\", input.display()))?;\n            let result = stub_wasi::prune_next_http_adapter(wasm)?;\n            use std::io::Write;\n            let mut options = fs::OpenOptions::new();\n            options.write(true).create_new(true);\n            #[cfg(unix)]\n            {\n                use std::os::unix::fs::OpenOptionsExt;\n                options.mode(0o600);\n            }\n            let mut file = options.open(&output)\n                .with_context(|| format!(\"Need fresh adapter output: {}\", output.display()))?;\n            #[cfg(unix)]\n            {\n                use std::os::unix::fs::PermissionsExt;\n                file.set_permissions(fs::Permissions::from_mode(0o600))?;\n            }\n            file.write_all(&result)?;\n            file.sync_all()?;\n        }\n        Commands::StubWasi {\n            input,"
+    }
+  ],
+  "stubWasiAppend": "exact old bytes + newline + next-adapter-policy.rs",
+  "nativeEngineSourceChanged": false,
+  "privateWasmCoreChanged": false
+}

@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "existingChanges": [
+    {
+      "path": "builtins/node-compat/register.cpp",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/builtins/node-compat/register.cpp",
+        "sha256": "7698e61ebf3dac01903d4b6567df76adc460a9c3da8f94dd1c9e528dc0ecbe4a",
+        "bytes": 16262
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/next-streaming-candidate-v1/after/builtins/node-compat/register.cpp",
+        "sha256": "0ae43fc8dc21133fb4ca3bc7536f0593ceb327aafeef34028ddfa95e0648cffa",
+        "bytes": 17999
+      },
+      "patch": "--- 9aec/builtins/node-compat/register.cpp\n+++ streaming/builtins/node-compat/register.cpp\n@@ -11,6 +11,9 @@\n #endif\n #ifdef NODE_COMPAT_ZLIB\n #include \"zlib/factories.generated.h\"\n+#ifdef NODE_COMPAT_ZLIB_STREAMING\n+#include \"zlib/stream-factories.generated.h\"\n+#endif\n #endif\n #ifdef NODE_COMPAT_STREAM_CONSUMERS\n #include \"stream-consumers/factories.generated.h\"\n@@ -49,7 +52,11 @@\n JSObject *create_crypto_hash_hmac_kernel(JSContext *cx);\n #endif\n #ifdef NODE_COMPAT_ZLIB\n-namespace zlib_profile { JSObject *create_kernel(JSContext *cx); }\n+namespace zlib_profile { JSObject *create_kernel(JSContext *cx);\n+#ifdef NODE_COMPAT_ZLIB_STREAMING\n+JSObject *create_stream_kernel(JSContext *cx);\n+#endif\n+}\n #endif\n #ifdef NODE_COMPAT_STREAM_WEB\n JSObject *create_stream_web_kernel(JSContext *cx);\n@@ -214,7 +221,8 @@\n \n #ifdef NODE_COMPAT_CLASSIC_STREAMS\n static bool install_classic_streams(api::Engine *engine, JS::HandleValue buffer_constructor,\n-                                    JS::HandleValue events_module, JS::HandleValue decoder_module) {\n+                                    JS::HandleValue events_module, JS::HandleValue decoder_module,\n+                                    JS::MutableHandleValue installed_module) {\n   auto *cx = engine->cx();\n   // CONTENT realm is already entered by install(). Native prerequisite globals\n   // and the retained factory records precede this call; no module-loader getter.\n@@ -246,6 +254,7 @@\n   JS::RootedValue root(cx), promises(cx);\n   if (!JS_GetProperty(cx, graph, \"root\", &root) ||\n       !JS_GetProperty(cx, graph, \"promises\", &promises)) return false;\n+  installed_module.set(root);\n   return engine->define_builtin_module(\"node:stream\", root) &&\n          engine->define_builtin_module(\"stream\", root) &&\n          engine->define_builtin_module(\"node:stream/promises\", promises) &&\n@@ -254,7 +263,11 @@\n #endif\n \n #ifdef NODE_COMPAT_ZLIB\n+#ifdef NODE_COMPAT_ZLIB_STREAMING\n+static bool install_zlib(api::Engine *engine, JS::HandleValue buffer_constructor, JS::HandleValue streams_module) {\n+#else\n static bool install_zlib(api::Engine *engine, JS::HandleValue buffer_constructor) {\n+#endif\n   auto *cx = engine->cx(); // install() already entered the content realm.\n   JS::RootedObject kernel(cx, zlib_profile::create_kernel(cx));\n   if (!kernel) return false;\n@@ -265,6 +278,22 @@\n       !JS_DefineProperty(cx, argument, \"Buffer\", buffer_constructor, 0)) return false;\n   JS::RootedValue argument_value(cx, JS::ObjectValue(*argument)), module(cx);\n   if (!evaluate_factory(cx, kZlibFactorySource, argument_value, &module)) return false;\n+#ifdef NODE_COMPAT_ZLIB_STREAMING\n+  JS::RootedObject streaming(cx,zlib_profile::create_stream_kernel(cx));\n+  JS::RootedObject tick(cx,core::EventLoop::create_internal_next_tick(cx));\n+  JS::RootedObject stream_argument(cx,JS_NewPlainObject(cx));\n+  if(!streaming||!tick||!stream_argument)return false;\n+  JS::RootedObject streams(cx,&streams_module.toObject());JS::RootedValue transform(cx);\n+  if(!JS_GetProperty(cx,streams,\"Transform\",&transform))return false;\n+  JS::RootedValue streaming_value(cx,JS::ObjectValue(*streaming)),tick_value(cx,JS::ObjectValue(*tick));\n+  if(!JS_DefineProperty(cx,stream_argument,\"base\",module,0)||\n+     !JS_DefineProperty(cx,stream_argument,\"kernel\",streaming_value,0)||\n+     !JS_DefineProperty(cx,stream_argument,\"Buffer\",buffer_constructor,0)||\n+     !JS_DefineProperty(cx,stream_argument,\"Transform\",transform,0)||\n+     !JS_DefineProperty(cx,stream_argument,\"nextTick\",tick_value,0))return false;\n+  JS::RootedValue stream_argument_value(cx,JS::ObjectValue(*stream_argument));\n+  if(!evaluate_factory(cx,kStreamingZlibFactorySource,stream_argument_value,&module))return false;\n+#endif\n   return engine->define_builtin_module(\"node:zlib\", module) &&\n          engine->define_builtin_module(\"zlib\", module);\n }\n@@ -329,7 +358,8 @@\n   if (!install_string_decoder(engine, buffer_constructor, &decoder_module)) return false;\n #endif\n #ifdef NODE_COMPAT_CLASSIC_STREAMS\n-  if (!install_classic_streams(engine, buffer_constructor, events_module, decoder_module)) return false;\n+  JS::RootedValue streams_module(cx);\n+  if (!install_classic_streams(engine, buffer_constructor, events_module, decoder_module, &streams_module)) return false;\n #endif\n #ifdef NODE_COMPAT_ASSERT\n   if (!install_assert(engine)) return false;\n@@ -344,7 +374,11 @@\n   if (!install_stream_web(engine)) return false;\n #endif\n #ifdef NODE_COMPAT_ZLIB\n+#ifdef NODE_COMPAT_ZLIB_STREAMING\n+  if (!install_zlib(engine, buffer_constructor, streams_module)) return false;\n+#else\n   if (!install_zlib(engine, buffer_constructor)) return false;\n+#endif\n #endif\n #ifdef NODE_COMPAT_STREAM_CONSUMERS\n   if (!install_stream_consumers(engine)) return false;\n"
+    },
+    {
+      "path": "cmake/builtins.cmake",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/cmake/builtins.cmake",
+        "sha256": "f1d5721b4d58184a8ec30a3e421e1288fdcf1131f9035a4b8a3f6ca00bfeb76f",
+        "bytes": 14056
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/next-streaming-candidate-v1/after/cmake/builtins.cmake",
+        "sha256": "31f7d0d9bfecf11cbeabb07a632f3feac2521051a9725a9209fa8b5c78c71c96",
+        "bytes": 14657
+      },
+      "patch": "--- 9aec/cmake/builtins.cmake\n+++ streaming/cmake/builtins.cmake\n@@ -307,3 +307,12 @@\n if(NODE_CRYPTO_AUDITED_BORROW AND NOT NODE_COMPAT_CRYPTO_HASH_HMAC)\n     message(FATAL_ERROR \"NODE_CRYPTO_AUDITED_BORROW requires NODE_COMPAT_CRYPTO_HASH_HMAC\")\n endif()\n+\n+option(NODE_COMPAT_ZLIB_STREAMING \"Enable bounded native Gzip/Deflate classic streams\" OFF)\n+if(NODE_COMPAT_ZLIB_STREAMING AND NOT CMAKE_SCRIPT_MODE_FILE)\n+    if(NOT TARGET builtin_node_compat OR NOT NODE_COMPAT_ZLIB OR NOT NODE_COMPAT_CLASSIC_STREAMS OR NOT NODE_COMPAT_INTERNAL_TICKS)\n+        message(FATAL_ERROR \"NODE_COMPAT_ZLIB_STREAMING requires node zlib, classic streams and internal ticks\")\n+    endif()\n+    target_sources(builtin_node_compat PRIVATE builtins/node-compat/zlib/stream-kernel.cpp)\n+    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_ZLIB_STREAMING=1)\n+endif()\n"
+    },
+    {
+      "path": "include/node-compat-entropy.h",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/include/node-compat-entropy.h",
+        "sha256": "6414e413a377aa21a039c175e90e26916911e88a071f29042cd1c47cfbee0fae",
+        "bytes": 889
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/next-streaming-candidate-v1/after/include/node-compat-entropy.h",
+        "sha256": "9be3ad9fd2a461dc81d9f115fce8dea993a8c6e64d39f4a43779cf47966087f8",
+        "bytes": 996
+      },
+      "patch": "--- 9aec/include/node-compat-entropy.h\n+++ streaming/include/node-compat-entropy.h\n@@ -12,6 +12,8 @@\n \n Status status();\n void begin_engine(bool pre_initialize);\n+// Read-only deployed-entry state; independent of entropy availability.\n+bool deployed_execution_started();\n bool require(JSContext *cx, const char *operation);\n bool invalid_result(JSContext *cx, const char *operation);\n \n"
+    },
+    {
+      "path": "builtins/node-compat/entropy-policy.cpp",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/builtins/node-compat/entropy-policy.cpp",
+        "sha256": "efdff496d591ce01a5841dcf38aeed61228ec0d330b39931cca627d8520edeb8",
+        "bytes": 2146
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/next-streaming-candidate-v1/after/builtins/node-compat/entropy-policy.cpp",
+        "sha256": "df24bacd70eee56ad4544e7f579338d521893cae684edc7e109bec6d284cc208",
+        "bytes": 2201
+      },
+      "patch": "--- 9aec/builtins/node-compat/entropy-policy.cpp\n+++ streaming/builtins/node-compat/entropy-policy.cpp\n@@ -15,6 +15,7 @@\n }\n \n void begin_engine(bool pre_initialize) { deployed = !pre_initialize; }\n+bool deployed_execution_started() { return deployed; }\n \n static bool fail(JSContext *cx, const char *operation, const char *code) {\n   JS_ReportErrorASCII(cx, \"%s: %s\", operation, code);\n"
+    }
+  ],
+  "newPaths": [
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/next-streaming-candidate-v1/after/builtins/node-compat/zlib/stream-kernel.cpp",
+      "sha256": "573eb9b088928bafdfa512ee3f6a8a6b1a0ce75c08eeb6e0729a760fa005d281",
+      "bytes": 10358
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/next-streaming-candidate-v1/after/builtins/node-compat/zlib/stream-facade.mjs",
+      "sha256": "faf7c4e1d141241224eca9d7ee3e0545eb3a514716a28605adaaf13d072a409e",
+      "bytes": 8765
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/next-streaming-candidate-v1/after/builtins/node-compat/zlib/generate-stream-factory.mjs",
+      "sha256": "fc34dee308bb9bb82afa37cfd10621740e48ca3ca5761428d7ff94dcb34c414b",
+      "bytes": 1701
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/next-streaming-candidate-v1/after/builtins/node-compat/zlib/stream-factories.generated.h",
+      "sha256": "c1dfade92487cdb2b62bfac13285c6f11a25f3258e95315afb86da65b6f1466b",
+      "bytes": 9077
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/next-streaming-candidate-v1/after/builtins/node-compat/export-manifest.zlib-streaming.node-v22.14.0.json",
+      "sha256": "06473c37fa2c474d0e0ab223133fa5cfd093358db7e7a9c55428b3f1b4da3eea",
+      "bytes": 5780
+    }
+  ],
+  "unchangedContext": [
+    {
+      "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/builtins/node-compat/export-manifest.zlib.node-v22.14.0.json",
+      "sha256": "37f82f61e4ad258c562fd9b7b4f071779b10d258df44eaf5bdd9f2f53a244315",
+      "bytes": 4400
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/builtins/node-compat/zlib/facade.mjs",
+      "sha256": "846b2b79da4d45c29833f7d60ce2cfa422b0b5b5a5e35316d2f19ddc6c27c903",
+      "bytes": 10783
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/builtins/node-compat/zlib/kernel.cpp",
+      "sha256": "f7e0fa67f9dce8be36f71d18e4dee9ecd564cc92daf24104d857e55623272411",
+      "bytes": 8988
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/builtins/node-compat/zlib/bounded-codec.h",
+      "sha256": "f6b1893e6a5d1cd2e9f17d13be8113a570eeb2a5d16beeb7379212554240a135",
+      "bytes": 5982
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/builtins/node-compat/zlib/constant-data.generated.mjs",
+      "sha256": "3bea44ebc8ce9a2fd187acbb17e7aa0330caa4e2507b64b88986bb64ea2f9ab9",
+      "bytes": 4194
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/builtins/node-compat/zlib/LICENSE.node",
+      "sha256": "1474fea5eff88dc92763acca3ca1f54b51fa153be1529eae74ace35957aea9ce",
+      "bytes": 140396
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/builtins/node-compat/zlib/factories.generated.h",
+      "sha256": "e3f524d3820200435eb8bce16c74916eb820a534b97be3b209bf1d734cbd0426",
+      "bytes": 15241
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/builtins/node-compat/zlib/generate-factory.mjs",
+      "sha256": "c73b293a069aadf730118ce2860733c4bce7700d966d0439d6572278a75a170e",
+      "bytes": 3027
+    }
+  ],
+  "flag": "NODE_COMPAT_ZLIB_STREAMING",
+  "default": "OFF",
+  "requires": [
+    "NODE_COMPAT_ZLIB",
+    "NODE_COMPAT_CLASSIC_STREAMS",
+    "NODE_COMPAT_INTERNAL_TICKS"
+  ],
+  "manifestSelection": {
+    "whenOn": "builtins/node-compat/export-manifest.zlib-streaming.node-v22.14.0.json",
+    "replaces": "builtins/node-compat/export-manifest.zlib.node-v22.14.0.json",
+    "publicModule": "node:zlib",
+    "appendDuplicateForbidden": true
+  },
+  "composition": "Apply exact localized hunks alongside FS/startup/Module/ALS. Shared deployed accessor bytes identical; classic installed-root output site overlaps FS. Do not overwrite a composed registrar with this full afterimage.",
+  "nativeSourceCount": null,
+  "metadata": null
+}

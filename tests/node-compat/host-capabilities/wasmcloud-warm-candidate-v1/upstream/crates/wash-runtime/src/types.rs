@@ -1,0 +1,272 @@
+//! Types used throughout the wasmcloud crate for workload management and host operations.
+//!
+//! This module contains two main categories of types:
+//!
+//! ## Public API Types (used in [`crate::host::HostApi`])
+//! - Request/Response types: [`WorkloadStartRequest`], [`WorkloadStartResponse`],
+//!   [`WorkloadStatusRequest`], [`WorkloadStatusResponse`],
+//!   [`WorkloadStopRequest`], [`WorkloadStopResponse`]
+//! - Host information: [`HostHeartbeat`]
+//!
+//! ## Core Workload Types (used internally)
+//! - Workload definition: [`Workload`], [`WorkloadState`], [`WorkloadStatus`]
+//! - Component configuration: [`Component`], [`Service`], [`LocalResources`]
+//! - Volume management: [`Volume`], [`VolumeType`], [`VolumeMount`],
+//!   [`EmptyDirVolume`], [`HostPathVolume`]
+
+use bytes::Bytes;
+use std::{collections::HashMap, sync::Arc};
+
+use crate::host::allowed_hosts::AllowedHost;
+use crate::host::allowed_ip_name::AllowedIpName;
+use crate::host::allowed_loopback::AllowedLoopbackPort;
+use crate::wit::WitInterface;
+
+/// Represents a deployable workload containing one or more WebAssembly components.
+/// A workload defines the complete runtime configuration including components,
+/// services, interfaces, and volumes.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Workload {
+    pub namespace: String,
+    pub name: String,
+    pub annotations: HashMap<String, String>,
+    pub service: Option<Service>,
+    pub components: Vec<Component>,
+    pub host_interfaces: Vec<WitInterface>,
+    pub volumes: Vec<Volume>,
+}
+
+/// The current state of a workload in its lifecycle.
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[repr(i32)]
+pub enum WorkloadState {
+    Unspecified = 0,
+    Starting = 1,
+    Running = 2,
+    Completed = 3,
+    Stopping = 4,
+    Error = 5,
+    NotFound = 6,
+}
+
+/// Configuration for a long-running service component that handles requests.
+/// Services can be restarted if they fail and have resource limits.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Service {
+    pub bytes: Bytes,
+    pub digest: Option<String>,
+    pub local_resources: LocalResources,
+    pub max_restarts: u64,
+}
+
+/// A WebAssembly component that can be executed as part of a workload.
+/// Components can be pooled for concurrent execution and have invocation limits.
+#[derive(Debug, Default, Clone, PartialEq)]
+pub struct Component {
+    pub name: String,
+    pub bytes: Bytes,
+    pub digest: Option<String>,
+    pub local_resources: LocalResources,
+    /// The instance limits, exactly as the wire carried them. Signed because
+    /// they mirror the Kubernetes CRD fields a workload sets them through, and
+    /// unset is spelled as a non-positive value there. Nothing reads them
+    /// directly: [`crate::engine::InstancePolicy::from_component`] decodes the
+    /// whole set into named, non-zero limits once.
+    pub pool_size: i32,
+    pub max_invocations: i32,
+    /// How many calls one warm instance may serve at the same time.
+    ///
+    /// Unset or below `1` means one, which is what a component gets without
+    /// asking: a warm instance serves a single call at a time, exactly as an
+    /// unpooled one does. Raising it lets an instance overlap calls while it is
+    /// awaiting I/O, and is only safe for a guest that yields rather than
+    /// blocks — a guest driving its own executor with `block_on` must stay at
+    /// one.
+    pub max_concurrency: i32,
+    /// How long the pool watches its own peak concurrency before retiring the
+    /// warm instances that peak did not need.
+    ///
+    /// Unset or below `1` means warm instances are never reclaimed for
+    /// idleness: a pool grows to `pool_size` under load and keeps whatever
+    /// its busiest moment needed until the workload stops.
+    pub reclaim_window_seconds: i32,
+    /// How many warm instances a reclaim sweep never retires below. Unset
+    /// lets an idle pool empty out, so the next call after a quiet spell
+    /// starts cold. Capped at `pool_size`, and only meaningful alongside
+    /// `reclaim_window_seconds`.
+    pub reclaim_min_instances: i32,
+}
+
+/// Resource limits and configuration for a component or service.
+/// Defines memory, CPU limits, configuration values, and volume mounts.
+#[derive(Debug, Clone, PartialEq)]
+pub struct LocalResources {
+    pub memory_limit_mb: i32,
+    pub cpu_limit: i32,
+    /// Opaque key-value configuration shared between operator + runtime + plugins.
+    /// Allows passing arbitrary configuration values to influence implementation behavior for all component interfaces.
+    /// Example: tracing=disable
+    ///
+    /// Also surfaced per component via `wasi:config/store`, layered over
+    /// the interface config (see
+    /// [`crate::plugin::wasi_config::DynamicConfig`]).
+    pub config: HashMap<String, String>,
+    /// `wasi:cli/env` variables, copied to `WasiCtxBuilder` at component
+    /// instantiation.
+    pub environment: HashMap<String, String>,
+    pub volume_mounts: Vec<VolumeMount>,
+    /// Parsed outbound allowlist.
+    /// **Empty = deny all outgoing requests**. See
+    /// [`crate::host::http::check_allowed_hosts`]). To opt into
+    /// unrestricted egress, pass an explicit `[AllowedHost::Any]`. The
+    /// wash config layer substitutes `[Any]` when `allowedHosts` is
+    /// omitted from YAML, so workloads coming through `wash dev` never
+    /// land here with an unintentionally-empty list. Strings from the
+    /// wire (proto / wash YAML) are parsed at conversion time, so the
+    /// request hot path matches against the typed enum directly.
+    pub allowed_hosts: Arc<[AllowedHost]>,
+    /// Which names the component may resolve through
+    /// `wasi:sockets/ip-name-lookup` (`resolve-addresses`), beyond the hosts
+    /// `allowed_hosts` names — a host it may connect to it may also resolve.
+    /// **Both empty = deny every lookup**, reported to the guest as
+    /// `permanent-resolver-failure`. See
+    /// [`crate::host::allowed_ip_name`] for the accepted entry forms; pass
+    /// an explicit `[AllowedIpName::Any]` to resolve any name. Strings from
+    /// the wire (proto / wash YAML) are parsed at conversion time, so the
+    /// resolve path matches against the typed enum directly.
+    pub allowed_ip_name_lookups: Arc<[AllowedIpName]>,
+    /// Ports on the machine's own loopback this component may reach through
+    /// `host.wasmcloud.internal`.
+    ///
+    /// **Empty = deny every host-loopback connection**, and a non-empty list is
+    /// still inert unless the host itself was started with
+    /// `--allow-host-loopback`: neither a workload author nor an operator can
+    /// open this door alone. See [`crate::host::allowed_loopback`] for the
+    /// accepted entry forms. Strings from the wire (proto / wash YAML) are
+    /// parsed at conversion time.
+    pub allowed_host_loopback_ports: Arc<[AllowedLoopbackPort]>,
+}
+
+impl Default for LocalResources {
+    fn default() -> Self {
+        Self {
+            memory_limit_mb: -1,
+            cpu_limit: -1,
+            config: HashMap::new(),
+            environment: HashMap::new(),
+            volume_mounts: Vec::new(),
+            allowed_hosts: Default::default(),
+            allowed_ip_name_lookups: Default::default(),
+            allowed_host_loopback_ports: Default::default(),
+        }
+    }
+}
+
+/// A named volume that can be mounted into components.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Volume {
+    pub name: String,
+    pub volume_type: VolumeType,
+}
+
+/// The type of volume - either host path or empty directory.
+#[derive(Debug, Clone, PartialEq)]
+pub enum VolumeType {
+    HostPath(HostPathVolume),
+    EmptyDir(EmptyDirVolume),
+}
+
+/// Describes how a volume should be mounted into a component.
+#[derive(Debug, Clone, PartialEq)]
+pub struct VolumeMount {
+    pub name: String,
+    pub mount_path: String,
+    pub read_only: bool,
+}
+
+/// An ephemeral empty directory volume that exists for the lifetime of the workload.
+#[derive(Debug, Clone, PartialEq)]
+pub struct EmptyDirVolume {}
+
+/// A volume that mounts a directory from the host filesystem.
+#[derive(Debug, Clone, PartialEq)]
+pub struct HostPathVolume {
+    pub local_path: String,
+}
+
+/// Information about the host's current state and capabilities.
+/// Returned by [`crate::host::HostApi::heartbeat`].
+#[derive(Debug, Clone, PartialEq)]
+pub struct HostHeartbeat {
+    pub id: String,
+    pub hostname: String,
+    pub http_port: u16,
+    pub friendly_name: String,
+    pub version: String,
+    pub labels: HashMap<String, String>,
+    pub started_at: chrono::DateTime<chrono::Utc>,
+    pub os_arch: String,
+    pub os_name: String,
+    pub os_kernel: String,
+    /// System CPU usage in percent (0.0 - 100.0)
+    pub system_cpu_usage: f32,
+    /// System total memory in bytes
+    pub system_memory_total: u64,
+    /// System free memory in bytes
+    pub system_memory_free: u64,
+    pub component_count: u64,
+    pub workload_count: u64,
+    pub imports: Vec<WitInterface>,
+    pub exports: Vec<WitInterface>,
+    /// Environment the host advertises itself as running in. For
+    /// Kubernetes host pods this is the pod's namespace; for
+    /// out-of-cluster hosts it is whatever the operator passed via
+    /// `wash host --environment`. Empty when no environment was
+    /// configured.
+    pub environment: String,
+}
+
+/// Status information about a workload including its ID, state, and any messages.
+#[derive(Debug, Clone, PartialEq)]
+pub struct WorkloadStatus {
+    pub workload_id: String,
+    pub workload_state: WorkloadState,
+    pub message: String,
+}
+
+/// Request to start a new workload on the host.
+#[derive(Debug, Clone, PartialEq)]
+pub struct WorkloadStartRequest {
+    pub workload_id: String,
+    pub workload: Workload,
+}
+
+/// Response after attempting to start a workload.
+#[derive(Debug, Clone, PartialEq)]
+pub struct WorkloadStartResponse {
+    pub workload_status: WorkloadStatus,
+}
+
+/// Request to get the status of a specific workload.
+#[derive(Debug, Clone, PartialEq)]
+pub struct WorkloadStatusRequest {
+    pub workload_id: String,
+}
+
+/// Response containing the status of a requested workload.
+#[derive(Debug, Clone, PartialEq)]
+pub struct WorkloadStatusResponse {
+    pub workload_status: WorkloadStatus,
+}
+
+/// Request to stop a running workload.
+#[derive(Debug, Clone, PartialEq)]
+pub struct WorkloadStopRequest {
+    pub workload_id: String,
+}
+
+/// Response after attempting to stop a workload.
+#[derive(Debug, Clone, PartialEq)]
+pub struct WorkloadStopResponse {
+    pub workload_status: WorkloadStatus,
+}

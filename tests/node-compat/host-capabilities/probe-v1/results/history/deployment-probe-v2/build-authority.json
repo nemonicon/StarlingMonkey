@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "state": "ROOT_STANDARD_WASI_DEPLOYMENT_PROBE_BUILD_V1",
+  "source": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/probe-v1/probe.c",
+    "sha256": "c2b205eba20730f3aff6e20841d320fa8614fdb6c4abad8deb903c2673faea1b",
+    "bytes": 9895
+  },
+  "world": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/probe-v1/profile.wit",
+    "sha256": "c8a5334f32266904e96ac70f8608d8147d0fdb89322e4b453db3792afcadaab8",
+    "bytes": 471
+  },
+  "generatedBindingsBefore": {
+    "path": "/Users/dan/dev/StarlingMonkey/host-apis/wasi-0.2.10/bindings/bindings.c",
+    "sha256": "af92e5d6cd38f7463d8a6096dfa4f1d372f250dfc2c6a34b808fb3fe89d782da",
+    "bytes": 324214
+  },
+  "generatedHeader": {
+    "path": "/Users/dan/dev/StarlingMonkey/host-apis/wasi-0.2.10/bindings/bindings.h",
+    "sha256": "65d87ea7ee6f846139addc8177050fd4def9012de331c9997ccf80977105184e",
+    "bytes": 107308
+  },
+  "derivedBindings": {
+    "path": "/private/tmp/starling-node-compat/deployment-probe-v2/source/bindings.c",
+    "sha256": "8b18277945d85f3773dd75e1a5d80111a8c0879413c6ba1ec4e41c1c967da48e",
+    "bytes": 323613
+  },
+  "compiler": {
+    "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasi-sdk/85e6/bin/clang",
+    "sha256": "1aca933cc48d7e137804231e0ced1624052fe489562ab496d63ad9a23998c7fe",
+    "bytes": 140472
+  },
+  "wasmTools": {
+    "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+    "sha256": "b332dd79057dafdcc8a36ca933d0d499acea506b56b1ea28e28fbb036c9e713d",
+    "bytes": 17556208
+  },
+  "commands": [
+    [
+      "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasi-sdk/85e6/bin/clang",
+      "--target=wasm32-wasi",
+      "-std=c17",
+      "-O2",
+      "-DNDEBUG",
+      "-Wall",
+      "-Werror",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-nostartfiles",
+      "-Wl,--no-entry",
+      "-Wl,--gc-sections",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/source/probe.c",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/source/bindings.c",
+      "-o",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.core.wasm"
+    ],
+    [
+      "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+      "component",
+      "embed",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/wit",
+      "--world",
+      "profile",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.core.wasm",
+      "-o",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.embedded.wasm"
+    ],
+    [
+      "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+      "component",
+      "new",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.embedded.wasm",
+      "-o",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.component.wasm"
+    ],
+    [
+      "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+      "validate",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.component.wasm"
+    ],
+    [
+      "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+      "component",
+      "wit",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.component.wasm"
+    ],
+    [
+      "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+      "print",
+      "/private/tmp/starling-node-compat/deployment-probe-v2/probe.core.wasm"
+    ]
+  ],
+  "derivedRule": "Remove unused CLI run export wrapper and old-world force-link paragraph; keep all standard ABI implementations unchanged and embed selected WIT metadata separately.",
+  "guestOrHostExecutionAllowed": false,
+  "starlingMonkeyEngineChanged": false
+}

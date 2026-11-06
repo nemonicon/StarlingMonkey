@@ -4,6 +4,164 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-06. Overall roadmap: **in progress**.
 
+Next.js remains the immediate priority. The new runtime is **not yet linked**
+and the comprehensive Next app has **not yet run in Wasm**. The next gate is one
+combined source/build generation, dependency controls inside a real component,
+then the unchanged24 HTTP/action and2 browser contracts. Generic crypto/API
+expansion and cost work stay behind this gate.
+
+Current native generation is435 inputs/embedding3, Source V5. It includes the
+bounded Readable.toWeb extension, ALS's real strict-definition guard, three
+authenticated existing compile headers and Performance's actual include-path
+correction. All eight installed generators pass. An independent read-only
+review confirms the exact435 files, unchanged81 C/C++ bodies and three embedding
+files relative to V4. The [closure audit](tests/node-compat/frameworks/nextjs/next-native-header-closure-audit-v1/README.md)
+checks1,400 actual old dependencies,80 compile rows and661 quoted includes.
+The fresh fourth native build is running with386 support inputs. No linked
+engine or Next guest is accepted yet.
+
+Three failed attempts stay preserved: missing Rust `.in` support templates;
+ALS checking an unset CMake variable instead of the actual strict compile
+definition; then successful configuration but compilation failing at21/120 on
+`sequence.hpp`. The complete header audit additionally found existing `wizer.h`
+and `rust-encoding.h` omissions and the Performance target include-path defect.
+The corrected headers are exact reviewed donor bytes; generation of their
+prebuilt FFI content is not claimed. Failed WORKs and raw process results remain.
+
+The fresh [matched host controls](tests/node-compat/frameworks/nextjs/browser-phase-matched-host-root-results-v1/independent-data-review-v1/results.json)
+both finish0 clean: selected guest-JS facades and stock Node each pass24/24 HTTP,
+cache1→2, incremental Suspense with five chunks/shell0/ready2 and2/2 error-free
+browser checks. All14 browser responses per arm finish before context closure.
+The earlier aborted `/actions` fetch does not recur; its cause remains unresolved
+and the failed run is retained. Gates and profile behavior were not relaxed.
+
+The selective Preview1-to-P2 **guest adapter** is now published at`d30ade5b`,
+49,672 bytes, after an actual fresh native CLI build and one pruning invocation.
+Core validation and a complete93-body/seven-stub audit pass; stdout/stderr,
+filesystem and clocks remain, initial stdin is genuinely Badfd and terminal
+queries are non-TTY. No fake resource handles or host modifications are added.
+The [retained evidence](tests/node-compat/frameworks/nextjs/next-preview1-adapter-publish-v1/root-result.json)
+is supplemented by an actual small C-component construction: all twelve emitted
+interfaces are selected standard0.2.10, with no external Preview1 or custom
+interface. The unused outgoing-handler is correctly absent. The control retains
+and exercises real Preview1 syscall imports through this adapter. Its stock
+Wasmtime [deployment](tests/node-compat/host-capabilities/next-adapter-probe-v1/README.md)
+passes three HTTP requests with retained counters1,2,3:
+stdout/stderr, non-readable stdin, app-file reads, clocks, entropy and P2/cache
+controls all pass. All six construction/validation commands and the one host
+run finish cleanly; raw responses and import evidence are retained for replay.
+This is not a SpiderMonkey or Next result.
+
+**Target correction:** pinned wasmCloud2.11 P2 HTTP creates a fresh store for
+every request even in normal workloads with pool settings. The
+[primary-source finding](tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/README.md)
+makes retained Next server/cache state **unavailable on that path** under the
+WASI0.2.x/no-host-modification constraints. The earlier three cold counters are
+consistent with this. Wasmtime's tested explicit reuse remains the viable
+stateful target. wasmCloud instantiation/cold-request checks remain useful;
+they cannot establish the original retained-state success contract.
+
+The [combined Source generation](tests/node-compat/frameworks/nextjs/native-profile-candidate-v1/README.md)
+now contains430 native-policy inputs plus three embedding inputs. All eight
+installed-generator checks and all13 SDK syntax frontends pass. The latter
+include real HTTP/import registrations, VM, streaming zlib, Module/P2 startup
+and context/timer integration;13,508 dependency observations/1,204 unique files
+match authenticated inputs. No engine or guest was executed by these checks.
+Actual CMake support-copy closure and a fresh build runner are being prepared.
+
+The [stronger full Next host control](tests/node-compat/frameworks/nextjs/native-profile-host-v1-root-results/independent-data-review-v1/results.json)
+uses the real guest-JS classic streams, Events, decoder, candidate Buffer and
+same exported HTTP message classes. It finishes raw1 clean:19/24 HTTP checks,
+cache1→2 and both browser interactions pass. Actual SSR/query/action-result/
+Suspense calls fail on unsupported `Readable.toWeb`; the action POST also fails.
+The stream contains only `BRIDGE_FAILURE`, with no shell/ready markers. This
+exposes a required adapter hidden by earlier controls' stock Node streams.
+The exact failures, bodies, chunks, browser results and monitor are retained;
+they are **host evidence, not Next-in-Wasm evidence**. A bounded stream adapter
+now takes priority before the first complete build.
+
+The raw [future component entries](tests/node-compat/frameworks/nextjs/next-component-candidate-v1/README.md)
+are prepared for genuine deployed Next loading from`/app`, neutral readiness,
+fresh request ownership and explicitly configured origin. Models pass127 checks,
+including ownership on readiness/native-entry failure. Actual construction stays
+blocked on a compatible guest Preview1-to-P2 adapter: the old clock-only adapter
+stubs stdio and cannot supply this profile. Thirteen standard0.2.10 interfaces
+are selected; no extra imports, version relabeling or host modification is admitted.
+
+The direct-P2 [FS V3](tests/node-compat/foundation-fs/next-fs-candidate-v3/README.md)
+now has explicit sync/callback/promises exports, real ReadStream state, safe
+numeric constant inspection and41 host cases. Three actual SDK frontends pass;
+[portable raw evidence](tests/node-compat/foundation-fs/next-fs-sdk-root-results-v1/README.md)
+retains3,080 postcompile dependency records. These are not runtime ownership,
+GC, nested-mount or rights proofs. Next still needs its actual `/app/.next/cache`
+layout and any additional writes validated with real preopens.
+
+[Native ALS V3](tests/node-compat/async-context/native-als-candidate-v3/README.md)
+now passes all13 actual SDK syntax commands, raw0/clean with unchanged protected
+inputs. V2's11 failures are retained: a nonexistent SpiderMonkey handle constant
+and an unrooted report-global argument. V3 fixes those exact APIs. Native Promise,
+await, timer/tick and concurrent-request behavior is still unexecuted. The join
+must retain V3's corrected default while adding Timer's virtual methods.
+
+The held startup/timer/Buffer/RNG Sources now cover actual Next demand with exact
+versioned exports. Startup has195 host cases; timers46; Buffer134; RuntimeOnly
+RNG46. The full Buffer host control passes24HTTP+2browser, but other host modules
+still emit Node Buffers, so it does not establish complete guest Buffer demand.
+The startup successor corrects native Performance's Unix epoch and precision;
+its six focused SDK frontend checks have been authorized and are pending results.
+
+[Streaming zlib Source](tests/node-compat/foundation-zlib/next-streaming-candidate-v1/README.md)
+is sealed at`10947d2a`:28 host cases cover actual Gzip/Deflate members, flush,
+backpressure, pause/destroy and26 balanced adapter opens/closes. Native contexts
+remain uncompiled. Its alternative manifest replaces the old sync-only zlib
+selection when enabled; it must not create duplicate node:zlib declarations.
+
+Root's HTTP module/private hosting factory now passes62 focused host checks;
+the explicit tty/inspector/v8/dns-promises surfaces pass422 binding/failure checks.
+These are real finite guest factories and uncompiled native registrations.
+Unsupported operations throw on call/new; inspection remains safe. The standard
+HTTP adapter enters the real native fresh-request boundary before creating any
+body/Request, and shared readiness is prepared in a neutral server resource.
+The existing Node bridge control remains distinct from native context execution.
+
+Actual Next client-reference manifests require `vm.runInNewContext`; an import
+stub would break rendering. A bounded real SpiderMonkey realm/evaluation Source
+is being finalized with19 actual manifest oracles and161 host data/model checks.
+Full Contextify semantics, asynchronous sandbox mutation, security isolation and
+timeouts are not claimed. Root is composing these candidates from frozen9aec,
+preserving old crypto/zlib/timer changes and producing fresh Source/build records
+instead of casting old metadata counts.
+
+Previous goal turn: **progress**. Checkpoint `5fe139b7` was committed and pushed;
+the checkout and origin/main matched before this continuation. The active target
+remains the full unchanged Next app running in Wasm, with all original contracts.
+
+New real deployment evidence now exists in the
+[standard-WASI probe](tests/node-compat/host-capabilities/probe-v1/results/summary.json).
+The93,929-byte C component `32830d39` validates and imports exactly ten selected
+standard0.2.10 interfaces: CLI environment, wall/monotonic clocks, filesystem
+types/preopens, HTTP types, IO error/poll/streams and secure random. Its only
+component export is incoming-handler; no adapter or Preview1 import is used.
+This is a genuine Wasm guest deployment control, **not StarlingMonkey or Next**.
+
+Stock Wasmtime42.0.1 serves six successful responses: default lifetime counters
+`[1,1,1]`; explicit `--max-instance-reuse-count32 --idle-instance-timeout60s`
+gives`[1,2,3]`. Official wasmCloud2.11.0 wash dev serves three successes with
+`[1,1,1]`. Both pass selected env, fresh RNG samples, wall/monotonic+poll, app
+file read and denied create, and cache create/write/read/link/EEXIST7/rename/
+unlink. Both report initial-cwd absent and preopen flags33. Read-only app tests
+use owned Unix555/444 modes; narrowed per-preopen WASI rights are **not** proved.
+No host source/binary was modified. All three host modes stop raw0 clean.
+
+Pinned primary source confirms Wasmtime's supported reuse options and wasmCloud's
+warm-instance policy. The pinned wash dev main component hardcodes ephemeral
+limits; normal warm-workload deployment remains a separate unexecuted gate.
+Startup therefore explicitly initializes the shared logical cwd to`/app` after
+deployed bootstrap. The first probe compile failed on an invented tuple-free
+helper and was corrected to the actual list-free API. The second built/validated
+successfully but its whole-text Preview1 assertion matched debug strings; the
+corrected audit checks actual import declarations. Earlier attempts stay failed.
+
 Current priority, at the user's request: **get the actual comprehensive Next.js
 application running successfully in Wasm**. The previous goal turn made progress
 and pushed `4a3c6a7b`; the current checkout was clean before this work. No clock

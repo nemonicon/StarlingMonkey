@@ -1,0 +1,86 @@
+"""Delegated Root: one adapter CLI then DATA validate/print, no Wasm execution."""
+from pathlib import Path
+import hashlib,importlib.util,json,os,stat,sys,traceback
+HERE=Path(__file__).resolve().parent
+OUTPUT=Path('/private/tmp/starling-node-compat/next-preview1-adapter-v1')
+MONITOR=HERE.parents[2]/'foundation-crypto/ownership-gc-build-controller-candidate-v1/monitor.py'
+def row(path):
+    p=Path(path);h=hashlib.sha256()
+    with p.open('rb')as f:
+        for b in iter(lambda:f.read(4*1024**2),b''):h.update(b)
+    return dict(path=str(p),sha256=h.hexdigest(),bytes=p.stat().st_size)
+def checked(r):
+    p=Path(r['path']);assert p.is_absolute()and'..'not in p.parts
+    assert all(not x.is_symlink()for x in(p,*p.parents));s=p.stat()
+    assert row(p)=={k:r[k]for k in('path','sha256','bytes')};t=p.stat()
+    assert(s.st_dev,s.st_ino,s.st_mode,s.st_nlink,s.st_size,s.st_mtime_ns,s.st_ctime_ns)==(t.st_dev,t.st_ino,t.st_mode,t.st_nlink,t.st_size,t.st_mtime_ns,t.st_ctime_ns)
+    return p
+def write(p,value):
+    p=Path(p);data=value if isinstance(value,bytes)else(json.dumps(value,indent=2)+'\n').encode()
+    fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+    with os.fdopen(fd,'wb')as f:os.fchmod(f.fileno(),0o600);f.write(data);f.flush();os.fsync(f.fileno())
+def family(r):
+    p=checked(r);j=json.loads(p.read_text());assert{r['path']for r in j['files']}=={str(x.relative_to(p.parent))for x in p.parent.rglob('*')if x.is_file()and x!=p}
+    for item in j['files']:checked(dict(item,path=str(p.parent/item['path'])))
+def original_inputs(a):
+    ledger=json.loads(checked(a['buildCompleteLedger']).read_text())
+    assert len(ledger['files'])==15433 and len(ledger['trees'])==5
+    for path,item in ledger['files'].items():
+        p=checked(item['descriptor']);s=p.stat();assert item['identity']==dict(mode=stat.S_IMODE(s.st_mode),device=s.st_dev,inode=s.st_ino,nlink=s.st_nlink,bytes=s.st_size,mtimeNs=s.st_mtime_ns,ctimeNs=s.st_ctime_ns),path
+    for tree in ledger['trees']:
+        p=Path(tree['root']);assert sorted(str(x.relative_to(p))for x in p.rglob('*')if x.is_file())==tree['files']
+        assert sorted(str(x.relative_to(p))for x in p.rglob('*')if x.is_dir())==tree['directories']
+    for r in a['pins'].values():checked(r)
+    family(a['sourceIndex']);family(a['actualCliBuildIndex'])
+    return dict(files=15433,trees=5,unchanged=True)
+def clean(t):
+    return t['rawExitCode']==0 and t['timeout']is False and t['forcedCleanup']is False and t['parentOwnedGroupGone']is True and t['allObservedOwnedGroupsGone']is True and all(t[k]==[]for k in('signals','interruptedSignals','errors','remainingObservedPids'))
+def load(path,name):
+    s=importlib.util.spec_from_file_location(name,path);m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
+def main():
+    assert __debug__and sys.flags.isolated and sys.dont_write_bytecode
+    a=json.loads((HERE/'authority.json').read_text());assert a['state']=='ROOT_DELEGATED_NEXT_SELECTIVE_ADAPTER_PUBLICATION_V1'and a['selectiveAdapterInvocationsAllowed']==1
+    assert a['wasmDataValidateAndPrintAllowed']is True and a['engineOrGuestExecutionAllowed']is False
+    assert not OUTPUT.exists();before=original_inputs(a)
+    assert (HERE/'core_data.py').read_bytes()==checked(a['pureCoreReader']).read_bytes()
+    os.umask(0o077);OUTPUT.mkdir(mode=0o700);(OUTPUT/'tmp').mkdir(mode=0o700)
+    monitor=load(checked(a['pins']['monitor']),'original_owned_monitor')
+    commands=[];error=None;after=None;audit_result=None;published=None
+    env={k:os.environ[k]for k in('HOME','USER','LOGNAME','CODEX_HOME')if k in os.environ};env.update(PATH='/usr/bin:/bin',TMPDIR=str(OUTPUT/'tmp'),LC_ALL='C',LANG='C')
+    raw=OUTPUT/'raw-selective-adapter.wasm'
+    def command(label,argv,cap):
+        directory=OUTPUT/label;directory.mkdir(mode=0o700)
+        terminal=monitor.monitor(argv,str(OUTPUT),env,directory,cap,row(HERE/'authority.json'))
+        record=dict(label=label,argv=argv,terminal=row(directory/'terminal.json'),rawExitCode=terminal['rawExitCode'],clean=clean(terminal))
+        commands.append(record);assert clean(terminal),label+' actual failure'
+        return terminal
+    try:
+        command('selective-cli',[a['pins']['newCli']['path'],'prune-next-http-adapter','--input',a['pins']['normalizedInput']['path'],'--output',str(raw)],120)
+        assert raw.is_file()and not raw.is_symlink()and stat.S_IMODE(raw.stat().st_mode)==0o600
+        # Capture before semantic assertions. This private raw file is never an
+        # accepted/published adapter merely because the producer returned0.
+        write(OUTPUT/'raw-candidate.json',row(raw))
+        command('wasm-tools-validate',[a['pins']['wasmTools']['path'],'validate',str(raw)],60)
+        command('wasm-tools-print',[a['pins']['wasmTools']['path'],'print',str(raw)],60)
+        audit=load(checked(a['pins']['auditSource']),'next_core_audit')
+        audit_result=audit.audit(checked(a['pins']['normalizedInput']).read_bytes(),raw.read_bytes())
+        write(OUTPUT/'core-data-audit.json',audit_result)
+        after=original_inputs(a)
+        target=OUTPUT/'next-preview1-adapter.wasm';write(target,raw.read_bytes())
+        assert target.read_bytes()==raw.read_bytes()and stat.S_IMODE(target.stat().st_mode)==0o600 and target.stat().st_nlink==1
+        published=row(target)
+    except BaseException as e:error=dict(type=type(e).__name__,message=str(e),stack=traceback.format_exc())
+    finally:
+        try:final=original_inputs(a)
+        except BaseException as e:final=dict(unchanged=False,type=type(e).__name__,message=str(e));published=None
+        passed=error is None and audit_result is not None and published is not None and final.get('unchanged')is True
+        result=dict(schemaVersion=1,state='NEXT_SELECTIVE_ADAPTER_CORE_DATA_VALIDATED_V1'if passed else'NEXT_SELECTIVE_ADAPTER_FAILURE_PRESERVED_V1',passed=passed,
+          authority=row(HERE/'authority.json'),sourceIndex=a['sourceIndex'],actualCliBuildIndex=a['actualCliBuildIndex'],nativeCli=a['pins']['newCli'],normalizedInput=a['pins']['normalizedInput'],
+          rawCandidate=row(raw)if raw.is_file()else None,publishedAdapter=published,commands=commands,error=error,initialProtection=before,finalProtection=final,
+          coreAudit=row(OUTPUT/'core-data-audit.json')if(OUTPUT/'core-data-audit.json').exists()else None,
+          wasmPrintedData=row(OUTPUT/'wasm-tools-print/stdout.log')if(OUTPUT/'wasm-tools-print/stdout.log').exists()else None,
+          final13InterfaceComponentVersionResourceClosureProved=False,engineOrGuestExecuted=False,globalPinsOrPackageModified=False)
+        write(OUTPUT/'result.json',result);write(HERE/'root-result.json',result)
+        print(json.dumps(dict(result=row(OUTPUT/'result.json'),passed=passed,publishedAdapter=published,error=error)),flush=True)
+    return 0 if passed else 1
+if __name__=='__main__':raise SystemExit(main())

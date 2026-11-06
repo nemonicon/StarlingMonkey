@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "state": "NEXT_ADAPTER_C_BUILD_PASSED_V1",
+  "passed": true,
+  "phase": "build",
+  "authority": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/next-adapter-probe-v1/authority.json",
+    "sha256": "321308767a9a2ebb49e5af8364d297d2196f1399ce4bcbc149502c209cf02478",
+    "bytes": 882
+  },
+  "plan": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/next-adapter-probe-v1/plan.json",
+    "sha256": "565a47e9c0be5896dc903c308a20b0e6110ea20ed2a9b24655f55df78a66c920",
+    "bytes": 12635
+  },
+  "commands": [
+    {
+      "label": "compile",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasi-sdk/85e6/bin/clang",
+        "--target=wasm32-wasi",
+        "-std=c17",
+        "-O2",
+        "-DNDEBUG",
+        "-Wall",
+        "-Werror",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-nostartfiles",
+        "-Wl,--no-entry",
+        "-Wl,--gc-sections",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/next-adapter-probe-v1/probe.c",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/next-adapter-probe-v1/bindings.c",
+        "-o",
+        "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/probe.core.wasm"
+      ],
+      "capSeconds": 120,
+      "terminal": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/compile/terminal.json",
+        "sha256": "bbb22a8fd330f64e76236d0bb9f5217ef712d24b2b3558ed6494a2748a7134cd",
+        "bytes": 1666
+      },
+      "stdout": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/compile/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/compile/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "clean": true,
+      "rawExitCode": 0
+    },
+    {
+      "label": "embed",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+        "component",
+        "embed",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/next-adapter-probe-v1",
+        "--world",
+        "next-http",
+        "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/probe.core.wasm",
+        "-o",
+        "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/probe.embedded.wasm"
+      ],
+      "capSeconds": 120,
+      "terminal": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/embed/terminal.json",
+        "sha256": "062bee4f2fb08da084c79f76cfb47c54d3e566bffd41433e9becfdb09fd30157",
+        "bytes": 1346
+      },
+      "stdout": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/embed/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/embed/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "clean": true,
+      "rawExitCode": 0
+    },
+    {
+      "label": "compose-adapter",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+        "component",
+        "new",
+        "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/probe.embedded.wasm",
+        "--adapt",
+        "wasi_snapshot_preview1=/private/tmp/starling-node-compat/next-preview1-adapter-v1/next-preview1-adapter.wasm",
+        "--merge-imports-based-on-semver=true",
+        "-o",
+        "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/probe.component.wasm"
+      ],
+      "capSeconds": 120,
+      "terminal": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/compose-adapter/terminal.json",
+        "sha256": "eee1dc6934fbdb6b419570f78bfb6f3c5ee4ad1789661112f0d52612626556bd",
+        "bytes": 1359
+      },
+      "stdout": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/compose-adapter/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/compose-adapter/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "clean": true,
+      "rawExitCode": 0
+    },
+    {
+      "label": "component-validate",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+        "validate",
+        "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/probe.component.wasm"
+      ],
+      "capSeconds": 120,
+      "terminal": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/component-validate/terminal.json",
+        "sha256": "b02252655548cf5db54117d63fc8a4d671cc1aaef3f378344c576e9871cf9827",
+        "bytes": 1370
+      },
+      "stdout": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/component-validate/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/component-validate/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "clean": true,
+      "rawExitCode": 0
+    },
+    {
+      "label": "component-wit",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+        "component",
+        "wit",
+        "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/probe.component.wasm"
+      ],
+      "capSeconds": 120,
+      "terminal": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/component-wit/terminal.json",
+        "sha256": "1180a3e9dba0bc9d02c6b06ce097ba2989ab7ef66b33cfdce00d86449239291b",
+        "bytes": 1365
+      },
+      "stdout": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/component-wit/stdout.log",
+        "sha256": "08c1cb3191cc901c1dfc167f04cb4e8c655485b435e2ebf080a81558fb365c93",
+        "bytes": 8281
+      },
+      "stderr": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/component-wit/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "clean": true,
+      "rawExitCode": 0
+    },
+    {
+      "label": "core-print",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools",
+        "print",
+        "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/probe.core.wasm"
+      ],
+      "capSeconds": 120,
+      "terminal": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/core-print/terminal.json",
+        "sha256": "20cdf03174d4f53d6564ca71f497de9a2a2748e3f8f6d5ad6108268042b00fab",
+        "bytes": 1446
+      },
+      "stdout": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/core-print/stdout.log",
+        "sha256": "159e0068442587ae2d52ebe94e95da3c1f6eb2cde2a03ba10859101ad634cc55",
+        "bytes": 519165
+      },
+      "stderr": {
+        "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/core-print/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "clean": true,
+      "rawExitCode": 0
+    }
+  ],
+  "error": null,
+  "initialProtection": {
+    "sdkFiles": 10114,
+    "sdkLinks": 31
+  },
+  "finalProtection": {
+    "unchanged": true,
+    "sdkFiles": 10114,
+    "sdkLinks": 31,
+    "sdkBytes": 366304928
+  },
+  "componentAudit": {
+    "path": "/private/tmp/starling-node-compat/next-adapter-probe-v1-build/component-audit.json",
+    "sha256": "8b63849313cc00ba195f142e4223931869e3756d06faceaba4808b3bed97728f",
+    "bytes": 4635
+  },
+  "hostResult": null,
+  "engineJSNextExecuted": false,
+  "hostModified": false
+}

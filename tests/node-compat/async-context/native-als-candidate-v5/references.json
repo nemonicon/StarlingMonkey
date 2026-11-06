@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "parentAlsV4Index": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/native-als-candidate-v4/index.json",
+    "sha256": "c0c560ab0bc0b6bed2ae43fbb931cb9e3e3476a450be6816ac066bf57127db6c",
+    "bytes": 2048
+  },
+  "baseComposedCMake": {
+    "path": "/private/tmp/starling-node-compat/next-native-profile-v3/source/cmake/builtins.cmake",
+    "sha256": "cf9927f2b96cff1be16c1477de59cf886a8e27343e48877f21771ff11f662df0",
+    "bytes": 24053
+  },
+  "failedConfiguredCMake": {
+    "path": "/private/tmp/starling-node-compat/next-native-build-v2/native-source/cmake/builtins.cmake",
+    "sha256": "cf9927f2b96cff1be16c1477de59cf886a8e27343e48877f21771ff11f662df0",
+    "bytes": 24053
+  },
+  "cmakeTool": {
+    "path": "/opt/homebrew/Cellar/cmake/4.3.3/bin/cmake",
+    "sha256": "21cc7838296a3b72bea03d332b3fe39d189807d641b16ef46975d0f9f688f769",
+    "bytes": 13617432
+  },
+  "localizedEdit": {
+    "path": "cmake/builtins.cmake",
+    "before": "    if(NOT TARGET builtin_node_compat OR NOT NODE_COMPAT_INTERNAL_TICKS OR NOT NODE_COMPAT_STRICT_INITIALIZATION)\n        message(FATAL_ERROR \"Native ALS requires Node compatibility and private tick checkpoints\")\n    endif()\n",
+    "after": "    if(NOT TARGET builtin_node_compat OR NOT TARGET extension_api OR NOT NODE_COMPAT_INTERNAL_TICKS)\n        message(FATAL_ERROR \"Native ALS requires Node compatibility and private tick checkpoints\")\n    endif()\n    # Strict initialization is an INTERFACE compile definition, not a CMake\n    # option. Check the actual producer target rather than an unset variable.\n    get_target_property(NODE_COMPAT_ALS_EXTENSION_DEFINITIONS extension_api INTERFACE_COMPILE_DEFINITIONS)\n    if(NOT \"NODE_COMPAT_STRICT_INITIALIZATION=1\" IN_LIST NODE_COMPAT_ALS_EXTENSION_DEFINITIONS)\n        message(FATAL_ERROR \"Native ALS requires strict initialization on extension_api\")\n    endif()\n    unset(NODE_COMPAT_ALS_EXTENSION_DEFINITIONS)\n"
+  },
+  "nativeCppChanged": false,
+  "newNativePaths": 0,
+  "changedExistingNativePaths": 1,
+  "rawMetadataProjected": false,
+  "rootAuthority": null,
+  "actualBuild": null,
+  "actualRuntime": null,
+  "allActionsAllowed": false
+}

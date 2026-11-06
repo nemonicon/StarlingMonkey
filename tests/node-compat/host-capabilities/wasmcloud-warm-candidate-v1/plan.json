@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "state": "UNAVAILABLE_P2_WARM",
+  "readOnlyResearch": true,
+  "actionAuthorization": null,
+  "actualDeploymentResult": null,
+  "hostOrNatsLaunched": false,
+  "guestExecuted": false,
+  "hostModified": false,
+  "sourceCommit": "bc5acfb8e15f7d6d199ca940354d82e590c2d5ff",
+  "component": {
+    "path": null,
+    "sha256": "32830d393ceccc7aaf7f399bd6816ab54928cc240db9b228352b3f16d2f1d720",
+    "bytes": 93929,
+    "standardImports": 10,
+    "httpVersion": "0.2.10",
+    "unchanged": true
+  },
+  "warmReuse": {
+    "desiredCounters": [
+      1,
+      2,
+      3
+    ],
+    "supportedForUnchangedProbeByPinnedNormalHttpPath": false,
+    "reason": "P2 HTTP unconditionally creates a fresh store and instance per request; the pooling branch requires targets_p3.",
+    "sourceExpectedCounters": [
+      1,
+      1,
+      1
+    ],
+    "actualCounters": null,
+    "poolPolicyStillExpressible": {
+      "poolSize": 1,
+      "maxInvocations": 32,
+      "maxConcurrency": 1,
+      "reclaimWindowSeconds": 0
+    },
+    "notAnAuthorizedAlternative": [
+      "host patch",
+      "new P3 guest",
+      "nonstandard guest host service"
+    ]
+  },
+  "transport": {
+    "encoding": "UTF-8 JSON generated protobuf serde, not protobuf binary or gRPC",
+    "discoverySubscription": "runtime.operator.heartbeat.*",
+    "hostIdSource": "exact single private-host heartbeat.id, checked against subject suffix",
+    "startSubject": "runtime.host.<hostId>.workload.start",
+    "statusSubject": "runtime.host.<hostId>.workload.status",
+    "stopSubject": "runtime.host.<hostId>.workload.stop",
+    "heartbeatSubject": "runtime.host.<hostId>.heartbeat",
+    "requestReply": "SUB a fresh _INBOX subject, flush using PING/PONG, PUB subject inbox byteLength CRLF json CRLF; bounded MSG reader handles PING/INFO/-ERR",
+    "runningState": "WORKLOAD_STATE_RUNNING",
+    "requestDeadlineSeconds": 60,
+    "discoveryDeadlineSeconds": 30,
+    "noAmbientServer": true
+  },
+  "artifacts": {
+    "normalReceiver": "ComponentSource::Oci unconditionally",
+    "fileUrlAcceptedByNormalReceiver": false,
+    "registry": "fresh stock zot minimal, bound only to 127.0.0.1",
+    "push": "stock wash oci push <localhost-reference:unique-tag> <authenticated-93929B-component> --insecure",
+    "startImage": "same localhost repository pinned to the actual returned OCI manifest digest",
+    "ociManifestDigestIsComponentSha256": false,
+    "cache": "fresh --oci-cache-dir populated by genuine OCI pull; never fabricate scoped cache entries",
+    "ambientCredentials": "fresh DOCKER_CONFIG containing empty auths plus isolated XDG and explicit empty wash user config; no account login"
+  },
+  "proposedDownloadsNotExecuted": [
+    {
+      "name": "nats-server",
+      "version": "2.15.2",
+      "platform": "darwin-arm64",
+      "url": "https://github.com/nats-io/nats-server/releases/download/v2.15.2/nats-server-v2.15.2-darwin-arm64.tar.gz",
+      "bytes": 6785830,
+      "sha256": "cbd2219d01502c38733485ac684269da585ee479fa3b1377264beecdefdf9e9d",
+      "checksumFile": "nats-SHA256SUMS"
+    },
+    {
+      "name": "zot-minimal",
+      "version": "2.1.22",
+      "platform": "darwin-arm64",
+      "url": "https://github.com/project-zot/zot/releases/download/v2.1.22/zot-darwin-arm64-minimal",
+      "bytes": 76420498,
+      "sha256": "c81a26040ae79c7e8a90c306a2377c69982a86ff35c259427bd9accea0eca14c",
+      "checksumFile": "zot-checksums.sha256.txt"
+    }
+  ],
+  "futurePrivateScope": {
+    "root": null,
+    "natsPort": null,
+    "registryPort": null,
+    "httpPort": null,
+    "hostId": null,
+    "ociDigestReference": null,
+    "nats": "fresh loopback-only core NATS; no cluster/leafnode/account import, no existing NATS state",
+    "zot": "fresh own storage directory, no registry extensions/sync/proxy/auth integration",
+    "wash": "pinned existing stock wash2.11.0; fresh user config/XDG/DOCKER_CONFIG/OCI cache/scratch; only explicit app/cache allowed-host-paths",
+    "ownership": "all future processes under original owned monitor, finite readiness/RPC/HTTP deadlines, complete raw streams and TERM/KILL cleanup; no launch under this plan"
+  },
+  "normalRightsOnlyFutureChecks": {
+    "appHostDirectoryWritableByHostOwner": true,
+    "hostNativeCreateControlRequired": true,
+    "appDescriptorFlagsExpected": 1,
+    "cacheDescriptorFlagsExpected": 33,
+    "appReadFixtureExpected": true,
+    "appCreateExpected": false,
+    "directCacheOperations": [
+      "create",
+      "write",
+      "read",
+      "link",
+      "second-link EEXIST",
+      "rename",
+      "unlink"
+    ],
+    "nestedPreopenOnly": "/app/.next/cache",
+    "nestedPathOperationsProvedByUnchangedProbe": false,
+    "longestPreopenRoutingProved": false,
+    "hostReadonlyModeIsOnlyPolicyEvidence": false
+  },
+  "remainingDecisions": [
+    "Whether a normal rights-only P2 deployment is worth running after the source-confirmed warm blocker",
+    "A different stock host with demonstrated P2 reuse, or a separately scoped standard P3 component/engine path, is needed for the wasmCloud warm gate",
+    "Actual nested-path operations require a new separately reviewed probe or real Next native-FS control; listing a nested preopen is insufficient"
+  ],
+  "deploymentWorkStopped": true
+}

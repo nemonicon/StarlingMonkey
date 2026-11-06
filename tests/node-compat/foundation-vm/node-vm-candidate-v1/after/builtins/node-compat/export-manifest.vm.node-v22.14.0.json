@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "profileVersion": "sm-node-22.14.0-m1.1",
+  "nodeVersion": "v22.14.0",
+  "status": "Source-only uncompiled finite-data VM. No native/frontend/runtime acceptance.",
+  "modules": {
+    "node:vm": {
+      "aliases": [
+        "vm"
+      ],
+      "status": "partial",
+      "exports": [
+        "Script",
+        "compileFunction",
+        "constants",
+        "createContext",
+        "createScript",
+        "default",
+        "isContext",
+        "measureMemory",
+        "runInContext",
+        "runInNewContext",
+        "runInThisContext"
+      ],
+      "supportedStatic": [
+        "runInNewContext",
+        "constants"
+      ],
+      "unsupportedStatic": [
+        "Script",
+        "compileFunction",
+        "createContext",
+        "createScript",
+        "isContext",
+        "measureMemory",
+        "runInContext",
+        "runInThisContext"
+      ],
+      "callablePolicy": "Real native JS_NewGlobalObject/Evaluate in a distinct same-compartment realm; deployed-only finite own-data copy-in/out. No parser replacement or host provider. Other callable/constructor operations throw ERR_SM_NODE_VM_UNSUPPORTED. Constants expose two meaningful unique readonly symbols: DONT_CONTEXTIFY(vm_context_no_contextify) and USE_MAIN_CONTEXT_DEFAULT_LOADER(vm_dynamic_import_main_context_default); consuming these flags is deferred.",
+      "limits": {
+        "sourceBytes": 1048576,
+        "dataBytes": 16777216,
+        "objects": 8192,
+        "properties": 32768,
+        "arrayLength": 131072,
+        "depth": 48,
+        "synchronousNesting": 4
+      },
+      "deviations": [
+        "No security sandbox or internal CPU timeout guarantee; real caller-owned deadline bounds an ordinary execution.",
+        "Only extensible plain object sandboxes, finite numbers, strings, booleans, null, undefined, ordinary objects/null-prototype objects and arrays; no proxies/getters/setters/symbol or BigInt data/functions/exotics/cycles/readonly properties.",
+        "Context root identity is retained and copied changes/deletions visible; nested input identities/prototypes, persistent Contextify/lexical state and asynchronous mutation parity are not claimed.",
+        "Only default options or filename string/plain filename option supported; timeout/microtaskMode/codeGeneration/importModuleDynamically/context flags and other options explicitly refuse.",
+        "No Node host bindings are injected. Math.random follows existing native entropy policy. Any Promise allocation, rejected async task or queued data-realm job refuses; no silent async-result success.",
+        "Whole original thrown values propagate across the shared compartment; copied output is bounded. Copy-out failure is retained privately and cannot turn a thrown call into success.",
+        "INIT realm creation/evaluation is denied using genuine reviewed deployed_execution_started barrier; no deployed re-snapshot/reset claim."
+      ]
+    }
+  },
+  "requiredHostInterfaces": [],
+  "moduleContract": "Exact default-flags Node22.14 VM11 export inventory/10 default members and two typed symbol constants. Only real native runInNewContext with explicit finite-data copy is proposed; other operations/constructor/context flags defer with coded errors. No host VM adapter, parser replacement or security-sandbox claim."
+}

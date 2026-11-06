@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "builtins/node-compat/register.cpp",
+      "edits": [
+        {
+          "before": "#include \"factories.generated.h\"",
+          "after": "#include \"factories.generated.h\"\n#ifdef NODE_COMPAT_NEXT_HTTP\n#include \"next-http/next-http.h\"\n#endif\n#ifdef NODE_COMPAT_NEXT_IMPORTS\n#include \"next-imports/next-imports.h\"\n#endif"
+        },
+        {
+          "before": "  return JS_DefineProperty(cx, engine->global(), \"Buffer\", buffer_constructor, 0);",
+          "after": "#ifdef NODE_COMPAT_NEXT_IMPORTS\n  if (!install_next_imports(engine)) return false;\n#endif\n#ifdef NODE_COMPAT_NEXT_HTTP\n  if (!install_next_http(engine)) return false;\n#endif\n  return JS_DefineProperty(cx, engine->global(), \"Buffer\", buffer_constructor, 0);"
+        }
+      ]
+    },
+    {
+      "path": "cmake/builtins.cmake",
+      "edits": [
+        {
+          "before": "if(NODE_CRYPTO_AUDITED_BORROW AND NOT NODE_COMPAT_CRYPTO_HASH_HMAC)\n    message(FATAL_ERROR \"NODE_CRYPTO_AUDITED_BORROW requires NODE_COMPAT_CRYPTO_HASH_HMAC\")\nendif()",
+          "after": "if(NODE_CRYPTO_AUDITED_BORROW AND NOT NODE_COMPAT_CRYPTO_HASH_HMAC)\n    message(FATAL_ERROR \"NODE_CRYPTO_AUDITED_BORROW requires NODE_COMPAT_CRYPTO_HASH_HMAC\")\nendif()\n\n# Experimental finite import-only surfaces. No new host capabilities.\noption(NODE_COMPAT_NEXT_IMPORTS \"Enable finite Next tty/inspector/v8/dns-promises imports\" OFF)\nif(NODE_COMPAT_NEXT_IMPORTS AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat)\n        message(FATAL_ERROR \"NODE_COMPAT_NEXT_IMPORTS requires ENABLE_BUILTIN_NODE_COMPAT=ON\")\n    endif()\n    target_sources(builtin_node_compat PRIVATE builtins/node-compat/next-imports/next-imports.cpp)\n    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_NEXT_IMPORTS=1)\nendif()\n\n# Node-shaped HTTP messages over the selected standard WASI guest entry.\noption(NODE_COMPAT_NEXT_HTTP \"Enable experimental Next HTTP message/hosting bindings\" OFF)\nif(NODE_COMPAT_NEXT_HTTP AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat)\n        message(FATAL_ERROR \"NODE_COMPAT_NEXT_HTTP requires ENABLE_BUILTIN_NODE_COMPAT=ON\")\n    endif()\n    foreach(NEXT_HTTP_PREREQUISITE ASYNC_LOCAL_STORAGE CLASSIC_STREAMS NEXT_STARTUP MODULE INTERNAL_TICKS)\n        if(NOT NODE_COMPAT_${NEXT_HTTP_PREREQUISITE})\n            message(FATAL_ERROR \"NODE_COMPAT_NEXT_HTTP requires NODE_COMPAT_${NEXT_HTTP_PREREQUISITE}=ON\")\n        endif()\n    endforeach()\n    # Bridge constructors/finish use these actual globals, including clearTimeout.\n    foreach(NEXT_HTTP_WEB fetch streams url timers)\n        if(NOT TARGET builtin_web_${NEXT_HTTP_WEB})\n            message(FATAL_ERROR \"NODE_COMPAT_NEXT_HTTP requires existing builtin_web_${NEXT_HTTP_WEB}\")\n        endif()\n    endforeach()\n    target_sources(builtin_node_compat PRIVATE builtins/node-compat/next-http/next-http.cpp)\n    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_NEXT_HTTP=1)\n    target_include_directories(builtin_node_compat PRIVATE \"${CMAKE_CURRENT_SOURCE_DIR}/runtime\")\n    add_dependencies(builtin_node_compat builtin_web_fetch builtin_web_streams builtin_web_url builtin_web_timers)\n    target_link_libraries(builtin_node_compat PRIVATE builtin_web_fetch builtin_web_streams builtin_web_url builtin_web_timers)\nendif()\n"
+        }
+      ]
+    }
+  ],
+  "base": {
+    "registrar": {
+      "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-freeze/source/builtins/node-compat/register.cpp",
+      "sha256": "7698e61ebf3dac01903d4b6567df76adc460a9c3da8f94dd1c9e528dc0ecbe4a",
+      "bytes": 16262
+    },
+    "cmake": {
+      "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-freeze/source/cmake/builtins.cmake",
+      "sha256": "f1d5721b4d58184a8ec30a3e421e1288fdcf1131f9035a4b8a3f6ca00bfeb76f",
+      "bytes": 14056
+    },
+    "role": "Frozen9aec original Source, not the evolving composed registrar"
+  },
+  "nativeMappings": [
+    {
+      "path": "builtins/node-compat/next-http/next-http.cpp",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-http/next-http-candidate-v1/next-http.cpp",
+        "sha256": "159c77044c2d4bd7eadb474ce133545cbe2afeb6a364817e7dbff085ddccc75c",
+        "bytes": 3335
+      },
+      "role": "native-cpp"
+    },
+    {
+      "path": "builtins/node-compat/next-http/next-http.h",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-http/next-http-candidate-v1/next-http.h",
+        "sha256": "c7eca76eb525446a9b149a702182903525434b6f77050fcc8ae5e1f4f5b024e1",
+        "bytes": 167
+      },
+      "role": "private-header"
+    },
+    {
+      "path": "builtins/node-compat/next-http/next-http-factory.generated.h",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-http/next-http-candidate-v1/next-http-factory.generated.h",
+        "sha256": "16001217b9f1997374523da702bf34f706d60b891f0a8f2bea1bc6bff8858e70",
+        "bytes": 20027
+      },
+      "role": "private-header"
+    },
+    {
+      "path": "builtins/node-compat/next-http/bridge.mjs",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-http/next-http-candidate-v1/bridge.mjs",
+        "sha256": "756580fcbb7940ea4fcd3135b9631b7c87c6a85b73d194b1adb251e9f28318f5",
+        "bytes": 10565
+      },
+      "role": "factory-source-or-generation-input"
+    },
+    {
+      "path": "builtins/node-compat/next-http/http-core.mjs",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-http/next-http-candidate-v1/http-core.mjs",
+        "sha256": "c1beb50845791cbaeaf140828b31eb53f1a1f01a8b0491a3f7f4c3eb7a3c84d7",
+        "bytes": 5699
+      },
+      "role": "factory-source-or-generation-input"
+    },
+    {
+      "path": "builtins/node-compat/next-http/inventory.node-v22.14.0.json",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-http/next-http-candidate-v1/inventory.node-v22.14.0.json",
+        "sha256": "cbfef3a91fea073a9fa3530e9f8c396c686efe76aa2b1b0193b387c707b39919",
+        "bytes": 4410
+      },
+      "role": "factory-source-or-generation-input"
+    },
+    {
+      "path": "builtins/node-compat/next-http/export-manifest.http.node-v22.14.0.json",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-http/next-http-candidate-v1/export-manifest.http.node-v22.14.0.json",
+        "sha256": "206e38e440cba9dd193736669b8543da9ef77eeb0bb21989983c25ece3cdbd79",
+        "bytes": 4113
+      },
+      "role": "selected-public-manifest"
+    },
+    {
+      "path": "builtins/node-compat/next-http/private-http-export-manifest.v1.json",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-http/next-http-candidate-v1/private-http-export-manifest.v1.json",
+        "sha256": "5d2c924717cb61af9d01c7e9d5eb5d0417557c9abc906353b95089763eab3c51",
+        "bytes": 617
+      },
+      "role": "private-export-manifest"
+    },
+    {
+      "path": "builtins/node-compat/next-http/generate-http-factory.mjs",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-http/next-http-candidate-v1/generate-http-factory.mjs",
+        "sha256": "0b78e5a9e4396d8dd728664dad2ed1ef81f644e84d3eda4b0f7ad17df0076206",
+        "bytes": 3529
+      },
+      "role": "factory-source-or-generation-input"
+    },
+    {
+      "path": "builtins/node-compat/next-imports/next-imports.cpp",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-next-imports/next-imports-candidate-v1/next-imports.cpp",
+        "sha256": "3c450134ca34d22533a451a18983278e55241845a880f035a7ea2f0e5ca4c757",
+        "bytes": 1282
+      },
+      "role": "native-cpp"
+    },
+    {
+      "path": "builtins/node-compat/next-imports/next-imports.h",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-next-imports/next-imports-candidate-v1/next-imports.h",
+        "sha256": "0359699a516a5ad0c11298636703d1a99f520868641e3d677c1eb7e1dd9e1bd0",
+        "bytes": 176
+      },
+      "role": "private-header"
+    },
+    {
+      "path": "builtins/node-compat/next-imports/next-imports-factory.generated.h",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-next-imports/next-imports-candidate-v1/next-imports-factory.generated.h",
+        "sha256": "0850c257938d65ddf8aae6f9812ea7a2ff14d542910480f853567c0e553a6897",
+        "bytes": 9333
+      },
+      "role": "private-header"
+    },
+    {
+      "path": "builtins/node-compat/next-imports/imports-core.mjs",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-next-imports/next-imports-candidate-v1/imports-core.mjs",
+        "sha256": "a12e75807401d52cd44db136a4a562270dbbb33cf42c0e9b626b1250309a5d8a",
+        "bytes": 1836
+      },
+      "role": "factory-source-or-generation-input"
+    },
+    {
+      "path": "builtins/node-compat/next-imports/inventory.node-v22.14.0.json",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-next-imports/next-imports-candidate-v1/inventory.node-v22.14.0.json",
+        "sha256": "920711a4c81dc5fcddf668f434a562a204ba0499317a911c05b642a97dc93569",
+        "bytes": 12799
+      },
+      "role": "factory-source-or-generation-input"
+    },
+    {
+      "path": "builtins/node-compat/next-imports/export-manifest.next-imports.node-v22.14.0.json",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-next-imports/next-imports-candidate-v1/export-manifest.next-imports.node-v22.14.0.json",
+        "sha256": "71580f598e6f35070b04cf5876e5f549157c346538aa9aba89ddf060e1e920de",
+        "bytes": 7816
+      },
+      "role": "selected-public-manifest"
+    },
+    {
+      "path": "builtins/node-compat/next-imports/generate-imports-factory.mjs",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-next-imports/next-imports-candidate-v1/generate-imports-factory.mjs",
+        "sha256": "dfd9af0132f14a0d6a834a08885edd2f1ba9701bf31560703c8e3a910d0d6c16",
+        "bytes": 1734
+      },
+      "role": "factory-source-or-generation-input"
+    }
+  ],
+  "guestEntryInputs": [
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-http/next-http-candidate-v1/wasi-adapter.mjs",
+      "sha256": "a366a2e064733c917f256a71ee9cfd07ea680a7810cbb992a5283c1c33757ff3",
+      "bytes": 5241
+    }
+  ],
+  "generatorContextPolicy": "Map each entire family into its own node-compat subdirectory so sibling includes/JS generator reads/output stay genuine. No root-level inventory filename collisions or namespace/global rebinding.",
+  "privateExports": {
+    "specifier": "starling:node-http",
+    "manifest": "builtins/node-compat/next-http/private-http-export-manifest.v1.json",
+    "exports": [
+      "createServerHandler",
+      "runFreshRequest",
+      "runNeutralServer"
+    ],
+    "publicNodeManifest": false
+  },
+  "requiredCallOrder": [
+    "Existing Buffer/events/classic modules registered before install_next_http",
+    "Compose startup/Module/ALS actual sources and flags; verify install_next_startup precedes install_next_http in final registrar",
+    "At ordinary deployed first entry, invoke createServerHandler(prepare) in neutral-server startup before first HTTP admission",
+    "Use createWasiHttpHandler(webHandler, types, actual hosting.runFreshRequest); whole body/header/Request conversion remains inside native fresh entry",
+    "Hosting handle awaits neutral readiness under same fresh owner, no second fresh owner"
+  ],
+  "newCapabilities": {
+    "NEXT_IMPORTS": [],
+    "NEXT_HTTP_nativeRegistration": [],
+    "separateGuestWasiAdapter": "Explicit standard wasi:http/types@0.2.10 plus required IO types; not a custom host service or Node socket/TLS implementation."
+  },
+  "sourceStatus": "Root-owned WIP snapshot; no final Source peer or operational authority created by this integration delta",
+  "compilerServerGuestActionsInvoked": false
+}

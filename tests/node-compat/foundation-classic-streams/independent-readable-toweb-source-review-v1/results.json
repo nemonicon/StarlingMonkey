@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "state": "BOUNDED_READABLE_TOWEB_SOURCE_REVIEW_PASSED_V1",
+  "sourceOnly": true,
+  "sourceReviewPassed": true,
+  "sourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/readable-toweb-candidate-v1/index.json",
+    "sha256": "60add956cd37861fde667e114a22a547418e48783be468e744bc2ff4f927f5a5",
+    "bytes": 6377
+  },
+  "reviewerAuthoredBridge": false,
+  "relationship": "Reviewer authored referenced Buffer candidate, Module and Startup work; not the classic stream core or this bridge.",
+  "scope": {
+    "familyMembersAuthenticated": 39,
+    "actualReferencesAuthenticated": 18,
+    "reviewerRanOwnerTests": false,
+    "retainedAuthorHostTests": 30,
+    "retainedAuthorNodeDifferentials": 14,
+    "hostApplicationExecutedByReviewer": false,
+    "nativeCompilerExecuted": false,
+    "engineOrGuestExecuted": false,
+    "operationalAuthorityIssued": false
+  },
+  "findings": [
+    {
+      "id": "ordinary-byte-ownership",
+      "severity": "no-blocker",
+      "detail": "Fixed attached unshared Uint8Array brand/window copy, lease bounds, byte budgets, pause/pull/resume/HWM, EOF/error/cancel cleanup use actual APIs; source method and controller variables stay ordinary GC-traced JS references."
+    },
+    {
+      "id": "native-constructor",
+      "severity": "no-blocker",
+      "detail": "runtime/engine.cpp create_content_global setsStreamsEnabled(true), then InitRealmStandardClasses. Registrar captures genuine ReadableStream; no host adapter import added."
+    },
+    {
+      "id": "integration",
+      "severity": "no-blocker",
+      "detail": "Generated header preserves original factory expression, replaces existing toWeb slot only; defaultOFF flag requires existing classic/native streams, m0.23 manifest replaces m0.12 aliases rather than selecting both."
+    },
+    {
+      "id": "manual-listener-mutation",
+      "severity": "bounded-limitation",
+      "detail": "lateErrorProtected is an installation-history WeakSet. Application removeAllListeners(error) after non-destroying manual error retirement can remove the shared no-op; rewrapping then retiring may skip reinstalling it. Existing repeated-error control assumes listeners stay installed. Universal application listener mutation/recovery resilience is not established."
+    }
+  ],
+  "qualifications": [
+    "cancel forwards destroy but does not await asynchronous _destroy completion",
+    "abandoned reader, GC finalizer, native Store death and HTTP teardown are not proved",
+    "retained host differentials use Node WebStream provider and host nextTick; native SpiderMonkey/ALSV4 scheduling/link/Next guest behavior remains untested",
+    "Object/decoded strings/custom strategy size/accessor option records/shared/resizable/detached domains refuse explicitly",
+    "No statement of full Node streams parity or closure of17 lifecycle gates"
+  ],
+  "materialOrdinaryNextPathBlockerFound": false,
+  "artifacts": [
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/readable-toweb-candidate-v1/readable-toweb.mjs",
+      "sha256": "1d42b4dc4dc8a4666da8e8c9ed688ed261e6b7c196d63d960afe8f8ae7ce07f1",
+      "bytes": 7935
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/readable-toweb-candidate-v1/toweb-factories.generated.h",
+      "sha256": "8cb726ae7748fa86bba8d80868e2126879c4cd80383c0074811eda5c3d5df364",
+      "bytes": 218918
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/readable-toweb-candidate-v1/integration-edits.json",
+      "sha256": "99a7cccb1012f5626c8720fe4811dccd8982597b38b0347fbffb1fc900fc86ea",
+      "bytes": 3189
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/readable-toweb-candidate-v1/test-final.stdout.log",
+      "sha256": "10912dd010dd1005a72399a51e2c3aae69310d03083689e7a9332f5d347bbb83",
+      "bytes": 3775
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-classic-streams/readable-toweb-candidate-v1/test-final.terminal.json",
+      "sha256": "dcbaa3a09e157cf771eda77de73b7dbdaa301708c933f45af3730f09dce3924d",
+      "bytes": 294
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/runtime/engine.cpp",
+      "sha256": "bb96b3e0cfa681c59e7d4dfbb0fe6d4a213a76b868dda4d296845cfa5e90633b",
+      "bytes": 26262
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "state": "NEXT_SELECTED_PROFILE_HOST_V1_FAILURE_DATA_REVIEWED",
+  "observationsValid": true,
+  "experimentPassed": false,
+  "sourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/native-profile-host-v1/index.json",
+    "sha256": "5399b60f55638218b031c6cb0c2f4a024682ecb353fbff7c865a67fe8b8c495a",
+    "bytes": 2220
+  },
+  "plan": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/native-profile-host-v1/plan.json",
+    "sha256": "be8a613e9728f59fb7e355982b00a0f162d6bbe50fe62e1185b5d06764e2aff0",
+    "bytes": 12478
+  },
+  "actualResult": {
+    "path": "/private/tmp/starling-node-compat/next-native-profile-host-v1/result.json",
+    "sha256": "a5d2a3fb21085bc06822c1c4f930887c650bb3bcf88fed721bb2eeccd0280bf2",
+    "bytes": 90476
+  },
+  "actualTerminal": {
+    "path": "/private/tmp/starling-node-compat/next-native-profile-host-v1-monitor/terminal.json",
+    "sha256": "2994465c33cca0d31f00bada5e207be51a1b0f0296e7d1b06852eb900de5ea04",
+    "bytes": 5365
+  },
+  "rootAuthority": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/native-profile-host-v1-root-results/authority.json",
+    "sha256": "658c13c3dbed34ed9def50df2eea3e56a53a2ab839afd6950bace3ca3e6e3941",
+    "bytes": 1088
+  },
+  "rawNodeExitCode": 1,
+  "ownedGroupsClean": true,
+  "protectedInputsCurrentHashesMatch": true,
+  "http": {
+    "total": 24,
+    "passed": 19,
+    "failed": [
+      {
+        "id": "dynamic-ssr",
+        "status": 500,
+        "failures": [
+          "status 500 != 200",
+          "missing \"NEXT_DYNAMIC_SSR\"",
+          "missing \"fixture-slug\""
+        ]
+      },
+      {
+        "id": "query",
+        "status": 500,
+        "failures": [
+          "status 500 != 200",
+          "missing \"NEXT_QUERY\"",
+          "missing \"hello world\"",
+          "missing \"one|two\""
+        ]
+      },
+      {
+        "id": "server-action-result-page",
+        "status": 500,
+        "failures": [
+          "status 500 != 200",
+          "missing \"NEXT_ACTION_RESULT\"",
+          "missing \"fixture-action\""
+        ]
+      },
+      {
+        "id": "suspense-complete",
+        "status": 500,
+        "failures": [
+          "status 500 != 200",
+          "missing \"NEXT_STREAM_SHELL\"",
+          "missing \"NEXT_STREAM_READY\""
+        ]
+      },
+      {
+        "id": "server-action-submit",
+        "status": 500,
+        "failures": null
+      }
+    ]
+  },
+  "browser": {
+    "passed": 2,
+    "total": 2,
+    "pageerrors": 0,
+    "consoleerrors": 0,
+    "failedrequests": 0,
+    "rawBrowserExitCode": 0
+  },
+  "cacheInvalidation": {
+    "before": {
+      "marker": "NEXT_CACHE_VALUE",
+      "generation": 1
+    },
+    "after": {
+      "marker": "NEXT_CACHE_VALUE",
+      "generation": 2
+    },
+    "passed": true
+  },
+  "streaming": {
+    "chunks": 1,
+    "shellChunk": -1,
+    "readyChunk": -1,
+    "complete": false,
+    "incrementalDeliveryObserved": false,
+    "retainedBytes": "BRIDGE_FAILURE"
+  },
+  "firstActualBlocker": {
+    "url": "/ssr/fixture-slug",
+    "valueType": "object",
+    "isNull": false,
+    "name": "Error",
+    "message": "node:stream.Readable.toWeb is unavailable in sm-node-22.14.0-m0.12",
+    "stack": "Error: node:stream.Readable.toWeb is unavailable in sm-node-22.14.0-m0.12\n    at unsupported (file:///Users/dan/dev/StarlingMonkey/builtins/node-compat/classic-streams/classic-streams.mjs:7:46)\n    at Function.unavailableOperation [as toWeb] (file:///Users/dan/dev/StarlingMonkey/builtins/node-compat/classic-streams/classic-streams.mjs:14:70)\n    at w (/private/tmp/starling-node-compat/next-native-profile-host-v1/application/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:4:2890)\n    at F (/private/tmp/starling-node-compat/next-native-profile-host-v1/application/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:11:1126)\n    at /private/tmp/starling-node-compat/next-native-profile-host-v1/application/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:18:5860\n    at async Transform.transform [as _transform] (/private/tmp/starling-node-compat/next-native-profile-host-v1/application/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:4:3465)",
+    "code": "ERR_SM_NODE_UNSUPPORTED",
+    "module": "node:stream",
+    "operation": "Readable.toWeb"
+  },
+  "contextModel": {
+    "neutralReadinessCount": 1,
+    "prepareOwner": null,
+    "freshRequests": 40,
+    "conversionAndBridgeIdsExact": true,
+    "pairedHTTPClassChecks": 40,
+    "nativeALSExecuted": false
+  },
+  "classification": "Actual selected classic Readable.toWeb refusal, not fixture/build/native/Wasm failure",
+  "otherObservedBlockerOperations": [
+    "Readable.toWeb"
+  ],
+  "rerunPerformed": false,
+  "sourceOrOriginalResultModified": false,
+  "guestOrNativeExecuted": false,
+  "rootOuterToolExitScope": "Only original monitor/Node and retained Root observation are checked; no fabricated raw Roottool stdout.",
+  "acceptanceOrRuntimeAuthority": false
+}

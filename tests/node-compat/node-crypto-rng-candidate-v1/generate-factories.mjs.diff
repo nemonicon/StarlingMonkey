@@ -1,0 +1,9 @@
+--- builtins/node-compat/generate-factories.mjs.before
++++ builtins/node-compat/generate-factories.mjs.after
+@@ -86,3 +86,6 @@
+   import('./generate-startup-factory.mjs'),
+   import('./generate-node-timers-factory.mjs'),
+ ]);
++
++// Explicit Source-maintenance opt-in; normal CMake consumes checked headers.
++if(process.argv.includes('--crypto-random'))await import('./generate-crypto-random-factory.mjs');

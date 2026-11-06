@@ -1,0 +1,33 @@
+--- cmake/builtins.cmake.before
++++ cmake/builtins.cmake.after
+@@ -153,11 +153,12 @@
+         target_sources(builtin_node_compat PRIVATE builtins/node-compat/module-kernel.cpp)
+         target_compile_definitions(extension_api INTERFACE NODE_COMPAT_MODULE=1)
+     endif()
++    option(NODE_COMPAT_CRYPTO_RANDOM "Experimental deployed-only Node random bytes/UUID" OFF)
+     option(NODE_COMPAT_CRYPTO_HASH_HMAC "Experimental SHA256 Hash/Hmac proposal" OFF)
+     option(NODE_CRYPTO_AUDITED_BORROW "Reviewed fixed-U8 NoGC EVP update borrowing" OFF)
+     if(NODE_COMPAT_CRYPTO_HASH_HMAC)
+-        if(NOT NODE_COMPAT_ENTROPY_MODE STREQUAL "OFF")
+-            message(FATAL_ERROR "SHA256 Hash/Hmac proposal requires entropy OFF")
++        if(NOT NODE_COMPAT_ENTROPY_MODE STREQUAL "OFF" AND NOT (NODE_COMPAT_CRYPTO_RANDOM AND NODE_COMPAT_ENTROPY_MODE STREQUAL "RUNTIME_ONLY"))
++            message(FATAL_ERROR "SHA256 profile requires entropy OFF, or explicit experimental RNG with RUNTIME_ONLY")
+         endif()
+         if(NOT TARGET builtin_web_crypto)
+             message(FATAL_ERROR "SHA256 Hash/Hmac value aliases require builtin_web_crypto")
+@@ -375,3 +376,15 @@
+     endforeach()
+     target_compile_definitions(extension_api INTERFACE NODE_COMPAT_TIMERS=1)
+ endif()
++
++# Explicit new native successor, never a cast of the old entropy-OFF83 frame.
++if(NODE_COMPAT_CRYPTO_RANDOM AND NOT CMAKE_SCRIPT_MODE_FILE)
++    if(NOT TARGET builtin_node_compat OR NOT TARGET builtin_web_crypto OR NOT NODE_COMPAT_CRYPTO_HASH_HMAC OR NOT NODE_COMPAT_NEXT_STARTUP OR NOT NODE_COMPAT_INTERNAL_TICKS OR NOT NODE_COMPAT_ASYNC_LOCAL_STORAGE)
++        message(FATAL_ERROR "NODE_COMPAT_CRYPTO_RANDOM requires genuine crypto/startup/deployed accessor/internal ticks/ALS")
++    endif()
++    if(NOT NODE_COMPAT_ENTROPY_MODE STREQUAL "RUNTIME_ONLY")
++        message(FATAL_ERROR "NODE_COMPAT_CRYPTO_RANDOM requires RUNTIME_ONLY entropy")
++    endif()
++    target_sources(builtin_node_compat PRIVATE builtins/node-compat/crypto-rng.cpp)
++    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_CRYPTO_RANDOM=1)
++endif()

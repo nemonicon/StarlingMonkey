@@ -1,0 +1,1641 @@
+//! OCI registry operations for pulling WebAssembly components
+//!
+//! This module provides functionality to interact with OCI registries for
+//! WebAssembly components, including docker credential integration and
+//! file-based caching. This module is only available when the `oci` feature is enabled.
+//!
+//! # Examples
+//!
+//! ```no_run
+//! use wash_runtime::oci::{pull_component, OciConfig, OciPullPolicy};
+//! use std::time::Duration;
+//!
+//! #[tokio::main]
+//! async fn main() -> anyhow::Result<()> {
+//!     // Basic pull
+//!     let config = OciConfig::default();
+//!     let (component_bytes, _digest) = pull_component("ghcr.io/wasmcloud/components/http-hello-world:latest", config, OciPullPolicy::IfNotPresent).await?;
+//!     println!("Pulled component of {} bytes", component_bytes.len());
+//!
+//!     // Pull with credentials and timeout
+//!     let config = OciConfig::new_with_credentials("username", "password")
+//!         .with_timeout(Duration::from_secs(30));
+//!     let (bytes, digest) = pull_component("ghcr.io/my-org/private:latest", config, OciPullPolicy::IfNotPresent).await?;
+//!     println!("Pulled {} bytes, digest: {}", bytes.len(), digest);
+//!
+//!     Ok(())
+//! }
+//! ```
+
+mod client;
+mod coalescer;
+use client::{TrustId, TrustSnapshot, pull_client};
+mod credentials;
+mod disk_cache;
+#[cfg(test)]
+#[path = "../tests/common/oci_ca.rs"]
+mod test_ca;
+#[cfg(test)]
+#[path = "../tests/common/oci_registry.rs"]
+mod test_registry;
+use coalescer::Coalescer;
+use credentials::CredentialResolver;
+#[cfg(test)]
+use credentials::cached_credentials;
+use disk_cache::CacheManager;
+
+use anyhow::{Context, Result, anyhow, bail};
+use oci_client::{
+    Reference,
+    client::{Certificate, CertificateEncoding, Client, ClientConfig, ClientProtocol},
+    manifest::{OciDescriptor, OciImageManifest},
+    secrets::RegistryAuth,
+};
+use oci_wasm::{ToConfig, WASM_LAYER_MEDIA_TYPE, WasmConfig};
+use sha2::{Digest, Sha256};
+use std::{
+    collections::{BTreeMap, BTreeSet, HashMap},
+    path::{Path, PathBuf},
+    sync::{Arc, OnceLock},
+    time::Duration,
+};
+use tracing::{debug, instrument, warn};
+
+/// Extra CA certificates every OCI client in this process trusts, on top of
+/// the platform's own trust store.
+///
+/// Trust roots are a property of the host, not of any one pull, so they live
+/// here rather than on [`OciConfig`]. That is built per workload (from an
+/// image pull secret) and per plugin, and would otherwise have to carry the
+/// same value to every construction site.
+///
+/// Empty until [`set_extra_ca_certificates`] is called. Certificates from
+/// `SSL_CERT_FILE` / `SSL_CERT_DIR` are not held here; they are read each
+/// time a client is built (see [`env_ca_certificates`]).
+static EXTRA_CA_CERTIFICATES: OnceLock<InstalledTrust> = OnceLock::new();
+
+/// The one set of extra trust roots a process runs with, and the configuration
+/// that asked for it.
+///
+/// Keyed by the paths rather than by the bytes read from them, because a bundle
+/// on disk is not immutable: cert-manager and projected Kubernetes secrets
+/// rewrite one in place, and the two calls that install a host's trust — the
+/// CLI before it pulls its host component plugins, the host it then builds —
+/// are separated by exactly those pulls. Comparing content would turn a
+/// rotation landing in that window into a startup failure.
+struct InstalledTrust {
+    /// A set, so the same bundles listed in a different order are the same
+    /// configuration.
+    paths: BTreeSet<PathBuf>,
+    certs: Vec<Certificate>,
+}
+
+/// Trust the PEM CA bundles at `paths` for every subsequent OCI pull or push.
+///
+/// Call once, before serving. A private CA the OS trusts (the macOS keychain,
+/// the Linux system bundle) or that `SSL_CERT_FILE` / `SSL_CERT_DIR` names is
+/// already trusted. This is for a CA wash should trust without the rest of the
+/// system, such as one mounted into a container.
+///
+/// Fails when a bundle cannot be read or does not parse, rather than starting
+/// a host that will reject every pull from the registry it was pointed at.
+///
+/// Naming the same bundles twice is a no-op, and does not re-read them: a
+/// `wash host` installs its CA paths before pulling its host component plugins,
+/// then the host it builds applies the same
+/// [`HostConfig::oci_ca_paths`](crate::host::HostConfig) again. *Different*
+/// paths arriving second fail, because the store holds one set for the whole
+/// process and that caller would otherwise be told its trust was configured
+/// when it was not.
+pub fn set_extra_ca_certificates(paths: &[PathBuf]) -> Result<()> {
+    install_ca_certificates(&EXTRA_CA_CERTIFICATES, paths)
+}
+
+/// [`set_extra_ca_certificates`] against a given store.
+///
+/// Split out to take the store as an argument: the real one can only be written
+/// once per process, so a test that exercised it would own it for the whole
+/// test binary.
+fn install_ca_certificates(store: &OnceLock<InstalledTrust>, paths: &[PathBuf]) -> Result<()> {
+    let requested: BTreeSet<PathBuf> = paths.iter().cloned().collect();
+    if requested.is_empty() {
+        // Claiming the store with nothing would lock out the caller that does
+        // have trust roots — and tell it that it succeeded. Say so when trust
+        // configured elsewhere in this process is in force regardless, because
+        // this caller asked for the platform roots alone and is not getting them.
+        if let Some(installed) = store.get() {
+            warn!(
+                paths = %display_paths(&installed.paths),
+                "no OCI CA certificates requested, but extra trust roots configured earlier in \
+                 this process apply to every OCI client in it"
+            );
+        }
+        return Ok(());
+    }
+    // Already installed by an earlier caller naming the same bundles. Returning
+    // here rather than re-reading is what keeps a rotation landing between the
+    // two calls from failing the second one.
+    if let Some(installed) = store.get() {
+        return conflicting_trust(&installed.paths, &requested);
+    }
+    let certs = load_ca_certificates(paths)?;
+    debug!(count = certs.len(), "trusting extra OCI CA certificates");
+    match store.set(InstalledTrust {
+        paths: requested,
+        certs,
+    }) {
+        Ok(()) => Ok(()),
+        // Lost a race to another caller; the winner decides. `set` failing
+        // means the store is claimed, so `get` is `Some`.
+        Err(rejected) => match store.get() {
+            Some(installed) => conflicting_trust(&installed.paths, &rejected.paths),
+            None => Ok(()),
+        },
+    }
+}
+
+/// Whether trust already installed covers what a caller asked for.
+fn conflicting_trust(installed: &BTreeSet<PathBuf>, requested: &BTreeSet<PathBuf>) -> Result<()> {
+    if installed == requested {
+        return Ok(());
+    }
+    bail!(
+        "different OCI CA certificates are already configured for this process ({}); the trust \
+         store holds one set, so {} would not take effect",
+        display_paths(installed),
+        display_paths(requested)
+    )
+}
+
+/// Paths as an operator wrote them, for an error they have to compare by eye.
+///
+/// `{:?}` on a `Path` escapes its separators, which turns a Windows path into
+/// something that does not match what is in the config it came from.
+fn display_paths(paths: &BTreeSet<PathBuf>) -> String {
+    paths
+        .iter()
+        .map(|path| path.display().to_string())
+        .collect::<Vec<_>>()
+        .join(", ")
+}
+
+/// Read and parse PEM CA bundles from disk. Split from
+/// [`set_extra_ca_certificates`] so the loading is testable on its own: the
+/// store it writes to can only be set once per process.
+///
+/// The certificates are parsed here and the bytes then handed on as read.
+/// Parsing makes a bad bundle a startup failure, rather than a failure of
+/// every pull once [`oci_client`] rejects it.
+fn load_ca_certificates(paths: &[PathBuf]) -> Result<Vec<Certificate>> {
+    paths
+        .iter()
+        .map(|path| {
+            let data = std::fs::read(path)
+                .with_context(|| format!("failed to read OCI CA bundle {}", path.display()))?;
+            validate_ca_bundle(&data)
+                .with_context(|| format!("invalid OCI CA bundle {}", path.display()))?;
+            Ok(Certificate {
+                encoding: CertificateEncoding::Pem,
+                data,
+            })
+        })
+        .collect()
+}
+
+/// Check that `data` is a PEM bundle holding at least one usable certificate.
+///
+/// Adding to a [`rustls::RootCertStore`] is the same work the TLS stack does
+/// when the client is built, so a bundle that passes here cannot fail there:
+/// PEM framing, and an X.509 body webpki accepts. A file that parses but holds
+/// no certificate is rejected too. It would otherwise be accepted and trust
+/// nothing, which reads identically to a CA that does not cover the registry.
+fn validate_ca_bundle(data: &[u8]) -> Result<()> {
+    use rustls::pki_types::pem::PemObject as _;
+
+    let certs = rustls::pki_types::CertificateDer::pem_slice_iter(data)
+        .collect::<std::result::Result<Vec<_>, _>>()
+        .map_err(|err| anyhow!("not PEM-encoded certificates: {err}"))?;
+    if certs.is_empty() {
+        bail!("no certificates found");
+    }
+    let mut store = rustls::RootCertStore::empty();
+    for cert in certs {
+        store
+            .add(cert)
+            .map_err(|err| anyhow!("certificate is not usable as a trust root: {err}"))?;
+    }
+    Ok(())
+}
+
+/// The CA certificates `SSL_CERT_FILE` / `SSL_CERT_DIR` name, or none when
+/// neither is set.
+///
+/// The Linux platform verifier already reads these, but the macOS and Windows
+/// ones consult only the OS store, so a CA trusted through either variable
+/// would be ignored there. Loading them when neither is set would only repeat
+/// the OS store the verifier already trusts.
+///
+/// Read for each pull's trust snapshot and each new push client, so changes
+/// apply to subsequent operations without waiting for a cached client to expire.
+fn env_ca_certificates() -> Vec<Certificate> {
+    if std::env::var_os("SSL_CERT_FILE").is_none() && std::env::var_os("SSL_CERT_DIR").is_none() {
+        return Vec::new();
+    }
+    usable_ca_certificates(rustls_native_certs::load_native_certs())
+}
+
+/// The loaded certificates webpki accepts as trust roots, as DER.
+///
+/// `oci-client` adds extra roots strictly, so one rejected entry fails the
+/// client build. An environment bundle is not validated at startup the way
+/// `--ca-path` is, so an entry that would be rejected is skipped here instead.
+fn usable_ca_certificates(loaded: rustls_native_certs::CertificateResult) -> Vec<Certificate> {
+    for err in &loaded.errors {
+        warn!(%err, "failed to load a CA certificate from SSL_CERT_FILE/SSL_CERT_DIR; skipping it");
+    }
+    let mut store = rustls::RootCertStore::empty();
+    loaded
+        .certs
+        .into_iter()
+        .filter_map(|cert| {
+            let data = cert.as_ref().to_vec();
+            match store.add(cert) {
+                Ok(()) => Some(Certificate {
+                    encoding: CertificateEncoding::Der,
+                    data,
+                }),
+                Err(err) => {
+                    warn!(%err, "CA certificate from SSL_CERT_FILE/SSL_CERT_DIR is not usable as a trust root; skipping it");
+                    None
+                }
+            }
+        })
+        .collect()
+}
+
+/// Build an OCI client, failing when `config` cannot be applied.
+///
+/// `Client::new` logs and falls back to a wholly default configuration
+/// instead, which turns an `insecure` registry back to HTTPS and drops every
+/// extra trust root.
+fn oci_client(config: ClientConfig) -> Result<Client> {
+    Client::try_from(config).context("failed to build the OCI client")
+}
+
+/// The extra CA certificates for a `ClientConfig`: the `SSL_CERT_FILE` /
+/// `SSL_CERT_DIR` certificates, then the configured `--ca-path` bundles.
+///
+/// The platform verifier loads the OS roots itself and skips any it cannot
+/// parse, but adds everything passed here strictly, so only certificates
+/// already checked against webpki belong.
+fn extra_ca_certificates() -> Vec<Certificate> {
+    let mut certs = env_ca_certificates();
+    if let Some(trust) = EXTRA_CA_CERTIFICATES.get() {
+        certs.extend(trust.certs.iter().cloned());
+    }
+    certs
+}
+
+#[allow(deprecated)]
+#[deprecated = "old media type used before Wasm WG standardization"]
+const WASMCLOUD_MEDIA_TYPE: &str = "application/vnd.module.wasm.content.layer.v1+wasm";
+
+/// The `config.json` [`get_credential`] reads, or `None` when it would find no
+/// config directory at all.
+///
+/// Mirrors `docker_credential`'s own resolution, which is not public: the crate
+/// reports a file that is absent and one that is malformed as the same error,
+/// and this is what tells them apart.
+fn docker_config_path() -> Option<PathBuf> {
+    docker_config_dir(std::env::var_os("DOCKER_CONFIG"), std::env::var_os("HOME"))
+        .map(|dir| dir.join("config.json"))
+}
+
+/// [`docker_config_path`]'s directory rule, over the environment it reads.
+fn docker_config_dir(
+    docker_config: Option<std::ffi::OsString>,
+    home: Option<std::ffi::OsString>,
+) -> Option<PathBuf> {
+    docker_config
+        .map(PathBuf::from)
+        .or_else(|| home.map(|home| Path::new(&home).join(".docker")))
+}
+
+/// Configuration for OCI operations
+/// ️ **Credential Precedence**:
+/// 1. Explicit credentials (if provided in this config)
+/// 2. Docker credential helper (system default)
+/// 3. Anonymous (if no credentials found)
+///
+/// # Rate Limiting
+///
+/// Note: This implementation does not include retry logic or exponential backoff for
+/// authentication failures. Repeated failures may trigger registry rate limits or
+/// account lockouts. Consider implementing retry logic at a higher level if needed.
+#[derive(Debug, Default, Clone)]
+pub struct OciConfig {
+    /// Optional explicit credentials (username, password)
+    pub credentials: Option<(String, String)>,
+    /// Whether to allow insecure registries (HTTP instead of HTTPS)
+    pub insecure: bool,
+    /// Cache directory override. Entries are scoped to resolved credentials,
+    /// HTTP/HTTPS and configured extra roots; changing that scope requires
+    /// fetching the artifact again. Legacy cache
+    /// entries without this scope are not reused, and [`cleanup_cache`] removes
+    /// them. Entry names are keyed with a random secret the cache creates in
+    /// `cache.key` (owner-only on Unix); removing it orphans every entry.
+    pub cache_dir: Option<PathBuf>,
+    /// Timeout for OCI operations (pull, push, etc.)
+    /// If None, uses default timeout from oci-client
+    pub timeout: Option<Duration>,
+}
+
+impl OciConfig {
+    /// Create a new OciConfig with a specific cache directory
+    pub fn new_with_cache(cache_dir: PathBuf) -> Self {
+        Self {
+            cache_dir: Some(cache_dir),
+            ..Default::default()
+        }
+    }
+
+    /// Create a new OciConfig with explicit credentials
+    pub fn new_with_credentials(username: impl Into<String>, password: impl Into<String>) -> Self {
+        Self {
+            credentials: Some((username.into(), password.into())),
+            ..Default::default()
+        }
+    }
+
+    /// Create a new OciConfig for insecure registries (HTTP)
+    pub fn new_insecure() -> Self {
+        Self {
+            insecure: true,
+            ..Default::default()
+        }
+    }
+
+    /// Create a new OciConfig with a timeout
+    pub fn new_with_timeout(timeout: Duration) -> Self {
+        Self {
+            timeout: Some(timeout),
+            ..Default::default()
+        }
+    }
+
+    /// Set the timeout for this config
+    pub fn with_timeout(mut self, timeout: Duration) -> Self {
+        self.timeout = Some(timeout);
+        self
+    }
+}
+
+/// OCI pull policy
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum OciPullPolicy {
+    /// ️ Always pull the component from the registry
+    Always,
+    /// ️ Pull the component only if not present in cache
+    IfNotPresent,
+    /// ️ Never pull the component; use only cached version
+    Never,
+}
+
+impl std::str::FromStr for OciPullPolicy {
+    type Err = anyhow::Error;
+
+    /// Parse a pull policy name: `always`, `ifNotPresent`, or `never`
+    /// (case- and separator-insensitive).
+    fn from_str(s: &str) -> Result<Self> {
+        match s.to_ascii_lowercase().replace(['-', '_'], "").as_str() {
+            "always" => Ok(Self::Always),
+            "ifnotpresent" => Ok(Self::IfNotPresent),
+            "never" => Ok(Self::Never),
+            other => bail!("invalid pull policy {other:?}; expected always|ifNotPresent|never"),
+        }
+    }
+}
+
+/// Pull a WebAssembly component from an OCI registry
+///
+/// This function pulls a WebAssembly component from an OCI-compliant registry,
+/// validates it, and optionally caches it for future use.
+///
+/// # Arguments
+/// * `reference` - OCI reference (e.g., "registry.io/my/component:v1.0.0")
+/// * `config` - Configuration for the pull operation
+///
+/// # Returns
+/// Raw bytes of the WebAssembly component
+///
+/// # Errors
+/// Returns an error if:
+/// - The reference is invalid
+/// - The registry is unreachable
+/// - Authentication fails
+/// - The pulled artifact is not a valid WebAssembly component
+/// - Caching operations fail
+///
+/// # Examples
+/// ```no_run
+/// use wash_runtime::oci::{pull_component, OciConfig, OciPullPolicy};
+///
+/// #[tokio::main]
+/// async fn main() -> anyhow::Result<()> {
+///     let config = OciConfig::default();
+///     let (component_bytes, _digest) = pull_component("ghcr.io/wasmcloud/components/http-hello-world:latest", config, OciPullPolicy::IfNotPresent).await?;
+///     println!("Successfully pulled {} bytes", component_bytes.len());
+///     Ok(())
+/// }
+/// ```
+pub async fn pull_component(
+    reference: &str,
+    config: OciConfig,
+    pull_policy: OciPullPolicy,
+) -> Result<(Vec<u8>, String)> {
+    let (bytes, digest) = pull_component_bytes(reference, config, pull_policy).await?;
+    Ok((bytes.to_vec(), digest))
+}
+
+/// [`pull_component`] without the copy into a `Vec`.
+///
+/// Concurrent pulls of one reference with the same credentials and settings
+/// are folded into one. Except for `Always`, its result answers the same
+/// request for [`PULL_REUSE`] after it finishes: a host restoring workloads
+/// from a few images would otherwise read each image from disk and ask the
+/// registry for its digest once per workload.
+#[instrument(skip(config), fields(reference = %reference, pull_policy = ?pull_policy))]
+pub(crate) async fn pull_component_bytes(
+    reference: &str,
+    config: OciConfig,
+    pull_policy: OciPullPolicy,
+) -> Result<(bytes::Bytes, String)> {
+    // Boxed so the pull's state machine (credentials, trust, the coalescer and
+    // the registry client) lives on the heap rather than in every caller's
+    // future. A CLI's `async fn main` holds all of its subcommands' futures at
+    // once, on a main thread whose stack is 1 MiB on Windows.
+    Box::pin(with_pull_timeout(reference, config.timeout, async {
+        let reference_parsed = Reference::try_from(reference)
+            .with_context(|| format!("invalid OCI reference: {reference}"))?;
+
+        let auth = CredentialResolver::new(config.credentials.clone())
+            .resolve_credentials(reference_parsed.registry())
+            .await;
+        let trust = TrustSnapshot::load().await?;
+
+        // Everything that can change what a pull returns, or whether it may
+        // return at all, is in the key. The credentials above all: a result one
+        // caller was authorised to fetch must never answer a caller who was not.
+        let key = PullKey {
+            reference: reference.to_string(),
+            auth: AuthId::of(&auth),
+            insecure: config.insecure,
+            cache_dir: config.cache_dir.clone(),
+            pull_policy: pull_policy.clone(),
+            timeout: config.timeout,
+            trust: trust.id,
+        };
+        let pulled = pull_coalescer()
+            .run_with_reuse(key, pull_policy != OciPullPolicy::Always, || {
+                Box::pin(pull_uncoalesced(
+                    reference,
+                    &reference_parsed,
+                    &config,
+                    &auth,
+                    &pull_policy,
+                    &trust,
+                ))
+            })
+            .await?;
+        Ok((pulled.bytes.clone(), pulled.digest.clone()))
+    }))
+    .await
+}
+
+/// The caller's deadline includes credential resolution, cache I/O and waiting
+/// for another pull. Taking over a cancelled initializer never resets it.
+async fn with_pull_timeout<T>(
+    reference: &str,
+    timeout: Option<Duration>,
+    work: impl std::future::Future<Output = Result<T>>,
+) -> Result<T> {
+    match timeout {
+        Some(timeout) => tokio::time::timeout(timeout, work).await.with_context(|| {
+            format!("timeout pulling component from {reference} after {timeout:?}")
+        })?,
+        None => work.await,
+    }
+}
+
+/// What one pull produced, shared by every caller it answered.
+struct Pulled {
+    bytes: bytes::Bytes,
+    digest: String,
+}
+
+/// How long a finished pull answers identical requests: long enough to fold a
+/// burst of starts of one image into one pull, short enough that a re-pushed
+/// tag is seen almost at once.
+const PULL_REUSE: Duration = Duration::from_secs(5);
+
+/// The longest a pull still in flight is joined by identical requests. Past it
+/// a new caller starts its own pull rather than wait on one that may be stuck.
+const PULL_JOIN: Duration = Duration::from_secs(600);
+
+#[derive(Clone, PartialEq, Eq, Hash)]
+struct PullKey {
+    reference: String,
+    auth: AuthId,
+    insecure: bool,
+    cache_dir: Option<PathBuf>,
+    pull_policy: OciPullPolicy,
+    /// A caller joining a pull waits as long as that pull is allowed to take,
+    /// so callers that set different timeouts must not wait on each other.
+    timeout: Option<Duration>,
+    trust: TrustId,
+}
+
+/// Which credentials a pull or a client uses, without holding the secret.
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+struct AuthId([u8; 32]);
+
+impl AuthId {
+    fn of(auth: &RegistryAuth) -> Self {
+        let mut hasher = Sha256::new();
+        // Length-prefixed, so no two different credentials hash the same bytes.
+        let mut field = |bytes: &[u8]| {
+            hasher.update((bytes.len() as u64).to_le_bytes());
+            hasher.update(bytes);
+        };
+        match auth {
+            RegistryAuth::Anonymous => field(b"anonymous"),
+            RegistryAuth::Basic(user, password) => {
+                field(b"basic");
+                field(user.as_bytes());
+                field(password.as_bytes());
+            }
+            RegistryAuth::Bearer(token) => {
+                field(b"bearer");
+                field(token.as_bytes());
+            }
+        }
+        Self(hasher.finalize().into())
+    }
+}
+
+fn pull_coalescer() -> &'static Coalescer<PullKey, Arc<Pulled>> {
+    static PULLS: OnceLock<Coalescer<PullKey, Arc<Pulled>>> = OnceLock::new();
+    // Bounded by the bytes finished pulls hold, not their count: each keeps
+    // its whole component for the reuse window, and a burst of large images
+    // would otherwise all stay resident. Pulls in flight are not counted and
+    // never refused: they hold only what their callers are waiting on.
+    PULLS.get_or_init(|| {
+        Coalescer::with_min_weight(
+            PULL_REUSE_BYTES,
+            PULL_JOIN,
+            PULL_REUSE,
+            PULL_ENTRY_WEIGHT,
+            |pulled| {
+                u32::try_from(pulled.bytes.len())
+                    .unwrap_or(u32::MAX)
+                    .saturating_add(PULL_ENTRY_WEIGHT)
+            },
+        )
+    })
+}
+
+/// The most component bytes finished pulls hold for reuse at once.
+const PULL_REUSE_BYTES: u64 = 256 * 1024 * 1024;
+/// Account for keys and bookkeeping even when a result holds few bytes.
+/// This also limits the cache to about 16k small results. Moka's
+/// maintenance is eventual; this is a retention target, not a strict RSS cap.
+const PULL_ENTRY_WEIGHT: u32 = 16 * 1024;
+
+/// Bound synchronous client and trust-store work without blocking Tokio's
+/// worker threads. A cancelled caller does not release a running task's permit.
+///
+/// Docker credential helpers run on their own limiter (see
+/// `credentials.rs`), so a helper that hangs cannot hold these permits.
+async fn blocking_io<T: Send + 'static>(
+    work: impl FnOnce() -> Result<T> + Send + 'static,
+) -> Result<T> {
+    static LIMIT: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(8);
+    blocking_on(&LIMIT, work).await
+}
+
+/// Run `work` on Tokio's blocking pool once `limit` grants a permit, which the
+/// task holds until `work` returns.
+async fn blocking_on<T: Send + 'static>(
+    limit: &'static tokio::sync::Semaphore,
+    work: impl FnOnce() -> Result<T> + Send + 'static,
+) -> Result<T> {
+    let permit = limit
+        .acquire()
+        .await
+        .context("OCI blocking-work limiter closed")?;
+    tokio::task::spawn_blocking(move || {
+        let _permit = permit;
+        work()
+    })
+    .await
+    .context("OCI blocking task failed")?
+}
+
+/// One pull as [`pull_component`] documents it, with nothing shared but the
+/// client.
+async fn pull_uncoalesced(
+    reference: &str,
+    reference_parsed: &Reference,
+    config: &OciConfig,
+    auth: &RegistryAuth,
+    pull_policy: &OciPullPolicy,
+    trust: &TrustSnapshot,
+) -> Result<Arc<Pulled>> {
+    // Initialize cache manager
+    let cache_manager = match &config.cache_dir {
+        Some(dir) => Some(
+            CacheManager::open(dir.clone(), auth, config.insecure, trust.id)
+                .await
+                .context("failed to open the OCI cache")?,
+        ),
+        None => None,
+    };
+    if let Some(cache_manager) = &cache_manager {
+        // Check cache first
+        if *pull_policy != OciPullPolicy::Always && cache_manager.is_cached(reference).await {
+            debug!("Found cached artifact");
+            let (component_data, digest) = cache_manager.read_cached(reference).await?;
+
+            // Never explicitly requests offline reuse. The cache key covers
+            // configured extra roots, but cannot encode all native trust-store
+            // policies or changes to the registry's authorization decisions.
+            // Entries are shared by user, so the password must be the one the
+            // registry last accepted for this entry.
+            if *pull_policy == OciPullPolicy::Never {
+                if !cache_manager.credential_matches(reference).await {
+                    bail!(
+                        "component is cached for this user under other credentials, and pull \
+                         policy 'Never' cannot check these with the registry; pull it once \
+                         with another policy"
+                    );
+                }
+                return Ok(Arc::new(Pulled {
+                    bytes: component_data.into(),
+                    digest,
+                }));
+            }
+
+            // Even a pinned digest must pass the caller's current registry
+            // authorization and TLS policy before a disk entry can be reused.
+            let fetched_digest = pull_client(reference_parsed, config.insecure, auth, trust)
+                .await?
+                .fetch_manifest_digest(reference_parsed, auth)
+                .await?;
+
+            if digest == fetched_digest {
+                // The registry has just accepted these credentials, e.g. a
+                // rotated password: let Never reuse the entry with them.
+                if !cache_manager.credential_matches(reference).await
+                    && let Err(error) = cache_manager.record_credential(reference).await
+                {
+                    warn!(%error, "failed to record revalidated OCI cache credentials");
+                }
+                return Ok(Arc::new(Pulled {
+                    bytes: component_data.into(),
+                    digest,
+                }));
+            }
+
+            debug!("Cached artifact expired; pulling new component version");
+        }
+    }
+
+    if *pull_policy == OciPullPolicy::Never {
+        bail!("component not found in cache and pull policy is 'Never'");
+    }
+
+    let client = pull_client(reference_parsed, config.insecure, auth, trust).await?;
+
+    // Pull the component using oci-client. Boxed: its future is large, and
+    // would otherwise sit inline in the coalesced pull's.
+    let pull_future = Box::pin(client.pull(
+        reference_parsed,
+        auth,
+        vec![
+            WASM_LAYER_MEDIA_TYPE,
+            #[allow(deprecated)]
+            WASMCLOUD_MEDIA_TYPE,
+        ],
+    ));
+
+    let image_data = pull_future
+        .await
+        .with_context(|| format!("failed to pull component from {reference}"))?;
+
+    // Extract the component bytes from the first layer
+    let component_data = image_data
+        .layers
+        .first()
+        .ok_or_else(|| anyhow!("no layers found in pulled artifact"))?
+        .data
+        .clone();
+    let digest = image_data
+        .digest
+        .ok_or_else(|| anyhow!("no digest found in pulled artifact"))?;
+
+    // Validate that it's a valid WebAssembly component
+    validate_component(&component_data)
+        .await
+        .with_context(|| "pulled artifact is not a valid WebAssembly component")?;
+
+    // Cache the component with its digest
+    if let Some(cache_manager) = &cache_manager {
+        cache_manager
+            .write_to_cache(reference, &component_data, &digest)
+            .await
+            .with_context(|| "failed to cache component")?;
+    }
+
+    Ok(Arc::new(Pulled {
+        bytes: component_data,
+        digest,
+    }))
+}
+
+/// Push a WebAssembly component to an OCI registry
+///
+/// This function validates a WebAssembly component and pushes it to an OCI-compliant registry.
+///
+/// # Arguments
+/// * `reference` - OCI reference (e.g., "registry.io/my/component:v1.0.0")
+/// * `component_data` - Raw bytes of the WebAssembly component
+/// * `config` - Configuration for the push operation
+/// * `annotations` - Optional OCI annotations to add to the manifest
+///
+/// # Returns
+/// The digest of the pushed component
+///
+/// # Errors
+/// Returns an error if:
+/// - The reference is invalid
+/// - The component data is not valid WebAssembly
+/// - Authentication fails
+/// - The registry is unreachable
+/// - Push operation fails
+///
+/// # Examples
+/// ```no_run
+/// use wash_runtime::oci::{push_component, OciConfig};
+///
+/// #[tokio::main]
+/// async fn main() -> anyhow::Result<()> {
+///     let component_bytes = std::fs::read("my-component.wasm")?;
+///     let config = OciConfig::default();
+///     let digest = push_component("registry.example.com/my-component:latest", &component_bytes, config, None).await?;
+///     println!("Pushed component with digest: {}", digest);
+///     Ok(())
+/// }
+/// ```
+#[instrument(
+    skip(component_data, config, annotations),
+    fields(
+        reference = %reference,
+        size = component_data.len(),
+        annotation_count = annotations.as_ref().map_or(0, |a| a.len())
+    )
+)]
+pub async fn push_component(
+    reference: &str,
+    component_data: &[u8],
+    config: OciConfig,
+    annotations: Option<HashMap<String, String>>,
+) -> Result<String> {
+    // Parse OCI reference
+    let reference_parsed = Reference::try_from(reference)
+        .with_context(|| format!("invalid OCI reference: {reference}"))?;
+
+    // Validate the component before pushing
+    validate_component(component_data)
+        .await
+        .with_context(|| "component data is not a valid WebAssembly component")?;
+
+    // Setup credential resolver
+    let credential_resolver = CredentialResolver::new(config.credentials);
+    let auth = credential_resolver
+        .resolve_credentials(reference_parsed.registry())
+        .await;
+
+    // Use one trust snapshot for the client and any disk entry it publishes.
+    let trust = TrustSnapshot::load().await?;
+    let client = oci_client(trust.client_config(config.insecure)?)?;
+
+    // Create the WebAssembly configuration and layer using oci-wasm
+    let (wasm_config, image_layer) = WasmConfig::from_raw_component(component_data.to_vec(), None)
+        .with_context(|| "failed to create WebAssembly configuration from component")?;
+
+    let layers = vec![image_layer];
+    let config_obj = wasm_config
+        .to_config()
+        .with_context(|| "failed to convert WebAssembly config")?;
+
+    // Create custom manifest with annotations if provided
+    let manifest = annotations.filter(|a| !a.is_empty()).map(|annotations| {
+        // Convert HashMap to BTreeMap for annotations
+        let btree_annotations: BTreeMap<String, String> = annotations.into_iter().collect();
+
+        // Create manifest descriptors for the config and layers
+        let config_descriptor = OciDescriptor {
+            media_type: config_obj.media_type.clone(),
+            digest: config_obj.sha256_digest(),
+            size: config_obj.data.len() as i64,
+            urls: None,
+            annotations: None,
+            artifact_type: None,
+        };
+
+        let layer_descriptors: Vec<OciDescriptor> = layers
+            .iter()
+            .map(|layer| OciDescriptor {
+                media_type: layer.media_type.clone(),
+                digest: layer.sha256_digest(),
+                size: layer.data.len() as i64,
+                urls: None,
+                annotations: None,
+                artifact_type: None,
+            })
+            .collect();
+
+        OciImageManifest {
+            schema_version: 2,
+            media_type: Some("application/vnd.oci.image.manifest.v1+json".to_string()),
+            config: config_descriptor,
+            layers: layer_descriptors,
+            subject: None,
+            artifact_type: None,
+            annotations: Some(btree_annotations),
+        }
+    });
+
+    // Push the component
+    let push_future = client.push(&reference_parsed, &layers, config_obj, &auth, manifest);
+
+    // Apply timeout if configured, otherwise just await the push
+    let push_result = if let Some(timeout) = config.timeout {
+        tokio::time::timeout(timeout, push_future)
+            .await
+            .with_context(|| format!("timeout pushing component to {reference} after {timeout:?}"))?
+            .with_context(|| format!("failed to push component to {reference}"))?
+    } else {
+        push_future
+            .await
+            .with_context(|| format!("failed to push component to {reference}"))?
+    };
+
+    // Extract the digest from the manifest URL
+    // The manifest URL typically contains the digest in the format: registry/repo@sha256:digest
+    let digest = if let Some(digest_part) = push_result.manifest_url.split('@').nth(1) {
+        digest_part.to_string()
+    } else {
+        // Fetch the manifest digest from the registry
+        client
+            .fetch_manifest_digest(&reference_parsed, &auth)
+            .await
+            .with_context(|| format!("failed to fetch manifest digest for {reference}"))?
+    };
+    // Cache the pushed component with its digest
+    if let Some(cache_dir) = config.cache_dir {
+        let cache_manager = CacheManager::open(cache_dir, &auth, config.insecure, trust.id)
+            .await
+            .context("failed to open the OCI cache")?;
+        cache_manager
+            .write_to_cache(reference, component_data, &digest)
+            .await
+            .with_context(|| "failed to cache pushed component")?;
+    }
+
+    Ok(digest)
+}
+
+/// Validate that the provided bytes represent a valid WebAssembly component
+///
+/// This function parses the WebAssembly bytes and validates that they form
+/// a valid WebAssembly component, not just a raw module.
+///
+/// # Arguments
+/// * `data` - The raw bytes to validate
+///
+/// # Returns
+/// Returns `Ok(())` if the data represents a valid WebAssembly component,
+/// otherwise returns an error describing why validation failed.
+///
+/// # Examples
+/// ```no_run
+/// use wash_runtime::oci::validate_component;
+///
+/// #[tokio::main]
+/// async fn main() -> anyhow::Result<()> {
+///     let component_bytes = std::fs::read("my-component.wasm")?;
+///     validate_component(&component_bytes).await?;
+///     println!("Component is valid!");
+///     Ok(())
+/// }
+/// ```
+pub async fn validate_component(data: &[u8]) -> Result<()> {
+    wit_component::decode_reader(data)
+        .context("failed to decode component bytes")
+        .map(|_| ())
+}
+
+/// Cleanup cached OCI artifacts
+#[instrument(skip(cache_dir))]
+pub async fn cleanup_cache(cache_dir: impl AsRef<Path>, age: Duration) -> Result<()> {
+    disk_cache::expire_artifacts(cache_dir.as_ref(), age).await
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Open `gate` once `joined` holds, so work held at the gate is provably
+    /// still in flight while every caller joins it.
+    async fn open_once(joined: impl Fn() -> bool, gate: &tokio::sync::watch::Sender<bool>) {
+        tokio::time::timeout(Duration::from_secs(10), async {
+            while !joined() {
+                tokio::task::yield_now().await;
+            }
+        })
+        .await
+        .expect("every caller joins the flight");
+        gate.send_replace(true);
+    }
+
+    #[tokio::test]
+    async fn failed_and_oversized_pulls_have_bounded_retention() {
+        let cache: Coalescer<String, u32> = Coalescer::with_min_weight(
+            16 * u64::from(PULL_ENTRY_WEIGHT),
+            Duration::from_secs(60),
+            Duration::from_secs(60),
+            PULL_ENTRY_WEIGHT,
+            |size| *size,
+        );
+        for index in 0..256 {
+            assert!(
+                cache
+                    .run(format!("registry/image-{index}"), || async {
+                        anyhow::bail!("unavailable")
+                    })
+                    .await
+                    .is_err()
+            );
+        }
+        cache.finished.run_pending_tasks();
+        assert_eq!(cache.finished.entry_count(), 0);
+        assert_eq!(cache.in_flight_count(), 0);
+        assert_eq!(
+            cache
+                .run("oversized".into(), || async { Ok(u32::MAX) })
+                .await
+                .unwrap(),
+            u32::MAX
+        );
+        cache.finished.run_pending_tasks();
+        assert!(!cache.finished.contains_key("oversized"));
+        assert_eq!(cache.in_flight_count(), 0);
+    }
+
+    /// Requests in flight are never refused for space: a full reuse cache,
+    /// here one too small to hold any result, must not stop coalescing.
+    #[tokio::test]
+    async fn a_full_reuse_cache_still_coalesces() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        let coalescer: Coalescer<&str, u32> =
+            Coalescer::new(1, Duration::from_secs(60), Duration::from_secs(60), |_| {
+                u32::MAX
+            });
+        let runs = AtomicUsize::new(0);
+        let (open, gate) = tokio::sync::watch::channel(false);
+        let work = || async {
+            runs.fetch_add(1, Ordering::SeqCst);
+            gate.clone().wait_for(|open| *open).await.unwrap();
+            Ok(1)
+        };
+        let (a, b, c, ()) = tokio::join!(
+            coalescer.run("ref", work),
+            coalescer.run("ref", work),
+            coalescer.run("ref", work),
+            open_once(|| coalescer.waiters(&"ref") == 3, &open),
+        );
+        assert_eq!((a.unwrap(), b.unwrap(), c.unwrap()), (1, 1, 1));
+        assert_eq!(runs.load(Ordering::SeqCst), 1);
+    }
+
+    #[tokio::test]
+    async fn credential_misses_coalesce_without_blocking_the_runtime() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        let cache: &'static Coalescer<String, RegistryAuth> = Box::leak(Box::new(Coalescer::new(
+            16,
+            Duration::from_secs(60),
+            Duration::from_secs(60),
+            |_| 1,
+        )));
+        let runs = Arc::new(AtomicUsize::new(0));
+        let (started, ready) = tokio::sync::oneshot::channel();
+        let (release, wait) = std::sync::mpsc::channel();
+        let first = tokio::spawn(cached_credentials(cache, "registry".into(), {
+            let runs = Arc::clone(&runs);
+            move || {
+                runs.fetch_add(1, Ordering::SeqCst);
+                let _ = started.send(());
+                wait.recv_timeout(Duration::from_secs(2))?;
+                Ok(RegistryAuth::Basic("user".into(), "secret".into()))
+            }
+        }));
+        ready.await.unwrap();
+        let second = tokio::spawn(cached_credentials(cache, "registry".into(), {
+            let runs = Arc::clone(&runs);
+            move || {
+                runs.fetch_add(1, Ordering::SeqCst);
+                Ok(RegistryAuth::Anonymous)
+            }
+        }));
+        // On a current-thread runtime the second caller cannot join while the
+        // helper blocks, unless the helper runs on the bounded blocking pool.
+        tokio::time::timeout(Duration::from_secs(1), async {
+            while cache.waiters(&"registry".to_string()) < 2 {
+                tokio::task::yield_now().await;
+            }
+        })
+        .await
+        .expect("the second caller joins while the helper blocks");
+        release.send(()).unwrap();
+        let expected = AuthId::of(&first.await.unwrap().unwrap());
+        assert!(expected == AuthId::of(&second.await.unwrap().unwrap()));
+        assert_eq!(runs.load(Ordering::SeqCst), 1);
+
+        assert!(
+            cached_credentials(cache, "broken".into(), || bail!("bad config"))
+                .await
+                .is_err()
+        );
+        assert!(
+            cached_credentials(cache, "broken".into(), || Ok(RegistryAuth::Anonymous))
+                .await
+                .is_ok()
+        );
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn a_cancelled_leader_does_not_extend_the_waiters_deadline() {
+        let coalescer = Arc::new(Coalescer::<&str, u32>::new(
+            16,
+            Duration::from_secs(60),
+            Duration::from_secs(5),
+            |_| 1,
+        ));
+        let deadline = Some(Duration::from_secs(30));
+        let began = tokio::time::Instant::now();
+        let leader = tokio::spawn({
+            let coalescer = Arc::clone(&coalescer);
+            async move {
+                with_pull_timeout("ref", deadline, coalescer.run("ref", std::future::pending)).await
+            }
+        });
+        tokio::task::yield_now().await;
+        let waiter = tokio::spawn(async move {
+            with_pull_timeout("ref", deadline, coalescer.run("ref", std::future::pending)).await
+        });
+        tokio::task::yield_now().await;
+        tokio::time::advance(Duration::from_secs(29)).await;
+        leader.abort();
+        let _ = leader.await;
+        let error = waiter.await.unwrap().unwrap_err();
+        assert!(error.is::<tokio::time::error::Elapsed>());
+        assert_eq!(began.elapsed(), Duration::from_secs(30));
+    }
+
+    #[tokio::test]
+    async fn fresh_pulls_share_active_work_but_never_completed_results() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        let coalescer = Coalescer::new(16, Duration::from_secs(60), Duration::from_secs(60), |_| 1);
+        let runs = AtomicUsize::new(0);
+        let (open, gate) = tokio::sync::watch::channel(false);
+        let work = || async {
+            let value = runs.fetch_add(1, Ordering::SeqCst);
+            gate.clone().wait_for(|open| *open).await.unwrap();
+            Ok(value)
+        };
+        let (a, b, ()) = tokio::join!(
+            coalescer.run_with_reuse("ref", false, work),
+            coalescer.run_with_reuse("ref", false, work),
+            open_once(|| coalescer.waiters(&"ref") == 2, &open),
+        );
+        assert_eq!(a.unwrap(), 0);
+        assert_eq!(b.unwrap(), 0);
+        assert_eq!(
+            coalescer.run_with_reuse("ref", false, work).await.unwrap(),
+            1
+        );
+        // Nothing could reuse an `Always` result, so none is kept.
+        coalescer.finished.run_pending_tasks();
+        assert_eq!(coalescer.finished.entry_count(), 0);
+        assert_eq!(coalescer.in_flight_count(), 0);
+    }
+    use tempfile::TempDir;
+
+    /// Identical requests in flight together do the work once and all get its
+    /// answer; a different request does its own.
+    #[tokio::test]
+    async fn concurrent_identical_pulls_run_once() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+
+        let coalescer: Coalescer<&str, u32> =
+            Coalescer::new(16, Duration::from_secs(60), Duration::from_secs(60), |_| 1);
+        let runs = AtomicUsize::new(0);
+        let (open, gate) = tokio::sync::watch::channel(false);
+        let work = |value| {
+            let runs = &runs;
+            let mut gate = gate.clone();
+            move || async move {
+                runs.fetch_add(1, Ordering::SeqCst);
+                gate.wait_for(|open| *open).await.unwrap();
+                Ok(value)
+            }
+        };
+
+        let (a, b, c, ()) = tokio::join!(
+            coalescer.run("ref", work(1)),
+            coalescer.run("ref", work(2)),
+            coalescer.run("other", work(3)),
+            open_once(
+                || coalescer.waiters(&"ref") == 2 && coalescer.waiters(&"other") == 1,
+                &open,
+            ),
+        );
+        assert_eq!((a.unwrap(), b.unwrap(), c.unwrap()), (1, 1, 3));
+        assert_eq!(runs.load(Ordering::SeqCst), 2);
+    }
+
+    /// Finished results are bounded by their weight, not their count, so a
+    /// burst of large pulls cannot all stay resident for the reuse window.
+    #[tokio::test]
+    async fn finished_results_are_bounded_by_weight() {
+        let coalescer: Coalescer<&str, u32> =
+            Coalescer::new(10, Duration::from_secs(60), Duration::from_secs(60), |v| *v);
+        for key in ["a", "b", "c"] {
+            assert_eq!(coalescer.run(key, || async { Ok(8) }).await.unwrap(), 8);
+        }
+        coalescer.finished.run_pending_tasks();
+        assert!(
+            coalescer.finished.weighted_size() <= 10,
+            "three results of 8 cannot all fit in 10: {}",
+            coalescer.finished.weighted_size()
+        );
+    }
+
+    /// Every caller sharing a failure gets its whole chain, not just the top
+    /// message: the cause underneath is usually the part worth reading.
+    #[tokio::test]
+    async fn a_shared_failure_keeps_its_chain() {
+        let coalescer: Coalescer<&str, u32> =
+            Coalescer::new(16, Duration::from_secs(60), Duration::from_secs(60), |_| 1);
+        let err = coalescer
+            .run("ref", || async {
+                Err(anyhow!("certificate not trusted").context("pulling ref"))
+            })
+            .await
+            .unwrap_err();
+        assert_eq!(format!("{err:#}"), "pulling ref: certificate not trusted");
+        assert_eq!(err.chain().count(), 2);
+    }
+
+    /// A failure answers the requests waiting on it rather than letting each
+    /// retry in turn, but the next request after it tries again at once.
+    #[tokio::test]
+    async fn a_failed_pull_answers_only_its_waiters() {
+        let coalescer: Coalescer<&str, u32> =
+            Coalescer::new(16, Duration::from_secs(60), Duration::from_secs(60), |_| 1);
+
+        let (open, gate) = tokio::sync::watch::channel(false);
+        let (a, b, ()) = tokio::join!(
+            coalescer.run("ref", || async {
+                gate.clone().wait_for(|open| *open).await.unwrap();
+                bail!("registry unreachable")
+            }),
+            coalescer.run("ref", || async { Ok(7) }),
+            open_once(|| coalescer.waiters(&"ref") == 2, &open),
+        );
+        assert!(a.unwrap_err().to_string().contains("registry unreachable"));
+        assert!(b.unwrap_err().to_string().contains("registry unreachable"));
+
+        assert_eq!(coalescer.run("ref", || async { Ok(7) }).await.unwrap(), 7);
+    }
+
+    /// Different credentials never share a pull or a client.
+    #[test]
+    fn credentials_are_part_of_the_identity() {
+        let basic = |user: &str, password: &str| {
+            AuthId::of(&RegistryAuth::Basic(user.to_string(), password.to_string()))
+        };
+        assert!(basic("a", "b") == basic("a", "b"));
+        assert!(basic("a", "b") != basic("a", "c"));
+        assert!(basic("ab", "") != basic("a", "b"));
+        assert!(basic("a", "b") != AuthId::of(&RegistryAuth::Anonymous));
+        assert!(AuthId::of(&RegistryAuth::Bearer("t".into())) != basic("t", ""));
+    }
+
+    /// Never serves a pinned entry offline: the host here does not resolve,
+    /// so any request would fail.
+    #[tokio::test]
+    async fn never_reuses_a_digest_pinned_entry_offline() {
+        let temp_dir = TempDir::new().unwrap();
+        let digest = format!("sha256:{}", "ab".repeat(32));
+        let reference = format!("registry.invalid/ns/component@{digest}");
+        CacheManager::open(
+            temp_dir.path().to_path_buf(),
+            &RegistryAuth::Basic("user".into(), "secret".into()),
+            false,
+            TrustSnapshot::load().await.unwrap().id,
+        )
+        .await
+        .unwrap()
+        .write_to_cache(&reference, b"cached bytes", &digest)
+        .await
+        .unwrap();
+
+        // Explicit credentials, so no docker credential helper runs either.
+        let mut config = OciConfig::new_with_credentials("user", "secret");
+        config.cache_dir = Some(temp_dir.path().to_path_buf());
+        let (bytes, pulled_digest) = pull_component(&reference, config, OciPullPolicy::Never)
+            .await
+            .unwrap();
+        assert_eq!(bytes, b"cached bytes");
+        assert_eq!(pulled_digest, digest);
+    }
+
+    /// Where the docker config is looked for has to match `docker_credential`'s
+    /// own rule, since telling an absent config from an unparseable one is done
+    /// by checking that path: `DOCKER_CONFIG` wins, `$HOME/.docker` is the
+    /// fallback, and neither present means there is no config to blame.
+    #[test]
+    fn the_docker_config_directory_follows_the_credential_crates_rule() {
+        use std::ffi::OsString;
+
+        assert_eq!(
+            docker_config_dir(
+                Some(OsString::from("/etc/docker")),
+                Some(OsString::from("/home/u"))
+            ),
+            Some(PathBuf::from("/etc/docker")),
+            "DOCKER_CONFIG wins over HOME"
+        );
+        assert_eq!(
+            docker_config_dir(None, Some(OsString::from("/home/u"))),
+            Some(PathBuf::from("/home/u/.docker"))
+        );
+        assert_eq!(docker_config_dir(None, None), None);
+    }
+
+    /// A bundle that cannot be read has to fail loudly at startup. Trust is
+    /// configured once and used much later, so a silently skipped bundle would
+    /// surface as every pull from that registry failing to verify, far from
+    /// the typo that caused it.
+    #[test]
+    fn missing_ca_bundle_is_an_error() {
+        let err = load_ca_certificates(&[PathBuf::from("/definitely/not/a/ca.pem")])
+            .expect_err("a missing CA bundle must not be skipped");
+        assert!(
+            err.to_string().contains("CA bundle"),
+            "the error should name what it failed to read, got: {err}"
+        );
+    }
+
+    /// A certificate webpki would reject is skipped, not handed to
+    /// `oci-client`, where it would fail the client build and discard its
+    /// whole configuration.
+    #[test]
+    fn env_ca_certificates_skip_unusable_entries() {
+        let dir = TempDir::new().expect("temp dir");
+        let ca = rcgen::generate_simple_self_signed(vec!["private-ca.test".to_string()])
+            .expect("generating a test certificate")
+            .cert;
+        let bundle = dir.path().join("bundle.pem");
+        std::fs::write(
+            &bundle,
+            format!(
+                "{}-----BEGIN CERTIFICATE-----\nbm90IGEgY2VydGlmaWNhdGU=\n-----END CERTIFICATE-----\n",
+                ca.pem()
+            ),
+        )
+        .expect("writing the bundle");
+
+        let loaded = rustls_native_certs::load_certs_from_paths(Some(&bundle), None);
+        assert_eq!(loaded.certs.len(), 2, "both PEM blocks load");
+        let certs = usable_ca_certificates(loaded);
+
+        assert_eq!(certs.len(), 1, "only the real CA is usable");
+        assert!(matches!(certs[0].encoding, CertificateEncoding::Der));
+        assert_eq!(certs[0].data, ca.der().as_ref());
+    }
+
+    /// An empty configuration must leave the store unclaimed. It can only be
+    /// written once, so an empty set taking it would lock out the caller that
+    /// does have trust roots — and that caller would be told it succeeded.
+    #[test]
+    fn no_ca_paths_leaves_the_trust_store_unclaimed() {
+        set_extra_ca_certificates(&[]).expect("an empty set is not a failure");
+        assert!(
+            EXTRA_CA_CERTIFICATES.get().is_none(),
+            "nothing to install must install nothing"
+        );
+    }
+
+    /// The ordinary double-apply: `wash host start` installs its CA paths
+    /// before pulling its host component plugins, then the host it builds
+    /// applies the same [`HostConfig::oci_ca_paths`] again. In any order — the
+    /// two callers hold the same configuration, not the same `Vec`.
+    #[test]
+    fn the_same_bundles_installed_twice_are_a_no_op() {
+        let dir = TempDir::new().unwrap();
+        let paths = [written_bundle(&dir, "a.pem"), written_bundle(&dir, "b.pem")];
+        let store = OnceLock::new();
+
+        install_ca_certificates(&store, &paths).expect("the first configuration installs");
+        let reversed = [paths[1].clone(), paths[0].clone()];
+        install_ca_certificates(&store, &reversed).expect("the same bundles are not a conflict");
+        assert_eq!(store.get().map(|t| t.certs.len()), Some(2));
+    }
+
+    /// The window between those two calls is a network pull of every host
+    /// component plugin, and the bundle on disk is not immutable: cert-manager
+    /// and projected Kubernetes secrets rewrite one in place. A rotation
+    /// landing in that window must not fail the host's startup.
+    #[test]
+    fn a_bundle_rewritten_between_two_installs_is_still_the_same_configuration() {
+        let dir = TempDir::new().unwrap();
+        let path = written_bundle(&dir, "ca.pem");
+        let store = OnceLock::new();
+
+        install_ca_certificates(&store, std::slice::from_ref(&path)).expect("the first install");
+        std::fs::write(&path, test_certificate_pem("rotated.test")).unwrap();
+        install_ca_certificates(&store, std::slice::from_ref(&path))
+            .expect("a rotated bundle at the same path is the same configuration");
+    }
+
+    /// Different bundles cannot be honored — the store holds one set for the
+    /// whole process — so the caller has to hear that, rather than be told its
+    /// trust was configured and watch every pull fail verification.
+    #[test]
+    fn conflicting_trust_is_an_error_not_a_silent_first_wins() {
+        let dir = TempDir::new().unwrap();
+        let (first, second) = (
+            written_bundle(&dir, "first.pem"),
+            written_bundle(&dir, "second.pem"),
+        );
+        let store = OnceLock::new();
+
+        install_ca_certificates(&store, std::slice::from_ref(&first))
+            .expect("the first bundle installs");
+        let err = install_ca_certificates(&store, std::slice::from_ref(&second))
+            .expect_err("different bundles must not be silently dropped");
+        let msg = err.to_string();
+        // Both halves, because the operator's next move is to compare them —
+        // spelled as they are on disk, which is what a Windows path escaped by
+        // `{:?}` would not be.
+        for named in [&first, &second] {
+            assert!(
+                msg.contains(named.to_str().unwrap()),
+                "the error should name {}: {msg}",
+                named.display()
+            );
+        }
+        // The first bundle is what is trusted, and it is intact.
+        assert_eq!(store.get().map(|t| t.certs.len()), Some(1));
+    }
+
+    /// A path in an error has to read as it does in the configuration it came
+    /// from. `{:?}` escapes separators, so a Windows path came out doubled and
+    /// matched nothing an operator could search for. Asserted with a
+    /// backslash-bearing path, which is an ordinary filename on Unix, so the
+    /// property holds on every platform this runs on.
+    #[test]
+    fn paths_in_errors_are_not_debug_escaped() {
+        let windows_ish = PathBuf::from(r"C:\etc\pki\ca.pem");
+        let rendered = display_paths(&BTreeSet::from([windows_ish.clone()]));
+        assert_eq!(rendered, windows_ish.display().to_string());
+        assert!(!rendered.contains(r"\\"), "separators must not be doubled");
+    }
+
+    /// A self-signed certificate written to `name` under `dir`.
+    fn written_bundle(dir: &TempDir, name: &str) -> PathBuf {
+        let path = dir.path().join(name);
+        std::fs::write(&path, test_certificate_pem(name)).unwrap();
+        path
+    }
+
+    /// A self-signed certificate, PEM encoded, for the bundles below.
+    fn test_certificate_pem(name: &str) -> String {
+        rcgen::generate_simple_self_signed(vec![name.to_string()])
+            .expect("generating a test certificate")
+            .cert
+            .pem()
+    }
+
+    #[test]
+    fn ca_bundles_are_read_as_pem() {
+        let dir = TempDir::new().unwrap();
+        let (first, second) = (dir.path().join("a.pem"), dir.path().join("b.pem"));
+        let (first_pem, second_pem) = (
+            test_certificate_pem("a.test"),
+            test_certificate_pem("b.test"),
+        );
+        std::fs::write(&first, &first_pem).unwrap();
+        std::fs::write(&second, &second_pem).unwrap();
+
+        let certs = load_ca_certificates(&[first, second]).expect("both bundles should load");
+        assert_eq!(certs.len(), 2, "every bundle is kept, not just the last");
+        // PEM, not DER: the bytes are handed to oci-client as read, so the
+        // encoding has to match what is on disk or verification fails at use.
+        assert!(matches!(certs[0].encoding, CertificateEncoding::Pem));
+        assert_eq!(certs[0].data, first_pem.as_bytes());
+        assert_eq!(certs[1].data, second_pem.as_bytes());
+    }
+
+    /// A bundle holding several certificates is kept whole: `oci-client` reads
+    /// every certificate out of one PEM blob, so splitting or truncating it
+    /// would drop trust roots the operator asked for.
+    #[test]
+    fn a_bundle_may_hold_several_certificates() {
+        let dir = TempDir::new().unwrap();
+        let path = dir.path().join("bundle.pem");
+        let bundle = test_certificate_pem("one.test") + &test_certificate_pem("two.test");
+        std::fs::write(&path, &bundle).unwrap();
+
+        let certs = load_ca_certificates(&[path]).expect("a multi-certificate bundle should load");
+        assert_eq!(certs.len(), 1, "one file is one entry, however many certs");
+        assert_eq!(certs[0].data, bundle.as_bytes());
+    }
+
+    /// Content is parsed at load, not at first pull. A bundle that would fail
+    /// the client build has to fail startup instead.
+    #[test]
+    fn unparseable_ca_bundles_are_rejected() {
+        let dir = TempDir::new().unwrap();
+        for (name, contents) in [
+            ("garbage.pem", "not a certificate at all\n".as_bytes()),
+            ("empty.pem", b""),
+            // Correct framing, contents that are not a certificate: the shape
+            // a truncated or wrongly-typed file takes.
+            (
+                "framed.pem",
+                b"-----BEGIN CERTIFICATE-----\nZm9v\n-----END CERTIFICATE-----\n",
+            ),
+        ] {
+            let path = dir.path().join(name);
+            std::fs::write(&path, contents).unwrap();
+            let err = load_ca_certificates(&[path])
+                .expect_err("{name} must not be accepted as a CA bundle");
+            assert!(
+                err.to_string().contains("invalid OCI CA bundle"),
+                "the error should name the bundle it rejected, got: {err}"
+            );
+        }
+    }
+
+    #[test]
+    fn no_ca_bundles_means_the_compiled_in_roots() {
+        assert!(
+            load_ca_certificates(&[]).unwrap().is_empty(),
+            "an empty list must not invent a root; the default trust is oci-client's own"
+        );
+    }
+
+    #[test]
+    fn test_oci_config_default() {
+        let config = OciConfig::default();
+        assert!(config.credentials.is_none());
+        assert!(!config.insecure);
+        assert!(config.cache_dir.is_none());
+    }
+
+    #[test]
+    fn test_oci_config_with_credentials() {
+        let config = OciConfig::new_with_credentials("user".to_string(), "pass".to_string());
+        assert_eq!(
+            config.credentials,
+            Some(("user".to_string(), "pass".to_string()))
+        );
+    }
+
+    #[test]
+    fn test_oci_config_insecure() {
+        let config = OciConfig::new_insecure();
+        assert!(config.insecure);
+    }
+
+    #[tokio::test]
+    async fn test_cache_manager_path_generation() {
+        let temp_dir = TempDir::new().unwrap();
+        let cache_manager = CacheManager::open(
+            temp_dir.path().to_path_buf(),
+            &RegistryAuth::Anonymous,
+            false,
+            TrustSnapshot::load().await.unwrap().id,
+        )
+        .await
+        .unwrap();
+
+        let reference = "localhost:5000/test:latest";
+        let entry_path = cache_manager.get_entry_path(reference);
+
+        assert!(entry_path.starts_with(cache_manager.get_cache_dir(reference)));
+        assert!(entry_path.file_name().unwrap() == "entry");
+    }
+
+    #[tokio::test]
+    async fn test_cache_manager_operations() {
+        let temp_dir = TempDir::new().unwrap();
+        let cache_manager = CacheManager::open(
+            temp_dir.path().to_path_buf(),
+            &RegistryAuth::Anonymous,
+            false,
+            TrustSnapshot::load().await.unwrap().id,
+        )
+        .await
+        .unwrap();
+
+        let reference = "localhost:5000/test:v1.0.0";
+        let test_data = b"test component data";
+        let test_digest = "sha256:abcd1234";
+
+        // Should not be cached initially
+        assert!(!cache_manager.is_cached(reference).await);
+
+        // Cache the data with digest
+        cache_manager
+            .write_to_cache(reference, test_data, test_digest)
+            .await
+            .unwrap();
+
+        // Should now be cached
+        assert!(cache_manager.is_cached(reference).await);
+
+        // Should be able to read the cached data and digest
+        let (cached_data, cached_digest) = cache_manager.read_cached(reference).await.unwrap();
+        assert_eq!(cached_data, test_data);
+        assert_eq!(cached_digest, test_digest);
+    }
+
+    #[tokio::test]
+    async fn test_validate_component_invalid_data() {
+        let invalid_data = b"not wasm data";
+        let result = validate_component(invalid_data).await;
+        assert!(result.is_err());
+    }
+
+    // Integration test with real registry - marked `#[ignore]`, run with `cargo test --include-ignored`
+    #[tokio::test]
+    #[ignore = "hits a real OCI registry (network); run with `cargo test --include-ignored`"]
+    async fn test_pull_and_validate_ghcr_component() {
+        // Use public OCI references for testing
+        let references = vec![
+            // wasmCloud hello world component
+            "ghcr.io/wasmcloud/components/http-hello-world-rust:0.1.0",
+            // Bytecode Alliance sample component
+            "ghcr.io/bytecodealliance/sample-wasi-http-rust/sample-wasi-http-rust:latest",
+        ];
+
+        let config = OciConfig::default();
+
+        // Pull the component anonymously
+        for reference in references {
+            let (component_bytes, digest) =
+                pull_component(reference, config.clone(), OciPullPolicy::IfNotPresent)
+                    .await
+                    .expect("Failed to pull component");
+
+            let res = validate_component(&component_bytes).await;
+            assert!(
+                res.is_ok(),
+                "Component validation failed for {reference}: {}",
+                res.unwrap_err()
+            );
+
+            // Verify digest format
+            assert!(
+                digest.starts_with("sha256:"),
+                "Digest should start with sha256:"
+            );
+        }
+    }
+
+    #[test]
+    fn test_oci_config_with_cache() {
+        let temp_dir = TempDir::new().unwrap();
+        let config = OciConfig::new_with_cache(temp_dir.path().to_path_buf());
+
+        assert!(config.cache_dir.is_some());
+        assert_eq!(config.cache_dir.unwrap(), temp_dir.path());
+        assert!(config.credentials.is_none());
+        assert!(!config.insecure);
+    }
+}

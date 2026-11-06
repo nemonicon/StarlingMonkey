@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "rawSingleEsm": true,
+  "worldPackage": "starling:next-component@0.1.0",
+  "worldName": "next-http",
+  "nativeSourceRoot": "/private/tmp/starling-node-compat/next-native-profile-v2/source",
+  "parentAdapter": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-http/next-http-candidate-v1/wasi-adapter.mjs",
+    "sha256": "a366a2e064733c917f256a71ee9cfd07ea680a7810cbb992a5283c1c33757ff3",
+    "bytes": 5241
+  },
+  "adapterDerivation": {
+    "before": "      return runFreshRequest(handleResources, undefined, incoming, outparam);",
+    "after": "      let entered=false;\n      try {\n        return runFreshRequest((...args)=>{\n          entered=true;\n          return handleResources(...args);\n        },undefined,incoming,outparam);\n      } catch(error) {\n        if(!entered)disposeBeforeEntry(incoming,outparam);\n        throw error;\n      }",
+    "appended": "\n// The caller still owns incoming/outparam until native callback entry. Always\n// attempt both drops, preserving the original pre-entry error even if cleanup\n// itself refuses. Cleanup failure is diagnostic and cannot turn into success.\nfunction disposeBeforeEntry(incoming,outparam) {\n  let failures=0;\n  for(const value of [incoming,outparam])try{drop(value);}catch{failures++;}\n  if(failures)try{console.error('NEXT_COMPONENT_PRE_ENTRY_DISPOSAL_FAILURE',failures);}catch{}\n}\n"
+  },
+  "nativeApis": [
+    {
+      "path": "/private/tmp/starling-node-compat/next-native-profile-v2/source/builtins/node-compat/private-startup-export-manifest.v1.json",
+      "sha256": "f046119b07908d21ff7a4ac1ae5e9448131a22de73e518a2ed54d1de4d9ead1f",
+      "bytes": 1327
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/next-native-profile-v2/source/builtins/node-compat/next-http/private-http-export-manifest.v1.json",
+      "sha256": "5d2c924717cb61af9d01c7e9d5eb5d0417557c9abc906353b95089763eab3c51",
+      "bytes": 617
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/next-native-profile-v2/source/builtins/node-compat/next-http/http-core.mjs",
+      "sha256": "c1beb50845791cbaeaf140828b31eb53f1a1f01a8b0491a3f7f4c3eb7a3c84d7",
+      "bytes": 5699
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/next-native-profile-v2/source/builtins/node-compat/startup-core.mjs",
+      "sha256": "d33b0ad8a49f6e44ad8b4ace7c00def1952b295ef7e03cdbfcecc181dbb6ae48",
+      "bytes": 13185
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/next-native-profile-v2/source/runtime/async_context_runtime.cpp",
+      "sha256": "d2667226caf763eb65a72784f78d63b86a6c7a21549425df210034f72ca8a4fd",
+      "bytes": 9874
+    }
+  ],
+  "witDependencies": [
+    {
+      "source": {
+        "path": "/private/tmp/starling-node-compat/next-native-profile-v2/source/host-apis/wasi-0.2.10/wit/deps/wasi-cli-0.2.10/package.wit",
+        "sha256": "214c0036896b988fd7cd9dc5dfc602078b831b628759375d6b68fadbbe2b60da",
+        "bytes": 6858
+      },
+      "copy": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v1/deps/wasi-cli-0.2.10/package.wit",
+        "sha256": "214c0036896b988fd7cd9dc5dfc602078b831b628759375d6b68fadbbe2b60da",
+        "bytes": 6858
+      }
+    },
+    {
+      "source": {
+        "path": "/private/tmp/starling-node-compat/next-native-profile-v2/source/host-apis/wasi-0.2.10/wit/deps/wasi-clocks-0.2.10/package.wit",
+        "sha256": "9e42d4fdecf00b70298f1d02fa09df4899219fda0b92784fd915b60e21cd41a2",
+        "bytes": 730
+      },
+      "copy": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v1/deps/wasi-clocks-0.2.10/package.wit",
+        "sha256": "9e42d4fdecf00b70298f1d02fa09df4899219fda0b92784fd915b60e21cd41a2",
+        "bytes": 730
+      }
+    },
+    {
+      "source": {
+        "path": "/private/tmp/starling-node-compat/next-native-profile-v2/source/host-apis/wasi-0.2.10/wit/deps/wasi-filesystem-0.2.10/package.wit",
+        "sha256": "ec3b02ebd6d643f84c7944d777a58efd7c5e4dcf59cdacc10c5ef1df1c7d957b",
+        "bytes": 4511
+      },
+      "copy": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v1/deps/wasi-filesystem-0.2.10/package.wit",
+        "sha256": "ec3b02ebd6d643f84c7944d777a58efd7c5e4dcf59cdacc10c5ef1df1c7d957b",
+        "bytes": 4511
+      }
+    },
+    {
+      "source": {
+        "path": "/private/tmp/starling-node-compat/next-native-profile-v2/source/host-apis/wasi-0.2.10/wit/deps/wasi-http-0.2.10/package.wit",
+        "sha256": "3e0c539616f3f1d677d530543dc41a7bb46787039a417c27976c119868bae7ea",
+        "bytes": 31611
+      },
+      "copy": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v1/deps/wasi-http-0.2.10/package.wit",
+        "sha256": "3e0c539616f3f1d677d530543dc41a7bb46787039a417c27976c119868bae7ea",
+        "bytes": 31611
+      }
+    },
+    {
+      "source": {
+        "path": "/private/tmp/starling-node-compat/next-native-profile-v2/source/host-apis/wasi-0.2.10/wit/deps/wasi-io-0.2.10/package.wit",
+        "sha256": "799bbdc5b45e4c7136d8e6e0f870cf8c73323663a959d420bb66a1bda8e8ea4f",
+        "bytes": 1400
+      },
+      "copy": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v1/deps/wasi-io-0.2.10/package.wit",
+        "sha256": "799bbdc5b45e4c7136d8e6e0f870cf8c73323663a959d420bb66a1bda8e8ea4f",
+        "bytes": 1400
+      }
+    },
+    {
+      "source": {
+        "path": "/private/tmp/starling-node-compat/next-native-profile-v2/source/host-apis/wasi-0.2.10/wit/deps/wasi-random-0.2.10/package.wit",
+        "sha256": "3f2205fb68718fb9ed864c41e8a2f45066bb7caf4d69ee399279d736ed4c52c1",
+        "bytes": 330
+      },
+      "copy": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v1/deps/wasi-random-0.2.10/package.wit",
+        "sha256": "3f2205fb68718fb9ed864c41e8a2f45066bb7caf4d69ee399279d736ed4c52c1",
+        "bytes": 330
+      }
+    },
+    {
+      "source": {
+        "path": "/private/tmp/starling-node-compat/next-native-profile-v2/source/host-apis/wasi-0.2.10/wit/deps/wasi-sockets-0.2.10/package.wit",
+        "sha256": "634f12cdd1c5f9cceb711db97af320086828221e5d57a8121a273f5f3938b62a",
+        "bytes": 5929
+      },
+      "copy": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v1/deps/wasi-sockets-0.2.10/package.wit",
+        "sha256": "634f12cdd1c5f9cceb711db97af320086828221e5d57a8121a273f5f3938b62a",
+        "bytes": 5929
+      }
+    }
+  ],
+  "actualNativeEngine": null,
+  "actualComponent": null,
+  "actualGuestExecution": null,
+  "fixtureContract": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/fixture-contract.json",
+    "sha256": "d6399e901a0612f672ee176e9ded84fcc19e3f4016059e5d5f728596b0b807f2",
+    "bytes": 8158
+  },
+  "applicationSourceRoot": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application",
+  "nextOptionEvidence": [
+    {
+      "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/server/next.js",
+      "sha256": "619bdfe17ccc471d1767114176a45266c86601d4d5d24a9d9194aa1f73b5afe1",
+      "bytes": 18260
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/server/lib/start-server.js",
+      "sha256": "2beb0e087fc69702d0eb7b67e5fd0f95fa216d6463dc3732c9a2966310aea5ad",
+      "bytes": 25819
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/server/next-server.js",
+      "sha256": "b213afa46803f94a38aa506c6b130eeb94841d7e1ca37686357adf2637cce69e",
+      "bytes": 71948
+    }
+  ],
+  "readinessFailurePolicy": "One sticky neutral initialization promise per component; no retry/reset; dispose unentered request/outparam pairs.",
+  "requiredRoutingEnvironment": "STARLING_NEXT_ORIGIN canonical HTTP(S) origin, set independently of incoming requests",
+  "modelTestsProveNativeAsync": false,
+  "standaloneSourceRoot": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/application/.next/standalone",
+  "applicationSourceRootRole": "Prior real Node custom-server control evidence; not a guest app acceptance or a reuse requirement.",
+  "standaloneCriticalInputs": [
+    {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/application/.next/standalone/package.json",
+      "sha256": "af95314e803093977c442fe1480be1fa11380cc35d502e3aa3ea048b9f223054",
+      "bytes": 331
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/application/.next/standalone/server.js",
+      "sha256": "d94d0ef9300818ede9ed2770e7c7446ead87cce20a59ef69b16b8ecea5fd4322",
+      "bytes": 8193
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/application/.next/standalone/.next/BUILD_ID",
+      "sha256": "e6cadb48b5349d3e80f49420a98735dcf8dea936deeebf01bbab8dee32cab817",
+      "bytes": 21
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/application/.next/standalone/.next/required-server-files.json",
+      "sha256": "1265fa5f4aedd1457e055fdc2f33a6c66a78e0b161ce8c3d8f4f9e6a8222b5e7",
+      "bytes": 10924
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/application/.next/standalone/node_modules/next/package.json",
+      "sha256": "76f5b7ef447577c2855eee017ae8a47aeefc1e4c95e71387b66c2671283682c8",
+      "bytes": 3188
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/application/.next/standalone/node_modules/react/package.json",
+      "sha256": "9cc9c3de5441a2eea7f41f52f3f2a15a4fc51f90c0b72741f0d7638643a85e67",
+      "bytes": 1242
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/application/.next/standalone/node_modules/react-dom/package.json",
+      "sha256": "89d54f11575c9b0f7819962d9d72a31970dfb4d103f07e8b1d1b37e6d1fc3258",
+      "bytes": 3054
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/application/.next/standalone/public/fixture.txt",
+      "sha256": "1577b49e22dd31e21c150221a90e022374dbdf371ad27fd912706f7d02dc1d1a",
+      "bytes": 18
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/application/.next/standalone/fixtures/message.txt",
+      "sha256": "6bb4bb9103d951dce4f9ff0ebaeee7e91d610226c5661630d59824f0d958b928",
+      "bytes": 23
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/application/.next/standalone/node_modules/next/dist/shared/lib/is-thenable.js",
+      "sha256": "b6a8c98acc38ae16373715ea01aaa3b1b4a747d65ef6ab21efea4f9c7790c0ed",
+      "bytes": 537
+    }
+  ],
+  "nativeSourceComposition": {
+    "path": "/private/tmp/starling-node-compat/next-native-profile-v2/composition.json",
+    "sha256": "132f703993b9a00a6da70d0f86994d38ab12c548f0d49bc73368b3fab404174e",
+    "bytes": 463828
+  }
+}

@@ -1,0 +1,248 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_ONLY_VM_LOCALIZED_DELTA_ON_CORRECTED_ALS_V3",
+  "parentAlsSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/native-als-candidate-v3/index.json",
+    "sha256": "44d7baf5c61e305d76ff5469f395235cdee0ca80c852714204f4c446d8bc66bc",
+    "bytes": 2062
+  },
+  "files": [
+    {
+      "path": "builtins/node-compat/register.cpp",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/native-als-candidate-v2/after/builtins/node-compat/register.cpp",
+        "sha256": "87ab1e79b497bf0fe313bd44d731b194bd5c8244f1237360afd82cf20a8bfbb3",
+        "bytes": 17026
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-vm/node-vm-candidate-v1/after/builtins/node-compat/register.cpp",
+        "sha256": "761cf60ddedd61f37659b0bb7b22c52babad971a10d3d17b82e55de9e697db1a",
+        "bytes": 17649
+      },
+      "edits": [
+        {
+          "before": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n#include \"async-hooks-factory.generated.h\"\n#include \"async_context_runtime.h\"\n#endif\nnamespace builtins::node_compat {\nJSObject *create_kernel(JSContext *cx);\n",
+          "after": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n#include \"async-hooks-factory.generated.h\"\n#include \"async_context_runtime.h\"\n#endif\n#ifdef NODE_COMPAT_VM_DATA\n#include \"vm-data-factory.generated.h\"\n#include \"vm-data-kernel.h\"\n#endif\nnamespace builtins::node_compat {\nJSObject *create_kernel(JSContext *cx);\n"
+        },
+        {
+          "before": "  if (!evaluate_factory(cx, kAsyncLocalStorageFactorySource, argument, &module)) return false;\n  return engine->define_builtin_module(\"node:async_hooks\", module) &&\n         engine->define_builtin_module(\"async_hooks\", module);\n}\n#endif\n#ifdef NODE_COMPAT_PATH\n",
+          "after": "  if (!evaluate_factory(cx, kAsyncLocalStorageFactorySource, argument, &module)) return false;\n  return engine->define_builtin_module(\"node:async_hooks\", module) &&\n         engine->define_builtin_module(\"async_hooks\", module);\n}\n#endif\n#ifdef NODE_COMPAT_VM_DATA\nstatic bool install_vm_data(api::Engine* engine) {\n  auto* cx=engine->cx();\n  JS::RootedObject kernel(cx,create_vm_data_kernel(cx));if(!kernel)return false;\n  JS::RootedValue argument(cx,JS::ObjectValue(*kernel)),module(cx);\n  if(!evaluate_factory(cx,kVmDataFactorySource,argument,&module))return false;\n  return engine->define_builtin_module(\"node:vm\",module)&&engine->define_builtin_module(\"vm\",module);\n}\n#endif\n#ifdef NODE_COMPAT_PATH\n"
+        },
+        {
+          "before": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n  if (!install_async_local_storage(engine)) return false;\n#endif\n  return JS_DefineProperty(cx, engine->global(), \"Buffer\", buffer_constructor, 0);\n}\n} // namespace builtins::node_compat\n",
+          "after": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n  if (!install_async_local_storage(engine)) return false;\n#endif\n#ifdef NODE_COMPAT_VM_DATA\n  if (!install_vm_data(engine)) return false;\n#endif\n  return JS_DefineProperty(cx, engine->global(), \"Buffer\", buffer_constructor, 0);\n}\n} // namespace builtins::node_compat\n"
+        }
+      ]
+    },
+    {
+      "path": "cmake/builtins.cmake",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/native-als-candidate-v2/after/cmake/builtins.cmake",
+        "sha256": "0ca0565d19ff80e07a66609e58f71411c468e1fc6a48fe2b19a171089feea2b4",
+        "bytes": 14838
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-vm/node-vm-candidate-v1/after/cmake/builtins.cmake",
+        "sha256": "b83af8ce0d6317a96b3edab22e64a1b4dc2a88c22f91b2f48252b672294db2a5",
+        "bytes": 15475
+      },
+      "edits": [
+        {
+          "before": "    target_include_directories(builtin_node_compat PRIVATE ${CMAKE_SOURCE_DIR}/runtime)\nendif()\n\n# UNAPPLIED classic source candidate: pure JS state machines over existing guest\n# byte/event/decoder primitives and the private FIFO. No external host service.\noption(NODE_COMPAT_CLASSIC_STREAMS \"Enable optional bounded node:stream classic core\" OFF)\n",
+          "after": "    target_include_directories(builtin_node_compat PRIVATE ${CMAKE_SOURCE_DIR}/runtime)\nendif()\n\n# Finite-data VM: real SM realm/evaluation, no Node host provider.\noption(NODE_COMPAT_VM_DATA \"Enable experimental finite-data node:vm\" OFF)\nif(NODE_COMPAT_VM_DATA AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat OR NOT NODE_COMPAT_ASYNC_LOCAL_STORAGE)\n        message(FATAL_ERROR \"VM data realms require Node compatibility and native ALS\")\n    endif()\n    target_sources(builtin_node_compat PRIVATE builtins/node-compat/vm-data-kernel.cpp)\n    target_compile_definitions(extension_api INTERFACE NODE_COMPAT_VM_DATA=1)\n    target_include_directories(builtin_node_compat PRIVATE ${CMAKE_SOURCE_DIR}/runtime)\nendif()\n\n# UNAPPLIED classic source candidate: pure JS state machines over existing guest\n# byte/event/decoder primitives and the private FIFO. No external host service.\noption(NODE_COMPAT_CLASSIC_STREAMS \"Enable optional bounded node:stream classic core\" OFF)\n"
+        }
+      ]
+    },
+    {
+      "path": "include/extension-api.h",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/native-als-candidate-v3/after/include/extension-api.h",
+        "sha256": "9c5f463ece0c94789e0b42b02b365bca646dce63eb1ca023c5fbff1334c76b70",
+        "bytes": 8096
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-vm/node-vm-candidate-v1/after/include/extension-api.h",
+        "sha256": "8e5352edf230c2ad7eaf2ea0109ecbdaf4354c77922087acde1cc072b4de11f8",
+        "bytes": 8277
+      },
+      "edits": [
+        {
+          "before": "  static JSContext *cx();\n  static HandleObject global();\n  EngineState state();\n  bool debugging_enabled();\n  bool wpt_mode();\n  const mozilla::Maybe<std::string> &init_location() const;\n",
+          "after": "  static JSContext *cx();\n  static HandleObject global();\n  EngineState state();\n#ifdef NODE_COMPAT_VM_DATA\n  // New private native VM seam, not a guessed embedding entry point.\n  static bool initialize_data_realm(JSContext* cx, JS::HandleObject global);\n#endif\n  bool debugging_enabled();\n  bool wpt_mode();\n  const mozilla::Maybe<std::string> &init_location() const;\n"
+        }
+      ]
+    },
+    {
+      "path": "runtime/async_context_queue.cpp",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/native-als-candidate-v3/after/runtime/async_context_queue.cpp",
+        "sha256": "0e6629771f617d98b07e7057f2638e78e98741028f897714f51411743bfd6eb6",
+        "bytes": 9774
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-vm/node-vm-candidate-v1/after/runtime/async_context_queue.cpp",
+        "sha256": "eee2699cb5c2a4f892ee8e05fae456104eb93ae9dd155d56becf461d0dad7d9f",
+        "bytes": 10011
+      },
+      "edits": [
+        {
+          "before": "// SOURCE-ONLY DRAFT. No native compilation/execution has verified this code.\n#include \"async_context_queue.h\"\n#include \"node_tick_queue.h\"\n#include \"js/CallAndConstruct.h\"\n#include \"js/Exception.h\"\n",
+          "after": "// SOURCE-ONLY DRAFT. No native compilation/execution has verified this code.\n#include \"async_context_queue.h\"\n#include \"async_context_runtime.h\"\n#include \"node_tick_queue.h\"\n#include \"js/CallAndConstruct.h\"\n#include \"js/Exception.h\"\n"
+        },
+        {
+          "before": "}\nbool ContextJobQueue::enqueuePromiseJob(JSContext* cx, HandleObject promise,\n    HandleObject job, HandleObject, HandleObject host_data) {\n  if (!resources_.ready() || !allowed_realm(job))\n    return unsupported(cx, \"Promise job outside initialized ALS realms\");\n  if (storage_.get().jobs.length() - storage_.get().cursor >= MaxPendingJobs)\n",
+          "after": "}\nbool ContextJobQueue::enqueuePromiseJob(JSContext* cx, HandleObject promise,\n    HandleObject job, HandleObject, HandleObject host_data) {\n  if (is_data_realm(JS::GetObjectRealmOrNull(job))) {\n    note_data_realm_async(JS::GetObjectRealmOrNull(job));\n    return unsupported(cx, \"node:vm data realm async jobs are outside this profile\");\n  }\n  if (!resources_.ready() || !allowed_realm(job))\n    return unsupported(cx, \"Promise job outside initialized ALS realms\");\n  if (storage_.get().jobs.length() - storage_.get().cursor >= MaxPendingJobs)\n"
+        }
+      ]
+    },
+    {
+      "path": "runtime/async_context_runtime.cpp",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/native-als-candidate-v2/after/runtime/async_context_runtime.cpp",
+        "sha256": "f94ac45dda681b7dddf001c145e9fcc3a2815f6bb5d6224e0eb3952001985089",
+        "bytes": 8281
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-vm/node-vm-candidate-v1/after/runtime/async_context_runtime.cpp",
+        "sha256": "d2667226caf763eb65a72784f78d63b86a6c7a21549425df210034f72ca8a4fd",
+        "bytes": 9874
+      },
+      "edits": [
+        {
+          "before": "  explicit Metadata(ResourceStore& resources) : resources_(resources) {}\n  JSObject* build(JSContext* cx, HandleObject object,\n                  js::AutoEnterOOMUnsafeRegion& oom) const override {\n    return resources_.promise_metadata(cx, object, oom);\n  }\n};\n",
+          "after": "  explicit Metadata(ResourceStore& resources) : resources_(resources) {}\n  JSObject* build(JSContext* cx, HandleObject object,\n                  js::AutoEnterOOMUnsafeRegion& oom) const override {\n    if (JS::IsPromiseObject(object) && is_data_realm(JS::GetObjectRealmOrNull(object))) {\n      note_data_realm_async(JS::GetObjectRealmOrNull(object));\n      return nullptr; // Data VM never admits Promise creation/async completion.\n    }\n    return resources_.promise_metadata(cx, object, oom);\n  }\n};\n"
+        },
+        {
+          "before": "        content(cx), initializer(cx) {}\n};\njs::UniquePtr<RuntimeState> runtime;\nbool invalid(JSContext* cx, const char* message) {\n  return InternalTickQueue::fail(cx, JSEXN_TYPEERR, \"ERR_INVALID_ARG_TYPE\", message);\n}\n",
+          "after": "        content(cx), initializer(cx) {}\n};\njs::UniquePtr<RuntimeState> runtime;\nuint8_t data_realm_marker;\nbool invalid(JSContext* cx, const char* message) {\n  return InternalTickQueue::fail(cx, JSEXN_TYPEERR, \"ERR_INVALID_ARG_TYPE\", message);\n}\n"
+        },
+        {
+          "before": "        \"ALS boundary entered from a request or captured child resource\");\n  return runtime->queue.require_quiescent(cx);\n}\nvoid shutdown_before_context(JSContext* cx) {\n  if (!runtime) return;\n  // Integration must dispose queued/timer/I/O resources while cx is alive,\n",
+          "after": "        \"ALS boundary entered from a request or captured child resource\");\n  return runtime->queue.require_quiescent(cx);\n}\nbool is_data_realm(JS::Realm* realm) {\n  return realm && JS::GetRealmPrivate(realm) == &data_realm_marker;\n}\nvoid note_data_realm_async(JS::Realm* realm) {\n  MOZ_RELEASE_ASSERT(is_data_realm(realm));\n  JSObject* global = JS::GetRealmGlobalOrNull(realm);\n  MOZ_RELEASE_ASSERT(global && JSCLASS_RESERVED_SLOTS(JS::GetClass(global)) > DataRealmAsyncSlot);\n  JS::SetReservedSlot(global, DataRealmAsyncSlot, JS::BooleanValue(true));\n}\nbool data_realm_async_attempted(JS::HandleObject global) {\n  MOZ_RELEASE_ASSERT(is_data_realm(JS::GetObjectRealmOrNull(global)));\n  return JS::GetReservedSlot(global, DataRealmAsyncSlot).toBoolean();\n}\nbool initialize_data_realm(JSContext* cx, JS::HandleObject global) {\n  MOZ_RELEASE_ASSERT(runtime && runtime->initialized);\n  JS::Realm* realm = JS::GetObjectRealmOrNull(global);\n  if (!realm || JS::GetCompartment(global) != JS::GetCompartment(runtime->content) ||\n      JS::GetRealmPrivate(realm) != nullptr ||\n      JSCLASS_RESERVED_SLOTS(JS::GetClass(global)) <= DataRealmAsyncSlot)\n    return invalid(cx, \"Unmatched new data realm/private-slot ownership\");\n  JS::SetReservedSlot(global, DataRealmAsyncSlot, JS::BooleanValue(false));\n  JS::SetRealmPrivate(realm, &data_realm_marker);\n  JSAutoRealm ar(cx, global);\n  js::SetAllocationMetadataBuilder(cx, &runtime->metadata);\n  return true;\n}\nvoid shutdown_before_context(JSContext* cx) {\n  if (!runtime) return;\n  // Integration must dispose queued/timer/I/O resources while cx is alive,\n"
+        }
+      ]
+    },
+    {
+      "path": "runtime/async_context_runtime.h",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/native-als-candidate-v2/after/runtime/async_context_runtime.h",
+        "sha256": "60c8504953405f1d97ae4fbfa31de5edc6b741238d081377bde83ff5c531dab1",
+        "bytes": 1761
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-vm/node-vm-candidate-v1/after/runtime/async_context_runtime.h",
+        "sha256": "6ae6b12ef5080f623356cc26efce027f9854e704bd5778f57951a4125250d8e3",
+        "bytes": 2228
+      },
+      "edits": [
+        {
+          "before": "#ifndef STARLING_ASYNC_CONTEXT_RUNTIME_H\n#define STARLING_ASYNC_CONTEXT_RUNTIME_H\n#include \"async_context_store.h\"\nnamespace core::async_context {\nbool prepare_before_self_hosted(JSContext* cx);\nbool initialize_realms(JSContext* cx, JS::HandleObject content,\n",
+          "after": "#ifndef STARLING_ASYNC_CONTEXT_RUNTIME_H\n#define STARLING_ASYNC_CONTEXT_RUNTIME_H\n#include \"async_context_store.h\"\n#include \"js/Class.h\"\nnamespace core::async_context {\nbool prepare_before_self_hosted(JSContext* cx);\nbool initialize_realms(JSContext* cx, JS::HandleObject content,\n"
+        },
+        {
+          "before": "bool run_neutral_server_native(JSContext* cx, unsigned argc, JS::Value* vp);\n// Called by existing pre-snapshot/reset guards; never drains or repairs state.\nbool require_quiescent_server_boundary(JSContext* cx);\nvoid shutdown_before_context(JSContext* cx);\n} // namespace core::async_context\n#endif\n",
+          "after": "bool run_neutral_server_native(JSContext* cx, unsigned argc, JS::Value* vp);\n// Called by existing pre-snapshot/reset guards; never drains or repairs state.\nbool require_quiescent_server_boundary(JSContext* cx);\n// New shared-compartment data realms use a static non-GC RealmPrivate marker.\n// They cannot enqueue async jobs; Promise allocation marks the call unsupported.\nstatic constexpr uint32_t DataRealmAsyncSlot = JSCLASS_GLOBAL_SLOT_COUNT;\nbool initialize_data_realm(JSContext* cx, JS::HandleObject global);\nbool is_data_realm(JS::Realm* realm);\nvoid note_data_realm_async(JS::Realm* realm);\nbool data_realm_async_attempted(JS::HandleObject global);\nvoid shutdown_before_context(JSContext* cx);\n} // namespace core::async_context\n#endif\n"
+        }
+      ]
+    },
+    {
+      "path": "runtime/engine.cpp",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/native-als-candidate-v2/after/runtime/engine.cpp",
+        "sha256": "0362834baa14cfe4fa7ab480cfb6789af2089a23c5cbf7de777934d618bc057b",
+        "bytes": 27587
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-vm/node-vm-candidate-v1/after/runtime/engine.cpp",
+        "sha256": "8ea9ac4670ecacaa5da053e6e912520d599c1c6c8801245b508526b708c6acce",
+        "bytes": 28146
+      },
+      "edits": [
+        {
+          "before": "\nstatic void rejection_tracker(JSContext *cx, bool mutedErrors, JS::HandleObject promise,\n                              JS::PromiseRejectionHandlingState state, void *data) {\n  RootedValue promiseVal(cx, JS::ObjectValue(*promise));\n\n  switch (state) {\n",
+          "after": "\nstatic void rejection_tracker(JSContext *cx, bool mutedErrors, JS::HandleObject promise,\n                              JS::PromiseRejectionHandlingState state, void *data) {\n#ifdef NODE_COMPAT_VM_DATA\n  auto* realm = JS::GetObjectRealmOrNull(promise);\n  if (core::async_context::is_data_realm(realm)) {\n    core::async_context::note_data_realm_async(realm);\n    return; // Refused VM async work never pollutes the application's tracker.\n  }\n#endif\n  RootedValue promiseVal(cx, JS::ObjectValue(*promise));\n\n  switch (state) {\n"
+        },
+        {
+          "before": "  const JSFunctionSpec funs[] = {JS_FN(\"random\", math_random, 0, 0), JS_FS_END};\n  return JS_DefineFunctions(cx, math, funs);\n}\n\nstatic Engine *ENGINE;\nJS::PersistentRootedValue SCRIPT_VALUE;\n",
+          "after": "  const JSFunctionSpec funs[] = {JS_FN(\"random\", math_random, 0, 0), JS_FS_END};\n  return JS_DefineFunctions(cx, math, funs);\n}\n\n#ifdef NODE_COMPAT_VM_DATA\nbool Engine::initialize_data_realm(JSContext* cx, JS::HandleObject global) {\n  JSAutoRealm ar(cx, global);\n  return JS::InitRealmStandardClasses(cx) && fix_math_random(cx, global) &&\n         core::async_context::initialize_data_realm(cx, global);\n}\n#endif\n\nstatic Engine *ENGINE;\nJS::PersistentRootedValue SCRIPT_VALUE;\n"
+        }
+      ]
+    },
+    {
+      "path": "runtime/script_loader.cpp",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-builtin-namespace-identity-candidate-v1/script_loader.cpp",
+        "sha256": "b399c648323e44983345036bc01d679fb3e4618514fc4990e4c2ea7a2d984625",
+        "bytes": 19128
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-vm/node-vm-candidate-v1/after/runtime/script_loader.cpp",
+        "sha256": "28b4fe9e52555ba8b4394d4ad7a99867629c21584cd28c4d2a9ad2d6c4e7626c",
+        "bytes": 19933
+      },
+      "edits": [
+        {
+          "before": "#include \"script_loader.h\"\n#include \"encode.h\"\n\n#include <cstdio>\n#include <js/CompilationAndEvaluation.h>\n",
+          "after": "#include \"script_loader.h\"\n#include \"encode.h\"\n#ifdef NODE_COMPAT_VM_DATA\n#include \"async_context_runtime.h\"\n#include \"node_tick_queue.h\"\n#include \"js/Realm.h\"\n#endif\n\n#include <cstdio>\n#include <js/CompilationAndEvaluation.h>\n"
+        },
+        {
+          "before": "bool module_load_hook(JSContext *cx, JS::HandleScript referrer, JS::HandleObject module_reques,\n                      JS::HandleValue hostDefined, JS::HandleValue payload, uint32_t lineNumber,\n                      JS::ColumnNumberOneOrigin columnNumber) {\n  RootedString specifier(cx, GetModuleRequestSpecifier(cx, module_reques));\n  if (!specifier) {\n    return false;\n",
+          "after": "bool module_load_hook(JSContext *cx, JS::HandleScript referrer, JS::HandleObject module_reques,\n                      JS::HandleValue hostDefined, JS::HandleValue payload, uint32_t lineNumber,\n                      JS::ColumnNumberOneOrigin columnNumber) {\n#ifdef NODE_COMPAT_VM_DATA\n  JS::Realm* data_realm = JS::GetCurrentRealmOrNull(cx);\n  if (!core::async_context::is_data_realm(data_realm))\n    data_realm = JS::GetObjectRealmOrNull(module_reques);\n  if (!core::async_context::is_data_realm(data_realm) && referrer) {\n    JS::Value marker = JS::GetScriptPrivate(referrer);\n    if (marker.isObject()) data_realm = JS::GetObjectRealmOrNull(&marker.toObject());\n  }\n  if (core::async_context::is_data_realm(data_realm)) {\n    core::async_context::note_data_realm_async(data_realm);\n    return core::InternalTickQueue::fail(cx, JSEXN_TYPEERR,\n        \"ERR_SM_NODE_VM_ASYNC\", \"Dynamic import from node:vm data realm is deferred\");\n  }\n#endif\n  RootedString specifier(cx, GetModuleRequestSpecifier(cx, module_reques));\n  if (!specifier) {\n    return false;\n"
+        }
+      ]
+    }
+  ],
+  "addedTargetFiles": [
+    {
+      "path": "builtins/node-compat/export-manifest.vm.node-v22.14.0.json",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-vm/node-vm-candidate-v1/after/builtins/node-compat/export-manifest.vm.node-v22.14.0.json",
+        "sha256": "e066c0db232c4a731a2a91f1cb67a2b08eee2e600a7b2432e1a18a03d34b4a54",
+        "bytes": 3318
+      }
+    },
+    {
+      "path": "builtins/node-compat/generate-vm-data-factory.mjs",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-vm/node-vm-candidate-v1/after/builtins/node-compat/generate-vm-data-factory.mjs",
+        "sha256": "a0258320651ef961750fcdec03ee2d53214887a370504aed018ea18dd71c7ff7",
+        "bytes": 1192
+      }
+    },
+    {
+      "path": "builtins/node-compat/vm-data-factory.generated.h",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-vm/node-vm-candidate-v1/after/builtins/node-compat/vm-data-factory.generated.h",
+        "sha256": "e051143da59d1d8d9322a02e901559bbd3f42b1c2125b882d931fe58a680ec04",
+        "bytes": 2950
+      }
+    },
+    {
+      "path": "builtins/node-compat/vm-data-factory.mjs",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-vm/node-vm-candidate-v1/after/builtins/node-compat/vm-data-factory.mjs",
+        "sha256": "0a70ef2dac26298d59e1ce8af65ec20642c3e0c261e49ad23218660160b48bbf",
+        "bytes": 2667
+      }
+    },
+    {
+      "path": "builtins/node-compat/vm-data-kernel.cpp",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-vm/node-vm-candidate-v1/after/builtins/node-compat/vm-data-kernel.cpp",
+        "sha256": "69d8ee3b426dc780914723d4ad8ff957f59e49278b1d794018dda2a2c302dcbb",
+        "bytes": 14941
+      }
+    },
+    {
+      "path": "builtins/node-compat/vm-data-kernel.h",
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-vm/node-vm-candidate-v1/after/builtins/node-compat/vm-data-kernel.h",
+        "sha256": "78070cd0f32ce65cf45c97e4b5732b8770b2036d32e24dbe1e89169a83d25d4d",
+        "bytes": 195
+      }
+    }
+  ],
+  "requiredOtherParent": "Reviewed INIT barrier b8a4 adds genuine entropy::deployed_execution_started; final composer must include it",
+  "nativeCompilerOrHelperInvoked": false,
+  "newProducerAndWholeFrameRequired": true
+}

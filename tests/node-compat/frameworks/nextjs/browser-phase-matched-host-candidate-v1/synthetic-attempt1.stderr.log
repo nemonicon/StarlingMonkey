@@ -1,0 +1,10 @@
+<anonymous_script>:18
+        const pending=(async()=>{try{const error=await response.finished();const observation={...requestData(request),status:response.status(),error:error?errorData(error):null};result.responseFinishedObservations.push({test:id,phase,...observation});trace(id,phase,'response.finished',observation);if(error)result.errors.push({stage:id+'-response-finished',requestId:requestId(request),...errorData(error)});}catch(error){trace(id,phase,'response.finished-rejected',{...requestData(request),error:errorData(error)});result.errors.push({stage:id+'-response-finished-rejected',requestId:requestId(request),...errorData(error)};}})();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ^
+
+SyntaxError: missing ) after argument list
+    at new Function (<anonymous>)
+    at harness (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-phase-matched-host-candidate-v1/test-instrumentation.mjs:18:12)
+    at file:///Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-phase-matched-host-candidate-v1/test-instrumentation.mjs:24:34
+
+Node.js v22.14.0

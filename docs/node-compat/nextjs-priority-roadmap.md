@@ -43,13 +43,20 @@ first; they cannot replace native and real-component gates.
 | Priority | Work | Completion gate |
 | --- | --- | --- |
 | 0 | Preserve the full app and establish the bridge control | Complete: actual unmodified Next passes24/24 HTTP,2/2 browser interactions and incremental Suspense through the candidate bridge on Node. This is a host control. The bundler's `.node.js` classification defect is fixed;44 checks pass. |
-| 0a | Check the deployment contract early | Before the combined engine build, run a small real standard-WASI component on each stock target to establish filesystem preopens/rights, clocks/random/environment selection and actual instance reuse. Earlier HTTP counters were all1; they do not establish a persistent Next server. Report target limitations before treating either deployment path as viable. |
-| 1 | Real CommonJS loader, Buffer demand, formatting and startup APIs | Integrate Module/createRequire/cache/JSON/webpack chunk loading, bounded native Buffer.concat and demanded util.format. Add explicit process, URL, OS, timers and performance surfaces from actual Next call sites. Verify ESM/CJS/default/global identities and coded failures for unsupported operations. |
+| 0a | Check the deployment contract early | Real C-component probe passes selected standard WASI on both stock hosts. Wasmtime explicit reuse gives1,2,3; default and wasmCloud dev give1,1,1. Pinned primary Source confirms normal wasmCloud P2 HTTP also creates a fresh instance per request regardless of pool settings. Retained-state Next success is unavailable on that path under the present constraints; mount rights and nested cache operation still require guest checks. |
+| 1 | Real CommonJS loader, Buffer demand, formatting and startup APIs | Integrate Module/createRequire/cache/JSON/webpack chunk loading, the demanded native Buffer subset and util.format. Include real VM evaluation of Next client-reference manifests: replacing this with an import stub would break real routes. Add process, URL, OS, timers, performance and explicit HTTP/import surfaces. Verify ESM/CJS/default/global identities and coded failures. |
 | 2 | Genuine application IO and computation | Standard read-only app/assets preopens and writable cache. Atomic link/EEXIST/unlink, stat/readdir and actual ReadStream/backpressure/close. RuntimeOnly secure RNG for UUID/cache names. Reuse native SHA256. Implement gzip/deflate streaming demanded by unchanged Next compression; one-shot zlib evidence does not establish streaming. |
 | 3 | Correct async/request context and lifecycle | Actual SpiderMonkey Promise queue plus task/tick/timer capture. Validate ALS run/exit/enterWith/bind/snapshot, throw paths, disable/re-enable, awaits and overlapping requests. Fresh native request resources with restoration; no JS global context stack. |
-| 4 | Construct and instantiate a complete guest | Fresh source/configuration/metadata and selected WIT through existing native registration/CMake. Audit emitted interfaces and callable imports; refuse custom services, unselected interfaces and Preview1 leakage. Real component controls for loader, FS, HTTP, Buffer, context and snapshot/resumption, then actual Next startup. |
+| 4 | Construct and instantiate a complete guest | Fresh435-input generation includes the three authenticated compile headers and Performance include-path correction; eight installed generators and independent Source review pass. Its full native build is running. The selective guest adapter passes real C-component construction and three Wasmtime requests using only selected standard0.2.10 imports. Next: linked native engine, real loader/FS/HTTP/Buffer/context controls, then actual Next startup. Audit final imports and snapshot/resumption separately. |
 | 5 | Run the full app and make it repeatable | Same24 HTTP contracts, two browser interactions, chunk ordering, cache generation and isolation on the Wasm server. Test retained-instance behavior explicitly. Instantiate on stock Wasmtime and pinned wasmCloud; document host reuse limits. Retain raw artifacts/failures as future regression checks. |
 | 6 | Measure and stabilize the working profile | Final component size, startup, memory and throughput against existing JS implementations. Promote only tested exports; publish limits and keep optional capabilities out of unrelated apps. |
+
+The original full success contract remains intact. Stock wasmCloud2.11's P2
+HTTP lifetime cannot satisfy its retained-server/cache portion: pool settings
+apply to the separate P3 HTTP path. P3 is outside this selected WASI0.2.x profile.
+Report wasmCloud cold-request/instantiation results separately; do not count
+them as a full-contract pass or modify the host to force reuse. See the
+[pinned Source analysis](../../tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/README.md).
 
 The first new linked generation should target actual application startup and
 dependency controls, followed immediately by the complete contract. Rank new
@@ -65,10 +72,12 @@ serialization also requests Buffer base64 support. Static call sites and
 conditional expressions are not runtime invocation observations; do not expand
 support based solely on an imported or read name.
 
-The existing host evidence selected no filesystem volumes, so it does not prove
-the new FS configuration. A guest-owned read-only application image is a possible
-portable packaging alternative, but is not implemented or selected here. It
-does not resolve a target's inability to retain the logical server/cache lifetime.
+The earlier Next host controls do not prove guest filesystem configuration. The
+new [real deployment probe](../../tests/node-compat/host-capabilities/probe-v1/README.md)
+selects `/app` and `/cache` on both hosts, with owned Unix modes for app write
+denial. Next's actual nested cache layout and narrower per-preopen rights remain
+open. A guest-owned application image is an unimplemented packaging alternative;
+it would not establish a retained logical server/cache lifetime.
 
 ## Current implementation state
 
@@ -79,16 +88,21 @@ does not resolve a target's inability to retain the logical server/cache lifetim
 | WASI HTTP adapter |13 host ownership/translation checks: EOF, cancellation, write splitting, IO failures and resource transfer | Uncompiled WIT/guest control; real standard host and native exception/resource behavior |
 | CommonJS Module |42 focused host cases plus full Next24HTTP+2browser:406 JS files/412 cached modules. V2 fixes generator inventory and passes Source review; actual kernel SDK syntax passes | Registrar/loader implementation frontend, joined native build, guest reads and full app loading |
 | Primitive util.format |728 Node/canonical/generated comparisons for the specified subset | Fresh guest generation and unchanged shared Next compatibility route |
-| Buffer.concat | Native guest candidate ready;38 Node differential+12 profile/generated-factory cases and actual SDK syntax pass | Independent review, linking, component differentials and full Next callers |
-| Filesystem | Native direct-P2 provider/stream handle draft; public facade unwritten | Fix two error paths, add public factory/real ReadStream/callbacks, wiring and genuine FS differentials before build |
-| AsyncLocalStorage | Native store/queue/task/tick/fresh-request draft;41 reversible edits and53 synchronous models | Final cross-file audit, owner tests, metadata/producer integration, native build and actual async/request propagation |
-| Process/URL/OS/performance/HTTP exports | Actual source demand identified; existing web code is a reuse candidate | Explicit exports, bounded semantics, lifecycle policy, implementation and tests |
-| Crypto/compression | Experimental SHA256 Hash/Hmac returns and native one-shot zlib results exist | RuntimeOnly UUID, live-native-state INIT barrier and demanded streaming compression |
+| Buffer | Next-demanded byte/encoding/copy/write subset:134 host checks; original concat SDK check passes. Full Next host control passes24HTTP+2browser using the candidate global Buffer | Other host modules still produce Node Buffers, so that control does not exhaustively validate guest Buffer demand. Compile/link and actual component tests remain required |
+| Filesystem | V3 public sync/callback/promises/ReadStream facade and direct-P2 provider;41 host checks. Three actual SDK frontends pass | Native resource/copy/close semantics and nested mount/realpath/recursive mkdir behavior in a real guest; full Next assets/cache writes |
+| AsyncLocalStorage | V3 real SpiderMonkey store/Promise queue/task/tick/fresh/neutral boundaries;53 synchronous models and72 ownership cases. All13 SDK frontends pass after retained V2 failures | Native await/reaction/task ordering, disable/re-enable and concurrent-request propagation; link and component lifecycle tests |
+| Startup and timers | Explicit process83/os24/url13 and timers12/promises5 inventories;195 startup and46 timer host cases. Native Performance epoch/precision correction prepared | Combined native frontend/link and deployed environment/clocks/FIFO/Immediate behavior; snapshot/resumption tests |
+| HTTP and required import surfaces | Real bridge factory plus HTTP/HTTPS module registration and native context binding pass SDK syntax;62 HTTP host checks. Four finite imported surfaces pass422 binding/failure checks. Matched selected/stock controls both pass24HTTP+2browser with strict streaming | Linking and actual standard-WASI request ownership, cancellation, native context and full application startup; earlier browser abort remains retained/unexplained |
+| Readable.toWeb | Actual stronger host control exposed five failed routes. Bounded m0.23 adapter passes30 cases/14 Node differentials; fresh full host contract passes with unchanged gates | Genuine native WebStream scheduling, async-destroy completion and resource cleanup in components; other Web adapters remain deferred |
+| VM manifest evaluation | Real SpiderMonkey realm/evaluation plus bounded own-data sandbox copy under preparation; actual Next manifest source fixtures retained | Native compiler/link and actual Next client/action route execution. No complete Contextify or security-sandbox claim |
+| Crypto/compression | Experimental SHA256 Hash/Hmac and one-shot zlib guest results exist. RuntimeOnly RNG candidate has46 host checks; native streaming Gzip/Deflate candidate has28 | Joined native compilation, INIT barrier, actual RNG calls and persistent compression-state cleanup in components |
 
-The Module provider currently uses guest libc for private reads; the FS candidate
-uses direct standard P2 descriptors. Join their cwd, preopen, symlink, rights and
-error behavior explicitly. The shared deployed accessor is a proposed private
-guest API observing the existing entry bit; it adds no host capability.
+The startup Source now replaces Module's libc private reads with the same direct
+standard-P2 provider used by process/FS, including shared logical cwd. This join
+is still awaiting guest execution. It uses the actual deployed-entry accessor
+without introducing a host service. Original Source drafts and failures remain
+retained; the combined Source generation must preserve the corrected V3 ALS
+header while adding Timer's virtual methods.
 
 ## Lifecycle and capabilities
 

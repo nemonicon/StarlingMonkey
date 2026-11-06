@@ -1,0 +1,32 @@
+// Source generation only: preserves the original m0.12 factory expression.
+import assert from 'node:assert/strict';
+import {readFile,writeFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {dirname,join,resolve} from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import vm from 'node:vm';
+assert.equal(process.version,'v22.14.0');
+const here=dirname(fileURLToPath(import.meta.url)),arg=process.argv.indexOf('--repository');
+assert(arg>=0,'--repository ACTUAL_ROOT required');const root=resolve(process.argv[arg+1]);
+const hash=b=>createHash('sha256').update(b).digest('hex');
+const refs=JSON.parse(await readFile(join(here,'references.json')));
+async function input(row){const b=await readFile(row.path);assert.equal(b.length,row.bytes);assert.equal(hash(b),row.sha256);return b.toString();}
+const header=await input(refs.baseFactory),manifest=JSON.parse(await readFile(join(here,'export-manifest.classic-toweb.node-v22.14.0.json')));
+await input(refs.manifestValidator);
+assert.equal(resolve(refs.manifestValidator.path),join(root,'builtins/node-compat/validate-manifest.mjs'));
+const {validateManifest}=await import(pathToFileURL(refs.manifestValidator.path));
+validateManifest(manifest,JSON.parse(await input(refs.manifestSchema)));
+assert.equal(manifest.profileVersion,'sm-node-22.14.0-m0.23');
+const oldManifest=JSON.parse(await input(refs.baseManifest));assert.deepEqual(manifest.modules['node:stream'].exports,oldManifest.modules['node:stream'].exports);assert.deepEqual(manifest.modules['node:stream/promises'].exports,oldManifest.modules['node:stream/promises'].exports);
+const begin='R"SM_NODE_PROFILE(',end=')SM_NODE_PROFILE";';
+assert.equal(header.split(begin).length,2);assert.equal(header.split(end).length,2);
+const base=header.slice(header.indexOf(begin)+begin.length,header.lastIndexOf(end));
+const bridge=(await readFile(join(here,'readable-toweb.mjs'),'utf8')).replace('export function installReadableToWeb','function installReadableToWeb');
+assert(!/^\s*(import|export)\b/m.test(bridge));
+const factory=`(function(dependencies){\n'use strict';\nconst baseFactory=${base};\n${bridge}\nreturn installReadableToWeb(baseFactory(dependencies),dependencies.ReadableStream);\n})`;
+const parsed=new vm.Script(factory).runInThisContext();assert.equal(typeof parsed,'function');assert.equal(parsed.length,1);
+const output='// Generated optional m0.23 Readable.toWeb bridge over unchanged m0.12 graph.\n'+`// Base factory SHA256 ${refs.baseFactory.sha256}; bridge SHA256 ${hash(await readFile(join(here,'readable-toweb.mjs')))}.\n`+`static constexpr const char kClassicStreamsFactorySource[] = R"SM_NODE_PROFILE(${factory})SM_NODE_PROFILE";\n`;
+assert.equal(output.split(end).length,2);
+const target=join(here,'toweb-factories.generated.h');
+if(process.argv.includes('--check'))assert.equal(await readFile(target,'utf8'),output);else await writeFile(target,output,{flag:'wx'});
+console.log(JSON.stringify({state:'SOURCE_ONLY_TOWEB_FACTORY_AND_MANIFEST_PASSED',baseFactoryUnchanged:true,profileVersion:manifest.profileVersion,headerSha256:hash(output),nativeOrGuestExecuted:false}));

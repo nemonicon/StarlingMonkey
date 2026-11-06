@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "sourceOnly": true,
+  "failures": [
+    {
+      "stage": "First pure manifest schema validation",
+      "rawExitCode": 1,
+      "toolChunk": "e71c62",
+      "error": "Invalid Node profile manifest $: missing moduleContract",
+      "correction": "Added required top-level moduleContract; no API/native code or input changed",
+      "nativeCompilerOrGuestInvoked": false
+    },
+    {
+      "stage": "Second pure schema validation",
+      "rawExitCode": 1,
+      "toolChunk": "957cc6",
+      "error": "Invalid Node profile manifest $.modules.node:vm: unexpected constantTypes",
+      "correction": "Kept typed constants in canonical Node surface metadata/factory and documented them in existing callablePolicy vocabulary; removed unsupported schema property without changing the schema",
+      "nativeCompilerOrGuestInvoked": false
+    },
+    {
+      "stage": "First read-only source join checker",
+      "rawExitCode": 1,
+      "toolChunk": "a7e632",
+      "error": "AssertionError: reject async before admission",
+      "cause": "Reader selected resources_.ready in earlier getHostDefinedData function, rather than scope enqueuePromiseJob",
+      "correction": "Scoped reader search to the real enqueuePromiseJob function; target code unchanged",
+      "nativeCompilerOrGuestInvoked": false
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "profileVersion": "sm-node-22.14.0-m0.24",
+  "nodeVersion": "v22.14.0",
+  "status": "Uncompiled startup v2 Source with deployed epoch/double performance; no engine/guest admission.",
+  "moduleContract": "Full pinned Node22 export-name record. Both specifier aliases bind the same actual default object/functions; process global equals default. Explicit partial behavior and limitations follow.",
+  "modules": {
+    "node:url": {
+      "aliases": [
+        "url"
+      ],
+      "status": "partial",
+      "exports": [
+        "URL",
+        "URLSearchParams",
+        "Url",
+        "default",
+        "domainToASCII",
+        "domainToUnicode",
+        "fileURLToPath",
+        "format",
+        "parse",
+        "pathToFileURL",
+        "resolve",
+        "resolveObject",
+        "urlToHttpOptions"
+      ],
+      "globals": [
+        "URL",
+        "URLSearchParams"
+      ],
+      "callablePolicy": "Supported finite methods use real guest algorithms/native providers. Enumerated unsupported callables throw own coded ERR_SM_NODE_UNSUPPORTED on call or construction; no host builtin adapters.",
+      "supportedStatic": [
+        "URL",
+        "URLSearchParams",
+        "fileURLToPath",
+        "pathToFileURL",
+        "format"
+      ],
+      "unsupportedStatic": [
+        "Url",
+        "domainToASCII",
+        "domainToUnicode",
+        "parse",
+        "resolve",
+        "resolveObject",
+        "urlToHttpOptions"
+      ],
+      "limits": {
+        "stringCodeUnits": 1048576
+      },
+      "deviations": [
+        "Actual existing native WHATWG URL/URLSearchParams are retained and global constructors share identity. Missing URL.canParse is implemented using that same constructor, preserving input conversion exceptions.",
+        "POSIX guest file URL conversion supports percent/Unicode/encoded-slash/host checks. windows:true is an explicit unsupported operation; fileURLToPath never opens a path. Relative pathToFileURL uses deployed FS cwd.",
+        "Legacy format supports URL-shaped objects and real querystring.stringify. String input requires deferred legacy parsing and refuses. Nonstring legacy fields and Unicode-domain URL formatting options are a bounded refusal.",
+        "Legacy Url/parse/resolve/resolveObject/domainToASCII/domainToUnicode/urlToHttpOptions remain named explicit throwing functions. No universal Proxy/stub module or private export is placed in the public Node manifest."
+      ]
+    }
+  },
+  "requiredHostInterfaces": [
+    "wasi:cli/environment@0.2.10"
+  ]
+}

@@ -1,0 +1,36 @@
+--- builtins/node-compat/register.cpp.before
++++ builtins/node-compat/register.cpp.after
+@@ -4,6 +4,9 @@
+ #include "js/CompilationAndEvaluation.h"
+ #include "js/SourceText.h"
+ #include "factories.generated.h"
++#ifdef NODE_COMPAT_CRYPTO_RANDOM
++#include "event_loop.h"
++#endif
+ #ifdef NODE_COMPAT_TIMERS
+ #include "node-timers-factory.generated.h"
+ #include "../web/timers.h"
+@@ -73,6 +76,9 @@
+ #endif
+ #ifdef NODE_COMPAT_CRYPTO_HASH_HMAC
+ JSObject *create_crypto_hash_hmac_kernel(JSContext *cx);
++#ifdef NODE_COMPAT_CRYPTO_RANDOM
++JSObject *create_crypto_random_kernel(JSContext *cx);
++#endif
+ #endif
+ #ifdef NODE_COMPAT_ZLIB
+ namespace zlib_profile { JSObject *create_kernel(JSContext *cx); }
+@@ -137,6 +143,13 @@
+       !JS_DefineProperty(cx, argument, "Buffer", buffer_constructor, 0) ||
+       !JS_DefineProperty(cx, argument, "webcrypto", webcrypto, 0) ||
+       !JS_DefineProperty(cx, argument, "subtle", subtle, 0)) return false;
++#ifdef NODE_COMPAT_CRYPTO_RANDOM
++  JS::RootedObject random_kernel(cx,create_crypto_random_kernel(cx));
++  JS::RootedObject random_tick(cx,core::EventLoop::create_internal_next_tick(cx));
++  if(!random_kernel||!random_tick)return false;
++  JS::RootedValue random_value(cx,JS::ObjectValue(*random_kernel)),random_tick_value(cx,JS::ObjectValue(*random_tick));
++  if(!JS_DefineProperty(cx,argument,"rng",random_value,0)||!JS_DefineProperty(cx,argument,"nextTick",random_tick_value,0))return false;
++#endif
+   JS::RootedValue value(cx, JS::ObjectValue(*argument)), module(cx);
+   if (!evaluate_factory(cx, kCryptoHashHmacFactorySource, value, &module)) return false;
+   return engine->define_builtin_module("node:crypto", module) &&

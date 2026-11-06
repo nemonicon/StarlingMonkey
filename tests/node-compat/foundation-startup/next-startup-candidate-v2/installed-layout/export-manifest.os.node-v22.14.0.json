@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "profileVersion": "sm-node-22.14.0-m0.24",
+  "nodeVersion": "v22.14.0",
+  "status": "Uncompiled startup v2 Source with deployed epoch/double performance; no engine/guest admission.",
+  "moduleContract": "Full pinned Node22 export-name record. Both specifier aliases bind the same actual default object/functions; process global equals default. Explicit partial behavior and limitations follow.",
+  "modules": {
+    "node:os": {
+      "aliases": [
+        "os"
+      ],
+      "status": "partial",
+      "exports": [
+        "EOL",
+        "arch",
+        "availableParallelism",
+        "constants",
+        "cpus",
+        "default",
+        "devNull",
+        "endianness",
+        "freemem",
+        "getPriority",
+        "homedir",
+        "hostname",
+        "loadavg",
+        "machine",
+        "networkInterfaces",
+        "platform",
+        "release",
+        "setPriority",
+        "tmpdir",
+        "totalmem",
+        "type",
+        "uptime",
+        "userInfo",
+        "version"
+      ],
+      "globals": [],
+      "callablePolicy": "Supported finite methods use real guest algorithms/native providers. Enumerated unsupported callables throw own coded ERR_SM_NODE_UNSUPPORTED on call or construction; no host builtin adapters.",
+      "supportedStatic": [
+        "arch",
+        "cpus",
+        "endianness",
+        "homedir",
+        "platform",
+        "tmpdir",
+        "type"
+      ],
+      "unsupportedStatic": [
+        "availableParallelism",
+        "freemem",
+        "getPriority",
+        "hostname",
+        "loadavg",
+        "machine",
+        "networkInterfaces",
+        "release",
+        "setPriority",
+        "totalmem",
+        "uptime",
+        "userInfo",
+        "version"
+      ],
+      "limits": {
+        "stringCodeUnits": 1048576
+      },
+      "deviations": [
+        "No host CPU/NIC/RAM/hostname information is fabricated. cpus=[] means unavailable, consistent with Node getCPUs()||[]; availableParallelism refuses.",
+        "arch=wasm32,platform=wasi,type=WASI,endianness=LE,EOL=\\n are explicit guest ABI constants, not host facts.",
+        "homedir requires actual deployed HOME absolute path; tmpdir uses deployed env and POSIX /tmp fallback, without claiming that path is preopened.",
+        "constants.errno is a finite set compiled from actual guest errno.h. Signal/priority/dlopen/host constants are omitted; devNull is explicitly undefined until a real guest sink exists."
+      ]
+    }
+  },
+  "requiredHostInterfaces": [
+    "wasi:cli/environment@0.2.10"
+  ]
+}
