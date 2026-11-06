@@ -1,0 +1,330 @@
+{
+  "schemaVersion": 1,
+  "suite": "package-component-regression-comparison-v1",
+  "coverage": {
+    "complete": false,
+    "cases": 10,
+    "requiredPositives": [
+      "native-cjs-interop",
+      "native-modules",
+      "react-element"
+    ],
+    "successfulReturns": [
+      {
+        "label": "baseline",
+        "id": "native-cjs-interop",
+        "retainedJcoCalls": 3,
+        "freshWasmtimeCalls": 1,
+        "nodeCompared": true
+      },
+      {
+        "label": "baseline",
+        "id": "native-modules",
+        "retainedJcoCalls": 3,
+        "freshWasmtimeCalls": 1,
+        "nodeCompared": true
+      },
+      {
+        "label": "baseline",
+        "id": "react-element",
+        "retainedJcoCalls": 3,
+        "freshWasmtimeCalls": 1,
+        "nodeCompared": true
+      },
+      {
+        "label": "current",
+        "id": "native-cjs-interop",
+        "retainedJcoCalls": 3,
+        "freshWasmtimeCalls": 1,
+        "nodeCompared": true
+      },
+      {
+        "label": "current",
+        "id": "native-modules",
+        "retainedJcoCalls": 3,
+        "freshWasmtimeCalls": 1,
+        "nodeCompared": true
+      },
+      {
+        "label": "current",
+        "id": "react-element",
+        "retainedJcoCalls": 3,
+        "freshWasmtimeCalls": 1,
+        "nodeCompared": true
+      }
+    ],
+    "constructedInterfaces": [
+      {
+        "label": "baseline",
+        "id": "native-cjs-interop",
+        "emittedImports": [],
+        "wit": "run: func() -> string",
+        "binaryIndependentlyDecoded": false
+      },
+      {
+        "label": "baseline",
+        "id": "native-modules",
+        "emittedImports": [],
+        "wit": "run: func() -> string",
+        "binaryIndependentlyDecoded": false
+      },
+      {
+        "label": "baseline",
+        "id": "react-element",
+        "emittedImports": [],
+        "wit": "run: func() -> string",
+        "binaryIndependentlyDecoded": false
+      },
+      {
+        "label": "baseline",
+        "id": "react-dom-edge",
+        "emittedImports": [],
+        "wit": "run: func() -> string",
+        "binaryIndependentlyDecoded": false
+      },
+      {
+        "label": "current",
+        "id": "native-cjs-interop",
+        "emittedImports": [],
+        "wit": "run: func() -> string",
+        "binaryIndependentlyDecoded": false
+      },
+      {
+        "label": "current",
+        "id": "native-modules",
+        "emittedImports": [],
+        "wit": "run: func() -> string",
+        "binaryIndependentlyDecoded": false
+      },
+      {
+        "label": "current",
+        "id": "react-element",
+        "emittedImports": [],
+        "wit": "run: func() -> string",
+        "binaryIndependentlyDecoded": false
+      },
+      {
+        "label": "current",
+        "id": "react-dom-edge",
+        "emittedImports": [],
+        "wit": "run: func() -> string",
+        "binaryIndependentlyDecoded": false
+      }
+    ]
+  },
+  "regressions": [
+    {
+      "label": "comparison",
+      "id": "next-standalone",
+      "kind": "probe-source-mismatch"
+    },
+    {
+      "label": "comparison",
+      "id": "next-page",
+      "kind": "probe-source-mismatch"
+    },
+    {
+      "label": "comparison",
+      "id": "next-route",
+      "kind": "probe-source-mismatch"
+    }
+  ],
+  "improvements": [],
+  "changedBlockers": [],
+  "outstandingKnownFailures": [
+    {
+      "id": "react-dom-edge",
+      "status": "failed",
+      "stage": "complete",
+      "reason": null,
+      "failures": [
+        {
+          "stage": "jco-runtime",
+          "classification": "caught-host-or-guest-error",
+          "diagnosticOnly": true,
+          "message": "wasm trap: wasm `unreachable` instruction executed"
+        },
+        {
+          "stage": "wasmtime",
+          "reason": "Actual CLI returned failure; complete streams and terminal retained"
+        }
+      ],
+      "candidates": null,
+      "failedProcessDiagnostics": {
+        "wasmtime": {
+          "stdout": "",
+          "stderr": "Error: failed to run main module `<RUN>/wasm/react-dom-edge/component.wasm`\n\nCaused by:\n    0: error while executing at wasm backtrace:\n    0:   0x6c35 - <unknown>!subscribe-instant\n    1: 0x1c0017 - <unknown>!<wasm function 4845>\n    2: 0x1c0e2b - <unknown>!<wasm function 4850>\n    3: 0x255ce3 - <unknown>!<wasm function 5577>\n    4: 0x24ef45 - <unknown>!<wasm function 5576>\n    5: 0x255c2a - <unknown>!<wasm function 5577>\n    6: 0x2566ea - <unknown>!<wasm function 5580>\n    7: 0x30d2b2 - <unknown>!<wasm function 6700>\n    8: 0x30cd73 - <unknown>!<wasm function 6699>\n    9: 0x256b7b - <unknown>!<wasm function 5581>\n   10: 0x24eeee - <unknown>!<wasm function 5576>\n   11: 0x255c2a - <unknown>!<wasm function 5577>\n   12: 0x2566ea - <unknown>!<wasm function 5580>\n   13: 0x2b9524 - <unknown>!<wasm function 6263>\n   14:  0xfe8b4 - <unknown>!<wasm function 3787>\n   15: 0x7d4d8c - <unknown>!run\n    1: wasm trap: wasm `unreachable` instruction executed\n\n"
+        }
+      },
+      "stillFailed": true
+    },
+    {
+      "id": "react-dom-string",
+      "status": "refused",
+      "stage": "bundling",
+      "reason": "BUNDLE_PROFILE_REFUSED",
+      "failures": [
+        {
+          "stage": "bundling",
+          "classification": "caught-host-or-guest-error",
+          "diagnosticOnly": true,
+          "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v2]\nError: Node builtin is not admitted by this profile: async_hooks\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:15:41)\n    at PluginContextImpl.resolveId (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:55:65)\n    at plugin (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:1678:30)\n    at file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2146:21\n    at plugin.<computed> (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2343:18)"
+        }
+      ],
+      "candidates": null,
+      "failedProcessDiagnostics": {},
+      "stillFailed": true
+    },
+    {
+      "id": "next-server",
+      "status": "refused",
+      "stage": "bundling",
+      "reason": "BUNDLE_PROFILE_REFUSED",
+      "failures": [
+        {
+          "stage": "bundling",
+          "classification": "caught-host-or-guest-error",
+          "diagnosticOnly": true,
+          "code": "ERR_SM_PACKAGE_BUNDLE_UNSUPPORTED",
+          "message": "Unprovided runtime loader/environment references: process,__dirname"
+        }
+      ],
+      "candidates": null,
+      "failedProcessDiagnostics": {},
+      "stillFailed": true
+    },
+    {
+      "id": "next-headers",
+      "status": "refused",
+      "stage": "bundling",
+      "reason": "BUNDLE_PROFILE_REFUSED",
+      "failures": [
+        {
+          "stage": "bundling",
+          "classification": "caught-host-or-guest-error",
+          "diagnosticOnly": true,
+          "code": "ERR_SM_PACKAGE_BUNDLE_UNSUPPORTED",
+          "message": "Unprovided runtime loader/environment references: process"
+        }
+      ],
+      "candidates": null,
+      "failedProcessDiagnostics": {},
+      "stillFailed": true
+    },
+    {
+      "id": "next-standalone",
+      "status": "refused",
+      "stage": "bundling",
+      "reason": "BUNDLE_PROFILE_REFUSED",
+      "failures": [
+        {
+          "stage": "bundling",
+          "classification": "caught-host-or-guest-error",
+          "diagnosticOnly": true,
+          "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v2] <APPLICATION>/.next/standalone/server.js\nError: require aliases, resolution and runtime loader state are unsupported: <APPLICATION>/.next/standalone/server.js\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:15:41)\n    at file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:83:64\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:18:34)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:22:46)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:21:54)\n    at walk (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:21:54)\n    at TransformPluginContextImpl.transform (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:67:7)\n    at plugin (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:1758:30)\n    at file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2146:21\n    at plugin.<computed> (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2343:18)"
+        }
+      ],
+      "candidates": null,
+      "failedProcessDiagnostics": {},
+      "stillFailed": true
+    },
+    {
+      "id": "next-page",
+      "status": "refused",
+      "stage": "bundling",
+      "reason": "BUNDLE_PROFILE_REFUSED",
+      "failures": [
+        {
+          "stage": "bundling",
+          "classification": "caught-host-or-guest-error",
+          "diagnosticOnly": true,
+          "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v2]\nError: Node builtin is not admitted by this profile: crypto\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:15:41)\n    at PluginContextImpl.resolveId (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:55:65)\n    at plugin (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:1678:30)\n    at file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2146:21\n    at plugin.<computed> (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2343:18)"
+        }
+      ],
+      "candidates": null,
+      "failedProcessDiagnostics": {},
+      "stillFailed": true
+    },
+    {
+      "id": "next-route",
+      "status": "refused",
+      "stage": "bundling",
+      "reason": "BUNDLE_PROFILE_REFUSED",
+      "failures": [
+        {
+          "stage": "bundling",
+          "classification": "caught-host-or-guest-error",
+          "diagnosticOnly": true,
+          "message": "Build failed with 1 error:\n\n[plugin sm-production-package-bundler-v2]\nError: Node builtin is not admitted by this profile: crypto\n    at refusal (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:15:41)\n    at PluginContextImpl.resolveId (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs:55:65)\n    at plugin (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:1678:30)\n    at file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2146:21\n    at plugin.<computed> (file:///private/tmp/starling-node-compat/toolchain/node_modules/rolldown/dist/shared/bindingify-input-options-CM8bmcLg.mjs:2343:18)"
+        }
+      ],
+      "candidates": null,
+      "failedProcessDiagnostics": {},
+      "stillFailed": true
+    }
+  ],
+  "frameworkCompatible": false,
+  "interpretation": "No-regression comparison only. Known failures remain failures; improvements do not establish general package/framework support.",
+  "limits": [
+    "Only recorded Node22/bundler/Wasmtime/native identities are enforced; installed Next/React package versions are absent from this matrix schema.",
+    "Checks retained WIT/audit/transpile records, not an independent decode of component binaries (not copied into the repository results).",
+    "Does not rehash external engine/tool/source trees, rerun applications, or approve changed harness code.",
+    "Finite Node controls require six passes and the exact headers outside-request-scope error. Generated-entry successes need a future oracle contract; missing fixtures are incomplete."
+  ],
+  "harnessSources": {
+    "baseline": [
+      {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-execution-v1/run-components.mjs",
+        "sha256": "0482c5d65cd8f787b34854136cf2666cd19521139e799ca34693c7f88d7d93d8",
+        "bytes": 7855
+      },
+      {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs",
+        "sha256": "86194e116e612ae26e295d3031c20474c5d1bd32968e6b7e08c63a9590f51c2c",
+        "bytes": 8992
+      },
+      {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasm-worker.mjs",
+        "sha256": "43776fe33693e6b88b4de36a1599160029a45c32d6ed559451114a9b9de00595",
+        "bytes": 19663
+      },
+      {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/package-environment-guards.mjs",
+        "sha256": "95deacde18a84cf4cb81eedf819d687540a391bda0ccead4ab399032aa9bab30",
+        "bytes": 3902
+      },
+      {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-bindings-v2/bindings.mjs",
+        "sha256": "f2cfb6e5e501572a1e68b345b45317f3f3cb521043e91181eaf70c10be26af14",
+        "bytes": 8579
+      }
+    ],
+    "current": [
+      {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-execution-v1/run-components.mjs",
+        "sha256": "0482c5d65cd8f787b34854136cf2666cd19521139e799ca34693c7f88d7d93d8",
+        "bytes": 7855
+      },
+      {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/framework-package-bundler-v2.mjs",
+        "sha256": "86194e116e612ae26e295d3031c20474c5d1bd32968e6b7e08c63a9590f51c2c",
+        "bytes": 8992
+      },
+      {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasm-worker.mjs",
+        "sha256": "43776fe33693e6b88b4de36a1599160029a45c32d6ed559451114a9b9de00595",
+        "bytes": 19663
+      },
+      {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/package-environment-guards.mjs",
+        "sha256": "95deacde18a84cf4cb81eedf819d687540a391bda0ccead4ab399032aa9bab30",
+        "bytes": 3902
+      },
+      {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/package-bundler-bindings-v2/bindings.mjs",
+        "sha256": "f2cfb6e5e501572a1e68b345b45317f3f3cb521043e91181eaf70c10be26af14",
+        "bytes": 8579
+      }
+    ]
+  }
+}

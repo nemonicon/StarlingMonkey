@@ -2,6 +2,13 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
+The [post-push Next.js report](nextjs-results-2026-11-06.md) records fresh
+comprehensive application and component checks after `77659217`: Node controls
+pass on replay,17 main Wasm failures and seven optional-package failures remain,
+and supported-module/React-element differentials pass. An initial aborted
+browser action request and changed generated-source identities stay documented.
+The full Next server still does not compile to Wasm.
+
 The [optional package-bundler follow-on](../../tests/node-compat/frameworks/package-bundler-execution-v1/README.md)
 passes three complete Node/Jco/Wasmtime differentials: native CommonJS interop,
 supported modules and real React elements. Its fresh ten-case replay retains
@@ -29,8 +36,9 @@ select only the standard WASI0.2.10 clock/poll interfaces.
 The default-OFF Hash/Hmac candidate now compiles and links as a 357-source
 engine. Its recipe exits0, but both wrappers exit1 after the staged Git index
 changes hash and mode. Independent review validates the compiled candidate and
-the recorded failure; it does not admit the engine. A read-only artifact
-revalidation is being prepared. The pinned Node oracle passes60 selected
+the recorded failure; it does not admit the engine. Read-only artifact
+revalidation Source passes independent review; its actual invocation is pending.
+The pinned Node oracle passes60 selected
 observations; guest crypto has not executed. Private clock diagnostic v2 remains
 uncompiled. These candidates and their open lifecycle gates are recorded in
 [progress.md](../../progress.md).

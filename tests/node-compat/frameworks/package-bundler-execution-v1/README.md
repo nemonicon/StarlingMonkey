@@ -4,6 +4,16 @@ Next.js remains incomplete; a separate selected-clock ReactDOM test is described
 below. The accepted finite profile
 bundler and foundations-v13 native engine are unchanged.
 
+The [2026-11-06 report](../../../../docs/node-compat/nextjs-results-2026-11-06.md)
+adds two complete matrices against a newly built comprehensive Next fixture.
+Both pass the same three positives and retain seven guest failures. The
+[same-build comparison](results-post-77659217-replay/comparison.json) exits0.
+The [historical-build comparison](results-post-77659217/comparison.json) retains
+three exact generated-source mismatches; independent read-only correlation
+matches those roles to the fresh build. Do not weaken source checks when a new
+Next build changes standalone/page/route bytes. Keep a reviewed same-build
+baseline separately from the historical source generation.
+
 The [fresh post-push v2 run](results-post-push-v2/results.json), executed after
 commit `d8034839`, repeats all ten cases with the corrected Node subpath controls.
 It exits 0 for complete observations and its three required positives: native

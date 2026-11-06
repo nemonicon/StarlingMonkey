@@ -1,0 +1,18 @@
+import { exec } from "node:child_process";
+// ../../../../private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217/application/.sm-wasm-child-process-call-df005fedcb8a.mjs
+function run() {
+	try {
+		exec("framework-probe-must-never-spawn");
+		return JSON.stringify({ unexpectedSuccess: true });
+	} catch (error) {
+		return JSON.stringify({
+			observedRefusal: true,
+			code: error.code,
+			name: error.name,
+			message: error.message,
+			callbackProvided: false,
+			callbackInvocationObserved: false
+		});
+	}
+}
+export { run };

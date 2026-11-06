@@ -1,0 +1,7 @@
+The first post-77659217 replay is preserved as a **Node-browser control failure**: production build and24 HTTP checks pass; both browser functional checks pass, but one server-action POST fetch reports `net::ERR_ABORTED`, making browser/oracle false and the comparator exit1. Page/console errors are empty. The capture lacks timing/response/context-close phase, so the cause is unresolved and this is not evidence of a guest regression.
+
+The separate untouched replay passes24 HTTP checks and both error-free browser checks; its observation comparator exits0. This does not erase the first failure or establish a fix. Both actual drivers exit1 because the required shared-compat differential remains blocked.
+
+All19 Wasm observations are complete and unchanged:16 bundling refusals, one shared-compat execution failure on Jco/Wasmtime, and two passing explicit refusal-behavior probes. All three constructed components keep zero public imports and scalar `run()->string`; native engine342/nine manifests remain unchanged. No full Next.js-in-Wasm, clock/native-profile or deployment acceptance is claimed.
+
+The JSON review records exact result/Root/comparison/browser/component hashes and finite payload-manifest digests. Full retained24 command terminals/streams per run,9 nested terminals, HTTP bodies/chunks, browser request bytes/screenshots,342 native source hashes/nine selected manifests and typed whole negative-probe returns were checked with read-only Python DATA. No comparator, Node/browser/guest, helper or target action was rerun by the reviewer.

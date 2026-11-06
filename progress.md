@@ -4,6 +4,39 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-06. Overall roadmap: **in progress**.
 
+All work through checkpoint `77659217c92019d5471570b937d69f6352cbe4e5` is
+committed and pushed; remote `origin/main` matched and the worktree was clean.
+The subsequent [fresh comprehensive Next.js checks](docs/node-compat/nextjs-results-2026-11-06.md)
+retain two successful Node builds and24/24 HTTP checks per run. Both browser
+interactions work in both runs; the first records one aborted action POST and
+fails its strict network check. An untouched replay passes all browser checks.
+Its19 Wasm observations preserve17 known failures with no changed blocker;
+the full Next server still does not compile. The supported-module differential
+passes Node/Jco/Wasmtime, and the optional package matrix passes its three
+positives while retaining seven guest failures. All raw observations and exact
+generated-source mismatches remain recorded for future checks. This advances
+application regression coverage; it does not admit a new runtime profile.
+
+The same-build optional-matrix replay now also passes its comparison with no
+changed blockers; the historical comparison's three generated-source mismatches
+stay failed. A finite Root check verifies all16 component occurrences' actual
+bytes, retained empty-import/scalar-WIT records and12 whole-string cases. The
+compact independent main review checks1,981 DATA assertions/568 descriptor
+copies, both runs' raw terminals/streams and six actual component import
+sections. Main43/package40 injected comparator checks and the separate retained
+clock checker pass. All ordinary workers and reviewers are terminal before the
+results checkpoint. No new Wasm binaries or dependencies are added to Git;
+their external locations and hashes remain recorded.
+
+Completion audit: the requested commit/push and comprehensive application
+experiment have concrete results, including retained failures and reusable
+comparators. The full roadmap is incomplete. Native crypto revalidation/freeze/
+guest execution, native clock lifecycle and request-context/ALS gates remain
+open; optional filesystem, Node HTTP/network/process profiles and same-component
+both-host release gates remain pending. Full Next server execution and adoption
+of a broader runtime profile are unproved. These are outstanding work, not
+successful compatibility claims.
+
 Current application result: the comprehensive Next.js fixture passes its Node
 build/HTTP/browser controls, while the full Next server still fails Wasm
 compilation. Three optional package cases pass full Node/Jco/Wasmtime
@@ -83,7 +116,10 @@ old index bytes, exact writer or stat-only mutation. The review records recipe0,
 parents1+1 and preservationfalse; its5,541-file/34-alias finite ledger is not a
 full future-freezer distribution proof. A compact separate [read-only revalidation
 Source](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-artifact-revalidation-candidate-v1/README.md)
-is sealed at `175e4061`, with25 payloads and independent Source review pending.
+is sealed at `175e4061`, with25 payloads. [Independent Source review](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-artifact-revalidation-source-review-v1/results.json)
+passes at `619de02f`, covering21,398 files/24 families,11 trees,34 aliases,
+six active ASTs and32 independent pure cases. Actual artifact revalidation
+remains unissued; neither this review nor the author checks execute the adapter.
 Its134,641 author checks cover21,372 current inputs/23 families/11 trees;
 41 pure cases pass. No operational adapter call has run. It may establish
 a new proof with an exact index hash/mode exception and fresh full before/final
@@ -129,10 +165,10 @@ indexed families:216 payloads/20,560,929 bytes, exact membership and all payload
 hashes, including nested copied indices. Only each family's own root index is
 excluded from its inventory. Status documentation passes whitespace checks.
 The checkpoint includes source proposals, retained failures and unadopted native
-candidate evidence; it does not promote those candidates. The next application
-action is a fresh comprehensive Next.js build/HTTP/browser/Wasm replay against
-the accepted v13 engine, followed by the supported-module and optional-package
-differentials. Results and changed blockers will be retained for future checks.
+candidate evidence; it does not promote those candidates. After its push, fresh
+comprehensive Next.js build/HTTP/browser/Wasm replay, supported-module and
+optional-package differentials execute against accepted v13. The linked
+application report above records results, remaining failures and future checks.
 
 Roadmap continuation after `ceb1ffe9`:
 

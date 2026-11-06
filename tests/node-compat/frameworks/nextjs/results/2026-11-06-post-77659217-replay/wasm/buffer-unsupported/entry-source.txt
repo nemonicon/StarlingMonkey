@@ -1,0 +1,13 @@
+import { Buffer } from 'node:buffer';
+export function run() {
+  const rows = [];
+  for (const [name, call] of [
+    ['Buffer.from(Array)', () => Buffer.from([1, 2, 3])],
+    ['Buffer.from(base64)', () => Buffer.from('AQID', 'base64')],
+    ['Buffer.readUInt32LE', () => Buffer.from(new Uint8Array([1, 2, 3, 4])).readUInt32LE(0)],
+  ]) {
+    try { const value = call(); rows.push({ name, returned: true, type: typeof value }); }
+    catch (error) { rows.push({ name, refused: true, code: error.code, nameOfError: error.name, message: error.message }); }
+  }
+  return JSON.stringify({ boundedUnsupportedProbes: rows });
+}

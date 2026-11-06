@@ -2,6 +2,13 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
+The [2026-11-06 application replay](nextjs-results-2026-11-06.md) repeats the
+comprehensive Next fixture after push `77659217`. Node build/HTTP/browser
+controls pass on the untouched replay;17 main and seven optional guest failures
+remain. Passing native-module/React slices, an initial browser abort and exact
+generated-source guard failures are retained separately. Full Next HTTP/Wasm
+execution remains unavailable.
+
 The [optional package-bundler follow-on](../../tests/node-compat/frameworks/package-bundler-execution-v1/README.md)
 passes three complete Node/Jco/Wasmtime differentials: native CommonJS interop,
 supported modules and real React elements. Its fresh ten-case replay retains
@@ -56,7 +63,8 @@ now compiles and links: engine `9aec9297` is10,024,185 bytes with the complete
 83-field sidecar `2b725c11` and357 native inputs. The recipe exits0; both wrappers
 exit1 on the staged Git-index hash/mode protection check. Independent failure
 review validates the compiled bytes and retains that failure. Read-only artifact
-revalidation is being prepared; freeze, admission and guest execution remain
+revalidation Source passes independent review; actual revalidation, freeze,
+admission and guest execution remain
 pending. The pinned Node oracle passes60 accepted observations and retains24
 separate policy observations, with independent DATA review passed. Host results
 do not validate guest crypto. The private

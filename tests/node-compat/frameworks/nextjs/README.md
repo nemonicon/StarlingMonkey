@@ -3,6 +3,16 @@ profile. **The full Next.js server does not currently compile through this profi
 bundler.** The stock Node application works; its failures in the Wasm pipeline are
 retained as regression observations.
 
+The [2026-11-06 post-push application report](../../../../docs/node-compat/nextjs-results-2026-11-06.md)
+records two fresh builds after `77659217`,24/24 HTTP checks per run and the same17
+Wasm failures. Both browser interactions work; one first-run aborted action POST
+fails the network-error check, while the untouched replay passes it. That failed
+record remains retained. The fresh supported supplement passes full Node/Jco/
+Wasmtime comparison; the optional package matrix keeps three positives and seven
+guest failures. Exact generated-input changes are reviewed separately from
+changed failure reasons. The reproduction commands below remain the future
+checks; they do not claim a working Next server component.
+
 The retained-evidence checks were rerun on2026-11-06: the full Next baseline/replay
 comparison and43 injected checks, optional package comparison and40 injected
 checks, and the separate seven-return clock check with18 semantic negatives all
