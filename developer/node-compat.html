@@ -1,0 +1,744 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Opt-in Node compatibility profile - StarlingMonkey Developer Documentation</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="Documentation for StarlingMonkey">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">StarlingMonkey Developer Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/bytecodealliance/StarlingMonkey" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/bytecodealliance/StarlingMonkey/edit/main/docs/src/developer/node-compat.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <style>
+.mdbook-alerts {
+  padding: 8px 16px;
+  margin-bottom: 16px;
+  border-left: 0.25em solid var(--mdbook-alerts-color);
+}
+
+.mdbook-alerts > *:first-child {
+  margin-top: 0;
+}
+
+.mdbook-alerts > *:last-child {
+  margin-bottom: 0;
+}
+
+.mdbook-alerts-title {
+  display: flex;
+  font-weight: 600;
+  align-items: center;
+  line-height: 1;
+  color: var(--mdbook-alerts-color);
+  text-transform: capitalize;
+}
+
+.mdbook-alerts-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.2em;
+  background-color: currentColor;
+  -webkit-mask: no-repeat center / 100%;
+  mask: no-repeat center / 100%;
+  -webkit-mask-image: var(--mdbook-alerts-icon);
+  mask-image: var(--mdbook-alerts-icon);
+}
+
+.mdbook-alerts-note {
+  --mdbook-alerts-color: rgb(9, 105, 218);
+  /* https://icon-sets.iconify.design/material-symbols/info-outline-rounded/ */
+  --mdbook-alerts-icon: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="24" height="24" viewBox="0 0 24 24"%3E%3Cpath fill="currentColor" d="M12 17q.425 0 .713-.288T13 16v-4q0-.425-.288-.712T12 11q-.425 0-.712.288T11 12v4q0 .425.288.713T12 17m0-8q.425 0 .713-.288T13 8q0-.425-.288-.712T12 7q-.425 0-.712.288T11 8q0 .425.288.713T12 9m0 13q-2.075 0-3.9-.788t-3.175-2.137q-1.35-1.35-2.137-3.175T2 12q0-2.075.788-3.9t2.137-3.175q1.35-1.35 3.175-2.137T12 2q2.075 0 3.9.788t3.175 2.137q1.35 1.35 2.138 3.175T22 12q0 2.075-.788 3.9t-2.137 3.175q-1.35 1.35-3.175 2.138T12 22m0-2q3.35 0 5.675-2.325T20 12q0-3.35-2.325-5.675T12 4Q8.65 4 6.325 6.325T4 12q0 3.35 2.325 5.675T12 20m0-8"%2F%3E%3C%2Fsvg%3E');
+}
+
+.mdbook-alerts-tip {
+  --mdbook-alerts-color: rgb(26, 127, 55);
+  /* https://icon-sets.iconify.design/material-symbols/lightbulb-outline-rounded/ */
+  --mdbook-alerts-icon: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="24" height="24" viewBox="0 0 24 24"%3E%3Cpath fill="currentColor" d="M12 22q-.825 0-1.412-.587T10 20h4q0 .825-.587 1.413T12 22m-3-3q-.425 0-.712-.288T8 18q0-.425.288-.712T9 17h6q.425 0 .713.288T16 18q0 .425-.288.713T15 19zm-.75-3q-1.725-1.025-2.738-2.75T4.5 9.5q0-3.125 2.188-5.312T12 2q3.125 0 5.313 2.188T19.5 9.5q0 2.025-1.012 3.75T15.75 16zm.6-2h6.3q1.125-.8 1.738-1.975T17.5 9.5q0-2.3-1.6-3.9T12 4Q9.7 4 8.1 5.6T6.5 9.5q0 1.35.613 2.525T8.85 14M12 14"%2F%3E%3C%2Fsvg%3E');
+}
+
+.mdbook-alerts-important {
+  --mdbook-alerts-color: rgb(130, 80, 223);
+  /* https://icon-sets.iconify.design/material-symbols/chat-info-outline-rounded/ */
+  --mdbook-alerts-icon: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="24" height="24" viewBox="0 0 24 24"%3E%3Cpath fill="currentColor" d="M12 7q.425 0 .713-.288T13 6q0-.425-.288-.712T12 5q-.425 0-.712.288T11 6q0 .425.288.713T12 7m0 8q.425 0 .713-.288T13 14v-4q0-.425-.288-.712T12 9q-.425 0-.712.288T11 10v4q0 .425.288.713T12 15m-6 3l-2.3 2.3q-.475.475-1.088.213T2 19.575V4q0-.825.588-1.412T4 2h16q.825 0 1.413.588T22 4v12q0 .825-.587 1.413T20 18zm-.85-2H20V4H4v13.125zM4 16V4z"%2F%3E%3C%2Fsvg%3E');
+}
+
+.mdbook-alerts-warning {
+  --mdbook-alerts-color: rgb(154, 103, 0);
+  /* https://icon-sets.iconify.design/material-symbols/warning-outline-rounded/ */
+  --mdbook-alerts-icon: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="24" height="24" viewBox="0 0 24 24"%3E%3Cpath fill="currentColor" d="M2.725 21q-.275 0-.5-.137t-.35-.363q-.125-.225-.137-.488t.137-.512l9.25-16q.15-.25.388-.375T12 3q.25 0 .488.125t.387.375l9.25 16q.15.25.138.513t-.138.487q-.125.225-.35.363t-.5.137zm1.725-2h15.1L12 6zM12 18q.425 0 .713-.288T13 17q0-.425-.288-.712T12 16q-.425 0-.712.288T11 17q0 .425.288.713T12 18m0-3q.425 0 .713-.288T13 14v-3q0-.425-.288-.712T12 10q-.425 0-.712.288T11 11v3q0 .425.288.713T12 15m0-2.5"%2F%3E%3C%2Fsvg%3E');
+}
+
+.mdbook-alerts-caution {
+  --mdbook-alerts-color: rgb(207, 34, 46);
+  /* https://icon-sets.iconify.design/material-symbols/brightness-alert-outline-rounded/ */
+  --mdbook-alerts-icon: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="24" height="24" viewBox="0 0 24 24"%3E%3Cpath fill="currentColor" d="M12 17q.425 0 .713-.288T13 16q0-.425-.288-.712T12 15q-.425 0-.712.288T11 16q0 .425.288.713T12 17m0-4q.425 0 .713-.288T13 12V8q0-.425-.288-.712T12 7q-.425 0-.712.288T11 8v4q0 .425.288.713T12 13m-3.35 7H6q-.825 0-1.412-.587T4 18v-2.65L2.075 13.4q-.275-.3-.425-.662T1.5 12q0-.375.15-.737t.425-.663L4 8.65V6q0-.825.588-1.412T6 4h2.65l1.95-1.925q.3-.275.663-.425T12 1.5q.375 0 .738.15t.662.425L15.35 4H18q.825 0 1.413.588T20 6v2.65l1.925 1.95q.275.3.425.663t.15.737q0 .375-.15.738t-.425.662L20 15.35V18q0 .825-.587 1.413T18 20h-2.65l-1.95 1.925q-.3.275-.662.425T12 22.5q-.375 0-.737-.15t-.663-.425zm.85-2l2.5 2.5l2.5-2.5H18v-3.5l2.5-2.5L18 9.5V6h-3.5L12 3.5L9.5 6H6v3.5L3.5 12L6 14.5V18zm2.5-6"%2F%3E%3C%2Fsvg%3E');
+}
+
+</style>
+<h1 id="opt-in-node-compatibility-profile"><a class="header" href="#opt-in-node-compatibility-profile">Opt-in Node compatibility profile</a></h1>
+<p>Current accepted checkpoint: <a href="../../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.html">foundations-v13, bounded classic streams</a>. The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.</p>
+<p>The latest accepted core <code>sm-node-22.14.0-m0.11</code> profile provides a bounded <code>node:buffer</code>
+and an importable <code>node:child_process</code> stub. It does not provide general Node.js
+compatibility or complete Buffer support. The API reference and differential
+oracle are Node.js <strong>v22.14.0</strong>.</p>
+<p>Latest acceptance is <a href="../../../tests/node-compat/foundation-scheduler/production-acceptance-v12/README.html">v12</a>,
+with unchanged core m0.11, Events m0.10 and seven optional foundations. Three
+production Release engines share306 native inputs; separate diagnostic Release/
+GC, fresh eight-stage replay, allocator/focused GC and both-host HTTP pass.
+Root verifies4,150 indexed evidence files and the unchanged v11 parent. Private
+ticks default OFF and add no public process/nextTick/ALS API. Classic streams
+have an applied default-OFF342 source layer and four reviewed original Release freezes.
+Independent <a href="../../../tests/node-compat/foundation-classic-streams/independent-normal-off-component-review-v1/README.html">OFF</a>
+and <a href="../../../tests/node-compat/foundation-classic-streams/independent-runtime-gc-component-review-v1/README.html">RuntimeOnly/GC</a> component reviews
+confirm three raw0 bounded suites with19/48/17/3/65 checks, retained/fresh calls
+and explicit failure/discard limits. OFF/GC import nothing; RuntimeOnly imports
+only standard random@0.2.10. GC retains combined owners, not an isolated VM root.
+Fresh replay-v3 and followon gates now pass, with independent reviews. The
+<a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/runtime-gates-complete-v1.json">runtime receipt</a>
+records40 replay+20 followon+15 classic+one HTTP component occurrences, not global
+binary uniqueness. HTTP25eb1a1c… passes three responses per stock host, exact six
+standard0.2.10 imports/type-only clock/no Preview1 and clean shutdown;
+<a href="../../../tests/node-compat/foundation-classic-streams/independent-combined-http-results-review-v1/README.html">independent final review</a>
+passes. Counters[1,1,1] do not establish reuse/isolation. New Node-host measurement
+workloads retain14 canonical trace gaps at1/16 iterations, despite exact output
+and checksum equality. The unchanged342 component reproduces four minimal
+byte/event gaps on retained/fresh Jco and Wasmtime with independent verification.
+The independently reviewed11-case run confirms two object-encoding gaps (six
+total). The <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/README.html#corrected-trace-source-generation">corrected source generation</a>
+retains four reviewed production freezes, 474 files each, and its reviewed
+26-file runtime family with 6,414 consumed inputs and 22 tool links. The three
+<a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/corrected-classic-runtime-root-results-v1.json">corrected classic suites</a>
+finish at Root-observed exit 0, publishing 90/91/90 files and 15 component
+occurrences. OFF/GC import nothing; RuntimeOnly imports only
+<code>wasi:random/random@0.2.10</code>. The <a href="../../../tests/node-compat/foundation-classic-streams/independent-corrected-classic-results-review-v1/README.html">independent all-four result review</a>,
+index <code>8c3da4a2…41e8cc</code>, passes 19 ordinary groups, 48 deferred call/new cases,
+17 overload refusals, three limits and 65 initializer failures per enabled suite,
+plus retained/fresh state and failure controls. Disabled OFF passes eight
+ESM/static-CJS denials without a component. The separately reviewed Node11 gate
+adds one zero-import component occurrence. Main and successful clean-control
+Wasmtime stdout bytes were not retained: the review checks parsed observations
+and stdout hashes, not an independent decode of those missing streams. Fatal
+raw streams are checked; generic traps do not identify error origin. GC covers
+combined owners only. Original source/native packets and counterexamples stay
+unchanged.</p>
+<p>Diagnostic producer-v3 has successful <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/measurement-producer-v3-on-native-root-results.json">ON</a>
+and <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/measurement-producer-v3-off-native-root-results.json">OFF</a>
+build/freeze/read-only checks, each at exit 0 with 109 build steps and 525 frozen
+files. Independent native reviews <a href="../../../tests/node-compat/foundation-classic-streams/independent-measurement-producer-v3-on-native-review-v1/README.html">ON <code>c05afb8d…</code></a>
+and <a href="../../../tests/node-compat/foundation-classic-streams/independent-measurement-producer-v3-off-native-review-v1/README.html">OFF <code>ca2debb8…</code></a>
+pass. Root’s separate <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/reviewed-diagnostic-v3-on-pins.json">ON-only pins</a>
+(<code>2e9811a5…</code>) and <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/diagnostic-v3-on-root-review-receipt.json">authority</a>
+(<code>9681578e…</code>) do not constitute a measurement pair.
+The <a href="../../../tests/node-compat/foundation-classic-streams/measurement-correctness-candidate-v1/README.html">correctness companion138a</a>,
+mandatory <a href="../../../tests/node-compat/foundation-classic-streams/measurement-correctness-reporting-amendment-v1/README.html">reporting amendment0558</a>
+and <a href="../../../tests/node-compat/foundation-classic-streams/independent-measurement-correctness-source-review-v1/README.html">source review c695</a>
+remain bound to the <a href="../../../tests/node-compat/foundation-classic-streams/measurement-correctness-activation-candidate-v1/README.html">ce2f activator</a>
+(19 files/6,908 inputs, 27 Root source checks and <a href="../../../tests/node-compat/foundation-classic-streams/independent-measurement-correctness-activation-source-review-v1/README.html">peer ee4d5</a>).
+<a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/correctness-source-activation-and-preflight-root-results.json">Source activation and artifact preflight</a>
+pass, creating family <code>4728c365…f33f49</code> (21 files/7,489 inputs), whose
+<a href="../../../tests/node-compat/foundation-classic-streams/independent-measurement-correctness-family-review-v1/README.html">generated-family review634077e4</a> passes.</p>
+<p>The <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/workload-timeout-attempt1-root-results.json">first full 20-workload/14-boundary attempt</a>
+(<code>e8165564…</code>, session90660) exits 1 after a 55-second Wasmtime child timeout.
+It publishes no final result, completion or semantic counterexample. The
+original timed-out case is unknown; unretained Jco observations cannot count as
+passes. The <a href="../../../tests/node-compat/foundation-classic-streams/independent-workload-timeout-failure-review-v1/README.html">independent failure review c5a0a80f</a>
+passes within that evidence scope. Separate fresh case0 Jco and Wasmtime
+controls match the full Node oracle. A <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/workload-public-case5-root-results.json">separate fresh case5 control</a>
+(<code>793a2f0d…</code>, session16818) returns child exit 0 after 177.338 operational seconds
+under a 600-second cap; its complete trace, setup and checksum equal Node case5.
+This proves neither the original timeout’s case/cause nor deadline adequacy for
+all cases or a performance result. The original failure remains unchanged.</p>
+<p>The <a href="../../../tests/node-compat/foundation-classic-streams/measurement-correctness-persistence-amendment-v1/README.html">persistence amendment60a8687e</a>
+and <a href="../../../tests/node-compat/foundation-classic-streams/independent-correctness-persistence-source-review-v1/README.html">peer6fb6</a>
+lead through the reviewed v2 activator to <a href="../../../tests/node-compat/foundation-classic-streams/measurement-correctness-activated-v2/README.html">source418ff8fe</a>
+(22 files/7,542 inputs; <a href="../../../tests/node-compat/foundation-classic-streams/independent-correctness-v2-family-review-v1/README.html">family peer c30b596a</a>).
+The <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/corrected-workload-v2-root-results.json">fresh full v2 run</a>
+finishes at Root-observed raw exit0 (session66794, receipt <code>6218afd5…</code>).
+<a href="../../../tests/node-compat/foundation-classic-streams/independent-workload-v2-results-review-v1/README.html">Independent result review0f59a0da</a>
+passes: all105 returned records match the complete original20 Node workload
+rows and14 boundary observations, across three retained Jco rotations, fresh
+Jco and21 fresh Wasmtime calls. All21 raw Wasmtime streams independently
+double-decode exactly;632 completion files and final source/native/tool seals
+are checked. Component29c7d954… is12,977,999 bytes with zero imports and two
+public scalar exports. No old result is resumed or reused. The ON-only
+diagnostic authority stays separate from production and measurement-pair
+authority. scheduledCallbacks is the original workload counter; native queue/
+work/empty counters are unavailable. This finite pass claims no performance,
+GC/root isolation, reset/ALS, request reuse or full Node/Streams compatibility.</p>
+<p>The separate <a href="../../../tests/node-compat/foundation-classic-streams/measurement-execution-candidate-v1/README.html">measurement-execution source4b6fdfa5</a>
+has 43 files/7,004 inputs. <a href="../../../tests/node-compat/foundation-classic-streams/independent-measurement-execution-source-review-v1/README.html">Independent review96bc44a3</a>
+requires mandatory M1 deadline/capture fixes and permits no activation. A
+<a href="../../../tests/node-compat/foundation-classic-streams/measurement-execution-deadline-amendment-v1/README.html">new amendment</a> is sealed at index <code>b0975b54…</code> (25 files/7,112 inputs), with 36 source/reversal,
+18 pure deadline and11 syntax checks. Its <a href="../../../tests/node-compat/foundation-classic-streams/independent-measurement-execution-deadline-source-review-v1/README.html">independent source review9e602ec9</a>
+passes. A separate Root review now authenticates both actual diagnostic variants.
+The <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/common-byte-v2-source-and-preflights-root-results.json">new source family and both preflights</a>
+pass at Root-observed exit0 (69131/24691): index1b801439… has35 files/7,709 inputs.
+<a href="../../../tests/node-compat/foundation-classic-streams/independent-common-byte-v2-family-review-v1/README.html">Independent family review4e986ca1</a> passes.
+The <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/common-byte-v2-stock-graph-failure-root-results.json">four-arm attempt25227</a> finishes at raw exit1 in the
+host stock graph checker before stock componentization. The inventory has no
+<code>provider</code> field; its three original guest paths are explicit sourceBeforeAfter
+rows. Native-on, canonical-on and canonical-off completed their full arms.
+<a href="../../../tests/node-compat/foundation-classic-streams/independent-common-byte-v2-three-arm-failure-review-v1/README.html">Independent reviewbf9fa2a6</a> verifies231 durable observations against
+all14 Node oracles, identity/probes, raw calls and final source closure. A new
+<a href="../../../tests/node-compat/foundation-classic-streams/measurement-stock-composition-candidate-v1/README.html">stock-only correction and composition source</a> passes
+<a href="../../../tests/node-compat/foundation-classic-streams/independent-stock-graph-composition-source-review-v1/README.html">independent reviewddbbe2a7</a>. Root source checks pass; a separate
+<a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/reviewed-common-byte-three-arms-for-stock-only-v1.json">three-arm authorityafdbc0bc</a> permits fresh stock execution.
+<a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/common-byte-stock-only-root-results-v1.json">Stock run91122</a> and <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/common-byte-composition-root-results-v1.json">composition12839</a> finish
+at exit0. <a href="../../../tests/node-compat/foundation-classic-streams/independent-common-byte-stock-and-composition-results-review-v1/README.html">Independent actual reviewab100c83</a> verifies all308
+observations against14 Node cases, exact raw calls, component/graph data and
+each arm origin. Both required actual-proof documents are indexed. Original
+source1b801, arm records and parent exit1 stay unchanged; this is new composed
+evidence, not a pass for the original failed run. Timing was still disabled at that preparation checkpoint. Future
+authority templates stay NULL; no external timing phase or timing result exists.</p>
+<p>The <a href="../../../tests/node-compat/foundation-classic-streams/trace-replay-activation-candidate-v1/README.html">corrected replay producer8851</a>
+passes <a href="../../../tests/node-compat/foundation-classic-streams/independent-trace-replay-activation-source-review-v1/README.html">source review c373</a>
+and its source activation creates <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/trace-replay-source-activation-root-results.json">family a08aec2d</a>
+with 83 files and 2,293/2,292 root/capability inputs; <a href="../../../tests/node-compat/foundation-classic-streams/independent-trace-replay-family-review-v1/README.html">generated-family review8529</a> passes.
+Root’s <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/trace-replay-preflight-attempt1-root-env-failure.json">preflight environment failure</a>
+is preserved: native OFF/RuntimeOnly/GC pass, then Release OFF lacks the required
+explicit <code>NODE_COMPAT_WASMTIME</code>. The <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/trace-replay-preflights-root-results.json">corrected-environment retry and combined preflights</a>
+pass without source/native changes or a guest in those preflight attempts.
+The <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/corrected-release-replay-root-results.json">fresh eight-stage replay</a>
+then passes at Root-observed exit 0, covering six optional foundations and 40
+component occurrences, including one fresh historical control. All import
+nothing. Five allocator-GC/focused/getter follow-ons also pass, with
+<a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/corrected-followon-imports-root-results.json">20 component import audits</a>:
+only the eight RuntimeOnly components import standard random@0.2.10.
+Independent <a href="../../../tests/node-compat/foundation-classic-streams/independent-corrected-replay-results-review-v1/README.html">replay6a67</a>
+and <a href="../../../tests/node-compat/foundation-classic-streams/independent-corrected-followon-results-review-v1/README.html">follow-on d116</a>
+result reviews pass, including source/native/tool/completion seals and control
+origins. These are occurrences, not globally unique binaries. Replay retains
+eight fatal raw streams and one independently decoded alias return; 30 other
+Wasmtime records have parsed-only or digest-only evidence. Follow-on allocator
+GC has a parsed observation without raw stdout or digest; getter Node/Jco values
+are parsed-only, while its Wasmtime return independently decodes. Getter/Symbol
+parity remains false, GC covers combined owners and failed instances are discarded.</p>
+<p>The <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/corrected-http-source-and-bundle-root-results.json">corrected HTTP source and whole-entry bundle</a>
+pass with17 expected imports and no bundled JS built-in adapters. The
+<a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/corrected-http-packaging-attempt1-root-env-failure.json">first packaging attempt</a>
+retains prepared inputs; build stderr asserts missing <code>NODE_COMPAT_WASM_TOOLS</code>
+before output creation. Its outer terminal status was lost to context and is
+not inferred. The <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/corrected-http-package-root-results.json">fresh same-input buildv2 and packaging audit</a> finish at Root-observed raw0
+(session71459, explicit tool): component24d76605… is64,058,731 bytes, with the
+17-import application bundle and exact six standard WASI0.2.10 interfaces;
+monotonic-clock duration is type-only, with no callable clock. Production
+admission completion exists; the collector verifies25 artifact references and
+the7,496-input closure, including a fresh static WIT audit. The
+<a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/corrected-http-combined-root-results.json">fresh combined host result</a>
+finishes at Root-observed raw0 for Wasmtime, wash and audit (session60088).
+Both hosts return three successful responses and stop at exit0 on identical
+component24d76605 bytes. <a href="../../../tests/node-compat/foundation-classic-streams/independent-corrected-http-results-review-v1/README.html">Independent result review2f5df929</a>
+passes all six bodies and source/native/tool/configuration evidence. Counters
+are1/1/1 on each host; no instance reuse or request isolation is inferred.
+Measurement is complete; targeted memory/startup, artifact/archive and acceptance remain incomplete; bounded
+v12 stays accepted and the roadmap is unfinished.
+The completed <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/common-byte-composed-timing-root-results-v1.json">measurement</a> finishes raw0:42 calibration/126 timed workers plus final source audit,1,037 output files. <a href="../../../tests/node-compat/foundation-classic-streams/independent-composed-timing-integrity-review-v1/README.html">Integrity review3843d019</a> and the <a href="../../node-compat/classic-stream-measurement-v1/README.html">numerical analysis</a> are separate evidence. The <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/classic-implementation-strategy-root-decision-v2.json">Root strategy decision</a> retains the shared guest-JS stream state machine and native byte primitives; registered imports avoid a duplicate bundle and save7.85% measured component bytes, with no consistent same-engine warm-speed or memory advantage. The optional unused installation stays OFF. Stock-provider differences include a different provider/scheduler; FNV/validation stays timed and controls are not subtracted. Public RSS includes proof/V8 overhead, and raw timing-call compact returns were not retained. The smaller-worker <a href="../../../tests/node-compat/foundation-classic-streams/measurement-memory-probe-candidate-v1/README.html">process RSS supplement</a> passed source review, but the <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/process-rss-supplement-v1-preworker-failure-root-results.json">actual attempt</a> exits1 before any worker: setup is signed32, while the probe expected strings. The corrected <a href="../../../tests/node-compat/foundation-classic-streams/measurement-memory-probe-candidate-v2/README.html">v2 source</a> passes independent review; the <a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/process-rss-supplement-v2-root-results.json">actual v2 run</a> finishes raw0 with18 fresh workers,126 retained typed returns,599 files and final source audit. <a href="../../../tests/node-compat/foundation-classic-streams/independent-process-rss-supplement-v2-results-review-v1/README.html">Independent result/numerical review</a> passes all18 workers/126 typed returns; same-engine pre-final maximum RSS ratios cross1 and no controls are subtracted. It excludes full proof reports from workers and retains public raw returns. No private heap or production-engine performance claim follows.</p>
+<p>Historical failures/counterexamples remain unchanged. The61-case <a href="../../../tests/node-compat/foundation-zlib/component-validation-candidate-v1/README.html">zlib corpus
+and harness a7eca234</a> and
+<a href="../../../tests/node-compat/foundation-zlib/component-validation-control-evidence-amendment-v1/README.html">control-evidence amendment fd3ec6ef</a>
+retain the <a href="../../../tests/node-compat/foundation-zlib/independent-component-validation-source-review-v1/README.html">240fdc77 source hold</a>.
+The new <a href="../../../tests/node-compat/foundation-zlib/component-validation-bootstrap-coverage-amendment-v1/README.html">bootstrap/coverage amendment a376c32b</a>
+(15 files/8,640 inputs) addresses the call-counter, native error-field-type and
+repeated-namespace identity gaps and rebinds producer v3. Its <a href="../../../tests/node-compat/foundation-zlib/independent-component-validation-coverage-source-review-v1/README.html">independent source
+review654f077f</a>
+passes. The <a href="../../../tests/node-compat/foundation-zlib/component-validation-v4-rebind-amendment-v1/README.html">v4 publisher rebindcd458</a>
+(8 files/8,770 inputs, nine publisher edits) passes <a href="../../../tests/node-compat/foundation-zlib/independent-component-validation-v4-rebind-source-review-v1/README.html">independent review74109e3f</a>.
+The a376 payload stays exact:61 Node cases,28 full-byte fixtures,40 bindings and
+107 typed constants. Separate <a href="../../../tests/node-compat/foundation-zlib/reviewed-native-v4-validation-bootstrap-pins-v1.json">Root validation-only pinsb61e1f38</a>
+and <a href="../../../tests/node-compat/foundation-zlib/native-v4-validation-bootstrap-root-review-v1.json">review7274a874</a> bind the three actual native variants; the
+normal production selector stays closed. The first activation wrapper omitted
+required arguments and stopped before publication. The corrected-argument
+<a href="../../../tests/node-compat/foundation-zlib/validation-source-activation-attempt2-context-failure-root-results.json">attempt49004</a> then stops at a historical preparation-path
+collection error; no source family or guest is published. A <a href="../../../tests/node-compat/foundation-zlib/component-validation-preparation-context-amendment-v1/README.html">context-only
+amendmentf6f0e191</a> is sealed, but <a href="../../../tests/node-compat/foundation-zlib/independent-component-validation-preparation-context-source-review-v1/README.html">review541b2779</a> holds it on ZVCTX-M2:
+the publisher treats an indexed-only peer as a preparation family and reads a
+manifest that does not exist. The <a href="../../../tests/node-compat/foundation-zlib/validation-source-activation-attempt2-root-origin-correction.json">Root origin correction</a>
+retains the original diagnosis and records this earlier observed failure; the
+later relocated-bootstrap-path issue is independently confirmed. A new publisher
+correction now distinguishes those family roles explicitly. The <a href="../../../tests/node-compat/foundation-zlib/component-validation-indexed-peer-amendment-v1/README.html">indexed-peer successorbd66</a> and <a href="../../../tests/node-compat/foundation-zlib/component-validation-indexed-peer-regression-evidence-v1/index.json">postseal inventory evidence5aa0</a> pass <a href="../../../tests/node-compat/foundation-zlib/independent-component-validation-indexed-peer-source-review-v1/README.html">independent source review6cbe</a>: all8,904 inventory rows agree, required preparation manifests remain mandatory, and the indexed-only peer requires all five indexed files. Root <a href="../../../tests/node-compat/foundation-zlib/validation-source-activation-v3-root-results.json">source activation-v3</a> finishes raw0 and publishes family8868d212 (19 files/10,964 consumed inputs). Its <a href="../../../tests/node-compat/foundation-zlib/independent-component-validation-v6-family-review-v1/README.html">generated-family review999df5f8</a> holds on ZV6-M1: four component-harness loaders are physically absent from the native stage and omitted from the consumed manifest. The <a href="../../../tests/node-compat/foundation-zlib/component-validation-tooling-closure-amendment-v1/README.html">tooling successor daa7d28a</a> now passes <a href="../../../tests/node-compat/foundation-zlib/independent-component-validation-tooling-closure-source-review-v1/README.html">source review567c3214</a> and Root22 physical/source checks plus six syntax commands. <a href="../../../tests/node-compat/foundation-zlib/validation-source-activation-v4-root-results.json">Activation-v4</a> finishes raw0, publishing v7/d67971d0 (21 files/11,036 inputs). Its native configured root and fully sealed component-tool root are distinct. <a href="../../../tests/node-compat/foundation-zlib/independent-component-validation-v7-family-review-v1/README.html">Generated-family review178ab2d0</a> passes. The <a href="../../../tests/node-compat/foundation-zlib/normal-codec-validation-attempt1-fixture-failure-root-results.json">first normal codec attempt</a> then finishes raw1 during componentization: its snapshot uses unsupported Buffer.from(Array). No component, final result or deployed codec observation is published; the failure source recheck passes. The same input kind also occurs in constructor-refusal arguments and the ordinary-GC fixture. The <a href="../../../tests/node-compat/foundation-zlib/component-validation-buffer-input-amendment-v1/README.html">three-expression Uint8Array amendment b0ced580</a> passes12 Root host-only regression checks using explicit test doubles and <a href="../../../tests/node-compat/foundation-zlib/independent-component-validation-buffer-input-source-review-v1/README.html">independent source reviewc277823a</a>. <a href="../../../tests/node-compat/foundation-zlib/validation-source-activation-v5-root-results.json">Fresh source activation-v5</a> finishes raw0 and publishes corrected v8/8af9a213 (21 files/11,107 inputs). <a href="../../../tests/node-compat/foundation-zlib/independent-component-validation-v8-family-review-v1/README.html">Generated-family review1e966afe</a> passes. <a href="../../../tests/node-compat/foundation-zlib/normal-codec-validation-v2-root-results.json">Normal validation-v2</a> finishes raw0 with283 bounded-profile codec observations over61 cases and1,544 completion artifacts. <a href="../../../tests/node-compat/foundation-zlib/gc-codec-validation-v1-root-results.json">GC validation-v1</a> finishes raw0 with three codec cases, combined-owner ordinary-GC and fresh Wasmtime checks,49 completion artifacts. Both components import nothing. <a href="../../../tests/node-compat/foundation-zlib/independent-normal-codec-validation-v2-results-review-v1/README.html">Independent normal reviewa36758db</a> and <a href="../../../tests/node-compat/foundation-zlib/independent-gc-codec-validation-results-review-v1/README.html">GC review461dec9c</a> pass. The <a href="../../../tests/node-compat/foundation-zlib/reviewed-codec-validation-results-v1.json">combined Root result review</a> retains22 Node/profile error-case differences (16 outcome/code, six additional errno-only), including11 originally unlabelled rows. The <a href="../../../tests/node-compat/foundation-zlib/independent-normal-codec-validation-v2-results-review-v1/node-profile-difference-ledger.json">per-case difference ledger</a> binds exact oracle/raw citations; no61-case Node parity is claimed. Source-coupled public VERNUM evidence does not rewrite metadata backend proof; operational admission remains closed. Separately, <a href="../../../tests/node-compat/foundation-zlib/disabled-selection-validation-root-results-v1.json">actual disabled validation</a> finishes raw0 with eight pre-componentization denials, five Buffer/stub observations and imports[]; <a href="../../../tests/node-compat/foundation-zlib/independent-disabled-selection-results-review-v1/README.html">independent result review5b199668</a> passes. This does not prove codec support or a unique cause for its generic direct-import rejection. The guest, driver, Node fixtures and native evidence remain unchanged.</p>
+<p>The <a href="../../../tests/node-compat/foundation-classic-streams/independent-composed-timing-inputs-review-v1/README.html">independent timing-input review372256</a> passes all non-authority data checks for the unapproved timing candidate and four Root prerequisite reviews. The three issuance gates remain closed: candidate state, timingAllowed:false and NOT_ISSUED quiet window. No timing has run.</p>
+<p>The <a href="../../../tests/node-compat/foundation-zlib/integration-candidate-v1/README.html">conditional integration56a6</a>
+and <a href="../../../tests/node-compat/foundation-zlib/independent-sdk-syntax-review-v1/README.html">SDK syntax evidence e757/peer4ef</a>
+remain bounded source/syntax evidence:350 proposed native paths, two syntax
+commands and1,048 dependency files (2 CPP+1,046 headers), with static <code>MOZ_Z_*</code>
+mapping. Old <a href="../../../tests/node-compat/foundation-zlib/independent-native-integration-source-review-v1/README.html">3ff/dafaff Z350-M1</a>
+and <a href="../../../tests/node-compat/foundation-zlib/independent-native-integration-v2-source-review-v1/README.html">c65/89bc Z350-M2</a>
+holds remain unchanged. The <a href="../../../tests/node-compat/foundation-zlib/descriptor-shadow-amendment-v1/README.html">two-identifier correction c92e</a>
+and <a href="../../../tests/node-compat/foundation-zlib/native-integration-candidate-v3/README.html">producer v3 index3929e24d</a>
+(81 files/2,146 inputs) pass <a href="../../../tests/node-compat/foundation-zlib/independent-native-integration-v3-source-review-v1/README.html">source reviewf471ec27</a>.
+<a href="../../../tests/node-compat/foundation-zlib/native-integration-v3-root-stage-results.json">Root’s eight source checks and isolated staging</a>
+pass (76544/964346f9), followed by <a href="../../../tests/node-compat/foundation-zlib/independent-native-integration-v3-stage-review-v1/README.html">actual stage reviewc75f3484</a>:
+869 exact copied rows =350 native+522 tooling−3 overlaps, plus the exact proposal
+and isolated Git54b base. Original preparation context is retained.</p>
+<p>The first ordinary Release normal-OFF attempt (Root62113) finishes at raw exit1.
+It reaches the final108/108 copy entry and then postbuild evidence collection.
+The actual CMake chain has one compiler <code>-o</code> and another for <code>wasm-opt</code>;
+<code>codec.link_commands</code> counts both across the compound line and asserts. The
+<a href="../../../tests/node-compat/foundation-zlib/native-integration-v3-build-attempt1-failure-root-results.json">Root failure receipt accf4b05</a>
+retains11 references, recipe/launcher exit1 and completed cleanup. No standalone
+CMake exit receipt was captured. The <a href="../../../tests/node-compat/foundation-zlib/independent-native-zlib-v3-build-failure-review-v1/README.html">independent failure reviewc319</a>
+and <a href="../../../tests/node-compat/foundation-zlib/native-integration-v3-build-failure-labels-root-clarification.json">Root label clarification</a>
+retain that distinction. Raw v3 engine62d8e6d8… remains unchanged and UNADMITTED
+at9,995,287 bytes, with no metadata sidecar, freeze or backend/runtime proof.</p>
+<p>The <a href="../../../tests/node-compat/foundation-zlib/native-integration-candidate-v4/README.html">v4 source d384af81</a>
+(85 files/2,261 preparation inputs) passes <a href="../../../tests/node-compat/foundation-zlib/independent-native-integration-v4-source-review-v1/README.html">source review31d5408e</a>.
+<a href="../../../tests/node-compat/foundation-zlib/native-integration-v4-root-stage-results.json">Root checks and staging</a>
+record nine source-check commands at0 (34385/42f14b), then plan/apply, staged
+verification, factory and Git checks at0 (89971). The <a href="../../../tests/node-compat/foundation-zlib/independent-native-integration-v4-stage-review-v1/README.html">independent actual-stage
+review5d857788</a>
+passes:979 exact copies=350 native+632 tooling−3 overlaps,85 proposal files plus
+index, ordinary Git54b clone and original-context preparation references.</p>
+<p>The one-job ordinary Release normal-OFF retry finishes at exit0 (Root69972) from
+<code>/tmp/starling-node-compat/zlib-source-v4</code>, with fresh <code>zlib-v4-build</code> and
+<code>production-zlib-v4</code> namespaces and2GiB start/800MiB stop guards, without
+DEBUG/OOM. The separate <a href="../../../tests/node-compat/foundation-zlib/native-integration-v4-cache-preseed-root-results.json">four-file cache preseed47668</a>
+contains only three archive downloads and cbindgen; no engine, configuration,
+source or old proof was copied. <a href="../../../tests/node-compat/foundation-zlib/native-integration-v4-normal-off-root-results.json">Build, freeze and verification</a>
+finish at Root-observed exit0 (69972/30705/85956). Engine fb165689… is9,995,295
+bytes; all1,024 frozen copies and1,022 original references rehash. The actual
+350-source build records62 native units, four strict, six private and one separate
+embedding command. <a href="../../../tests/node-compat/foundation-zlib/independent-native-zlib-v4-normal-off-review-v1/README.html">Independent ordinary native reviewba0451db</a> passes.
+The <a href="../../../tests/node-compat/foundation-zlib/native-integration-v4-gc-off-root-results.json">GC variant</a> also finishes build/freeze/verification at exit0
+(44299/71826/23840). All ordinary frozen
+copies remain unchanged after the expected shared build-cache reconfiguration.
+<a href="../../../tests/node-compat/foundation-zlib/independent-native-zlib-v4-gc-off-review-v1/README.html">Independent GC review90e9e6e3</a> passes. The <a href="../../../tests/node-compat/foundation-zlib/native-integration-v4-disabled-off-root-results.json">disabled variant</a>
+also finishes build/freeze/verification at exit0 (66192/28710/63712), and
+<a href="../../../tests/node-compat/foundation-zlib/independent-native-zlib-v4-disabled-off-review-v1/README.html">independent reviewac8d15ac</a> confirms its61 native/five private
+commands and kernel omission. All three frozen sets remain intact. Runtime backend proof
+remains false/null/null; checked-in future pins stay NULL, while the external
+Root authority permits validation only. The later <a href="../../../tests/node-compat/foundation-zlib/reviewed-codec-validation-results-v1.json">bounded runtime results</a> now include normal codec, combined-owner GC and disabled-control components with independent reviews. Operational admission, explicit Node differences, matched codec costs and new-engine selected-host/release gates remain open. Historical host/ECHO vectors and syntax remain separate evidence; metadata backend-proof fields stay false. Complete <code>node:zlib</code> support is not claimed.</p>
+<p>Enable the profile explicitly when building StarlingMonkey or its ComponentizeJS
+embedding:</p>
+<pre><code class="language-sh">cmake -S . -B cmake-build-node-profile -DCMAKE_BUILD_TYPE=Release \
+  -DENABLE_BUILTIN_NODE_COMPAT=ON
+</code></pre>
+<p>The option defaults to OFF. Normal builds do not install these modules or global
+Buffer. The profile requires the existing text-codec builtin. Its hexadecimal
+kernels are native guest code; the overload/error/view semantics live in a small
+JavaScript facade. Neither module adds a host service or calls WASI directly.
+The final component import set still depends on the application world and
+ComponentizeJS feature selection, and must be inspected after composition.</p>
+<p>Seven independent optional foundations are compiled and tested in the
+<a href="../../../tests/node-compat/foundation-scheduler/production-acceptance-v12/README.html">v12 acceptance</a>.
+All default to OFF and require the core option above:</p>
+<div class="table-wrapper"><table><thead><tr><th>CMake option</th><th>Bounded modules</th></tr></thead><tbody>
+<tr><td><code>NODE_COMPAT_PATH=ON</code></td><td><code>path</code>, <code>path/posix</code>, <code>path/win32</code>; fixed cwd/platform policy and bounded glob matching</td></tr>
+<tr><td><code>NODE_COMPAT_EVENTS=ON</code></td><td>Synchronous EventEmitter and bounded <code>addAbortListener</code>; <code>once</code>, <code>on</code>, <code>EventEmitterAsyncResource</code> and other manifest refusals remain deferred</td></tr>
+<tr><td><code>NODE_COMPAT_STRING_DECODER=ON</code></td><td>StringDecoder UTF8/hex; other known encodings throw</td></tr>
+<tr><td><code>NODE_COMPAT_ASSERT=ON</code></td><td>Assert/strict scalar assertions; deep/async/CallTracker operations throw</td></tr>
+<tr><td><code>NODE_COMPAT_QUERYSTRING=ON</code></td><td>Legacy Querystring with explicit input/output/field caps and deferred overloads</td></tr>
+<tr><td><code>NODE_COMPAT_UTIL=ON</code></td><td>Bounded Util/types/sys;29 captured-intrinsic predicates, pure helpers and native codec aliases; remaining calls throw</td></tr>
+<tr><td><code>NODE_COMPAT_STREAM_WEB=ON</code></td><td>Exactly18 stream/web exports over real native classes; bounded UTF8 codecs, iteration and ordinary DataView/BYOB adapters; compression call/new throws. Requires web streams and text-codec builtins</td></tr>
+</tbody></table>
+</div>
+<p>The accepted private <code>NODE_COMPAT_INTERNAL_TICKS</code> queue defaults OFF and exposes
+no public process/nextTick API. The experimental default-OFF
+<code>NODE_COMPAT_CLASSIC_STREAMS</code> option requires Events, StringDecoder and private
+ticks. Its applied source/compiled artifacts and ordinary-component result are
+tracked separately from accepted runtime support; see the
+<a href="../../../tests/node-compat/foundation-classic-streams/production-adoption-v1/README.html">current adoption ledger</a>.</p>
+<p>Each has its own versioned manifest and generated header, with real named/default
+bindings and both canonical/bare registration. These modules add no host
+capability. The checkpoint validates strict factory execution, selected bundler
+imports, aliases, snapshot state and deployed errors; it is not general Node
+compatibility. The <a href="../../node-compat/compatibility-matrix.html">compatibility matrix</a>
+and individual manifests define each bounded contract.</p>
+<p>Events m0.10 passes 29 focused Node groups in both entropy modes, alias/CJS/
+snapshot/error checks and separate fatal/discard controls. Its fresh ordinary
+and protected callback returns omit Node’s <code>.then</code> getter read: Node
+<code>1/1/0</code> versus native <code>0/0/0</code>, ordered ordinary/protected/already-aborted.
+The getters return undefined; callable-then/rejection parity is not established.
+The target uses its well-known nonregistry <code>Symbol.dispose</code>, differing from
+Node’s <code>Symbol.for('nodejs.dispose')</code>. These are
+<a href="../../../tests/node-compat/milestones/foundations-v11/reports/callbackReturn.json">confirmed limitations</a>.
+The Release GC proof combines signal/listener/closure-held Symbol owners across eight
+public hex roundtrips; it does not isolate prototype-only Symbol liveness or add
+an OOM/fault result.</p>
+<p>Stream/web retains ten corresponding native global constructor identities and
+three hidden native class constructors. Its codec constructors are module-only.
+Input limits are1Mi UTF16 units per encoder chunk and16MiB per decoder/BYOB
+input; fixed attached unshared local unmodified views and min1 only. These caps
+do not bound total retained queues or output. Writable-controller signal,
+Proxy/layout/cross-realm inputs, several native error codes and controller arity
+remain gaps. Both OFF import names fail bundling and actual initialization;
+no adapter fallback occurs. See the <a href="../../../builtins/node-compat/export-manifest.stream-web.node-v22.14.0.json">m0.9 manifest</a>
+and <a href="../../../tests/node-compat/foundation-stream-web/production-adoption/README.html">executed native gates</a>.</p>
+<h2 id="supported-buffer-subset"><a class="header" href="#supported-buffer-subset">Supported Buffer subset</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>API</th><th>Contract</th></tr></thead><tbody>
+<tr><td><code>Buffer.alloc(size, fill?)</code></td><td>Integer size from 0 to 16 MiB; numeric fill only, zero by default. No pool.</td></tr>
+<tr><td><code>Buffer.allocUnsafe(size)</code></td><td>Primitive finite raw number from0 through16MiB; accepted fractions truncate. After unchanged validation, m0.11 directly returns privately branded captured native Uint8Array storage: fresh exact zeroed backing at offset0, no pool. This intentionally differs from Node’s uninitialized/slab storage; allocUnsafeSlow remains deferred.</td></tr>
+<tr><td><code>Buffer.from(string, encoding?)</code></td><td>UTF-8 (<code>utf8</code>, <code>utf-8</code>) or hexadecimal (<code>hex</code>), case-insensitive. At most 1,048,576 UTF-16 source units. Hex truncates at the first invalid pair and drops an odd final nibble.</td></tr>
+<tr><td><code>Buffer.from(Uint8Array)</code></td><td>Copies the visible bytes to independent storage.</td></tr>
+<tr><td><code>Buffer.from(ArrayBuffer, offset?, length?)</code></td><td>Shares fixed-length backing storage; nonnegative integer offset/length only; view length at most 16 MiB.</td></tr>
+<tr><td><code>Buffer.isBuffer</code>, <code>Buffer.isEncoding</code></td><td>Private instance brand and explicit profile encoding allowlist.</td></tr>
+<tr><td><code>Buffer.byteLength</code></td><td>Selected string encodings, fixed attached ArrayBuffer or Uint8Array. Shared, resizable and detached storage is rejected.</td></tr>
+<tr><td><code>buf.toString(encoding?, start?, end?)</code></td><td>UTF-8 or hex; integer range arguments with clipping. UTF-8 preserves a leading BOM and replaces malformed input.</td></tr>
+<tr><td><code>buf.slice</code>, <code>buf.subarray</code></td><td>Shared backing storage and Buffer identity, with Uint8Array range normalization.</td></tr>
+<tr><td><code>.buffer</code>, <code>.byteOffset</code>, <code>.byteLength</code>, <code>.length</code>, indices, <code>.parent</code>, <code>.offset</code></td><td>Real Uint8Array backing relationships and legacy view aliases.</td></tr>
+</tbody></table>
+</div>
+<p>Core m0.11 adds no exports, encodings, C++ allocation kernel, raw byte borrow or
+allocator transfer. The same JS-owned zeroing and 16 MiB cap apply; acceptance
+establishes bounded correctness, not a current performance or memory advantage.</p>
+<p>Instances have genuine typed-array internal slots. Both constructor and prototype
+inherit from Uint8Array; species operations such as map/filter create independent
+Buffer instances. Inherited Uint8Array operations remain available except methods
+that Node overloads and this profile explicitly rejects.</p>
+<p>Array-like/valueOf/JSON input, non-Uint8 typed arrays, DataView, SharedArrayBuffer,
+resizable backing storage for construction, the legacy Buffer constructor,
+additional encodings, numeric readers/writers, copying/searching/writing/fill
+methods, concat, uninitialized allocation, allocUnsafeSlow and full inspection/serialization are outside
+the subset. Invalid supported arguments use selected Node error codes; excluded
+overloads throw <code>ERR_SM_NODE_UNSUPPORTED</code>. Full coercion, error-order and message
+parity are not promised.</p>
+<p>The finite manifest accounts for every Node 22 <code>node:buffer</code> export. Blob, File,
+SlowBuffer, atob, btoa, isAscii, isUtf8, resolveObjectURL and transcode are explicit
+throwing callable bindings in this milestone. Constants remain numeric:
+<code>INSPECT_MAX_BYTES</code> is 50, <code>kMaxLength</code>/<code>constants.MAX_LENGTH</code> are 16 MiB and
+<code>kStringMaxLength</code>/<code>constants.MAX_STRING_LENGTH</code> are 32 MiB. These are profile caps,
+not Node’s platform maxima; memory pressure may still cause allocation failure.</p>
+<h2 id="module-and-bundler-contract"><a class="header" href="#module-and-bundler-contract">Module and bundler contract</a></h2>
+<p>Native installation uses the existing <code>add_builtin</code> and
+<code>api::Engine::define_builtin_module</code>. Both <code>node:</code> and bare aliases are registered
+with the same exported values. Global Buffer is the same constructor as the
+module export. Namespace objects remain cached by specifier; aliases need not
+have equal namespace-object identity unless the bundler canonicalizes them.</p>
+<p>In the core Buffer/stub modules, every named export equals the corresponding
+default-object member; their defaults and constants are frozen. Optional
+foundations have their own declared default graphs: Path/Querystring/StringDecoder
+defaults are mutable objects, Events/Assert defaults are mutable functions, and
+named bindings retain the initially registered references. There is no runtime CommonJS loader or
+<code>syncBuiltinESMExports</code> mutation protocol. Unknown names fail ESM linking;
+unadmitted modules have no implicit empty stub.</p>
+<p>A bundler must preserve the selected native imports before an adapter plugin can
+replace them. The finite resolver in <code>tests/node-compat/profile-bundler.mjs</code>
+canonicalizes modules selected by the actual engine receipt, externalizes their <code>node:</code> imports,
+rejects other builtins/custom adapters, and lowers a deliberately narrow literal
+CommonJS require contract for local <code>.cjs</code> files imported by explicit path. It is
+not a general npm CommonJS package loader. Applications using Jco’s default Node
+adapter bundling
+do not automatically use this native profile. Global injection must use the
+canonical native Buffer and must not bring in another Buffer implementation.</p>
+<p><code>node:child_process</code> has nine callable exports plus default: ChildProcess,
+_forkChild, exec, execFile, execFileSync, execSync, fork, spawn and spawnSync.
+Calls and construction always throw an Error with <code>code</code>, <code>module</code>, <code>operation</code>
+and <code>profile</code> fields. This applies during snapshot initialization and deployed
+execution. Importing and inspecting the namespace/default object is safe; neither
+is an accidental thenable. No process-spawn or custom host capability is imported.</p>
+<h2 id="native-ownership-and-generated-sources"><a class="header" href="#native-ownership-and-generated-sources">Native ownership and generated sources</a></h2>
+<p>The byte kernels allocate JS-managed typed arrays or owned staging memory. All
+JS objects/strings are rooted across allocation. Typed-data pointers are borrowed
+only inside no-GC regions, after allocation and validation, and never retained
+across a callback or suspension. Hex encoding copies owned staging bytes into a
+JS string. The production UTF8 encoder now writes directly into an exactly sized
+GC-owned Uint8Array; TextDecoder owns its UTF16 staging allocation and releases
+the borrowed input before result-string creation. These remain distinct paths,
+without a blanket zero-copy claim. No Rust/C++ allocation is implicitly
+transferred to an incompatible allocator.</p>
+<p>Fresh, bounded outputs from captured native producers receive prototype and
+private WeakSet branding without reading their backing-buffer getter. This
+avoids materializing SpiderMonkey’s small inline arrays unnecessarily. External
+inputs and observable species/view outputs keep full validation. The
+<a href="../../node-compat/buffer-optimization-and-abi-fix.html">allocation follow-up</a>
+records the mechanism, matched experiment and limits.</p>
+<p>The facade and stub sources and their versioned manifest live under
+<code>builtins/node-compat</code>. The checked-in generated factory header keeps normal CMake
+builds independent of Node/npm. The accompanying deterministic generator checks
+that the header agrees with those sources and validates the manifest against its
+<a href="../../node-compat/manifest-validation.html">versioned restricted schema</a>.
+Factories execute as strict script in the content realm
+after native text codecs are installed, before application module evaluation.</p>
+<p><code>NODE_COMPAT_GC_STRESS</code> is a development-only build setting for forced collection
+at rooted kernel boundaries. It is not a Node API or host capability. It must not
+be enabled for performance measurements.</p>
+<h2 id="integration-validation"><a class="header" href="#integration-validation">Integration validation</a></h2>
+<p><code>tests/node-compat</code> builds the pinned ComponentizeJS embedding against this source
+and tests surviving native imports, aliases, CommonJS conversion, global identity,
+the Buffer subset and predictable stub failures. The runner requires an explicit
+custom engine, an exact Node v22.14.0 oracle and Wasmtime 42.0.1. It validates final
+imports against the empty allowlist for the pure test world.</p>
+<p>Earlier normal and compacting-GC-stress native engines passed the full component
+suite on Wasmtime 42.0.1: 381 string vectors and 250 byte-array vectors against
+Node v22.14.0, shared/copying views, native static/dynamic imports and aliases,
+snapshot state, CommonJS/global identities, 91 unavailable Buffer methods and all
+nine child-process callable exports. Direct/constructed/awaited top-level stub
+calls and unknown named imports failed componentization. Both final test
+components had zero host imports. SharedArrayBuffer was not exposed by the engine,
+so native shared-input construction tests were skipped explicitly.</p>
+<p>The accepted <a href="../../../tests/node-compat/milestones/foundations-v11/reports/releaseEight.json">v11 release batch</a>
+contains eight passing gates: five successful same-engine results were reverified,
+and three strict suites ran fresh after a preserved storage failure. The first
+allocator attempt’s missing <code>pathToFileURL</code> import was a harness failure, also
+preserved before its successful fresh retry. Neither failure changes native
+source or establishes failure reuse.</p>
+<p>The new <a href="../../../tests/node-compat/milestones/foundations-v11/reports/allocatorGc.json">allocator GC gate</a>
+covers three retained Jco calls and fresh Wasmtime, with eight valid native hex
+roundtrips per call; it is narrower than rerunning the full byte corpus under GC.
+The <a href="../../../tests/node-compat/milestones/foundations-v11/reports/focusedReceipt.json">19 focused Events components</a>
+retain the callback getter/Symbol counterexamples and combined-owner limitation.
+No new genuine OOM/fault result, ALS or request teardown is established.</p>
+<p>The same v11 HTTP component, SHA-256
+<code>634ce53e1ce976703d3df9b1fb869da61fbdb823cee56c6f9fd6e235e26c4b4a</code>,
+passes three requests on stock Wasmtime 42.0.1 and official wash 2.11.0; both stop
+with exit 0. Its <a href="../../../tests/node-compat/milestones/foundations-v11/reports/httpAudit.json">six exact standard 0.2.10 imports</a>
+are <code>wasi:http/types</code>, <code>wasi:io/{error,poll,streams}</code>, <code>wasi:random/random</code> and
+type-only <code>wasi:clocks/monotonic-clock</code> for <code>duration</code>. No clock function, outgoing
+HTTP, socket, DNS, TLS, filesystem, CLI/environment or custom service is inferred.
+Counters <code>[1,1,1]</code> on both hosts prove neither same-instance reuse nor request
+isolation. The <a href="../../../tests/node-compat/milestones/foundations-v11/README.html">immutable checkpoint</a>
+records all three current engines and their exact sources and configuration.</p>
+<p>The following v10 and earlier results retain their historical artifact scope.</p>
+<p>The historical v10 release batch replays the core and prior foundations, with
+four source-pinned engines sharing 304 native inputs and 33 primary reports.
+Exact hashes, configs and executed scope are in the
+<a href="../../../tests/node-compat/milestones/foundations-v10/results.json">immutable checkpoint</a>.
+Its separate combined-owner GC gate is narrower than rerunning the entire byte
+corpus under a new GC engine.</p>
+<p>That v10 HTTP component, SHA-256
+<code>0fcad53793003261f6f664ffadc758ae9fe3c6e1b7dd9f6599528f5a35075610</code>,
+passes three requests on stock Wasmtime 42.0.1 and official wash 2.11.0; both stop
+with exit 0. Its <a href="../../../tests/node-compat/milestones/foundations-v10/reports/http-audit.json">six exact standard 0.2.10 imports</a>
+are <code>wasi:http/types</code>, <code>wasi:io/{error,poll,streams}</code>, <code>wasi:random/random</code> and
+type-only <code>wasi:clocks/monotonic-clock</code> for <code>duration</code>. Random is explicitly
+selected; no clock function, outgoing HTTP, socket, DNS, TLS, filesystem,
+environment or custom service is inferred. Counters are <code>[1,1,1]</code> on both hosts;
+this proves neither same-instance reuse nor request isolation. The corrected
+Wasmtime-v2 result and failed first harness attempt are preserved separately.</p>
+<p>The HTTP packaging script uses a hash-guarded composition of the pinned stock
+splicer’s real APIs to keep manual HTTP bindings while removing outgoing HTTP.
+It restores its process-local function replacement afterward. The native engine,
+installed npm files and host binaries remain unchanged. Its final core has no
+Preview1 imports and is wrapped without an adapter. These packaging details and
+the exact emitted type graph are part of the reproduction record.</p>
+<p>The <a href="../../../tests/node-compat/bench/README.html">A/B measurement results</a>
+compare supported operations with Jco’s actual Buffer adapter using the same
+release engine and capability-free world. Conversion throughput improved in the
+measured non-Weval mode; copying throughput was about 4–15% lower, and peak memory
+was higher in some small-buffer cases. The
+<a href="../../node-compat/portability-and-performance.html">result summary</a> separates those
+tradeoffs from component size and startup observations. A separate
+<a href="../../../tests/node-compat/bench/abi-results.json">ABI diagnostic</a> reproduced
+incorrect high-<code>u32</code> result transport without Buffer code. The current build
+recipe applies a versioned guest-source patch for scalar export results; its
+<a href="../../../tests/node-compat/abi-fix/README.html">direct regression</a> passes 339 Jco
+checks and direct Wasmtime controls. This is a local ComponentizeJS guest patch,
+not a fix in released 0.23.0. A separately reproduced high-<code>u32</code> imported-callback
+argument defect required a separate imported-I32 splicer patch; the current
+explicit v2 packager includes that correction and the disabled-clock errno fix.
+Both fixes have separate pinned source/provenance gates. Benchmark checksums retain signed
+<code>s32</code> to preserve their original matched protocol.</p>
+<p>The original architecture audit and frozen semantic templates are in
+<code>docs/node-compat</code>; their released-engine/reference-kernel results must not be
+confused with tests of the current native implementation. Complete Node
+semantics, exhaustive OOM injection, shared input construction, concurrent
+request isolation and production cluster deployment remain separate gates.</p>
+<p>Current <a href="../../../tests/node-compat/bench-clock-v2/RESULTS.html">corrected-clock</a>
+and <a href="../../../tests/node-compat/weval-experiment/v5/RESULTS.html">Weval</a> measurements
+retain their own exact engines and workload limits. Native byte codecs improve
+the measured throughput, while small copying constructors and several memory
+cases remain counterexamples. The copying scenario calls <code>Buffer.from(existing Buffer)</code>; it does not validate the still-deferred <code>Buffer.prototype.copy</code> API.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../developer/builtins-cpp.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../developer/builtins-rust.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../developer/builtins-cpp.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../developer/builtins-rust.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
