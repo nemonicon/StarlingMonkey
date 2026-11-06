@@ -1,0 +1,41 @@
+from pathlib import Path
+import ast,importlib.util,json,shlex
+HERE=Path(__file__).resolve().parent
+s=importlib.util.spec_from_file_location('genuine_delta_source',HERE/'run.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m)
+p=json.loads((HERE/'plan.json').read_bytes());w=Path('/private/tmp/starling-node-compat/next-native-module-utf16-delta-model-only');calls,paths=m.commands(p,w);checks=[]
+def check(name,value):assert value,name;checks.append(name)
+check('five exact native CLI phases',[x[0]for x in calls]==['compile','archive','ranlib','link','optimize'])
+old=shlex.split(p['originalCompileRow']['command']);expected=list(old);expected[expected.index('-o')+1]=str(w/p['archiveMember']);expected+=['-ivfsoverlay',str(w/'overlay.json'),'-MD','-MF',str(w/'module-kernel.d'),'-MT',str(w/p['archiveMember'])]
+check('actual compile tokens unchanged except owned output and declared VFS/dependency flags',calls[0][1]==expected)
+check('virtual original Source path retained',calls[0][1][calls[0][1].index('-c')+1]==p['originalCompileSource']['path'])
+check('private archive exact member',calls[1][1]==[p['tools']['llvmAr']['path'],'r',str(w/'libbuiltin_node_compat.a'),str(w/'module-kernel.cpp.obj')])
+check('real ranlib',calls[2][1]==[p['tools']['llvmRanlib']['path'],str(w/'libbuiltin_node_compat.a')])
+check('all reused link paths absolute',all(Path(x).is_absolute()for x in paths))
+check('one archive substitution',calls[3][1].count(str(w/'libbuiltin_node_compat.a'))==1)
+check('owned link output',calls[3][1][calls[3][1].index('-o')+1]==str(w/'raw.wasm'))
+check('single declared link debug-strip delta',calls[3][1].count('-Wl,--strip-debug')==1)
+check('same optimization flags',calls[4][1][1:]==['--strip-debug','-O3','-o',str(w/'raw.wasm'),str(w/'raw.wasm')])
+check('no shell/meta build argv',all(x[1][0].split('/')[-1]not in ['sh','bash','cmake','ninja','cargo','rustc','rustup','wasmtime']for x in calls))
+check('disk distinct limited policy',p['disk']['startBytes']==1024**3 and p['disk']['stopBytes']==800*1024**2)
+check('no unmeasured transient promise',p['disk']['maximumTransientBytesProved']is False)
+check('new actual metadata kind',p['newMetadataKind']=='EXPERIMENTAL_NEXT_INTL_INCREMENTAL_NATIVE_BUILD_ACTUAL_V1')
+check('no action slots',p['actionsAllowed']is False and p['rootAuthority']is None and p['actualEngine']is None)
+meta,rows,members=m.input_rows(p)
+check('genuine15member archive',len(members)==15)
+check('selected one member',sum(x['name']==p['archiveMember']for x in members)==1)
+check('all actual link inputs pinned',all(any(r['path']==x for r in rows)for x in paths))
+check('baseline80 retained',len(meta['actualCompileRows'])==80)
+check('separate baseline embedding retained',len(meta['actualSeparateEmbeddingCompileRows'])==1)
+check('make dep continuation',m.dependency_paths('x: /private/a \\\n /private/b\n')==['/private/a','/private/b'])
+check('make escaped space',m.dependency_paths('x: /private/with\\ space.h\n')==['/private/with space.h'])
+for text in ['missing delimiter','x: relative.h']:
+ try:m.dependency_paths(text)
+ except AssertionError:checks.append('reject bad dep '+text)
+ else:raise AssertionError(text)
+for bad in [dict(p,originalLinkArgv=[p['originalLinkArgv'][0],';evil']),dict(p,originalLinkArgv=[p['originalLinkArgv'][0],'@unreviewed.rsp'])]:
+ try:m.commands(bad,w)
+ except AssertionError:checks.append('reject unknown link argv')
+ else:raise AssertionError('badlink')
+surface=m.core_surface(meta['engine']['path']);check('actual baseline core surface read',len(surface['imports'])==93 and surface['componentCapabilitiesProved']is False)
+ast.parse((HERE/'run.py').read_bytes());checks.append('actual Python3.9 syntax')
+print(json.dumps(dict(schemaVersion=1,state='LIMITED_MODULE_UTF16_DELTA_SOURCE_MODELS_PASSED_V1',checks=len(checks),caseNames=checks,actualReadHashInputRows=len(rows),archiveMembers=members,sourceOnly=True,nativeOrUtilityOrCompilerActionsInvoked=False),indent=2))

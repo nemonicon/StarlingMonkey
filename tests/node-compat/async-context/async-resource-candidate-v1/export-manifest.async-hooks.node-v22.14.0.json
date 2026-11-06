@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "profileVersion": "sm-node-22.14.0-async-resource-m0.1",
+  "nodeVersion": "v22.14.0",
+  "status": "Experimental entry-level CJS/default facade Source, no native/guest execution or installed factory amendment.",
+  "moduleContract": "Pinned full Node22 export inventory and provider constants retained; native ALS-backed bounded AsyncResource constructor + runInAsyncScope on mutable CJS/default only. Old frozen ESM named binding remains deferred.",
+  "modules": {
+    "node:async_hooks": {
+      "aliases": [
+        "async_hooks"
+      ],
+      "status": "partial",
+      "exports": [
+        "AsyncLocalStorage",
+        "AsyncResource",
+        "asyncWrapProviders",
+        "createHook",
+        "default",
+        "executionAsyncId",
+        "executionAsyncResource",
+        "triggerAsyncId"
+      ],
+      "supportedStatic": [
+        "AsyncLocalStorage",
+        "AsyncLocalStorage.bind",
+        "AsyncLocalStorage.snapshot",
+        "asyncWrapProviders",
+        "AsyncResource (string type, options undefined; CJS/default entry binding only)"
+      ],
+      "supportedPrototype": [
+        "getStore",
+        "run",
+        "enterWith",
+        "disable",
+        "exit",
+        "AsyncResource.runInAsyncScope"
+      ],
+      "unsupportedStatic": [
+        "createHook",
+        "executionAsyncId",
+        "executionAsyncResource",
+        "triggerAsyncId",
+        "AsyncResource.bind"
+      ],
+      "limits": {
+        "bindingsPerResource": 256,
+        "pendingPromiseJobs": 4096,
+        "jobsPerCheckpoint": 65536,
+        "boundArguments": 1024,
+        "asyncResourceTypeCodeUnits": 4096,
+        "asyncResourceUserArguments": 1023
+      },
+      "callablePolicy": "Native mutable resource cells and real SM147 registration/creation/job hooks; per-instance synchronous restoration preserves other instance changes and original throws. Disabled stores are excluded at child capture without expiring old cells. Deferred API calls/construction throw coded ERR_SM_NODE_UNSUPPORTED;63 frozen provider numbers are metadata only, not implemented providers. Entry AsyncResource captures actual AsyncLocalStorage.snapshot at construction and invokes it around Reflect.apply; no JS context stack or new native service.",
+      "unsupportedPrototypePolicy": "AsyncResource.bind/emitDestroy/asyncId/triggerAsyncId remain coded ERR_SM_NODE_UNSUPPORTED; no IDs, hooks or destroy delivery are implemented.",
+      "deviations": [
+        "Only the existing content/initializer shared compartment is eligible; unknown jobs/layouts/foreign compartments refuse. Private PromiseReactionRecord discrimination pins SM9dab/147 class and11slots.",
+        "Legacy queue selected before application registration. SM off-thread/delayed dispatch is refused one-way and reported at checkpoint, not silently dropped.",
+        "SM AllocationMetadataBuilder callback/table failure is fatal component allocation failure; no recoverable-OOM claim or OOM/GC-pressure probe.",
+        "Per-resource/job/argument caps differ from Node; overflow is ERR_SM_NODE_ASYNC_CONTEXT_LIMIT.",
+        "Bound asyncResource deprecation accessors/names/warning delivery and broad AsyncResource compatibility are not claimed.",
+        "Fresh request owner is native/private HTTP-kernel entry; ordinary app imports receive no extra async_hooks name. Descendants inherit owner after initial JS return; cancellation/expired host handle teardown remains separately required.",
+        "No new external host capability, engine/guest execution, security/adoption or reusable/reset-safe snapshot claim.",
+        "Neutral server readiness uses a distinct persistent native server resource; fresh request roots never inherit its store bindings. Body/stream creation must occur inside the future HTTP fresh entry.",
+        "Before pre-snapshot/reset boundaries, the native queue must be empty/inactive/successful and current owner must be the neutral server; rejected off-thread dispatch stays a failure. This is not a reset-safety claim.",
+        "FinalizationRegistry registration-context propagation is outside this ALS contract; existing finalizer ordering/strict exception policy is preserved without a new ALS finalizer hook.",
+        "Custom Promise species returning a non-Promise are refused explicitly: no cross-request owner is inferred from the resolver context. Ordinary actual-Promise species/await/reactions remain in the proposed contract.",
+        "Entry facade replaces only mutable CJS/default.AsyncResource; frozen named ESM references and earlier cached constructors remain old.",
+        "Constructor options are deferred; non-string type rejects; type length above4096 and more than1023 user arguments refuse.",
+        "Invalid callback throws coded ERR_INVALID_ARG_TYPE; pinned Node22 uses uncoded TypeError here.",
+        "Installation is pure INIT. Application constructors are ordinary deployed by existing bootstrap/order policy, not by a new JS phase assertion; no INIT capture/snapshot-reuse proof."
+      ]
+    }
+  },
+  "requiredHostInterfaces": []
+}

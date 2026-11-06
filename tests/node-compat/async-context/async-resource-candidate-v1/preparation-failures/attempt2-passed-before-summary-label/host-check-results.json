@@ -1,0 +1,285 @@
+{
+  "schemaVersion": 1,
+  "hostOnly": true,
+  "targetGuestOrNativeExecuted": false,
+  "passed": true,
+  "phases": [
+    {
+      "name": "test-grammar",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "--check",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/async-resource-candidate-v1/test-host.mjs"
+      ],
+      "terminal": {
+        "path": "/private/tmp/starling-node-compat/next-async-resource-v1-host-checks-attempt2/test-grammar/terminal.json",
+        "bytes": 1456,
+        "sha256": "048ccd66728f7febf8112ebcc403ebc099f1f09a88612a03653aa89a596d5d5c"
+      },
+      "stdout": {
+        "path": "/private/tmp/starling-node-compat/next-async-resource-v1-host-checks-attempt2/test-grammar/stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/private/tmp/starling-node-compat/next-async-resource-v1-host-checks-attempt2/test-grammar/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "differential",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/async-resource-candidate-v1/test-host.mjs"
+      ],
+      "terminal": {
+        "path": "/private/tmp/starling-node-compat/next-async-resource-v1-host-checks-attempt2/differential/terminal.json",
+        "bytes": 1396,
+        "sha256": "194359bc65b7aa0de88f7b42312612f3e906e63bc5f4c0753b9468eaeda84f0d"
+      },
+      "stdout": {
+        "path": "/private/tmp/starling-node-compat/next-async-resource-v1-host-checks-attempt2/differential/stdout.log",
+        "bytes": 2895,
+        "sha256": "2ec0f1188d3ab9de1742456eeab43a989761ce4292277c95d0a95668a52ddc78"
+      },
+      "stderr": {
+        "path": "/private/tmp/starling-node-compat/next-async-resource-v1-host-checks-attempt2/differential/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "sourceProtectionPassed": true,
+  "tests": {
+    "schemaVersion": 1,
+    "state": "ASYNC_RESOURCE_SELECTED_HOST_DIFFERENTIALS_PASSED_V1",
+    "passed": true,
+    "hostOnly": true,
+    "guestOrNativeExecuted": false,
+    "backend": "actual pinned Node22 AsyncLocalStorage.snapshot; no JS context stack",
+    "records": [
+      {
+        "name": "installation does not capture context and retains the old named binding",
+        "passed": true,
+        "value": {
+          "captureAtInstall": 0,
+          "captureAtConstruction": 1,
+          "esmNamedUpdated": false
+        }
+      },
+      {
+        "name": "registration capture, receiver, arguments, synchronous return and restoration",
+        "passed": true,
+        "value": {
+          "node": {
+            "value": 12,
+            "callerRestored": true,
+            "outer": "caller"
+          },
+          "candidate": {
+            "value": 12,
+            "callerRestored": true,
+            "outer": "caller"
+          }
+        }
+      },
+      {
+        "name": "null/undefined/primitive receivers preserve strict callback semantics",
+        "passed": true,
+        "value": {
+          "node": [
+            null,
+            null,
+            0,
+            false,
+            "x"
+          ],
+          "candidate": [
+            null,
+            null,
+            0,
+            false,
+            "x"
+          ]
+        }
+      },
+      {
+        "name": "zero arguments and returned object identity",
+        "passed": true,
+        "value": {
+          "node": {
+            "identity": true,
+            "argc": 0
+          },
+          "candidate": {
+            "identity": true,
+            "argc": 0
+          }
+        }
+      },
+      {
+        "name": "original thrown objects and falsy values restore caller context",
+        "passed": true,
+        "value": {
+          "node": {
+            "throws": 7,
+            "restored": true
+          },
+          "candidate": {
+            "throws": 7,
+            "restored": true
+          }
+        }
+      },
+      {
+        "name": "nested resources restore each captured cell",
+        "passed": true,
+        "value": {
+          "node": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "candidate": [
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      {
+        "name": "await and timer descendants inherit real captured ALS",
+        "passed": true,
+        "value": {
+          "node": {
+            "result": [
+              true,
+              true,
+              true
+            ],
+            "callerAfterAwait": true
+          },
+          "candidate": {
+            "result": [
+              true,
+              true,
+              true
+            ],
+            "callerAfterAwait": true
+          }
+        }
+      },
+      {
+        "name": "Promise rejection preserves original value and captured callback context",
+        "passed": true,
+        "value": {
+          "node": {
+            "identity": true,
+            "callerRestored": true
+          },
+          "candidate": {
+            "identity": true,
+            "callerRestored": true
+          }
+        }
+      },
+      {
+        "name": "disable and re-enable follow actual ALS global enable policy",
+        "passed": true,
+        "value": {
+          "node": {
+            "disabled": true,
+            "enabled": [
+              true,
+              true
+            ]
+          },
+          "candidate": {
+            "disabled": true,
+            "enabled": [
+              true,
+              true
+            ]
+          }
+        }
+      },
+      {
+        "name": "capture while exit-disabled excludes store on later enabled caller",
+        "passed": true,
+        "value": {
+          "node": [
+            true,
+            true
+          ],
+          "candidate": [
+            true,
+            true
+          ]
+        }
+      },
+      {
+        "name": "multiple ALS instances preserve mutations within captured resource",
+        "passed": true,
+        "value": {
+          "node": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "candidate": [
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      {
+        "name": "Next on-finished exact lazy constructor and bound cleanup shape",
+        "passed": true,
+        "value": {
+          "node": {
+            "receiver": true,
+            "context": true,
+            "error": true,
+            "response": true
+          },
+          "candidate": {
+            "receiver": true,
+            "context": true,
+            "error": true,
+            "response": true
+          }
+        }
+      },
+      {
+        "name": "invalid constructor types and callback/receiver codes",
+        "passed": true,
+        "value": true
+      },
+      {
+        "name": "unsupported IDs, hooks, bind, destroy and options refuse explicitly",
+        "passed": true,
+        "value": {
+          "noFakeIds": true,
+          "noHookDeliveryClaim": true
+        }
+      },
+      {
+        "name": "bounded type and argument limits are explicit deviations",
+        "passed": true,
+        "value": true
+      },
+      {
+        "name": "installation refuses immutable bindings and tampering",
+        "passed": true,
+        "value": true
+      }
+    ],
+    "cases": 16
+  }
+}

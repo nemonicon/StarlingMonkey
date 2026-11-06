@@ -2,35 +2,65 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
-The [Next priority roadmap](nextjs-priority-roadmap.md) orders implementation by
-actual application dependencies. The experimental435-input engine now links;
-its component imports exactly13 selected WASI0.2.10 interfaces and passes16
-dependency controls over three real requests. These results do not promote the
-accepted production matrix. The Intl-enabled V7 engine now starts real Next
-and passes11/24 HTTP checks. Response piping, file-stream options and POST view
-handling remain blockers; cache/strict-stream/browser stages are incomplete.
+The [Next priority roadmap](nextjs-priority-roadmap.md) now records a passing
+experimental full-application smoke milestone. The unmodified **Next 16.4.5 /
+React 19.3.1** application passes **24/24 HTTP, cache generation 1 → 2, five
+incremental Suspense chunks and 2/2 browser interactions** on stock Wasmtime
+42.0.1 with reuse 128 and idle timeout 60 seconds. The same hydration-aware
+browser worker, whole 20-second limits and strict zero-error gates also pass on
+the matched stock Node 22.14.0 control. See the
+[current milestone report](nextjs-wasm-milestone-2026-11-06.md). Portable
+[native](../../tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/hydration-v5-review/README.md)
+and [matched Node](../../tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/hydration-stock-v1-review/README.md)
+reviews preserve the raw evidence and DATA checks.
+
+This result uses component `55f05e3d…`, native engine `4623640b…`, raw entry V4
+and six bounded guest facades. Its thirteen emitted standard imports are all
+WASI 0.2.10, with the incoming-handler export. Server JavaScript runs in embedded
+SpiderMonkey/Wasm; client JavaScript runs in the browser. No JavaScript AOT,
+client-Wasm, complete Node/Buffer compatibility or production promotion follows.
+The accepted foundations-v13 checkpoint and its machine-readable API statuses
+remain unchanged.
 
 | Experimental API/language gate | Strategy and capability | Current status and deviation | Validation |
 | --- | --- | --- | --- |
-| Node `global` alias | Small pure guest entry facade; no host capability | Bounded: exact self-alias descriptor; other Node globals have separate contracts | Pinned Node descriptor/private-realm tests; first real Next failure removed |
-| CommonJS JS/JSON, aliases and demanded Buffer operations | Native loader/P2 read-only filesystem plus native byte kernels | Partial; basic loads/codecs/identities work; Unicode CJS literal and POST-view observations need isolation |48 component controls pass; real Next SSR runs, full contract11/24 |
-| ALS await, ticks, timers, bind/snapshot | Native Promise/task context propagation; clock/poll interfaces only for scheduled controls | Partial; default Node22 `exit()` semantics retained; broader overlap/disable/GC/lifecycle tests remain | Actual distinct-store capture/restoration and scheduled controls pass in all three requests |
-| WASI request-body EOF | Audited guest facade over `wasi:io/streams@0.2.10` | Bounded typed `ComponentError.payload` handling; unknown throws remain failures |50 host checks plus actual GET/GET/POST;21-byte POST and all48 control records pass |
-| Unicode property regex literals/constructors | Native SpiderMonkey plus ICU/ICU4X; no additional host interface | Selected expressions supported in experimental V7; older no-Intl failures retained | Strict12-case differential passes36/36 records, including invalid-property controls |
-| Unicode ignore-case matching | Native SpiderMonkey regex engine; no host interface | Selected Kelvin folding now matches pinned Node22 in V7 | Three requests match; no complete Unicode/RegExp conformance claim |
-| `Error.captureStackTrace` and selected CallSite methods | Native SavedFrame capture plus bounded guest facade and explicit guest-SM provenance API; no new host capability | Partial: lazy hooks, descriptors, thrown identity and exact depd extraction work. Anonymous inferred function-name type differs. Eval origins/receivers/native/async flags remain deferred | Actual9/12 selected records match; strict run remains raw1 for three name differences.64 facade host checks pass; native and patched-library builds pass |
-| `ReadableStream.pipeTo` with AbortSignal | Small guest semantics facade over existing native streams; no additional host interface | Unavailable on current path: genuine signal is rejected, blocking JSON routes. Guest facade under development | Exact Next failure cause retained; cancellation/backpressure/error/cleanup differential required |
-| `fs.createReadStream` send options | Audited options facade over native WASI filesystem/streams | Partial: current finite option validator rejects send's `root`; normalize irrelevant policy keys while preserving actual FS checks | Public asset failure retained; exact Node option/getter/stream tests and real asset/browser checks required |
+| Node `global` alias | Pure guest entry facade; no additional host capability | Bounded exact self-alias descriptor; other Node globals retain separate contracts | Pinned Node descriptor/private-realm tests and successful full Next smoke |
+| CommonJS JS/JSON, aliases and demanded Buffer operations | Native loader/P2 reads and native byte kernels; bounded Buffer view facade | Native UTF-16 Module compilation fixes the Unicode source discrepancy without a Function fallback. Broader Buffer/loader semantics remain partial | 48 dependency records and full 24/24 HTTP plus 2/2 browser smoke; exact decoded static assets match source |
+| ALS await, ticks, timers, bind/snapshot | Native Promise/task context propagation | Default Node22 exit semantics retained; overlapping-request/disable/GC/lifecycle depth remains open | Distinct-store dependency controls and actual Next requests/actions; sequential smoke is not concurrency proof |
+| AsyncResource | Small CJS-default guest facade over native ALS.snapshot | Only constructor(string/no options) and runInAsyncScope selected; IDs, hooks, emitDestroy, bind and named ESM rebinding remain deferred | 16 host cases plus the app's actual asset/action path in the passing component |
+| WASI request-body EOF and classic body conversion | Typed ComponentError.payload handling plus bounded classic Readable conversion | Unknown errors remain failures; body/resource ownership has explicit limits | GET/GET/POST dependency controls, JSON POST and real Server Actions pass |
+| Unicode property regex and ignore-case | Native SpiderMonkey with coherent patched Intl/ICU/ICU4X; no new host interface | Selected Unicode expressions supported; no full RegExp conformance claim | Strict 12-case differential passes all 36 records, including Kelvin folding and invalid-property controls |
+| Error.captureStackTrace and selected CallSite methods | Native SavedFrames, bounded guest facade and explicit guest-SM provenance API | Lazy hooks and exact send/depd extraction work. Three anonymous function-name type differences remain; eval-origin/receivers/native/async flags defer | Strict stack suite remains failed at 9/12; native UTF-16 app loading preserves genuine provenance and the full app smoke passes |
+| ReadableStream.pipeTo with AbortSignal | Audited guest facade over real native readers/writers and protected abort listeners | Measured Next paths work. Private disturbed/queued-close state and signal pipeThrough limits remain; native regression/integration is pending | 31 host differential cases, actual JSON/actions and five-chunk Suspense; no app signal removal |
+| fs.createReadStream send options | Bounded option facade over native WASI FS/streams | Send's irrelevant options normalized while real FS checks remain; general FS parity is not claimed | Public asset, nine decoded script responses against five source files, full HTTP/browser and cache smoke pass |
 
-The language baseline is a dependency gate alongside the API/export inventory.
-Fix Unicode support through coherent Intl/ICU-enabled guest artifacts and the
-existing native/Rust integration; the [build plan](nextjs-intl-build-plan.md)
-keeps host interfaces and target hosts unchanged. No dependency source rewriting
-or JavaScript replacement of the regex parser is part of that plan. The first
-Intl C++ libraries and84-package single-Rust aggregate now compile and link.
-The [actual runtime baseline](../../tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/actual-review/README.md)
-retains selected successes and remaining failures. These results do not promote
-the accepted production profile or establish complete Buffer/Node support.
+The passing generation retains the coherent patched Intl build's 80 native
+compile rows and separate embedding as ancestry, then freshly compiles one
+UTF-16 Module unit and relinks. The
+[actual incremental build review](../../tests/node-compat/frameworks/nextjs/next-native-module-utf16-delta-root-results-v1/actual-review/README.md)
+keeps the new metadata kind, immutable baseline, archive/core checks and input
+protections distinct; no eighty-fresh-frontend claim is made. The
+[Intl build plan](nextjs-intl-build-plan.md) and
+[earlier runtime baseline](../../tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/actual-review/README.md)
+retain the language/stack gates and original failures.
+
+The prior 11/24, 0/23 and 22/24 runs remain failures. The pre-hydration V4 browser
+clicked before its client scripts arrived; the new version-bounded readiness
+observer checks own data properties without invoking handlers, then performs
+the same real clicks. It preserves the 20-second limit and zero-error gates.
+Nine decoded script captures match the unchanged app files; the tenth captured
+body is the actual POST RSC response, not a tenth script. Encoded byte counts
+are recorded separately and do not establish compressed-wire hashes.
+
+Current work is reproducible retained-artifact runs, deeper native stream/context
+and cleanup regressions, exact production-selection review, and measurements.
+Re-snapshot/reset safety, broad API compatibility and portable clean-machine
+bootstrap remain open. Pinned wasmCloud 2.11.0 P2 HTTP makes a fresh store/instance
+per request, so its retained-server/cache contract is not accepted; its P3 pool
+settings do not change that P2 lifetime. No host changes or interface widening
+are used to manufacture reuse. The successful Wasmtime smoke remains scoped to
+its explicit reuse configuration. App mode 0444/0555 and a separate writable
+cache do not prove read-only rights on the actual WASI preopen descriptor.
 
 The [optional package-bundler follow-on](../../tests/node-compat/frameworks/package-bundler-execution-v1/README.md)
 runs native CommonJS interop, supported modules and real React creation with

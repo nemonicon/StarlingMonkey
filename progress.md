@@ -4,7 +4,46 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-06. Overall roadmap: **in progress**.
 
-Next.js remains the immediate priority. The experimental engine now links, and
+
+**Latest actual Next result:24/24 HTTP,2/2 browser; full selected contract passes.**
+The unchanged Next16.4.5/React19.3.1 standalone application runs in the real
+SpiderMonkey Wasm component on stock Wasmtime42.0.1, in two fresh successful
+runs. Native UTF16 engine
+`4623640b` and component`55f05e3d` pass cache invalidation generation1→2,
+incremental Suspense delivery (five chunks/shell0/ready2), a hydrated counter
+click and a real browser Server Action. Page, console, network and collector
+errors are all empty. Five pinned client scripts match their decoded source
+bytes. Original parent exit0, owned shutdown and original/read-only app
+bookends pass. The matched pinned Node22.14 control also passes the same full
+contract using byte-identical browser-worker code. The new
+`tests/node-compat/frameworks/nextjs/run-native-next-regression.py` command
+creates a fresh request and reuses the existing bounded runner; its actual
+`engine462-hydration-v5-repeat` run passes the complete contract again.
+The [portable native first/repeat reader](tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/hydration-v5-review/README.md)
+and [matched Node reader](tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/hydration-stock-v1-review/README.md)
+both pass Root readback. Full raw process, HTTP, stream, browser, decoded body
+and screenshot evidence is retained; generated action RSC bodies retain their
+distinct hashes. These DATA readers validate evidence without executing targets.
+
+The prior24/24 HTTP,1/2 browser failure remains preserved. Its counter click
+preceded client scripts by about2.15s. The new worker waits for load and the
+actual React handler before the same user click/submit, within the same20s
+limits. It does not invoke handlers directly, change application code, relax
+errors or filter cancellations. The earlier action abort remains a historical
+failure; this successful run does not retrospectively reclassify it.
+
+The classic Readable Request BodyInit facade and native-snapshot-backed CJS
+AsyncResource constructor/runInAsyncScope now work in the actual component:
+JSON POST and public assets pass. Host differentials22+16 pass; explicit IDs,
+hooks/destroy/bind/options and old ESM named-binding limits remain. The next
+step is to retain the passing regression and promote the bounded changes
+through ordinary native component/API checks. See the [milestone report](docs/node-compat/nextjs-wasm-milestone-2026-11-06.md)
+for repeat commands, exact artifacts and outstanding work. This is an
+experimental profile; foundations-v13 remains the accepted production
+checkpoint. Full Node/Buffer support, AOT, performance gains and wasmCloud P2
+retained-instance deployment are not established.
+
+**Earlier startup history (retained):** The experimental engine now links, and
 both real JavaScript component entries construct and validate with exactly13
 selected standard WASI0.2.10 imports. The profile globals prelude fixes the first
 actual Next startup failure (`global` missing). The second actual attempt then
@@ -15,7 +54,7 @@ contract is claimed from that older run. The Intl-enabled V7 engine now builds;
 the current full-app result and remaining blockers are recorded below.
 Generic crypto/API expansion and cost work stay behind this gate.
 
-**Current actual Next milestone:** the rebuilt V7 engine runs the unchanged
+**Earlier V7 baseline:** the rebuilt V7 engine runs the unchanged
 Next application and passes11 of24 HTTP cases, including home/nested/dynamic
 SSR, query, action-form SSR, client-counter SSR, completed Suspense, redirects
 and404s. The run remains raw1/unaccepted. JSON responses fail in the response
@@ -63,12 +102,20 @@ but regresses startup:23/23 initial HTTP cases fail because the nonASCII
 `Function` fallback gives send's real frames eval provenance, and its depd
 path requests the explicitly unsupported `getEvalOrigin`. That failed
 prototype remains unchanged; no provenance or application-source workaround
-will be counted as success. The native UTF16 module-compiler afterimage is now
-prepared. A separate limited one-object rebuild/relink is being prepared from
+will be counted as success. The native UTF16 module-compiler afterimage was then
+prepared. A separate limited one-object rebuild/relink was prepared from
 the actual V7 CMake recipe, reusing audited archives/tools read-only. It has its
 own proposed1GiB start/800MiB sampled floor and<100MiB persistent-output budget;
 temporary peak remains unmeasured. The full builder's2/3GiB guard is unchanged.
-The request for2GiB more headroom remains pending. No limited build has run yet.
+Space subsequently increases enough for the limited operation. The actual
+build now passes five phases0/clean plus Root0: one fresh frontend,1,046
+preauthenticated dependency paths,14 unchanged node archive members, and
+matching core import/export function signatures.80 baseline compile rows/79
+unchanged and a separate embedding are ancestry; no80-fresh claim is made.
+Engine4623640b is31,324,051 bytes, metadata726d69cf. Independent current1,949-row/
+13-tree readback and portable322-file DATA review pass. Minimum sampled free
+space is1,309,847,552 bytes; final private output70,761,705 bytes. Temporary peak
+remains unproved.
 
 The first [Intl-enabled guest library CI build](https://github.com/nemonicon/StarlingMonkey/actions/runs/42272037547)
 now succeeds at pushed commit`dc7bad5c`:17 raw0 owned phases, baseFirefox9dab,

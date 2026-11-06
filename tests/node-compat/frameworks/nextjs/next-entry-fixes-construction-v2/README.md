@@ -1,0 +1,1 @@
+Code-identical actual constructor tools; finite entry/native-kind retarget. Requires new actual incremental UTF16 engine/wholemetadata and meaningful Root fixed fields, one fresh compile plus explicit base ancestry. Never cast as full80freshbuild. No app/ordinarycalls at INIT. Late Root authority required.

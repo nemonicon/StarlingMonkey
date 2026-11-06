@@ -1,150 +1,145 @@
 # Next.js execution priority
 
-Updated 2026-11-06. The immediate target is the **complete existing Next 16.4.5
-App Router application executing in a Wasm component**. The accepted general
-profile remains foundations-v13. New loader, filesystem, async-context and
-HTTP sources are experimental until built and exercised in that component.
+Updated 2026-11-06. The complete existing **Next 16.4.5 / React 19.3.1 App Router
+application now passes the selected experimental Wasmtime smoke contract**:
+24/24 HTTP checks, cache generation 1 → 2, five incremental Suspense chunks,
+and both browser interactions, with zero recorded browser or observer errors.
+A stock Node 22.14.0 control passes the same browser worker, readiness checks,
+20-second test limits and error gates. See the
+[current milestone](nextjs-wasm-milestone-2026-11-06.md). The portable
+[native first/repeat review](../../tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/hydration-v5-review/README.md)
+and [matched Node review](../../tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/hydration-stock-v1-review/README.md)
+retain the actual observations and read-only checkers.
 
-Pins are Node 22.14.0 semantics, React/ReactDOM 19.3.1, ComponentizeJS 0.23.0,
-Jco 1.40.0, Rolldown 1.2.16 and Wasmtime 42.0.1. The secondary target is
-wasmCloud 2.11.0, source `bc5acfb8e15f7d6d199ca940354d82e590c2d5ff`, embedding
-Wasmtime 48.0.7; retain the [existing host setup](../../tests/node-compat/wasmcloud/README-host.md).
-The accepted StarlingMonkey generation derives from `54b3329b3ce818fd1f244e871e9c259b63667cda`
-with recorded overlays: engine `d54446dc…`, sidecar `bfaec95e…`,342 native inputs.
-Current repository HEAD is not the identity of a newly compiled engine.
-Select standard WASI 0.2.10 interfaces explicitly. Neither a custom host service
-nor host-engine modifications are part of this plan.
+The accepted production checkpoint remains
+[foundations-v13](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md).
+The new result is an experimental profile, not production promotion or complete
+Node/Buffer compatibility. Server JavaScript executes in SpiderMonkey inside
+Wasm; the browser executes ordinary Next client JavaScript. This is neither
+JavaScript AOT compilation nor a client-side Wasm port.
 
-## Success contract
+## Exact passing generation
+
+The passing component is `55f05e3d…` (37,214,436 bytes), engine `4623640b…`
+(31,324,051 bytes), and incremental metadata `726d69cf…`. The engine retains the
+coherent patched Intl/SavedFrame V7 build and its 80 native compile rows plus
+separate embedding as ancestry. One fresh UTF-16 Module translation unit and a
+new archive/relink replace the failed non-ASCII `Function` workaround; this is
+not a claim of 80 fresh frontend compilations. The
+[build review](../../tests/node-compat/frameworks/nextjs/next-native-module-utf16-delta-root-results-v1/actual-review/README.md)
+records that distinction and the input protections.
+
+The raw [guest entry](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v4/guest-entry.mjs)
+loads the unmodified standalone application from `/app`. Its six bounded guest
+facades provide the Node global alias, cross-prototype Buffer input handling,
+send's ReadStream options, AbortSignal-aware pipeTo, classic request-body
+conversion, and AsyncResource construction/runInAsyncScope over native ALS
+capture. Their limits remain part of the experimental contract. The entry
+contains no `Function` compilation fallback or diagnostic app wrapper.
+
+The final component imports exactly thirteen selected standard WASI interfaces,
+all at **0.2.10**, and exports `wasi:http/incoming-handler@0.2.10`. The successful
+host is stock **Wasmtime 42.0.1**, explicitly configured with instance reuse 128
+and idle timeout 60 seconds, a physically read-only app tree and fresh writable nested
+cache, and a declared loopback origin. No custom host service, host modification,
+raw socket/TLS/DNS implementation or interface-version widening is involved.
+The generic accepted foundations-v13 engine remains `d54446dc…`, sidecar
+`bfaec95e…`, with 342 native policy inputs; repository HEAD is not its identity.
+
+Other tool pins remain ComponentizeJS 0.23.0, Jco 1.40.0 and Rolldown 1.2.16.
+The matched browser is Chrome 156.0.8078.81 with Playwright Core 1.64.1.
+The second host target is wasmCloud 2.11.0, pinned source
+`bc5acfb8e15f7d6d199ca940354d82e590c2d5ff`, embedding Wasmtime 48.0.7;
+retain the [existing host setup](../../tests/node-compat/wasmcloud/README-host.md).
+
+## Success contract and retained failures
 
 Keep the original [fixture contract](../../tests/node-compat/frameworks/nextjs/fixture-contract.json):
-23 HTTP cases plus a build-derived actual Server Action POST; cache reuse and
-invalidation; request headers/cookies; dynamic SSR; filesystem/SHA route;
-public/static assets; hydration/counter click; browser form action; and
-incremental Suspense delivery. Retain failures and compare future runs to the
-same contracts. Compilation alone and a React-only render do not close this
-milestone. Do not turn off Next features to obtain a smaller passing workload.
+23 base requests plus the build-derived Server Action POST, SSR/layouts,
+headers/cookies, JSON/bad input, filesystem/SHA, public assets, cache reuse and
+invalidation, hydration/counter click, browser action, and incremental Suspense.
+The passing run retains all 24 HTTP responses, cache generations 1 and 2, shell
+in chunk 0 and ready content in chunk 2 of five chunks, and nine decoded script
+captures matching five unchanged source files plus one actual POST RSC body. Both real browser clicks
+pass; no handler is invoked by the readiness observer.
 
-Use Next's real custom-server `prepare()`/`getRequestHandler()` path behind the
-standard `wasi:http/incoming-handler` export. This keeps the real router,
-rendering, actions and cache while letting the selected host own HTTP transport.
-The untouched standalone tree and computed module/chunk loads remain the
-application. `http.createServer().listen()` needs a separate TCP-server
-implementation; this hosting path does not require it. HTTPS scheme metadata
-does not provide raw TLS sockets; WASI P2 sockets themselves provide no TLS.
+The [hydration harness](../../tests/node-compat/frameworks/nextjs/browser-hydration-candidate-v1/README.md)
+waits for load and the pinned React own-data handler binding before interaction.
+It keeps the same count/action assertions, whole 20-second limits and strict
+zero page/console/request/observer-error gates. The earlier V4 counter click
+preceded script responses by about 2.15 seconds. Its timeout and action abort
+remain failures; the later pass does not rewrite them or establish a unique
+cause for every earlier abort. Browser decoded-body hashes and encoded byte
+counts are retained; compressed wire hashes are not inferred from Playwright.
 
-## Order of work
+Earlier no-Intl failures, the 11/24 route baseline, the eval-provenance 0/23
+prototype, and the native UTF-16 22/24 run remain in the
+[runtime records](../../tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1).
+The original foundations-v13 bundler corpus and its expected failures remain
+separate regression baselines. A React-only render or successful import never
+substitutes for this application contract.
 
-Rows1–3 are now combined in an experimental guest. Unicode now passes and
-structured stacks unblock startup. Current priorities are0d–0f, demonstrated
-route failures from the first11/24 passing Next run, before unrelated APIs. Keep
-small audited profile facades in the entry where appropriate; native changes
-still require a genuine coherent build and real-component validation.
+## Priorities after the first pass
 
 | Priority | Work | Completion gate |
 | --- | --- | --- |
-| 0 | Preserve the full app and establish the bridge control | Complete: actual unmodified Next passes24/24 HTTP,2/2 browser interactions and incremental Suspense through the candidate bridge on Node. This is a host control. The bundler's `.node.js` classification defect is fixed;44 checks pass. |
-| 0a | Check the deployment contract early | Real C-component probe passes selected standard WASI on both stock hosts. Wasmtime explicit reuse gives1,2,3; default and wasmCloud dev give1,1,1. Pinned primary Source confirms normal wasmCloud P2 HTTP also creates a fresh instance per request regardless of pool settings. Retained-state Next success is unavailable on that path under the present constraints; mount rights and nested cache operation still require guest checks. |
-| 0b | Enable required Unicode regex behavior in the guest engine | Selected gate complete: V7 enginee7baa5a9 builds in six clean phases and passes all36 strict Unicode differential records. Exact84-package Rust aggregate,80 native compile rows and separate embedding. Engine31,324,485 bytes; size/performance work follows a working application. See [build plan](nextjs-intl-build-plan.md). |
-| 0c | Supply the structured stack traces required by send/depd | Startup requirement works: lazy hooks and exact depd location extraction succeed. Actual9/12 selected records match; three anonymous function-name type differences keep the strict run failed. Record the deviation and retain regression; broader CallSite/eval-origin methods remain deferred. [Current baseline](../../tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/actual-review/README.md). |
-| 0d | Fix AbortSignal-aware response piping | Confirmed actual cause for JSON routes: `pipeTo()` rejects genuine AbortSignal. Implement a small audited guest facade over native stream readers/writers with correct close/cancel/abort/backpressure and listener cleanup, then rerun original routes/cache gates. No signal removal or app rewrite. |
-| 0e | Accept Next send's file-stream options safely | Actual public asset fails on `createReadStream.root`. Normalize finite irrelevant send options using Node's getter/copy behavior, retain meaningful FS validation and preopen rights, then verify assets/client chunks and browser loading. |
-| 0f | Resolve POST view handling and Unicode CJS literal discrepancy | Actual POST refuses an ArrayBuffer view; determine intrinsic type before changing Buffer. Decoder assertion actual is correct Euro while expected compiled literal is mojibake; instrument the provided module source/compile path before fixing the wrong layer. Preserve diagnostic failures and API identities in the eventual implementation. |
-| 1 | Real CommonJS loader, Buffer demand, formatting and startup APIs | Integrate Module/createRequire/cache/JSON/webpack chunk loading, the demanded native Buffer subset and util.format. Include real VM evaluation of Next client-reference manifests: replacing this with an import stub would break real routes. Add process, URL, OS, timers, performance and explicit HTTP/import surfaces. Verify ESM/CJS/default/global identities and coded failures. |
-| 2 | Genuine application IO and computation | Standard read-only app/assets preopens and writable cache. Atomic link/EEXIST/unlink, stat/readdir and actual ReadStream/backpressure/close. RuntimeOnly secure RNG for UUID/cache names. Reuse native SHA256. Implement gzip/deflate streaming demanded by unchanged Next compression; one-shot zlib evidence does not establish streaming. |
-| 3 | Correct async/request context and lifecycle | Actual SpiderMonkey Promise queue plus task/tick/timer capture. Validate ALS run/exit/enterWith/bind/snapshot, throw paths, disable/re-enable, awaits and overlapping requests. Fresh native request resources with restoration; no JS global context stack. |
-| 4 | Construct and instantiate a complete guest | V6 engine `c2bff940` links,10,255,826 bytes, six phases0/clean and2,631 protected inputs unchanged. Both JS entries construct/validate and emit exactly13 selected0.2.10 imports/incoming-handler. The corrected dependency component now passes all16 controls on three real GET/GET/POST requests,48 records, with clean shutdown and preserved inputs. Complete lifecycle/concurrency/GC/snapshot and broader API checks remain open. |
-| 5 | Run the full app and make it repeatable | V7 runs unchanged Next and passes11/24 HTTP cases. All24 requests are retained; cache JSON parsing prevents strict-stream/browser stages. Complete0d–0f, then rerun unchanged24 HTTP/action+2 browser/cache/stream contracts. Preserve failed baselines and host lifetime checks. wasmCloud retained P2 state remains unavailable. |
-| 6 | Measure and stabilize the working profile | Final component size, startup, memory and throughput against existing JS implementations. Promote only tested exports; publish limits and keep optional capabilities out of unrelated apps. |
+| 1 | Make the passing generation reproducible | The [retained-artifact runner](../../tests/node-compat/frameworks/nextjs/run-native-next-regression.py) supplies fresh run IDs and the existing pinned path; the first run and a fresh repeat both pass. Keep complete raw evidence and DATA checks. Portable clean-machine bootstrap remains open; historical failures remain unchanged. |
+| 2 | Regress response and compression semantics | Retain the actual JSON/action/static/cache/Suspense/browser pass. Expand meaningful pipeTo cancellation, abort, backpressure, throw, close and listener-cleanup controls; decide native integration versus the audited facade with a new tested generation. Encoded-wire diagnostics are optional evidence, not an assumed missing fix. |
+| 3 | Close context and resource boundaries | Concurrent first preparation, overlapping requests, native Promise/task/tick/timer restoration, disable/re-enable, cancellation and teardown. AsyncResource currently supports only the selected constructor/runInAsyncScope path; IDs, hooks, emitDestroy, bind and ESM rebinding are not inferred. |
+| 4 | Prepare production promotion | Review exact selected manifests, defaults, build inputs, INIT barriers, facade limits and host rights; run the required release and compatibility suites before any profile/API promotion. Keep foundations-v13 accepted until this decision is explicit. |
+| 5 | Measure the working profile | Reproducible component size, cold/warm startup, memory and throughput against declared controls. The functional pass establishes no performance advantage or memory bound. |
+| 6 | Report other hosts honestly | Separate cold-instance wasmCloud observations from retained Wasmtime behavior. No host changes or P3 substitution to manufacture the selected P2 retained-server contract. |
 
-The original full success contract remains intact. Stock wasmCloud2.11's P2
-HTTP lifetime cannot satisfy its retained-server/cache portion: pool settings
-apply to the separate P3 HTTP path. P3 is outside this selected WASI0.2.x profile.
-Report wasmCloud cold-request/instantiation results separately; do not count
-them as a full-contract pass or modify the host to force reuse. See the
-[pinned Source analysis](../../tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/README.md).
+## Per-surface depth
 
-The next linked generation should target actual application startup and
-dependency controls, followed immediately by the complete contract. Rank new
-blockers by startup, required route failures, context/resource correctness and
-optional branches. Import-only compatibility is never successful execution.
+The full app pass demonstrates the paths it actually exercised. It does not
+replace each surface's broader differential, lifetime and failure suite.
+
+| Surface | Current experimental evidence | Remaining boundary |
+| --- | --- | --- |
+| CommonJS, VM and primitive util.format | Genuine Module/createRequire, JSON/cache/chunk loading and VM client-reference-manifest evaluation run in the successful app. Native UTF-16 compilation preserves real stack provenance. | Arbitrary packages, full Contextify/security sandbox, broad formatting and all Node loader semantics are unproved. |
+| Buffer | Bounded native bytes/codecs plus an intrinsic-view entry facade satisfy the measured routes, POST and asset paths. | Complete Node Buffer overloads/prototypes/coercions, pooling and cross-realm parity are not claimed. |
+| Filesystem | Actual physically read-only app/assets, static chunks, request FS/SHA route and writable nested cache work. ReadStream send options use a bounded facade. | General mount rights, recursive/path options, native resource cancellation/close and adversarial reuse need their own suites. |
+| HTTP and WASI adapter | Real custom-server prepare/getRequestHandler, typed request-body EOF, native response streaming, actions and resource translation pass the selected full app contract. | General Node listen/TCP/TLS/HTTP2 behavior and exhaustive cancellation/ownership semantics are outside the pass. |
+| AsyncLocalStorage and AsyncResource | Real native store/Promise queue/task/tick/fresh/neutral boundaries; dependency controls and actual Next request/action/static paths run. The bounded AsyncResource facade calls native ALS.snapshot. | Full hooks/IDs/lifecycle, cross-request concurrency, broader AsyncResource and named ESM binding parity remain open. |
+| Startup, timers and performance | Required process/env/cwd, URL/OS, timers/immediates and performance paths are present in the linked profile and measured app. | Broad Node API coverage, phase/ref-unref edge cases, snapshot resumption and reset safety remain separate. |
+| Native web and classic streams | The app's request conversion, response piping, gzip/static delivery and five-chunk Suspense path pass. | pipeTo facade disturbed-state/queued-close/private-state limits and signal pipeThrough remain explicit; native regression work is priority 2. |
+| Crypto/compression | RuntimeOnly RNG, native SHA256, existing Hash/Hmac and streaming Gzip/Deflate are selected in the generation; demanded app paths execute. | This is not proof of all crypto operations, keys, compression formats or persistent-state cleanup. |
+| Unicode and Error stacks | Patched Intl/ICU generation passes 36 strict Unicode records. Real native SavedFrames unblock send/depd. | Three anonymous function-name type differences keep the separate strict stack run failed; eval-origin/receiver/native/async methods remain deferred. |
 
 The [startup/API inventory](../../tests/node-compat/frameworks/nextjs/startup-api-demand-v1/README.md)
-now supplies56 exact citations from all406 loaded JS files and nine complete
-pinned export-name inventories. It prioritizes mutable process/env/cwd, truthful
-OS data, real nextTick/Immediate ordering, patchable timer modules, legacy URL
-format/file helpers, HTTP Agents and streaming zlib cleanup. Conditional cache
-serialization also requests Buffer base64 support. Static call sites and
-conditional expressions are not runtime invocation observations; do not expand
-support based solely on an imported or read name.
+retains 56 citations from 406 loaded JS files and nine pinned export inventories.
+Static or conditional calls are demand evidence, not proof that every branch ran.
+The [original bridge control](../../tests/node-compat/frameworks/nextjs/http-bridge-candidate-v1/README.md)
+and [C deployment probe](../../tests/node-compat/host-capabilities/probe-v1/README.md)
+remain distinct controls rather than substitutes for the successful Next guest.
 
-The earlier Next host controls do not prove guest filesystem configuration. The
-new [real deployment probe](../../tests/node-compat/host-capabilities/probe-v1/README.md)
-selects `/app` and `/cache` on both hosts, with owned Unix modes for app write
-denial. Next's actual nested cache layout and narrower per-preopen rights remain
-open. A guest-owned application image is an unimplemented packaging alternative;
-it would not establish a retained logical server/cache lifetime.
+## Lifecycle and host limits
 
-## Per-surface preparation and remaining depth
+Application loading is deployed-only. INIT installs snapshot-safe facades without
+reading app files, deployed environment, entropy or request resources. The lazy
+guest boundary prepares the logical server once under a neutral native resource,
+then enters a fresh request owner before constructing the Web Request/body.
+The successful sequential smoke run does not prove concurrent first-request
+behavior, complete resource teardown or deployed re-snapshot/reset safety.
 
-The table below retains the preparation suites and deeper validation still
-needed per surface. The newer c2bff940 real component already exercises all16
-dependency controls across three requests; that bounded smoke result supersedes
-older statements that no guest link or execution had occurred. It does not
-establish the full per-surface suites, lifecycle/concurrency or full Next app.
+Keep the real custom-server prepare/getRequestHandler route. The host owns HTTP
+transport; an HTTPS scheme is routing metadata, not a raw TLS implementation.
+The app and browser source trees stay unchanged. App files/directories are
+physically mode 0444/0555; the CLI mounts `APP::/app` and the separate cache.
+These Unix-mode checks do not prove that the WASI preopen descriptor itself
+has read-only capability rights. Optional APIs cannot be inferred from names
+that happen to import or appear in the inventory.
 
-| Dependency | Verified now | Still outstanding |
-| --- | --- | --- |
-| Resolved-target bundling |44 host checks; genuine Next `.node.js` files resolve as JS and actual binaries are refused | Closed dynamic application graph and guest loader execution |
-| HTTP bridge | Full Next on Node:24HTTP+2browser, five chunks, cache1→2;21 focused bridge checks | Native streams, real WASI execution and registered HTTP surfaces demanded by Next |
-| WASI HTTP adapter |13 host ownership/translation checks: EOF, cancellation, write splitting, IO failures and resource transfer | Uncompiled WIT/guest control; real standard host and native exception/resource behavior |
-| CommonJS Module |42 focused host cases plus full Next24HTTP+2browser:406 JS files/412 cached modules. V2 fixes generator inventory and passes Source review; actual kernel SDK syntax passes | Registrar/loader implementation frontend, joined native build, guest reads and full app loading |
-| Primitive util.format |728 Node/canonical/generated comparisons for the specified subset | Fresh guest generation and unchanged shared Next compatibility route |
-| Buffer | Next-demanded byte/encoding/copy/write subset:134 host checks; original concat SDK check passes. Full Next host control passes24HTTP+2browser using the candidate global Buffer | Other host modules still produce Node Buffers, so that control does not exhaustively validate guest Buffer demand. Compile/link and actual component tests remain required |
-| Filesystem | V3 public sync/callback/promises/ReadStream facade and direct-P2 provider;41 host checks. Three actual SDK frontends pass | Native resource/copy/close semantics and nested mount/realpath/recursive mkdir behavior in a real guest; full Next assets/cache writes |
-| AsyncLocalStorage | V3 real SpiderMonkey store/Promise queue/task/tick/fresh/neutral boundaries;53 synchronous models and72 ownership cases. All13 SDK frontends pass after retained V2 failures | Native await/reaction/task ordering, disable/re-enable and concurrent-request propagation; link and component lifecycle tests |
-| Startup and timers | Explicit process83/os24/url13 and timers12/promises5 inventories;195 startup and46 timer host cases. Native Performance epoch/precision correction prepared | Combined native frontend/link and deployed environment/clocks/FIFO/Immediate behavior; snapshot/resumption tests |
-| HTTP and required import surfaces | Real bridge factory plus HTTP/HTTPS module registration and native context binding pass SDK syntax;62 HTTP host checks. Four finite imported surfaces pass422 binding/failure checks. Matched selected/stock controls both pass24HTTP+2browser with strict streaming | Linking and actual standard-WASI request ownership, cancellation, native context and full application startup; earlier browser abort remains retained/unexplained |
-| Readable.toWeb | Actual stronger host control exposed five failed routes. Bounded m0.23 adapter passes30 cases/14 Node differentials; fresh full host contract passes with unchanged gates | Genuine native WebStream scheduling, async-destroy completion and resource cleanup in components; other Web adapters remain deferred |
-| VM manifest evaluation | Real SpiderMonkey realm/evaluation plus bounded own-data sandbox copy under preparation; actual Next manifest source fixtures retained | Native compiler/link and actual Next client/action route execution. No complete Contextify or security-sandbox claim |
-| Crypto/compression | Experimental SHA256 Hash/Hmac and one-shot zlib guest results exist. RuntimeOnly RNG candidate has46 host checks; native streaming Gzip/Deflate candidate has28 | Joined native compilation, INIT barrier, actual RNG calls and persistent compression-state cleanup in components |
+The passing host configuration requires declared instance reuse. On pinned
+wasmCloud 2.11.0 the normal **P2 HTTP** path creates a new store/instance per
+request; pool size, max concurrency and reclaim settings govern a different P3
+path and do not provide retained P2 state. The complete retained-server/cache
+contract is therefore not accepted on that wasmCloud path. Report cold-request
+results separately; do not widen the world or modify the host to force reuse.
+See the [pinned lifetime analysis](../../tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/README.md).
 
-The startup Source now replaces Module's libc private reads with the same direct
-standard-P2 provider used by process/FS, including shared logical cwd. This join
-is still awaiting guest execution. It uses the actual deployed-entry accessor
-without introducing a host service. Original Source drafts and failures remain
-retained; the combined Source generation must preserve the corrected V3 ALS
-header while adding Timer's virtual methods.
-
-## Lifecycle and capabilities
-
-Load the application lazily after deployed entry. Snapshot initialization must
-not capture deployed environment values, filesystem contents, entropy or live
-request handles. Preserve application top-level failures when it is actually
-loaded. Snapshot-safe registration and runtime app preparation are distinct.
-Deployed-instance re-snapshot/reset behavior is not accepted.
-
-Run deployed `next(...).prepare()` once under a neutral server resource before
-entering any fresh request resource. Module singletons, cache infrastructure and
-the shared readiness Promise must not inherit the first request's context.
-Each request's continuation after readiness and all its subsequent app work must
-run under its own genuine native owner. The current host control prepares Next
-before admitting HTTP calls; the guest's lazy preparation needs an equally
-explicit native boundary and concurrent-first-request tests.
-
-The future Next world needs explicitly selected standard HTTP types/incoming
-handler, filesystem types/preopens, clocks/poll/streams/error and secure random.
-Select CLI environment/stdio only when implemented and intended; select outgoing
-HTTP only for actual outbound paths. The current bridge-control WIT is a smaller
-uncompiled dependency world, not the full app world or an emitted-import report.
-Audit final component bytes. Host filesystem rights must enforce mount policy.
-
-Cache/module state requires a declared logical server lifetime. A fresh instance
-per request does not prove same-instance cache invalidation or ALS isolation.
-Use actual retained-instance tests where supported and report each target host
-separately. Do not modify Wasmtime or wasmCloud to force reuse.
-
-Generic clock diagnostics, unrelated crypto algorithms, broader Node inventory,
-new optimizations and general adoption/performance paperwork move behind these
-dependencies. Existing evidence remains valid within its scope. The full roadmap
-and full Next-in-Wasm gate are **not complete**.
+The experimental full-application smoke milestone has passed on the selected
+Wasmtime configuration and its matched Node control. Reproducibility, deeper
+per-surface/lifecycle regressions, production promotion and performance work
+remain open.

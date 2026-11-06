@@ -2,11 +2,18 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
-**Current priority: get the full Next.js app running in Wasm.** Follow the
-[Next execution roadmap](nextjs-priority-roadmap.md). The real HTTP bridge and
-candidate CommonJS core now pass all24 HTTP and both browser checks on Node;
-native Buffer/Module kernels pass SDK syntax. Filesystem and ALS are unfinished
-drafts. A full Next Wasm component and its deployment checks remain outstanding.
+**Next.js now passes the selected full application contract in Wasm.** Two
+fresh stock Wasmtime42.0.1 runs and a matched Node22.14 control pass24/24 HTTP
+checks, cache invalidation, incremental Suspense and both hydrated browser
+interactions with zero captured errors. The [milestone report](nextjs-wasm-milestone-2026-11-06.md)
+records the exact experimental engine/component, thirteen standard WASI0.2.10
+imports, explicit host reuse settings and repeat command. Server JavaScript
+executes in SpiderMonkey/Wasm; the browser runs ordinary Next client JavaScript.
+The [priority roadmap](nextjs-priority-roadmap.md) now leads with reproducibility,
+deeper stream/context/lifetime checks and production promotion. Full Node/Buffer
+compatibility, performance gains and wasmCloud retained P2 execution remain open.
+
+## Earlier experimental checkpoints
 
 The [experimental Hash/Hmac results](hash-hmac-results-2026-11-06.md) now cover
 fourteen complete Jco/stock-Wasmtime returns:280 accepted Node-record comparisons
@@ -21,14 +28,15 @@ comprehensive application and component checks after `77659217`: Node controls
 pass on replay,17 main Wasm failures and seven optional-package failures remain,
 and supported-module/React-element differentials pass. An initial aborted
 browser action request and changed generated-source identities stay documented.
-The full Next server still does not compile to Wasm.
+That original foundations-v13 bundler path still fails; the successful native
+loader/component path above is a separate experimental generation.
 
 The [optional package-bundler follow-on](../../tests/node-compat/frameworks/package-bundler-execution-v1/README.md)
 passes three complete Node/Jco/Wasmtime differentials: native CommonJS interop,
 supported modules and real React elements. Its fresh ten-case replay retains
 seven known guest failures; ReactDOM edge constructs a zero-import component
-and traps at clock subscription. Full Next.js HTTP/Wasm execution remains
-unavailable. Both framework runners and regression comparators are documented
+and traps at clock subscription. Full Next.js HTTP/Wasm execution was unavailable
+in that generation. Both framework runners and regression comparators are documented
 and retained for future checks.
 
 The experimental clock adapter passes core validation and complete WIT-package

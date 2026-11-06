@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "observed": {
+    "result": {
+      "path": "/private/tmp/starling-node-compat/next-wasmtime-deployment-engine4623640b-native-utf16-v2/result.json",
+      "sha256": "fd718cefd1f9f035e16f1ce7e6fe5c42dd554393438fd4b6e45aca758e98eef8",
+      "bytes": 8007
+    },
+    "clientResult": {
+      "path": "/private/tmp/starling-node-compat/next-wasmtime-deployment-engine4623640b-native-utf16-v2/client/result.json",
+      "sha256": "a2ef5fab98ebb1af73a0ff52c4e2b3de058dfc8a5fe9ab7ae26ac0bcaa936455",
+      "bytes": 113434
+    },
+    "stderr": {
+      "path": "/private/tmp/starling-node-compat/next-wasmtime-deployment-engine4623640b-native-utf16-v2/wasmtime.stderr.log",
+      "sha256": "f08c6cb490abee14ca25a2424a30d39689e8748bb20f9c0a6558d31fc09cdc96",
+      "bytes": 9896
+    },
+    "postBody": {
+      "path": "/private/tmp/starling-node-compat/next-wasmtime-deployment-engine4623640b-native-utf16-v2/client/responses/json-post.txt",
+      "sha256": "f9d061f41ec283a146a78bb542a7c27468308123de4350b84ecd6177cc225f19",
+      "bytes": 32
+    },
+    "postStatus": 400,
+    "body": {
+      "marker": "NEXT_JSON_BAD_INPUT"
+    },
+    "textResolvedAndJsonParseRefused": true,
+    "actualGuestTextRetained": false
+  },
+  "source": {
+    "nativeRequest": {
+      "path": "/private/tmp/starling-node-compat/next-native-intl-build-v1/native-source/builtins/web/fetch/request-response.cpp",
+      "sha256": "6154fa1edfbdf33bbc3d0f0a46a7933167f66e43d8c0ae2f1e228093a2272f5a",
+      "bytes": 123708
+    },
+    "nextRequestAdapter": {
+      "path": "/private/tmp/starling-node-compat/next-wasmtime-deployment-engine4623640b-native-utf16-v2/app/node_modules/next/dist/server/web/spec-extension/adapters/next-request.js",
+      "sha256": "f14b8c6a9267c8af1cf93e242f9ca274e8b06d967899045aa2bdce652c6bf017",
+      "bytes": 5136
+    },
+    "nextNodeRequest": {
+      "path": "/private/tmp/starling-node-compat/next-wasmtime-deployment-engine4623640b-native-utf16-v2/app/node_modules/next/dist/server/base-http/node.js",
+      "sha256": "7ccc14c9963f27f14408693660eb6b74d1f539098b802f8b2bc579503db5eea5",
+      "bytes": 4396
+    },
+    "fixture": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/app-fixture/app/api/json/route.js",
+      "sha256": "4b867e5750ce935cd64c0a819a7e734f4e87c7b1263b90ed53cf167fd960a47b",
+      "bytes": 641
+    },
+    "entrySourceIndex": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v2/index.json",
+      "sha256": "95a9a4498a1cd17647730e850f4c29c059d92f05427d657988cd891baab32b3a",
+      "bytes": 2340
+    }
+  },
+  "attribution": "Source-coupled: Next passes the original classic incoming body as BodyInit. Native Request accepts native Web ReadableStream but has no async-iterable branch; other objects use core::encode/USV string. No actual failing guest text was logged. Host Source-contract model reproduces BAD_INPUT; it is not native execution.",
+  "correction": "Convert only actual selected classic Readable bodies through the existing real Readable.toWeb. Preserve all other native body behavior, unchanged application, request bytes and native text decoder."
+}

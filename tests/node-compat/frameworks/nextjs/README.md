@@ -1,7 +1,58 @@
-This experiment tests a real Next.js application against the accepted StarlingMonkey
-profile. **The full Next.js server does not currently compile through this profile's
-bundler.** The stock Node application works; its failures in the Wasm pipeline are
-retained as regression observations.
+# Next.js execution
+
+The unmodified **Next.js 16.4.5 / React 19.3.1** standalone application now
+passes the selected **experimental native Wasm smoke contract**: 24/24 HTTP,
+cache generation 1 → 2, five incremental Suspense chunks, and 2/2 browser
+interactions with zero recorded page, console, request or observer errors.
+The same hydration-aware browser worker, whole 20-second limits and strict
+error gates also pass against stock Node 22.14.0. The
+[current milestone report](../../../../docs/node-compat/nextjs-wasm-milestone-2026-11-06.md)
+and [priority roadmap](../../../../docs/node-compat/nextjs-priority-roadmap.md)
+record the exact scope and remaining work. Portable
+[native first/repeat](next-intl-runtime-root-results-v1/hydration-v5-review/README.md)
+and [matched Node](next-intl-runtime-root-results-v1/hydration-stock-v1-review/README.md)
+reviews retain the actual evidence and DATA checkers.
+
+This route uses component `55f05e3d…` (37,214,436 bytes), engine `4623640b…`
+(31,324,051 bytes), the raw [entry V4](next-component-entry-fixes-v4/guest-entry.mjs)
+and its six bounded guest facades. Native UTF-16 Module compilation preserves
+real source and stack provenance; no Function fallback or app source rewrite is
+installed. Server JavaScript runs inside SpiderMonkey/Wasm while the browser
+runs ordinary Next client JavaScript. This is not JavaScript AOT compilation
+or a client-side Wasm application.
+
+Stock Wasmtime 42.0.1 is configured with reuse **128**, idle timeout **60s**,
+a physically read-only app tree mounted at `/app`, a fresh writable nested
+cache and explicit loopback origin.
+The component emits exactly thirteen selected standard WASI **0.2.10** imports
+and the incoming-handler export. No custom host service, host modification,
+interface widening or raw socket/TLS implementation is used. wasmCloud's pinned
+P2 HTTP path creates a fresh instance per request and is not accepted for this
+retained-server/cache contract. The physical 0444/0555 modes do not establish
+read-only capability rights on the WASI preopen descriptor. Production remains accepted **foundations-v13**;
+the experimental pass does not promote broad Node or Buffer support.
+
+The [hydration worker](browser-hydration-candidate-v1/README.md) observes the
+pinned React own-data handler binding without invoking it, then performs the
+same real counter click and browser action. Nine decoded script responses
+match five unchanged app files; a tenth captured body is the actual POST RSC
+response. The previous early-click timeout and aborted action request remain
+failed observations, with no retroactive causal or pass relabeling.
+
+Use the [retained-artifact runner](run-native-next-regression.py) for this exact
+native generation, using its reviewed baseline authority and exact artifact pins.
+A fresh run ID is mandatory; the first run and a fresh repeat both pass.
+Portable clean-machine bootstrap and broader lifecycle/production regression
+work are separate; the historical commands
+below deliberately reproduce the older foundations-v13 bundler corpus.
+
+## Historical foundations-v13 bundler corpus
+
+The original experiment tested the full application against the accepted
+foundations-v13 finite profile. Its full Next entries were refused by that
+profile's bundler; the working stock Node controls and every Wasm failure remain
+regression observations. The newer successful raw-entry/native-loader route
+above does not replace or rewrite this corpus.
 
 The [2026-11-06 post-push application report](../../../../docs/node-compat/nextjs-results-2026-11-06.md)
 records two fresh builds after `77659217`,24/24 HTTP checks per run and the same17
@@ -10,8 +61,8 @@ fails the network-error check, while the untouched replay passes it. That failed
 record remains retained. The fresh supported supplement passes full Node/Jco/
 Wasmtime comparison; the optional package matrix keeps three positives and seven
 guest failures. Exact generated-input changes are reviewed separately from
-changed failure reasons. The reproduction commands below remain the future
-checks; they do not claim a working Next server component.
+changed failure reasons. The reproduction commands below remain checks for that historical corpus;
+they do not replay the newer native server component.
 
 The retained-evidence checks were rerun on2026-11-06: the full Next baseline/replay
 comparison and43 injected checks, optional package comparison and40 injected
@@ -40,8 +91,8 @@ cover the first fresh render. A later [seven-return differential](../../foundati
 finishes raw0: three retained Jco calls, one fresh Jco call and three fresh
 Wasmtime calls all match the complete retained Node result. [Independent review](../../foundation-scheduler/independent-clock-v13-runtime-v2-results-review-v2/results.json)
 passes all seven full returns and raw cleanup. The zero-import failure above remains the
-original regression baseline. Clock lifecycle gates and the full Next server
-remain unfinished.
+original regression baseline. Clock lifecycle gates remain separate; this historical clock experiment did
+not exercise the full Next server.
 
 Use the separate read-only [clock record checker](../package-bundler-execution-v1/check-clock-render.mjs)
 for this exact experimental source/component generation:
@@ -65,7 +116,7 @@ The fixture pins Next.js **16.4.5**, React/ReactDOM **19.3.1**, Node **22.14.0**
 ComponentizeJS **0.23.0**, Jco **1.40.0**, Rolldown **1.2.16**, and Wasmtime
 **42.0.1**. Browser controls use Playwright Core **1.64.1** and the installed
 Chrome executable, whose version and SHA are recorded. Both npm dependency trees
-have lockfiles. The native engine is accepted **foundations-v13**, normal OFF,
+have lockfiles. The native engine for this historical corpus is accepted **foundations-v13**, normal OFF,
 SHA `d54446dcd4071fe2c2b1db4984ead78d2fe61ceb0a0396822df8416a26921a92`.
 Its metadata SHA is `bfaec95ee0058edf587ebbf1cb020d7871759e896aa0d809e1af788a300531d6`;
 all 342 native source hashes and nine selected manifests are checked.
@@ -126,9 +177,10 @@ and **no imports**, including the component that traps. They are 12,946,112,
 12,914,375 and 12,912,302 bytes in the first run. These sizes include the engine;
 they are not incremental library costs or performance measurements. No custom
 host service, host modification, adapter Buffer replacement or widened import
-policy is used. None of the full Next entries reaches component construction,
-so there is no deployed Next HTTP/Wasm result. wasmCloud was not exercised for
-this new application.
+policy is used. None of the full Next entries in this historical bundler corpus reached
+component construction, so that corpus contains no deployed Next HTTP/Wasm
+result. This does not describe the newer native milestone above. wasmCloud
+was not exercised for this historical application run.
 
 Use an exact Node 22.14.0 executable and the existing reviewed packager/toolchain.
 Keep generated dependencies and binaries outside the checkout. Default paths
@@ -147,7 +199,7 @@ node tests/node-compat/frameworks/nextjs/run.mjs --browser \
   --output /private/tmp/nextjs-fresh-run \
   --record /private/tmp/nextjs-fresh-evidence
 
-# Current baseline: the driver exits 1 with complete observations and known breaks.
+# Historical v13 baseline: the driver exits 1 with complete observations and known breaks.
 # Evaluate the retained evidence even when that expected exit occurs.
 node tests/node-compat/frameworks/nextjs/check-results.mjs \
   tests/node-compat/frameworks/nextjs/results/2026-11-05-v13/results.json \
@@ -198,7 +250,9 @@ recorded external paths. An evidence commit does not make those binaries part
 of Git. The experiment does not measure performance, prove request reuse or
 establish complete Buffer, Streams, Node or Next.js compatibility.
 
-The next implementation priorities from this experiment are:
+The following historical demand priorities led to the native route above.
+Current work is ordered by the [priority roadmap](../../../../docs/node-compat/nextjs-priority-roadmap.md);
+these original requirements remain recorded for the older corpus:
 
 1. Integrate and extend the separately tested optional production CommonJS
    bundler while preserving native builtin admission and explicit denials. Its

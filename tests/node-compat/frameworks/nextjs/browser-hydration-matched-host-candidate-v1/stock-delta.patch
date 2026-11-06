@@ -1,0 +1,66 @@
+--- /Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-phase-matched-host-candidate-v1/run-stock.mjs
++++ /Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-hydration-matched-host-candidate-v1/run-stock.mjs
+@@ -7,8 +7,9 @@
+ import {Readable} from 'node:stream';
+ import {createRequire} from 'node:module';
+ import {spawn} from 'node:child_process';
+-import {cp, mkdir, readFile, writeFile, rm} from 'node:fs/promises';
+-import {dirname, join, resolve} from 'node:path';
++import {constants} from 'node:fs';
++import {cp, mkdir, readFile, writeFile, rm, lstat, readdir, realpath} from 'node:fs/promises';
++import {dirname, join, resolve, relative} from 'node:path';
+ import {fileURLToPath} from 'node:url';
+ import {createRequestBridge} from '../http-bridge-candidate-v1/bridge.mjs';
+ import {createHostModuleRequire} from '../http-bridge-candidate-v1/module-host-provider.mjs';
+@@ -18,13 +19,24 @@
+ const browserTools = process.argv[4];
+ assert.equal(process.version, 'v22.14.0');
+ assert.equal(process.argv.length,5);assert(browserTools,'Both browser checks mandatory');
+-assert.equal(root,'/private/tmp/starling-node-compat/next-browser-phase-stock-v1');
++assert.equal(root,'/private/tmp/starling-node-compat/next-browser-hydration-stock-v1');
+ assert(source.endsWith('/application/.next/standalone'));
+ await mkdir(root, {mode: 0o700});
+ await mkdir(join(root, 'responses'));
+ const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+ const descriptor = async path => { const b = await readFile(path); return {path, sha256: hash(b), bytes: b.length}; };
+-const result = {schemaVersion: 1, suite: 'FULL_NEXT_STOCK_ORIGINAL_MODULE_BRIDGE_INSTRUMENTED_BROWSER_CONTROL_V1',
++const plan = JSON.parse(await readFile(join(here, 'plans.json')));
++assert.deepEqual(await descriptor(plan.applicationInputs.path),plan.applicationInputs);
++const input = JSON.parse(await readFile(plan.applicationInputs.path));assert.equal(input.root,source);
++async function walk(root){const out={files:[],dirs:['.'],links:[]};async function visit(dir){for(const name of(await readdir(dir)).sort()){const path=join(dir,name),s=await lstat(path),r=relative(root,path);if(s.isSymbolicLink())out.links.push(r);else if(s.isDirectory()){out.dirs.push(r);await visit(path);}else{assert(s.isFile(),'Only regular files/directories');out.files.push(r);}}}await visit(root);return out;}
++async function sourceBookend(){assert.equal(await realpath(input.root),input.root);const tree=await walk(input.root);assert.equal(tree.links.length,0);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),input.directories.map(x=>x.path).sort());for(const r of input.files){const path=join(input.root,r.path),s=await lstat(path);assert.deepEqual(await descriptor(path),{path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);assert.equal(s.nlink,r.nlink);}for(const r of input.directories){const s=await lstat(join(input.root,r.path));assert.equal(s.mode&0o777,r.mode);assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);}}
++async function copiedApplicationBookend(application){
++  const tree=await walk(application);assert.equal(tree.links.length,0);
++  assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),input.directories.map(x=>x.path).sort());
++  for(const r of input.files){const path=join(application,r.path),s=await lstat(path);assert.deepEqual(await descriptor(path),{path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}
++  for(const r of input.directories)assert.equal((await lstat(join(application,r.path))).mode&0o777,r.mode);
++}
++const result = {schemaVersion: 1, suite: 'FULL_NEXT_STOCK_ORIGINAL_MODULE_BRIDGE_HYDRATION_BROWSER_CONTROL_V1',
+   node: process.version, guestExecuted: false, applicationModified: false,
+   standaloneSource: source, sourceServer: await descriptor(join(source, 'server.js')),
+   bridge: await descriptor(join(here, '../http-bridge-candidate-v1/bridge.mjs')), harness: await descriptor(fileURLToPath(import.meta.url)),
+@@ -34,7 +46,10 @@
+ let server, app;
+ try {
+   const application = join(root, 'application');
+-  await cp(source, application, {recursive: true, force: false, errorOnExist: true, verbatimSymlinks: true});
++  await sourceBookend();
++  await cp(source, application, {recursive: true, force: false, errorOnExist: true, verbatimSymlinks: true,mode:constants.COPYFILE_FICLONE});
++  await copiedApplicationBookend(application);
++  result.applicationCopy={files:input.regularFiles,bytes:input.bytes,byteIdentical:true,independentInodes:true,modesEqual:true,copyFlag:'COPYFILE_FICLONE',reflinkActuallyUsed:null,fallback:'Node ordinary byte copy if reflink unsupported'};
+   assert.equal((await descriptor(join(application, 'server.js'))).sha256, result.sourceServer.sha256);
+   // A fresh logical server starts with an empty cache. Only its owned copy is reset.
+   await rm(join(application, '.next/cache'), {recursive: true, force: true});
+@@ -151,10 +166,11 @@
+ } finally {
+   if (server) { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
+   if (app) await app.close();
++  try{await sourceBookend();result.originalApplicationInputsPreserved=true;}catch(error){result.originalApplicationInputsPreserved=false;result.errors.push({stage:'original-app-final-protection',name:error.name,message:error.message,stack:error.stack});}
+   result.passed = result.prepared && result.http.length === 24 && result.http.every(x => x.passed)
+     && result.cacheInvalidation?.passed === true && result.streaming?.complete === true && result.streaming?.incrementalDeliveryObserved === true
+     && result.browserExit?.code === 0 && result.browser?.passed === true
+-    && result.errors.length === 0 && result.transportErrors.length === 0;
++    && result.originalApplicationInputsPreserved === true && result.errors.length === 0 && result.transportErrors.length === 0;
+   await save();
+ }
+ console.log(JSON.stringify({state: result.passed ? 'FULL_NEXT_HOST_MESSAGE_BRIDGE_PASSED' : 'FULL_NEXT_HOST_MESSAGE_BRIDGE_FAILED',

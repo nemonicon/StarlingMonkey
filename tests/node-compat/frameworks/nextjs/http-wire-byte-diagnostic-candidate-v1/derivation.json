@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "parentIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v4/index.json",
+    "sha256": "fd49fc44a683f12029604ca4d704d87787a9652603aa34c083327d5f27adc7e0",
+    "bytes": 2928
+  },
+  "parentDeploy": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v4/deploy.mjs",
+    "sha256": "022a1df742fa936c11a2111479a8ae93f84bf035649658061bcc6645cb475faf",
+    "bytes": 16496
+  },
+  "parentRunOwned": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v4/run-owned.py",
+    "sha256": "246ebcea64c366f8c06ec4f20b2a501ddb28cda75c1679aab300ca977e58a208",
+    "bytes": 4267
+  },
+  "deployEdits": [
+    {
+      "before": "ROOT_NEXT_WASMTIME_DEPLOYMENT_AUTHORIZED_V2",
+      "after": "ROOT_NEXT_HTTP_WIRE_BYTE_DIAGNOSTIC_AUTHORIZED_V1",
+      "occurrences": 1
+    },
+    {
+      "before": "['localhostServeAllowed','actualNextGuestAllowed','browserAllowed']",
+      "after": "['localhostServeAllowed','actualNextGuestAllowed','wireByteDiagnosticAllowed']",
+      "occurrences": 1
+    },
+    {
+      "before": "['compilerAllowed','componentConstructionAllowed','externalDeploymentAllowed','adoptionAllowed']",
+      "after": "['compilerAllowed','componentConstructionAllowed','externalDeploymentAllowed','adoptionAllowed','browserAllowed']",
+      "occurrences": 1
+    },
+    {
+      "before": "await protect();await verify(authority.constructionResult);",
+      "after": "for(const [key,value] of Object.entries(plan.fixedInputs))assert.deepEqual(authority[key],value,'Fixed actual input:'+key);\nawait protect();await verify(authority.constructionResult);",
+      "occurrences": 1
+    },
+    {
+      "before": "NEXT_WASMTIME_DEPLOYMENT_IN_PROGRESS_V2",
+      "after": "NEXT_HTTP_WIRE_BYTE_DIAGNOSTIC_IN_PROGRESS_V1",
+      "occurrences": 1
+    },
+    {
+      "before": "[join(here,'run-contracts.mjs'),origin,join(output,'client'),plan.browserTools,authority.runId]",
+      "after": "[join(here,'wire-client.mjs'),origin,join(output,'client'),join(here,'plan.json')]",
+      "occurrences": 1
+    },
+    {
+      "before": "result.contractsPassed=true;",
+      "after": "result.wireByteObservationsValidated=true;",
+      "occurrences": 1
+    },
+    {
+      "before": "stage:'deployment-or-contracts'",
+      "after": "stage:'deployment-or-wire-diagnostic'",
+      "occurrences": 1
+    },
+    {
+      "before": "result.contractsPassed===true",
+      "after": "result.wireByteObservationsValidated===true",
+      "occurrences": 1
+    },
+    {
+      "before": "'NEXT_WASMTIME_DEPLOYMENT_CONTRACTS_PASSED_UNREVIEWED_V2':'NEXT_WASMTIME_DEPLOYMENT_FAILED_UNACCEPTED_V2'",
+      "after": "'NEXT_HTTP_WIRE_BYTE_DIAGNOSTIC_PASSED_UNREVIEWED_V1':'NEXT_HTTP_WIRE_BYTE_DIAGNOSTIC_FAILED_UNACCEPTED_V1'",
+      "occurrences": 1
+    }
+  ],
+  "scope": "Exact held deployment control reused, wire client replaces full contract/browser client; fixed actual component55f05 only. No guest/body/host edits.",
+  "additionalDeployEdits": [
+    {
+      "before": "import {createReadStream} from 'node:fs';",
+      "after": "import {createReadStream,constants as fsConstants} from 'node:fs';"
+    },
+    {
+      "before": "verbatimSymlinks:true});",
+      "after": "verbatimSymlinks:true,mode:fsConstants.COPYFILE_FICLONE});"
+    }
+  ]
+}
