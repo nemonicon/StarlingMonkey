@@ -6,7 +6,9 @@ import hashlib
 import importlib.util
 import json
 import os
+import re
 import shutil
+import stat
 import sys
 import tarfile
 import time
@@ -21,6 +23,13 @@ MONITOR = ('tests/node-compat/foundation-crypto/ownership-gc-build-controller-ca
 LIFECYCLE = ('tests/node-compat/foundation-scheduler/resource-build-controller-candidate-v1/lifecycle.py', '54557e22b4cd1c99cdc67c6dc8ff55826fae0d47a6b6481b72019c9480e5293d')
 START_FREE = 20 * 1024**3
 STOP_FREE = 4 * 1024**3
+PATCH_FAMILY = 'tests/node-compat/frameworks/nextjs/stacktrace-native-v1/spidermonkey-patch'
+PATCH_INDEX_SHA = '531bcc7e777b8451d903da23c13bc6e3a005d2a63e90aab1569167d9d25b8a23'
+PATCH_INDEX_BYTES = 4455
+PATCH_SHA = '1a571a891cffd3b81b463c922212f8a4ab1dd1f42b717da4cac5c401445bc9b1'
+PATCH_BYTES = 9772
+PATCH_FILES = ('js/public/SavedFrameAPI.h', 'js/src/vm/SavedFrame.h',
+               'js/src/vm/SavedStacks.cpp', 'js/src/vm/StructuredClone.cpp')
 
 
 def descriptor(path):
@@ -30,6 +39,87 @@ def descriptor(path):
         for block in iter(lambda: stream.read(4 * 1024**2), b''):
             h.update(block)
     return dict(path=str(path), bytes=path.stat().st_size, sha256=h.hexdigest())
+
+
+def saved_frame_eval_requested(environment):
+    value = environment.get('SM_SAVED_FRAME_EVAL', '0')
+    assert value in ('0', '1'), 'SM_SAVED_FRAME_EVAL must be exactly 0 or 1'
+    return value == '1'
+
+
+def authenticate_patch_family():
+    """Authenticate the closed sealed DATA family, without executing derive.py."""
+    root = REPO / PATCH_FAMILY
+    index = root / 'index.json'
+    assert root.is_dir() and not root.is_symlink()
+    assert index.is_file() and not index.is_symlink()
+    assert descriptor(index)['sha256'] == PATCH_INDEX_SHA
+    assert descriptor(index)['bytes'] == PATCH_INDEX_BYTES
+    data = json.loads(index.read_text())
+    assert data['state'] == 'GUEST_SAVEDFRAME_IS_EVAL_PATCH_SOURCE_INDEX_V1'
+    names = [r['path'] for r in data['files']]
+    assert len(names) == len(set(names)) == 27
+    physical = set()
+    for path in root.rglob('*'):
+        assert not path.is_symlink(), str(path)
+        if path.is_file():
+            assert stat.S_ISREG(path.lstat().st_mode)
+            physical.add(path.relative_to(root).as_posix())
+        else:
+            assert path.is_dir()
+    assert physical == set(names) | {'index.json'}
+    for r in data['files']:
+        rel = Path(r['path'])
+        assert not rel.is_absolute() and '..' not in rel.parts
+        got = descriptor(root / rel)
+        assert got['sha256'] == r['sha256'] and got['bytes'] == r['bytes']
+    primary = json.loads((root / 'primary-source.json').read_text())
+    derived = json.loads((root / 'derivation.json').read_text())
+    assert primary['commit'] == derived['baseCommit'] == COMMIT
+    assert {r['path'] for r in primary['files']} == set(PATCH_FILES)
+    assert {r['path'] for r in derived['after']} == set(PATCH_FILES)
+    assert len(primary['files']) == len(derived['after']) == 4
+    for r in primary['files']:
+        b = (root / 'before' / r['path']).read_bytes()
+        assert hashlib.sha256(b).hexdigest() == r['sha256'] and len(b) == r['bytes']
+        assert hashlib.sha1(b'blob ' + str(len(b)).encode() + b'\0' + b).hexdigest() == r['gitBlobSha1']
+    patch = descriptor(root / 'saved-frame-is-eval-v1.patch')
+    assert patch['sha256'] == PATCH_SHA and patch['bytes'] == PATCH_BYTES
+    return dict(index=descriptor(index), patch=patch,
+                before=primary['files'], after=derived['after'], payloadFiles=27)
+
+
+def assert_patch_source_bytes(source, patch_input, applied):
+    """Check actual fresh source bytes, never a projected old source context."""
+    source = Path(source)
+    assert source.is_dir() and not source.is_symlink()
+    rows = patch_input['after' if applied else 'before']
+    observations = []
+    for r in rows:
+        path = source / r['path']
+        assert all(not p.is_symlink() for p in [path, *path.parents] if p == source or source in p.parents)
+        mode = path.lstat().st_mode
+        assert stat.S_ISREG(mode)
+        got = descriptor(path)
+        assert got['sha256'] == r['sha256'] and got['bytes'] == r['bytes'], r['path']
+        observations.append(dict(descriptor=got, mode=stat.S_IMODE(mode)))
+    return observations
+
+
+def assert_patch_diff_names(data):
+    # A captured git diff --name-only -z HEAD includes staged and unstaged
+    # tracked changes. Reject mode-only or content changes to every other file.
+    names = data.decode('utf-8').split('\0')
+    assert names[-1] == ''
+    names = names[:-1]
+    assert len(names) == len(set(names)) == 4
+    assert set(names) == set(PATCH_FILES), names
+    return names
+
+
+def assert_patch_modes(before, after):
+    assert {r['descriptor']['path']: r['mode'] for r in before} == {
+        r['descriptor']['path']: r['mode'] for r in after}
 
 
 def save(path, value):
@@ -74,11 +164,14 @@ def main(work):
     assert __debug__ and sys.dont_write_bytecode and sys.flags.isolated
     assert sys.platform == 'linux', 'This driver is intentionally Linux CI only'
     assert work.is_absolute() and not work.exists() and '..' not in work.parts
+    saved_frame_eval = saved_frame_eval_requested(os.environ)
     os.umask(0o077)
     work.mkdir()
     evidence = work / 'evidence'
     evidence.mkdir()
     result = dict(schemaVersion=1, state='running', forkCommit=COMMIT,
+                  guestBaseCommit=COMMIT, savedFrameEvalRequested=saved_frame_eval,
+                  guestPatchSha256=None, savedFrameEvalCapability=None,
                   componentOrEngineExecuted=False, runtimeAccepted=False,
                   phases=[], startFreeBytes=shutil.disk_usage(work).free,
                   startRequirementBytes=START_FREE, stopFloorBytes=STOP_FREE,
@@ -92,10 +185,9 @@ def main(work):
                CCACHE_DISABLE='1', SCCACHE_DISABLE='1', LC_ALL='C.UTF-8', LANG='C.UTF-8')
     for name in ('tmp', 'tools', 'project', 'cargo-home', 'rustup-home', 'mozbuild-state'):
         (work / name).mkdir()
-    monitor = utility(MONITOR, 'intl_build_original_owned_monitor')
-
     def phase(name, argv, seconds):
         assert shutil.disk_usage(work).free >= STOP_FREE
+        print(json.dumps(dict(phase=name, state='starting', freeBytes=shutil.disk_usage(work).free)), flush=True)
         out = evidence / name
         out.mkdir()
         packet = dict(argv=list(map(str, argv)), cwd=str(work), environment=env)
@@ -108,6 +200,7 @@ def main(work):
         inner = json.loads((out / 'worker-result.json').read_text()) if (out / 'worker-result.json').exists() else None
         row = dict(name=name, terminal=descriptor(outer / 'terminal.json'), worker=descriptor(out / 'worker-result.json') if inner else None)
         result['phases'].append(row)
+        print(json.dumps(dict(phase=name, state='finished', rawWorkerExitCode=terminal['rawExitCode'], freeBytes=shutil.disk_usage(work).free)), flush=True)
         assert terminal['rawExitCode'] == 0 and terminal['allObservedOwnedGroupsGone'] and not terminal['forcedCleanup'] and not terminal['timeout']
         assert not terminal['errors'] and not terminal['signals'] and not terminal['interruptedSignals'] and not terminal['remainingObservedPids']
         assert inner and inner['rawChildExitCode'] == 0, name
@@ -115,6 +208,14 @@ def main(work):
 
     try:
         assert result['startFreeBytes'] >= START_FREE, 'Need 20 GiB free before source fetch; no global runner cleanup is performed'
+        # Authenticate every member before any custom utility import or command.
+        # This is an opt-in guest source patch, never execution of derive.py.
+        patch_input = authenticate_patch_family() if saved_frame_eval else None
+        if patch_input:
+            result['sourcePatch'] = dict(input=patch_input, applied=False,
+                                         sourceCleanValidated=False)
+            shutil.copytree(REPO / PATCH_FAMILY, evidence / 'savedframe-patch-source')
+        monitor = utility(MONITOR, 'intl_build_original_owned_monitor')
         tools = {name: shutil.which(name) for name in ('cmake', 'ninja', 'clang', 'clang++', 'rustup', 'curl', 'git')}
         assert all(tools.values()), tools
         result['tools'] = {name: descriptor(Path(path).resolve()) for name, path in tools.items()}
@@ -148,6 +249,20 @@ def main(work):
         source = work / 'project/deps/spidermonkey-source'
         phase('source-revision', [tools['git'], '-C', source, 'rev-parse', 'HEAD'], 60)
         assert (evidence / 'source-revision/command.log').read_text().strip() == COMMIT
+        if patch_input:
+            assert authenticate_patch_family() == patch_input
+            phase('source-prepatch-clean', [tools['git'], '-C', source, 'diff', '--exit-code',
+                  '--no-ext-diff', '--no-textconv', 'HEAD', '--'], 60)
+            result['sourcePatch']['beforeFiles'] = assert_patch_source_bytes(source, patch_input, False)
+            patch_path = patch_input['patch']['path']
+            phase('savedframe-patch-check', [tools['git'], '-C', source, 'apply', '--check',
+                  '--whitespace=error', patch_path], 60)
+            phase('savedframe-patch-apply', [tools['git'], '-C', source, 'apply',
+                  '--whitespace=error', patch_path], 60)
+            result['sourcePatch']['afterFiles'] = assert_patch_source_bytes(source, patch_input, True)
+            assert_patch_modes(result['sourcePatch']['beforeFiles'], result['sourcePatch']['afterFiles'])
+            result['sourcePatch']['applied'] = True
+            result['guestPatchSha256'] = PATCH_SHA
         ffi_paths = ('intl/icu_capi', 'intl/icu_segmenter_data',
                      'intl/bidi/rust/unicode-bidi-ffi', 'third_party/rust/unicode-bidi')
         # These self-contained path crates are inputs for the later SINGLE
@@ -172,23 +287,49 @@ def main(work):
                 target = evidence / ('generated/' + rel)
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(path, target)
-        dist = work / 'spidermonkey-dist-release-intl'
+        suffix = '-savedframe-eval' if saved_frame_eval else ''
+        dist = work / ('spidermonkey-dist-release-intl' + suffix)
         assert shutil.disk_usage(work).free >= STOP_FREE
         dist.mkdir()
         shutil.copytree(obj / 'dist/include', dist / 'include', symlinks=False)
         shutil.copyfile(obj / 'dist/libspidermonkey.a', dist / 'libspidermonkey.a')
         assert shutil.disk_usage(work).free >= STOP_FREE
         config = (dist / 'include/js-config.h').read_text()
-        import re
         assert re.search(r'^#define\s+JS_HAS_INTL_API\s+1\s*$', config, re.M)
+        saved_frame_header = dist / 'include/js/SavedFrameAPI.h'
+        capability = bool(re.search(r'^#define\s+JS_HAS_SAVEDFRAME_IS_EVAL\s+1\s*$',
+                                     saved_frame_header.read_text(), re.M))
+        assert capability == saved_frame_eval
+        if patch_input:
+            expected = next(r for r in patch_input['after'] if r['path'] == 'js/public/SavedFrameAPI.h')
+            installed = descriptor(saved_frame_header)
+            assert installed['sha256'] == expected['sha256'] and installed['bytes'] == expected['bytes']
+            result['installedSavedFrameApiHeader'] = installed
+        result['savedFrameEvalCapability'] = 1 if capability else 0
         phase('static-members', [sdk / 'bin/llvm-ar', 't', obj / 'dist/libjs_static.a'], 300)
         phase('merged-members', [sdk / 'bin/llvm-ar', 't', dist / 'libspidermonkey.a'], 300)
         result['distributionFiles'] = [descriptor(p) for p in sorted(dist.rglob('*')) if p.is_file()]
-        with tarfile.open(evidence / 'spidermonkey-static-release-intl.tar.gz', 'w:gz') as archive:
+        archive_path = evidence / ('spidermonkey-static-release-intl' + suffix + '.tar.gz')
+        with tarfile.open(archive_path, 'w:gz') as archive:
             archive.add(dist, arcname=dist.name, recursive=True)
         assert shutil.disk_usage(work).free >= STOP_FREE
-        result['distributionArchive'] = descriptor(evidence / 'spidermonkey-static-release-intl.tar.gz')
-        phase('source-clean', [tools['git'], '-C', source, 'diff', '--exit-code', 'HEAD'], 60)
+        result['distributionArchive'] = descriptor(archive_path)
+        if patch_input:
+            assert authenticate_patch_family() == patch_input
+            result['sourcePatch']['finalFiles'] = assert_patch_source_bytes(source, patch_input, True)
+            assert_patch_modes(result['sourcePatch']['beforeFiles'], result['sourcePatch']['finalFiles'])
+            final_revision = phase('source-final-revision', [tools['git'], '-C', source, 'rev-parse', 'HEAD'], 60)
+            assert final_revision.read_text().strip() == COMMIT
+            changes = phase('source-clean', [tools['git'], '-C', source, 'diff', '--name-only', '-z',
+                            '--no-ext-diff', '--no-textconv', '--no-renames', 'HEAD', '--'], 60)
+            result['sourcePatch']['changedPaths'] = assert_patch_diff_names(changes.read_bytes())
+            actual_diff = phase('source-patch-diff', [tools['git'], '-C', source, 'diff', '--binary',
+                                '--full-index', '--no-ext-diff', '--no-textconv', '--no-renames',
+                                '--no-color', 'HEAD', '--'], 60)
+            result['sourcePatch']['actualDiff'] = descriptor(actual_diff)
+            result['sourcePatch']['sourceCleanValidated'] = True
+        else:
+            phase('source-clean', [tools['git'], '-C', source, 'diff', '--exit-code', 'HEAD'], 60)
         result['state'] = 'guest-library-built-engine-and-runtime-pending'
     except BaseException as error:
         result['state'] = 'failed-no-runtime-acceptance'

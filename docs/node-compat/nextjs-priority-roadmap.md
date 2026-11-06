@@ -35,8 +35,8 @@ does not provide raw TLS sockets; WASI P2 sockets themselves provide no TLS.
 
 ## Order of work
 
-Rows1–3 are now combined in an experimental guest. Current priority is row0b,
-the actual JavaScript language blocker, before expanding unrelated APIs. Keep
+Rows1–3 are now combined in an experimental guest. Current priorities are0b
+and0c, the demonstrated language/startup blockers, before unrelated APIs. Keep
 small audited profile facades in the entry where appropriate; native changes
 still require a genuine coherent build and real-component validation.
 
@@ -44,12 +44,13 @@ still require a genuine coherent build and real-component validation.
 | --- | --- | --- |
 | 0 | Preserve the full app and establish the bridge control | Complete: actual unmodified Next passes24/24 HTTP,2/2 browser interactions and incremental Suspense through the candidate bridge on Node. This is a host control. The bundler's `.node.js` classification defect is fixed;44 checks pass. |
 | 0a | Check the deployment contract early | Real C-component probe passes selected standard WASI on both stock hosts. Wasmtime explicit reuse gives1,2,3; default and wasmCloud dev give1,1,1. Pinned primary Source confirms normal wasmCloud P2 HTTP also creates a fresh instance per request regardless of pool settings. Retained-state Next success is unavailable on that path under the present constraints; mount rights and nested cache operation still require guest checks. |
-| 0b | Enable required Unicode regex behavior in the guest engine | Confirmed by actual12-case differential:21 property SyntaxErrors and3 Kelvin-sign ignore-case mismatches across three requests. SM147 lacks Intl; source guards explain the property failures. Next: coherent Intl/ICU-enabled SM147 artifacts and single Rust aggregate, full native relink, then the same differential and app. See [build plan](nextjs-intl-build-plan.md). Current fewGiB free is insufficient;20GiB budget/other volume requested. No host changes or dependency rewriting. |
+| 0b | Enable required Unicode regex behavior in the guest engine | Actual current-engine differential:21 property SyntaxErrors and3 Kelvin-sign mismatches. First Intl-enabled SM147 library now builds in CI:17 clean0 phases, coherent distribution archive2508af52. Actual combined84-package Rust metadata/vendor/offline checks pass, preserving all49 old versions. A fresh native link and the unchanged Unicode/app gates remain. See [build plan](nextjs-intl-build-plan.md); no host or application rewriting. |
+| 0c | Supply the structured stack traces required by send/depd | Actual isolated component:12/12 records differ from Node; prepare hooks never run and exact depd throws `e.getFileName is not a function`. A bounded facade passes64 host checks after three retained provider-validation failures. Existing SavedFrame APIs omit eval provenance; the four-file guest-SM patch and mandatory native API consumer remain uncompiled. Build coherent patched library/headers, then the native engine and real component differentials. [Retained failure](../../tests/node-compat/frameworks/nextjs/stacktrace-probe-root-results-v1/actual-review/README.md). |
 | 1 | Real CommonJS loader, Buffer demand, formatting and startup APIs | Integrate Module/createRequire/cache/JSON/webpack chunk loading, the demanded native Buffer subset and util.format. Include real VM evaluation of Next client-reference manifests: replacing this with an import stub would break real routes. Add process, URL, OS, timers, performance and explicit HTTP/import surfaces. Verify ESM/CJS/default/global identities and coded failures. |
 | 2 | Genuine application IO and computation | Standard read-only app/assets preopens and writable cache. Atomic link/EEXIST/unlink, stat/readdir and actual ReadStream/backpressure/close. RuntimeOnly secure RNG for UUID/cache names. Reuse native SHA256. Implement gzip/deflate streaming demanded by unchanged Next compression; one-shot zlib evidence does not establish streaming. |
 | 3 | Correct async/request context and lifecycle | Actual SpiderMonkey Promise queue plus task/tick/timer capture. Validate ALS run/exit/enterWith/bind/snapshot, throw paths, disable/re-enable, awaits and overlapping requests. Fresh native request resources with restoration; no JS global context stack. |
 | 4 | Construct and instantiate a complete guest | V6 engine `c2bff940` links,10,255,826 bytes, six phases0/clean and2,631 protected inputs unchanged. Both JS entries construct/validate and emit exactly13 selected0.2.10 imports/incoming-handler. The corrected dependency component now passes all16 controls on three real GET/GET/POST requests,48 records, with clean shutdown and preserved inputs. Complete lifecycle/concurrency/GC/snapshot and broader API checks remain open. |
-| 5 | Run the full app and make it repeatable | Missing `global` is fixed by a small audited profile prelude; second actual Next-in-Wasm run is blocked by Unicode property regex parsing.23 base HTTP500; later action/cache/stream/browser phases blocked. Complete0b then rerun the unchanged24 HTTP/action+2 browser/cache/stream contracts. Preserve failed baselines and host lifetime checks. wasmCloud retained P2 state remains unavailable. |
+| 5 | Run the full app and make it repeatable | Missing `global` is fixed; second actual app run remains blocked by Unicode parsing.23 base HTTP500; action/cache/stream/browser stages blocked. Complete0b+0c, then rerun unchanged24 HTTP/action+2 browser/cache/stream contracts. Preserve failed baselines and host lifetime checks. wasmCloud retained P2 state remains unavailable. |
 | 6 | Measure and stabilize the working profile | Final component size, startup, memory and throughput against existing JS implementations. Promote only tested exports; publish limits and keep optional capabilities out of unrelated apps. |
 
 The original full success contract remains intact. Stock wasmCloud2.11's P2
@@ -59,7 +60,7 @@ Report wasmCloud cold-request/instantiation results separately; do not count
 them as a full-contract pass or modify the host to force reuse. See the
 [pinned Source analysis](../../tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/README.md).
 
-The first new linked generation should target actual application startup and
+The next linked generation should target actual application startup and
 dependency controls, followed immediately by the complete contract. Rank new
 blockers by startup, required route failures, context/resource correctness and
 optional branches. Import-only compatibility is never successful execution.
@@ -80,7 +81,13 @@ denial. Next's actual nested cache layout and narrower per-preopen rights remain
 open. A guest-owned application image is an unimplemented packaging alternative;
 it would not establish a retained logical server/cache lifetime.
 
-## Current implementation state
+## Per-surface preparation and remaining depth
+
+The table below retains the preparation suites and deeper validation still
+needed per surface. The newer c2bff940 real component already exercises all16
+dependency controls across three requests; that bounded smoke result supersedes
+older statements that no guest link or execution had occurred. It does not
+establish the full per-surface suites, lifecycle/concurrency or full Next app.
 
 | Dependency | Verified now | Still outstanding |
 | --- | --- | --- |

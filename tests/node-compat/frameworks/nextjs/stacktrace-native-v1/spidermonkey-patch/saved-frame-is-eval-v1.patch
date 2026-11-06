@@ -1,0 +1,265 @@
+--- a/js/public/SavedFrameAPI.h
++++ b/js/public/SavedFrameAPI.h
+@@ -71,6 +71,26 @@
+ extern JS_PUBLIC_API SavedFrameResult GetSavedFrameSourceId(
+     JSContext* cx, JSPrincipals* principals, Handle<JSObject*> savedFrame,
+     uint32_t* sourceIdp,
++    SavedFrameSelfHosted selfHosted = SavedFrameSelfHosted::Include);
++
++// StarlingMonkey guest extension, version 1. The library and installed header
++// must be built from the same authenticated patch.
++#define JS_HAS_SAVEDFRAME_IS_EVAL 1
++
++/**
++ * Get captured JS eval/dynamic-function provenance without interpreting source
++ * names or sourceURL text. Live ordinary sources without an introduction type
++ * are false; eval and the standard dynamic-function constructors are true.
++ * Unrecognized introduction types, heap-reconstructed frames, and all frames
++ * read through structured clone have unknown provenance. Like a principal
++ * refusal, unknown provenance returns AccessDenied and writes false to isEvalp;
++ * that false is only a safe default, NOT a successful non-eval classification.
++ * Async adoption preserves the captured provenance. Wasm frames are non-eval.
++ * This API does not expose eval origins or provide cloned-stack eval parity.
++ */
++extern JS_PUBLIC_API SavedFrameResult GetSavedFrameIsEval(
++    JSContext* cx, JSPrincipals* principals, Handle<JSObject*> savedFrame,
++    bool* isEvalp,
+     SavedFrameSelfHosted selfHosted = SavedFrameSelfHosted::Include);
+ 
+ /**
+--- a/js/src/vm/SavedFrame.h
++++ b/js/src/vm/SavedFrame.h
+@@ -8,6 +8,7 @@
+ #define vm_SavedFrame_h
+ 
+ #include "mozilla/Attributes.h"
++#include "mozilla/Maybe.h"
+ 
+ #include "gc/Policy.h"
+ #include "js/ColumnNumber.h"  // JS::TaggedColumnNumberOneOrigin
+@@ -49,6 +50,7 @@
+   // Convenient getters for SavedFrame's reserved slots for use from C++.
+   JSAtom* getSource();
+   uint32_t getSourceId();
++  mozilla::Maybe<bool> getIsEval();
+   // Line number (1-origin).
+   uint32_t getLine();
+   // Column number in UTF-16 code units.
+@@ -123,6 +125,7 @@
+   void initFromLookup(JSContext* cx, Handle<Lookup> lookup);
+   void initSource(JSAtom* source);
+   void initSourceId(uint32_t id);
++  void initIsEval(mozilla::Maybe<bool> isEval);
+   void initLine(uint32_t line);
+   void initColumn(JS::TaggedColumnNumberOneOrigin column);
+   void initFunctionDisplayName(JSAtom* maybeName);
+@@ -136,6 +139,7 @@
+     // The reserved slots in the SavedFrame class.
+     JSSLOT_SOURCE,
+     JSSLOT_SOURCEID,
++    JSSLOT_ISEVAL,  // Boolean for known provenance, undefined for unknown.
+     JSSLOT_LINE,
+     JSSLOT_COLUMN,
+     JSSLOT_FUNCTIONDISPLAYNAME,
+--- a/js/src/vm/SavedStacks.cpp
++++ b/js/src/vm/SavedStacks.cpp
+@@ -10,6 +10,7 @@
+ #include "mozilla/DebugOnly.h"
+ 
+ #include <algorithm>
++#include <cstring>
+ #include <utility>
+ 
+ #include "jsapi.h"
+@@ -176,7 +177,7 @@
+   Lookup(JSAtom* source, uint32_t sourceId, uint32_t line,
+          JS::TaggedColumnNumberOneOrigin column, JSAtom* functionDisplayName,
+          JSAtom* asyncCause, SavedFrame* parent, JSPrincipals* principals,
+-         bool mutedErrors,
++         bool mutedErrors, Maybe<bool> isEval,
+          const Maybe<LiveSavedFrameCache::FramePtr>& framePtr = Nothing(),
+          jsbytecode* pc = nullptr, Activation* activation = nullptr)
+       : source(source),
+@@ -188,6 +189,7 @@
+         parent(parent),
+         principals(principals),
+         mutedErrors(mutedErrors),
++        isEval(isEval),
+         framePtr(framePtr),
+         pc(pc),
+         activation(activation) {
+@@ -208,6 +210,7 @@
+         parent(savedFrame.getParent()),
+         principals(savedFrame.getPrincipals()),
+         mutedErrors(savedFrame.getMutedErrors()),
++        isEval(savedFrame.getIsEval()),
+         framePtr(Nothing()),
+         pc(nullptr),
+         activation(nullptr) {
+@@ -228,6 +231,7 @@
+   SavedFrame* parent;
+   JSPrincipals* principals;
+   bool mutedErrors;
++  Maybe<bool> isEval;
+ 
+   // These are used only by the LiveSavedFrameCache and not used for identity or
+   // hashing.
+@@ -263,6 +267,7 @@
+   SavedFrame* parent() { return value().parent; }
+   JSPrincipals* principals() { return value().principals; }
+   bool mutedErrors() { return value().mutedErrors; }
++  Maybe<bool> isEval() { return value().isEval; }
+   Maybe<LiveSavedFrameCache::FramePtr> framePtr() { return value().framePtr; }
+   jsbytecode* pc() { return value().pc; }
+   Activation* activation() { return value().activation; }
+@@ -316,13 +321,19 @@
+   // and add another overload of AddToHash with more arguments.
+   return AddToHash(lookup.line, lookup.column.rawValue(), lookup.source,
+                    lookup.functionDisplayName, lookup.asyncCause,
+-                   lookup.mutedErrors, parentHash,
++                   lookup.mutedErrors,
++                   lookup.isEval.isSome() ? (*lookup.isEval ? 2 : 1) : 0,
++                   parentHash,
+                    JSPrincipalsPtrHasher::hash(lookup.principals));
+ }
+ 
+ /* static */
+ bool SavedFrame::HashPolicy::match(SavedFrame* existing, const Lookup& lookup) {
+   MOZ_ASSERT(existing);
++
++  if (existing->getIsEval() != lookup.isEval) {
++    return false;
++  }
+ 
+   if (existing->getLine() != lookup.line) {
+     return false;
+@@ -453,6 +464,15 @@
+   return v.toPrivateUint32();
+ }
+ 
++Maybe<bool> SavedFrame::getIsEval() {
++  const Value& value = getReservedSlot(JSSLOT_ISEVAL);
++  MOZ_ASSERT(value.isBoolean() || value.isUndefined());
++  if (value.isBoolean()) {
++    return Some(value.toBoolean());
++  }
++  return Nothing();
++}
++
+ uint32_t SavedFrame::getLine() {
+   const Value& v = getReservedSlot(JSSLOT_LINE);
+   return v.toPrivateUint32();
+@@ -509,6 +529,11 @@
+ 
+ void SavedFrame::initSourceId(uint32_t sourceId) {
+   initReservedSlot(JSSLOT_SOURCEID, PrivateUint32Value(sourceId));
++}
++
++void SavedFrame::initIsEval(Maybe<bool> isEval) {
++  initReservedSlot(JSSLOT_ISEVAL,
++                   isEval.isSome() ? BooleanValue(*isEval) : UndefinedValue());
+ }
+ 
+ void SavedFrame::initLine(uint32_t line) {
+@@ -570,6 +595,7 @@
+ 
+   initSource(lookup.source());
+   initSourceId(lookup.sourceId());
++  initIsEval(lookup.isEval());
+   initLine(lookup.line());
+   initColumn(lookup.column());
+   initFunctionDisplayName(lookup.functionDisplayName());
+@@ -815,6 +841,29 @@
+     return SavedFrameResult::AccessDenied;
+   }
+   *sourceIdp = frame->getSourceId();
++  return SavedFrameResult::Ok;
++}
++
++JS_PUBLIC_API SavedFrameResult GetSavedFrameIsEval(
++    JSContext* cx, JSPrincipals* principals, HandleObject savedFrame,
++    bool* isEvalp,
++    SavedFrameSelfHosted selfHosted /* = SavedFrameSelfHosted::Include */) {
++  js::AssertHeapIsIdle();
++  CHECK_THREAD(cx);
++  MOZ_RELEASE_ASSERT(cx->realm());
++  MOZ_ASSERT(isEvalp);
++  *isEvalp = false;
++  bool skippedAsync;
++  Rooted<js::SavedFrame*> frame(cx, UnwrapSavedFrame(cx, principals, savedFrame,
++                                                     selfHosted, skippedAsync));
++  if (!frame) {
++    return SavedFrameResult::AccessDenied;
++  }
++  Maybe<bool> isEval = frame->getIsEval();
++  if (isEval.isNothing()) {
++    return SavedFrameResult::AccessDenied;
++  }
++  *isEvalp = *isEval;
+   return SavedFrameResult::Ok;
+ }
+ 
+@@ -1411,6 +1460,32 @@
+   return capture.match(m);
+ }
+ 
++// Compilation metadata belongs to the ScriptSource shared by its nested
++// functions. The display URL/filename is intentionally never consulted here.
++static Maybe<bool> SavedFrameEvalProvenance(FrameIter& iter) {
++  if (iter.isWasm()) {
++    return Some(false);
++  }
++  JSScript* script = iter.script();
++  if (script->isForEval()) {
++    return Some(true);
++  }
++  ScriptSource* source = script->scriptSource();
++  if (!source->hasIntroductionType()) {
++    return Some(false);
++  }
++  const char* type = source->introductionType();
++  if (std::strcmp(type, "eval") == 0 || std::strcmp(type, "Function") == 0 ||
++      std::strcmp(type, "GeneratorFunction") == 0 ||
++      std::strcmp(type, "AsyncFunction") == 0 ||
++      std::strcmp(type, "AsyncGenerator") == 0) {
++    return Some(true);
++  }
++  // Other embedders/debugger introduction kinds are not classified by this
++  // bounded extension. The getter refuses instead of returning a guessed bool.
++  return Nothing();
++}
++
+ bool SavedStacks::insertFrames(JSContext* cx, MutableHandle<SavedFrame*> frame,
+                                JS::StackCapture&& capture,
+                                HandleObject startAtObj) {
+@@ -1558,7 +1633,8 @@
+                                   displayAtom,
+                                   nullptr,  // asyncCause
+                                   nullptr,  // parent (not known yet)
+-                                  principals, iter.mutedErrors(), framePtr,
++                                  principals, iter.mutedErrors(),
++                                  SavedFrameEvalProvenance(iter), framePtr,
+                                   iter.pc(), &activation)) {
+         return false;
+       }
+@@ -2112,7 +2188,8 @@
+                                 functionDisplayName,
+                                 /* asyncCause */ nullptr,
+                                 /* parent */ nullptr, principals,
+-                                /* mutedErrors */ true)) {
++                                /* mutedErrors */ true,
++                                /* isEval */ Nothing())) {
+       ReportOutOfMemory(cx);
+       return false;
+     }
+--- a/js/src/vm/StructuredClone.cpp
++++ b/js/src/vm/StructuredClone.cpp
+@@ -3704,6 +3704,8 @@
+   // Don't specify a source ID when reading a cloned saved frame, as these IDs
+   // are only valid within a specific process.
+   savedFrame->initSourceId(0);
++  // Clone wire format has no eval provenance; never fabricate non-eval.
++  savedFrame->initIsEval(mozilla::Nothing());
+ 
+   RootedValue name(context());
+   if (!startRead(&name, AtomizeStrings)) {

@@ -7,7 +7,8 @@ actual application dependencies. The experimental435-input engine now links;
 its component imports exactly13 selected WASI0.2.10 interfaces and passes16
 dependency controls over three real requests. These results do not promote the
 accepted production matrix. Full Next startup remains blocked by core-language
-Unicode regex behavior, despite its module exports being available.
+Unicode regex behavior. A separate actual component also confirms the V8
+structured-stack behavior required by Next's send/depd dependency is absent.
 
 | Experimental API/language gate | Strategy and capability | Current status and deviation | Validation |
 | --- | --- | --- | --- |
@@ -17,12 +18,15 @@ Unicode regex behavior, despite its module exports being available.
 | WASI request-body EOF | Audited guest facade over `wasi:io/streams@0.2.10` | Bounded typed `ComponentError.payload` handling; unknown throws remain failures |50 host checks plus actual GET/GET/POST;21-byte POST and all48 control records pass |
 | Unicode property regex literals/constructors | Native SpiderMonkey plus Unicode data; no additional host interface | Unavailable in current no-Intl engine; exact Zod identifier pattern rejects |12-case Node/guest differential,36 captured records:21 property SyntaxErrors |
 | Unicode ignore-case matching | Native SpiderMonkey regex engine; no host interface | Partial: `/^k$/iu` misses Kelvin sign `K` compared with pinned Node22 | Same differential captures the mismatch on all three requests; comparator remains failed |
+| `Error.captureStackTrace` and selected CallSite methods | Native SavedFrame capture plus bounded guest facade; no new host capability | Current guest supplies eager strings and ignores prepare hooks. Candidate requires a new, uncompiled guest-SM provenance API; eval origins/receivers/native/async flags remain deferred with explicit call errors | Actual three-request probe:12/12 differences and exact depd TypeError. Facade host tests64/64 after retained provider-boundary failures; new guest implementation remains untested |
 
 The language baseline is a dependency gate alongside the API/export inventory.
 Fix Unicode support through coherent Intl/ICU-enabled guest artifacts and the
 existing native/Rust integration; the [build plan](nextjs-intl-build-plan.md)
 keeps host interfaces and target hosts unchanged. No dependency source rewriting
-or JavaScript replacement of the regex parser is part of that plan.
+or JavaScript replacement of the regex parser is part of that plan. The first
+Intl C++ library builds in CI; the84-package Rust graph passes locked offline
+resolution. Neither result promotes the current guest's regex/stack status.
 
 The [optional package-bundler follow-on](../../tests/node-compat/frameworks/package-bundler-execution-v1/README.md)
 runs native CommonJS interop, supported modules and real React creation with

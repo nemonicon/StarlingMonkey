@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "baseCommit": "9dab3d6f643e926a340c391ea30968e940390dec",
+  "changedFiles": 4,
+  "edits": [
+    {
+      "path": "js/public/SavedFrameAPI.h",
+      "before": "/**\n * Given a SavedFrame JSObject, get its line property (1-origin).",
+      "after": "// StarlingMonkey guest extension, version 1. The library and installed header\n// must be built from the same authenticated patch.\n#define JS_HAS_SAVEDFRAME_IS_EVAL 1\n\n/**\n * Get captured JS eval/dynamic-function provenance without interpreting source\n * names or sourceURL text. Live ordinary sources without an introduction type\n * are false; eval and the standard dynamic-function constructors are true.\n * Unrecognized introduction types, heap-reconstructed frames, and all frames\n * read through structured clone have unknown provenance. Like a principal\n * refusal, unknown provenance returns AccessDenied and writes false to isEvalp;\n * that false is only a safe default, NOT a successful non-eval classification.\n * Async adoption preserves the captured provenance. Wasm frames are non-eval.\n * This API does not expose eval origins or provide cloned-stack eval parity.\n */\nextern JS_PUBLIC_API SavedFrameResult GetSavedFrameIsEval(\n    JSContext* cx, JSPrincipals* principals, Handle<JSObject*> savedFrame,\n    bool* isEvalp,\n    SavedFrameSelfHosted selfHosted = SavedFrameSelfHosted::Include);\n\n/**\n * Given a SavedFrame JSObject, get its line property (1-origin)."
+    },
+    {
+      "path": "js/src/vm/SavedFrame.h",
+      "before": "#include \"mozilla/Attributes.h\"",
+      "after": "#include \"mozilla/Attributes.h\"\n#include \"mozilla/Maybe.h\""
+    },
+    {
+      "path": "js/src/vm/SavedFrame.h",
+      "before": "  uint32_t getSourceId();",
+      "after": "  uint32_t getSourceId();\n  mozilla::Maybe<bool> getIsEval();"
+    },
+    {
+      "path": "js/src/vm/SavedFrame.h",
+      "before": "  void initSourceId(uint32_t id);",
+      "after": "  void initSourceId(uint32_t id);\n  void initIsEval(mozilla::Maybe<bool> isEval);"
+    },
+    {
+      "path": "js/src/vm/SavedFrame.h",
+      "before": "    JSSLOT_SOURCEID,",
+      "after": "    JSSLOT_SOURCEID,\n    JSSLOT_ISEVAL,  // Boolean for known provenance, undefined for unknown."
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "before": "#include <algorithm>",
+      "after": "#include <algorithm>\n#include <cstring>"
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "before": "         bool mutedErrors,\n",
+      "after": "         bool mutedErrors, Maybe<bool> isEval,\n"
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "before": "        mutedErrors(mutedErrors),",
+      "after": "        mutedErrors(mutedErrors),\n        isEval(isEval),"
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "before": "        mutedErrors(savedFrame.getMutedErrors()),",
+      "after": "        mutedErrors(savedFrame.getMutedErrors()),\n        isEval(savedFrame.getIsEval()),"
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "before": "  bool mutedErrors;\n",
+      "after": "  bool mutedErrors;\n  Maybe<bool> isEval;\n"
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "before": "  bool mutedErrors() { return value().mutedErrors; }",
+      "after": "  bool mutedErrors() { return value().mutedErrors; }\n  Maybe<bool> isEval() { return value().isEval; }"
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "before": "                   lookup.mutedErrors, parentHash,",
+      "after": "                   lookup.mutedErrors,\n                   lookup.isEval.isSome() ? (*lookup.isEval ? 2 : 1) : 0,\n                   parentHash,"
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "before": "  if (existing->getLine() != lookup.line) {",
+      "after": "  if (existing->getIsEval() != lookup.isEval) {\n    return false;\n  }\n\n  if (existing->getLine() != lookup.line) {"
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "before": "uint32_t SavedFrame::getLine() {",
+      "after": "Maybe<bool> SavedFrame::getIsEval() {\n  const Value& value = getReservedSlot(JSSLOT_ISEVAL);\n  MOZ_ASSERT(value.isBoolean() || value.isUndefined());\n  if (value.isBoolean()) {\n    return Some(value.toBoolean());\n  }\n  return Nothing();\n}\n\nuint32_t SavedFrame::getLine() {"
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "before": "void SavedFrame::initLine(uint32_t line) {",
+      "after": "void SavedFrame::initIsEval(Maybe<bool> isEval) {\n  initReservedSlot(JSSLOT_ISEVAL,\n                   isEval.isSome() ? BooleanValue(*isEval) : UndefinedValue());\n}\n\nvoid SavedFrame::initLine(uint32_t line) {"
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "before": "  initSourceId(lookup.sourceId());",
+      "after": "  initSourceId(lookup.sourceId());\n  initIsEval(lookup.isEval());"
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "before": "JS_PUBLIC_API SavedFrameResult GetSavedFrameLine(",
+      "after": "JS_PUBLIC_API SavedFrameResult GetSavedFrameIsEval(\n    JSContext* cx, JSPrincipals* principals, HandleObject savedFrame,\n    bool* isEvalp,\n    SavedFrameSelfHosted selfHosted /* = SavedFrameSelfHosted::Include */) {\n  js::AssertHeapIsIdle();\n  CHECK_THREAD(cx);\n  MOZ_RELEASE_ASSERT(cx->realm());\n  MOZ_ASSERT(isEvalp);\n  *isEvalp = false;\n  bool skippedAsync;\n  Rooted<js::SavedFrame*> frame(cx, UnwrapSavedFrame(cx, principals, savedFrame,\n                                                     selfHosted, skippedAsync));\n  if (!frame) {\n    return SavedFrameResult::AccessDenied;\n  }\n  Maybe<bool> isEval = frame->getIsEval();\n  if (isEval.isNothing()) {\n    return SavedFrameResult::AccessDenied;\n  }\n  *isEvalp = *isEval;\n  return SavedFrameResult::Ok;\n}\n\nJS_PUBLIC_API SavedFrameResult GetSavedFrameLine("
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "before": "bool SavedStacks::insertFrames(JSContext* cx, MutableHandle<SavedFrame*> frame,",
+      "after": "// Compilation metadata belongs to the ScriptSource shared by its nested\n// functions. The display URL/filename is intentionally never consulted here.\nstatic Maybe<bool> SavedFrameEvalProvenance(FrameIter& iter) {\n  if (iter.isWasm()) {\n    return Some(false);\n  }\n  JSScript* script = iter.script();\n  if (script->isForEval()) {\n    return Some(true);\n  }\n  ScriptSource* source = script->scriptSource();\n  if (!source->hasIntroductionType()) {\n    return Some(false);\n  }\n  const char* type = source->introductionType();\n  if (std::strcmp(type, \"eval\") == 0 || std::strcmp(type, \"Function\") == 0 ||\n      std::strcmp(type, \"GeneratorFunction\") == 0 ||\n      std::strcmp(type, \"AsyncFunction\") == 0 ||\n      std::strcmp(type, \"AsyncGenerator\") == 0) {\n    return Some(true);\n  }\n  // Other embedders/debugger introduction kinds are not classified by this\n  // bounded extension. The getter refuses instead of returning a guessed bool.\n  return Nothing();\n}\n\nbool SavedStacks::insertFrames(JSContext* cx, MutableHandle<SavedFrame*> frame,"
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "before": "                                  principals, iter.mutedErrors(), framePtr,",
+      "after": "                                  principals, iter.mutedErrors(),\n                                  SavedFrameEvalProvenance(iter), framePtr,"
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "before": "                                /* mutedErrors */ true)) {",
+      "after": "                                /* mutedErrors */ true,\n                                /* isEval */ Nothing())) {"
+    },
+    {
+      "path": "js/src/vm/StructuredClone.cpp",
+      "before": "  savedFrame->initSourceId(0);",
+      "after": "  savedFrame->initSourceId(0);\n  // Clone wire format has no eval provenance; never fabricate non-eval.\n  savedFrame->initIsEval(mozilla::Nothing());"
+    }
+  ],
+  "after": [
+    {
+      "path": "js/public/SavedFrameAPI.h",
+      "sha256": "fc3b58f8706814517ae9c12a218c0df6a4df943874f59cdf70054e7f7db75934",
+      "bytes": 7304
+    },
+    {
+      "path": "js/src/vm/SavedFrame.h",
+      "sha256": "74cd00c52fdb310b7efa6858db0e466054f0504fe308f3d4b2c73216f9768694",
+      "bytes": 10686
+    },
+    {
+      "path": "js/src/vm/SavedStacks.cpp",
+      "sha256": "3cee0ced6ceea84e608b850ebe996de06ba1e51e991274e6df47ebaa0ffe3534",
+      "bytes": 77043
+    },
+    {
+      "path": "js/src/vm/StructuredClone.cpp",
+      "sha256": "d9562b98ac8b242f8c8eec76737e28aa8647270ceda4ff8c655a0b137cf57c64",
+      "bytes": 139185
+    }
+  ],
+  "uncompiled": true,
+  "cloneWireFormatChanged": false,
+  "unknownProvenanceRefused": true
+}

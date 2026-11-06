@@ -15,6 +15,36 @@ contract is claimed. The immediate requirement is an Intl-enabled SpiderMonkey
 guest build, followed by the unchanged full24 HTTP/action and2 browser contract.
 Generic crypto/API expansion and cost work stay behind this gate.
 
+The first [Intl-enabled guest library CI build](https://github.com/nemonicon/StarlingMonkey/actions/runs/42272037547)
+now succeeds at pushed commit`dc7bad5c`:17 raw0 owned phases, baseFirefox9dab,
+library archive2508af52/222,772,017 bytes. Its complete Actions ZIP is downloaded
+and matches published ae81c73e/227,191,494 bytes. This is C++/ICU library evidence,
+not a new native engine or successful Next run. Artifact closure review is in
+progress; local capacity is no longer blocking that guest-library prerequisite.
+
+Actual Cargo resolution/vendor/offline-locked metadata now passes with84
+packages, all49 old versions preserved.76 external packages/2,278 files/
+35,510,599 bytes pass checksums; Mozilla's patched Bidi Rust/manifest match.
+First seed's smallvec101 failure remains unchanged. A separate old-only offline
+control captures the feature differences: old Serde adds derive/serde_derive,
+Smallvec adds union, Syn adds full, and serde_derive becomes selected. The
+control's erroneous49-lock==metadata-count assertion stays failed; its actual
+Cargo command is0/clean and separate DATA reconciliation records48 old versus84
+new metadata nodes. No Rust compilation or FFI linkage has run.
+
+The [actual structured-stack component probe](tests/node-compat/frameworks/nextjs/stacktrace-probe-root-results-v1/actual-review/README.md)
+confirms another startup requirement: three HTTP200 responses/counters1,2,3,
+all12 records differ from Node; hooks never run and exact send/depd throws
+`e.getFileName is not a function`. The experiment remains raw1/parityfalse,
+with clean owned shutdown and preserved inputs; Root's portable DATA reader
+passes. The proposed native capture/facade passes64 host checks after three
+retained bad-provider failures. SavedFrame lacks truthful eval provenance, so
+a sealed four-file **guest SpiderMonkey** patch adds a new API;112 Source/model
+checks and a16-case actual Node oracle pass, but that API is still uncompiled.
+The next opt-in CI build will produce coherent patched headers/library before
+the full native engine link. No host modification or additional WASI import is
+introduced. Complete V8 Error/CallSite semantics are not claimed.
+
 The native dependency component now [passes all16 controls on GET, GET and
 POST](tests/node-compat/frameworks/nextjs/dependencies-wasmtime-root-results-v3/actual-review/README.md):48 actual records, HTTP200 each, POST21 bytes, clean0 owned shutdown and
 original/read-only app preserved. The initial ALS failure was an incorrect
@@ -50,6 +80,36 @@ and stale cached distributions/wrong revisions. SDK30, Rust1.88, cbindgen0.29.1,
 private build state, a20GiB start/4GiB stop policy and artifact-only outputs are
 specified. It has not yet compiled SpiderMonkey or run a guest. The existing
 release workflow, WASI interfaces and unchanged Next success gates remain.
+Commit `dc7bad5c` is pushed; its manual [CI run42272037547](https://github.com/nemonicon/StarlingMonkey/actions/runs/42272037547)
+is in progress at exactly `dc7bad5c36306368fd8a2816136f02f959aed0ee`.
+An abbreviated-SHA dispatch was rejected422 without creating a run; dispatch
+by `main` succeeded and the returned full commit identity was checked.
+The first run has a120-minute job ceiling; the next workflow version raises
+that ceiling to210 minutes to accommodate the sum of bounded phase deadlines.
+Actual successful compilation, ICU archive closure, new Rust lock/vendor,
+full engine link and unchanged Next runtime contract are still outstanding.
+
+The [single Rust aggregate companion](docs/node-compat/nextjs-intl-build-plan/README.md)
+contains uncompiled templates for the two added FFI crates and three required
+root overrides.59 static Source/TOML checks pass under Python3.12; neither old
+49-package lock is asserted to be the combined graph. The exact four FFI source
+directories were acquired separately within a32MiB ceiling:1,127 files and
+11,364,714 bytes, all rooted in the exact commit's26 verified Git trees. Every
+blob's Git SHA1/SHA256, size, mode and complete membership match; Root repeated
+the complete local-file check. The [manifest](tests/node-compat/frameworks/nextjs/spidermonkey-intl-build-v1/ffi-source-manifest.json)
+records the raw-GitHub fallback for binary/large connector responses. No root
+Cargo workspace was injected into this reduced source layout. This permits
+bounded Cargo-only resolution while CI builds the larger C++ library; actual
+resolution/vendor/offline checks remain pending.
+
+The [startup source audit](tests/node-compat/frameworks/nextjs/spidermonkey-intl-build-v1/next-startup-audit.md)
+predicts another immediate frontier: bundled send/depd expects lazy V8
+structured stack traces, whereas exact SM147's captureStackTrace installs an
+eager string. An isolated ordinary guest probe is being prepared; this is not
+yet a measured Next failure or an implemented fix. The audit corrects an early
+inode hypothesis: send's instanceof Stats branch should accept the actual
+guest Stats objects, so no synthetic inode or speculative FS expansion is
+justified. Actual Next success gates remain unchanged.
 
 Current native Source candidate is435 inputs/embedding3, V6. Its V5 base includes the
 bounded Readable.toWeb extension, ALS's real strict-definition guard, three
