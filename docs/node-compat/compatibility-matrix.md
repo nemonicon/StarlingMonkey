@@ -27,9 +27,12 @@ Latest experimental evidence and remaining gates are recorded in
 [progress.md](../../progress.md). The reviewed codec cost workload does not
 establish universal speed or lower guest memory. Native combined355 build/freeze
 passes, validation-only export/bootstrap and retained read-only API checks now
-precede two successful component constructions. The pure component imports
-nothing; the resource component selects only three standard WASI0.2.10 clock/poll
-interfaces. Ordinary runtime validation and operational adoption remain open.
+precede five accepted component constructions and one identified, unaccepted INIT
+timer refusal. The pure component imports nothing; clock/resource components
+select only three standard WASI0.2.10 clock/poll interfaces. A separate pure
+control returns seven whole Node-equal Jco/Wasmtime strings at raw0, with
+independent runtime DATA review passed. Clock/resource runtime validation and operational
+adoption remain open.
 Default-OFF Hash/Hmac Source and SDK syntax checks do not change the deferred
 `node:crypto` API status. The experimental clock and guarded-key results remain
 separate from public API compatibility; exact evidence is in the

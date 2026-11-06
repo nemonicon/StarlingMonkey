@@ -1,0 +1,26 @@
+# Pure synthetic environment/argv models. No shell or Git command is run.
+import shlex
+original={'HOME':'/synthetic-home','home':'/synthetic-home-lower','CODEX_HOME':'/synthetic-codex','PATH':'/synthetic-bin','GIT_DIR':'blocked','GIT_CONFIG_PARAMETERS':'blocked','GIT_CONFIG_COUNT':'7','GIT_TEMPLATE_DIR':'blocked','BASH_ENV':'blocked','ENV':'blocked','BASH_FUNC_bad%%':'secret-sentinel','SHELLOPTS':'blocked','BASHOPTS':'blocked','CDPATH':'blocked','GLOBIGNORE':'blocked','DYLD_INSERT_LIBRARIES':'blocked','LD_PRELOAD':'blocked'}
+copy_before=dict(original);env=m.git_environment(original);assert original==copy_before
+for key in ['HOME','home','CODEX_HOME','PATH']:assert env[key]==original[key]
+for key in ['BASH_ENV','ENV','BASH_FUNC_bad%%','SHELLOPTS','BASHOPTS','CDPATH','GLOBIGNORE','DYLD_INSERT_LIBRARIES','LD_PRELOAD']:assert key not in env
+assert env['GIT_CONFIG_GLOBAL']==env['GIT_CONFIG_SYSTEM']=='/dev/null'and env['GIT_CONFIG_COUNT']=='0'and'GIT_DIR'not in env and'GIT_TEMPLATE_DIR'not in env
+records.append(dict(name='Explicit Git/shell/loader startup cleanup preserves home and original env',passed=True))
+fact=m.git_environment_fact(original);assert fact['valuesRecorded']is False and'secret-sentinel'not in json.dumps(fact)and fact['userHomeVariablesPreserved']is True
+records.append(dict(name='Names-only cleanup facts never retain removed values',passed=True))
+git='/synthetic tool/quote\'name/git';prefix=m.git_prefix(git);server=m.upload_pack_command(git)
+assert shlex.split(server)==prefix+['-c','uploadpack.allowAnySHA1InWant=true','upload-pack']
+records.append(dict(name='Real upload-pack command-string tokens safely round-trip without execution',passed=True))
+commands=m.initial_git_commands(git);assert len(commands)==4
+assert commands[0]==prefix+['init','--template='+m.git_policy()['templateRoot'],'--object-format=sha1','--initial-branch=stage-baseline',str(m.DEST)]
+assert commands[1][-2:]==[m.REPO.as_uri(),m.BASE]
+for flag in ['--no-tags','--depth=1','--no-recurse-submodules','--no-auto-maintenance','--no-write-commit-graph']:assert flag in commands[1]
+assert '--upload-pack='+server in commands[1]and not any('clone'==x or x=='--unshallow'or'*'in x for row in commands for x in row)
+assert commands[2]==prefix+['-C',str(m.DEST),'checkout','--detach',m.BASE]and commands[3]==prefix+['-C',str(m.DEST),'rev-list','--count','HEAD']
+records.append(dict(name='Single exact-OID depth1 no-tags fetch; no full-clone or history fallback',passed=True))
+for key,value in [('core.hooksPath',m.git_policy()['hooksRoot']),('core.fsmonitor','false'),('gc.auto','0'),('maintenance.auto','false'),('maintenance.strategy','none'),('protocol.allow','never'),('protocol.file.allow','always')]:
+ assert [key,value]in m.git_policy()['clientConfig'];records.append(dict(name='Client/server Git control '+key,passed=True))
+assert m.git_policy()['transientPackByteCapClaim']is False and m.git_policy()['reachableHistoryExpected']==1
+records.append(dict(name='Reachable depth bound does not pretend to cap transient pack bytes',passed=True))
+for field,value in [('fetchDepth',2),('automaticTags',True),('automaticMaintenance',True),('transientPackByteCapClaim',True),('templateRoot','/unowned-template')]:
+ bad=copy.deepcopy(root);bad['baselineGitPolicy'][field]=value;no('Root rejects Git policy '+field,lambda bad=bad:m.root_model(bad,own,refs))

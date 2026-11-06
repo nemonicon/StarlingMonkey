@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 1,
+  "donorController": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-stage-candidate-v1/controller.py",
+    "sha256": "c72c969b2403d6ceb74d6fed72824d2699d70d84e6d528a7d72575158409f2b2",
+    "bytes": 31277
+  },
+  "donorIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-stage-candidate-v1/index.json",
+    "sha256": "2395af2c6807953fb32173cd8c7f63b4f1f379360f991e2bb39dff87153620c0",
+    "bytes": 4708
+  },
+  "edits": [
+    {
+      "before": "import hashlib,importlib.util,json,os,shutil,stat,subprocess,sys",
+      "after": "import hashlib,importlib.util,json,os,shutil,stat,subprocess,sys,shlex",
+      "count": 1,
+      "afterPositions": [
+        102
+      ]
+    },
+    {
+      "before": "OWN=REPO/'tests/node-compat/foundation-crypto/node-crypto-hash-hmac-stage-candidate-v1'",
+      "after": "OWN=REPO/'tests/node-compat/foundation-crypto/node-crypto-hash-hmac-stage-candidate-v2'",
+      "count": 1,
+      "afterPositions": [
+        292
+      ]
+    },
+    {
+      "before": "node-crypto-hash-hmac-v1-stage-external-root",
+      "after": "node-crypto-hash-hmac-v1-stage-v2-external-root",
+      "count": 1,
+      "afterPositions": [
+        930
+      ]
+    },
+    {
+      "before": "node-crypto-hash-hmac-v1-stage.json",
+      "after": "node-crypto-hash-hmac-v1-stage-v2.json",
+      "count": 1,
+      "afterPositions": [
+        1028
+      ]
+    },
+    {
+      "before": "INDEPENDENT_NODE_CRYPTO_HASH_HMAC357_STAGE_SOURCE_REVIEW_PASSED_V1",
+      "after": "INDEPENDENT_NODE_CRYPTO_HASH_HMAC357_STAGE_SOURCE_REVIEW_PASSED_V2",
+      "count": 1,
+      "afterPositions": [
+        7956
+      ]
+    },
+    {
+      "before": "ROOT_REVIEWED_NODE_CRYPTO_HASH_HMAC357_SOURCE_STAGE_V1",
+      "after": "ROOT_REVIEWED_NODE_CRYPTO_HASH_HMAC357_SOURCE_STAGE_V2",
+      "count": 1,
+      "afterPositions": [
+        8526
+      ]
+    },
+    {
+      "before": "NODE_CRYPTO_HASH_HMAC357_STAGE_CONFIG_V1",
+      "after": "NODE_CRYPTO_HASH_HMAC357_STAGE_CONFIG_V2",
+      "count": 1,
+      "afterPositions": [
+        12042
+      ]
+    },
+    {
+      "before": "NODE_CRYPTO_HASH_HMAC357_SOURCE_STAGE_RAW_ZERO_UNREVIEWED_V1",
+      "after": "NODE_CRYPTO_HASH_HMAC357_SOURCE_STAGE_RAW_ZERO_UNREVIEWED_V2",
+      "count": 1,
+      "afterPositions": [
+        30705
+      ]
+    },
+    {
+      "before": "NODE_CRYPTO_HASH_HMAC357_SOURCE_STAGE_STARTED",
+      "after": "NODE_CRYPTO_HASH_HMAC357_SOURCE_STAGE_STARTED_V2",
+      "count": 1,
+      "afterPositions": [
+        17654
+      ]
+    },
+    {
+      "before": "NODE_CRYPTO_HASH_HMAC357_SOURCE_STAGED_NOT_BUILT",
+      "after": "NODE_CRYPTO_HASH_HMAC357_SOURCE_STAGED_NOT_BUILT_V2",
+      "count": 2,
+      "afterPositions": [
+        23919,
+        26326
+      ]
+    },
+    {
+      "before": "NODE_CRYPTO_HASH_HMAC357_SOURCE_STAGE_FAILED_OR_PARTIAL_RETAINED",
+      "after": "NODE_CRYPTO_HASH_HMAC357_SOURCE_STAGE_FAILED_OR_PARTIAL_RETAINED_V2",
+      "count": 2,
+      "afterPositions": [
+        24292,
+        25847
+      ]
+    },
+    {
+      "before": "def git_environment():\n    # Only child Git execution overrides are removed. User home variables stay\n    # unchanged; no global config or original repository setting is rewritten.\n    env={k:v for k,v in os.environ.items()if not k.startswith('GIT_')}\n    env.update(GIT_CONFIG_NOSYSTEM='1',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_SYSTEM='/dev/null',GIT_CONFIG_COUNT='0',GIT_TERMINAL_PROMPT='0')\n    return env",
+      "after": "",
+      "count": 1,
+      "afterPositions": [
+        4577
+      ]
+    },
+    {
+      "before": "ownedFreshCloneOnly=True",
+      "after": "ownedFreshBaselineCheckoutOnly=True",
+      "count": 1,
+      "afterPositions": [
+        16428
+      ]
+    },
+    {
+      "before": "fresh-clone, Git-byte-identical",
+      "after": "fresh-checkout, Git-byte-identical",
+      "count": 1,
+      "afterPositions": [
+        15851
+      ]
+    },
+    {
+      "before": "def safe(name):",
+      "after": "def git_policy():\n    policy_root=OUT/'git-policy'\n    return dict(version='PRIVATE_SINGLE_BASELINE_FETCH_V2',baseline=BASE,fetchDepth=1,replaceObjects=False,automaticTags=False,recursiveSubmodules=False,automaticMaintenance=False,writeCommitGraph=False,templateRoot=str(policy_root/'empty-template'),hooksRoot=str(policy_root/'disabled-hooks'),commandCwd=str(policy_root),clientConfig=[['core.hooksPath',str(policy_root/'disabled-hooks')],['core.fsmonitor','false'],['core.attributesFile','/dev/null'],['core.excludesFile','/dev/null'],['gc.auto','0'],['gc.autoDetach','false'],['maintenance.auto','false'],['maintenance.autoDetach','false'],['maintenance.strategy','none'],['fetch.writeCommitGraph','false'],['submodule.recurse','false'],['protocol.allow','never'],['protocol.file.allow','always'],['init.defaultBranch','stage-baseline'],['init.defaultRefFormat','files']],serverObjectRequest='uploadpack.allowAnySHA1InWant=true only for this literalBASE local request; no repo configuration mutation',reachableHistoryExpected=1,transientPackByteCapClaim=False,originalRepositoryConfigurationModified=False,userHomeVariablesPreserved=True)\n\n\ndef git_prefix(git):\n    result=[git,'--no-replace-objects']\n    for key,value in git_policy()['clientConfig']:result+=['-c',key+'='+value]\n    return result\n\n\ndef upload_pack_command(git):\n    # Git's actual --upload-pack API is one command string. Quote every token;\n    # child_environment removes exported shell functions/startup inputs first.\n    return shlex.join(git_prefix(git)+['-c','uploadpack.allowAnySHA1InWant=true','upload-pack'])\n\n\ndef initial_git_commands(git):\n    prefix=git_prefix(git)\n    return [prefix+['init','--template='+git_policy()['templateRoot'],'--object-format=sha1','--initial-branch=stage-baseline',str(DEST)],prefix+['-C',str(DEST),'fetch','--no-tags','--depth=1','--no-recurse-submodules','--no-auto-maintenance','--no-write-commit-graph','--upload-pack='+upload_pack_command(git),REPO.as_uri(),BASE],prefix+['-C',str(DEST),'checkout','--detach',BASE],prefix+['-C',str(DEST),'rev-list','--count','HEAD']]\n\n\ndef git_environment(original=None):\n    original=dict(os.environ)if original is None else dict(original)\n    startup={'BASH_ENV','ENV','SHELLOPTS','BASHOPTS','CDPATH','GLOBIGNORE','LD_PRELOAD','LD_LIBRARY_PATH','DYLD_INSERT_LIBRARIES','DYLD_LIBRARY_PATH'}\n    env={k:v for k,v in original.items()if not k.startswith(('GIT_','BASH_FUNC_'))and k not in startup}\n    env.update(GIT_CONFIG_NOSYSTEM='1',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_SYSTEM='/dev/null',GIT_CONFIG_COUNT='0',GIT_TERMINAL_PROMPT='0')\n    for key in ['HOME','home','CODEX_HOME']:assert env.get(key)==original.get(key)\n    return env\n\n\ndef git_environment_fact(original):\n    after=git_environment(original)\n    return dict(removedNames=sorted(k for k in original if k not in after or k.startswith('GIT_')),valuesRecorded=False,userHomeVariablesPreserved=all(after.get(k)==original.get(k)for k in ['HOME','home','CODEX_HOME']),globalAndSystemConfigEntrypointsDisabled=True,exportedShellFunctionsRemoved=True)\n\n\ndef assert_private_git_policy():\n    policy=git_policy();root=Path(policy['commandCwd'])\n    assert root.is_dir()and not root.is_symlink()and stat.S_IMODE(root.stat().st_mode)==0o700\n    for key in ['templateRoot','hooksRoot']:\n        p=Path(policy[key]);assert p.is_dir()and not p.is_symlink()and stat.S_IMODE(p.stat().st_mode)==0o700 and not list(p.iterdir())\n\n\ndef baseline_git_observation(count_record):\n    assert checked(count_record['stdout']).read_bytes()==b'1\\n'\n    fetch=DEST/'.git/FETCH_HEAD';lines=fetch.read_bytes().splitlines();assert len(lines)==1 and lines[0].split(b'\\t',1)[0]==BASE.encode()\n    shallow=DEST/'.git/shallow'\n    if shallow.exists():assert not shallow.is_symlink()and shallow.read_bytes()==(BASE+'\\n').encode()\n    references=[]\n    for p in (DEST/'.git/refs').rglob('*'):\n        assert not p.is_symlink()\n        if p.is_file():references.append(str(p.relative_to(DEST/'.git')))\n    assert not references\n    packed=DEST/'.git/packed-refs'\n    if packed.exists():assert not packed.is_symlink()and all(not line or line.startswith(b'#')for line in packed.read_bytes().splitlines())\n    return dict(reachableCommits=1,tagAndRemoteRefs=[],detachedHead=BASE,fetchHead=descriptor(fetch),shallowBoundary=descriptor(shallow)if shallow.exists()else None,privateConfig=descriptor(DEST/'.git/config'),countRaw=count_record['stdout'],depthAndTreeOnly=True,exactPackObjectSetClaim=False,transientPackByteCapClaim=False)\n\n\n\ndef safe(name):",
+      "count": 1,
+      "afterPositions": [
+        1131
+      ]
+    },
+    {
+      "before": "    record=dict(argv=argv,timeoutSeconds=120,returncode=None,timedOut=False)",
+      "after": "    assert_private_git_policy()\n    record=dict(argv=argv,cwd=git_policy()['commandCwd'],environmentPolicy=git_environment_fact(dict(os.environ)),timeoutSeconds=120,returncode=None,timedOut=False)",
+      "count": 1,
+      "afterPositions": [
+        9174
+      ]
+    },
+    {
+      "before": "child=subprocess.run(argv,capture_output=True,timeout=120,env=git_environment())",
+      "after": "child=subprocess.run(argv,cwd=git_policy()['commandCwd'],capture_output=True,timeout=120,env=git_environment())",
+      "count": 1,
+      "afterPositions": [
+        9410
+      ]
+    },
+    {
+      "before": "    assert value['phase']=='source-stage-only'and value['sourceStageAllowed']is True",
+      "after": "    assert value['phase']=='source-stage-only'and value['sourceStageAllowed']is True\n    assert value['baselineGitPolicy']==refs['baselineGitPolicy']==git_policy()",
+      "count": 1,
+      "afterPositions": [
+        12834
+      ]
+    },
+    {
+      "before": "    captured=list(unique.values());indices=list({r['path']:r for r in indices}.values())",
+      "after": "    source_config=descriptor(REPO/'.git/config');assert source_config['path']not in unique or unique[source_config['path']]==source_config;unique[source_config['path']]=source_config\n    captured=list(unique.values());indices=list({r['path']:r for r in indices}.values())",
+      "count": 1,
+      "afterPositions": [
+        19205
+      ]
+    },
+    {
+      "before": "copies=plan['files'],embedding=plan['embeddingData'])",
+      "after": "copies=plan['files'],embedding=plan['embeddingData'],originalRepositoryConfig=source_config)",
+      "count": 1,
+      "afterPositions": [
+        19566
+      ]
+    },
+    {
+      "before": "        recheck(frame);result['originalProtection']=durable",
+      "after": "        policy=git_policy();policy_root=Path(policy['commandCwd']);absent(policy_root);policy_root.mkdir(mode=0o700)\n        for key in ['templateRoot','hooksRoot']:Path(policy[key]).mkdir(mode=0o700)\n        assert_private_git_policy();result['baselineGitPolicy']=policy;result['originalRepositoryConfig']=frame['originalRepositoryConfig']\n        recheck(frame);result['originalProtection']=durable",
+      "count": 1,
+      "afterPositions": [
+        23532
+      ]
+    },
+    {
+      "before": "        run([git,'clone','--no-local','--no-checkout',str(REPO),str(DEST)])\n        run([git,'-C',str(DEST),'checkout','--detach',BASE])",
+      "after": "        for argv in initial_git_commands(git):last=run(argv)\n        result['baselineGitObservation']=baseline_git_observation(last)\n        assert_private_git_policy()",
+      "count": 1,
+      "afterPositions": [
+        24669
+      ]
+    },
+    {
+      "before": "tree_record=run([git,'-C',str(DEST),'ls-tree','-r','-z','--full-tree',BASE])",
+      "after": "tree_record=run(git_prefix(git)+['-C',str(DEST),'ls-tree','-r','-z','--full-tree',BASE])",
+      "count": 1,
+      "afterPositions": [
+        25114
+      ]
+    },
+    {
+      "before": "record=run([git,'-C',str(DEST),'cat-file','blob',item['object']])",
+      "after": "record=run(git_prefix(git)+['-C',str(DEST),'cat-file','blob',item['object']])",
+      "count": 1,
+      "afterPositions": [
+        25658
+      ]
+    },
+    {
+      "before": "        actual_links={str(p.relative_to(DEST)):os.readlink(p)for p in DEST.rglob('*')if p.is_symlink()}",
+      "after": "        assert_private_git_policy()\n        result['stagedGitObjects']=git_objects(DEST);result['stagedGitObjectBytes']=sum(r['bytes']for r in result['stagedGitObjects'])\n        actual_links={str(p.relative_to(DEST)):os.readlink(p)for p in DEST.rglob('*')if p.is_symlink()}",
+      "count": 1,
+      "afterPositions": [
+        28461
+      ]
+    },
+    {
+      "before": "    git=frame['root']['gitBinary']['path'];expected=[[git,'clone','--no-local','--no-checkout',str(REPO),str(DEST)],[git,'-C',str(DEST),'checkout','--detach',BASE],[git,'-C',str(DEST),'ls-tree','-r','-z','--full-tree',BASE]]\n    expected += [[git,'-C',str(DEST),'cat-file','blob',r['gitObject']]for r in value['baselineDocumentationLinks']]\n    assert [r['argv']for r in value['commands']]==expected and len(expected)==6",
+      "after": "    assert value['baselineGitPolicy']==git_policy() and value['baselineGitObservation']['reachableCommits']==1\n    assert value['baselineGitObservation']['tagAndRemoteRefs']==[]\n    assert value['originalRepositoryConfig']==frame['originalRepositoryConfig']\n    git=frame['root']['gitBinary']['path'];expected=initial_git_commands(git)+[git_prefix(git)+['-C',str(DEST),'ls-tree','-r','-z','--full-tree',BASE]]\n    expected += [git_prefix(git)+['-C',str(DEST),'cat-file','blob',r['gitObject']]for r in value['baselineDocumentationLinks']]\n    assert [r['argv']for r in value['commands']]==expected and len(expected)==8\n    assert all(r['cwd']==git_policy()['commandCwd']and r['environmentPolicy']['userHomeVariablesPreserved']is True for r in value['commands'])",
+      "count": 1,
+      "afterPositions": [
+        33054
+      ]
+    },
+    {
+      "before": "        checked(value['progress'])",
+      "after": "        assert_private_git_policy()\n        observation=value['baselineGitObservation'];checked(observation['fetchHead']);checked(observation['privateConfig']);checked(observation['countRaw'])\n        if observation['shallowBoundary']is not None:checked(observation['shallowBoundary'])\n        assert git_objects(DEST)==value['stagedGitObjects']\n        checked(value['progress'])",
+      "count": 1,
+      "afterPositions": [
+        35237
+      ]
+    }
+  ],
+  "outputController": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-stage-candidate-v2/controller.py",
+    "sha256": "271977b9a634afdfac70d961a0dbb37e6d79106733e7741ea82bad6224c3e258",
+    "bytes": 37125
+  },
+  "sourceOnly": true,
+  "donorNamespaceOrGlobalsRebound": false
+}

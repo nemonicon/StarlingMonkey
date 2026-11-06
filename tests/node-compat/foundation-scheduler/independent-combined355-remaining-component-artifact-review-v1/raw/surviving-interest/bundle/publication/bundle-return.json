@@ -1,0 +1,28 @@
+{
+  "code": "// tests/node-compat/foundation-scheduler/combined-clock-lifecycle-candidate-v2/fixtures/surviving-interest.mjs\nlet calls = 0;\nfunction check(value, message) {\n\tif (!value) throw new Error(\"COMBINED_SURVIVOR_CHECK:\" + message);\n}\nasync function run() {\n\tcalls++;\n\tconst events = [], ids = [], cancelled = [];\n\tlet cancelledCallbacks = 0;\n\tfunction remember(id) {\n\t\tcheck(Number.isInteger(id) && id > 0 && !ids.includes(id), \"unique positive ID\");\n\t\tids.push(id);\n\t\treturn id;\n\t}\n\tfor (let i = 0; i < 8; i++) {\n\t\tconst id = remember(setTimeout(() => {\n\t\t\tcancelledCallbacks++;\n\t\t}, 0));\n\t\tcancelled.push(id);\n\t\tclearTimeout(id);\n\t\tclearTimeout(id);\n\t}\n\tconst a = new Promise((resolve) => remember(setTimeout(() => {\n\t\tevents.push(\"timer-a\");\n\t\tPromise.resolve().then(() => events.push(\"job-after-a\"));\n\t\tresolve(\"a\");\n\t}, 0)));\n\tconst b = new Promise((resolve) => remember(setTimeout(() => {\n\t\tevents.push(\"timer-b\");\n\t\tresolve(\"b\");\n\t}, 0)));\n\tPromise.resolve().then(() => events.push(\"job-before-timers\"));\n\tconst values = await Promise.all([a, b]);\n\tawait new Promise((resolve) => remember(setTimeout(() => {\n\t\tevents.push(\"fence\");\n\t\tresolve();\n\t}, 0)));\n\tcheck(JSON.stringify(events) === JSON.stringify([\n\t\t\"job-before-timers\",\n\t\t\"timer-a\",\n\t\t\"job-after-a\",\n\t\t\"timer-b\",\n\t\t\"fence\"\n\t]), \"oldest survivor and job checkpoints\");\n\tcheck(cancelledCallbacks === 0, \"cancelled tasks never dispatch\");\n\treturn JSON.stringify({\n\t\tschemaVersion: 1,\n\t\tkind: \"combined-surviving-interest-observation-v1\",\n\t\tcalls,\n\t\tvalues,\n\t\tevents,\n\t\tids,\n\t\tcancelled,\n\t\tcancelledCallbacks,\n\t\tpendingPromiseResolved: true,\n\t\tnativeInterestCountObserved: false,\n\t\tallInvalidTaskSelectionExercised: false,\n\t\tnativeResourceDropsObserved: false,\n\t\tresetCalled: false,\n\t\tentropyRequested: false\n\t});\n}\nexport { run };\n",
+  "imports": [],
+  "moduleIds": [
+    "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-lifecycle-candidate-v2/fixtures/surviving-interest.mjs"
+  ],
+  "admittedBuiltins": [
+    "node:assert",
+    "node:assert/strict",
+    "node:buffer",
+    "node:child_process",
+    "node:events",
+    "node:path",
+    "node:path/posix",
+    "node:path/win32",
+    "node:querystring",
+    "node:stream",
+    "node:stream/consumers",
+    "node:stream/promises",
+    "node:stream/web",
+    "node:string_decoder",
+    "node:sys",
+    "node:util",
+    "node:util/types",
+    "node:zlib"
+  ],
+  "globalBufferPolicy": "custom engine installs canonical native Buffer before application evaluation"
+}

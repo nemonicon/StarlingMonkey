@@ -1,0 +1,28 @@
+{
+  "code": "// tests/node-compat/foundation-scheduler/combined-clock-lifecycle-candidate-v2/fixtures/clock-snapshot.mjs\nconst initialization = {\n\tdateNow: Date.now(),\n\tjobs: 0,\n\tmoduleEvaluations: 1\n};\nPromise.resolve().then(() => {\n\tinitialization.jobs++;\n});\nlet calls = 0;\nfunction check(value, message) {\n\tif (!value) throw new Error(\"COMBINED_CLOCK_CHECK:\" + message);\n}\nfunction readClock() {\n\tconst dateNow = Date.now();\n\tconst dateObject = /* @__PURE__ */ new Date();\n\tconst performanceNow = performance.now();\n\tconst timeOrigin = performance.timeOrigin;\n\tcheck(Number.isFinite(dateNow) && Number.isInteger(dateNow), \"finite Date milliseconds\");\n\tcheck(Number.isFinite(dateObject.getTime()), \"finite Date object\");\n\tcheck(Number.isFinite(performanceNow) && performanceNow >= 0, \"finite monotonic elapsed\");\n\tcheck(Number.isFinite(timeOrigin), \"finite first-call origin\");\n\treturn {\n\t\tdateNow,\n\t\tdateObject: dateObject.getTime(),\n\t\tiso: dateObject.toISOString(),\n\t\tperformanceNow,\n\t\ttimeOrigin\n\t};\n}\nasync function run() {\n\tcalls++;\n\tcheck(initialization.jobs === 1, \"initialization Promise job drained once\");\n\tconst before = readClock();\n\tlet callbacks = 0;\n\tawait new Promise((resolve) => setTimeout(() => {\n\t\tcallbacks++;\n\t\tresolve();\n\t}, 1));\n\tconst after = readClock();\n\tcheck(callbacks === 1, \"single timer callback\");\n\tcheck(after.performanceNow >= before.performanceNow, \"same-instance monotonic elapsed\");\n\tcheck(after.timeOrigin === before.timeOrigin, \"stable origin within export\");\n\treturn JSON.stringify({\n\t\tschemaVersion: 1,\n\t\tkind: \"combined-clock-snapshot-observation-v1\",\n\t\tcalls,\n\t\tinitialization: { ...initialization },\n\t\tbefore,\n\t\tafter,\n\t\tcallbacks,\n\t\telapsed: after.performanceNow - before.performanceNow,\n\t\tinitPerformanceCalled: false,\n\t\tentropyRequested: false,\n\t\tresetCalled: false,\n\t\tnativeMonotonicOffsetObserved: false,\n\t\thostClockValuesAreExactOracle: false\n\t});\n}\nexport { run };\n",
+  "imports": [],
+  "moduleIds": [
+    "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-lifecycle-candidate-v2/fixtures/clock-snapshot.mjs"
+  ],
+  "admittedBuiltins": [
+    "node:assert",
+    "node:assert/strict",
+    "node:buffer",
+    "node:child_process",
+    "node:events",
+    "node:path",
+    "node:path/posix",
+    "node:path/win32",
+    "node:querystring",
+    "node:stream",
+    "node:stream/consumers",
+    "node:stream/promises",
+    "node:stream/web",
+    "node:string_decoder",
+    "node:sys",
+    "node:util",
+    "node:util/types",
+    "node:zlib"
+  ],
+  "globalBufferPolicy": "custom engine installs canonical native Buffer before application evaluation"
+}

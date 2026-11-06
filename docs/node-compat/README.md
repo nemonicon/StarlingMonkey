@@ -20,12 +20,22 @@ actual-result review passes; snapshot and broader clock gates remain open.
 The combined355 native retry completes all 108 build steps and passes
 independent BUILD review. Its complete 80-field sidecar and 2,596-copy freeze
 pass independent DATA review. Export, validation-only bootstrap and the retained
-read-only API also pass independent result review. Fresh pure and resource
-components construct successfully; their ordinary runtime calls and operational
-admission remain open. The resource component selects only the standard
-WASI0.2.10 clock/poll interfaces. Default-OFF Hash/Hmac and private clock diagnostic
+read-only API also pass independent result review. The complete six-outcome
+construction review accepts five components and identifies one unaccepted INIT
+timer refusal. A separate pure Buffer control finishes raw0 with seven whole
+Node-equal Jco/Wasmtime returns; independent runtime DATA review passes.
+Ordinary clock/resource calls and operational admission remain open. Clock
+components select only the standard WASI0.2.10 clock/poll interfaces.
+Default-OFF Hash/Hmac and private clock diagnostic
 templates pass bounded SDK syntax checks; neither is linked or runtime validated.
 See the [execution status](execution-status.md) for their exact evidence.
+The original resource mapping fails at harness serialization; its partials and
+raw failure remain retained. The v3 successor passes Source review, completes a
+fresh mapping at raw0 and passes independent mapped DATA review. Pristine input
+options and the actual typed post-call shape are separate; unused Jco default
+rules grant no extra capability. A separately issued ordinary resource runtime
+phase is now running; its result and independent review remain pending. Clock,
+survivor and fatal lifecycle gates remain open. See [progress.md](../../progress.md).
 The separate secret355
 component and corrected v3 guarded runtime also pass actual review: 23 complete
 returns and 45 Node-oracle signatures. Three fresh stock-Wasmtime validations

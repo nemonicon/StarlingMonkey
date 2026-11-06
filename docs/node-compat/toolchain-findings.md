@@ -1,5 +1,27 @@
 # ComponentizeJS, Jco, WASI and host audit
 
+The combined355 resource mapping experiment found a caller boundary issue in the
+pinned Jco implementation. Its `transpileComponent` calls `prepOpts`, which
+mutates the options object. The first caller later passed that same object to
+its strict JSON writer and failed publication after generating and auditing the
+mapped files. Its raw1 failure remains retained. The corrected caller saves the
+pristine request before Jco import, passes a separate workcopy, and records a
+typed post-call shape. [The fresh mapping run](../../tests/node-compat/foundation-scheduler/combined-native-runtime-v3-resource-map-root-results.json)
+finishes raw0 and actually observes the added undefined `flagsAsBigInt` field;
+[independent mapped DATA review](../../tests/node-compat/foundation-scheduler/independent-combined355-runtime-v3-resource-mapped-results-review-v1/results.json)
+passes. That mapping action imported no application and invoked no guest export.
+Ordinary runtime is a separate phase documented in [progress.md](../../progress.md).
+
+The same post-call shape contains default map names for `jco:node/*` and
+`wasi:tls/types@0.2.0-draft`. They are not selected capabilities in this profile.
+The unchanged component imports only the three selected standard WASI0.2.10
+clock/poll interfaces; the mapped static imports target only the official
+clock/io shim files. Options-map entries are not emitted imports or capability
+grants. Keep auditing the final component type graph and generated loading graph;
+do not infer portable Node/TLS support from Jco's adapter names. WASI P2 sockets
+alone still do not provide TLS. [progress.md](../../progress.md) records the
+failed and corrected Source generations and actual review boundaries.
+
 Historical source audit collected on 2026-11-02. Current executed build/ABI/host evidence is in the [allocation-r2](../../tests/node-compat/milestones/allocation-r2/README.md) and [entropy-v1](../../tests/node-compat/milestones/entropy-v1/README.md) checkpoints; the audit below predates those builds. **Source-verified findings** below do not establish that rebuilding ComponentizeJS against this StarlingMonkey checkout succeeds. External source archives were inspected under `/tmp/starling-node-audit`; installed tools and generated components are kept outside the repository.
 
 ## Exact baseline

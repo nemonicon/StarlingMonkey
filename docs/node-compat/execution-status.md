@@ -25,7 +25,17 @@ independent actual-result review. Two fresh components construct successfully:
 [pure](../../tests/node-compat/foundation-scheduler/combined-native-component-v1-construct-pure-root-results.json)
 has no imports; [resource](../../tests/node-compat/foundation-scheduler/combined-native-component-v1-construct-resource-root-results.json)
 imports exactly the selected three WASI0.2.10 clock/poll interfaces. Ordinary
-runtime calls, full catalogue validation and operational admission remain open.
+runtime calls and operational admission remain open. Subsequent construction
+review covers the full six-fixture catalogue: five accepted components and one
+identified, unaccepted initialization refusal. The separate pure-only control
+now returns seven whole Node-equal strings on Jco/Wasmtime at raw0; independent
+runtime DATA review passes. The original resource mapping fails at harness serialization; its partials and
+raw failure remain retained. The v3 successor passes Source review, completes a
+fresh mapping at raw0 and passes independent mapped DATA review. Pristine input
+options and the actual typed post-call shape are separate; unused Jco default
+rules grant no extra capability. A separately issued ordinary resource runtime
+phase is now running; its result and independent review remain pending. Clock,
+survivor and fatal lifecycle gates remain open. See [progress.md](../../progress.md).
 The separate secret355
 component and corrected v3 guarded runtime also pass actual review: 23 complete
 returns and 45 Node-oracle signatures. Three fresh stock-Wasmtime validations

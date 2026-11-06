@@ -1,0 +1,552 @@
+{
+  "schemaVersion": 1,
+  "donors": [
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/policy.json",
+      "sha256": "fc9c5e97594507513ed20efeced61dbf2be1a92ff038e7f1df1bcddd0b56a681",
+      "bytes": 300290
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/layer-policy.py",
+      "sha256": "4e30750fc8967514493b26096e814929ac4e567f1a01d86bc6a140f3bcecf609",
+      "bytes": 24409
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/build-engine.sh",
+      "sha256": "12bbfbf46d129dd7993a982f7138043c050f0c912b37bd373af9db7c59f99f98",
+      "bytes": 55015
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/native-admission-model.py",
+      "sha256": "8287b5da1488ffc32a0bf76c4d0f9bcca85681240586c5f144c3822f2e6917f1",
+      "bytes": 8237
+    }
+  ],
+  "edits": [
+    {
+      "role": "metadata-model",
+      "before": "Pure full355 metadata-shape gate",
+      "after": "Pure new357 metadata-shape gate",
+      "count": 1,
+      "afterPositions": [
+        3
+      ]
+    },
+    {
+      "role": "metadata-model",
+      "before": "== 355",
+      "after": "== 357",
+      "count": 1,
+      "afterPositions": [
+        607
+      ]
+    },
+    {
+      "role": "metadata-model",
+      "before": "== 11",
+      "after": "== 12",
+      "count": 1,
+      "afterPositions": [
+        2320
+      ]
+    },
+    {
+      "role": "metadata-model",
+      "before": "== 6\n",
+      "after": "== 7\n",
+      "count": 1,
+      "afterPositions": [
+        3009
+      ]
+    },
+    {
+      "role": "metadata-model",
+      "before": "== 68",
+      "after": "== 69",
+      "count": 1,
+      "afterPositions": [
+        6256
+      ]
+    },
+    {
+      "role": "metadata-model",
+      "before": "== 62",
+      "after": "== 63",
+      "count": 2,
+      "afterPositions": [
+        6321,
+        6623
+      ]
+    },
+    {
+      "role": "metadata-model",
+      "before": "'ACTUAL_FRESH_COMBINED355_ABI_PRECONFIGURE_PATH_OBSERVATION_V1'",
+      "after": "'ACTUAL_FRESH_HASH_HMAC357_ABI_PRECONFIGURE_PATH_OBSERVATION_V1'",
+      "count": 1,
+      "afterPositions": [
+        7331
+      ]
+    },
+    {
+      "role": "metadata-model",
+      "before": "'FINITE_COMBINED355_NORMAL_OFF_METADATA_SHAPE_ONLY_V1'",
+      "after": "'FINITE_NODE_CRYPTO_HASH_HMAC357_NORMAL_OFF_METADATA_SHAPE_ONLY_V1'",
+      "count": 1,
+      "afterPositions": [
+        8083
+      ]
+    },
+    {
+      "role": "metadata-model",
+      "before": "'nativeFiles':355",
+      "after": "'nativeFiles':357",
+      "count": 1,
+      "afterPositions": [
+        8164
+      ]
+    },
+    {
+      "role": "metadata-model",
+      "before": "    assert metadata['entropyPolicy'] == 'off'",
+      "after": "    assert metadata['entropyPolicy'] == 'off'\n    assert metadata['nodeCryptoHashHmacEnabled'] is True\n    assert metadata['nodeCryptoAuditedBorrowEnabled'] is False\n    assert len(metadata) == policy['expectedRawMetadataFields']\n    assert sorted(metadata) == policy['expectedRawMetadataKeys']",
+      "count": 1,
+      "afterPositions": [
+        1280
+      ]
+    },
+    {
+      "role": "metadata-model",
+      "before": "'CMAKE_C_COMPILER_LAUNCHER':'','CMAKE_CXX_COMPILER_LAUNCHER':''}",
+      "after": "'CMAKE_C_COMPILER_LAUNCHER':'','CMAKE_CXX_COMPILER_LAUNCHER':'',\n              'NODE_COMPAT_CRYPTO_HASH_HMAC':'ON','NODE_CRYPTO_AUDITED_BORROW':'OFF'}",
+      "count": 1,
+      "afterPositions": [
+        2067
+      ]
+    },
+    {
+      "role": "metadata-model",
+      "before": "    return {'state':",
+      "after": "    hash_policy=metadata['nodeCryptoHashHmacPolicy']\n    assert hash_policy['sourcePolicy'] == policy['hashHmacSourcePolicy']\n    assert hash_policy['enabled'] is True and hash_policy['auditedBorrowEnabled'] is False\n    assert len(hash_policy['actualPrivateHashHmacMacroCompileCommands']) == 7\n    assert len(hash_policy['actualRegistrationCompileCommands']) == len(hash_policy['actualKernelCompileCommands']) == 1\n    assert hash_policy['actualInstallationOrder']['cryptoBeforeNode'] is True\n    assert hash_policy['actualNinjaCapture']['rawExitCode'] == 0\n    assert hash_policy['actualNinjaCapture']['timeout'] is False\n    assert hash_policy['moduleManifest'] == policy['hashHmacSourcePolicy']['packagingManifestInput']\n    assert hash_policy['actualNativeAliasIdentityValidated'] is False\n    assert hash_policy['runtimeValidation'] is None and hash_policy['operationalAdmission'] is False\n    assert hash_policy['borrowRuntimeAuthorized'] is False and hash_policy['algorithmOutputVerified'] is False\n    assert metadata['privateRustupBootstrapPolicy']['persistentSetting'] == 'disable'\n    return {'state':",
+      "count": 1,
+      "afterPositions": [
+        8398
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "BASE_ROOT=REPO/'tests/node-compat/foundation-crypto/ownership-secret-integration-candidate-v1'\nBASE=json.loads((BASE_ROOT/'policy.json').read_bytes())\nANCESTOR_ROOT=REPO/'tests/node-compat/foundation-scheduler/integration-candidate-v1'\nANCESTOR=json.loads((ANCESTOR_ROOT/'policy.json').read_bytes())\nassert BASE['expectedNativeSourceManifest']==POLICY['combinedSourcePolicy']['parentExpectedNativeSourceManifest']\nbefore={r['path']:r['sha256']for r in BASE['expectedNativeSourceManifest']}\nafter={r['path']:r['sha256']for r in POLICY['expectedNativeSourceManifest']}\nassert len(before)==len(after)==355 and before.keys()==after.keys()\nchanges=POLICY['combinedSourcePolicy']['changes']\nassert len(changes)==7 and sum(before[p]==after[p]for p in before)==348\nfor r in changes:assert before[r['path']]==r['beforeSha256']and after[r['path']]==r['afterSha256']\nfor key in ('cryptoKeyOwnershipSourcePolicy','cryptoSecretFailureSourcePolicy','streamConsumersSourcePolicy','zlibSourcePolicy'):\n    assert POLICY[key]==BASE[key], 'Historical ancestry preserved; current source checked separately'\nassert POLICY['parentExpectedNativeSourceManifest']==ANCESTOR['expectedNativeSourceManifest']\n",
+      "after": "BASE_ROOT=REPO/'tests/node-compat/foundation-crypto/ownership-secret-integration-candidate-v1'\nBASE=json.loads((BASE_ROOT/'policy.json').read_bytes())\nANCESTOR_ROOT=REPO/'tests/node-compat/foundation-scheduler/integration-candidate-v1'\nANCESTOR=json.loads((ANCESTOR_ROOT/'policy.json').read_bytes())\nPARENT_ROOT=REPO/'tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2'\nPARENT=json.loads((PARENT_ROOT/'policy.json').read_bytes())\nassert PARENT['expectedNativeSourceManifest']==POLICY['combinedSourcePolicy']['parentExpectedNativeSourceManifest']\nassert PARENT['combinedSourcePolicy']==POLICY['parentCombinedSourcePolicy']\nassert BASE['expectedNativeSourceManifest']==PARENT['combinedSourcePolicy']['parentExpectedNativeSourceManifest']\nbefore={r['path']:r['sha256']for r in PARENT['expectedNativeSourceManifest']}\nafter={r['path']:r['sha256']for r in POLICY['expectedNativeSourceManifest']}\nassert len(before)==355 and len(after)==357 and before.keys() <= after.keys()\nchanges=POLICY['combinedSourcePolicy']['changes']\nassert len(changes)==4 and sum(before[p]==after[p]for p in before)==353\nassert sum(r['beforeSha256']is None for r in changes)==2\nfor r in changes:assert before.get(r['path'])==r['beforeSha256']and after[r['path']]==r['afterSha256']\nfor key in ('cryptoKeyOwnershipSourcePolicy','cryptoSecretFailureSourcePolicy','streamConsumersSourcePolicy','zlibSourcePolicy'):\n    assert POLICY[key]==PARENT[key]==BASE[key], 'Historical ancestry preserved; current source checked separately'\nfor key in ('resourceOwnershipSourcePolicy','taskSelectionSourcePolicy','zlibErrorSemanticsSourcePolicy'):\n    assert POLICY[key]==PARENT[key]\nassert POLICY['parentExpectedNativeSourceManifest']==ANCESTOR['expectedNativeSourceManifest']\nmodel_path=HERE/'hash-hmac-model.py'\nassert digest(model_path)==POLICY['hashHmacModelSha256']\nmodel_spec=importlib.util.spec_from_file_location('new357_hash_hmac_source_primitives',model_path)\nHASH_MODEL=importlib.util.module_from_spec(model_spec);model_spec.loader.exec_module(HASH_MODEL)\n",
+      "count": 1,
+      "afterPositions": [
+        1460
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "Full current355 source/compile producer",
+      "after": "New357 source/compile producer",
+      "count": 1,
+      "afterPositions": [
+        3
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "Path('/private/tmp/starling-node-compat/combined-native355-v1-source')",
+      "after": "Path('/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source')",
+      "count": 1,
+      "afterPositions": [
+        349
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "REPO/'tests/node-compat/foundation-scheduler/combined-native-integration-candidate-v1/donor-inputs.json'",
+      "after": "HERE/'donor-inputs.json'",
+      "count": 1,
+      "afterPositions": [
+        519
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "POLICY_SHA256='fc9c5e97594507513ed20efeced61dbf2be1a92ff038e7f1df1bcddd0b56a681'",
+      "after": "POLICY_SHA256='99f15d4a8f39a3eefeeec738597e57218f2a0dbc8d9febc55ed32f40405402d0'",
+      "count": 1,
+      "afterPositions": [
+        544
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "AUTH_SHA256='c837e8eb61329370775e0a24b0c914a6efe6bfcb3e51a03a8ed2ecd41fa807db'",
+      "after": "AUTH_SHA256='c4189e1a5b15c5a847ee2c571868e0bd653d58d0ed3031501aace8d286a1279b'",
+      "count": 1,
+      "afterPositions": [
+        625
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "assert len(rows)==len({r['path']for r in rows})==355",
+      "after": "assert len(rows)==len({r['path']for r in rows})==357",
+      "count": 1,
+      "afterPositions": [
+        4145
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "len(cpp)==62",
+      "after": "len(cpp)==63",
+      "count": 1,
+      "afterPositions": [
+        9434
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "(5 if web else 4)+int(metadata['zlibEnabled'])",
+      "after": "(5 if web else 4)+int(metadata['zlibEnabled'])+int(metadata['nodeCryptoHashHmacEnabled'])",
+      "count": 1,
+      "afterPositions": [
+        11890
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "def decorate(metadata,repo,source_dir,entries,embedding_commands,enabled):",
+      "after": "def decorate(metadata,repo,source_dir,entries,embedding_commands,enabled,ninja_capture,ninja_text):",
+      "count": 1,
+      "afterPositions": [
+        12040
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "normal-OFF combined355 producer",
+      "after": "normal-OFF Hash/Hmac357 producer",
+      "count": 1,
+      "afterPositions": [
+        12231
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "==68",
+      "after": "==69",
+      "count": 1,
+      "afterPositions": [
+        20973
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "len(native)==62",
+      "after": "len(native)==63",
+      "count": 1,
+      "afterPositions": [
+        21297
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "len(private)==6",
+      "after": "len(private)==7",
+      "count": 1,
+      "afterPositions": [
+        21357
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "'actualCompileDatabaseRows':68",
+      "after": "'actualCompileDatabaseRows':69",
+      "count": 1,
+      "afterPositions": [
+        24611
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "'ACTUAL_FRESH_COMBINED355_ABI_PRECONFIGURE_PATH_OBSERVATION_V1'",
+      "after": "'ACTUAL_FRESH_HASH_HMAC357_ABI_PRECONFIGURE_PATH_OBSERVATION_V1'",
+      "count": 1,
+      "afterPositions": [
+        23220
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "Actual355 source/command observations; parent342/306 are immutable ancestry, never projected metadata.",
+      "after": "Actual new357 source/command observations; parent355/342/306 are immutable ancestry, never projected metadata.",
+      "count": 1,
+      "afterPositions": [
+        15184
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "Exact combined355 initial normal-OFF source policy verified",
+      "after": "Exact new357 Hash/Hmac initial normal-OFF source policy verified",
+      "count": 1,
+      "afterPositions": [
+        25188
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "    authenticate_inputs()\n    return metadata",
+      "after": "    metadata['nodeCryptoHashHmacPolicy']=HASH_MODEL.observe_hash_hmac(\n        metadata,POLICY,repo,entries,embedding_commands,install_text,\n        dict(path=str(install),sha256=digest(install),bytes=install.stat().st_size),\n        manifest_values,ninja_capture,ninja_text)\n    authenticate_inputs()\n    assert digest(model_path)==POLICY['hashHmacModelSha256']\n    return metadata",
+      "count": 1,
+      "afterPositions": [
+        25041
+      ]
+    },
+    {
+      "role": "helper",
+      "before": "# Own literal configured-native context; never mutate an imported donor namespace.",
+      "after": "assert HERE==Path('/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-integration-candidate-v1'), 'Exact active source helper context required'\n# Own literal configured-native context; never mutate an imported donor namespace.",
+      "count": 1,
+      "afterPositions": [
+        423
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2",
+      "after": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-integration-candidate-v1",
+      "count": 2,
+      "afterPositions": [
+        381,
+        3420
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "/private/tmp/starling-node-compat/combined-native355-v1-source",
+      "after": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source",
+      "count": 2,
+      "afterPositions": [
+        542,
+        2814
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "/private/tmp/starling-node-compat/combined-native355-v2-build",
+      "after": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-build",
+      "count": 2,
+      "afterPositions": [
+        646,
+        3178
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "combined355-v2",
+      "after": "hash-hmac357-v1",
+      "count": 2,
+      "afterPositions": [
+        7759,
+        8381
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "combined355",
+      "after": "Hash/Hmac357",
+      "count": 7,
+      "afterPositions": [
+        2924,
+        3105,
+        3275,
+        8995,
+        9339,
+        12062,
+        53108
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "complete355",
+      "after": "complete357",
+      "count": 1,
+      "afterPositions": [
+        8761
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "ACTUAL_FRESH_COMBINED355_ABI_PRECONFIGURE_PATH_OBSERVATION_V1",
+      "after": "ACTUAL_FRESH_HASH_HMAC357_ABI_PRECONFIGURE_PATH_OBSERVATION_V1",
+      "count": 1,
+      "afterPositions": [
+        10015
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "4e30750fc8967514493b26096e814929ac4e567f1a01d86bc6a140f3bcecf609",
+      "after": "43ea1fbe2d7218c5ab12d2e9b528fbeeafa32b3d9e430f4b56cf6b50d8522c09",
+      "count": 5,
+      "afterPositions": [
+        12173,
+        13087,
+        27949,
+        36129,
+        52022
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "fc9c5e97594507513ed20efeced61dbf2be1a92ff038e7f1df1bcddd0b56a681",
+      "after": "99f15d4a8f39a3eefeeec738597e57218f2a0dbc8d9febc55ed32f40405402d0",
+      "count": 2,
+      "afterPositions": [
+        12310,
+        13224
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "FINITE_COMBINED355_NORMAL_OFF_METADATA_SHAPE_ONLY_V1",
+      "after": "FINITE_NODE_CRYPTO_HASH_HMAC357_NORMAL_OFF_METADATA_SHAPE_ONLY_V1",
+      "count": 1,
+      "afterPositions": [
+        53442
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "nativeFiles=355",
+      "after": "nativeFiles=357",
+      "count": 1,
+      "afterPositions": [
+        53509
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "consumers_enabled=\"${NODE_COMPAT_STREAM_CONSUMERS:-0}\"",
+      "after": "consumers_enabled=\"${NODE_COMPAT_STREAM_CONSUMERS:-0}\"\nhash_hmac_enabled=\"${NODE_COMPAT_CRYPTO_HASH_HMAC:-0}\"\nborrow_enabled=\"${NODE_CRYPTO_AUDITED_BORROW:-0}\"\n[[ \"$hash_hmac_enabled\" == 1 && \"$borrow_enabled\" == 0 ]] || { echo 'Named experimental recipe requires HASH_HMAC=1 and COPY-only BORROW=0; global defaults remain OFF' >&2; exit 1; }",
+      "count": 1,
+      "afterPositions": [
+        1544
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "-DENABLE_JS_DEBUGGER=OFF -DENABLE_BUILTIN_WPT_SUPPORT=OFF -DNODE_COMPAT_LOCKED_RUST=ON",
+      "after": "-DNODE_COMPAT_CRYPTO_HASH_HMAC=ON -DNODE_CRYPTO_AUDITED_BORROW=OFF \\\n  -DENABLE_JS_DEBUGGER=OFF -DENABLE_BUILTIN_WPT_SUPPORT=OFF -DNODE_COMPAT_LOCKED_RUST=ON",
+      "count": 1,
+      "afterPositions": [
+        24076
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "    'NODE_COMPAT_STREAM_CONSUMERS': 'ON' if consumers_enabled == '1' else 'OFF',",
+      "after": "    'NODE_COMPAT_STREAM_CONSUMERS': 'ON' if consumers_enabled == '1' else 'OFF',\n    'NODE_COMPAT_CRYPTO_HASH_HMAC':'ON','NODE_CRYPTO_AUDITED_BORROW':'OFF',",
+      "count": 1,
+      "afterPositions": [
+        30874
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "selected_manifests = [{'path':path",
+      "after": "manifest_paths.append('tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-integration-candidate-v1/crypto-module-manifest.json')\nselected_manifests = [{'path':path",
+      "count": 1,
+      "afterPositions": [
+        42604
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "    'gcStress': stress == '1', 'oomTesting': oom == '1',",
+      "after": "    'gcStress': stress == '1', 'oomTesting': oom == '1',\n    'nodeCryptoHashHmacEnabled':True,'nodeCryptoAuditedBorrowEnabled':False,",
+      "count": 1,
+      "afterPositions": [
+        45523
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "rust_commands = [line for line in command('ninja','-C',build_dir,'-t','commands').splitlines() if 'cargo rustc --lib' in line]",
+      "after": "ninja_executable=shutil.which('ninja')\nassert ninja_executable and pathlib.Path(ninja_executable).is_absolute()\nninja_executable=str(pathlib.Path(ninja_executable).resolve())\nninja_tool=dict(path=ninja_executable,sha256=digest(ninja_executable),bytes=pathlib.Path(ninja_executable).stat().st_size)\nninja_argv=[ninja_executable,'-C',build_dir,'-t','commands']\nninja_stem=pathlib.Path(work)/('full-ninja-'+pathlib.Path(artifact).name)\ntry:\n    ninja_result=subprocess.run(ninja_argv,cwd=repo,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=60,check=False)\n    ninja_out,ninja_err=ninja_result.stdout,ninja_result.stderr\n    ninja_exit,ninja_timeout=ninja_result.returncode,False\nexcept subprocess.TimeoutExpired as failure:\n    ninja_out,ninja_err=failure.stdout or b'',failure.stderr or b''\n    ninja_exit,ninja_timeout=None,True\nfor suffix,payload in [('.stdout',ninja_out),('.stderr',ninja_err)]:\n    with open(str(ninja_stem)+suffix,'xb') as file:file.write(payload);file.flush();os.fsync(file.fileno())\ndef captured_descriptor(suffix):\n    path=pathlib.Path(str(ninja_stem)+suffix)\n    return dict(path=str(path),sha256=digest(path),bytes=path.stat().st_size)\nninja_capture=dict(argv=ninja_argv,tool=ninja_tool,rawExitCode=ninja_exit,timeout=ninja_timeout,stdout=captured_descriptor('.stdout'),stderr=captured_descriptor('.stderr'))\nwith open(str(ninja_stem)+'.terminal.json','x') as file:json.dump(ninja_capture,file,indent=2);file.write('\\n');file.flush();os.fsync(file.fileno())\nassert digest(ninja_executable)==ninja_tool['sha256']\nassert ninja_exit==0 and not ninja_timeout and ninja_err==b''\nninja_text=ninja_out.decode('utf-8',errors='strict')\nrust_commands = [line for line in ninja_text.splitlines() if 'cargo rustc --lib' in line]",
+      "count": 1,
+      "afterPositions": [
+        43712
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "import datetime, hashlib, json, os, pathlib, subprocess, sys",
+      "after": "import datetime, hashlib, json, os, pathlib, subprocess, sys, shutil",
+      "count": 1,
+      "afterPositions": [
+        27325
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "metadata = layer.decorate(metadata,repo,source_dir,json.loads(compile_commands),embedding_commands,ticks_enabled == '1')",
+      "after": "metadata = layer.decorate(metadata,repo,source_dir,json.loads(compile_commands),embedding_commands,ticks_enabled == '1',ninja_capture,ninja_text)",
+      "count": 1,
+      "afterPositions": [
+        54157
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "before_rustup=pathlib.Path(work)/'private-rustup-settings-before-install.json'\nrustup_before=json.loads(before_rustup.read_bytes())\nassert rustup_before['state']=='PRIVATE_RUSTUP_AUTO_SELF_UPDATE_DISABLED_BEFORE_INSTALL_V1'and rustup_before['persistentSetting']=='disable'\nsettings=pathlib.Path(work)/'rustup-home/settings.toml'\nassert [line.strip()for line in settings.read_text().splitlines()if line.strip().startswith('auto_self_update')]==['auto_self_update = \"disable\"']\nmetadata['privateRustupBootstrapPolicy']={'persistentSetting':'disable','privateHomes':{'rustup':str(pathlib.Path(work)/'rustup-home'),'cargo':str(pathlib.Path(work)/'cargo-home')},'beforeInstallRecord':{'path':str(before_rustup),'sha256':digest(before_rustup),'bytes':before_rustup.stat().st_size},'settingsAtBuildCompletion':{'path':str(settings),'sha256':digest(settings),'bytes':settings.stat().st_size},'oldFailedWorkResumed':False}\n",
+      "after": "",
+      "count": 1,
+      "afterPositions": [
+        55898
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "# New355-only raw metadata shape gate,",
+      "after": "before_rustup=pathlib.Path(work)/'private-rustup-settings-before-install.json'\nrustup_before=json.loads(before_rustup.read_bytes())\nassert rustup_before['state']=='PRIVATE_RUSTUP_AUTO_SELF_UPDATE_DISABLED_BEFORE_INSTALL_V1'and rustup_before['persistentSetting']=='disable'\nsettings=pathlib.Path(work)/'rustup-home/settings.toml'\nassert [line.strip()for line in settings.read_text().splitlines()if line.strip().startswith('auto_self_update')]==['auto_self_update = \"disable\"']\nmetadata['privateRustupBootstrapPolicy']={'persistentSetting':'disable','privateHomes':{'rustup':str(pathlib.Path(work)/'rustup-home'),'cargo':str(pathlib.Path(work)/'cargo-home')},'beforeInstallRecord':{'path':str(before_rustup),'sha256':digest(before_rustup),'bytes':before_rustup.stat().st_size},'settingsAtBuildCompletion':{'path':str(settings),'sha256':digest(settings),'bytes':settings.stat().st_size},'oldFailedWorkResumed':False}\n# New357-only raw metadata shape gate,",
+      "count": 1,
+      "afterPositions": [
+        55150
+      ]
+    },
+    {
+      "role": "recipe",
+      "before": "    json.dump(metadata, output, indent=2); output.write('\\n')",
+      "after": "    json.dump(metadata, output, indent=2); output.write('\\n'); output.flush(); os.fsync(output.fileno())",
+      "count": 1,
+      "afterPositions": [
+        56864
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-integration-candidate-v1/policy.json",
+      "sha256": "99f15d4a8f39a3eefeeec738597e57218f2a0dbc8d9febc55ed32f40405402d0",
+      "bytes": 380740
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-integration-candidate-v1/layer-policy.py",
+      "sha256": "43ea1fbe2d7218c5ab12d2e9b528fbeeafa32b3d9e430f4b56cf6b50d8522c09",
+      "bytes": 25806
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-integration-candidate-v1/build-engine.sh",
+      "sha256": "cd56df45fe89cf6a4c183f7e7d349b0107e8bad9ecfd3039b4c0fd70d370e1e7",
+      "bytes": 57414
+    },
+    {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-integration-candidate-v1/native-admission-model.py",
+      "sha256": "063c2fd7e49c5d32bca5b307ae54ec82af263748f5ecb969743ff78731323edd",
+      "bytes": 9678
+    }
+  ],
+  "scope": "Source derivation only; no native build or metadata conversion"
+}

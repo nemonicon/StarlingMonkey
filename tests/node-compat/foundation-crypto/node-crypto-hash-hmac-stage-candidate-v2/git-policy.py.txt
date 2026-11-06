@@ -1,0 +1,56 @@
+def git_policy():
+    policy_root=OUT/'git-policy'
+    return dict(version='PRIVATE_SINGLE_BASELINE_FETCH_V2',baseline=BASE,fetchDepth=1,replaceObjects=False,automaticTags=False,recursiveSubmodules=False,automaticMaintenance=False,writeCommitGraph=False,templateRoot=str(policy_root/'empty-template'),hooksRoot=str(policy_root/'disabled-hooks'),commandCwd=str(policy_root),clientConfig=[['core.hooksPath',str(policy_root/'disabled-hooks')],['core.fsmonitor','false'],['core.attributesFile','/dev/null'],['core.excludesFile','/dev/null'],['gc.auto','0'],['gc.autoDetach','false'],['maintenance.auto','false'],['maintenance.autoDetach','false'],['maintenance.strategy','none'],['fetch.writeCommitGraph','false'],['submodule.recurse','false'],['protocol.allow','never'],['protocol.file.allow','always'],['init.defaultBranch','stage-baseline'],['init.defaultRefFormat','files']],serverObjectRequest='uploadpack.allowAnySHA1InWant=true only for this literalBASE local request; no repo configuration mutation',reachableHistoryExpected=1,transientPackByteCapClaim=False,originalRepositoryConfigurationModified=False,userHomeVariablesPreserved=True)
+
+
+def git_prefix(git):
+    result=[git,'--no-replace-objects']
+    for key,value in git_policy()['clientConfig']:result+=['-c',key+'='+value]
+    return result
+
+
+def upload_pack_command(git):
+    # Git's actual --upload-pack API is one command string. Quote every token;
+    # child_environment removes exported shell functions/startup inputs first.
+    return shlex.join(git_prefix(git)+['-c','uploadpack.allowAnySHA1InWant=true','upload-pack'])
+
+
+def initial_git_commands(git):
+    prefix=git_prefix(git)
+    return [prefix+['init','--template='+git_policy()['templateRoot'],'--object-format=sha1','--initial-branch=stage-baseline',str(DEST)],prefix+['-C',str(DEST),'fetch','--no-tags','--depth=1','--no-recurse-submodules','--no-auto-maintenance','--no-write-commit-graph','--upload-pack='+upload_pack_command(git),REPO.as_uri(),BASE],prefix+['-C',str(DEST),'checkout','--detach',BASE],prefix+['-C',str(DEST),'rev-list','--count','HEAD']]
+
+
+def git_environment(original=None):
+    original=dict(os.environ)if original is None else dict(original)
+    startup={'BASH_ENV','ENV','SHELLOPTS','BASHOPTS','CDPATH','GLOBIGNORE','LD_PRELOAD','LD_LIBRARY_PATH','DYLD_INSERT_LIBRARIES','DYLD_LIBRARY_PATH'}
+    env={k:v for k,v in original.items()if not k.startswith(('GIT_','BASH_FUNC_'))and k not in startup}
+    env.update(GIT_CONFIG_NOSYSTEM='1',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_SYSTEM='/dev/null',GIT_CONFIG_COUNT='0',GIT_TERMINAL_PROMPT='0')
+    for key in ['HOME','home','CODEX_HOME']:assert env.get(key)==original.get(key)
+    return env
+
+
+def git_environment_fact(original):
+    after=git_environment(original)
+    return dict(removedNames=sorted(k for k in original if k not in after or k.startswith('GIT_')),valuesRecorded=False,userHomeVariablesPreserved=all(after.get(k)==original.get(k)for k in ['HOME','home','CODEX_HOME']),globalAndSystemConfigEntrypointsDisabled=True,exportedShellFunctionsRemoved=True)
+
+
+def assert_private_git_policy():
+    policy=git_policy();root=Path(policy['commandCwd'])
+    assert root.is_dir()and not root.is_symlink()and stat.S_IMODE(root.stat().st_mode)==0o700
+    for key in ['templateRoot','hooksRoot']:
+        p=Path(policy[key]);assert p.is_dir()and not p.is_symlink()and stat.S_IMODE(p.stat().st_mode)==0o700 and not list(p.iterdir())
+
+
+def baseline_git_observation(count_record):
+    assert checked(count_record['stdout']).read_bytes()==b'1\n'
+    fetch=DEST/'.git/FETCH_HEAD';lines=fetch.read_bytes().splitlines();assert len(lines)==1 and lines[0].split(b'\t',1)[0]==BASE.encode()
+    shallow=DEST/'.git/shallow'
+    if shallow.exists():assert not shallow.is_symlink()and shallow.read_bytes()==(BASE+'\n').encode()
+    references=[]
+    for p in (DEST/'.git/refs').rglob('*'):
+        assert not p.is_symlink()
+        if p.is_file():references.append(str(p.relative_to(DEST/'.git')))
+    assert not references
+    packed=DEST/'.git/packed-refs'
+    if packed.exists():assert not packed.is_symlink()and all(not line or line.startswith(b'#')for line in packed.read_bytes().splitlines())
+    return dict(reachableCommits=1,tagAndRemoteRefs=[],detachedHead=BASE,fetchHead=descriptor(fetch),shallowBoundary=descriptor(shallow)if shallow.exists()else None,privateConfig=descriptor(DEST/'.git/config'),countRaw=count_record['stdout'],depthAndTreeOnly=True,exactPackObjectSetClaim=False,transientPackByteCapClaim=False)
