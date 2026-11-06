@@ -1,0 +1,13 @@
+# PROPOSED private CARGO_HOME/config.toml; Root must render/authenticate it.
+# The merged directory must contain both the existing aggregate dependencies
+# and exact fork Intl packages with Cargo checksum metadata. No network fallback.
+[source.crates-io]
+replace-with = "next-intl-merged-vendor"
+
+[source."git+https://github.com/servo/unicode-bidi?rev=ca612daf1c08c53abe07327cb3e6ef6e0a760f0c"]
+git = "https://github.com/servo/unicode-bidi"
+rev = "ca612daf1c08c53abe07327cb3e6ef6e0a760f0c"
+replace-with = "next-intl-merged-vendor"
+
+[source.next-intl-merged-vendor]
+directory = "@NODE_COMPAT_INTL_VENDOR@"

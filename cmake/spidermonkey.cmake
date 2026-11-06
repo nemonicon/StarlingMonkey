@@ -1,4 +1,13 @@
 set(SM_TAG FIREFOX_147_0_4_RELEASE_STARLING)
+set(SM_SOURCE_COMMIT 9dab3d6f643e926a340c391ea30968e940390dec)
+
+# Experimental source builds are explicit: the published distribution has Intl
+# disabled. Do not silently use it to satisfy an Intl build request.
+option(SPIDERMONKEY_BUILD_FROM_SOURCE "Build the pinned SpiderMonkey source instead of downloading a distribution" OFF)
+option(SPIDERMONKEY_INTL "Enable Intl in a SpiderMonkey source build, or require it in a supplied distribution" OFF)
+if(SPIDERMONKEY_BUILD_FROM_SOURCE AND DEFINED ENV{SPIDERMONKEY_BINARIES})
+    message(FATAL_ERROR "SPIDERMONKEY_BUILD_FROM_SOURCE conflicts with SPIDERMONKEY_BINARIES")
+endif()
 
 include("manage-git-source")
 
@@ -20,9 +29,13 @@ endif()
 #
 # This can be set, for example, to the output directly (`release/` or `debug/`)
 # under a local clone of the `spidermonkey-wasi-embedding` repo.
-if (DEFINED ENV{SPIDERMONKEY_BINARIES})
+if (SPIDERMONKEY_BUILD_FROM_SOURCE)
+    message(STATUS "Building pinned SpiderMonkey source explicitly (Intl=${SPIDERMONKEY_INTL})")
+elseif (DEFINED ENV{SPIDERMONKEY_BINARIES})
     set(SM_LIB_DIR $ENV{SPIDERMONKEY_BINARIES})
     message(STATUS "Using pre-built SpiderMonkey artifacts from local directory ${SM_LIB_DIR}")
+elseif(SPIDERMONKEY_INTL)
+    message(FATAL_ERROR "Intl requires SPIDERMONKEY_BUILD_FROM_SOURCE or an explicitly supplied SPIDERMONKEY_BINARIES distribution")
 else()
     set(SM_URL https://github.com/bytecodealliance/starlingmonkey/releases/download/libspidermonkey_${SM_TAG}/spidermonkey-static-${SM_BUILD_TYPE}.tar.gz)
     message(STATUS "Checking for pre-built SpiderMonkey artifacts at ${SM_URL}")
@@ -46,8 +59,16 @@ endif()
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/null.cpp "")
 
-if (DEFINED SM_LIB_DIR)
+if (DEFINED SM_LIB_DIR AND NOT SPIDERMONKEY_BUILD_FROM_SOURCE)
     set(SM_INCLUDE_DIR ${SM_LIB_DIR}/include)
+
+    if(SPIDERMONKEY_INTL)
+        file(STRINGS "${SM_INCLUDE_DIR}/js-config.h" SM_INTL_DEFINITION
+            REGEX "^#define[ \t]+JS_HAS_INTL_API[ \t]+1([ \t]|$)")
+        if(NOT SM_INTL_DEFINITION)
+            message(FATAL_ERROR "The supplied SpiderMonkey distribution does not define JS_HAS_INTL_API=1")
+        endif()
+    endif()
 
     add_library(spidermonkey INTERFACE)
     target_include_directories(spidermonkey INTERFACE ${SM_INCLUDE_DIR})
@@ -63,6 +84,13 @@ else()
         TAG ${SM_TAG}
         SOURCE_DIR ${SM_SOURCE_DIR}
     )
+
+    execute_process(COMMAND git -C ${SM_SOURCE_DIR} rev-parse HEAD
+        OUTPUT_VARIABLE SM_ACTUAL_COMMIT OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE SM_REVISION_RESULT)
+    if(NOT SM_REVISION_RESULT EQUAL 0 OR NOT SM_ACTUAL_COMMIT STREQUAL SM_SOURCE_COMMIT)
+        message(FATAL_ERROR "SpiderMonkey source revision is ${SM_ACTUAL_COMMIT}; expected ${SM_SOURCE_COMMIT}")
+    endif()
 
     # Each build configuration gets its own object directory
     set(SM_OBJ_DIR ${CMAKE_CURRENT_BINARY_DIR}/spidermonkey-obj)
@@ -104,11 +132,16 @@ else()
     find_program(SM_HOST_CXX clang++ c++ REQUIRED DOCS "C++ compiler for building")
 
     set(MOZCONFIG "${CMAKE_CURRENT_BINARY_DIR}/mozconfig-${SM_BUILD_TYPE}")
+    if(SPIDERMONKEY_INTL)
+        set(SM_INTL_OPTION --with-intl-api)
+    else()
+        set(SM_INTL_OPTION --without-intl-api)
+    endif()
     set(MOZCONFIG_CONTENT "ac_add_options --enable-project=js
 ac_add_options --disable-js-shell
 ac_add_options --target=wasm32-unknown-wasi
 ac_add_options --without-system-zlib
-ac_add_options --without-intl-api
+ac_add_options ${SM_INTL_OPTION}
 ac_add_options --disable-jit
 ac_add_options --disable-shared-js
 ac_add_options --disable-shared-memory

@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.27)
+project(SpiderMonkeyIntlGuest LANGUAGES C CXX)
+if(NOT IS_ABSOLUTE "${STARLING_SOURCE_ROOT}")
+    message(FATAL_ERROR "STARLING_SOURCE_ROOT must identify the reviewed checkout")
+endif()
+list(PREPEND CMAKE_MODULE_PATH "${STARLING_SOURCE_ROOT}/cmake")
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/deps")
+include(spidermonkey)

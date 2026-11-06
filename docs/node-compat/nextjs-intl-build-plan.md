@@ -1,7 +1,7 @@
 # Next.js: Intl-enabled SpiderMonkey 147 build plan
 
-Status: **source preflight only; no fetch, compiler, library, engine or guest
-action authorized by this document.** The current WASI 0.2.10 world and stock
+Status: **local source preflight complete; explicit CI library build prepared,
+compilation pending.** The current WASI 0.2.10 world and stock
 Wasmtime/wasmCloud hosts remain unchanged. No application/regex rewriting or JS
 compatibility shim is proposed.
 
@@ -16,8 +16,9 @@ That 2,324-byte header has SHA256
 its `MOZ_ICU4X=1` does **not** establish an Intl-enabled parser. The retained
 538,170,426-byte `libspidermonkey.a` is the old non-Intl artifact.
 
-The current [CMake integration](../../cmake/spidermonkey.cmake) selects
-`FIREFOX_147_0_4_RELEASE_STARLING` and explicitly supplies `--without-intl-api`.
+The baseline [CMake integration](../../cmake/spidermonkey.cmake) selects
+`FIREFOX_147_0_4_RELEASE_STARLING` and supplies `--without-intl-api` in its
+default configuration.
 GitHub's tag-ref API resolved this tag to commit
 **`9dab3d6f643e926a340c391ea30968e940390dec`** in
 [`bytecodealliance/firefox`](https://github.com/bytecodealliance/firefox/tree/9dab3d6f643e926a340c391ea30968e940390dec).
@@ -96,7 +97,24 @@ and the subsequent full engine build. Use single-job limits, an explicit disk
 floor and raw monitored commands; any source reduction or debug-symbol policy
 change must be recorded honestly. Do not delete prior evidence to make space.
 
-## Required evidence after capacity and action authorization
+## Capacity workaround and integration preparation
+
+The [bounded local tool preflight](../../tests/node-compat/frameworks/nextjs/spidermonkey-intl-tool-preflight-v1/README.md)
+executes 17 read-only tool/version commands and verifies Make 3.81, SDK 27 and
+Python 3.12 prerequisites. It finds one concrete upgrade: existing cbindgen
+0.29.0 is below the exact fork's required 0.29.1. No local Mach/build runs.
+
+The [manual CI library build](../../tests/node-compat/frameworks/nextjs/spidermonkey-intl-build-v1/README.md)
+uses the existing CMake module with explicit source/Intl opt-ins, exact commit
+verification and private build state. Six actual CMake selection tests pass;
+the default distribution path remains unchanged. The already enabled public
+fork can use standard Ubuntu runners, avoiding a local source/compiler peak.
+The job requires 20 GiB free initially and a 4 GiB floor, retains raw failure
+evidence and uploads artifacts only. No repository setting, release workflow,
+host interface or runtime policy is changed. Actual compilation is still
+pending; CI capacity and source-build feasibility have not been measured.
+
+## Required evidence after the library and engine builds
 
 Retain generated Intl configuration, actual `V8_INTL_SUPPORT` compile rows,
 ICU/data/Rust archive identities, whole link commands, all raw failures and
@@ -107,3 +125,10 @@ world by assumption. Run the isolated Unicode-property probe, then the
 unchanged full Next application/contracts. Neither a defined `Intl` global
 nor a successful regex alone admits the complete profile, snapshot/reuse,
 security or performance gates.
+
+The bounded [single-aggregate companion](nextjs-intl-build-plan/README.md)
+contains proposed Cargo/CMake afterimages, exact upstream manifest snapshots,
+root patch/vendor requirements and offline Source tests. It consumes Root's
+`SPIDERMONKEY_INTL` selector without editing the SpiderMonkey workflow or build
+options. Its new combined lock/vendor inputs remain unissued; it is not a
+resolved or compiled implementation.

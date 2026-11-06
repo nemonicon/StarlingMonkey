@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "forkCommit": "9dab3d6f643e926a340c391ea30968e940390dec",
+  "claims": [
+    {
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/mach",
+      "symbols": "MIN_PYTHON_VERSION/MAX_PYTHON_VERSION_TO_CONSIDER",
+      "finding": "Python>=3.9; alternative search through3.12; this is not a strict maximum check."
+    },
+    {
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/python/sites/mach.txt",
+      "symbols": "requires-python and vendored directives",
+      "finding": "Mach Python>=3.9; in-tree vendored Python package paths are required."
+    },
+    {
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/python/mach/mach/site.py",
+      "symbols": "SitePackagesSource.for_mach",
+      "finding": "MACH_BUILD_PYTHON_NATIVE_PACKAGE_SOURCE accepts none; MACH_NO_UV disables uv selection."
+    },
+    {
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/python/mach/mach/util.py",
+      "symbols": "get_state_dir/get_virtualenv_base_dir",
+      "finding": "MOZBUILD_STATE_PATH selects state and source-specific virtualenv base."
+    },
+    {
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/build/mach_initialize.py",
+      "symbols": "initialize",
+      "finding": "Initializes state and activates Python before dispatch; can delete stale third_party/python/psutil."
+    },
+    {
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/build/moz.configure/bindgen.configure",
+      "symbols": "check_cbindgen_version",
+      "finding": "Minimum cbindgen0.29.1; explicit CBINDGEN override is fatal if too old."
+    },
+    {
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/moz.configure",
+      "symbols": "check_gmake_version",
+      "finding": "GNU Make minimum3.81."
+    },
+    {
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/build/moz.configure/toolchain.configure",
+      "symbols": "mac_sdk_min_version/sysroot/compiler",
+      "finding": "MacSDK minimum26.1; explicit CC/CXX/HOST_CC/HOST_CXX and sysroot selectors supported."
+    },
+    {
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/build/moz.configure/bootstrap.configure",
+      "symbols": "want_bootstrap",
+      "finding": "--disable-bootstrap disables automatic toolchain bootstrap/update."
+    },
+    {
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/python/mozbuild/mozbuild/build_commands.py",
+      "symbols": "configure/build",
+      "finding": "Actual configure subcommand and build --jobs parameter; full build selected with no target."
+    },
+    {
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/js/moz.configure",
+      "symbols": "check_intl_api/check_icu4x/icu_version",
+      "finding": "Explicit --with-intl-api sets JS_HAS_INTL_API; disabling ICU4X with Intl is refused; ICU source version read from source tree."
+    },
+    {
+      "url": "https://github.com/bytecodealliance/firefox/blob/9dab3d6f643e926a340c391ea30968e940390dec/js/src/make-source-package.py",
+      "symbols": "rsync_filter_list/copy_cargo_toml",
+      "finding": "Full standalone package needs build/native/Intl/vendored dependencies and rewritten Cargo workspace/patch selections."
+    }
+  ],
+  "onlyPrimarySourcesUsed": true,
+  "upstreamFilesBrowsedReadOnly": true,
+  "upstreamSourceExecuted": false,
+  "fullSourceAcquisitionPerformed": false
+}

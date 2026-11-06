@@ -39,6 +39,18 @@ commit`9dab3d6f`, bundled ICU78.1 and the required ICU4X/unicode-bidi single-Rus
 aggregate integration. Only about3.2GiB is free; a request for20GiB build headroom
 or another writable volume is pending. Heavy source fetch/build has not started.
 
+The [local Intl tool preflight](tests/node-compat/frameworks/nextjs/spidermonkey-intl-tool-preflight-v1/README.md)
+now records 17 successful read-only tool/version queries. Installed cbindgen
+0.29.0 is below the exact fork's required 0.29.1; Make3.81, SDK27 and Python3.12
+meet the inspected prerequisites. The [manual CI library build](tests/node-compat/frameworks/nextjs/spidermonkey-intl-build-v1/README.md)
+provides a capacity workaround on the already enabled public fork, using the
+existing CMake module with explicit source/Intl options. Six actual selection
+tests pass, including rejection of no-Intl headers, conflicting source inputs
+and stale cached distributions/wrong revisions. SDK30, Rust1.88, cbindgen0.29.1,
+private build state, a20GiB start/4GiB stop policy and artifact-only outputs are
+specified. It has not yet compiled SpiderMonkey or run a guest. The existing
+release workflow, WASI interfaces and unchanged Next success gates remain.
+
 Current native Source candidate is435 inputs/embedding3, V6. Its V5 base includes the
 bounded Readable.toWeb extension, ALS's real strict-definition guard, three
 authenticated existing compile headers and Performance's actual include-path

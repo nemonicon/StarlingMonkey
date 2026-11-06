@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "sourceOnly": true,
+  "path": "cmake/build-crates.cmake",
+  "beforeSha256": "b4f4a71a07f484f5d76abf6b1f63671e6c2a378a281b36e79c506afcf6b14798",
+  "afterSha256": "3cbf3f9f080345694c40bc329bbc56b553b137d6291eaf745213c285e5a50dab",
+  "edits": [
+    {
+      "before": "configure_file(\"runtime/crates/staticlib-template/Cargo.toml.in\" \"${RUST_STATICLIB_TOML}\")",
+      "after": "# PROPOSED single-aggregate Intl join. SPIDERMONKEY_INTL is declared by\n# cmake/spidermonkey.cmake (default OFF); no SM library is built here.\nset(NODE_COMPAT_INTL_FIREFOX_SOURCE \"\" CACHE PATH \"Authenticated full or reduced exact9dab Intl source layout\")\nset(NODE_COMPAT_INTL_LOCKFILE \"\" CACHE FILEPATH \"New reviewed combined aggregate lock; old locks are not interchangeable\")\nif(SPIDERMONKEY_INTL)\n    if(NOT SM_TAG STREQUAL \"FIREFOX_147_0_4_RELEASE_STARLING\")\n        message(FATAL_ERROR \"Intl147 Rust join requires the matching SpiderMonkey fork/tag\")\n    endif()\n    foreach(relative IN ITEMS intl/icu_capi/Cargo.toml intl/bidi/rust/unicode-bidi-ffi/Cargo.toml intl/icu_segmenter_data/Cargo.toml)\n        if(NOT EXISTS \"${NODE_COMPAT_INTL_FIREFOX_SOURCE}/${relative}\")\n            message(FATAL_ERROR \"Missing authenticated Intl source: ${relative}\")\n        endif()\n    endforeach()\n    file(STRINGS \"${SM_INCLUDE_DIR}/js-config.h\" INTL147_HEADER_MARKER REGEX \"^#[ \\t]*define[ \\t]+JS_HAS_INTL_API[ \\t]+1[ \\t]*$\")\n    if(NOT INTL147_HEADER_MARKER)\n        message(FATAL_ERROR \"Intl147 Rust join requires coherent Intl-enabled SpiderMonkey headers/library\")\n    endif()\n    if(NOT \"$ENV{CARGO_NET_OFFLINE}\" STREQUAL \"true\" OR NOT EXISTS \"$ENV{CARGO_HOME}/config.toml\")\n        message(FATAL_ERROR \"Intl147 requires the reviewed private offline merged-vendor Cargo configuration before Corrosion metadata\")\n    endif()\n    configure_file(\"runtime/crates/staticlib-template/Cargo.intl.toml.in\" \"${RUST_STATICLIB_TOML}\" @ONLY)\nelse()\n    configure_file(\"runtime/crates/staticlib-template/Cargo.toml.in\" \"${RUST_STATICLIB_TOML}\")\nendif()"
+    },
+    {
+      "before": "configure_file(\"runtime/crates/staticlib-template/Cargo.lock\" \"${RUST_STATICLIB_LOCK}\" COPYONLY)",
+      "after": "if(SPIDERMONKEY_INTL)\n    if(NOT EXISTS \"${NODE_COMPAT_INTL_LOCKFILE}\")\n        message(FATAL_ERROR \"Intl147 combined lock has not been issued\")\n    endif()\n    configure_file(\"${NODE_COMPAT_INTL_LOCKFILE}\" \"${RUST_STATICLIB_LOCK}\" COPYONLY)\nelse()\n    configure_file(\"runtime/crates/staticlib-template/Cargo.lock\" \"${RUST_STATICLIB_LOCK}\" COPYONLY)\nendif()"
+    },
+    {
+      "before": "option(NODE_COMPAT_LOCKED_RUST \"Require the versioned aggregate Rust lockfile\" OFF)",
+      "after": "option(NODE_COMPAT_LOCKED_RUST \"Require the versioned aggregate Rust lockfile\" OFF)\nif(SPIDERMONKEY_INTL AND NOT NODE_COMPAT_LOCKED_RUST)\n    message(FATAL_ERROR \"Intl147 requires the new combined locked aggregate\")\nendif()"
+    },
+    {
+      "before": "add_rust_lib(multipart \"${CMAKE_CURRENT_SOURCE_DIR}/crates/rust-multipart\" \"\\\"capi\\\", \\\"simd\\\"\")",
+      "after": "add_rust_lib(multipart \"${CMAKE_CURRENT_SOURCE_DIR}/crates/rust-multipart\" \"\\\"capi\\\", \\\"simd\\\"\")\n\nif(SPIDERMONKEY_INTL)\n    # add_rust_lib currently always enables defaults. Append this dependency\n    # explicitly to preserve the upstream default-features=false contract.\n    add_library(icu_capi INTERFACE)\n    target_include_directories(icu_capi INTERFACE \"${NODE_COMPAT_INTL_FIREFOX_SOURCE}/intl/icu_capi\")\n    file(APPEND $CACHE{RUST_STATICLIB_TOML} \"icu_capi = { path = \\\"${NODE_COMPAT_INTL_FIREFOX_SOURCE}/intl/icu_capi\\\", default-features = false, features = [\\\"any_provider\\\", \\\"compiled_data\\\", \\\"segmenter\\\", \\\"calendar\\\"] }\\n\")\n    file(APPEND $CACHE{RUST_STATICLIB_RS} \"pub use icu_capi;\\n\")\n    add_rust_lib(unicode-bidi-ffi \"${NODE_COMPAT_INTL_FIREFOX_SOURCE}/intl/bidi/rust/unicode-bidi-ffi\")\nendif()"
+    }
+  ],
+  "newSourceTemplate": "runtime/crates/staticlib-template/Cargo.intl.toml.in",
+  "rootOwnedToolingTemplate": "cargo-config.intl.toml.in",
+  "existingProductionSourcesModified": false,
+  "rootOwnedExistingSelector": "SPIDERMONKEY_INTL"
+}
