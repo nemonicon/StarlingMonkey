@@ -26,8 +26,14 @@ new API support.
 Latest experimental evidence and remaining gates are recorded in
 [progress.md](../../progress.md). The reviewed codec cost workload does not
 establish universal speed or lower guest memory. Native combined355 build/freeze
-passes remain separate from admission/runtime/adoption; the experimental clock
-and guarded-key results remain separate from public API compatibility.
+passes, validation-only export/bootstrap and retained read-only API checks now
+precede two successful component constructions. The pure component imports
+nothing; the resource component selects only three standard WASI0.2.10 clock/poll
+interfaces. Ordinary runtime validation and operational adoption remain open.
+Default-OFF Hash/Hmac Source and SDK syntax checks do not change the deferred
+`node:crypto` API status. The experimental clock and guarded-key results remain
+separate from public API compatibility; exact evidence is in the
+[execution status](execution-status.md).
 
 The machine-readable [API matrix](api-matrix.csv) is the per-API record: each row has module, API, type, inventory origin, status, implementation strategy, required capability, deviation and validation plan. [Node export inventory](node-v22.14.0-exports.json) contains the exact 72 module namespaces obtained from Node v22.14.0 on macOS arm64. [Policy](policy.json) defines dispositions and overrides; [generator](scripts/inventory.mjs) checks the oracle version and documentation hash. Documented overload/event/property records supplement reflection and can duplicate reflected API records.
 
@@ -56,7 +62,7 @@ Every CSV row also says that production checkout integration is not implemented 
 The CSV and the following initial-contract tables preserve the original audit.
 Current bounded implementation evidence is separate:
 
-The latest accepted overlay is [v12](../../tests/node-compat/foundation-scheduler/production-acceptance-v12/README.md): core m0.11 and seven optional foundations retain their bounded APIs. Three306-input production engines, separate scheduler diagnostics, fresh replay/focused gates and both-host HTTP pass. Root verifies4,150 indexed files. Getter/Symbol parity, combined GC owners and reset/reuse remain limits.
+The latest accepted overlay is [foundations-v13](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md), adding the bounded corrected classic-stream layer to its reviewed v12 parent. The original audit tables below retain their initial contract. Getter/Symbol parity, combined GC owners and reset/reuse remain limits.
 
 The original classic342 artifacts retain their bounded suites, replay/followon and same-byte HTTP evidence:40+20+15+1 component occurrences, without a global binary-uniqueness claim. Fourteen host-model trace differences and six actual minimal Node differences remain preserved counterexamples; old passes do not validate a changed source generation.
 

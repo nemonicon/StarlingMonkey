@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "scope": "Exactly two collector insertions and two focused test insertion blocks",
+  "files": [
+    {
+      "file": "collectors.mjs",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-lifecycle-candidate-v1/collectors.mjs",
+        "sha256": "d6a0ed2ff0f7fc999f120d2e8ed90b4a5fedf53b256b4e000775dcba4678ba32",
+        "bytes": 12028
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-lifecycle-candidate-v2/collectors.mjs",
+        "sha256": "f4905ae6b13170539e797a31e8383025150dbb47e81ef15708b4431af8368483",
+        "bytes": 12517
+      },
+      "insertions": [
+        "  need(value.counters.run === value.counters.startedCases, 'one started case per run entry');\n  need(value.counters.completedCases <= value.counters.startedCases, 'no completion before a start');\n",
+        "  need(value.current === before.run && value.current === before.startedCases, 'sequence equals actual entry counters');\n  need(before.completedCases === value.current - 1, 'all previous finite cases completed');\n  need(after.completedCases === value.current, 'current finite case completed');\n"
+      ],
+      "reverseByRemovingInsertionsExact": true
+    },
+    {
+      "file": "test-models.mjs",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-lifecycle-candidate-v1/test-models.mjs",
+        "sha256": "3442faac968d3656fcec318f152b5bb0281ff5a5268100d24012171eebbcdf5c",
+        "bytes": 8667
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-lifecycle-candidate-v2/test-models.mjs",
+        "sha256": "da8ea00bf219efa233f5444513dbfb6ab538a1f43cc92a6f154aa58f06fe05bb",
+        "bytes": 9955
+      },
+      "insertions": [
+        "rejected('Root counterexample current1 versus entry9', sequence[0], v => {\n  v.before.counters.run = v.after.counters.run = 9;\n  v.before.counters.startedCases = v.after.counters.startedCases = 9;\n}, v => validateResourceRun(JSON.stringify(v), 0));\nrejected('callback sequence self-consistent but not entry', sequence[0], v => {\n  v.current = 2; v.result.events[0].value = 'queued-2';\n}, v => validateResourceRun(JSON.stringify(v), 0));\nrejected('completion ahead of started case', sequence[0], v => {\n  v.before.counters.completedCases = 2; v.after.counters.completedCases = 3;\n}, v => validateResourceRun(JSON.stringify(v), 0));\nrejected('completion gap behind current entry', sequence[0], v => {\n  v.current = 7; v.result.events[0].value = 'queued-7';\n  v.before.counters.run = v.after.counters.run = 7;\n  v.before.counters.startedCases = v.after.counters.startedCases = 7;\n  v.before.counters.completedCases = 2; v.after.counters.completedCases = 3;\n}, v => validateResourceRun(JSON.stringify(v), 0));\n",
+        "rejected('inspect run/start mismatch', wrapper.before, v => v.state.counters.run++, v => validateResourceInspect(JSON.stringify(v)));\nrejected('inspect impossible completion', wrapper.before, v => v.state.counters.completedCases++, v => validateResourceInspect(JSON.stringify(v)));\n"
+      ],
+      "reverseByRemovingInsertionsExact": true
+    }
+  ],
+  "sourceOnly": true,
+  "allInverseExact": true
+}

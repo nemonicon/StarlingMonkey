@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "scope": "UNAPPLIED native/external embedding afterimages only",
+  "files": [
+    {
+      "role": "nativeAfterimage",
+      "repositoryPath": "runtime/event_loop.cpp",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/combined-native355-v2-freeze/source/runtime/event_loop.cpp",
+        "sha256": "b7c374f2b35391bf194858eb5368fe4f867ce107b5ce890a1dca0a3547f127d1",
+        "bytes": 13268
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v1/after/runtime/event_loop.cpp",
+        "sha256": "252a1dc3c21fa65a2c137e3a35b6e5f79f92e7fa494c6b2e52555ecf7f412582",
+        "bytes": 14304
+      },
+      "edits": [
+        {
+          "before": "#include \"event_loop.h\"\n",
+          "after": "#include \"event_loop.h\"\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n#include \"clock-lifecycle-diagnostics.h\"\nnamespace lifecycle_diag = diagnostics::clock_lifecycle;\n#endif\n"
+        },
+        {
+          "before": "  queue.get().tasks.emplace_back(task);",
+          "after": "  queue.get().tasks.emplace_back(task);\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n  lifecycle_diag::count(lifecycle_diag::Counter::QueueEnqueue);\n#endif"
+        },
+        {
+          "before": "      tasks->erase(it);",
+          "after": "      tasks->erase(it);\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n      lifecycle_diag::count(lifecycle_diag::Counter::QueueDetachCancel);\n#endif"
+        },
+        {
+          "before": "void EventLoop::incr_event_loop_interest() { queue.get().interest_cnt++; }",
+          "after": "void EventLoop::incr_event_loop_interest() {\n  queue.get().interest_cnt++;\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n  lifecycle_diag::count(lifecycle_diag::Counter::InterestIncr);\n#endif\n}"
+        },
+        {
+          "before": "  queue.get().interest_cnt--;",
+          "after": "  queue.get().interest_cnt--;\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n  lifecycle_diag::count(lifecycle_diag::Counter::InterestDecr);\n#endif"
+        },
+        {
+          "before": "    tasks->erase(tasks->begin() + task_idx);",
+          "after": "    tasks->erase(tasks->begin() + task_idx);\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n    lifecycle_diag::count(lifecycle_diag::Counter::QueueDetachRun);\n#endif"
+        },
+        {
+          "before": "} // namespace core",
+          "after": "} // namespace core\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\nnamespace diagnostics::clock_lifecycle {\nRuntimeCounts runtime_counts() {\n  return {queue.get().tasks.size(), queue.get().interest_cnt,\n    queue.get().event_loop_running, timer_registry_size(), immediate_cache_owned()};\n}\n} // namespace diagnostics::clock_lifecycle\n#endif"
+        }
+      ],
+      "inverseExact": true
+    },
+    {
+      "role": "nativeAfterimage",
+      "repositoryPath": "builtins/web/timers.cpp",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/combined-native355-v2-freeze/source/builtins/web/timers.cpp",
+        "sha256": "0024d009d11aab0705789f5d72fd8ec87deec9c44bdd8b913d970257aaadc9e4",
+        "bytes": 9077
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v1/after/builtins/web/timers.cpp",
+        "sha256": "1a736943ed5413934d9bb6555a6e0931fc72a31c557c97800d8c4a84df0b24ce",
+        "bytes": 10338
+      },
+      "edits": [
+        {
+          "before": "#include \"timers.h\"\n",
+          "after": "#include \"timers.h\"\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n#include \"clock-lifecycle-diagnostics.h\"\nnamespace lifecycle_diag = diagnostics::clock_lifecycle;\n#endif\n"
+        },
+        {
+          "before": "  bool retired_ = false;",
+          "after": "  bool retired_ = false;\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n  uint64_t diagnostic_lease_ = 0;\n#endif"
+        },
+        {
+          "before": "      host_api::MonotonicClock::unsubscribe(owned);",
+          "after": "#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n      lifecycle_diag::timer_drop_begin(diagnostic_lease_, owned, handle_);\n#endif\n      host_api::MonotonicClock::unsubscribe(owned);\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n      lifecycle_diag::timer_drop_returned(diagnostic_lease_, owned);\n      diagnostic_lease_ = 0;\n#endif"
+        },
+        {
+          "before": "    retired_ = true;",
+          "after": "    retired_ = true;\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n    lifecycle_diag::count(lifecycle_diag::Counter::TimerRetire);\n#endif"
+        },
+        {
+          "before": "        arguments_(std::move(args)) {}",
+          "after": "        arguments_(std::move(args)) {\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n    lifecycle_diag::count(lifecycle_diag::Counter::TimerConstruct);\n#endif\n  }"
+        },
+        {
+          "before": "  ~TimerTask() override { drop_pollable(); }",
+          "after": "  ~TimerTask() override {\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n    lifecycle_diag::count(lifecycle_diag::Counter::TimerDestroy);\n#endif\n    drop_pollable();\n  }"
+        },
+        {
+          "before": "    handle_ = host_api::MonotonicClock::subscribe(deadline_, true);",
+          "after": "    handle_ = host_api::MonotonicClock::subscribe(deadline_, true);\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n    if (diagnostic_lease_ != 0) lifecycle_diag::state.invariantViolation = true;\n    diagnostic_lease_ = lifecycle_diag::timer_acquired(timer_id_, handle_);\n#endif"
+        },
+        {
+          "before": "} // namespace builtins::web::timers",
+          "after": "} // namespace builtins::web::timers\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\nnamespace diagnostics::clock_lifecycle {\nstd::size_t timer_registry_size() { return TIMERS_MAP->timers_.count(); }\n} // namespace diagnostics::clock_lifecycle\n#endif"
+        }
+      ],
+      "inverseExact": true
+    },
+    {
+      "role": "nativeAfterimage",
+      "repositoryPath": "host-apis/wasi-0.2.0/host_api.cpp",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/combined-native355-v2-freeze/source/host-apis/wasi-0.2.0/host_api.cpp",
+        "sha256": "e2594bf5f1ada6a941c7a8fec71ca86ce3f62c6f209bc913a701985bf7627631",
+        "bytes": 36492
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v1/after/host-apis/wasi-0.2.0/host_api.cpp",
+        "sha256": "99047d813137a8d14610babd2bcf78db171efa68c4381c8bf816fcf9ecf1cf99",
+        "bytes": 38073
+      },
+      "edits": [
+        {
+          "before": "#include \"host_api.h\"\n",
+          "after": "#include \"host_api.h\"\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n#include \"clock-lifecycle-diagnostics.h\"\nnamespace lifecycle_diag = diagnostics::clock_lifecycle;\n#endif\n"
+        },
+        {
+          "before": "  auto list = list_borrow_pollable_t{handles.data(), handles.size()};",
+          "after": "#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n  lifecycle_diag::count(lifecycle_diag::Counter::PollCall);\n  if (handles.empty()) lifecycle_diag::count(lifecycle_diag::Counter::EmptyPollAttempt);\n#endif\n  auto list = list_borrow_pollable_t{handles.data(), handles.size()};"
+        },
+        {
+          "before": "  // Remove tasks whose pollable handles have been invalidated (e.g. by abort).",
+          "after": "#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n  lifecycle_diag::count(lifecycle_diag::Counter::SelectorCall);\n  const auto diagnostic_before_prune = tasks.size();\n#endif\n  // Remove tasks whose pollable handles have been invalidated (e.g. by abort)."
+        },
+        {
+          "before": "  if (tasks.empty()) {\n    return std::nullopt;",
+          "after": "#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n  if (tasks.size() > diagnostic_before_prune) lifecycle_diag::state.invariantViolation = true;\n  else lifecycle_diag::count(lifecycle_diag::Counter::PrunedInvalid, diagnostic_before_prune - tasks.size());\n#endif\n  if (tasks.empty()) {\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n    lifecycle_diag::count(lifecycle_diag::Counter::SelectorEmpty);\n#endif\n    return std::nullopt;"
+        },
+        {
+          "before": "          immediately_ready = wasi_clocks_monotonic_clock_subscribe_duration(0);",
+          "after": "          immediately_ready = wasi_clocks_monotonic_clock_subscribe_duration(0);\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n          lifecycle_diag::count(lifecycle_diag::Counter::ImmediateCacheAcquire);\n#endif"
+        },
+        {
+          "before": "        handles.emplace_back(immediately_ready.value().__handle);",
+          "after": "#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n        lifecycle_diag::count(lifecycle_diag::Counter::ImmediateCacheUse);\n#endif\n        handles.emplace_back(immediately_ready.value().__handle);"
+        },
+        {
+          "before": "  wasi_io_poll_pollable_drop_own(own_pollable_t{handle_id});",
+          "after": "#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n  lifecycle_diag::count(lifecycle_diag::Counter::HostMonotonicDropAttempt);\n#endif\n  wasi_io_poll_pollable_drop_own(own_pollable_t{handle_id});\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n  lifecycle_diag::count(lifecycle_diag::Counter::HostMonotonicDropReturned);\n#endif"
+        },
+        {
+          "before": "\nstatic std::optional<wasi_clocks_monotonic_clock_own_pollable_t> immediately_ready;",
+          "after": "\nstatic std::optional<wasi_clocks_monotonic_clock_own_pollable_t> immediately_ready;\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\nnamespace diagnostics::clock_lifecycle {\nbool immediate_cache_owned() { return immediately_ready.has_value(); }\n} // namespace diagnostics::clock_lifecycle\n#endif"
+        }
+      ],
+      "inverseExact": true
+    },
+    {
+      "role": "nativeAfterimage",
+      "repositoryPath": "cmake/builtins.cmake",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/combined-native355-v2-freeze/source/cmake/builtins.cmake",
+        "sha256": "09b4d73d6a2f0f3d83dff0c3bec98304632a712e1217493cd7deb6a080d4dfc0",
+        "bytes": 12524
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v1/after/cmake/builtins.cmake",
+        "sha256": "a1aa134afbe5bba8ed576ef521a51a06b829d43396d0926e9ae6aaa21943b495",
+        "bytes": 13976
+      },
+      "edits": [
+        {
+          "before": "if(CMAKE_SCRIPT_MODE_FILE)\n    set(CMAKE_MODULE_PATH \"${CMAKE_CURRENT_LIST_DIR}\")\nelse()\n    add_library(builtins STATIC builtins/install_builtins.cpp)\n    target_include_directories(builtins PRIVATE ${CMAKE_CURRENT_BINARY_DIR})\n    target_link_libraries(builtins PRIVATE extension_api)\nendif()\n\ninclude(\"add_builtin\")\n\nset(INSTALL_BUILTINS ${CMAKE_CURRENT_BINARY_DIR}/builtins.incl CACHE INTERNAL \"Path to the builtins.incl file\" FORCE)\nfile(WRITE ${INSTALL_BUILTINS} \"// This file is generated by CMake\\n\")\n\n\n# These builtins are always enabled.\nadd_builtin(builtins/web/global_self.cpp)\nadd_builtin(builtins/web/queue-microtask.cpp)\nadd_builtin(builtins/web/structured-clone.cpp)\nadd_builtin(builtins/web/base64.cpp)\nadd_builtin(builtins/web/blob.cpp)\nadd_builtin(builtins/web/file.cpp)\n\nadd_builtin(\n    builtins::web::event\n    SRC\n        builtins/web/event/event.cpp\n        builtins/web/event/event-target.cpp\n        builtins/web/event/custom-event.cpp\n        builtins/web/event/global-event-target.cpp)\n\nadd_builtin(\n    builtins::web::abort\n    SRC\n        builtins/web/abort/abort-signal.cpp\n        builtins/web/abort/abort-controller.cpp)\n\nadd_builtin(\n    builtins::web::form_data\n    SRC\n        builtins/web/form-data/form-data.cpp\n        builtins/web/form-data/form-data-encoder.cpp\n        builtins/web/form-data/form-data-parser.cpp\n    DEPENDENCIES\n        multipart\n)\n\nadd_builtin(\n    builtins::web::dom_exception\n    SRC\n        builtins/web/dom-exception.cpp\n    INCLUDE_DIRS\n        runtime)\n\nadd_builtin(\n    builtins::web::url\n    SRC\n        builtins/web/url.cpp\n    INCLUDE_DIRS\n        runtime)\n\nadd_builtin(builtins/web/console.cpp)\n\nadd_builtin(builtins/web/performance.cpp)\n\nadd_builtin(\n    builtins::web::timers\n    SRC\n        builtins/web/timers.cpp\n    INCLUDE_DIRS\n        runtime)\n\nadd_builtin(builtins/web/worker-location.cpp)\n\nadd_builtin(\n    builtins::web::text-codec\n    SRC\n        builtins/web/text-codec/text-codec.cpp\n        builtins/web/text-codec/text-decoder.cpp\n        builtins/web/text-codec/text-encoder.cpp\n    INCLUDE_DIRS\n        runtime)\n\nadd_builtin(\n    builtins::web::streams\n    SRC\n        builtins/web/streams/buf-reader.cpp\n        builtins/web/streams/compression-stream.cpp\n        builtins/web/streams/decompression-stream.cpp\n        builtins/web/streams/native-stream-sink.cpp\n        builtins/web/streams/native-stream-source.cpp\n        builtins/web/streams/streams.cpp\n        builtins/web/streams/transform-stream.cpp\n        builtins/web/streams/transform-stream-default-controller.cpp\n    INCLUDE_DIRS\n        runtime)\n\nadd_builtin(\n    builtins::web::fetch\n    SRC\n        builtins/web/fetch/fetch-api.cpp\n        builtins/web/fetch/fetch-utils.cpp\n        builtins/web/fetch/headers.cpp\n        builtins/web/fetch/request-response.cpp\n    DEPENDENCIES\n)\n\nadd_builtin(\n    builtins::web::fetch::fetch_event\n    SRC\n        builtins/web/fetch/fetch_event.cpp\n    DEPENDENCIES\n        host_api)\n\nadd_builtin(\n    builtins::web::crypto\n    SRC\n        builtins/web/crypto/crypto.cpp\n        builtins/web/crypto/crypto-algorithm.cpp\n        builtins/web/crypto/crypto-key.cpp\n        builtins/web/crypto/crypto-key-ec-components.cpp\n        builtins/web/crypto/crypto-key-rsa-components.cpp\n        builtins/web/crypto/json-web-key.cpp\n        builtins/web/crypto/subtle-crypto.cpp\n        builtins/web/crypto/uuid.cpp\n    DEPENDENCIES\n        OpenSSL::Crypto\n    INCLUDE_DIRS\n        runtime)\n\n# This bounded Node profile is deliberately opt-in. It adds no host imports;\n# the facade reuses the existing native TextEncoder/TextDecoder implementation.\noption(ENABLE_BUILTIN_NODE_COMPAT \"Enable bounded Node v22.14.0 Buffer and child_process profile\" OFF)\nif(ENABLE_BUILTIN_NODE_COMPAT AND NOT TARGET builtin_web_text_codec AND NOT CMAKE_SCRIPT_MODE_FILE)\n    message(FATAL_ERROR \"ENABLE_BUILTIN_NODE_COMPAT requires ENABLE_BUILTIN_WEB_TEXT_CODEC=ON\")\nendif()\nadd_builtin(\n    builtins::node_compat\n    DISABLED_BY_DEFAULT\n    SRC\n        builtins/node-compat/buffer.cpp\n        builtins/node-compat/register.cpp\n        builtins/node-compat/entropy-policy.cpp\n        builtins/node-compat/entropy-bridge.cpp\n    DEPENDENCIES\n        builtin_web_text_codec)\n\nif(TARGET builtin_node_compat)\n    option(NODE_COMPAT_PATH \"Enable optional pure node:path/posix/win32 modules\" OFF)\n    if(NODE_COMPAT_PATH)\n        target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_PATH=1)\n    endif()\n    option(NODE_COMPAT_EVENTS \"Enable optional bounded synchronous node:events module\" OFF)\n    if(NODE_COMPAT_EVENTS)\n        foreach(NODE_COMPAT_EVENT_PREREQUISITE builtin_web_event builtin_web_abort builtin_web_queue_microtask)\n            if(NOT TARGET ${NODE_COMPAT_EVENT_PREREQUISITE})\n                message(FATAL_ERROR \"NODE_COMPAT_EVENTS m0.10 requires ${NODE_COMPAT_EVENT_PREREQUISITE}\")\n            endif()\n        endforeach()\n        target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_EVENTS=1)\n        # EventListener layout must agree in every translation unit. This is a\n        # derived guest feature, not an independently selectable cache option.\n        target_compile_definitions(extension_api INTERFACE NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER=1)\n        add_dependencies(builtin_node_compat builtin_web_event builtin_web_abort builtin_web_queue_microtask)\n        target_link_libraries(builtin_node_compat PRIVATE builtin_web_event builtin_web_abort builtin_web_queue_microtask)\n    endif()\n    option(NODE_COMPAT_STRING_DECODER \"Enable optional bounded node:string_decoder module\" OFF)\n    option(NODE_COMPAT_ASSERT \"Enable optional bounded node:assert/strict modules\" OFF)\n    option(NODE_COMPAT_QUERYSTRING \"Enable optional bounded node:querystring module\" OFF)\n    option(NODE_COMPAT_UTIL \"Enable optional bounded node:util/types and sys modules\" OFF)\n    foreach(NODE_COMPAT_FOUNDATION STRING_DECODER ASSERT QUERYSTRING UTIL)\n        if(NODE_COMPAT_${NODE_COMPAT_FOUNDATION})\n            target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_${NODE_COMPAT_FOUNDATION}=1)\n        endif()\n    endforeach()\n    # A selected compatibility profile must not snapshot an initializer whose\n    # queued work rejected without a handler. Propagate through the existing\n    # runtime interface target, including ComponentizeJS embedding builds.\n    target_compile_definitions(extension_api INTERFACE NODE_COMPAT_STRICT_INITIALIZATION=1)\n    option(NODE_COMPAT_OOM_TESTING \"Enable test-only SpiderMonkey debug allocator faults in Buffer kernels\" OFF)\n    if(NODE_COMPAT_OOM_TESTING)\n        target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_OOM_TESTING=1)\n    endif()\n    option(NODE_COMPAT_GC_STRESS \"Collect between native Buffer kernel allocation boundaries (tests only)\" OFF)\n    if(NODE_COMPAT_GC_STRESS)\n        target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_GC_STRESS=1)\n    endif()\nendif()\n\nif(NODE_COMPAT_PATH AND NOT TARGET builtin_node_compat AND NOT CMAKE_SCRIPT_MODE_FILE)\n    message(FATAL_ERROR \"NODE_COMPAT_PATH requires ENABLE_BUILTIN_NODE_COMPAT=ON\")\nendif()\n\nif(NODE_COMPAT_EVENTS AND NOT TARGET builtin_node_compat AND NOT CMAKE_SCRIPT_MODE_FILE)\n    message(FATAL_ERROR \"NODE_COMPAT_EVENTS requires ENABLE_BUILTIN_NODE_COMPAT=ON\")\nendif()\n\nforeach(NODE_COMPAT_FOUNDATION STRING_DECODER ASSERT QUERYSTRING UTIL)\n    if(NODE_COMPAT_${NODE_COMPAT_FOUNDATION} AND NOT TARGET builtin_node_compat AND NOT CMAKE_SCRIPT_MODE_FILE)\n        message(FATAL_ERROR \"NODE_COMPAT_${NODE_COMPAT_FOUNDATION} requires ENABLE_BUILTIN_NODE_COMPAT=ON\")\n    endif()\nendforeach()\n\n# Keep the entire stream/web factory and private native capture optional. The\n# existing web builtins must be explicitly available; add_dependencies is not\n# initializer topology. Their earlier add_builtin declarations install first.\noption(NODE_COMPAT_STREAM_WEB \"Enable optional bounded node:stream/web module\" OFF)\nif(NODE_COMPAT_STREAM_WEB AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat)\n        message(FATAL_ERROR \"NODE_COMPAT_STREAM_WEB requires ENABLE_BUILTIN_NODE_COMPAT=ON\")\n    endif()\n    if(NOT TARGET builtin_web_streams)\n        message(FATAL_ERROR \"NODE_COMPAT_STREAM_WEB requires ENABLE_BUILTIN_WEB_STREAMS=ON\")\n    endif()\n    if(NOT TARGET builtin_web_text_codec)\n        message(FATAL_ERROR \"NODE_COMPAT_STREAM_WEB requires ENABLE_BUILTIN_WEB_TEXT_CODEC=ON\")\n    endif()\n    target_sources(builtin_node_compat PRIVATE builtins/node-compat/stream-web-kernel.cpp)\n    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_STREAM_WEB=1)\n    target_include_directories(builtin_node_compat PRIVATE \"${CMAKE_CURRENT_SOURCE_DIR}\")\n    add_dependencies(builtin_node_compat builtin_web_streams builtin_web_text_codec)\n    target_link_libraries(builtin_node_compat PRIVATE builtin_web_streams builtin_web_text_codec)\nendif()\n\n# Private scheduler proposal: no public process namespace or host capability.\noption(NODE_COMPAT_INTERNAL_TICKS \"Enable private bounded guest nextTick queue\" OFF)\nif(NODE_COMPAT_INTERNAL_TICKS AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat)\n        message(FATAL_ERROR \"NODE_COMPAT_INTERNAL_TICKS requires ENABLE_BUILTIN_NODE_COMPAT=ON\")\n    endif()\n    target_compile_definitions(extension_api INTERFACE NODE_COMPAT_INTERNAL_TICKS=1)\nendif()\n\n# UNAPPLIED classic source candidate: pure JS state machines over existing guest\n# byte/event/decoder primitives and the private FIFO. No external host service.\noption(NODE_COMPAT_CLASSIC_STREAMS \"Enable optional bounded node:stream classic core\" OFF)\nif(NODE_COMPAT_CLASSIC_STREAMS AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat)\n        message(FATAL_ERROR \"NODE_COMPAT_CLASSIC_STREAMS requires ENABLE_BUILTIN_NODE_COMPAT=ON\")\n    endif()\n    foreach(CLASSIC_PREREQUISITE EVENTS STRING_DECODER INTERNAL_TICKS)\n        if(NOT NODE_COMPAT_${CLASSIC_PREREQUISITE})\n            message(FATAL_ERROR \"NODE_COMPAT_CLASSIC_STREAMS requires NODE_COMPAT_${CLASSIC_PREREQUISITE}=ON\")\n        endif()\n    endforeach()\n    if(NOT TARGET builtin_web_abort)\n        message(FATAL_ERROR \"NODE_COMPAT_CLASSIC_STREAMS requires existing native web AbortSignal/AbortController\")\n    endif()\n    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_CLASSIC_STREAMS=1)\n    # The Events prerequisite already links/initializes web Event/Abort. This\n    # feature does not select web streams, clocks, stdio or new WASI imports.\nendif()\n\n# Optional bounded zlib proposal; no second codec or find_package(ZLIB) fallback.\noption(NODE_COMPAT_ZLIB \"Enable bounded synchronous node:zlib source proposal\" OFF)\nif(NODE_COMPAT_ZLIB AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat OR NOT TARGET spidermonkey)\n        message(FATAL_ERROR \"NODE_COMPAT_ZLIB requires the existing native Node and SpiderMonkey targets\")\n    endif()\n    if(NOT CMAKE_BUILD_TYPE STREQUAL \"Release\" OR NODE_COMPAT_OOM_TESTING)\n        message(FATAL_ERROR \"Bounded zlib proposal selects ordinary Release only\")\n    endif()\n    foreach(ZLIB_REQUIRED \"${SM_INCLUDE_DIR}/zlib.h\" \"${SM_INCLUDE_DIR}/zconf.h\" \"${SM_INCLUDE_DIR}/mozzconf.h\" \"${SM_LIB_DIR}/libspidermonkey.a\")\n        if(NOT EXISTS \"${ZLIB_REQUIRED}\")\n            message(FATAL_ERROR \"Selected guest codec input missing: ${ZLIB_REQUIRED}; no system codec fallback\")\n        endif()\n    endforeach()\n    # Existing add_builtin already links this target to spidermonkey. Actual\n    # header/archive/link and zlibVersion() identity still require new evidence.\n    target_include_directories(builtin_node_compat BEFORE PRIVATE \"${SM_INCLUDE_DIR}\")\n    target_sources(builtin_node_compat PRIVATE builtins/node-compat/zlib/kernel.cpp)\n    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_ZLIB=1)\nendif()\n\n# Independent optional consumers: existing native decoder, no new C++ kernel.\noption(NODE_COMPAT_STREAM_CONSUMERS \"Enable bounded node:stream/consumers text/json\" OFF)\nif(NODE_COMPAT_STREAM_CONSUMERS AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat OR NOT TARGET builtin_web_text_codec)\n        message(FATAL_ERROR \"NODE_COMPAT_STREAM_CONSUMERS requires existing Node and native TextCodec builtins\")\n    endif()\n    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_STREAM_CONSUMERS=1)\n    add_dependencies(builtin_node_compat builtin_web_text_codec)\n    target_link_libraries(builtin_node_compat PRIVATE builtin_web_text_codec)\nendif()\n",
+          "after": "if(CMAKE_SCRIPT_MODE_FILE)\n    set(CMAKE_MODULE_PATH \"${CMAKE_CURRENT_LIST_DIR}\")\nelse()\n    add_library(builtins STATIC builtins/install_builtins.cpp)\n    target_include_directories(builtins PRIVATE ${CMAKE_CURRENT_BINARY_DIR})\n    target_link_libraries(builtins PRIVATE extension_api)\nendif()\n\ninclude(\"add_builtin\")\n\nset(INSTALL_BUILTINS ${CMAKE_CURRENT_BINARY_DIR}/builtins.incl CACHE INTERNAL \"Path to the builtins.incl file\" FORCE)\nfile(WRITE ${INSTALL_BUILTINS} \"// This file is generated by CMake\\n\")\n\n\n# These builtins are always enabled.\nadd_builtin(builtins/web/global_self.cpp)\nadd_builtin(builtins/web/queue-microtask.cpp)\nadd_builtin(builtins/web/structured-clone.cpp)\nadd_builtin(builtins/web/base64.cpp)\nadd_builtin(builtins/web/blob.cpp)\nadd_builtin(builtins/web/file.cpp)\n\nadd_builtin(\n    builtins::web::event\n    SRC\n        builtins/web/event/event.cpp\n        builtins/web/event/event-target.cpp\n        builtins/web/event/custom-event.cpp\n        builtins/web/event/global-event-target.cpp)\n\nadd_builtin(\n    builtins::web::abort\n    SRC\n        builtins/web/abort/abort-signal.cpp\n        builtins/web/abort/abort-controller.cpp)\n\nadd_builtin(\n    builtins::web::form_data\n    SRC\n        builtins/web/form-data/form-data.cpp\n        builtins/web/form-data/form-data-encoder.cpp\n        builtins/web/form-data/form-data-parser.cpp\n    DEPENDENCIES\n        multipart\n)\n\nadd_builtin(\n    builtins::web::dom_exception\n    SRC\n        builtins/web/dom-exception.cpp\n    INCLUDE_DIRS\n        runtime)\n\nadd_builtin(\n    builtins::web::url\n    SRC\n        builtins/web/url.cpp\n    INCLUDE_DIRS\n        runtime)\n\nadd_builtin(builtins/web/console.cpp)\n\nadd_builtin(builtins/web/performance.cpp)\n\nadd_builtin(\n    builtins::web::timers\n    SRC\n        builtins/web/timers.cpp\n    INCLUDE_DIRS\n        runtime)\n\nadd_builtin(builtins/web/worker-location.cpp)\n\nadd_builtin(\n    builtins::web::text-codec\n    SRC\n        builtins/web/text-codec/text-codec.cpp\n        builtins/web/text-codec/text-decoder.cpp\n        builtins/web/text-codec/text-encoder.cpp\n    INCLUDE_DIRS\n        runtime)\n\nadd_builtin(\n    builtins::web::streams\n    SRC\n        builtins/web/streams/buf-reader.cpp\n        builtins/web/streams/compression-stream.cpp\n        builtins/web/streams/decompression-stream.cpp\n        builtins/web/streams/native-stream-sink.cpp\n        builtins/web/streams/native-stream-source.cpp\n        builtins/web/streams/streams.cpp\n        builtins/web/streams/transform-stream.cpp\n        builtins/web/streams/transform-stream-default-controller.cpp\n    INCLUDE_DIRS\n        runtime)\n\nadd_builtin(\n    builtins::web::fetch\n    SRC\n        builtins/web/fetch/fetch-api.cpp\n        builtins/web/fetch/fetch-utils.cpp\n        builtins/web/fetch/headers.cpp\n        builtins/web/fetch/request-response.cpp\n    DEPENDENCIES\n)\n\nadd_builtin(\n    builtins::web::fetch::fetch_event\n    SRC\n        builtins/web/fetch/fetch_event.cpp\n    DEPENDENCIES\n        host_api)\n\nadd_builtin(\n    builtins::web::crypto\n    SRC\n        builtins/web/crypto/crypto.cpp\n        builtins/web/crypto/crypto-algorithm.cpp\n        builtins/web/crypto/crypto-key.cpp\n        builtins/web/crypto/crypto-key-ec-components.cpp\n        builtins/web/crypto/crypto-key-rsa-components.cpp\n        builtins/web/crypto/json-web-key.cpp\n        builtins/web/crypto/subtle-crypto.cpp\n        builtins/web/crypto/uuid.cpp\n    DEPENDENCIES\n        OpenSSL::Crypto\n    INCLUDE_DIRS\n        runtime)\n\n# This bounded Node profile is deliberately opt-in. It adds no host imports;\n# the facade reuses the existing native TextEncoder/TextDecoder implementation.\noption(ENABLE_BUILTIN_NODE_COMPAT \"Enable bounded Node v22.14.0 Buffer and child_process profile\" OFF)\nif(ENABLE_BUILTIN_NODE_COMPAT AND NOT TARGET builtin_web_text_codec AND NOT CMAKE_SCRIPT_MODE_FILE)\n    message(FATAL_ERROR \"ENABLE_BUILTIN_NODE_COMPAT requires ENABLE_BUILTIN_WEB_TEXT_CODEC=ON\")\nendif()\nadd_builtin(\n    builtins::node_compat\n    DISABLED_BY_DEFAULT\n    SRC\n        builtins/node-compat/buffer.cpp\n        builtins/node-compat/register.cpp\n        builtins/node-compat/entropy-policy.cpp\n        builtins/node-compat/entropy-bridge.cpp\n    DEPENDENCIES\n        builtin_web_text_codec)\n\nif(TARGET builtin_node_compat)\n    option(NODE_COMPAT_PATH \"Enable optional pure node:path/posix/win32 modules\" OFF)\n    if(NODE_COMPAT_PATH)\n        target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_PATH=1)\n    endif()\n    option(NODE_COMPAT_EVENTS \"Enable optional bounded synchronous node:events module\" OFF)\n    if(NODE_COMPAT_EVENTS)\n        foreach(NODE_COMPAT_EVENT_PREREQUISITE builtin_web_event builtin_web_abort builtin_web_queue_microtask)\n            if(NOT TARGET ${NODE_COMPAT_EVENT_PREREQUISITE})\n                message(FATAL_ERROR \"NODE_COMPAT_EVENTS m0.10 requires ${NODE_COMPAT_EVENT_PREREQUISITE}\")\n            endif()\n        endforeach()\n        target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_EVENTS=1)\n        # EventListener layout must agree in every translation unit. This is a\n        # derived guest feature, not an independently selectable cache option.\n        target_compile_definitions(extension_api INTERFACE NODE_COMPAT_EVENTS_ADD_ABORT_LISTENER=1)\n        add_dependencies(builtin_node_compat builtin_web_event builtin_web_abort builtin_web_queue_microtask)\n        target_link_libraries(builtin_node_compat PRIVATE builtin_web_event builtin_web_abort builtin_web_queue_microtask)\n    endif()\n    option(NODE_COMPAT_STRING_DECODER \"Enable optional bounded node:string_decoder module\" OFF)\n    option(NODE_COMPAT_ASSERT \"Enable optional bounded node:assert/strict modules\" OFF)\n    option(NODE_COMPAT_QUERYSTRING \"Enable optional bounded node:querystring module\" OFF)\n    option(NODE_COMPAT_UTIL \"Enable optional bounded node:util/types and sys modules\" OFF)\n    foreach(NODE_COMPAT_FOUNDATION STRING_DECODER ASSERT QUERYSTRING UTIL)\n        if(NODE_COMPAT_${NODE_COMPAT_FOUNDATION})\n            target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_${NODE_COMPAT_FOUNDATION}=1)\n        endif()\n    endforeach()\n    # A selected compatibility profile must not snapshot an initializer whose\n    # queued work rejected without a handler. Propagate through the existing\n    # runtime interface target, including ComponentizeJS embedding builds.\n    target_compile_definitions(extension_api INTERFACE NODE_COMPAT_STRICT_INITIALIZATION=1)\n    option(NODE_COMPAT_OOM_TESTING \"Enable test-only SpiderMonkey debug allocator faults in Buffer kernels\" OFF)\n    if(NODE_COMPAT_OOM_TESTING)\n        target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_OOM_TESTING=1)\n    endif()\n    option(NODE_COMPAT_GC_STRESS \"Collect between native Buffer kernel allocation boundaries (tests only)\" OFF)\n    if(NODE_COMPAT_GC_STRESS)\n        target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_GC_STRESS=1)\n    endif()\nendif()\n\nif(NODE_COMPAT_PATH AND NOT TARGET builtin_node_compat AND NOT CMAKE_SCRIPT_MODE_FILE)\n    message(FATAL_ERROR \"NODE_COMPAT_PATH requires ENABLE_BUILTIN_NODE_COMPAT=ON\")\nendif()\n\nif(NODE_COMPAT_EVENTS AND NOT TARGET builtin_node_compat AND NOT CMAKE_SCRIPT_MODE_FILE)\n    message(FATAL_ERROR \"NODE_COMPAT_EVENTS requires ENABLE_BUILTIN_NODE_COMPAT=ON\")\nendif()\n\nforeach(NODE_COMPAT_FOUNDATION STRING_DECODER ASSERT QUERYSTRING UTIL)\n    if(NODE_COMPAT_${NODE_COMPAT_FOUNDATION} AND NOT TARGET builtin_node_compat AND NOT CMAKE_SCRIPT_MODE_FILE)\n        message(FATAL_ERROR \"NODE_COMPAT_${NODE_COMPAT_FOUNDATION} requires ENABLE_BUILTIN_NODE_COMPAT=ON\")\n    endif()\nendforeach()\n\n# Keep the entire stream/web factory and private native capture optional. The\n# existing web builtins must be explicitly available; add_dependencies is not\n# initializer topology. Their earlier add_builtin declarations install first.\noption(NODE_COMPAT_STREAM_WEB \"Enable optional bounded node:stream/web module\" OFF)\nif(NODE_COMPAT_STREAM_WEB AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat)\n        message(FATAL_ERROR \"NODE_COMPAT_STREAM_WEB requires ENABLE_BUILTIN_NODE_COMPAT=ON\")\n    endif()\n    if(NOT TARGET builtin_web_streams)\n        message(FATAL_ERROR \"NODE_COMPAT_STREAM_WEB requires ENABLE_BUILTIN_WEB_STREAMS=ON\")\n    endif()\n    if(NOT TARGET builtin_web_text_codec)\n        message(FATAL_ERROR \"NODE_COMPAT_STREAM_WEB requires ENABLE_BUILTIN_WEB_TEXT_CODEC=ON\")\n    endif()\n    target_sources(builtin_node_compat PRIVATE builtins/node-compat/stream-web-kernel.cpp)\n    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_STREAM_WEB=1)\n    target_include_directories(builtin_node_compat PRIVATE \"${CMAKE_CURRENT_SOURCE_DIR}\")\n    add_dependencies(builtin_node_compat builtin_web_streams builtin_web_text_codec)\n    target_link_libraries(builtin_node_compat PRIVATE builtin_web_streams builtin_web_text_codec)\nendif()\n\n# Private scheduler proposal: no public process namespace or host capability.\noption(NODE_COMPAT_INTERNAL_TICKS \"Enable private bounded guest nextTick queue\" OFF)\nif(NODE_COMPAT_INTERNAL_TICKS AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat)\n        message(FATAL_ERROR \"NODE_COMPAT_INTERNAL_TICKS requires ENABLE_BUILTIN_NODE_COMPAT=ON\")\n    endif()\n    target_compile_definitions(extension_api INTERFACE NODE_COMPAT_INTERNAL_TICKS=1)\nendif()\n\n# UNAPPLIED classic source candidate: pure JS state machines over existing guest\n# byte/event/decoder primitives and the private FIFO. No external host service.\noption(NODE_COMPAT_CLASSIC_STREAMS \"Enable optional bounded node:stream classic core\" OFF)\nif(NODE_COMPAT_CLASSIC_STREAMS AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat)\n        message(FATAL_ERROR \"NODE_COMPAT_CLASSIC_STREAMS requires ENABLE_BUILTIN_NODE_COMPAT=ON\")\n    endif()\n    foreach(CLASSIC_PREREQUISITE EVENTS STRING_DECODER INTERNAL_TICKS)\n        if(NOT NODE_COMPAT_${CLASSIC_PREREQUISITE})\n            message(FATAL_ERROR \"NODE_COMPAT_CLASSIC_STREAMS requires NODE_COMPAT_${CLASSIC_PREREQUISITE}=ON\")\n        endif()\n    endforeach()\n    if(NOT TARGET builtin_web_abort)\n        message(FATAL_ERROR \"NODE_COMPAT_CLASSIC_STREAMS requires existing native web AbortSignal/AbortController\")\n    endif()\n    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_CLASSIC_STREAMS=1)\n    # The Events prerequisite already links/initializes web Event/Abort. This\n    # feature does not select web streams, clocks, stdio or new WASI imports.\nendif()\n\n# Optional bounded zlib proposal; no second codec or find_package(ZLIB) fallback.\noption(NODE_COMPAT_ZLIB \"Enable bounded synchronous node:zlib source proposal\" OFF)\nif(NODE_COMPAT_ZLIB AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat OR NOT TARGET spidermonkey)\n        message(FATAL_ERROR \"NODE_COMPAT_ZLIB requires the existing native Node and SpiderMonkey targets\")\n    endif()\n    if(NOT CMAKE_BUILD_TYPE STREQUAL \"Release\" OR NODE_COMPAT_OOM_TESTING)\n        message(FATAL_ERROR \"Bounded zlib proposal selects ordinary Release only\")\n    endif()\n    foreach(ZLIB_REQUIRED \"${SM_INCLUDE_DIR}/zlib.h\" \"${SM_INCLUDE_DIR}/zconf.h\" \"${SM_INCLUDE_DIR}/mozzconf.h\" \"${SM_LIB_DIR}/libspidermonkey.a\")\n        if(NOT EXISTS \"${ZLIB_REQUIRED}\")\n            message(FATAL_ERROR \"Selected guest codec input missing: ${ZLIB_REQUIRED}; no system codec fallback\")\n        endif()\n    endforeach()\n    # Existing add_builtin already links this target to spidermonkey. Actual\n    # header/archive/link and zlibVersion() identity still require new evidence.\n    target_include_directories(builtin_node_compat BEFORE PRIVATE \"${SM_INCLUDE_DIR}\")\n    target_sources(builtin_node_compat PRIVATE builtins/node-compat/zlib/kernel.cpp)\n    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_ZLIB=1)\nendif()\n\n# Independent optional consumers: existing native decoder, no new C++ kernel.\noption(NODE_COMPAT_STREAM_CONSUMERS \"Enable bounded node:stream/consumers text/json\" OFF)\nif(NODE_COMPAT_STREAM_CONSUMERS AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat OR NOT TARGET builtin_web_text_codec)\n        message(FATAL_ERROR \"NODE_COMPAT_STREAM_CONSUMERS requires existing Node and native TextCodec builtins\")\n    endif()\n    target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_STREAM_CONSUMERS=1)\n    add_dependencies(builtin_node_compat builtin_web_text_codec)\n    target_link_libraries(builtin_node_compat PRIVATE builtin_web_text_codec)\nendif()\n\n# SOURCE-ONLY separate diagnostic variant. Both flags are OFF by default.\noption(NODE_COMPAT_LIFECYCLE_DIAGNOSTICS \"Instrument private lifecycle snapshots\" OFF)\noption(ENABLE_BUILTIN_DIAGNOSTICS_CLOCK_LIFECYCLE \"Enable private lifecycle module\" OFF)\nif(ENABLE_BUILTIN_DIAGNOSTICS_CLOCK_LIFECYCLE AND NOT NODE_COMPAT_LIFECYCLE_DIAGNOSTICS)\n    message(FATAL_ERROR \"Private lifecycle module requires its instrumentation flag\")\nendif()\nif(NODE_COMPAT_LIFECYCLE_DIAGNOSTICS)\n    if(NOT ENABLE_BUILTIN_NODE_COMPAT OR NOT ENABLE_BUILTIN_WEB_TIMERS)\n        message(FATAL_ERROR \"Lifecycle diagnostics require the genuine Node and timer targets\")\n    endif()\n    if(NOT CMAKE_BUILD_TYPE STREQUAL \"Release\" OR ENABLE_JS_DEBUGGER OR NODE_COMPAT_OOM_TESTING OR NODE_COMPAT_GC_STRESS)\n        message(FATAL_ERROR \"Lifecycle diagnostics require ordinary Release without debugger/OOM/GC stress\")\n    endif()\n    if(NOT ENABLE_BUILTIN_DIAGNOSTICS_CLOCK_LIFECYCLE)\n        message(FATAL_ERROR \"Instrumented lifecycle variant requires its explicit private module\")\n    endif()\n    target_compile_definitions(extension_api INTERFACE NODE_COMPAT_LIFECYCLE_DIAGNOSTICS=1)\n    target_compile_definitions(host_api PRIVATE NODE_COMPAT_LIFECYCLE_DIAGNOSTICS=1)\n    target_include_directories(host_api PRIVATE \"${CMAKE_CURRENT_SOURCE_DIR}/include\")\n    add_builtin(diagnostics::clock_lifecycle DISABLED_BY_DEFAULT\n        SRC builtins/diagnostics/clock-lifecycle.cpp)\nendif()\n"
+        }
+      ],
+      "inverseExact": true
+    },
+    {
+      "role": "externalEmbeddingAfterimage",
+      "repositoryPath": "embedding/embedding.cpp",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/combined-native355-v2-freeze/componentize-source/embedding/embedding.cpp",
+        "sha256": "9dcb63beaf55ff6af9ca4d2019316d4a167657c02ed76a1bf246012da0bcd205",
+        "bytes": 22252
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v1/after/componentize-source/embedding/embedding.cpp",
+        "sha256": "ed05e40b9b5fe221ef6669fdd3451abcc4721bfecae6a5f0051e0fe3141c816b",
+        "bytes": 22887
+      },
+      "edits": [
+        {
+          "before": "#include \"embedding.h\"\n",
+          "after": "#include \"embedding.h\"\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n#include \"clock-lifecycle-diagnostics.h\"\nnamespace lifecycle_diag = diagnostics::clock_lifecycle;\n#endif\n"
+        },
+        {
+          "before": "  Runtime.cur_fn_idx = fn_idx;",
+          "after": "  Runtime.cur_fn_idx = fn_idx;\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n  lifecycle_diag::entered_call();\n#endif"
+        },
+        {
+          "before": "  if (!Runtime.engine->run_event_loop()) {\n    Runtime.engine->abort(\"(call) event loop error\");",
+          "after": "#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n  const bool diagnostic_loop_success = Runtime.engine->run_event_loop();\n  lifecycle_diag::after_loop(fn_idx, diagnostic_loop_success, Runtime.cur_fn_idx, Runtime.free_list.size());\n  if (!diagnostic_loop_success) {\n#else\n  if (!Runtime.engine->run_event_loop()) {\n#endif\n    Runtime.engine->abort(\"(call) event loop error\");"
+        },
+        {
+          "before": "  Runtime.free_list.clear();",
+          "after": "  Runtime.free_list.clear();\n#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS\n  lifecycle_diag::after_post_call(fn_idx, Runtime.cur_fn_idx, Runtime.free_list.size());\n#endif"
+        }
+      ],
+      "inverseExact": true
+    }
+  ],
+  "edits": 28,
+  "allReverseExact": true
+}

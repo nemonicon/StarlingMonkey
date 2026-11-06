@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "state": "UNEXECUTED_COMBINED355_LIFECYCLE_SCHEDULE_SOURCE_V1",
+  "sourceAndPackagingArePrerequisitesNotThisSchedule": true,
+  "sessionReuseMeansRetainedModuleOnlyNotRequestIsolation": true,
+  "resource": {
+    "exports": {
+      "inspect": [],
+      "run": [
+        "u32 case-id"
+      ],
+      "validate": []
+    },
+    "caseIds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "caseNames": [
+      "one-shot-argv",
+      "queued-double-clear",
+      "interval-self-clear",
+      "nested-victim-clear",
+      "active-self-clear-argv",
+      "handled-callback-error",
+      "bounded32-clear"
+    ],
+    "callbacksPerRotation": 14,
+    "newIdsPerRotation": 46,
+    "retainedJco": {
+      "instances": 1,
+      "rotations": 3,
+      "orderedCaseIds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "inspectBeforeAndAfter": true
+    },
+    "freshJco": {
+      "instances": 1,
+      "rotations": 1,
+      "orderedCaseIds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "inspectBeforeAndAfter": true
+    },
+    "stockWasmtime42": {
+      "freshProcesses": 3,
+      "literalInvoke": "validate()",
+      "innerSevenCasesEach": 7
+    },
+    "totalInnerCaseExecutions": 49,
+    "totalCallbackObservations": 98,
+    "totalNewIds": 322,
+    "exactBetweenHostExportState": {
+      "before.run": "previous.after.run+1",
+      "before.startedCases": "previous.after.startedCases+1",
+      "before.completedCases": "previous.after.completedCases",
+      "before.timerCallbacks": "previous.after.timerCallbacks",
+      "before.registeredIds": "previous.after.registeredIds"
+    },
+    "newComponentArtifactAndGeneratedProtocolRequired": true
+  },
+  "clockSnapshot": {
+    "wit": "fixtures/scalar.wit",
+    "literalStockInvoke": "run()",
+    "retainedJcoCalls": 3,
+    "freshJcoCalls": 1,
+    "freshStockWasmtimeProcesses": 3,
+    "fullStringsComparedToDeterministicNodeOracle": false,
+    "whyNoExactNodeStringOracle": "Real Date/performance samples differ by process/host. Validate full structures, within-instance monotonic/order and recorded realtime brackets; do not substitute fixed timestamps.",
+    "hostRealtimeBrackets": "Future caller records complete host before/after observations around each owned command/export. Brackets are observations, clock adjustments can make a bracket inconclusive, and no arbitrary tolerance may hide that.",
+    "nativeOffsetProof": null
+  },
+  "survivingInterest": {
+    "wit": "fixtures/scalar.wit",
+    "literalStockInvoke": "run()",
+    "retainedJcoCalls": 3,
+    "freshJcoCalls": 1,
+    "freshStockWasmtimeProcesses": 3,
+    "callbackOrder": [
+      "job-before-timers",
+      "timer-a",
+      "job-after-a",
+      "timer-b",
+      "fence"
+    ],
+    "cancelledTimersPerCall": 8,
+    "registeredTimersPerCall": 11,
+    "nativeInterestProof": null
+  },
+  "pureControl": {
+    "wit": "fixtures/scalar.wit",
+    "nativeResidualImports": [
+      "node:buffer"
+    ],
+    "requiredComponentImports": [],
+    "retainedJcoCalls": 2,
+    "freshStockWasmtimeProcesses": 1
+  },
+  "fatalCallback": {
+    "fixture": "fixtures/fatal.mjs",
+    "wit": "fixtures/scalar.wit",
+    "freshDisposableJcoProcesses": 1,
+    "freshDisposableStockProcesses": 1,
+    "precondition": "Seven-case handled-error positive control passed on the same new artifact lineage.",
+    "expected": "Observed invocation failure; no normal string or completion. Whole raw error retained; generic trap does not uniquely prove the JS error identity.",
+    "discardAfterFailure": true,
+    "timeoutsCountAsExpectedFatal": false
+  },
+  "fatalInitializer": {
+    "fixture": "fixtures/init-fatal.mjs",
+    "wit": "fixtures/scalar.wit",
+    "freshConstructionAttempt": 1,
+    "expected": "Genuine request-handling guard refusal during initialization, not a later import audit, tool error or timeout.",
+    "componentAccepted": false,
+    "ordinaryExportCalled": false
+  },
+  "rawCapture": {
+    "order": [
+      "pre-recheck",
+      "invoke-once",
+      "persist-whole-typed-return-or-throw-and-all-streams",
+      "persist-terminal-and-group-cleanup",
+      "validate",
+      "final-recheck-including-failure"
+    ],
+    "opaqueThrownValuesFullRepresentationClaim": false,
+    "noProgressMixedIntoGuestStdout": true
+  },
+  "ownedBounds": {
+    "ordinaryChildSeconds": 180,
+    "outerControllerSeconds": 1200,
+    "rootMustBindExactNewControllerSource": true,
+    "boundsCopiedFromMechanismOnlyNotIssuedAuthority": true,
+    "noUnboundedRetry": true
+  },
+  "newRootPhase": null,
+  "componentArtifactProof": null,
+  "runtimeAuthority": null
+}

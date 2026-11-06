@@ -1,6 +1,7 @@
 The optional production-package bundler now gets real React19.3.1 and nested
 CommonJS/native-builtin dependencies into capability-free components. Full
-Next.js and ReactDOM rendering remain incomplete. The accepted finite profile
+Next.js remains incomplete; a separate selected-clock ReactDOM test is described
+below. The accepted finite profile
 bundler and foundations-v13 native engine are unchanged.
 
 The [fresh post-push v2 run](results-post-push-v2/results.json), executed after
@@ -38,8 +39,8 @@ actual application/library inputs with the new `packages-v2` selection:
 ReactDOM's actual production `startWork` calls `setTimeout(..., 0)`. The named
 clock-subscription trap in the zero-capability test therefore motivates the
 separate explicit standard-clock profile; no timer shim or extra import is
-silently supplied. A selected-clock component still needs its own construction,
-snapshot and both-host runtime tests. The [previous v1 matrix](results-component-matrix/results.json)
+silently supplied. The separate selected-clock construction and both-host runtime
+results are below; broader snapshot validation remains open. The [previous v1 matrix](results-component-matrix/results.json)
 and [v1 Source HOLD](../package-bundler-implementation-review-v1/README.md)
 remain unchanged.
 
@@ -143,7 +144,9 @@ unrecorded runtime behavior. Use the separate Next runner/comparator for the ful
 HTTP/browser baseline. `nextjs/run.mjs` uses the original profile path; optional
 bundler checks require this matrix's explicit `--bundler packages-v2` selection.
 
-All emitted application components select no host interfaces. Their engine,
+All components emitted by the original zero-import package matrix select no
+host interfaces. The separate clock component selects its three declared
+standard interfaces. Their engine,
 metadata, source inputs, component hashes, WIT, whole typed results, raw process
 streams and cleanup observations are recorded. Large components/cores and npm
 dependencies remain external at their descriptors. Archived executed-source

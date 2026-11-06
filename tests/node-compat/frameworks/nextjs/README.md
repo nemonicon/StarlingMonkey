@@ -3,6 +3,13 @@ profile. **The full Next.js server does not currently compile through this profi
 bundler.** The stock Node application works; its failures in the Wasm pipeline are
 retained as regression observations.
 
+The retained-evidence checks were rerun on2026-11-06: the full Next baseline/replay
+comparison and43 injected checks, optional package comparison and40 injected
+checks, and the separate seven-return clock check with18 semantic negatives all
+pass. These are evidence rechecks; the known17 main-Next and seven optional-matrix
+failures remain. Current native experiments and outstanding work are tracked in
+[progress.md](../../../../progress.md).
+
 The follow-on [optional package-bundler experiment](../package-bundler-execution-v1/README.md)
 advances beyond the original CommonJS refusals below. A fresh ten-case run after
 checkpoint `d8034839` passes complete Node/Jco/Wasmtime comparisons for native

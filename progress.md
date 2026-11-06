@@ -14,6 +14,118 @@ See the [Next fixture](tests/node-compat/frameworks/nextjs/README.md) for the
 original failures and reusable regression commands. This Git checkpoint
 preserves the new evidence, retained failures and proposed source-only tooling; the full roadmap remains incomplete.
 
+Roadmap continuation after `30517ee6`:
+
+- Previous goal turn: **progress**. All checkout changes were committed and
+  pushed; remote `origin/main` was verified as `30517ee67fde903febf90c16db23842fa3da4933`
+  and the worktree was clean. Full roadmap remains incomplete.
+- Combined artifact-tooling Source `c365e608` now passes independent
+  [Source review4df251c3](tests/node-compat/foundation-scheduler/independent-combined355-native-artifact-tooling-source-review-v1/results.json)
+  for genuine full80 input models, full compact protection, real own
+  contexts and pure/grammar checks. The [actual export-only phase](tests/node-compat/foundation-scheduler/combined-native355-artifact-v1-export-root-results.json)
+  finishes at Root40725 raw0: outer parent46729 and worker47096 under genuine
+  nested1,200s/600s monitors, all observed groups gone with no timeout/signals/
+  errors. Candidate `435b30fe` is1,574,865 bytes; native frame `5c5c521f` is
+  744,251 bytes. Compact worker JSON and formatted candidate differ in bytes
+  but have equal complete parsed values; both raw formats remain retained.
+  Final protection passes. Independent actual export review passes below.
+  No engine or guest action has run; the subsequent validation bootstrap is
+  recorded below. The export has exactly five output files and no producer index/completion;
+  its reviewer authenticates full native80/355+3/eleven-manifest DATA,
+  whole raw candidate JSON and owned cleanup before the pin/bootstrap phase.
+- [Export DATA review21d82edd](tests/node-compat/foundation-scheduler/independent-combined355-native-pin-export-results-review-v1/results.json)
+  passes all five files, whole parsed candidate/worker equality, full80 frame,
+  2,596 frozen rows and both owned monitor results. Root issues validation-only
+  pins `a31710b3` with exactly four state/reviewRequired changes; all native data,
+  NULL variants and runtime/adoption restrictions remain unchanged. The [actual
+  bootstrap phase](tests/node-compat/foundation-scheduler/combined-native355-artifact-v1-bootstrap-root-results.json)
+  finishes at Root10796 raw0 (parent50367/worker50636), under1,200s/600s monitors.
+  Frame `c9f61b8f` is3,036,236 bytes; full native frame `5c5c521f` is unchanged
+  from export. Both monitor cleanups and final protection pass. Independent
+  [Bootstrap DATA reviewfa45a2af](tests/node-compat/foundation-scheduler/independent-combined355-native-bootstrap-results-review-v1/results.json)
+  passes full frame/pin reconstruction, whole raw JSON and both monitors. No
+  engine or guest call occurs. The [actual retained read-only API test](tests/node-compat/foundation-scheduler/combined-native355-artifact-v1-read-only-root-results.json)
+  finishes at Root43356 raw0 (Node54826): two full3,112,808-byte data returns are
+  identical; fresh recheck functions and three rechecks pass. Current API helper/
+  process/write counts remain0, separate from the historical CLI verifier count1.
+  [Independent read-only DATA reviewfd06076b](tests/node-compat/foundation-scheduler/independent-combined355-retained-read-only-results-review-v1/results.json)
+  passes the actual records/shapes and full current protection, with original
+  timing/zero-action counts qualified by inspected Source/control flow.
+- Root's bounded pure review of lifecycle Source6cfcc7e4 finds a collector gap:
+  a synthetic record with `current=1` and run/started counters9 is accepted.
+  Completed-versus-started relations are also missing. This is a test-validator
+  finding, not a guest failure. The v1 collector is held for runtime consumption;
+  its fixture bytes remain unchanged. A genuine v2 successor tightens those
+  relations with negative tests and actual new catalogue paths. [Successor
+  960a3b26](tests/node-compat/foundation-scheduler/combined-clock-lifecycle-candidate-v2/README.md)
+  passes [independent Source reviewb791b56b](tests/node-compat/foundation-scheduler/independent-combined355-clock-lifecycle-v2-source-review-v1/results.json):
+  49 pure checks, eight grammar checks, all source anchors and two independent
+  malformed records admitted by v1 but rejected by v2. The initial Root reader
+  assumed descriptor-only reference rows; its corrected read/hash result and
+  failed preparation code remain separate. No old source/runtime evidence is
+  rewritten and all17 runtime gates remain unexecuted.
+- The [357-source diagnostic template7aed33ec](tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v1/README.md)
+  is Source-only with default-OFF private read-only queue/interest/timer-lease/
+  cache/post-call observations. Its512-row lease ledger reports overflow and
+  incomplete recording explicitly; source collectors reject both. It adds no
+  current355 export and is not linked/admitted. Actual fixed-source SDK
+  [syntax checks29815de8](tests/node-compat/foundation-scheduler/combined-clock-diagnostics-sdk-syntax-v1/README.md)
+  and the [new-file driver retryb6a2a716](tests/node-compat/foundation-scheduler/combined-clock-diagnostics-sdk-builtin-retry-v1/README.md)
+  pass all five translation units, across six driver invocations. The initial
+  new-file path failure is retained. These are front-end checks only: no native
+  build, link, diagnostic engine, guest call or lifecycle acceptance follows.
+- [Combined component-caller Sourceaec12b5c](tests/node-compat/foundation-scheduler/combined-native-component-caller-candidate-v1/README.md)
+  passes [independent Source reviewa4c441dd](tests/node-compat/foundation-scheduler/independent-combined355-component-caller-source-review-v1/results.json).
+  It uses real c365 retained full80 admission, the real clock loader and separate
+  bundle-preparation/fresh-construction Nodes. Root binds each actual bundle SHA
+  in paired loader/construction records before loading. Both actual bundles
+  retain native `node:buffer`; no JavaScript Buffer adapter is substituted.
+  [Pure construction](tests/node-compat/foundation-scheduler/combined-native-component-v1-construct-pure-root-results.json)
+  returns component `181b59fd`,13,053,537 bytes, imports[], `run()->string`;
+  [resource construction](tests/node-compat/foundation-scheduler/combined-native-component-v1-construct-resource-root-results.json)
+  returns `5599dd8a`,13,092,238 bytes, with exactly the selected monotonic-clock,
+  wall-clock and poll interfaces at0.2.10. Both original inner/outer terminals
+  are raw0 with clean owned groups; whole publication hashes and membership
+  pass Root observation. Resource's tool response was lost during compaction;
+  its report records the actual terminal files without reconstructing a session
+  ID. [Pure artifact review0dc8bf11](tests/node-compat/foundation-scheduler/independent-combined355-pure-component-artifact-review-v1/results.json)
+  passes the actual component/type/core/glue and both owned phases; its explicit
+  per-pure result leaves the other five fixtures unaccepted. No ordinary guest export or generated
+  application module has run. Resource artifact review, remaining four fixture
+  constructions, all runtime/lifecycle gates and overall six-fixture acceptance
+  remain open; neither component promotes the355 engine.
+- [Native SHA256 Hash/Hmac Sourceafdbefde](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-candidate-v1/README.md)
+  passes [independent Source review1c23afaf](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-source-review-v1/results.json).
+  It specifies bounded update/digest methods, explicit named/default exports and
+  unsupported operations, meaningful partial constants and native WebCrypto
+  aliases. Default message handling copies; an experimental borrowed path is
+  separately gated. Both flags default OFF. Actual SDK syntax checks pass the
+  registrar and kernel in COPY and BORROW modes; the [SDK receipt9b237805](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-sdk-syntax-v1/README.md) records
+  the installed guest OpenSSL headers and retained reader-preparation failure.
+  Source remains unapplied to production. No real Hash/Hmac algorithm/provider,
+  native build/link, component, runtime, alias, GC, erasure or performance gate
+  has run. These templates do not add accepted `node:crypto` support.
+
+Checkpoint validation on2026-11-06: all16 new indexed evidence families pass
+exact membership and SHA checks (810 indexed members,826 files including their
+own indices). New JSON and Python grammar checks pass, and no binary or file
+over50MiB is staged. Whitespace warnings are confined to the byte-preserved
+upstream Node license and captured generated Jco glue; editable documentation
+passes. Those captured bytes remain unchanged.
+
+The five existing read-only framework checks were rerun with pinned Node22.14.0:
+Next baseline/replay comparison, its43 self-tests, optional package baseline/
+replay comparison, its40 self-tests, and the selected-clock checker with seven
+whole returns and18 semantic negatives. All exit0 with no regression or changed
+blocker. The17 known main-Next failures and seven optional-matrix failures remain.
+These checks inspect retained evidence; no new framework build, server, browser
+or component runtime was executed by this checkpoint recheck. The
+[Next runner/checker commands](tests/node-compat/frameworks/nextjs/README.md)
+and [package/clock checker commands](tests/node-compat/frameworks/package-bundler-execution-v1/README.md)
+remain the reusable regression entry points. Full Next HTTP/Wasm, request
+context, broader module support and deployment/reuse gates remain outstanding.
+
+
 Roadmap continuation after `9806b383`:
 
 - Previous goal turn: **progress**. All 473 pending files were committed and
@@ -210,7 +322,7 @@ Roadmap continuation after `9806b383`:
   The [genuine runtime differential](tests/node-compat/foundation-scheduler/clock-v13-runtime-v2-root-results.json)
   finishes at Root33981 raw0: three retained plus one fresh Jco and three fresh
   Wasmtime returns all equal the complete Node result. Five child terminals and
-  outer cleanup complete; Source-controlled final checks pass. Independent
+  outer cleanup complete; Source-controlled final checks pass.
   [Independent actual DATA review54683955](tests/node-compat/foundation-scheduler/independent-clock-v13-runtime-v2-results-review-v2/results.json)
   passes all seven full strings, five child PIDs/six owned groups, all three
   unchanged full native-frame captures and current declared protection. It
@@ -234,9 +346,9 @@ Roadmap continuation after `9806b383`:
   pinned standard WASI shim. Original wasi:* glue stays unchanged. Standard shim
   clocks/polling use a real worker thread and blocking Atomics.wait, requiring
   externally owned Node-process deadlines rather than JavaScript timers.
-  Mapped-output review, actual runtime results and the broader clock suite remain
-  open. No new host service or widened component import is introduced by this
-  standard-shim test plan.
+  Mapped-output and actual runtime reviews now pass for this bounded rendering
+  workload. The broader clock suite remains open. No new host service or widened
+  component import is introduced by this standard-shim test path.
 
 
 - [Combined native artifact toolingc365e608](tests/node-compat/foundation-scheduler/combined-native-artifact-tooling-candidate-v1/README.md)

@@ -19,14 +19,27 @@ actual-result review passes; snapshot and broader clock gates remain open.
 
 The combined355 native retry completes all 108 build steps and passes
 independent BUILD review. Its complete 80-field sidecar is preserved, and the
-2,596-copy freeze completes raw0 and passes independent DATA review. Native
-admission and runtime checks remain open. The separate secret355
+2,596-copy freeze completes raw0 and passes independent DATA review. Export,
+validation-only pins, read-only bootstrap and repeatable retained API now pass
+independent actual-result review. Two fresh components construct successfully:
+[pure](../../tests/node-compat/foundation-scheduler/combined-native-component-v1-construct-pure-root-results.json)
+has no imports; [resource](../../tests/node-compat/foundation-scheduler/combined-native-component-v1-construct-resource-root-results.json)
+imports exactly the selected three WASI0.2.10 clock/poll interfaces. Ordinary
+runtime calls, full catalogue validation and operational admission remain open.
+The separate secret355
 component and corrected v3 guarded runtime also pass actual review: 23 complete
 returns and 45 Node-oracle signatures. Three fresh stock-Wasmtime validations
 finish raw0 with 27 matching tags and pass independent actual-result review.
 Node crypto exports, native wiping and request reuse are not established.
 [progress.md](../../progress.md) records evidence and remaining work. Accepted
 production remains foundations-v13.
+
+The default-OFF [SHA256 Hash/Hmac template](../../tests/node-compat/foundation-crypto/node-crypto-hash-hmac-candidate-v1/README.md)
+passes independent Source review and three guest-SDK syntax checks. The private
+[clock lifecycle diagnostic template](../../tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v1/README.md)
+passes five SDK translation-unit syntax checks, with the initial new-file driver
+failure preserved. Neither template is linked or runtime validated. Crypto
+provider/ownership/GC gates and all broader clock lifecycle gates remain open.
 
 The [Next.js application experiment](../../tests/node-compat/frameworks/nextjs/README.md)
 now has two real Node production builds,24 HTTP and two browser checks per run,

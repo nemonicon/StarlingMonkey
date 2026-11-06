@@ -1,0 +1,19 @@
+Independent Node SHA256 Hash/Hmac Source review
+
+Bounded SOURCE PASS of afdb. The native kernel remains uncompiled and every operational/proof gate remains unissued.
+
+Bounded SOURCE review only; no native/C++/SDK compile, native helper/engine/component/generated/guest/provider/key/crypto/GC/DEBUG/OOM/reset workload was invoked. Native kernel remains UNCOMPILED.
+
+Actual147 API declarations and own State rooting/foreground-finalizer/native-owner order were inspected. Pure/mock cases do not prove compilation, moving-GC/finalization/abandonment, NoGC/provider callbacks, allocation failures, native alias identities or runtime erasure.
+
+Copying remains baseline and both feature/borrow CMake switches defaultOFF. Borrowing requires separately reviewed actual provider/allocator/link/initialization/import/NoGC evidence; name=default is a Source restriction, not a general provider safety attestation.
+
+Native staging/provider cleanup calls are exact pinned API paths. Logical staging and32-byte output cleansing is intended by Source; all secret copies/slack/register/user strings/buffers/provider state erasure, secure heap/locking or security completion are not claimed.
+
+Full initial68ESM/71default names are preserved with explicit refusing methods/constructors/streams/other algorithms. Only two SHA256 factories are proposed; nine finite numeric guest constants are partial, not host Node backend/cipher availability attestation. Existing real native Crypto/SubtleCrypto objects are passed rather than placeholders; actual public alias/import behavior is future validation.
+
+Hmac repeated digest empty versus Hash throw follows captured Node22 Source. Supported encoding/type/size/options and frozen property/prototype semantics remain deliberately narrower; exact native provider/allocation Node error codes and whole Node crypto compatibility are not implemented.
+
+Real one-argument factory/module/CMake/target APIs are used in unapplied afterimages over genuine staged355. Future integration requires a fresh source policy/count/manifest/build/artifact lineage; no old355 metadata projection or activation follows. Live-state snapshot policy and actual INIT absence of live native contexts remain mandatory unproved integration gates.
+
+Captured official source and literal vectors are reference DATA, not an executed Node oracle. Host pure tests use a noncryptographic kernel; filesystem/server/Next compatibility, entropy expansion, performance and adoption remain unproved.

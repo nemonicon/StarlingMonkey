@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "applied": false,
+  "baseSourceRoot": "/private/tmp/starling-node-compat/combined-native355-v1-source",
+  "files": [
+    {
+      "base": {
+        "path": "/private/tmp/starling-node-compat/combined-native355-v1-source/cmake/builtins.cmake",
+        "sha256": "09b4d73d6a2f0f3d83dff0c3bec98304632a712e1217493cd7deb6a080d4dfc0",
+        "bytes": 12524,
+        "role": "unchanged staged integration base"
+      },
+      "afterimage": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-candidate-v1/afterimages/cmake/builtins.cmake",
+        "sha256": "f1d5721b4d58184a8ec30a3e421e1288fdcf1131f9035a4b8a3f6ca00bfeb76f",
+        "bytes": 14056,
+        "role": "unapplied source afterimage"
+      },
+      "diff": "--- cmake/builtins.cmake\n+++ cmake/builtins.cmake\n@@ -145,6 +145,25 @@\n         builtin_web_text_codec)\n \n if(TARGET builtin_node_compat)\n+    option(NODE_COMPAT_CRYPTO_HASH_HMAC \"Experimental SHA256 Hash/Hmac proposal\" OFF)\n+    option(NODE_CRYPTO_AUDITED_BORROW \"Reviewed fixed-U8 NoGC EVP update borrowing\" OFF)\n+    if(NODE_COMPAT_CRYPTO_HASH_HMAC)\n+        if(NOT NODE_COMPAT_ENTROPY_MODE STREQUAL \"OFF\")\n+            message(FATAL_ERROR \"SHA256 Hash/Hmac proposal requires entropy OFF\")\n+        endif()\n+        if(NOT TARGET builtin_web_crypto)\n+            message(FATAL_ERROR \"SHA256 Hash/Hmac value aliases require builtin_web_crypto\")\n+        endif()\n+        target_sources(builtin_node_compat PRIVATE builtins/node-compat/hash-hmac-kernel.cpp)\n+        target_link_libraries(builtin_node_compat PRIVATE OpenSSL::Crypto builtin_web_crypto)\n+        add_dependencies(builtin_node_compat builtin_web_crypto)\n+        target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_CRYPTO_HASH_HMAC=1)\n+        if(NODE_CRYPTO_AUDITED_BORROW)\n+            target_compile_definitions(builtin_node_compat PRIVATE NODE_CRYPTO_AUDITED_BORROW=1)\n+        endif()\n+    elseif(NODE_CRYPTO_AUDITED_BORROW)\n+        message(FATAL_ERROR \"NODE_CRYPTO_AUDITED_BORROW requires NODE_COMPAT_CRYPTO_HASH_HMAC\")\n+    endif()\n     option(NODE_COMPAT_PATH \"Enable optional pure node:path/posix/win32 modules\" OFF)\n     if(NODE_COMPAT_PATH)\n         target_compile_definitions(builtin_node_compat PRIVATE NODE_COMPAT_PATH=1)\n@@ -281,3 +300,10 @@\n     add_dependencies(builtin_node_compat builtin_web_text_codec)\n     target_link_libraries(builtin_node_compat PRIVATE builtin_web_text_codec)\n endif()\n+\n+if(NODE_COMPAT_CRYPTO_HASH_HMAC AND NOT TARGET builtin_node_compat AND NOT CMAKE_SCRIPT_MODE_FILE)\n+    message(FATAL_ERROR \"NODE_COMPAT_CRYPTO_HASH_HMAC requires ENABLE_BUILTIN_NODE_COMPAT\")\n+endif()\n+if(NODE_CRYPTO_AUDITED_BORROW AND NOT NODE_COMPAT_CRYPTO_HASH_HMAC)\n+    message(FATAL_ERROR \"NODE_CRYPTO_AUDITED_BORROW requires NODE_COMPAT_CRYPTO_HASH_HMAC\")\n+endif()\n"
+    },
+    {
+      "base": {
+        "path": "/private/tmp/starling-node-compat/combined-native355-v1-source/builtins/node-compat/register.cpp",
+        "sha256": "879b74c797eac19f07e86fa4e93bfa29578e11d0250fc3fb00439167580af9f6",
+        "bytes": 13918,
+        "role": "unchanged staged integration base"
+      },
+      "afterimage": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-candidate-v1/afterimages/builtins/node-compat/register.cpp",
+        "sha256": "7698e61ebf3dac01903d4b6567df76adc460a9c3da8f94dd1c9e528dc0ecbe4a",
+        "bytes": 16262,
+        "role": "unapplied source afterimage"
+      },
+      "diff": "--- builtins/node-compat/register.cpp\n+++ builtins/node-compat/register.cpp\n@@ -4,6 +4,11 @@\n #include \"js/CompilationAndEvaluation.h\"\n #include \"js/SourceText.h\"\n #include \"factories.generated.h\"\n+#ifdef NODE_COMPAT_CRYPTO_HASH_HMAC\n+#include \"crypto-factory.generated.h\"\n+#include \"../web/crypto/crypto.h\"\n+#include \"../web/crypto/subtle-crypto.h\"\n+#endif\n #ifdef NODE_COMPAT_ZLIB\n #include \"zlib/factories.generated.h\"\n #endif\n@@ -40,6 +45,9 @@\n \n namespace builtins::node_compat {\n JSObject *create_kernel(JSContext *cx);\n+#ifdef NODE_COMPAT_CRYPTO_HASH_HMAC\n+JSObject *create_crypto_hash_hmac_kernel(JSContext *cx);\n+#endif\n #ifdef NODE_COMPAT_ZLIB\n namespace zlib_profile { JSObject *create_kernel(JSContext *cx); }\n #endif\n@@ -62,6 +70,42 @@\n   arguments[0].set(argument);\n   return JS::Call(cx, JS::UndefinedHandleValue, factory, arguments, result);\n }\n+\n+#ifdef NODE_COMPAT_CRYPTO_HASH_HMAC\n+static bool install_crypto_hash_hmac(api::Engine *engine, JS::HandleValue buffer_constructor) {\n+  auto *cx = engine->cx();\n+  JS::RootedObject kernel(cx, create_crypto_hash_hmac_kernel(cx));\n+  JS::RootedObject argument(cx, JS_NewPlainObject(cx));\n+  if (!kernel || !argument) return false;\n+  JS::RootedValue kernel_value(cx, JS::ObjectValue(*kernel));\n+  JS::RootedValue webcrypto(cx), subtle(cx);\n+  // install_builtins follows CMake declaration order: native WebCrypto was\n+  // installed before Node compatibility, and application code has not run.\n+  if (!JS_GetProperty(cx, engine->global(), \"crypto\", &webcrypto)) return false;\n+  if (!webcrypto.isObject()) {\n+    JS_ReportErrorASCII(cx, \"ERR_SM_NODE_PROFILE_INITIALIZATION: native Crypto is unavailable\");\n+    return false;\n+  }\n+  JS::RootedObject webcrypto_object(cx, &webcrypto.toObject());\n+  if (JS::GetClass(webcrypto_object) != &builtins::web::crypto::Crypto::class_) {\n+    JS_ReportErrorASCII(cx, \"ERR_SM_NODE_PROFILE_INITIALIZATION: wrong native Crypto class\");\n+    return false;\n+  }\n+  if (!JS_GetProperty(cx, webcrypto_object, \"subtle\", &subtle)) return false;\n+  if (!subtle.isObject() || JS::GetClass(&subtle.toObject()) != &builtins::web::crypto::SubtleCrypto::class_) {\n+    JS_ReportErrorASCII(cx, \"ERR_SM_NODE_PROFILE_INITIALIZATION: native SubtleCrypto is unavailable\");\n+    return false;\n+  }\n+  if (!JS_DefineProperty(cx, argument, \"kernel\", kernel_value, 0) ||\n+      !JS_DefineProperty(cx, argument, \"Buffer\", buffer_constructor, 0) ||\n+      !JS_DefineProperty(cx, argument, \"webcrypto\", webcrypto, 0) ||\n+      !JS_DefineProperty(cx, argument, \"subtle\", subtle, 0)) return false;\n+  JS::RootedValue value(cx, JS::ObjectValue(*argument)), module(cx);\n+  if (!evaluate_factory(cx, kCryptoHashHmacFactorySource, value, &module)) return false;\n+  return engine->define_builtin_module(\"node:crypto\", module) &&\n+         engine->define_builtin_module(\"crypto\", module);\n+}\n+#endif\n \n #ifdef NODE_COMPAT_PATH\n static bool install_path(api::Engine *engine) {\n@@ -270,6 +314,9 @@\n   JS::RootedObject buffer_namespace(cx, &buffer_module.toObject());\n   JS::RootedValue buffer_constructor(cx);\n   if (!JS_GetProperty(cx, buffer_namespace, \"Buffer\", &buffer_constructor)) return false;\n+#ifdef NODE_COMPAT_CRYPTO_HASH_HMAC\n+  if (!install_crypto_hash_hmac(engine, buffer_constructor)) return false;\n+#endif\n #ifdef NODE_COMPAT_PATH\n   if (!install_path(engine)) return false;\n #endif\n"
+    }
+  ],
+  "newFilesToPlaceOnlyInFutureFreshSource": {
+    "hash-hmac-kernel.cpp": "builtins/node-compat/hash-hmac-kernel.cpp",
+    "crypto-factory.generated.h": "builtins/node-compat/crypto-factory.generated.h"
+  },
+  "nativeSourceCountAfterIntegrationNotClaimed": true
+}

@@ -19,7 +19,14 @@ actual-result review passes; snapshot and broader clock gates remain open.
 
 The combined355 native retry completes all 108 build steps and passes
 independent BUILD review. Its complete 80-field sidecar and 2,596-copy freeze
-pass independent DATA review; native admission and runtime remain open. The separate secret355
+pass independent DATA review. Export, validation-only bootstrap and the retained
+read-only API also pass independent result review. Fresh pure and resource
+components construct successfully; their ordinary runtime calls and operational
+admission remain open. The resource component selects only the standard
+WASI0.2.10 clock/poll interfaces. Default-OFF Hash/Hmac and private clock diagnostic
+templates pass bounded SDK syntax checks; neither is linked or runtime validated.
+See the [execution status](execution-status.md) for their exact evidence.
+The separate secret355
 component and corrected v3 guarded runtime also pass actual review: 23 complete
 returns and 45 Node-oracle signatures. Three fresh stock-Wasmtime validations
 finish raw0 with 27 matching tags and pass independent actual-result review.
