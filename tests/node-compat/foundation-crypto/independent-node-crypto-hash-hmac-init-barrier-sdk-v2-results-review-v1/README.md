@@ -1,0 +1,5 @@
+Both real SDK frontends passed: entropy-policy.cpp and hash-hmac-kernel.cpp, with exact actual started argv,60-second owned monitors,raw0,empty streams and no signals/errors. The emitted .d files contain1,021 and1,052 complete dependency occurrences, all matched to pre-frontend approved bytes; both use the changed VFS header. All12,864 captured inputs,9 trees,34 aliases and one explicit absence remain equal to before/final/current evidence.
+
+The portable UTF8 capsule preserves the whole23-file SDK publication (including its original nested index), outer Root monitor text and exact driver/plan/Root context. No SDK payloads or binaries were copied. Closed membership includes every copied nested index.
+
+The originalV1 pre-authentication failure remains failed and the prior reviewer miss remains qualified. This proves SDK syntax/type acceptance only. Native source/engine/metadata are unchanged; no link, new engine, INIT refusal, guest/crypto/snapshot, namespace fix, reuse, security or adoption acceptance follows. No target action was invoked by this reviewer.

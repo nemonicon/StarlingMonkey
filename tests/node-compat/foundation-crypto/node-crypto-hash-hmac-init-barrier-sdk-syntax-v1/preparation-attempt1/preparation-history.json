@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "events": [
+    {
+      "operation": "First pure read/hash/AST plan preparation",
+      "rawExitCode": 1,
+      "failure": "AssertionError in clean_arguments while inspecting actualEmbeddingCompileCommands[0]",
+      "cause": "The selected two Hash CPP rows require NODE_COMPAT_CRYPTO_HASH_HMAC=1; the unscheduled embedding provenance command does not contain that target macro.",
+      "correction": "Extract only the single literal -c source from the genuine embedding command to resolve its unchanged three DATA inputs. Keep the Hash macro requirement on both scheduled native rows.",
+      "compilerOrHelperInvoked": false,
+      "externalOutputCreated": false,
+      "scope": "Driver preparation error; no frontend, native artifact, original source or existing proof changed."
+    },
+    {
+      "operation": "First synthetic driver check",
+      "rawExitCode": 1,
+      "failure": "Missing or duplicate dependency names in synthetic makefile sample",
+      "cause": "The test sample accidentally contained two literal plus characters from its multiline construction; duplicate tokens were correctly refused.",
+      "correction": "Build the sample explicitly using chr(92) and newline literals; keep the real dependency parser unchanged.",
+      "compilerOrHelperInvoked": false,
+      "externalOutputCreated": false
+    }
+  ]
+}

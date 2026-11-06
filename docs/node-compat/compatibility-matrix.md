@@ -45,12 +45,18 @@ Its two zero-import components now pass fourteen retained/fresh Jco and stock
 Wasmtime returns,280 accepted Node-record comparisons and112 separate native
 policy checks. The first reporting-counter bug is preserved; corrected runs
 have truthful counters. Direct native aliases share functions/default objects
-and retain separate namespace objects, a Node deviation. Lifecycle/cost/freeze
-and release gates remain open. The candidate
+and retain separate namespace objects, a Node deviation. Its1,893-file freeze
+and frozen-only verifier finish0, with independent frozen-artifact review passed.
+Lifecycle/cost and release gates remain open. The candidate
 is unadopted, and accepted production's `node:crypto` API status remains deferred.
 The60-observation host Node oracle stays separate. The experimental clock and guarded-key results remain
 separate from public API compatibility; exact evidence is in the
 [execution status](execution-status.md).
+
+The separate private clock diagnostic357/82 generation now links at
+recipe0/wrapper0 after independent Source/stage review. Its actual-build review
+passes; new component/runtime checks remain unissued. Private diagnostics add no
+public Node API support and admit no new profile.
 
 The machine-readable [API matrix](api-matrix.csv) is the per-API record: each row has module, API, type, inventory origin, status, implementation strategy, required capability, deviation and validation plan. [Node export inventory](node-v22.14.0-exports.json) contains the exact 72 module namespaces obtained from Node v22.14.0 on macOS arm64. [Policy](policy.json) defines dispositions and overrides; [generator](scripts/inventory.mjs) checks the oracle version and documentation hash. Documented overload/event/property records supplement reflection and can duplicate reflected API records.
 

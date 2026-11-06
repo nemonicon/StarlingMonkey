@@ -6,8 +6,9 @@ The [experimental Hash/Hmac results](hash-hmac-results-2026-11-06.md) now cover
 fourteen complete Jco/stock-Wasmtime returns:280 accepted Node-record comparisons
 and112 separate native-policy checks. Both components import nothing; direct
 native aliases share functions/default objects but retain separate namespace
-objects. The new candidate remains outside production acceptance, with freeze,
-lifecycle and cost gates open.
+objects. Its freeze, frozen-only verifier and independent frozen-artifact review
+pass; snapshot/lifecycle and cost gates remain open. The candidate stays outside
+production acceptance.
 
 The [post-push Next.js report](nextjs-results-2026-11-06.md) records fresh
 comprehensive application and component checks after `77659217`: Node controls
@@ -40,22 +41,22 @@ timer refusal. A separate pure Buffer control finishes raw0 with seven whole
 Node-equal Jco/Wasmtime returns; independent runtime DATA review passes.
 Broader clock lifecycle and operational admission remain open. Clock components
 select only the standard WASI0.2.10 clock/poll interfaces.
-The default-OFF Hash/Hmac candidate now compiles and links as a 357-source
-engine. Its recipe exits0, but both wrappers exit1 after the staged Git index
-changes hash and mode. Independent review validates the compiled candidate and
-the recorded failure; it does not admit the engine. Read-only artifact
-revalidation first fails on two retained system `/tmp` paths. Its narrow v2
-correction passes actual full-input guard tests and independent Source review;
-the genuine API retry exits0. A corrected review publication passes the whole
-caller contract. A zero-import13,240,343-byte component passes actual artifact
-review and returns80 Node-equal accepted Hash/Hmac records on Jco. A harness
-counter-publication defect is preserved and being corrected before full runtime
-acceptance; stock-host/direct-alias/lifecycle/cost gates remain open. The
-original failures remain preserved.
-The pinned Node oracle passes60 selected
-observations; the separate guest result above is still experimental. Private clock diagnostic v2 passes
-seven actual SDK frontends and Source review; linking and runtime remain
-pending. These candidates and their open lifecycle gates are recorded in
+The default-OFF Hash/Hmac357 candidate retains its original recipe0/wrappers1
+Git-index protection failure. Genuine read-only revalidation and a corrected
+coverage publication pass. Both zero-import components now pass fourteen
+Jco/Wasmtime returns,280 accepted comparisons and112 separate policy checks.
+The first counter-publication defect stays preserved; corrected runs have
+truthful counters. Its1,893-file freeze, frozen-only verification and independent
+actual-freeze review pass. Live-EVP snapshot, lifecycle,
+security and cost gates remain open. The pinned Node oracle's60 observations
+remain separate from guest execution.
+
+The private clock diagnostic branch passes seven SDK frontends, independent
+Source/stage reviews and a new native Release build. Engine `d13aec90` has
+genuine82-field metadata,357 native/three external sources and eleven manifests;
+it is a different generation from Hash/Hmac357/83. Independent actual-build
+review passes; new component/runtime actions remain unissued. These candidates and
+their open lifecycle gates are recorded in
 [progress.md](../../progress.md).
 See the [execution status](execution-status.md) for their exact evidence.
 The original resource mapping fails at harness serialization; its partials and

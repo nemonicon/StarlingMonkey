@@ -6,8 +6,9 @@ Latest [experimental native Hash/Hmac](hash-hmac-results-2026-11-06.md) passes
 independent complete-sequence review on retained/fresh Jco and stock Wasmtime:
 14 strings/280 accepted records/112 separate policy checks. Corrected call
 counters and the direct-alias namespace-object deviation are retained. These
-diagnostic passes leave freeze, snapshot/lifetime/GC/erasure/cost and production
-adoption incomplete.
+diagnostic passes leave snapshot/lifetime/GC/erasure/cost and production adoption
+incomplete. The1,893-file freeze and genuine frozen-only verifier finish0;
+independent actual-freeze result review passes.
 
 The [2026-11-06 application replay](nextjs-results-2026-11-06.md) repeats the
 comprehensive Next fixture after push `77659217`. Node build/HTTP/browser
@@ -77,16 +78,24 @@ Independent actual DATA checks at `61250674` have a coverage-publication defect;
 the genuine `a39cce0d` successor passes the unchanged whole-contract consumer.
 Actual zero-import component `2e538349` passes independent artifact review.
 Its first ordinary Jco phase returns80 Node-equal accepted records/32 separate
-policy checks, but a primitive-counter publication bug withholds full phase
-acceptance. A minimal caller fix and fresh calls against the same component
-are next. Stock-host/direct-alias, freeze, lifecycle and operational admission
-remain pending. The pinned Node oracle passes60 accepted observations and retains24
-separate policy observations, with independent DATA review passed. Host results
-do not validate guest crypto. The private
+policy checks, but a primitive-counter publication bug withholds that phase's
+acceptance. The genuine caller correction passes fresh bundled/direct-native
+Jco and stock Wasmtime: fourteen strings/280 accepted comparisons/112 separate
+policy checks, with independent complete-sequence review. The direct-import
+namespace object difference remains explicit. Its actual freeze retains the
+unchanged9aec/2b725 engine/metadata and1,893 files; frozen-only verification
+and independent actual-freeze review pass. Snapshot/lifecycle,
+security, cost and operational admission stay open. The pinned Node oracle
+passes60 accepted observations and retains24 separate policy observations,
+with independent DATA review passed. Host and guest results remain distinct.
+The private
 [clock diagnostic v2](../../tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v2/README.md)
 passes independent Source review and seven actual SDK syntax/type frontends,
 with Root readback of actual argv, raw0/empty streams and11,721 protected files.
-It has no new native link or runtime result. Crypto snapshot/provider/ownership/GC/cost gates and the
+Its reviewed V3 producer now stages1,583 sources/tools and finishes a new native
+Release build at recipe0/wrapper0. Engine `d13aec90` is10,043,743 bytes, with
+genuine82-field sidecar `56b13135`; independent actual-build review passes.
+No new clock component or runtime action has run. Crypto snapshot/provider/ownership/GC/cost gates and the
 remaining native clock lifecycle gates stay open.
 
 The [Next.js application experiment](../../tests/node-compat/frameworks/nextjs/README.md)

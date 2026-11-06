@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "include/node-compat-entropy.h",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/include/node-compat-entropy.h",
+        "sha256": "6414e413a377aa21a039c175e90e26916911e88a071f29042cd1c47cfbee0fae",
+        "bytes": 889
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-init-barrier-candidate-v1/after/include/node-compat-entropy.h",
+        "sha256": "c47ca317b5956eaea7ee6cf9199ca04645c9fdfc5402773fb14729b5f303e15d",
+        "bytes": 1042
+      },
+      "edits": [
+        {
+          "before": "void begin_engine(bool pre_initialize);",
+          "after": "void begin_engine(bool pre_initialize);\n#ifdef NODE_COMPAT_CRYPTO_HASH_HMAC\n// Read-only private lifecycle state, independent of entropy availability.\nbool deployed_execution_started();\n#endif",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseVerified": true
+    },
+    {
+      "path": "builtins/node-compat/entropy-policy.cpp",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/builtins/node-compat/entropy-policy.cpp",
+        "sha256": "efdff496d591ce01a5841dcf38aeed61228ec0d330b39931cca627d8520edeb8",
+        "bytes": 2146
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-init-barrier-candidate-v1/after/builtins/node-compat/entropy-policy.cpp",
+        "sha256": "d1d3ee7e8dfce4dcfb02ab0e76c0f217414ceec229c3e2082bf13b3013fb8938",
+        "bytes": 2244
+      },
+      "edits": [
+        {
+          "before": "void begin_engine(bool pre_initialize) { deployed = !pre_initialize; }",
+          "after": "void begin_engine(bool pre_initialize) { deployed = !pre_initialize; }\n#ifdef NODE_COMPAT_CRYPTO_HASH_HMAC\nbool deployed_execution_started() { return deployed; }\n#endif",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseVerified": true
+    },
+    {
+      "path": "builtins/node-compat/hash-hmac-kernel.cpp",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/builtins/node-compat/hash-hmac-kernel.cpp",
+        "sha256": "e07a5a35aafa82637ffbbffb5d2c01876c703bc641faf331210fd433bae87ecd",
+        "bytes": 12504
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-init-barrier-candidate-v1/after/builtins/node-compat/hash-hmac-kernel.cpp",
+        "sha256": "b0346b88953573126de417fee99509b69ea6ac6a497780c7b440fd4dc75637ff",
+        "bytes": 14568
+      },
+      "edits": [
+        {
+          "before": "#include \"builtin.h\"",
+          "after": "#include \"builtin.h\"\n#include \"extension-api.h\"\n#include \"node-compat-entropy.h\"",
+          "count": 1
+        },
+        {
+          "before": "DEF_ERR(CryptoLimit, JSEXN_RANGEERR, \"Native SHA256 profile limit exceeded\", 0)",
+          "after": "DEF_ERR(CryptoLimit, JSEXN_RANGEERR, \"Native SHA256 profile limit exceeded\", 0)\nDEF_ERR(CryptoInitialization, JSEXN_TYPEERR,\n        \"ERR_SM_NODE_CRYPTO_INITIALIZATION: {0} requires deployed execution\", 1)",
+          "count": 1
+        },
+        {
+          "before": "struct MdFree {",
+          "after": "// A completed Engine pre-init is earlier than the embedding's FINAL snapshot\n// boundary. Only the existing real deployed-export hook opens this barrier.\n// No state/provider/key/output access is permitted before it opens.\nstatic bool require_runtime(JSContext *cx, const char *operation) {\n  auto *engine = api::Engine::get(cx);\n  if (engine && engine->state() == api::EngineState::Initialized &&\n      entropy::deployed_execution_started()) return true;\n  api::throw_error(cx, CryptoInitialization, operation);\n  JS::RootedValue exception(cx);\n  if (!JS_GetPendingException(cx, &exception) || !exception.isObject()) return false;\n  JS::RootedObject object(cx, &exception.toObject());\n  JS::RootedString name(cx, JS_NewStringCopyZ(cx, \"TypeError\"));\n  if (!name) return false;\n  JS::RootedString code(cx, JS_NewStringCopyZ(cx, \"ERR_SM_NODE_CRYPTO_INITIALIZATION\"));\n  if (!code) return false;\n  JS::RootedString op(cx, JS_NewStringCopyZ(cx, operation));\n  if (!op) return false;\n  JS::RootedValue name_value(cx, JS::StringValue(name));\n  JS::RootedValue code_value(cx, JS::StringValue(code));\n  JS::RootedValue operation_value(cx, JS::StringValue(op));\n  // Match the existing entropy diagnostic helper: strings are allocated before\n  // clearing the pending error, and OOM while decorating remains pending.\n  JS_ClearPendingException(cx);\n  if (!JS_DefineProperty(cx, object, \"name\", name_value, 0) ||\n      !JS_DefineProperty(cx, object, \"code\", code_value, JSPROP_ENUMERATE) ||\n      !JS_DefineProperty(cx, object, \"operation\", operation_value, JSPROP_ENUMERATE)) return false;\n  JS_SetPendingException(cx, exception);\n  return false;\n}\nstruct MdFree {",
+          "count": 1
+        },
+        {
+          "before": "static bool create_hash(JSContext *cx, unsigned argc, JS::Value *vp) {\n  auto args = JS::CallArgsFromVp(argc, vp);",
+          "after": "static bool create_hash(JSContext *cx, unsigned argc, JS::Value *vp) {\n  auto args = JS::CallArgsFromVp(argc, vp);\n  if (!require_runtime(cx, \"createHash\")) return false;",
+          "count": 1
+        },
+        {
+          "before": "static bool create_hmac(JSContext *cx, unsigned argc, JS::Value *vp) {\n  auto args = JS::CallArgsFromVp(argc, vp);",
+          "after": "static bool create_hmac(JSContext *cx, unsigned argc, JS::Value *vp) {\n  auto args = JS::CallArgsFromVp(argc, vp);\n  if (!require_runtime(cx, \"createHmac\")) return false;",
+          "count": 1
+        },
+        {
+          "before": "static bool update(JSContext *cx, unsigned argc, JS::Value *vp) {\n  auto args = JS::CallArgsFromVp(argc, vp);",
+          "after": "static bool update(JSContext *cx, unsigned argc, JS::Value *vp) {\n  auto args = JS::CallArgsFromVp(argc, vp);\n  if (!require_runtime(cx, \"Hash/Hmac.update\")) return false;",
+          "count": 1
+        },
+        {
+          "before": "static bool digest(JSContext *cx, unsigned argc, JS::Value *vp) {\n  auto args = JS::CallArgsFromVp(argc, vp);",
+          "after": "static bool digest(JSContext *cx, unsigned argc, JS::Value *vp) {\n  auto args = JS::CallArgsFromVp(argc, vp);\n  if (!require_runtime(cx, \"Hash/Hmac.digest\")) return false;",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseVerified": true
+    }
+  ]
+}

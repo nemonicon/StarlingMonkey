@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "failures": [
+    {
+      "stage": "current-before reader preparation",
+      "toolChunk": "748d09",
+      "error": "AssertionError comparing complete stat_result before/after a read, including access time",
+      "correction": "Compare content/ownership/size/mtime/ctime identity, excluding read access time. No target operation or Git mutation ran."
+    },
+    {
+      "stage": "independent reader field shape",
+      "toolChunk": "143fe9",
+      "error": "Reader compared expectedRawMetadataFields array directly to82",
+      "correction": "Validate the actual declared array length82; no target operation or source mutation."
+    },
+    {
+      "stage": "manifest supplemental reader preparation",
+      "toolChunk": "51f207",
+      "error": "Reader initially assumed selectedModuleManifests.sha256 meant canonical JSON hash",
+      "correction": "Actual pinned fields are raw file byte hashes. Verify raw hash plus entire manifest value against the corresponding genuine selectedManifestValues entry. No target bytes changed."
+    }
+  ]
+}

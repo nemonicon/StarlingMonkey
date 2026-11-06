@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "events": [
+    {
+      "operation": "First pure read/hash/AST plan preparation",
+      "rawExitCode": 1,
+      "failure": "AssertionError in clean_arguments while inspecting actualEmbeddingCompileCommands[0]",
+      "cause": "The selected two Hash CPP rows require NODE_COMPAT_CRYPTO_HASH_HMAC=1; the unscheduled embedding provenance command does not contain that target macro.",
+      "correction": "Extract only the single literal -c source from the genuine embedding command to resolve its unchanged three DATA inputs. Keep the Hash macro requirement on both scheduled native rows.",
+      "compilerOrHelperInvoked": false,
+      "externalOutputCreated": false,
+      "scope": "Driver preparation error; no frontend, native artifact, original source or existing proof changed."
+    },
+    {
+      "operation": "First synthetic driver check",
+      "rawExitCode": 1,
+      "failure": "Missing or duplicate dependency names in synthetic makefile sample",
+      "cause": "The test sample accidentally contained two literal plus characters from its multiline construction; duplicate tokens were correctly refused.",
+      "correction": "Build the sample explicitly using chr(92) and newline literals; keep the real dependency parser unchanged.",
+      "compilerOrHelperInvoked": false,
+      "externalOutputCreated": false
+    },
+    {
+      "operation": "Independent dormant SDK preflight finding before any compiler grant",
+      "reviewer": "/root/cost_component_results_review",
+      "historicalPreparationIndex": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-init-barrier-sdk-syntax-v1/preparation-attempt1/index.json",
+        "sha256": "15ec27cca9cce9cd08d017b18ecddd86e5034622f068a225b561f3d5d77834d8",
+        "bytes": 1668
+      },
+      "historicalDriverSha256": "3cf52467acbc2f3757da936431d84e511ae512b47c6727ed4379951b024dddaf",
+      "historicalFilesPreservedByteExact": 11,
+      "oldPredicate": "def clean_terminal(t):\n    return (t['allObservedOwnedGroupsGone'] is True and t['parentOwnedGroupGone'] is True\n            and not t['forcedCleanup'] and not t['timeout'] and not t['signals']\n            and not t['errors'] and not t['remainingObservedPids'])",
+      "oldPredicateUtf8Sha256": "1c4bfd6c79c7b2706ce21e08055b427ad202d3fcf8bbfc60e0bad71a175749ef",
+      "counterexamples": [
+        {
+          "interruptedSignals": [
+            2
+          ],
+          "oldPredicate": true,
+          "correctedPredicate": false,
+          "scope": "Synthetic actual-function predicate call, no monitor/compiler"
+        },
+        {
+          "interruptedSignals": [
+            15
+          ],
+          "oldPredicate": true,
+          "correctedPredicate": false,
+          "scope": "Synthetic actual-function predicate call, no monitor/compiler"
+        }
+      ],
+      "cause": "Original0af may record interruption after child exit without forced cleanup or sent signals; old predicate ignored interruptedSignals.",
+      "correction": "Require t['interruptedSignals'] == [] in the genuine predicate. Raw frontend exit code remains a separate combined-success gate.",
+      "compilerAuthorityIssued": false,
+      "compilerOrHelperInvoked": false,
+      "externalOutputCreated": false
+    }
+  ]
+}

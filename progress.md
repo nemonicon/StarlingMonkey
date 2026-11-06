@@ -22,8 +22,9 @@ the native C++ and external embedding payloads are unchanged.
 [Independent Source review](tests/node-compat/foundation-scheduler/independent-clock-diagnostic357-native-integration-v3-source-review-v1/results.json),
 index `a3c58ffd`, passes384 bounded checks, including the actual old-fail/new-pass
 predicate and fourteen Root authority models. Seven earlier SDK frontends passed
-syntax checks. No clock V3 source staging, native build or guest action has run.
-Its prospective357 native/three external/eleven manifest/82-field identity is
+syntax checks. Source staging, native Release build and their independent DATA
+reviews now pass. No new clock component/guest action has run.
+Its actual357 native/three external/eleven manifest/82-field identity is
 separate from the experimental Hash/Hmac357/83 artifact.
 
 The unapplied [native namespace-cache correction](tests/node-compat/foundation-crypto/node-builtin-namespace-identity-candidate-v1/README.md)
@@ -46,8 +47,9 @@ The proposed frozen-only verifier reads copied roles and unchanged83-field
 pure models. Source checks cover63 bounded cases and21,475 current inputs,
 thirty families and eleven trees. The proposed copy includes1,642 source/tool
 files, three actual embedding sources, three historical staged references and
-169 selected WORK witnesses. Independent Source review, actual freeze and
-frozen-only verification remain unissued. No freezer/helper/guest action ran.
+169 selected WORK witnesses. Independent Source review, actual freeze,
+frozen-only verification and independent frozen-artifact DATA review now pass.
+No engine, guest or crypto operation runs in those phases.
 
 The pre-commit closure audit verifies23 changed indexed families,623 payloads
 and31,457,812 payload bytes. It excludes only each outer family's own root
@@ -58,6 +60,225 @@ The staged whitespace check exits2 on six immutable evidence paths: the two
 byte-exact generated Jco files, three unapplied embedding patches and one sealed
 reviewer's extra EOF newline. Those recorded bytes are preserved; edited
 documentation and the new Root launcher have no whitespace warnings.
+
+The complete725-file checkpoint is committed and pushed as
+`dca02ed598ade315ed452cf7726641b11ced44b9`; `origin/main` matches, and the
+worktree was clean before subsequent actions. The authorized next
+[clock source stage](tests/node-compat/foundation-scheduler/combined-clock-diagnostic357-stage-v3-root-results.json)
+finishes Root42445/parent52442/worker52704, raw0, clean owned groups.
+Journal `93244df7` retains1,583 copied sources/tools, baseline54b, detached
+private Git metadata and exact preimages. Current source originals and the
+original repository object/index window are preserved. A compact independent
+actual-stage review is pending; native compilation and guest execution have
+not run. Git mutations are held during that review's before/final window.
+
+[Independent freezer Source review](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-freezer-source-review-v1/results.json)
+passes at `d54a57ef`:50,353 checks,21,501 unique files including the freezer's
+26 actual members, thirty families and eleven trees. No operational helper,
+freezer or verifier ran in that review. Root issues the separate actual
+[freeze-only action](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-freeze-v1-root-invocation.json)
+at15125/parent54794, with1,800-second owned monitors. Static copies, one genuine
+read-only P3 admission and frozen-only verification are allowed; compiler,
+engine, guest, crypto and public profile actions remain forbidden. The outcome
+is pending; original recipe0/parents1+1/preservationfalse remain unchanged.
+
+The live-EVP snapshot design now identifies a concrete late-INIT seam:
+`finish_pre_initialization()` sets EngineState::Initialized before ComponentizeJS
+finishes binding exports and draining final jobs/ticks. REQUEST_HANDLER_ONLY
+alone cannot cover that window. The existing private entropy policy's deployed
+state, flipped through the real embedding entry hook, distinguishes deployed
+calls even when entropy is OFF. A proposed read-only accessor plus native
+Hash/Hmac guards will use that state and EngineState together. No new host
+capability or embedding hook is required; implementation and actual INIT/late
+binding/ordinary-call validation remain pending in a separate native generation.
+
+[Independent clock stage review](tests/node-compat/foundation-scheduler/independent-clock-diagnostic357-stage-v3-results-review-v1/results.json)
+passes at `ed52c7f6`, with the whole genuine V3 consumer contract. It verifies
+all1,583 copies,357 native/1,226 tools, eleven manifests,742 baseline entries,
+234 overwritten blob preimages and909 packed Git objects. Both parents/five
+Git commands finish0 and current26,341-file/24-family bookends pass. Its separate
+29-file current user-Git window is unchanged; historic stage protection is
+limited to the actual objects/index capture. Three corrected reader assumptions
+are retained (the sealed README says two, a clerical count deviation).
+Root issues the separate [clock native build](tests/node-compat/foundation-scheduler/combined-clock-diagnostic357-build-v3-root-invocation.json)
+at22041/parent56756: Release, jobs1, entropyOFF, no GC/OOM/DEBUG/reset,7,200-second
+owned monitors,2GiB start/800MiB stop. The result is pending; no clock engine or
+guest has executed, and no private/public runtime profile is admitted.
+
+The actual [crypto freeze](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-freeze-v1-root-results.json)
+now finishes15125/parent54794, raw0, clean. Receipt `187fabbe` retains1,893 copied
+payloads/641,351,629 bytes and21,513 protected current references. The genuine
+frozen-only verifier returns its whole NOT_ADOPTED record, using the frozen
+9aec engine, byte-exact2b725 raw83 metadata and copied roles. No helper admission
+or old Ninja command is replayed by that verifier; the freeze itself made one
+fresh genuine read-only P3 admission. Independent actual-freeze DATA review is
+pending. Uncopied live SDK/reference originals, live-EVP snapshots, security,
+cost and profile adoption are outside this frozen-only acceptance scope.
+
+The actual [clock native build](tests/node-compat/foundation-scheduler/combined-clock-diagnostic357-build-v3-root-results.json)
+now finishes22041/parent56756, recipe0/wrapper0 and clean owned monitors.
+Engine `d13aec90` is10,043,743 bytes; sidecar `56b13135` is848,807 bytes,
+with genuine82 raw fields,357 native/three external sources and eleven whole
+manifests. Requested/observed diagnostic and performance flags agree. The
+direct82 model returns SHAPE_ONLY, runtimeAccepted=false. Original source,
+staged copies and cache inputs are preserved. This build's configured Git
+index has a retained raw preimage; the allowed comparison proves742 baseline
+entries, identical semantics/flags/extensions and mode, with stat-cache bytes
+and inode changed. That evidence does not retroactively repair the old Hash
+build's missing preimage. Independent actual-build DATA review is pending;
+no clock engine/component/guest, lifecycle gate or public adoption is claimed.
+
+[Independent namespace-fix Source review](tests/node-compat/foundation-crypto/independent-node-builtin-namespace-identity-source-review-v1/results.json)
+passes at `b6da1601`, covering both exact derivations,357 source files,
+1,041 actual SDK dependencies and24 pure predicate cases. The new cache key
+remains rooted and explicitly registered. Primitive-value, embedded-NUL and
+late-registration synthetic model limits remain explicit; no new registration
+API or actual fixture observation is inferred. Clang0/original driver1 remain
+separate, and current9aec namespace identity stays unchanged until a new linked
+generation and raw import-order tests pass.
+
+The standalone [Hash/Hmac INIT barrier Source](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-init-barrier-candidate-v1/README.md)
+is sealed at `b8a4f219`: three existing-file afterimages,357=354 retained+three
+changed, no new path/external change or implicit alias-fix composition.
+It adds a read-only deployed-state accessor and guards all four native primitives
+before native key/state/provider/EVP/output access. Errors carry TypeError and
+`ERR_SM_NODE_CRYPTO_INITIALIZATION`; cleanup remains unconditional. Eight future
+fixtures cover import-only/ordinary positives and direct, finalized, top-level
+job, late getter and final-job refusals. Author checks53 Source/58 synthetic/nine
+grammar cases pass. No compiler, engine, crypto, snapshot or fixture executes.
+The separate [Root Source review](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-init-barrier-source-review-v1/results.json)
+passes at `7c8f9ab8`, covering1,066 checks/498 current files/three families and
+twenty exact guard truth-table cases. It authenticates all357 current native
+hashes/three actual external inputs and the real lifecycle/bindgen/error seams.
+Root requested the high-level requirement; a different agent authored the
+afterimages. This source/hash/order review grants no native action or snapshot
+acceptance. Two-CPP SDK driver preparation is separate and unexecuted.
+
+The [independent actual clock build review](tests/node-compat/foundation-scheduler/independent-clock-diagnostic357-build-v3-results-review-v1/results.json)
+passes at `9d4f0218`, with whole future/own contracts joined. Actual DB69 has
+63 policy/five other/one generated-null rows and one separate embedding command;
+all seven shared diagnostic commands are bound. Its actual link has31 ordered
+static-library arguments/30 unique archives, rather than an inherited old count.
+All44,369 current files/25 families, seven distributions/4,650 OpenSSL sources,
+62 aliases/two hardlinks and real Git index preimage semantics pass. Recipe and
+both parents finish0 clean. No engine, guest or freezer action occurs in review;
+private component construction is the next experimental clock step.
+
+The [independent frozen Hash/Hmac review](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-frozen-artifact-review-v1/results.json)
+passes at `9d2ed35a`:80,672 checks/23,724 unique files/32 families. All1,893
+copied payloads plus receipt have exact hashes,0600 modes, single/distinct inodes
+and correct original relationships. Whole P3 return, raw83 metadata,169 WORK
+witnesses and1,642+three actual external+three historical reference roles agree.
+Both monitored phases finish0; all303 retained events reconcile. The reader's
+first stdout-publication typo is preserved; a corrected read-only completion
+finishes0, without verifier/helper/admission replay. Whole result/contract coverage
+matches. Uncopied live SDK/reference offline closure remains false; the original
+failed BUILD outcomes and current unadopted/snapshot/security/cost scope remain.
+
+Preflight of the still-unexecuted INIT-barrier SDK driver finds one concrete
+cleanup-predicate gap: it omits `interruptedSignals`, so a cleanly exited child
+can be misreported clean after its monitor is interrupted. No compiler authority
+is issued. The initial preparation bytes/fingerprint are being retained before
+a minimal driver/test correction; this is not a native compiler or guard failure.
+
+The corrected preparation `cf79802e` retains all eleven original15ec files and
+passes72 pure cases/three ASTs. [Independent bounded boundary audit](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-init-barrier-boundary-audit-v1.json)
+passes its525 joined checks and records the real old-accept/new-refuse interrupt
+counterexamples. Root then issues a separate [two-CPP syntax attempt](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-init-barrier-sdk-v1-root-invocation.json),
+54203/parent81211. That [actual attempt](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-init-barrier-sdk-v1-root-results.json)
+finishes raw1 with clean owned groups before creating its output or importing
+the compiler monitor. No compiler starts. The actual directory guard rejects
+the fifth declared tree, an absent text-codec include directory with zero ledger
+files/aliases. The [Root diagnostic](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-init-barrier-sdk-v1-path-guard-root-data.json)
+confirms the first four real trees exist and only this unused `-I` path is
+absent. The preflight did not test the actual empty-tree path predicate. All
+executed v1 preparation/Root/raw evidence stays immutable; a genuine v2 driver
+must preserve the original compile argument and check this explicit absence
+before/final, without creating or changing the historical directory. Actual
+INIT-barrier C++ syntax remains untested; there is no native compiler failure.
+[Independent actual failure review](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-init-barrier-sdk-v1-failure-data-review.json)
+passes317 scoped checks and embeds all five original monitor text files. It
+reproduces the actual path assertion through the unchanged extracted predicate,
+qualifies the prior preflight's missed path parity and confirms no compiler
+monitor was reached. The genuine [v2 preparation](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-init-barrier-sdk-syntax-v2/README.md)
+is held at `9f0690d3`, with fourteen payloads. It keeps all real compile flags,
+authenticates four required trees and explicitly bookends the one absent include.
+The real five-path guard checks433,091,709 bytes per bookend/34 aliases;
+ten filesystem negatives,77 pure cases and four AST checks pass. Its new Root
+protocol/output are unissued, the old attempt and Source b8a4 stay unchanged,
+and independent v2 preflight is pending before any new compiler authority.
+
+[Independent v2 SDK preflight](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-init-barrier-sdk-v2-preflight-audit.json)
+now passes at `3aa36f2b`, with472 canonical JSON checks/77 scoped files.
+The genuine actual root/absence guards and six filesystem negatives pass;
+the author's full433MB/12,748-row hash report is authenticated separately.
+The chat's474 count included two later output assertions; the immutable JSON472
+is authoritative. Root issues a fresh [V2 syntax authority](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-init-barrier-sdk-v2-root-invocation.json),
+65438/parent84322, with a300-second outer/two60-second compiler deadlines.
+The [actual two-CPP result](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-init-barrier-sdk-v2-root-results.json)
+finishes raw0, clean. Both real SDK frontends start and return0; their dependency
+files and before/final protections pass. This is C++ syntax/type acceptance,
+with no object, link, engine, crypto, snapshot or fixture execution. Independent
+actual-result DATA review is pending. Original v1's no-compiler failure remains
+unchanged; the barrier is still unapplied to any native engine generation.
+
+The private [clock selector component caller Source](tests/node-compat/foundation-scheduler/clock-diagnostic357-selector-component-candidate-v1/README.md)
+is sealed at `8b909eba`, with60 DATA/pure checks and four pinned Node grammar
+checks. It uses the actual authenticated61685 package's `componentize` API and
+pruned87777 adapter, preserving whole bytes through the real capture helper
+before WIT/capability audits. It accepts the full genuine82-field build proof
+and declares the actual private guest module's three methods/default record;
+only standard0.2.10 wall-clock, monotonic-clock and io/poll are selectable.
+The private module is internal guest code, not a host service. General loader
+hardpins and callback limitations are handled by this genuine direct API path;
+no old355/Hash83 frame, imported namespace/global rebind or host modification is
+used. C's narrow preinspection prompted alias/diagnostic/TMPDIR corrections
+before sealing; formal Source review now passes. Construction/runtime slots
+remain NULL. No package, engine, clock probe, compiler or guest
+action ran; this Source admits no lifecycle gate or public API.
+
+[Independent actual two-CPP review](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-init-barrier-sdk-v2-results-review-v1/results.json)
+passes at `4d235f7c`, with the whole fixed/exact/coverage contract joined.
+Both real compiler starts, original flags/60-second deadlines, raw0 and empty
+streams/signals reconcile. Dependency files contain1,021 and1,052 entries,
+covering1,053 unique physical inputs; both see the changed header through VFS.
+All12,864 current captured files, nine membership trees,34 aliases and one
+explicit absence match actual before/final protection; the four required trees
+have exactly12,748 approved ledger rows. A closed35-file UTF8 text capsule
+retains all23 actual publication files/nested index plus Root context, with no
+SDK payload or binaries copied. Source/native binary/raw metadata remain
+unchanged; no link, runtime INIT behavior or adoption is proved. All ordinary
+native/SDK actions and this result reviewer are terminal before checkpoint.
+
+The [independent clock caller Source peer](tests/node-compat/foundation-scheduler/independent-clock-diagnostic357-selector-component-source-review-v1/results.json)
+passes at `10ddfa57`, with the genuine full consumer contract including
+verifiedPassed=true. All36 owner payloads/70 declared compact descriptors,
+107 unique files/150,439,328 bytes stay stable. Sixty owner and33 independently
+exercised exported pure cases pass. Actual61685/87777, Jco and whole-capture
+primary APIs are inspected; a full44,369-native/4,889-package replay remains the
+operational caller's responsibility. No package, loader, componentizer, engine,
+probe, clock or guest action runs in review. All writers are stopped for the
+next all-work checkpoint; actual clock component construction remains next.
+
+The final closure audit verifies12 new indexed families,607 payloads and
+42,853,252 payload bytes, including all nested copied indexes as DATA. All1,607
+local links in current documentation resolve. Engines/components/SDK libraries
+stay external; small raw Git and monitor evidence retain their recorded bytes.
+All Source/data writers and owned operational processes are stopped.
+The staged whitespace check has one warning in the byte-exact retained native
+build log; its sealed bytes are preserved. Edited documentation and code have
+no whitespace warnings.
+
+The next measured application-demand item is the actual
+[`format('value:%s:%d', 'ok', 7)` call](tests/node-compat/frameworks/nextjs/app-fixture/lib/compat.mjs#L50),
+whose Node result is `value:ok:7`; current `util.format` is explicitly deferred.
+A read-only pinned-Node Source assessment identifies a small audited primitive
+`%s`/`%d`/`%%` facade with exact parser/negative-zero/missing-argument rules and
+explicit object/inspect/directive/limit refusals as a possible bounded successor.
+It requires new util/sys support manifests, generated factory/profile checks,
+real native artifact metadata and fresh component/application regressions.
+No formatter implementation, oracle or guest run occurs in that assessment;
+it does not repair the current Next baseline or establish full Next support.
 
 Continuation after `e91cf013`: the previous goal turn made **progress**. It
 pushed the all-work checkpoint and fresh comprehensive Next.js/component
@@ -286,13 +507,14 @@ Immediate remaining work:
    snapshot-clock and surviving-job tests passed their bounded reviews; fatal
    cause, native pollable/drop/interest, invalid-queue, offset and teardown proof
    remain open. Failed-instance reuse and request isolation remain unproved.
-2. Complete a reproducible freeze of the revalidated experimental Hash/Hmac
-   candidate after the retained wrapper integrity failure. Raw83 metadata review,
-   zero-import component inspection and fourteen ordinary-call Node differentials
-   have passed their experimental reviews. A frozen-only verifier and native
-   module namespace-alias correction are in preparation; neither is adopted.
-   Define and enforce live EVP-context initialization/snapshot policy before any
-   public crypto admission; borrowing, secret erasure and cost gates stay open.
+2. Integrate a genuine new Hash/Hmac generation after the reviewed freeze.
+   Raw83 metadata, frozen-only verification, zero-import component inspection
+   and fourteen ordinary-call Node differentials pass their experimental reviews.
+   The namespace-cache fix and INIT barrier are reviewed unapplied sources;
+   the barrier's two-CPP syntax checks and independent DATA review pass after
+   preserved driver corrections. Compose/version the policies explicitly, build/link new bytes,
+   test early/late INIT refusals and repeat ordinary-call/import-order checks.
+   Borrowing, secret erasure, lifecycle, cost and public admission stay open.
 3. Admit any new profile only after its required correctness, capability, lifecycle
    and cost checks. Re-run the pinned Next/package checks with genuine new artifact
    pins and retain changed blockers. The full Next server is still unavailable.

@@ -1,0 +1,130 @@
+"""Synthetic source/argv/dependency tests only; never imports operational code."""
+from pathlib import Path
+import ast
+import hashlib
+import json
+import os
+import shlex
+
+HERE = Path(__file__).resolve().parent
+plan = json.loads((HERE / 'plan.json').read_bytes())
+tree = ast.parse((HERE / 'run-sdk-syntax.py').read_text())
+selected = ['clean_arguments', 'parse_dependencies', 'clean_terminal', 'check_authority']
+namespace = dict(Path=Path, shlex=shlex, os=os, OUTPUT=Path(plan['outputRoot']),
+                 UNIT_IDS=['entropy-policy', 'hash-hmac-kernel'])
+for name in selected:
+    node = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == name)
+    exec(compile(ast.Module(body=[node], type_ignores=[]), 'real-driver-pure-' + name, 'exec'), namespace)
+checks = []
+
+
+def check(label, condition):
+    assert condition, label
+    checks.append(label)
+
+
+def refuses(label, callback):
+    try:
+        callback()
+    except (AssertionError, ValueError):
+        checks.append(label)
+    else:
+        raise AssertionError(label)
+
+
+for unit in plan['units']:
+    declared, kept, main, removed = namespace['clean_arguments'](unit['actualCompileRow']['command'])
+    check(unit['id'] + ': exact original row retained', main == unit['actualCompileRow']['file'])
+    check(unit['id'] + ': wrapper not executed', declared == plan['references']['compilerWrapper']['path'])
+    check(unit['id'] + ': preserved arguments exact', kept == unit['preservedArguments'])
+    check(unit['id'] + ': original -c and -o removed', {part[0] for part in removed} >= {'-c', '-o'})
+    check(unit['id'] + ': syntax only', '-c' not in unit['argv'] and '-o' not in unit['argv'] and unit['argv'].count('-fsyntax-only') == 1)
+    check(unit['id'] + ': own dependency output', unit['dependencyFile'].startswith(plan['outputRoot'] + '/dependencies/'))
+    check(unit['id'] + ': real cwd retained', unit['cwd'] == unit['actualCompileRow']['directory'])
+    check(unit['id'] + ': physical main planned', unit['privateMainPath'] == plan['outputRoot'] + '/native/builtins/node-compat/' + unit['id'] + '.cpp')
+    for bad in ('-DDEBUG=1', '-DNODE_COMPAT_OOM_TESTING=1', '-DNODE_CRYPTO_AUDITED_BORROW=1', '@response.rsp', '-Xclang'):
+        refuses(unit['id'] + ': rejects ' + bad, lambda b=bad: namespace['clean_arguments'](unit['actualCompileRow']['command'] + ' ' + b))
+
+# A real counterexample to the donor's mixed-ordering comparison. Equal
+# membership must pass even when Path component order differs from strings.
+members = [Path('/scope/foo/a.h'), Path('/scope/foo.cpp')]
+path_order = [str(p) for p in sorted(members)]
+string_order = sorted(str(p) for p in members)
+check('mixed Path/string ordering counterexample exists', path_order != string_order)
+check('equal canonical string sets pass', set(path_order) == set(string_order))
+check('missing member detected', set(path_order) != set(string_order[:-1]))
+check('extra member detected', set(path_order) != set(string_order + ['/scope/extra.h']))
+
+parse = namespace['parse_dependencies']
+sample = 'syntax-only-test: ' + chr(92) + '\n /scope/main.cpp ' + chr(92) + '\n /scope/a' + chr(92) + ' b.h /scope/header.h\n'
+check('make continuation and escaped space', parse(sample, 'syntax-only-test') == ['/scope/main.cpp', '/scope/a b.h', '/scope/header.h'])
+check('CRLF continuation', parse('t: \\\r\n /a.h\n', 't') == ['/a.h'])
+refuses('wrong dependency target denied', lambda: parse(sample, 'wrong'))
+refuses('empty dependency list denied', lambda: parse('t:', 't'))
+refuses('duplicate dependency denied', lambda: parse('t: /a /a', 't'))
+refuses('malformed quoting denied', lambda: parse('t: "unfinished', 't'))
+check('lexical dot-dot normalizes to pre-observed SDK path', os.path.abspath('/sdk/bin/../share/header.h') == '/sdk/share/header.h')
+sample_row = plan['references']['donorDependencySample']
+raw_sample = Path(sample_row['path']).read_bytes()
+check('actual donor dependency text authenticated', hashlib.sha256(raw_sample).hexdigest() == sample_row['sha256'] and len(raw_sample) == sample_row['bytes'])
+old_names = parse(raw_sample.decode(), 'syntax-only-script-loader')
+check('actual donor emitted full dependency list parsed', len(old_names) == 1041)
+ledger_row = plan['references']['inputLedger']
+raw_ledger = Path(ledger_row['path']).read_bytes()
+check('dependency comparison ledger authenticated', hashlib.sha256(raw_ledger).hexdigest() == ledger_row['sha256'] and len(raw_ledger) == ledger_row['bytes'])
+old_indexed = {r['path'] for r in json.loads(raw_ledger)['files']}
+normalized_old = [os.path.abspath(p) for p in old_names]
+check('all 1040 non-main donor dependencies have prior provenance', all(p in old_indexed for p in normalized_old[1:]))
+mapping = {r['name']: r['external-contents'] for r in plan['overlay']['roots']}
+check('overlay has all three changed files', len(mapping) == 3)
+check('VFS maps header to genuine private afterimage', mapping[plan['candidateFiles'][0]['before']['path']] == plan['candidateFiles'][0]['privatePath'])
+check('no extra external embedding frontend', len(plan['units']) == 2 and plan['separateExternalEmbeddingTranslationUnits'] == 0)
+
+clean = dict(allObservedOwnedGroupsGone=True, parentOwnedGroupGone=True, forcedCleanup=False,
+             timeout=False, signals=[], interruptedSignals=[], errors=[], remainingObservedPids=[])
+check('clean original monitor model accepted', namespace['clean_terminal'](clean))
+check('nonzero frontend may be cleanup-clean; final success checks raw code separately', namespace['clean_terminal'](dict(clean, rawExitCode=1)))
+for name, value in [('allObservedOwnedGroupsGone', False), ('parentOwnedGroupGone', False),
+                    ('forcedCleanup', True), ('timeout', True), ('signals', [15]),
+                    ('interruptedSignals', [2]), ('interruptedSignals', [15]),
+                    ('interruptedSignals', None),
+                    ('errors', ['snapshot']), ('remainingObservedPids', [123])]:
+    check('rejects unclean ' + name, not namespace['clean_terminal'](dict(clean, **{name: value})))
+
+# Exact former driver predicate as preserved historical DATA; no module import.
+old_path = Path(plan['references']['failedPreparationIndex']['path']).parent / 'preparation-attempt1/run-sdk-syntax.py'
+old_raw = old_path.read_bytes()
+check('old driver 3cf fingerprint preserved', hashlib.sha256(old_raw).hexdigest() == '3cf52467acbc2f3757da936431d84e511ae512b47c6727ed4379951b024dddaf')
+old_tree = ast.parse(old_raw)
+old_node = next(n for n in old_tree.body if isinstance(n, ast.FunctionDef) and n.name == 'clean_terminal')
+old_namespace = {}
+exec(compile(ast.Module(body=[old_node], type_ignores=[]), 'exact-former-clean-terminal', 'exec'), old_namespace)
+check('old/new both accept clean base', old_namespace['clean_terminal'](clean) and namespace['clean_terminal'](clean))
+for interrupted in ([2], [15]):
+    case = dict(clean, interruptedSignals=interrupted)
+    check('old pass/new refuse interruption ' + str(interrupted), old_namespace['clean_terminal'](case) is True and namespace['clean_terminal'](case) is False)
+
+authority = json.loads((HERE / 'root-authority-template.json').read_bytes())
+index = dict(path=str(HERE / 'index.json'), sha256='synthetic-only', bytes=1)
+grant = dict(authority, driverPreparationIndex=index, sourceReview=plan['reviewedSourcePair'], syntaxOnlyCompilerAllowed=True)
+namespace['check_authority'](grant, plan, index)
+check('positive synthetic finite authority shape', True)
+refuses('unissued template denied', lambda: namespace['check_authority'](authority, plan, index))
+old_authority_row = plan['references']['failedRootAuthority']
+old_authority_raw = Path(old_authority_row['path']).read_bytes()
+check('old actual authority DATA authenticated', hashlib.sha256(old_authority_raw).hexdigest() == old_authority_row['sha256'] and len(old_authority_raw) == old_authority_row['bytes'])
+old_authority = json.loads(old_authority_raw)
+refuses('actual V1 authority cannot activate V2', lambda: namespace['check_authority'](old_authority, plan, index))
+for name, value in [('outputRoot', '/different'), ('timeoutSecondsPerUnit', 61),
+                    ('units', ['hash-hmac-kernel']), ('cryptoAllowed', True),
+                    ('engineAllowed', True), ('sourceIndex', None), ('sourceReview', None)]:
+    refuses('authority refuses ' + name, lambda n=name, v=value: namespace['check_authority'](dict(grant, **{n: v}), plan, index))
+
+check('compiler execution absent from preparation', plan['actualCompilerTranslationUnits'] == 0 and plan['compilerAuthorization'] is None)
+check('preflight bookends not falsely reported', plan['currentExecutionInputHashBookendsPerformed'] is False)
+check('external output still absent', not Path(plan['outputRoot']).exists())
+check('four required existing trees', len(plan['protectedTrees']) == 4 and sum(t['regularFiles'] for t in plan['protectedTrees']) == 12748)
+check('single absent include is explicit', len(plan['absentIncludePolicies']) == 1 and plan['absentIncludePolicies'][0]['mustRemainAbsent'] is True)
+check('original literal absent include remains in both commands', all(plan['absentIncludePolicies'][0]['literalCompileArgument'] in u['preservedArguments'] for u in plan['units']))
+print(json.dumps(dict(schemaVersion=1, state='SYNTHETIC_DRIVER_CHECKS_PASSED', checks=len(checks),
+      cases=checks, compilerHelperMonitorEngineCryptoInvoked=False), indent=2))

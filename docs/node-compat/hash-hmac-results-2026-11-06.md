@@ -99,8 +99,36 @@ changing the engine. The original four digest returns passed80 comparisons but
 their phase acceptance remains false. Corrected runs preserve truthful3/1
 attempt/return/comparison counts; they are the accepted diagnostic evidence.
 
-Remaining gates are full freeze/reproduction and frozen-only verification,
-initialization/live-EVP snapshot policy, secret-copy/erasure and GC/lifetime
+The [actual freeze](../../tests/node-compat/foundation-crypto/node-crypto-hash-hmac-freeze-v1-root-results.json)
+now finishes with clean exit0. Receipt `187fabbe…` retains1,893 payload files,
+641,351,629 bytes and the unchanged9aec/2b725 engine/metadata. Its genuine
+frozen-only verifier returns a NOT_ADOPTED record using copied roles and pure
+83-field models. [Independent actual-freeze review](../../tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-frozen-artifact-review-v1/results.json)
+passes80,672 checks, including every copied role and whole result/contract
+coverage. A reader-only stdout typo is preserved; its corrected read-only
+completion finishes0 without rerunning the verifier or admission. The
+freeze rechecks current references but does not physically copy the whole SDK
+and reference distributions; its offline verifier does not rehash those live
+originals. Earlier failed build outcomes remain unchanged.
+
+The snapshot audit also identifies late initialization after
+`Engine::finish_pre_initialization()` sets the Initialized state. Export binding
+and final jobs/ticks still run before the snapshot finishes. A proposed native
+barrier must combine engine state with the existing deployed-execution state;
+REQUEST_HANDLER_ONLY alone is insufficient. The current9aec artifact has no
+general live-EVP initialization barrier.
+The [standalone barrier Source](../../tests/node-compat/foundation-crypto/node-crypto-hash-hmac-init-barrier-candidate-v1/README.md)
+and [separate Source review](../../tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-init-barrier-source-review-v1/results.json)
+now specify that restriction for all four native primitives, with identifiable
+TypeError/code/operation fields and unconditional cleanup. Two actual SDK
+frontends and [independent result review](../../tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-init-barrier-sdk-v2-results-review-v1/results.json)
+now pass. The original driver failed before compilation on an absent include
+directory; its genuine successor preserves that `-I` and checks explicit
+absence. The guard remains unapplied and unlinked; actual early/late INIT
+refusals and ordinary-call regressions require a genuine new native generation.
+
+Remaining gates are fresh reproduction, initialization/live-EVP snapshot policy,
+secret-copy/erasure and GC/lifetime
 coverage, allocation limits, malformed inputs, performance/component-size
 comparison, broader release gates and optional host capabilities. The fixture
 creates contexts only during ordinary calls. Full Node, Buffer, crypto and
