@@ -31,8 +31,14 @@ precede five accepted component constructions and one identified, unaccepted INI
 timer refusal. The pure component imports nothing; clock/resource components
 select only three standard WASI0.2.10 clock/poll interfaces. A separate pure
 control returns seven whole Node-equal Jco/Wasmtime strings at raw0, with
-independent runtime DATA review passed. Clock/resource runtime validation and operational
-adoption remain open.
+independent runtime DATA review passed. The separate ordinary resource suite also
+passes independent review:35 public strings/49 cases/98 callback observations/322
+per-instance timer IDs on retained/fresh Jco and stock Wasmtime. This is web timer
+behavior, without Node Timeout-object parity, native cleanup proof or a public
+`node:timers` implementation. Clock-snapshot and surviving-job seven-return
+suites also pass independent review, without an epoch/native offset/cleanup claim.
+Fatal observation remains unaccepted because the source-specific diagnostic is
+missing; native lifecycle and operational adoption remain open.
 Default-OFF Hash/Hmac Source and SDK syntax checks do not change the deferred
 `node:crypto` API status. The experimental clock and guarded-key results remain
 separate from public API compatibility; exact evidence is in the

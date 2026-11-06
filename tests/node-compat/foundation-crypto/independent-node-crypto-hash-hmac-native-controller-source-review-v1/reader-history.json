@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "ownerSourceModified": false,
+  "operationalTargetRerun": false,
+  "reviewerFailures": [
+    {
+      "source": "reader-history/first-pure-review.py",
+      "stderr": "reader-history/first-pure.stderr",
+      "cause": "Reader tried treating the intentionally UNISSUED template state as an issued model input; correctly rejected.",
+      "correction": "Only in-memory pure test shape uses the required model state; no Root document or action frame issued."
+    },
+    {
+      "source": "reader-history/second-pure-review.py",
+      "stderr": "reader-history/second-pure.stderr",
+      "cause": "Reader assumed NULL substitution made skeletal templates complete; missing variant was correctly rejected.",
+      "correction": "Materialize complete synthetic MODEL fields from actual refs and models.root requirements; Root completion requirement retained explicitly."
+    },
+    {
+      "source": "reader-history/third-pure-review.py",
+      "stderr": "reader-history/third-pure.stderr",
+      "cause": "Reader counted total lifecycle parameters rather than required/callable parameters; real function has5 required and4 defaults.",
+      "correction": "Check required<=actual-call-arity<=total using real AST signatures, with no lifecycle invocation."
+    }
+  ],
+  "passedPureChecks": 91,
+  "authorPreparationFailureRetainedAsImmutableSourceData": "Source leading-double-slash preparation correction remains in its own sealed source-preparation-failures.json"
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "passed": true,
+  "originalObserver": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-runtime-v3-root-observe.py",
+    "sha256": "888fb6c6fe77e81759b5141f9f2ea236fee1772fae2f344e8e096c245c497f9b",
+    "bytes": 8235
+  },
+  "actualObserver": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-runtime-v3-root-observe-v2.py",
+    "sha256": "c59b01241fbaf4e28521592443ff7c19fb6a87a93b4910ab245551ca5bad648e",
+    "bytes": 8333
+  },
+  "edits": [
+    {
+      "before": "\"\"\"Data-only observation of original completed runtime-v3 Root operations.",
+      "after": "\"\"\"V2 data-only observer: adds fatal mapping, never fatal runtime classification."
+    },
+    {
+      "before": "assert case in ['resource', 'clock-snapshot', 'surviving-interest', 'pure']",
+      "after": "assert case in ['resource', 'clock-snapshot', 'surviving-interest', 'pure', 'fatal']\nassert case != 'fatal' or phase == 'map'  # No fatal runtime classification here."
+    }
+  ],
+  "wholeForwardComparison": true,
+  "fatalRuntimeClassificationAdded": false,
+  "observerExecutedByReviewer": false
+}

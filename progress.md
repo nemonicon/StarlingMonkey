@@ -14,6 +14,26 @@ See the [Next fixture](tests/node-compat/frameworks/nextjs/README.md) for the
 original failures and reusable regression commands. This Git checkpoint
 preserves the new evidence, retained failures and proposed source-only tooling; the full roadmap remains incomplete.
 
+Immediate remaining work:
+
+1. Finish the combined-runtime timer, snapshot-clock, surviving-job and fatal-error
+   tests. Separate public behavior from native pollable/drop/interest and teardown
+   evidence; failed-instance reuse and request isolation remain unproved.
+2. Compile the staged experimental Hash/Hmac candidate, verify its complete new
+   build metadata and component imports, then run ordinary-call Node differentials.
+   Define and enforce live EVP-context initialization/snapshot policy before any
+   public crypto admission; borrowing, secret erasure and cost gates stay open.
+3. Admit any new profile only after its required correctness, capability, lifecycle
+   and cost checks. Re-run the pinned Next/package checks with genuine new artifact
+   pins and retain changed blockers. The full Next server is still unavailable.
+
+The next all-work snapshot verifies 15 completed indexed families: 774 payloads,
+14,122,361 payload bytes, exact membership and every nested copied index. It also
+includes 38 explicitly **UNSEALED WIP** files in controller Sourcev3: no index,
+result, receipt or action grant. Its inherited references/templates are not
+runnable or approved. All writers are held during this Git snapshot; Source
+validation and independent review remain required before any new native phase.
+
 Roadmap continuation after `ceb1ffe9`:
 
 - Previous goal turn: **progress**. All872 changed files were committed and
@@ -153,6 +173,74 @@ Roadmap continuation after `ceb1ffe9`:
   Root starts at30639/parent33375, invocation34760977, with the same1,800/1,200s
   bounds; its actual result, independent mapped DATA and ordinary calls remain
   pending. It does not reuse the resource mapping as a different fixture proof.
+  Its original30639 tool later finishes raw0 and clean; [Root observation](tests/node-compat/foundation-scheduler/combined-native-runtime-v3-clock-snapshot-map-root-results.json)
+  verifies all15 published files and the original inner/outer/Node frames.
+  [Independent clock mapping DATA review07c61d25](tests/node-compat/foundation-scheduler/independent-combined355-runtime-v3-clock-snapshot-mapped-results-review-v1/results.json)
+  now passes all15 actual files, seven loading artifacts, unchanged core/ABI,
+  standard shim imports and full native protection. The pristine request is402B;
+  actual typed undefined/default-map observations remain separate. Root issues a
+  separate [ordinary clock phase](tests/node-compat/foundation-scheduler/combined-native-runtime-v3-clock-snapshot-run-root-invocation.json)
+  at65943/parent49310 with1,800/1,200s bounds: three retained/one fresh Jco and
+  three fresh Wasmtime strings, live host wall brackets with1ms coarse allowance,
+  no `performance.timeOrigin` epoch assumption. Actual clock result/review remain
+  pending at launch. The original65943 later finishes raw0/clean across all five
+  commands; [Root clock observation](tests/node-compat/foundation-scheduler/combined-native-runtime-v3-clock-snapshot-run-root-results.json)
+  authenticates42 payload/44 total files and all seven complete returns.
+  [Independent clock runtime review5cb20028](tests/node-compat/foundation-scheduler/independent-combined355-clock-snapshot-runtime-v3-results-review-v1/results.json)
+  now passes all seven strings, initialization/jobs/retained counters, Date/ISO
+  host brackets and retained monotonic/origin continuity,20 mutation refusals,
+  whole44-file publication and all five child/two parent clean0 layers. Actual
+  `timeOrigin` values remain host-clock observations, without Unix-epoch, Node
+  performance parity, native-offset or teardown claims. The first
+  data-reader attempt looked for the Python terminal frame in Node publication
+  stdout; its pre-write assertion is retained in a [preparation correction](tests/node-compat/foundation-scheduler/combined-native-runtime-v3-root-observe-preparation-correction-v1.json).
+  Correcting that endpoint does not rerun the target. Separate mapping-only
+  Roots for surviving-interest41448/parent42167 and fatal5482/parent42192 now
+  start with1,800/1,200s bounds and fresh fixture-specific paths. Neither grants
+  ordinary or fatal execution; actual mapped reviews remain required. Both
+  original mapping tools subsequently finish raw0/clean and Root observes all15
+  members each: [surviving-interest map](tests/node-compat/foundation-scheduler/combined-native-runtime-v3-surviving-interest-map-root-results.json)
+  and [fatal map](tests/node-compat/foundation-scheduler/combined-native-runtime-v3-fatal-map-root-results.json).
+  A new data-only observer v2 adds fatal mapping to its CLI and explicitly
+  excludes fatal runtime classification; the already-used v1 stays unchanged.
+  [Independent survivor mapping review73837797](tests/node-compat/foundation-scheduler/independent-combined355-runtime-v3-surviving-interest-mapped-results-review-v1/results.json)
+  passes all15 files/seven loading artifacts, unchanged core/ABI, standard3
+  bindings and native protections. Root issues a separate [ordinary survivor phase](tests/node-compat/foundation-scheduler/combined-native-runtime-v3-surviving-interest-run-root-invocation.json)
+  at22922/parent54250, with1,800/1,200s bounds and the seven-string retained/
+  fresh Jco/Wasmtime schedule. The original22922 later finishes raw0/clean;
+  [Root survivor observation](tests/node-compat/foundation-scheduler/combined-native-runtime-v3-surviving-interest-run-root-results.json)
+  authenticates42 payload/44 total files and all seven whole strings. Independent
+  [actual survivor review98dc56ca](tests/node-compat/foundation-scheduler/independent-combined355-surviving-interest-runtime-v3-results-review-v1/results.json)
+  now passes all seven strings:8 cancellations and two surviving Promise values
+  per call, ordered fence/events, zero cancelled callbacks, retained1/2/3 and
+  fresh1 counters, and retained ID continuity. Totals are77 per-instance ID
+  observations/56 cancellations/14 values/35 events;22 mutations refuse. Full
+  publication, all five child/two parent clean0 layers and frozen/native guards
+  pass. Native interest/drop/all-invalid/offset/teardown remain unproved. Independent
+  [fatal mapping review580e1f59](tests/node-compat/foundation-scheduler/independent-combined355-runtime-v3-fatal-mapped-results-review-v1/results.json)
+  now passes all15 files/core/ABI/standard bindings and actual raw0 ownership.
+  Its direct fields keep every fatal-runtime/cause/gate acceptance claim false.
+  After the genuine actual resource prerequisite d77c, Root issues a separate
+  [disposable fatal observation](tests/node-compat/foundation-scheduler/combined-native-runtime-v3-fatal-fatal-root-invocation.json)
+  at52435/parent60456 with1,800/1,200s bounds. At most one fresh Jco and one
+  fresh Wasmtime attempt may be observed; generic throws/traps stay
+  cause-inconclusive and unaccepted. No current355 native callback diagnostic
+  or expected-callback cause proof is invented. The [actual fatal observation](tests/node-compat/foundation-scheduler/combined-native-runtime-v3-fatal-fatal-root-results.json)
+  finishes **raw1/unaccepted**: one Jco child exits1 with an actual pre-call
+  marker/retained typed throw, and one Wasmtime child exits134 with a generic
+  `unreachable` diagnostic. Both children and both parents have clean owned-group
+  cleanup, no timeout/signalling/overflow/errors. Wasmtime does not retain the
+  unique source marker; the parent correctly refuses that missing identity/reach
+  evidence. All15 partial files are hashed; no owner result/index/completion or
+  fatal-classification record exists. Generic failure does not prove the callback
+  cause, native callback execution, original JS error identity or safe reuse.
+  [Independent failure reviewa57873cb](tests/node-compat/foundation-scheduler/independent-combined355-fatal-observation-v3-failure-review-v1/results.json)
+  now authenticates all15 partial files, real pure inconclusive classification/
+  20 counterexamples, both nonzero children/two parents with clean cleanup and
+  complete frozen/native protection. Its exact observation-review state means
+  DATA review passed; the fixed outcome remains FAILED_OBSERVATION_CAUSE_INCONCLUSIVE_UNACCEPTED,
+  phaseSucceeded/acceptedRuntimeObservation/expected-callback proof/gate allfalse.
+  No workload is rerun.
 - [Hash/Hmac stage-controller Source2395af2c](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-stage-candidate-v1/README.md)
   passes [qualified independent Source reviewa703429a](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-stage-source-review-v1/results.json).
   Its1642 unique source destinations and three separate embedding DATA copies,
@@ -191,7 +279,115 @@ Roadmap continuation after `ceb1ffe9`:
   historical source-controlled bookends remain separately qualified. All review
   writes stopped and the original Git protection window finished before Root
   creates the next authorized commit. A future owned build-controller Source
-  is being prepared; actual build/configure/freeze/crypto authority stays absent.
+  [Source9e5195b9](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-controller-candidate-v1/README.md)
+  is now sealed:2,458 source/data/pure checks over5,058 inputs/15 families and13
+  Python AST checks pass. It separates build from freeze, requires an independent
+  actual357/83 BUILD proof/full ledger before freeze imports, uses genuine7c5a/
+  0af/f751 contexts, and keeps INIT EVP/public crypto admission open. Independent
+  [Source review85f29843](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-native-controller-source-review-v1/results.json)
+  now passes5,082 current rows/16 families,91 independent inert cases and full
+  actual API/phase/refusal checks. The issued Root must fully populate the
+  skeletal templates using the real model and references. Root's first outer
+  launcher uses7,500s, beyond the unchanged monitor's7,200s limit; it fails an
+  assertion before any child/Source controller/cache/build/WORK is created.
+  [Original refusal](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-build-v1-root-results.json)
+  is retained. A new [v2 Root build invocation](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-build-v2-root-invocation.json)
+  starts at14463/parent73627 with7,200s outer and7,200s inner refusal bounds,
+  jobs1,2GiB start/800MiB stop floors, HASH-ON/COPY-only/entropy-OFF and no
+  borrowing/GC/DEBUG/OOM. The source controller and metadata model stay unchanged.
+  This is the first actual native build attempt for this generation; configure/
+  compile/link and read-only inline metadata validation are allowed, but engine,
+  component, crypto, freeze, snapshot and public-profile admission stay forbidden.
+  The [actual14463 preparation](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-build-v2-root-results.json)
+  finishes **raw1 before recipe/compiler execution**. Its owner result records
+  zero completed cache copies, rawChildExitCode null and preserved Source/cache
+  inputs. The retained WORK contains only one162,093-byte archive, identical in
+  hash to its source, distinct inode/single link, with actual mode0600 versus
+  requested0644. Source sets umask077 and creates the file without fchmod before
+  requiring0644; this Source-derived cause matches every retained predicate.
+  The original caught assertion stack is absent, so that attribution remains
+  explicitly Source-coupled. Both original parent monitors exit1 with complete
+  owned-group cleanup/no timeout/signals/errors. No build.log, engine, metadata,
+  recipe, compiler, crypto or freeze exists. Compact independent failure DATA
+  [review11c1c14e](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-build-v2-root-preflight-review-v1/results.json)
+  now passes the exact Root/preflight models,42 refusal mutations and the compact
+  actual failed DATA wire. It verifies the complete original {output,result}
+  frame, both clean raw1 parent lifetimes and every hash/inode/link/mode term,
+  while keeping actualBuildSucceeded/buildAcceptance false. Its own initial
+  bare-envelope reader assumption is retained and corrected within the review.
+  Native source has not failed compilation; no compiler was invoked.
+  A genuine controller v2 is being prepared with explicit owned-fd fchmod/fsync
+  and real benign temp-copy tests under077 for0644/0755. Fresh WORK/freeze/output
+  paths preserve the failed v1 files. An initial Root assumption that the recipe
+  accepts arbitrary NODE_COMPAT_BUILD_ROOT is withdrawn: its line55 guard plus
+  policy/helper/model work contexts bind v1. The fix therefore includes new owned
+  producer/context afterimages, exact reversible edits and fresh actual83 output;
+  unchanged7c5a native357/3/12 and actualstage7df remain ancestry, without global
+  rebinding, restaging or old-metadata projection. New Source/peer/Root/build and
+  all actual algorithm/snapshot/cost/adoption gates remain pending. The corrected
+  [controller Sourcee8b47cc8](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-controller-candidate-v2/README.md)
+  is sealed and passes [independent Source review552b65af](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-native-controller-v2-source-review-v1/results.json):
+  2,880 preparation checks/5,191 inputs/18 families/19 AST parses, five real tiny
+  copy regressions under077, pinned Bash grammar and19-file/12-edit exact
+  derivations. Native changes are zero. The peer checks5,230 current files/19
+  families,103 inert cases and245 correction checks; retained real copy evidence
+  has exact0644/0755 after fchmod and preserves old partial failures. A fresh
+  [v3 Root build phase](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-build-v3-root-invocation.json)
+  starts at83192/parent80122 using the genuine new producer and V2 work/freeze
+  roots,7,200s outer/inner bounds, COPY-only/HASH-ON/entropy-OFF/jobs1. Failed v1
+  WORK/output and all native7c5a/stage7df source identities remain protected.
+  The [actual83192 phase](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-build-v3-root-results.json)
+  now finishes **raw1 in early recipe authentication**. All four cache copies
+  complete with correct hashes/modes/independent inodes, so the077 mode fix works.
+  The recipe child starts and exits1 with clean lifecycle/group cleanup; both
+  parent monitors also finish1 cleanly. The fresh ABI record and sourceDir/lib
+  exist; the seven owner/five WORK files include an empty build.log. No archive
+  extraction, helper CLI, dependency fetch, CMake configure, compiler, engine,
+  metadata, crypto or freeze is reached. Its new policy is b2421527, while both
+  shell policy guards at recipe lines194/204 still require old99f15d4a; the helper
+  guards and helper POLICY_SHA match the new policy. This Source-coupled cause
+  is qualified by the absent original Bash execution trace. [Independent failed
+  DATA reviewf05f9285](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-build-v3-failure-review-v1/results.json)
+  now passes all four full cache-copy byte/mode/inode records, seven owner/five
+  WORK members, whole JSON/raw lifetimes and exact stale/correct guard joins.
+  Both parent/recipe nonzero lifetimes have clean cleanup; actualBuildSucceeded
+  remains false. Its recipe process sample has PID/group but only `(bash)` as
+  command; full argv is not inferred from that sample. The two reviewer-only
+  envelope/key assumptions are retained. Old Sourcepeer552b stays immutable and
+  its missed cross-file literal join is recorded. A genuine Sourcev3 successor with fresh
+  WORK/freeze/output paths, all policy/helper guard joins and a stale-literal
+  regression is being prepared. Native7c5a source remains unchanged and uncompiled
+  by these attempts; actual algorithm/snapshot/cost/adoption gates remain open. A private diagnostic-fixture Source audit additionally finds that
+  current7aed exports only `snapshot()`: JS cancellation erases queued tasks, so
+  it cannot create an all-invalid selector queue, and no native resume-offset
+  field is exposed. Those requirements remain blocked by missing guest-only test
+  instrumentation, rather than being replaced with public JS counters. The compact
+  [fixture Source3c337c1a](tests/node-compat/foundation-scheduler/combined-clock-diagnostic-fixtures-candidate-v1/README.md)
+  passes [bounded Source reviewc9af5ff0](tests/node-compat/foundation-scheduler/independent-combined-clock-diagnostic-fixtures-source-review-v1/results.json).
+  Its three real API wrappers/seven unchanged resource bodies/45 synthetic and23
+  independent cases keep fullGateAccepted false, even for synthetic pruning.
+  This is a missing-instrumentation finding, not an impossible passing guest.
+  Native offset fields live in runtime/js.cpp (`mono_clock_offset`, `wizen`);
+  the actual owning queue/selector and post-selection settlement need distinct
+  guest-only seams and real link/transition proof. A synchronous quiescent actual-
+  queue selector probe could cover that branch, while natural event-loop settlement
+  and Store/fatal/cached-drop proof remain separate. No diagnostic native build
+  is issued from the insufficient v1 interface. Diagnostic v2 Source design is
+  deferred temporarily while the native cache-mode correction is prepared.
+- Checkpoint **1d5edac05f902501c52d8c01690c418a80777f06** commits all1,527
+  changed files and is pushed to `origin/main`; `git ls-remote` returns the same
+  full SHA and the worktree is clean immediately after push. The next operations
+  below continue the roadmap, which remains incomplete. Editable documentation
+  whitespace checks pass;3,799 warnings in six byte-exact raw generated captures
+  and one sealed Source EOF are preserved instead of altering authenticated bytes.
+- After1d5, a read-only closure audit verifies13 completed indexed families:
+  705 payloads/718 actual regular files,12,374,845 payload bytes, all12 nested
+  copied indexes and the full resource family including its previously tracked
+  planning files. It excludes the then-active V2 Source peer; that peer is now
+  independently sealed as552b. No closure/path/hash/symlink issue is found.
+  The next all-work checkpoint includes these final results, both native
+  preparation refusals, the real copy-mode regression/fix and the completed
+  failed83192 invocation plus Source-coupled policy-guard finding. The complete roadmap remains in progress.
 - This all-work checkpoint includes21 newly sealed families:1,423 indexed
   payloads/14,640,973 bytes pass Root whole-membership/hash checks, including
   nested copied indexes. The resource runtime review directory contains four
@@ -199,6 +395,20 @@ Roadmap continuation after `ceb1ffe9`:
   review is claimed. All review writers are held during the authorized Git
   snapshot. Ordinary resource55164 and clock-map30639 continue externally;
   their configs/invocations are recorded, results still pending at this snapshot.
+  The subsequent [resource runtime55164](tests/node-compat/foundation-scheduler/combined-native-runtime-v3-resource-run-root-results.json)
+  finishes raw0 with both original monitors clean and all five commands0. Root
+  authenticates70 payload/72 total files, including both complete nested child
+  indexes/completions and original Node/Python output frames. Whole declared
+  coverage is35 public strings/49 inner cases/98 callbacks/322 new timer IDs.
+  [Independent actual resource reviewd77c82e2](tests/node-compat/foundation-scheduler/independent-combined355-resource-runtime-v3-results-review-v1/results.json)
+  now passes the full whole-string/case/ID schedule,20 retained-DATA mutation
+  negatives, all72 files including nested indexes, five child/two parent raw0
+  layers and full native/frozen protection. The exact same-index whole contract
+  fulfills the handled-error resource prerequisite for a later separate fatal
+  observation. The322 ID observations are newly issued within each instance;
+  fresh instances intentionally reuse ranges, so global uniqueness is not claimed.
+  This is not full17-gate/profile acceptance, native-interest/drop/
+  teardown, failed-instance reuse, Node Timeout-object parity or adoption proof.
 - Surviving-interest, fatal and INIT-fatal bundles finish raw0 at Root33382,
   68649 and98293 with clean owned groups and complete native-manifest bindings.
   Their separate constructions finish at Root86269/37335 raw0 and26507 raw1,

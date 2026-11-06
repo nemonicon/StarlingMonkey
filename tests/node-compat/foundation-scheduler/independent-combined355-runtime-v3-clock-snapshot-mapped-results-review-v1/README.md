@@ -1,0 +1,13 @@
+# Combined355 clock-snapshot mapped-output DATA review V3
+
+Bounded PASS for the complete map-only publication of the accepted clock-snapshot component5e020b28. This is not an ordinary runtime, snapshot-resumption, Date/monotonic-reasonableness or whole clock profile acceptance.
+
+The actual Source54a phase30639 returned clean zero under original0af inner1200s and outer1800s bounds. The complete13-payload/15-file output, whole raw Node publication frame, two-record outer frame, all owned raw terminal flags and original launch arguments were independently checked. OriginalRoot observer's envelope-selection mistake and no-target-rerun correction remain explicitly retained DATA.
+
+All seven loading files match the actual per-case artifact proof ea27/ec3e/31f8. Six non-JavaScript files, including the complete main core, are byte-identical to the original. Host-only Acorn parsing and the authenticated pure Source models compare the whole original/mapped JavaScript AST: scalar run()->string plus exact empty_util, top-level await, maincore URL and three inline cores remain intact. Static bindings use only the official0.31.0 clock/io shim URLs for the three standard0.2.10 interfaces; the sole dynamic Node loader is node:fs/promises. Neither generated module nor any shim/application was imported.
+
+The pristine402-byte requested-options document is separately retained from the actual typed post-call work-object shape (including own undefined). The23 unused default Node/TLS map rules are not generated imports or capability/runtime support. OriginalV2 publication failure remains failed; its unretained options cause remains source inference.
+
+Current protection rehashed30,977 files/45 fixed families, the private4889-file/21-link package, original20,816 mode rows,1,613 original/stage pairs and all2,597 frozen files. These current checks and actual successful Source-controlled guards have separate scopes; no actual-time per-file readtrace, new native frame or universal OS attestation is invented. References reuse compact fixed ledgers rather than historical tree copies. Every nested copied index is in this review index.
+
+Only read/hash, Python DATA readers and an authenticated Node host metadata-parser/pure-model check ran. No original verifier, retainedAPI/recheck, Jco, compiler, application import/export, guest, Wasmtime or crypto action was invoked by the reviewer. One own capture-ordering failure is retained in reader-history.json and passed after its capture metadata was available. The result-contract.json is intended for the genuine Source54a mapping.reviewedMapped consumer; it grants no action authority.

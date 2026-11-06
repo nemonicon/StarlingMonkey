@@ -25,7 +25,7 @@ independent actual-result review. Two fresh components construct successfully:
 [pure](../../tests/node-compat/foundation-scheduler/combined-native-component-v1-construct-pure-root-results.json)
 has no imports; [resource](../../tests/node-compat/foundation-scheduler/combined-native-component-v1-construct-resource-root-results.json)
 imports exactly the selected three WASI0.2.10 clock/poll interfaces. Ordinary
-runtime calls and operational admission remain open. Subsequent construction
+clock lifecycle and operational admission remain open. Subsequent construction
 review covers the full six-fixture catalogue: five accepted components and one
 identified, unaccepted initialization refusal. The separate pure-only control
 now returns seven whole Node-equal strings on Jco/Wasmtime at raw0; independent
@@ -34,8 +34,15 @@ raw failure remain retained. The v3 successor passes Source review, completes a
 fresh mapping at raw0 and passes independent mapped DATA review. Pristine input
 options and the actual typed post-call shape are separate; unused Jco default
 rules grant no extra capability. A separately issued ordinary resource runtime
-phase is now running; its result and independent review remain pending. Clock,
-survivor and fatal lifecycle gates remain open. See [progress.md](../../progress.md).
+phase finishes raw0 with35 public strings/49 cases/98 callbacks and322
+per-instance ID observations;
+[independent runtime review](../../tests/node-compat/foundation-scheduler/independent-combined355-resource-runtime-v3-results-review-v1/results.json)
+passes the whole schedule and publication/process/native protection. The separate
+seven-return clock-snapshot and surviving-job suites also pass independent DATA
+review. The disposable fatal observation finishes raw1: its generic Wasmtime trap
+lacks source-specific callback evidence, so it stays cause-inconclusive and
+unaccepted. Native cleanup/offset/invalid-queue and wider lifecycle gates remain
+open. No public Node timers module or new production profile is admitted. See [progress.md](../../progress.md).
 The separate secret355
 component and corrected v3 guarded runtime also pass actual review: 23 complete
 returns and 45 Node-oracle signatures. Three fresh stock-Wasmtime validations

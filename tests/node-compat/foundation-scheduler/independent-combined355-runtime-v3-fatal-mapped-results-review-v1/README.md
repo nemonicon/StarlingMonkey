@@ -1,0 +1,13 @@
+# Combined355 fatal mapped-output DATA review V3
+
+Bounded PASS for the complete map-only publication of accepted fatal component9d28937f. Fatal ordinary runtime was not invoked in this phase or review. Expected callback failure, cause proof, fatal gate satisfaction and fatal runtime acceptance remain false. Runtime/adoption authority remains NULL/unissued by this review.
+
+The actual Source54a phase5482 returned clean zero under original0af inner1200s and outer1800s bounds. All13 payload/15 actual files, whole raw Node publication frame, two-record outer envelope, complete launch arguments and monitored cleanup fields were independently checked. The current data observerV2 exactly preservesV1 behavior except its description and a fatal-map-only CLI guard; it cannot classify fatal runtime. The observer was not executed by the reviewer.
+
+All seven loading files match actual per-case artifact ea27/dc6f/d615. Six non-JavaScript files, including the whole maincore, are byte-identical to the original. Authenticated host-only Acorn parsing and pure Source models compare the whole original/mapped JavaScript AST: scalar run()->string plus exact empty_util, top-level await, maincore URL and three inline cores remain intact. Static bindings use only official0.31.0 clock/io URLs for the three standard0.2.10 interfaces. The sole dynamic Node loader is node:fs/promises. Generated module and shims were not imported.
+
+The pristine393-byte requested options remain distinct from the actual typed post-call mutable-object shape, including own undefined. Its23 unused default Node/TLS mapping rules are not generated imports, capabilities or runtime support. OriginalV2 resource publication failure remains failed and the unretained old options cause remains source inference.
+
+Current protection rehashed30,977 files/45 fixed families, private4889-file/21-link package,20,816 original mode rows,1,613 original/stage pairs and2,597 frozen files. These current checks and successful actual Source-controlled guards are distinct; no actual-time per-file readtrace, new native frame or universal environmental attestation is invented. Compact fixed ledgers are reused without historical tree copies. Every nested copied index is indexed.
+
+Only read/hash, Python DATA readers and an authenticated Node host metadata-parser/pure-model check ran. No verifier, retainedAPI/recheck, Jco, compiler, generated import, ordinary export, engine/guest, Wasmtime, callback/crypto workload or target rerun was invoked by the reviewer. All host checks passed first attempt. result-contract.json matches genuine Source54a mapping.reviewedMapped whole fixed/exact/coverage/mapped-file joins and grants no action authority.

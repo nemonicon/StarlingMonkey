@@ -93,13 +93,17 @@ caller = Path(str(output) + '-root-caller')
 inner_terminal, outer_terminal = row(external / 'terminal.json'), row(caller / 'terminal.json')
 clean(inner_terminal, authority)
 clean(outer_terminal, authority)
-frames = [json.loads(line) for line in (external / 'stdout.log').read_text().splitlines()
+frames = [json.loads(line) for line in (caller / 'stdout.log').read_text().splitlines()
           if line.startswith('{')]
 terminal_frames = [f for f in frames if f.get('state') == 'COMBINED355_RUNTIME_RAW_TERMINAL_UNREVIEWED_V3']
 assert len(terminal_frames) == 1
 assert terminal_frames[0]['phase'] == phase and terminal_frames[0]['fixtureId'] == case
 assert terminal_frames[0]['terminal'] == inner_terminal and terminal_frames[0]['rawExitCode'] == 0
 ix, result_row, completion, count = publication(output)
+node_frame = json.loads((external / 'stdout.log').read_bytes())
+assert node_frame == dict(root=str(output), index=dict(ix, path='index.json'),
+                          completion=dict(completion, path='completion.json'),
+                          completeUnreviewed=True)
 result = checked(result_row)
 assert result['sourceIndex'] == r['sourceIndex'] and result['rootAuthority'] == authority
 assert result['config'] == config and result['fixtureId'] == case
@@ -112,6 +116,7 @@ report = dict(schemaVersion=1,
               invocation=invocation, observer=row(Path(__file__).resolve()),
               actualIndex=ix, completion=completion, externalParentTerminal=inner_terminal,
               outerTerminal=outer_terminal, externalStdout=row(external / 'stdout.log'),
+              outerStdout=row(caller / 'stdout.log'),
               completePublicationMembershipAndHashesVerified=True,
               payloadFileCount=count, totalFileCount=count + 2,
               sourceControlledFinalChecksPassed=True, component=result['component'],

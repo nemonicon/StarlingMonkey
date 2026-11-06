@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "state": "ROOT_DATA_READER_PREPARATION_CORRECTION_V1",
+  "originalObserver": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-runtime-v3-root-observe.py",
+    "sha256": "bbbacd392408ba125d346250f04a5e40a60327d6ffaee508622ae1f13b06e57f",
+    "bytes": 7910
+  },
+  "originalCommit": "1d5edac05f902501c52d8c01690c418a80777f06",
+  "actualToolObservation": {
+    "rawExitCode": 1,
+    "chunkId": "d9acca",
+    "diagnostic": "AssertionError at assert len(terminal_frames) == 1"
+  },
+  "cause": "Reader searched Node publication stdout for the Python outer-controller terminal frame; that frame is retained in root-caller stdout.",
+  "targetOperationRerun": false,
+  "targetToolSession": 30639,
+  "targetToolRawExitCode": 0,
+  "rootResultWrittenBeforeCorrection": false,
+  "correction": "Read the original outer-controller frame from root-caller/stdout.log; separately validate Node publication stdout against result/index/completion."
+}

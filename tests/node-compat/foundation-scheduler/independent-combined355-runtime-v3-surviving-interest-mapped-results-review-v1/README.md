@@ -1,0 +1,13 @@
+# Combined355 surviving-interest mapped-output DATA review V3
+
+Bounded PASS for the complete map-only publication of the accepted surviving-interest component71076407. This is not ordinary runtime, native surviving-interest/drop/teardown evidence or whole clock profile acceptance.
+
+The actual Source54a phase41448 returned clean zero under original0af inner1200s and outer1800s bounds. All13 payload/15 actual files, whole raw Node publication frame, two-record outer envelope, original full launch arguments and monitored cleanup fields were independently checked. Reader preparation waited for the actual terminal/Root tuple; clock-snapshot's observer-correction history and actual results are not transferred here.
+
+All seven loading files match the actual per-case artifact proof ea27/2d9c/64899. Six non-JavaScript files, including the complete main core, are byte-identical to the original. Authenticated host-only Acorn parsing and pure Source models compare whole original/mapped JavaScript AST: scalar run()->string plus exact empty_util, top-level await, maincore URL and three inline core bytes remain intact. Static bindings use only official0.31.0 clock/io URLs for three standard0.2.10 interfaces. The sole dynamic Node loader is node:fs/promises. Generated module and shims were not imported.
+
+The pristine406-byte requested-options document is distinct from the actual typed post-call mutable-object shape, including own undefined. Its23 unused default Node/TLS map rules are not generated imports, capabilities or runtime support. The originalV2 resource publication failure remains failed and its unretained actual options cause remains source inference.
+
+Full current protection rehashed30,977 files/45 fixed families, the private4889-file/21-link package,20,816 original mode rows,1,613 original/stage pairs and all2,597 frozen files. These current checks and successful actual Source-controlled guards have separate scopes; no actual-time per-file readtrace, new native frame or universal OS/environment attestation is invented. Fixed ledgers are referenced instead of recopying historical trees. Every nested copied index is indexed.
+
+Only read/hash, Python DATA readers and an authenticated Node host metadata-parser/pure-model check ran. No verifier, retainedAPI/recheck, Jco, compiler, application import/export, engine/guest, Wasmtime or crypto action ran by the reviewer. All checks passed on their first actual attempt. The result-contract.json matches the genuine Source54a mapping.reviewedMapped consumer's whole fixed/exact/coverage/mapped-file joins, with no issued action authority.
