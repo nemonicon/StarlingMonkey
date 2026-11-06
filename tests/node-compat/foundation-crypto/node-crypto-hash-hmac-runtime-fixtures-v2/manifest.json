@@ -1,0 +1,245 @@
+{
+  "schemaVersion": 1,
+  "state": "UNCOMPILED_UNEXECUTED_ORDINARY_CALL_FIXTURE_SOURCE_V2",
+  "exports": [
+    {
+      "name": "run",
+      "arguments": [],
+      "result": "string"
+    }
+  ],
+  "worldName": "validation",
+  "staticNativeImports": [
+    "node:crypto",
+    "crypto",
+    "node:buffer"
+  ],
+  "proposedSelectedInterfaces": [],
+  "requiredFinalEmittedImports": [],
+  "moduleInitPolicy": "Imports/literal metadata/counter/function declarations only; no factory/update/digest before ordinaryrun.",
+  "nodeComparableCases": [
+    "hash-empty",
+    "hash-ascii-abc",
+    "hash-unicode-eacute",
+    "hash-unicode-surrogate",
+    "hash-partition-abc",
+    "hash-block-55",
+    "hash-block-56",
+    "hash-block-63",
+    "hash-block-64",
+    "hash-block-65",
+    "hash-nonzero-window-copy",
+    "hash-output-ownership",
+    "hmac-rfc4231-1",
+    "hmac-rfc4231-2",
+    "hmac-rfc4231-6-long-key",
+    "hmac-rfc4231-7-long-key-data",
+    "hmac-empty",
+    "hmac-key-window-snapshot",
+    "terminal-hash",
+    "terminal-hmac"
+  ],
+  "profileOnlyCases": [
+    "unsupported-hash-constructor",
+    "unsupported-hmac-constructor",
+    "unsupported-sha1",
+    "unsupported-options",
+    "unsupported-input-encoding-hex",
+    "unsupported-output-encoding-base64",
+    "invalid-algorithm-type",
+    "invalid-receiver"
+  ],
+  "expectedPositiveRecordCount": 20,
+  "expectedProfileRecordCount": 8,
+  "positiveComparison": "Future authentic Node22.14 oracle compares full accepted algorithm/byte/terminal-semantics records by call ordinal; preserve full rawstrings first. Expected finalized error codes are parity targets; error messages and unsupported/profile records are separate.",
+  "namespaceComparison": "Require68 initial exportnames and declared function/default/alias/value identities. Namespace objectidentity and namespace/default descriptors are separate observedrecords, not universal Nodeparity.",
+  "providerConstantsComparison": "Full typed constants are separate; guest nine-header subset/numbers are not runtime provider-version/cipher proof.",
+  "knownHashVectors": [
+    {
+      "id": "hash-empty",
+      "message": "",
+      "expectedHex": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "hash-ascii-abc",
+      "message": "abc",
+      "expectedHex": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+    },
+    {
+      "id": "hash-unicode-eacute",
+      "message": "\u00e9",
+      "expectedHex": "4a99557e4033c3539de2eb65472017cad5f9557f7a0625a09f1c3f6e2ba69c4c"
+    }
+  ],
+  "knownHmacVectors": [
+    {
+      "id": "hmac-rfc4231-1",
+      "keyHex": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
+      "message": "Hi There",
+      "expectedHex": "b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7"
+    },
+    {
+      "id": "hmac-rfc4231-2",
+      "keyUtf8": "Jefe",
+      "message": "what do ya want for nothing?",
+      "expectedHex": "5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843"
+    },
+    {
+      "id": "hmac-rfc4231-6-long-key",
+      "keyHex": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "message": "Test Using Larger Than Block-Size Key - Hash Key First",
+      "expectedHex": "60e431591ee0b67f0d8a26aacbf5b77f8e0bc6213728c5140546040f0ee37f54"
+    },
+    {
+      "id": "hmac-rfc4231-7-long-key-data",
+      "keyHex": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "message": "This is a test using a larger than block-size key and a larger than block-size data. The key needs to be hashed before being used by the HMAC algorithm.",
+      "expectedHex": "9b09ffa71b942fcb27635fbcd5b0e944bfdc63644f0713938a7f51535c3a35e2"
+    }
+  ],
+  "limits": {
+    "profileStringCodeUnits": 1048576,
+    "profileUpdateBytes": 16777216,
+    "profileTotalBytes": 67108864,
+    "profileKeyBytes": 1048576,
+    "fixtureMaximumKeyBytes": 131,
+    "fixtureMaximumMessageBytes": 152,
+    "fixtureMaximumContextsPerRunUpperBound": 40,
+    "proposedRawStringCaptureLimitBytes": 262144
+  },
+  "proposedSampling": {
+    "nodeOracleCalls": 3,
+    "jcoRetainedCalls": 3,
+    "jcoFreshCalls": 1,
+    "stockWasmtimeFreshCalls": 3,
+    "retainedCallOrdinals": [
+      1,
+      2,
+      3
+    ],
+    "freshCallOrdinals": [
+      1
+    ],
+    "notAnActualSchedule": true
+  },
+  "requiredFutureInputs": {
+    "actualNode22Oracle": null,
+    "actual357BuildReview": null,
+    "actual357FrozenArtifactReview": null,
+    "actual357NativeReadOnlyApi": null,
+    "full83BootstrapOrRetainedRecord": null,
+    "pairedConstructionRoot": null,
+    "actualComponentArtifactReview": null,
+    "runtimeRootAuthority": null
+  },
+  "sourceReferences": {
+    "facade": "tests/node-compat/foundation-crypto/node-crypto-hash-hmac-candidate-v1/crypto-facade.mjs",
+    "kernel": "tests/node-compat/foundation-crypto/node-crypto-hash-hmac-candidate-v1/hash-hmac-kernel.cpp",
+    "literalPlan": "tests/node-compat/foundation-crypto/node-crypto-hash-hmac-candidate-v1/future-validation.json",
+    "namespaceInventory": "tests/node-compat/foundation-crypto/node-crypto-hash-hmac-candidate-v1/node-export-manifest.json",
+    "packagingManifest": "tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-integration-candidate-v1/crypto-module-manifest.json"
+  },
+  "referenceSources": [
+    {
+      "kind": "RFC4231 HMAC cases1,2,6,7",
+      "url": "https://www.rfc-editor.org/rfc/rfc4231.html",
+      "executed": false
+    },
+    {
+      "kind": "Unicodeeacute reference literal; actualpinnedNode oracle mandatory",
+      "url": "https://github.com/googleads/google-ads-php/issues/1173",
+      "executed": false
+    },
+    {
+      "kind": "Official Node22.14 Hash terminal semantics test",
+      "url": "https://raw.githubusercontent.com/nodejs/node/v22.14.0/test/parallel/test-crypto-hash.js",
+      "executed": false
+    }
+  ],
+  "runtimeActionsExecuted": false,
+  "hostOrGuestCryptoExecuted": false,
+  "nativeCompiled": false,
+  "componentBuilt": false,
+  "sourcePeer": null,
+  "rootAuthority": null,
+  "operationalAdmission": false,
+  "runtimeAcceptanceClaim": false,
+  "requiredAliasBooleans": {
+    "namedDefaultHashSame": true,
+    "namedDefaultHmacSame": true,
+    "bareNamedHashSame": true,
+    "bareNamedHmacSame": true,
+    "bareDefaultObjectSame": true,
+    "diffieHellmanAliasSame": true,
+    "prngAliasSame": true,
+    "rngAliasSame": true,
+    "pseudoRandomBytesAliasSame": true,
+    "defaultWebcryptoSame": true,
+    "defaultSubtleSame": true,
+    "webcryptoGlobalSame": true,
+    "subtleSame": true
+  },
+  "profileExpectedErrorCodes": {
+    "unsupported-hash-constructor": "ERR_SM_NODE_UNSUPPORTED",
+    "unsupported-hmac-constructor": "ERR_SM_NODE_UNSUPPORTED",
+    "unsupported-sha1": "ERR_SM_NODE_UNSUPPORTED",
+    "unsupported-options": "ERR_SM_NODE_UNSUPPORTED",
+    "unsupported-input-encoding-hex": "ERR_SM_NODE_UNSUPPORTED",
+    "unsupported-output-encoding-base64": "ERR_SM_NODE_UNSUPPORTED",
+    "invalid-algorithm-type": "ERR_INVALID_ARG_TYPE",
+    "invalid-receiver": "ERR_INVALID_THIS"
+  },
+  "profileLimitsAreDeclaredNotExercised": true,
+  "nativeProfileDefaultFrozenExpected": true,
+  "directBareSpecifierNamespaceResolverParityProved": false,
+  "bundleAliasQualification": "Generic builtinMap/bundler may canonicalize crypto to node:crypto. Capture actual native-residual import graph; these function/default identity cases do not prove distinct namespace resolver behavior.",
+  "futureCollectorRequirements": [
+    "Retain full typed raw string/throw and process streams before parsing/assertion; reject missing or unexpected IDs/counts and unexpectedFixtureThrow",
+    "Require every accepted positive actual outcome.kind return and expected full hex/byte sizes, complete literal vectors, chunk equality, sentinels, snapshot/ownership flags",
+    "Authenticate actual pinned Node22 control, compare accepted positive records and declared alias values by call ordinal; finalized error code/name are compared, messages/diagnostics remain full separate fields with explicit scope",
+    "For native profile only require every selected refusal expected code. Stock Node may accept constructors/options/other algorithms/encodings; preserve those observations without claiming parity",
+    "Require complete68 namespace names and profile alias relationships; retain all descriptor/provider/constant records separately; do not equate nine guest constants/backend numbers with Node",
+    "Require retained calls1/2/3 and fresh calls1 from genuine newly admitted component; all contexts created inside ordinaryrun and driven to digest, never invoke run during Wizer INIT",
+    "No unexpected cleanup throw or opaque operation value may be silently accepted; source error/cleanup records are observations requiring future host validation"
+  ],
+  "nativeProfileInputWindowCases": [
+    "plain Uint8Array nonzero-offset window",
+    "Buffer nonzero-offset subarray"
+  ],
+  "stringConversionChecks": {
+    "unicodeInputEscapes": "actual JavaScript Unicode escapes, not backslash-u text",
+    "surrogateExpectedUtf8Hex": "c3a9f09d849eefbfbd",
+    "inputUtf8Encoding": "utf8",
+    "alternateAcceptedEncoding": "utf-8 is facade Source-supported; explicit alternate-encoding runtime case deferred"
+  },
+  "profileExpectedCounters": {
+    "invalid-algorithm-type.algorithmConversions": 0
+  },
+  "nodeComparisonProjection": {
+    "requiredPositiveValues": "Every positive operation outcome/hex/byte count/chunk/window/output-ownership/terminal-code field; require first consuming operations to return successfully",
+    "diagnosticOnlyFields": [
+      "error.message",
+      "namespaceInspection.namespaceObjectsSame",
+      "namespaceInspection.namespaceDescriptors",
+      "namespaceInspection.defaultDescriptors",
+      "providerAndConstants"
+    ],
+    "profileOnlyNotComparedToNode": [
+      "profilePolicy",
+      "namespaceInspection.defaultFrozen"
+    ],
+    "wholeRawStringsRetainedBeforeProjection": true,
+    "fullJsonEqualityWithStockNodeRequired": false,
+    "componentJcoVsWasmtimeWholeJsonEqualityForSameOrdinalRequired": true
+  },
+  "predecessorSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-runtime-fixtures-v1/index.json",
+    "sha256": "78008e58789654007011bb0495e3b888e741d75e811ecf9451753d7a618fbbf5",
+    "bytes": 990
+  },
+  "correctionScope": [
+    "Use declared m0.11 from(Uint8Array) copying overload; Array input is unsupported.",
+    "Use actual U8 intrinsic on the fixed Buffer window; own Buffer.prototype.fill is explicitly a refusal."
+  ],
+  "bufferProfileInventory": "buffer-profile-inventory.json"
+}

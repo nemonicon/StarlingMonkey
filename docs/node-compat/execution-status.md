@@ -51,12 +51,18 @@ Node crypto exports, native wiping and request reuse are not established.
 [progress.md](../../progress.md) records evidence and remaining work. Accepted
 production remains foundations-v13.
 
-The default-OFF [SHA256 Hash/Hmac template](../../tests/node-compat/foundation-crypto/node-crypto-hash-hmac-candidate-v1/README.md)
-passes independent Source review and three guest-SDK syntax checks. The private
-[clock lifecycle diagnostic template](../../tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v1/README.md)
-passes five SDK translation-unit syntax checks, with the initial new-file driver
-failure preserved. Neither template is linked or runtime validated. Crypto
-provider/ownership/GC gates and all broader clock lifecycle gates remain open.
+The default-OFF [SHA256 Hash/Hmac candidate](../../tests/node-compat/foundation-crypto/node-crypto-hash-hmac-candidate-v1/README.md)
+now compiles and links: engine `9aec9297` is10,024,185 bytes with the complete
+83-field sidecar `2b725c11` and357 native inputs. The recipe exits0; both wrappers
+exit1 on the staged Git-index hash/mode protection check. Independent failure
+review validates the compiled bytes and retains that failure. Read-only artifact
+revalidation is being prepared; freeze, admission and guest execution remain
+pending. The pinned Node oracle passes60 accepted observations and retains24
+separate policy observations, with independent DATA review passed. Host results
+do not validate guest crypto. The private
+[clock diagnostic v2](../../tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v2/README.md)
+is uncompiled Source. Crypto snapshot/provider/ownership/GC/cost gates and the
+remaining native clock lifecycle gates stay open.
 
 The [Next.js application experiment](../../tests/node-compat/frameworks/nextjs/README.md)
 now has two real Node production builds,24 HTTP and two browser checks per run,

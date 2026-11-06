@@ -16,23 +16,123 @@ preserves the new evidence, retained failures and proposed source-only tooling; 
 
 Immediate remaining work:
 
-1. Finish the combined-runtime timer, snapshot-clock, surviving-job and fatal-error
-   tests. Separate public behavior from native pollable/drop/interest and teardown
-   evidence; failed-instance reuse and request isolation remain unproved.
-2. Compile the staged experimental Hash/Hmac candidate, verify its complete new
-   build metadata and component imports, then run ordinary-call Node differentials.
+1. Complete the remaining native clock lifecycle gates. Ordinary timer,
+   snapshot-clock and surviving-job tests passed their bounded reviews; fatal
+   cause, native pollable/drop/interest, invalid-queue, offset and teardown proof
+   remain open. Failed-instance reuse and request isolation remain unproved.
+2. Revalidate and freeze the compiled experimental Hash/Hmac candidate after the
+   retained wrapper integrity failure, verify component imports, then run
+   ordinary-call Node differentials. Compilation/link and raw83 metadata review
+   are complete; guest crypto has not executed.
    Define and enforce live EVP-context initialization/snapshot policy before any
    public crypto admission; borrowing, secret erasure and cost gates stay open.
 3. Admit any new profile only after its required correctness, capability, lifecycle
    and cost checks. Re-run the pinned Next/package checks with genuine new artifact
    pins and retain changed blockers. The full Next server is still unavailable.
 
-The next all-work snapshot verifies 15 completed indexed families: 774 payloads,
+Checkpoint `6066915b` verified 15 completed indexed families: 774 payloads,
 14,122,361 payload bytes, exact membership and every nested copied index. It also
 includes 38 explicitly **UNSEALED WIP** files in controller Sourcev3: no index,
 result, receipt or action grant. Its inherited references/templates are not
 runnable or approved. All writers are held during this Git snapshot; Source
 validation and independent review remain required before any new native phase.
+
+Current continuation after `6066915b`: previous goal turn **made progress**.
+It pushed all 875 changed files as `6066915b3daa6fa09c0b221229f9698cc9b4e239`;
+remote `origin/main` matched and the worktree was clean at that checkpoint.
+The corrected [controller Sourcev3](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-controller-candidate-v3/README.md)
+is now sealed as `2ebed6b8`, with49 members. Its3,055 Source/data/pure checks
+cover5,336 inputs/21 families and21 Python AST files. All56 producer bindings
+pass;28 guard-regression checks/12 isolated hash-predicate commands reproduce
+the held-v2 two stale guards, accept all four corrected guards and reject four
+zero-pin mutations with diagnostics. All five real copy-mode outcomes remain
+bound by exact function identity. Initial publication stops on a missing
+preparation-history member before indexing; the member is included and final
+closure passes. [Independent Source review35be5fcc](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-native-controller-v3-source-review-v1/results.json)
+passes all seven active hash guards, complete path/self/model/ref joins,
+22 reversals,103 inert cases and full5,378-file/22-family before/final intake.
+The only noted future-contract prose saysV2; actual states, paths and model
+checks enforceV3. No Source action is inferred from that review. Root's complete
+actual pure Root/peer checks pass before authority files are written, then a
+fresh [build-v4 invocation](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-build-v4-root-invocation.json)
+starts at62405/parent87467:7,200s outer/inner, jobs1,2GiB start/800MiB stop,
+HASH-ON/COPY-only/BORROW-OFF/entropy-OFF, no DEBUG/GC/OOM. New WORK3 and producer
+identities82dd/12abb/225f are used; failed WORK1/2 remain protected. The [actual build4 observation](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-build-v4-root-results.json)
+now records **recipe exit0 and wrapper exit1**. Compilation/linking/copy complete:
+engine `9aec9297` is10,024,185B and byte-exact raw83 metadata `2b725c11` is731,387B,
+with357 native/three embedding/twelve manifest rows. The log has109 display
+records ending109/109, but repeats39 and omits40; those display values do not
+prove unique task ordinals. A Root reader's overly strict ordered-label assertion
+is retained/corrected before its result write; no build rerun occurs.
+The wrapper fails recheck before inline admission and in final protection. Both
+original parent exits1 and recipe0 retain clean owned-group cleanup. A [current
+input recheck](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-build-v4-input-recheck-root-data.json)
+finds exactly one changed hash among5,375 inputs: staged `.git/index`,03f5eb17
+becomesbfbb4330 at the same95,901B length;5,374 other files still match. Original
+index bytes are absent, so exact writer/stat-only change is unproved. Independent
+pure decoding confirms current valid DIRCv2/checksum/742 stage0 path-mode-OID
+entries equal the authenticated54b baseline tree. Independent raw83 metadata,
+69-row DB/macros/objects/archives/link validation is passing; full failure DATA
+review is being finished. Original owner evidenceComplete remains false.
+[Independent build4 failure/candidate reviewa4338bdc](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-native-build-v4-results-review-v1/results.json)
+now passes the raw83 model, actual69=63+5+null compile rows, strict4/private7/
+separate embedding1, guest OpenSSL include/link, whole ordered archives and
+engine copies. The Git index also changes mode0644 to0600; all other configured
+modes match. Its current742 entries match baseline semantics, without proof of
+old index bytes, exact writer or stat-only mutation. The review records recipe0,
+parents1+1 and preservationfalse; its5,541-file/34-alias finite ledger is not a
+full future-freezer distribution proof. A compact separate [read-only revalidation
+Source](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-artifact-revalidation-candidate-v1/README.md)
+is sealed at `175e4061`, with25 payloads and independent Source review pending.
+Its134,641 author checks cover21,372 current inputs/23 families/11 trees;
+41 pure cases pass. No operational adapter call has run. It may establish
+a new proof with an exact index hash/mode exception and fresh full before/final
+bookends.
+It must preserve the old failed wrapper and must not rewrite metadata, repin an
+old guard, cast an old frame or imply every original parent exited0. No engine,
+crypto, component, freeze or production admission is granted yet. The complete
+roadmap, including the later optional host-capability phases, remains active.
+
+Parallel Source progress: [private diagnostic v2](tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v2/README.md)
+is sealed at90efee09 with1,398 Source checks/72 synthetic cases. It implements a
+cap8 synchronous probe on the actual owning queue and same-translation-unit
+clock offset/wizen/origin observations, default OFF. Its357-source cohort is
+349 retained+six changed+two new, with three separate embedding inputs/one
+changed; it is distinct from Hash/Hmac357. It is uncompiled and not independently
+Source-approved, and proves no link/ODR, natural-loop settlement, Store death,
+teardown or runtime gate. Runtime Hash/Hmac fixture Source78008e58 supplies20
+accepted and eight policy records but remains unexecuted. Root inspection finds
+two setup calls outside the bounded Buffer API (from(Array) and Buffer.fill);
+a small fixture successor is correcting those with supported Uint8Array paths
+before the pinned Node oracle and any guest run. [Fixtures v2](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-runtime-fixtures-v2/README.md)
+is now sealed as16b195e6: exactly two expression changes use
+Buffer.from(Uint8Array.of(...)) and Uint8Array.prototype.fill.call on its Buffer
+window. All20/8 IDs and values remain unchanged; actual repo/staged Buffer
+facade/manifest/factory inventory and static negative cases are checked.
+A separate [pinned Node oracle](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-node-oracle-v1-root-results.json)
+finishes raw0 under original0af with clean ownership and three complete scalar
+strings (calls1/2/3). Root validates60 accepted observations: all SHA/RFC vectors,
+UTF8-surrogate bytes, block partitions, view mutation/copy, Hmac key snapshot,
+output ownership and finalized-state behavior. All20 accepted records are equal
+across calls. The24 policy observations, namespace descriptors and full host
+constants/provider records remain separate; they do not imply guest parity.
+Raw strings and original streams are retained. [Independent DATA review](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-node-oracle-results-review-v1/results.json)
+passes at index `aa9a3ef4`: all60 accepted and24 separate policy observations,
+complete strings, process completion and20 mutated-DATA refusals. The review
+discloses fixture authorship and does not claim independent fixture Source
+approval. Host-only constants/provider and accepted unsupported-profile calls
+remain separate from native parity.
+This is real host Hash/Hmac execution, with no guest or engine crypto invocation.
+
+All-work checkpoint preparation on2026-11-06 verifies eight completed changed
+indexed families:216 payloads/20,560,929 bytes, exact membership and all payload
+hashes, including nested copied indices. Only each family's own root index is
+excluded from its inventory. Status documentation passes whitespace checks.
+The checkpoint includes source proposals, retained failures and unadopted native
+candidate evidence; it does not promote those candidates. The next application
+action is a fresh comprehensive Next.js build/HTTP/browser/Wasm replay against
+the accepted v13 engine, followed by the supported-module and optional-package
+differentials. Results and changed blockers will be retained for future checks.
 
 Roadmap continuation after `ceb1ffe9`:
 

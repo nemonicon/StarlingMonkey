@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_BUFFER_CALL_INVENTORY_NOT_RUNTIME_PROOF",
+  "profileVersion": "sm-node-22.14.0-m0.11",
+  "policyFiles": [
+    {
+      "repository": {
+        "path": "/Users/dan/dev/StarlingMonkey/builtins/node-compat/buffer-facade.mjs",
+        "sha256": "8ebfa0253a85bc9b2e91b65391c9f85c26594d107ad0d016cd0351dad89dd235",
+        "bytes": 13582
+      },
+      "actualStaged357": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/builtins/node-compat/buffer-facade.mjs",
+        "sha256": "8ebfa0253a85bc9b2e91b65391c9f85c26594d107ad0d016cd0351dad89dd235",
+        "bytes": 13582
+      },
+      "byteEqual": true
+    },
+    {
+      "repository": {
+        "path": "/Users/dan/dev/StarlingMonkey/builtins/node-compat/export-manifest.node-v22.14.0.json",
+        "sha256": "abfcc6a07e1b3d2e0877293a7c5fe02bc1ff971a7703c5860d8385b3ad510872",
+        "bytes": 4265
+      },
+      "actualStaged357": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/builtins/node-compat/export-manifest.node-v22.14.0.json",
+        "sha256": "abfcc6a07e1b3d2e0877293a7c5fe02bc1ff971a7703c5860d8385b3ad510872",
+        "bytes": 4265
+      },
+      "byteEqual": true
+    },
+    {
+      "repository": {
+        "path": "/Users/dan/dev/StarlingMonkey/builtins/node-compat/factories.generated.h",
+        "sha256": "2b6b98b2f5b873c9aff6f0b27cba01c6ad3ef854c49d2ce27ad1f089a9233044",
+        "bytes": 18133
+      },
+      "actualStaged357": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/builtins/node-compat/factories.generated.h",
+        "sha256": "2b6b98b2f5b873c9aff6f0b27cba01c6ad3ef854c49d2ce27ad1f089a9233044",
+        "bytes": 18133
+      },
+      "byteEqual": true
+    }
+  ],
+  "fixtureDirectStaticCalls": [
+    {
+      "method": "from",
+      "input": "immutable vector.message string",
+      "encoding": "utf8",
+      "profileSupported": true
+    },
+    {
+      "method": "from",
+      "input": "Unicode string literal",
+      "encoding": "utf8",
+      "profileSupported": true
+    },
+    {
+      "method": "from",
+      "input": "Uint8Array.of(...) fixed byte view",
+      "encoding": null,
+      "profileSupported": true
+    },
+    {
+      "method": "isBuffer",
+      "input": "returned U8/digest or explicit Buffer window",
+      "profileSupported": true
+    }
+  ],
+  "fixtureBufferInstanceCalls": [
+    {
+      "method": "subarray",
+      "receiver": "bufferBacking",
+      "arguments": [
+        1,
+        4
+      ],
+      "profileSupported": true
+    }
+  ],
+  "fixtureInheritedByteOperations": [
+    "byteLength getter",
+    "numeric indexed byte reads/writes",
+    "explicit Uint8Array.prototype.fill.call(bufferView,120)"
+  ],
+  "transitiveCryptoFacadeBufferOperations": [
+    "from(string,utf8) for one UTF8 conversion",
+    "from(native ordinary Uint8Array digest) for independent result",
+    "Buffer.prototype.toString(hex) for hex output"
+  ],
+  "hostOnlyStaticParserBufferOperations": [
+    "from(parsed Unicode source literal,utf8)",
+    "byteLength(literal vector string)",
+    "toString(hex) on the host conversion result"
+  ],
+  "deferredOrUnused": [
+    "Buffer.from(Array)",
+    "Buffer.prototype.fill",
+    "Buffer.of",
+    "Buffer constructor",
+    "Buffer alloc/pool APIs",
+    "Buffer write/numeric helpers",
+    "base64/latin1 encodings"
+  ],
+  "encodingSeparation": "Fixture direct Buffer encodings are utf8 only; crypto facade hex output uses the supported Buffer hex encoder. Unsupported hex input/base64 output are crypto-facade refusal cases and do not request those Buffer encodings.",
+  "oldSourceEvidence": {
+    "hashFixtureActuallyExecuted": false,
+    "relatedDifferentFixtureZlibFailure": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-zlib/normal-codec-validation-attempt1-fixture-failure-root-results.json",
+      "sha256": "7460b94d1a151b897bb4ecdd2689ddf6d61e9dee392724e413172e4cd2da980d",
+      "bytes": 3991
+    },
+    "attribution": "Historical zlib Source/Root evidence reports from(Array) refusal; no zlib or Hash/Hmac rerun by this author."
+  },
+  "namespaceAliasAndInputShapeScope": "Ordinary own fixed/unshared U8/Buffer inputs; no user-modified constructors/species, cross-realm/proxy or aliased dynamic loader proof.",
+  "cryptoExecuted": false,
+  "targetBufferExecuted": false,
+  "runtimeAcceptanceClaim": false
+}

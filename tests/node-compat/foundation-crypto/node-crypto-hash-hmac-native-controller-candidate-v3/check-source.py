@@ -17,7 +17,7 @@ refs=json.loads((OWN/'references.json').read_bytes());source=json.loads((OWN/'so
 for r in source['files']:cap.add(r)
 for ix in source['families']:cap.family(ix)
 need(len(source['files'])==len({r['path']for r in source['files']}),'unique declared original inputs')
-stage=io_guard.read(refs['actualStageReview']['result']);models.failure(io_guard.read(refs['failedBuildReview']['result']),refs);cap.proof(refs['failedBuildReview'],refs['failedBuildContract'],'INDEPENDENT_NODE_CRYPTO_HASH_HMAC357_BUILD_V2_ROOT_PREFLIGHT_AND_FAILURE_REVIEW_PASSED_V1')
+stage=io_guard.read(refs['actualStageReview']['result']);models.failure(io_guard.read(refs['failedBuildReview']['result']),refs);cap.proof(refs['failedBuildReview'],refs['failedBuildContract'],'INDEPENDENT_NODE_CRYPTO_HASH_HMAC357_BUILD_V3_FAILURE_REVIEW_PASSED_V1')
 models.stage(stage,refs);checks.append('actual C stage model/full357/12/1642+3/no-action wire')
 _,contract=cap.proof(refs['actualStageReview'],refs['actualStageContract'],models.STAGE_STATE);checks.append('actual complete stage contract fixed/descriptors/properties/coverage')
 journal=io_guard.read(refs['stageJournal']);need(len(journal['copies'])==1642 and len(journal['embeddingDataCompleted'])==3,'actual stage role counts')
@@ -72,7 +72,7 @@ for p in sorted(OWN.rglob('*.py')):
   if isinstance(n,ast.Call)and isinstance(n.func,ast.Name):need(n.func.id not in ['exec','eval'],'no dynamic code eval '+p.name)
 benign=json.loads((OWN/'benign-copy-test-results.json').read_bytes());need(benign['state']=='BENIGN_OWNED_COPY_MODE_REGRESSIONS_PASSED_V2'and len(benign['cases'])==5,'real benign old-fail/new644+755 and partial-failure evidence')
 need(benign['actualNativeCacheCopiesInvoked']is False and benign['actualBenignFilesystemCopiesInvoked']is True,'benign filesystem operation scope distinct from native phase')
-newpolicy=io_guard.read(refs['policy']);oldpolicy=io_guard.read(json.loads((OWN.parent/'node-crypto-hash-hmac-native-controller-candidate-v1/references.json').read_bytes())['policy'])
+newpolicy=io_guard.read(refs['policy']);oldpolicy=io_guard.read(json.loads((OWN.parent/'node-crypto-hash-hmac-native-controller-candidate-v2/references.json').read_bytes())['policy'])
 need(newpolicy['expectedNativeSourceManifest']==oldpolicy['expectedNativeSourceManifest']and newpolicy['selectedModuleManifests']==oldpolicy['selectedModuleManifests'],'native357 and12 manifests unchanged; only real host producer contexts amended')
 need(newpolicy['contexts']==dict(configuredSourceRoot=refs['configuredSourceRoot'],workRoot=refs['workRoot'],freezeRoot=refs['freezeRoot']),'actual new policy binds genuine new WORK/FREEZE')
 need(stage['workRoot']==refs['stageDeclaredWorkRoot']and stage['freezeRoot']==refs['stageDeclaredFreezeRoot']and stage['workRoot']!=refs['workRoot'],'actual stage declared historical v1 roots are not rewritten')
@@ -93,6 +93,11 @@ for r in json.loads((OWN/'derivations.json').read_bytes())['files']:
  for op in reversed(r['edits']):
   a=op['afterOffset'];need(value[a:a+len(op['after'])]==op['after'],'exact inverse preimage '+r['output']);value=value[:a]+op['before']+value[a+len(op['after']):]
  need(value==before,'exact inverse '+r['output'])
+guard=load('guard_audit.py').audit(OWN);need(guard['passed']and len(guard['activeLiteralSlots'])==7,'all actual owned producer literal/path/model/selfhash/current-source joins pass')
+reg=json.loads((OWN/'guard-regression-results.json').read_bytes());need(reg['state']=='OWNED_PRODUCER_GUARD_REGRESSION_PASSED_V3'and len(reg['oldAudit']['failures'])==2 and reg['newAudit']['passed'],'actual e8b stale-policy failure vs all V3 joins pass')
+need(len(reg['isolatedSourceGuardCommands'])==12 and all(r['rawExitCode']==r['expectedExitCode']for r in reg['isolatedSourceGuardCommands']),'benign isolated Source guard predicates/diagnostic counterexamples retained')
+need(reg['actualProducerEntryInvoked']is reg['actualHelperInvoked']is reg['nativeCacheCopied']is False,'isolated guard units are not a producer/helper/native workload')
+need(reg['retainedActualModeRegression']==io_guard.row(OWN.parent/'node-crypto-hash-hmac-native-controller-candidate-v2/benign-copy-test-results.json')and reg['actualCopyFunctionsByteIdentical'],'fchmod and five real077 outcomes retained by exact generic function identity')
 # Never import actual configured native helper/model or call a Source main.
 checkframe=dict(capture=cap,stage=journal,refs=refs,configuredTree=json.loads((OWN/'configured-tree.json').read_bytes()),failedV1Protection=json.loads((OWN/'failed-v1-protection.json').read_bytes()),originalModes={r['path']:stat.S_IMODE(io_guard.checked(r).stat().st_mode)for r in source['files']})
 controller.recheck(checkframe);checks.append('actual full live-data recheck branch without bootstrap or operational action')

@@ -26,10 +26,14 @@ timer refusal. A separate pure Buffer control finishes raw0 with seven whole
 Node-equal Jco/Wasmtime returns; independent runtime DATA review passes.
 Broader clock lifecycle and operational admission remain open. Clock components
 select only the standard WASI0.2.10 clock/poll interfaces.
-Default-OFF Hash/Hmac and private clock diagnostic
-templates pass bounded SDK syntax checks; neither is linked or runtime validated. The first Hash/Hmac build preparation stops before compilation
-on a cache-file mode check; its failed output and the genuine successor work are
-recorded in [progress.md](../../progress.md).
+The default-OFF Hash/Hmac candidate now compiles and links as a 357-source
+engine. Its recipe exits0, but both wrappers exit1 after the staged Git index
+changes hash and mode. Independent review validates the compiled candidate and
+the recorded failure; it does not admit the engine. A read-only artifact
+revalidation is being prepared. The pinned Node oracle passes60 selected
+observations; guest crypto has not executed. Private clock diagnostic v2 remains
+uncompiled. These candidates and their open lifecycle gates are recorded in
+[progress.md](../../progress.md).
 See the [execution status](execution-status.md) for their exact evidence.
 The original resource mapping fails at harness serialization; its partials and
 raw failure remain retained. The v3 successor passes Source review, completes a

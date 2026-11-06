@@ -386,7 +386,7 @@ def command(*args):
 import importlib.util
 sys.dont_write_bytecode = True
 layer_file = pathlib.Path(actual_helper)
-assert digest(layer_file) == '12abbfc5601f02d04588efe6463ead296adacf0292cc930e98acd440d2a22a4d', 'HASH_HMAC357_HELPER_SHA_MISMATCH:metadata-preimport'
+assert digest(layer_file) == '12abbfc5601f02d04588efe6463ead296adacf0292cc930e98acd440d2a22a4d', 'HASH_HMAC357_HELPER_SHA_MISMATCH:python-guard-1'
 layer_spec = importlib.util.spec_from_file_location('reviewed_classic_layer',layer_file)
 layer = importlib.util.module_from_spec(layer_spec); layer_spec.loader.exec_module(layer)
 manifest = layer.source_manifest(repo)
@@ -460,7 +460,7 @@ strict_callback_v3_sources = {'builtins/web/event/event-target.cpp': '431267539a
 # Preserve the accepted v3 attestation verbatim. This is a separately named
 # source extension; the old policy must never claim the new EventTarget bytes.
 protected_abort_sources = {'builtins/web/event/event-target.h': '516f9c609d78576cf72897c4c5bbe1106a3d04ab4a197c50cedee3fa0c8fb96d', 'builtins/web/event/event-target.cpp': '1c0263f958d0f6221accf04ffa2ac12c6406e11914e1b2fab3c41c66c3038a1e', 'builtins/node-compat/register.cpp': '19eef9879c94e5232238f6df738d57057d384fa025849ee319fcf51eb06eda2b', 'builtins/node-compat/events.mjs': 'b58b0e0891145748e71139b8d08abb4187fe52e1aa12f9705beee3f6380b68f6', 'builtins/node-compat/events-add-abort-listener.mjs': '106be45fe33b0e35d97aad6ece3fb368210cb954bb652ea7bcdfa478b9c7083e', 'builtins/node-compat/events-factories.generated.h': '41b4c286e24089e0c223d0e80d4d0f587322afee8816811f2e754217f8103437', 'builtins/node-compat/generate-events-factory.mjs': '90a7ae6b887fce3bf92dc167090ea44c0bb8755400be2ff577658539f4a84354', 'builtins/node-compat/generate-factories.mjs': '46b0e0a40d3a50dae58e0d833c4861d1344df045eaf490f74060bbccc1a4561e', 'builtins/node-compat/export-manifest.events.node-v22.14.0.json': '90f7dc152b990dc8955c0801eab11b9410a10dc96a8019c1b7a81b69981eb561', 'cmake/builtins.cmake': '0155eae9e45f2d059663f1bcc54315e58e4f2cb0d8e5a9dfcb76cfa9a7f5f9ea'}
-assert digest(layer_file) == '12abbfc5601f02d04588efe6463ead296adacf0292cc930e98acd440d2a22a4d', 'Classic source helper changed during compilation'
+assert digest(layer_file) == '12abbfc5601f02d04588efe6463ead296adacf0292cc930e98acd440d2a22a4d', 'HASH_HMAC357_HELPER_SHA_MISMATCH:python-guard-2'
 layer.validate_sources(repo,manifest)
 strict_callback_sources = dict(strict_callback_v3_sources)
 strict_callback_sources['builtins/web/event/event-target.cpp'] = protected_abort_sources['builtins/web/event/event-target.cpp']
@@ -650,8 +650,8 @@ codec_spec=importlib.util.spec_from_file_location('bounded_zlib_codec_evidence',
 codec=importlib.util.module_from_spec(codec_spec);codec_spec.loader.exec_module(codec)
 metadata['zlibSelectedCodecInput']=codec.selected_compile_input(spidermonkey_dir)
 metadata = layer.decorate(metadata,repo,source_dir,json.loads(compile_commands),embedding_commands,ticks_enabled == '1',ninja_capture,ninja_text)
-assert digest(layer_file) == '12abbfc5601f02d04588efe6463ead296adacf0292cc930e98acd440d2a22a4d', 'HASH_HMAC357_HELPER_SHA_MISMATCH:metadata-preimport'
-assert digest(layer_file.parent / 'policy.json') == layer.POLICY_SHA256
+assert digest(layer_file) == '12abbfc5601f02d04588efe6463ead296adacf0292cc930e98acd440d2a22a4d', 'HASH_HMAC357_HELPER_SHA_MISMATCH:python-guard-3'
+assert digest(layer_file.parent / 'policy.json') == layer.POLICY_SHA256, 'HASH_HMAC357_POLICY_SHA_MISMATCH:metadata-postdecorate'
 
 codec_file=pathlib.Path(repo)/'tests/node-compat/foundation-zlib/native-integration-candidate-v4/codec-evidence.py'
 assert digest(codec_file)=='3df425d7fcfaf241b7c8d6f889bcefb8efde229af8df5e4c610e18a49b1bfd0c'

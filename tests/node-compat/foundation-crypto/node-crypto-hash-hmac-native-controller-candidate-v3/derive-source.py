@@ -1,14 +1,14 @@
 """Exact forward/inverse Source DATA, no owner/producer module execution."""
 from pathlib import Path
 import difflib,hashlib,json
-OWN=Path(__file__).resolve().parent;OLD=OWN.with_name('node-crypto-hash-hmac-native-controller-candidate-v1');NATIVE=OWN.with_name('node-crypto-hash-hmac-native-integration-candidate-v1')
+OWN=Path(__file__).resolve().parent;OLD=OWN.with_name('node-crypto-hash-hmac-native-controller-candidate-v2');NATIVE=OWN.with_name('node-crypto-hash-hmac-native-integration-candidate-v1')
 def desc(p):
  b=p.read_bytes();return dict(path=str(p),sha256=hashlib.sha256(b).hexdigest(),bytes=len(b))
 rows=[]
 for p in sorted(OWN.rglob('*')):
  if not p.is_file():continue
  relative=p.relative_to(OWN)
- donor=NATIVE/relative.name if relative.parts[0]=='producer'else OLD/relative
+ donor=OLD/relative
  if not donor.is_file()or relative.name in ['index.json','results.json','source-receipt.json','source-check-results.json','preparation-history.json']:continue
  if relative.parts[0]!='producer'and p.suffix not in ['.py','.sh']:continue
  before=donor.read_text();after=p.read_text();ops=[]

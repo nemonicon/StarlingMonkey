@@ -118,6 +118,7 @@ def bootstrap(config_row):
  frame['io']=io;frame['capture']=cap;models=load(frame,'models.py');frame['models']=models
  frame['loadOwn']=lambda name:load(frame,name)
  models.cache_plan(read(refs['cachePlan']),refs)
+ guard_report=load(frame,'guard_audit.py').audit(OWN);assert guard_report['passed']and len(guard_report['activeLiteralSlots'])==7,'Producer cross-file digest join refusal before any phase'
  models.failure(read(refs['failedBuildReview']['result']),refs)
  models.stage(read(refs['actualStageReview']['result']),refs);models.root(root,own,refs,ENV_POLICY);models.peer(read(root['controllerSourceReview']['result']),own,refs,ENV_POLICY)
  for pair in [refs['integrationSourceReview']]:

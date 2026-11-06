@@ -47,6 +47,7 @@ def peer(value,own,refs,policy):
  assert value['actualStageReviewIndexSha256']==refs['actualStageReview']['index']['sha256']and value['requiredRootEnvironmentPolicy']==policy
  assert value['producerRecipeSha256']==refs['recipe']['sha256']and value['producerHelperSha256']==refs['helper']['sha256']and value['producerPolicySha256']==refs['policy']['sha256']
  assert value['failedBuildReviewIndexSha256']==refs['failedBuildReview']['index']['sha256']
+ assert value['allOwnedProducerHashGuardsJoined']is True
  assert value['actualBenignCopyModeRegressionPassed']is True
  assert value['sourceOnly']is value['sourceReviewPassed']is True
  for key in ['ownerActionsInvoked','hostActionsInvoked','nativeBuildActionsInvoked','freezeActionsInvoked','cryptoOperationsInvoked']:assert value[key]is False
@@ -74,10 +75,10 @@ def cache_plan(plan,refs):
 
 
 def failure(value,refs):
- assert value['schemaVersion']==1 and value['state']=='INDEPENDENT_NODE_CRYPTO_HASH_HMAC357_BUILD_V2_ROOT_PREFLIGHT_AND_FAILURE_REVIEW_PASSED_V1'and value['verifiedPassed']is True
- assert value['controllerSourceIndexSha256']==refs['parentControllerIndex']['sha256']and value['integrationSourceIndexSha256']==SOURCE_SHA
+ assert value['schemaVersion']==1 and value['state']=='INDEPENDENT_NODE_CRYPTO_HASH_HMAC357_BUILD_V3_FAILURE_REVIEW_PASSED_V1'and value['verifiedPassed']is True
+ assert value['controllerSourceIndexSha256']==refs['parentControllerIndex']['sha256']
  assert value['actualBuildSucceeded']is value['phaseSucceeded']is value['buildAcceptanceClaim']is False
- assert value['reviewedOutcome']=='CACHE_PREPARATION_FAILED_BEFORE_RECIPE_COMPILER'and value['verifiedFailureData']is True
- for k in ['engineExecuted','guestExecuted','cryptoOperationsInvoked','freezeInvoked','operationalAdmission','runtimeAcceptanceClaim','grantsAnyActionAuthority']:assert value[k]is False
- assert value['coverage']['completedCacheRecords']==0 and value['coverage']['physicalPartialWorkFiles']==1 and value['coverage']['recipeOrCompilerCommandsStarted']==0
- assert value['actualEngine']is value['actualMetadata']is None
+ assert value['reviewedOutcome']=='EARLY_RECIPE_FAILED_STALE_POLICY_DIGEST_GUARD'and value['verifiedFailureData']is True
+ for k in ['engineExecuted','guestExecuted','cryptoOperationsInvoked','freezeInvoked','operationalAdmission','runtimeAcceptanceClaim','grantsAnyActionAuthority','compilerStarted']:assert value[k]is False
+ assert value['coverage']['completedCacheCopies']==4 and value['coverage']['actualWorkFiles']==5 and value['coverage']['recipeRawExitCode']==1 and value['coverage']['staleShellPolicyGuardJoins']==2
+ assert value['actualNewEngine']is value['actualNewMetadata']is None

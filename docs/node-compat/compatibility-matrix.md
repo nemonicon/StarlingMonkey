@@ -39,8 +39,10 @@ behavior, without Node Timeout-object parity, native cleanup proof or a public
 suites also pass independent review, without an epoch/native offset/cleanup claim.
 Fatal observation remains unaccepted because the source-specific diagnostic is
 missing; native lifecycle and operational adoption remain open.
-Default-OFF Hash/Hmac Source and SDK syntax checks do not change the deferred
-`node:crypto` API status. The experimental clock and guarded-key results remain
+The default-OFF Hash/Hmac candidate has compiled and linked, with independent
+review of its complete83-field metadata and failed wrapper protection. It is
+unadopted and has not executed guest crypto. Its60-observation host Node oracle
+does not change the deferred `node:crypto` API status. The experimental clock and guarded-key results remain
 separate from public API compatibility; exact evidence is in the
 [execution status](execution-status.md).
 
