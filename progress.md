@@ -269,6 +269,14 @@ The staged whitespace check has one warning in the byte-exact retained native
 build log; its sealed bytes are preserved. Edited documentation and code have
 no whitespace warnings.
 
+The650-file all-work checkpoint is committed and pushed as
+`98cb2d37cf650ae18d2f7bcaec0b0a342b1dc9f5`; `origin/main` matches and the
+worktree is clean at that checkpoint. This goal turn made **progress** through
+actual native build, freeze and SDK results plus reusable retained evidence.
+The roadmap remains **in progress**: clock component/runtime gates, a new
+integrated Hash/Hmac generation with actual INIT/import-order tests, lifecycle,
+cost, optional capability/host gates and broader application compatibility remain.
+
 The next measured application-demand item is the actual
 [`format('value:%s:%d', 'ok', 7)` call](tests/node-compat/frameworks/nextjs/app-fixture/lib/compat.mjs#L50),
 whose Node result is `value:ok:7`; current `util.format` is explicitly deferred.
