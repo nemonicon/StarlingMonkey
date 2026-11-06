@@ -40,9 +40,15 @@ suites also pass independent review, without an epoch/native offset/cleanup clai
 Fatal observation remains unaccepted because the source-specific diagnostic is
 missing; native lifecycle and operational adoption remain open.
 The default-OFF Hash/Hmac candidate has compiled and linked, with independent
-review of its complete83-field metadata and failed wrapper protection. It is
-unadopted and has not executed guest crypto. Its60-observation host Node oracle
-does not change the deferred `node:crypto` API status. The experimental clock and guarded-key results remain
+review of its complete83-field metadata and retained failed wrapper protection.
+Its two zero-import components now pass fourteen retained/fresh Jco and stock
+Wasmtime returns,280 accepted Node-record comparisons and112 separate native
+policy checks. The first reporting-counter bug is preserved; corrected runs
+have truthful counters. Direct native aliases share functions/default objects
+and retain separate namespace objects, a Node deviation. Lifecycle/cost/freeze
+and release gates remain open. The candidate
+is unadopted, and accepted production's `node:crypto` API status remains deferred.
+The60-observation host Node oracle stays separate. The experimental clock and guarded-key results remain
 separate from public API compatibility; exact evidence is in the
 [execution status](execution-status.md).
 

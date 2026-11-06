@@ -2,6 +2,13 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
+The [experimental Hash/Hmac results](hash-hmac-results-2026-11-06.md) now cover
+fourteen complete Jco/stock-Wasmtime returns:280 accepted Node-record comparisons
+and112 separate native-policy checks. Both components import nothing; direct
+native aliases share functions/default objects but retain separate namespace
+objects. The new candidate remains outside production acceptance, with freeze,
+lifecycle and cost gates open.
+
 The [post-push Next.js report](nextjs-results-2026-11-06.md) records fresh
 comprehensive application and component checks after `77659217`: Node controls
 pass on replay,17 main Wasm failures and seven optional-package failures remain,
@@ -37,10 +44,18 @@ The default-OFF Hash/Hmac candidate now compiles and links as a 357-source
 engine. Its recipe exits0, but both wrappers exit1 after the staged Git index
 changes hash and mode. Independent review validates the compiled candidate and
 the recorded failure; it does not admit the engine. Read-only artifact
-revalidation Source passes independent review; its actual invocation is pending.
+revalidation first fails on two retained system `/tmp` paths. Its narrow v2
+correction passes actual full-input guard tests and independent Source review;
+the genuine API retry exits0. A corrected review publication passes the whole
+caller contract. A zero-import13,240,343-byte component passes actual artifact
+review and returns80 Node-equal accepted Hash/Hmac records on Jco. A harness
+counter-publication defect is preserved and being corrected before full runtime
+acceptance; stock-host/direct-alias/lifecycle/cost gates remain open. The
+original failures remain preserved.
 The pinned Node oracle passes60 selected
-observations; guest crypto has not executed. Private clock diagnostic v2 remains
-uncompiled. These candidates and their open lifecycle gates are recorded in
+observations; the separate guest result above is still experimental. Private clock diagnostic v2 passes
+seven actual SDK frontends and Source review; linking and runtime remain
+pending. These candidates and their open lifecycle gates are recorded in
 [progress.md](../../progress.md).
 See the [execution status](execution-status.md) for their exact evidence.
 The original resource mapping fails at harness serialization; its partials and

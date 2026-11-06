@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "copyIo": {
+    "original": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-controller-candidate-v3/copy_io.py",
+      "sha256": "ee5d77d8ea5f9b0dc67019cb5d0328dbd3956991059d7992c0ab6a43bfeaa350",
+      "bytes": 6676
+    },
+    "after": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-freezer-candidate-v1/copy_io.py",
+      "sha256": "da88a2d3bdb9488813bb49b87a78ae14b801ad4f06361a1e18d3728bc7e49288",
+      "bytes": 6726
+    },
+    "before": "            with target.open('xb') as result:\n                if row.get('original') is not None:",
+    "afterText": "            with target.open('xb') as result:\n                os.fchmod(result.fileno(), 0o600)\n                if row.get('original') is not None:",
+    "singleReplacement": true
+  },
+  "models": {
+    "metadata": {
+      "original": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-controller-candidate-v3/producer/native-admission-model.py",
+        "sha256": "063c2fd7e49c5d32bca5b307ae54ec82af263748f5ecb969743ff78731323edd",
+        "bytes": 9678
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-freezer-candidate-v1/metadata_model.py",
+        "sha256": "063c2fd7e49c5d32bca5b307ae54ec82af263748f5ecb969743ff78731323edd",
+        "bytes": 9678
+      }
+    },
+    "hash": {
+      "original": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-native-controller-candidate-v3/producer/hash-hmac-model.py",
+        "sha256": "cdc83b1d7e376325e58272393f1ee00cdcb6b62ba6fe9473f0c6ddf92c00a877",
+        "bytes": 7870
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-freezer-candidate-v1/hash_model.py",
+        "sha256": "cdc83b1d7e376325e58272393f1ee00cdcb6b62ba6fe9473f0c6ddf92c00a877",
+        "bytes": 7870
+      }
+    }
+  }
+}

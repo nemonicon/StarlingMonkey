@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "state": "ACTUAL_SOURCE_MANIFEST_ORDER_JOIN_BLOCKER_CONFIRMED",
+  "sourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-native-integration-candidate-v2/index.json",
+    "sha256": "a52ee25caa3e026ad8efae1955473bea2a98090811d66cea7be911853b5d7c64",
+    "bytes": 4763
+  },
+  "policy": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-native-integration-candidate-v2/policy.json",
+    "sha256": "7636f489071987c9cc4c136dcd4a5557b29b40a9330b45e80f9ef2c870e02959",
+    "bytes": 125429
+  },
+  "helper": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-native-integration-candidate-v2/layer-policy.py",
+    "sha256": "45e4b1b517b8faabf29436be7eb56a99852e83e3975c61dff1faf828a016f458",
+    "bytes": 26330
+  },
+  "recipe": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-native-integration-candidate-v2/build-engine.sh",
+    "sha256": "ee9b3ba71e3323e2e5ca1e21cefbb09a3585e1e3a1d992202939a0cdcdfaa94c",
+    "bytes": 56107
+  },
+  "exactExtractedPredicate": "sorted(manifest,key=lambda r:r['path'])==actual and all(set(r)=={'path','sha256'}for r in manifest)",
+  "sourceRowCount": 357,
+  "declaredSourceRowsAlreadyCanonical": false,
+  "stageAndPolicyPathHashMapsEqual": true,
+  "lastDeclaredRows": [
+    {
+      "path": "builtins/diagnostics/clock-lifecycle.cpp",
+      "sha256": "ee84ed0560f7f88bb5536281601e86c3eac8067e33a86d627e4efff021a11fb2"
+    },
+    {
+      "path": "include/clock-lifecycle-diagnostics.h",
+      "sha256": "280492b3737082b2130b8b86b04cbc3f1fc3e8c60506d257b0969769acc93642"
+    }
+  ],
+  "cases": [
+    {
+      "name": "actual emitted unsorted357 refuses its own actual source rows",
+      "expected": false,
+      "observed": false
+    },
+    {
+      "name": "caller-only sorting cannot repair unsorted actual policy rows",
+      "expected": false,
+      "observed": false
+    },
+    {
+      "name": "prospective source canonical policy/manifest consistency",
+      "expected": true,
+      "observed": true
+    },
+    {
+      "name": "changed source hash refused",
+      "expected": false,
+      "observed": false
+    },
+    {
+      "name": "duplicate source row refused",
+      "expected": false,
+      "observed": false
+    },
+    {
+      "name": "extra row field refused",
+      "expected": false,
+      "observed": false
+    }
+  ],
+  "helperOrRecipeOrStageOrCompilerOrGuestInvoked": false,
+  "scope": "Pure evaluation of exact helper AST predicate over authenticated actual source-policy rows; no helper function or source_manifest invocation."
+}

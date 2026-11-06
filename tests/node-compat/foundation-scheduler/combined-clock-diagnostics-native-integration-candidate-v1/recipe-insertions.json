@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "parentRecipe": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/build-engine.sh",
+    "sha256": "12bbfbf46d129dd7993a982f7138043c050f0c912b37bd373af9db7c59f99f98",
+    "bytes": 55015
+  },
+  "sourceAnchors": [
+    {
+      "role": "diagnostic-external-delta-after-existing-abi-entry-tick-chain",
+      "before": "[[ \"$(sha256_file \"$source_dir/embedding/embedding.cpp\")\" == 9dcb63beaf55ff6af9ca4d2019316d4a167657c02ed76a1bf246012da0bcd205 ]] || { echo 'Private tick boundary source mismatch' >&2; exit 1; }\n",
+      "patch": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-native-integration-candidate-v1/embedding-diagnostic.UNAPPLIED.patch",
+        "sha256": "abce118339a8bd4cc280380797dbab10dd82f186e6a93260ff5007d5ce7d7784",
+        "bytes": 2289
+      },
+      "beforeImage": {
+        "path": "/private/tmp/starling-node-compat/combined-native355-v2-freeze/componentize-source/embedding/embedding.cpp",
+        "sha256": "9dcb63beaf55ff6af9ca4d2019316d4a167657c02ed76a1bf246012da0bcd205",
+        "bytes": 22252
+      },
+      "afterImage": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v2/after/componentize-source/embedding/embedding.cpp",
+        "sha256": "93d886076e361b9d62db5d79190877fbbd03a6ab9de1a812ccf54935cb090603",
+        "bytes": 23229
+      },
+      "insertionAfter": "# New own recipe must first authenticate diagnostic_patch against its final SHA.\npatch -d \"$source_dir\" -p1 < \"$diagnostic_patch\"\n[[ \"$(sha256_file \"$source_dir/embedding/embedding.cpp\")\" == 93d886076e361b9d62db5d79190877fbbd03a6ab9de1a812ccf54935cb090603 ]] || exit 1\n",
+      "applied": false
+    },
+    {
+      "role": "configure-arguments",
+      "before": "  -DENABLE_JS_DEBUGGER=OFF -DENABLE_BUILTIN_WPT_SUPPORT=OFF -DNODE_COMPAT_LOCKED_RUST=ON \\\n",
+      "insertionAfter": "  -DNODE_COMPAT_LIFECYCLE_DIAGNOSTICS=ON -DENABLE_BUILTIN_DIAGNOSTICS_CLOCK_LIFECYCLE=ON -DENABLE_BUILTIN_WEB_PERFORMANCE=ON \\\n"
+    },
+    {
+      "role": "metadata-extension-before-exclusive-publication",
+      "before": "with open(artifact + '.build.json', 'x') as output:\n",
+      "insertionBefore": "# NEW OWN helper/classifier must have validated full357/82 before this seam.\n# fields = diagnostic_fields(own_diagnostic_policy, actual_classification, actual_install_witness)\n# assert not (set(metadata) & set(fields)); metadata.update(fields)\n# own_classifier.validate_fresh_diagnostic_metadata(metadata, ...)\n"
+    },
+    {
+      "role": "external-source-capture",
+      "before": "assert rows==expected,'Exact unchanged external3 sources required before configure'\n",
+      "requiredChange": "Own expected external3 must be the exact90ef inventory (only embedding.cpp changes), not the parent three hashes."
+    }
+  ],
+  "applied": false,
+  "runnable": false,
+  "warning": "Comments/anchors are reviewable insertion templates, not a completed recipe or an executable authorization.",
+  "requiredRewiredLiteralCouplings": {
+    "helperRecipeLiteralPredicates": 5,
+    "policyRecipeLiteralPredicates": 2,
+    "helperPolicySelfHashConstant": 1,
+    "embeddingPatchDigestPredicate": 1,
+    "status": "New helper/policy/full-recipe slots remain NULL; all must be recomputed from final actual afterimage bytes before any Root build scope."
+  }
+}

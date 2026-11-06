@@ -1,0 +1,65 @@
+// Experimental host caller. Only stdlib imports precede complete authentication.
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {createReadStream} from 'node:fs';
+import {readFile,lstat,readdir,readlink,realpath,mkdir,writeFile} from 'node:fs/promises';
+import {dirname,join,resolve,isAbsolute} from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import {isDeepStrictEqual as same} from 'node:util';
+const HERE=dirname(fileURLToPath(import.meta.url));
+const hash=b=>createHash('sha256').update(b).digest('hex');
+const cleanOwned=t=>{assert(t.terminalExitZeroObserved===true&&t.ownedGroupGone===true&&t.signals.length===0&&t.errors.length===0&&t.closed===true&&t.status===0&&t.signal===null&&t.spawnError===null&&t.timedOut===false&&t.externalSignal===null&&t.signalCount===0&&t.outputLimitExceeded===false,'Clean owned raw0 required');};
+const absent=async p=>{try{await lstat(p);throw new Error('Fresh output already exists: '+p);}catch(e){if(e.code!=='ENOENT')throw e;}};
+function descriptor(r){assert(r&&Object.keys(r).sort().join(',')==='bytes,path,sha256');assert(typeof r.path==='string'&&isAbsolute(r.path)&&resolve(r.path)===r.path&&!r.path.includes('\\')&&!r.path.includes('\0'));assert(Number.isSafeInteger(r.bytes)&&r.bytes>=0&&/^[0-9a-f]{64}$/.test(r.sha256));return r;}
+const selectedTmp=new Set(['/tmp/starling-node-compat/zlib-source-v4/tests/node-compat/classic-streams-admission.mjs','/tmp/starling-node-compat/zlib-source-v4/tests/node-compat/zlib-admission.mjs']);
+async function physical(path){if(path.startsWith('/tmp/')){assert(selectedTmp.has(path));assert((await lstat('/tmp')).isSymbolicLink()&&await readlink('/tmp')==='private/tmp'&&await realpath('/tmp')==='/private/tmp');path='/private'+path;}for(let q=path;;q=dirname(q)){assert(!(await lstat(q)).isSymbolicLink(),q);if(dirname(q)===q)break;}return path;}
+async function fingerprint(path){const s=await lstat(path);assert(s.isFile()&&!s.isSymbolicLink());const h=createHash('sha256');for await(const b of createReadStream(path))h.update(b);const z=await lstat(path);assert(same([s.dev,s.ino,s.mode,s.nlink,s.size,s.mtimeMs,s.ctimeMs],[z.dev,z.ino,z.mode,z.nlink,z.size,z.mtimeMs,z.ctimeMs]));return{path,sha256:h.digest('hex'),bytes:s.size};}
+async function treeDigest(spec){const rows=[];async function walk(root,prefix=''){for(const name of(await readdir(root)).sort()){const p=join(root,name),s=await lstat(p),r={path:prefix+name,kind:s.isSymbolicLink()?'link':s.isDirectory()?'directory':'file',mode:s.mode&0o777};if(s.isSymbolicLink())Object.assign(r,{linkText:await readlink(p),resolved:await realpath(p)});else if(s.isDirectory())await walk(p,prefix+name+'/');else{assert(s.isFile());const d=await fingerprint(p);Object.assign(r,{bytes:d.bytes,sha256:d.sha256});}rows.push(r);}}await walk(spec.root);rows.sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0);assert((await lstat(spec.root)).mode%0o1000===spec.rootMode);assert(rows.length===spec.entries&&hash(JSON.stringify(rows))===spec.sha256,'Tool tree changed: '+spec.root);}
+class Capture{
+ constructor(){this.rows=new Map();this.ids=new Map();this.families=new Map();this.trees=[];}
+ async file(raw){const r=descriptor(raw),p=await physical(r.path),s=await lstat(p),d=await fingerprint(p);assert(d.bytes===r.bytes&&d.sha256===r.sha256);const id=[s.dev,s.ino,s.mode,s.nlink,s.size,s.mtimeMs,s.ctimeMs];if(this.rows.has(r.path)){assert(same(this.rows.get(r.path),r)&&same(this.ids.get(r.path),id));}else{this.rows.set(r.path,r);this.ids.set(r.path,id);}return p;}
+ async json(r){assert(r.bytes<=32*1024*1024);return JSON.parse(await readFile(await this.file(r),'utf8'));}
+ async family(r){const v=await this.json(r),root=dirname(r.path),names=new Set(['index.json']);for(const f of v.files){assert(f.path&&!isAbsolute(f.path)&&!f.path.includes('\\')&&f.path.split('/').every(x=>x&&x!=='.'&&x!=='..')&&!names.has(f.path));names.add(f.path);await this.file({...f,path:join(root,f.path)});}const actual=[];async function walk(p,prefix=''){for(const n of await readdir(p)){const q=join(p,n),s=await lstat(q);assert(!s.isSymbolicLink());if(s.isDirectory())await walk(q,prefix+n+'/');else{assert(s.isFile());actual.push(prefix+n);}}}await walk(root);assert(same(actual.sort(),[...names].sort()));this.families.set(r.path,r);return v;}
+ async proof(pair,contract){const ix=await this.family(pair.index);for(const r of[pair.result,contract])assert(ix.files.some(x=>join(dirname(pair.index.path),x.path)===r.path&&x.sha256===r.sha256&&x.bytes===r.bytes));const p=await this.json(pair.result),k=await this.json(contract);assert(p.state===k.requiredReviewState&&p.schemaVersion===1&&p.verifiedPassed===true);for(const group of ['requiredFixedValues','requiredExactDescriptors','requiredVerifiedProperties'])for(const[n,v]of Object.entries(k[group]??{}))assert(same(p[n],v),'Whole contract '+n);if(k.requiredCoverage)assert(same(p.coverage,k.requiredCoverage));for(const r of Object.values(k.requiredExactDescriptors??{})){if(r&&Object.keys(r).sort().join(',')==='bytes,path,sha256')await this.file(r);else if(r&&Object.keys(r).sort().join(',')==='index,result'){await this.family(r.index);await this.file(r.result);}}return p;}
+ async recheck(){for(const r of[...this.rows.values()])await this.file(r);for(const r of[...this.families.values()])await this.family(r);for(const t of this.trees)await treeDigest(t);}
+}
+async function main(){
+ assert(process.argv.length===3&&process.version==='v22.14.0'&&process.execArgv.length===0);
+ for(const key of ['NODE_OPTIONS','NODE_PATH','RUST_LOG','LD_PRELOAD','LD_LIBRARY_PATH'])assert(!Object.hasOwn(process.env,key),key);
+ const c=new Capture(),configRow=JSON.parse(process.argv[2]),cfg=await c.json(configRow),root=await c.json(cfg.rootAuthority),own=cfg.sourceIndex;
+ assert(own.path===join(HERE,'index.json')&&same(root.sourceIndex,own));const ix=await c.family(own),ref=ix.files.find(r=>r.path==='references.json'),refs=await c.json({...ref,path:join(HERE,ref.path)});
+ assert(root.schemaVersion===1&&root.state==='ROOT_REVIEWED_EXPERIMENTAL_HASH_HMAC357_WASMTIME_DIAGNOSTIC_V1'&&root.sourceReviewedByRoot===true&&root.stockWasmtimeAllowed===true&&root.ordinaryHashHmacAllowed===true&&root.freshProcesses===3);
+ assert(root.entrySha256===ix.files.find(r=>r.path==='companion.mjs').sha256&&same(root.nativeEngine,refs.nativeEngine)&&same(root.nativeMetadata,refs.nativeMetadata));
+ for(const key of ['nativeBuildAllowed','nativeFreezeAllowed','publicProfileAdmission','liveEvpSnapshotAdmission','resetOrReuseAcceptance','securityAcceptance','costAcceptance','gcPressureAllowed','debugAllowed','oomAllowed','cryptoKeyOrKeyObjectAllowed','generatedJsImportAllowed','newNodeOracleAllowed'])assert(root[key]===false,key);
+ assert(isAbsolute(root.outputRoot)&&resolve(root.outputRoot)===root.outputRoot&&root.outputRoot.startsWith(refs.outputPrefix));await physical(dirname(root.outputRoot));assert(await realpath(process.execPath)===refs.node.path);
+ for(const row of [refs.node,refs.wasmtime,refs.wave,refs.durableHost,refs.fixtureManifest])await c.file(row);await c.family(refs.parentCallerIndex);await c.family(refs.comparator.index);await c.file(refs.comparator.module);
+ const proof=await c.proof(root.artifactReview,root.artifactContract);assert(proof.state==='INDEPENDENT_NODE_CRYPTO_HASH_HMAC357_READ_ONLY_REVALIDATED_ARTIFACT_REVIEW_PASSED_V1'&&same(proof.engine,refs.nativeEngine)&&same(proof.metadata,refs.nativeMetadata)&&same(proof.actualRevalidationResult,refs.revalidationResult));
+ const native=await c.json(refs.revalidationResult),ledger=await c.json(native.inputHashes);for(const r of ledger.files)await c.file(r);const aliases=await c.json(native.referenceAliases);for(const r of aliases.symlinks)assert(await readlink(r.path)===r.linkText&&await realpath(r.path)===r.resolved);
+ const metadata=await c.json(refs.nativeMetadata);await c.file(refs.nativeEngine);assert(Object.keys(metadata).length===83&&metadata.sourceManifest.length===357&&metadata.selectedModuleManifests.length===12&&metadata.nodeCryptoHashHmacEnabled===true&&metadata.nodeCryptoAuditedBorrowEnabled===false);
+ assert(root.actualComponentReviewed===true&&['bundled','raw-fixture'].includes(root.arm));await c.file(root.component);const constructed=await c.json(root.constructionResult);assert(constructed.sourceIndex.sha256===refs.parentCallerIndex.sha256&&constructed.phase==='construct'&&constructed.arm===root.arm&&constructed.primaryPresent===false&&constructed.finalErrors.length===0&&same(constructed.component,root.component));
+ const emitted=await readFile(await c.file(root.emittedWit),'utf8');assert(!/^\s*import\s/m.test(emitted)&&/export\s+run\s*:\s*func\(\s*\)\s*->\s*string\s*;/.test(emitted)&&(emitted.match(/\bfunc\s*\(/g)??[]).length===1);
+ const expected=await readFile(await c.file(root.actualFreshJcoRawReturn),'utf8'),oracle=await c.proof(refs.oracleReview,refs.oracleContract),manifest=await c.json(refs.fixtureManifest);
+ const recheck=async()=>{await c.recheck();for(const r of aliases.symlinks)assert(await readlink(r.path)===r.linkText&&await realpath(r.path)===r.resolved);};await recheck();
+ // No executable version probe: exact pinned binary DATA above is the version gate.
+ const {runOwnedCommand}=await import(pathToFileURL(refs.durableHost.path)),{parseScalarStringOutput}=await import(pathToFileURL(refs.wave.path)),comparator=await import(pathToFileURL(refs.comparator.module.path));
+ await absent(root.outputRoot);await mkdir(root.outputRoot,{mode:0o700});await mkdir(join(root.outputRoot,'processes'),{mode:0o700});
+ async function save(name,value){const bytes=Buffer.from(JSON.stringify(value,null,2)+'\n');await writeFile(join(root.outputRoot,name),bytes,{flag:'wx',mode:0o600});const h=await import('node:fs/promises');const fd=await h.open(join(root.outputRoot,name),'r');try{await fd.sync();}finally{await fd.close();}return fingerprint(join(root.outputRoot,name));}
+ let primary={present:false},finalErrors=[],sessions=[];
+ try{
+  for(let ordinal=1;ordinal<=3;ordinal++){
+   await recheck();let localPrimary=false;
+   try{
+    const args=['run','--invoke','run()',root.component.path];await save('call-'+ordinal+'-argv.json',{executable:refs.wasmtime,args,expectedCallOrdinal:1,noShell:true,noCustomHost:true});
+    const terminal=await runOwnedCommand({output:root.outputRoot,name:'fresh-'+ordinal,executable:refs.wasmtime.path,args,write:writeFile,register:()=>{},timeoutMs:180000,maxOutputBytes:16*1024*1024});sessions.push({ordinal,pid:terminal.pid,terminalPath:terminal.terminalPath,rawExitCode:terminal.status});
+    // The owned helper fsyncs ALL available raw stdout/stderr before returning.
+    cleanOwned(terminal);assert(terminal.stderrFile.bytes===0);const stdout=await readFile(await c.file(terminal.stdoutFile));const value=parseScalarStringOutput({stdoutBytes:stdout,rawDurablyRetained:true});
+    await save('call-'+ordinal+'-decoded.json',{type:'string',value,rawStdout:terminal.stdoutFile,rawStderr:terminal.stderrFile,expectedCallOrdinal:1});
+    const compared=comparator.compareHashHmacReturn(value,{expectedCallOrdinal:1,nodeAcceptedRecords:oracle.acceptedOracleRecords,fixtureManifest:manifest});await save('call-'+ordinal+'-comparison.json',compared);assert(compared.comparison.passed===true);assert(value===expected,'Full same-arm/fresh-ordinal Jco/Wasmtime string equality');
+   }catch(error){localPrimary=true;throw error;}finally{try{await recheck();}catch(error){if(!localPrimary)throw error;finalErrors.push({scope:'command-final-protection',type:typeof error});}}
+  }
+ }catch(error){primary={present:true,type:error===null?'null':typeof error};if(error!==null&&['string','boolean'].includes(typeof error))primary.value=error;else if(typeof error==='number')primary.diagnostic=String(error);else if(error&&typeof error==='object')for(const [key,d]of Object.entries(Object.getOwnPropertyDescriptors(error)))if(['message','stack','code'].includes(key)&&Object.hasOwn(d,'value')&&typeof d.value==='string')primary[key]=d.value;}
+ finally{try{await recheck();}catch(error){finalErrors.push({scope:'phase-final-protection',type:typeof error});}}
+ const complete=!primary.present&&finalErrors.length===0&&sessions.length===3;await save('result.json',{schemaVersion:1,state:complete?'EXPERIMENTAL_HASH_HMAC357_WASMTIME3_COMPLETE_UNREVIEWED_V1':'EXPERIMENTAL_HASH_HMAC357_WASMTIME3_FAILED_UNACCEPTED_V1',sourceIndex:own,rootAuthority:cfg.rootAuthority,component:root.component,constructionResult:root.constructionResult,arm:root.arm,wasmtime:refs.wasmtime,sessions,primary,finalErrors,ordinaryCallOrdinals:[1,1,1],fullRawStringsCompared:complete,generatedJsImported:false,nodeOracleRerun:false,publicProfileAdmission:false,freezeOrSnapshotOrReuseOrSecurityOrCostAcceptance:false});
+ if(!complete)throw new Error('Wasmtime diagnostic failed; complete available raw evidence retained');console.log(JSON.stringify({complete:true,outputRoot:root.outputRoot,sessions:3,experimentalOnly:true}));
+}
+main().catch(error=>{console.error(error);process.exitCode=1;});

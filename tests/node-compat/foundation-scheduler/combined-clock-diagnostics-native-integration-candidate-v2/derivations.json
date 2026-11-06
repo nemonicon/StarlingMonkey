@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "native-admission-model.py",
+      "original": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/native-admission-model.py",
+        "sha256": "8287b5da1488ffc32a0bf76c4d0f9bcca85681240586c5f144c3822f2e6917f1",
+        "bytes": 8237
+      },
+      "edits": [
+        {
+          "before": "Pure full355 metadata-shape gate",
+          "after": "Pure own357/82 diagnostic metadata-shape gate",
+          "count": 1
+        },
+        {
+          "before": "== 355",
+          "after": "== 357",
+          "count": 1
+        },
+        {
+          "before": "== 68",
+          "after": "== 69",
+          "count": 1
+        },
+        {
+          "before": "== 62",
+          "after": "== 63",
+          "count": 2
+        },
+        {
+          "before": "'ACTUAL_FRESH_COMBINED355_ABI_PRECONFIGURE_PATH_OBSERVATION_V1'",
+          "after": "'ACTUAL_FRESH_CLOCK_DIAGNOSTIC357_ABI_PRECONFIGURE_PATH_OBSERVATION_V2'",
+          "count": 1
+        },
+        {
+          "before": "    return {'state':'FINITE_COMBINED355_NORMAL_OFF_METADATA_SHAPE_ONLY_V1',\n            'nativeFiles':355,'engineRead':False,'runtimeAccepted':False,'grantsAuthority':False}",
+          "after": "    validate_diagnostic_fields(metadata,policy)\n    assert set(metadata)==set(policy['expectedRawMetadataFields']) and len(metadata)==82\n    return {'state':'FINITE_CLOCK_DIAGNOSTIC357_NORMAL_OFF_METADATA_SHAPE_ONLY_V2',\n            'nativeFiles':357,'rawMetadataFields':82,'engineRead':False,'runtimeAccepted':False,'grantsAuthority':False}",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseVerified": true,
+      "intermediate": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-native-integration-candidate-v2/native-admission-model.py",
+        "sha256": "cfeeaa99717f6ce792cd8f96735fbccf854480101de4ad379be858f73d38c602",
+        "bytes": 8426
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-native-integration-candidate-v2/native-admission-model.py",
+        "sha256": "4838687ec3c1b6d5e9e7b76530fdda5a4bb8c293f61011e456173fa66874f470",
+        "bytes": 14252
+      }
+    },
+    {
+      "path": "layer-policy.py",
+      "original": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/layer-policy.py",
+        "sha256": "4e30750fc8967514493b26096e814929ac4e567f1a01d86bc6a140f3bcecf609",
+        "bytes": 24409
+      },
+      "edits": [
+        {
+          "before": "Full current355 source/compile producer",
+          "after": "Full own diagnostic357 source/compile producer",
+          "count": 1
+        },
+        {
+          "before": "REPO=Path('/private/tmp/starling-node-compat/combined-native355-v1-source')\n# Own literal configured-native context; never mutate an imported donor namespace.\nDONOR_INPUTS=REPO/'tests/node-compat/foundation-scheduler/combined-native-integration-candidate-v1/donor-inputs.json'\nPOLICY_SHA256='fc9c5e97594507513ed20efeced61dbf2be1a92ff038e7f1df1bcddd0b56a681'\nAUTH_SHA256='c837e8eb61329370775e0a24b0c914a6efe6bfcb3e51a03a8ed2ecd41fa807db'\ndef digest(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()\nassert digest(HERE/'policy.json')==POLICY_SHA256\nPOLICY=json.loads((HERE/'policy.json').read_bytes())\n\ndef authenticate_inputs():\n    assert digest(DONOR_INPUTS)==AUTH_SHA256\n    rows=json.loads(DONOR_INPUTS.read_bytes())['files']\n    assert len(rows)==len({r['path']for r in rows})\n    for r in rows:\n        path=REPO\n        for part in r['path'].split('/'):\n            assert part and part not in('.','..');path/=part;assert not path.is_symlink(),path\n        assert path.is_file()and path.stat().st_size==r['bytes']and digest(path)==r['sha256'],path\n    return True\nauthenticate_inputs()\nBASE_ROOT=REPO/'tests/node-compat/foundation-crypto/ownership-secret-integration-candidate-v1'\nBASE=json.loads((BASE_ROOT/'policy.json').read_bytes())\nANCESTOR_ROOT=REPO/'tests/node-compat/foundation-scheduler/integration-candidate-v1'\nANCESTOR=json.loads((ANCESTOR_ROOT/'policy.json').read_bytes())\nassert BASE['expectedNativeSourceManifest']==POLICY['combinedSourcePolicy']['parentExpectedNativeSourceManifest']\nbefore={r['path']:r['sha256']for r in BASE['expectedNativeSourceManifest']}\nafter={r['path']:r['sha256']for r in POLICY['expectedNativeSourceManifest']}\nassert len(before)==len(after)==355 and before.keys()==after.keys()\nchanges=POLICY['combinedSourcePolicy']['changes']\nassert len(changes)==7 and sum(before[p]==after[p]for p in before)==348\nfor r in changes:assert before[r['path']]==r['beforeSha256']and after[r['path']]==r['afterSha256']\nfor key in ('cryptoKeyOwnershipSourcePolicy','cryptoSecretFailureSourcePolicy','streamConsumersSourcePolicy','zlibSourcePolicy'):\n    assert POLICY[key]==BASE[key], 'Historical ancestry preserved; current source checked separately'\nassert POLICY['parentExpectedNativeSourceManifest']==ANCESTOR['expectedNativeSourceManifest']\n",
+          "after": "REPO=Path('/private/tmp/starling-node-compat/combined-clock-diagnostic357-v2-source')\nANCESTRY=Path('/private/tmp/starling-node-compat/combined-native355-v2-freeze/source')\nDONOR_INPUTS=ANCESTRY/'tests/node-compat/foundation-scheduler/combined-native-integration-candidate-v1/donor-inputs.json'\nPOLICY_SHA256='7636f489071987c9cc4c136dcd4a5557b29b40a9330b45e80f9ef2c870e02959'\nAUTH_SHA256='c837e8eb61329370775e0a24b0c914a6efe6bfcb3e51a03a8ed2ecd41fa807db'\ndef digest(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()\nassert digest(HERE/'policy.json')==POLICY_SHA256\nSPEC=json.loads((HERE/'policy.json').read_bytes())\nbase_path=Path(SPEC['basePolicy']['path']);assert base_path.is_file()and not base_path.is_symlink()\nassert base_path.stat().st_size==SPEC['basePolicy']['bytes']and digest(base_path)==SPEC['basePolicy']['sha256']\nPARENT_POLICY=json.loads(base_path.read_bytes())\nmodel_path=HERE/'native-admission-model.py';assert digest(model_path)==SPEC['admissionModelSha256']\nmodel_spec=importlib.util.spec_from_file_location('own_clock357_source_policy_model',model_path)\nmodel=importlib.util.module_from_spec(model_spec);model_spec.loader.exec_module(model)\nPOLICY=model.assemble_policy(SPEC,PARENT_POLICY)\ndef authenticate_inputs():\n    assert digest(DONOR_INPUTS)==AUTH_SHA256\n    rows=json.loads(DONOR_INPUTS.read_bytes())['files']\n    assert len(rows)==len({r['path']for r in rows})\n    for r in rows:\n        path=ANCESTRY\n        for part in r['path'].split('/'):\n            assert part and part not in('.','..');path/=part;assert not path.is_symlink(),path\n        assert path.is_file()and path.stat().st_size==r['bytes']and digest(path)==r['sha256'],path\n    return True\nauthenticate_inputs()\nBASE_ROOT=ANCESTRY/'tests/node-compat/foundation-crypto/ownership-secret-integration-candidate-v1'\nBASE=json.loads((BASE_ROOT/'policy.json').read_bytes())\nANCESTOR_ROOT=ANCESTRY/'tests/node-compat/foundation-scheduler/integration-candidate-v1'\nANCESTOR=json.loads((ANCESTOR_ROOT/'policy.json').read_bytes())\nassert BASE['expectedNativeSourceManifest']==PARENT_POLICY['combinedSourcePolicy']['parentExpectedNativeSourceManifest']\nparent_before={r['path']:r['sha256']for r in BASE['expectedNativeSourceManifest']}\nparent_after={r['path']:r['sha256']for r in PARENT_POLICY['expectedNativeSourceManifest']}\nassert len(parent_before)==len(parent_after)==355 and parent_before.keys()==parent_after.keys()\nassert sum(parent_before[p]==parent_after[p]for p in parent_before)==348\nfor r in PARENT_POLICY['combinedSourcePolicy']['changes']:assert parent_before[r['path']]==r['beforeSha256']and parent_after[r['path']]==r['afterSha256']\nfor key in ('cryptoKeyOwnershipSourcePolicy','cryptoSecretFailureSourcePolicy','streamConsumersSourcePolicy','zlibSourcePolicy'):\n    assert POLICY[key]==BASE[key]\nassert POLICY['parentExpectedNativeSourceManifest']==ANCESTOR['expectedNativeSourceManifest']\n",
+          "count": 1
+        },
+        {
+          "before": "def expected(relative,base_expected):\n    prior=ANCESTOR['sourceLayer'].get(relative)\n    parent=base_expected\n    if prior is not None:\n        assert prior['beforeSha256']==base_expected\n        parent=prior['afterSha256']\n    entry=POLICY['sourceLayer'].get(relative)\n    if entry is None:return parent\n    assert entry['beforeSha256']==parent,'Actual306 source ancestry mismatch: '+relative\n    return entry['afterSha256']",
+          "after": "def expected(relative,base_expected):\n    prior=ANCESTOR['sourceLayer'].get(relative)\n    parent=base_expected\n    if prior is not None:\n        assert prior['beforeSha256']==base_expected\n        parent=prior['afterSha256']\n    entry=POLICY['sourceLayer'].get(relative)\n    if entry is not None:\n        assert entry['beforeSha256']==parent,'Actual306 source ancestry mismatch: '+relative\n        parent=entry['afterSha256']\n    diagnostic={r['path']:r for r in POLICY['diagnosticSourcePolicy']['changes']}.get(relative)\n    if diagnostic is not None:\n        assert diagnostic['beforeSha256']==parent\n        parent=diagnostic['afterSha256']\n    return parent",
+          "count": 1
+        },
+        {
+          "before": "assert len(rows)==len({r['path']for r in rows})==355",
+          "after": "assert len(rows)==len({r['path']for r in rows})==357",
+          "count": 1
+        },
+        {
+          "before": "'Unreviewed combined355 source: '",
+          "after": "'Unreviewed clock diagnostic357 source: '",
+          "count": 1
+        },
+        {
+          "before": "path=REPO/'tests/node-compat/foundation-zlib/native-integration-candidate-v4/codec-evidence.py'",
+          "after": "path=ANCESTRY/'tests/node-compat/foundation-zlib/native-integration-candidate-v4/codec-evidence.py'",
+          "count": 1
+        },
+        {
+          "before": "assert len(cpp)==62",
+          "after": "assert len(cpp)==63",
+          "count": 1
+        },
+        {
+          "before": "assert digest(Path(source_dir)/'embedding/embedding.cpp')==POLICY['embedding']['afterSha256']",
+          "after": "assert digest(Path(source_dir)/'embedding/embedding.cpp')==POLICY['expectedComponentizeSourceManifest'][0]['sha256']",
+          "count": 1
+        },
+        {
+          "before": "==68",
+          "after": "==69",
+          "count": 1
+        },
+        {
+          "before": "len(native)==62",
+          "after": "len(native)==63",
+          "count": 1
+        },
+        {
+          "before": "'actualCompileDatabaseRows':68",
+          "after": "'actualCompileDatabaseRows':69",
+          "count": 1
+        },
+        {
+          "before": "ACTUAL_FRESH_COMBINED355_ABI_PRECONFIGURE_PATH_OBSERVATION_V1",
+          "after": "ACTUAL_FRESH_CLOCK_DIAGNOSTIC357_ABI_PRECONFIGURE_PATH_OBSERVATION_V2",
+          "count": 1
+        },
+        {
+          "before": "    authenticate_inputs()\n    return metadata",
+          "after": "    classification=model.classify_diagnostic_commands(POLICY,database,embedding_commands,metadata['requestedCMakeOptions'],metadata['observedCMakeOptions'])\n    namespace='NS_DEF(diagnostics::clock_lifecycle)'\n    assert install_text.count(namespace)==1\n    metadata['clockLifecycleDiagnosticSourcePolicy']=copy.deepcopy(POLICY['diagnosticSourcePolicy'])\n    metadata['clockLifecycleDiagnosticBuildEvidence']={'diagnosticOnly':True,'actualSharedCompileCommands':classification,'actualInstallation':{'path':str(install),'sha256':digest(install),'namespace':namespace,'count':1,'performanceTargetEnabled':values['ENABLE_BUILTIN_WEB_PERFORMANCE']=='ON'},'actualPolicyCpp':len(native),'actualDatabaseRows':len(database),'actualNodePrivateCpp':len(private),'actualSeparateEmbeddingCpp':len(embedding_commands),'actualLinkedInlineStateIdentityProved':False,'actualStrongGetterLinkProved':False,'nativeClockOrSelectorRuntimeInvoked':False,'fullSeventeenGateAccepted':False,'runtimeValidation':None,'operationalAdmission':False}\n    authenticate_inputs()\n    return metadata",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseVerified": true,
+      "intermediate": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-native-integration-candidate-v2/layer-policy.py",
+        "sha256": "45e4b1b517b8faabf29436be7eb56a99852e83e3975c61dff1faf828a016f458",
+        "bytes": 26330
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-native-integration-candidate-v2/layer-policy.py",
+        "sha256": "45e4b1b517b8faabf29436be7eb56a99852e83e3975c61dff1faf828a016f458",
+        "bytes": 26330
+      }
+    },
+    {
+      "path": "build-engine.sh",
+      "original": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2/build-engine.sh",
+        "sha256": "12bbfbf46d129dd7993a982f7138043c050f0c912b37bd373af9db7c59f99f98",
+        "bytes": 55015
+      },
+      "edits": [
+        {
+          "before": "/private/tmp/starling-node-compat/combined-native355-v1-source",
+          "after": "/private/tmp/starling-node-compat/combined-clock-diagnostic357-v2-source",
+          "count": 2
+        },
+        {
+          "before": "/private/tmp/starling-node-compat/combined-native355-v2-build",
+          "after": "/private/tmp/starling-node-compat/combined-clock-diagnostic357-v2-build",
+          "count": 2
+        },
+        {
+          "before": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-native-build-controller-candidate-v2",
+          "after": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-native-integration-candidate-v2",
+          "count": 2
+        },
+        {
+          "before": "combined355-v2.",
+          "after": "clock-diagnostic357-v2.",
+          "count": 2
+        },
+        {
+          "before": "ACTUAL_FRESH_COMBINED355_ABI_PRECONFIGURE_PATH_OBSERVATION_V1",
+          "after": "ACTUAL_FRESH_CLOCK_DIAGNOSTIC357_ABI_PRECONFIGURE_PATH_OBSERVATION_V2",
+          "count": 1
+        },
+        {
+          "before": "4e30750fc8967514493b26096e814929ac4e567f1a01d86bc6a140f3bcecf609",
+          "after": "45e4b1b517b8faabf29436be7eb56a99852e83e3975c61dff1faf828a016f458",
+          "count": 5
+        },
+        {
+          "before": "fc9c5e97594507513ed20efeced61dbf2be1a92ff038e7f1df1bcddd0b56a681",
+          "after": "7636f489071987c9cc4c136dcd4a5557b29b40a9330b45e80f9ef2c870e02959",
+          "count": 2
+        },
+        {
+          "before": "classification==dict(state='FINITE_COMBINED355_NORMAL_OFF_METADATA_SHAPE_ONLY_V1',nativeFiles=355,engineRead=False,runtimeAccepted=False,grantsAuthority=False)",
+          "after": "classification==dict(state='FINITE_CLOCK_DIAGNOSTIC357_NORMAL_OFF_METADATA_SHAPE_ONLY_V2',nativeFiles=357,rawMetadataFields=82,engineRead=False,runtimeAccepted=False,grantsAuthority=False)",
+          "count": 1
+        },
+        {
+          "before": "\n\nsm_variant=release",
+          "after": "\nclock_patch=\"$consumers_layer_root/embedding-diagnostic.UNAPPLIED.patch\"\n[[ \"$(sha256_file \"$clock_patch\")\" == abce118339a8bd4cc280380797dbab10dd82f186e6a93260ff5007d5ce7d7784 ]] || exit 1\npatch -p1 -d \"$source_dir\" < \"$clock_patch\"\n[[ \"$(sha256_file \"$source_dir/embedding/embedding.cpp\")\" == 93d886076e361b9d62db5d79190877fbbd03a6ab9de1a812ccf54935cb090603 ]] || exit 1\n\nsm_variant=release",
+          "count": 1
+        },
+        {
+          "before": "'sha256':'9dcb63beaf55ff6af9ca4d2019316d4a167657c02ed76a1bf246012da0bcd205'",
+          "after": "'sha256':'93d886076e361b9d62db5d79190877fbbd03a6ab9de1a812ccf54935cb090603'",
+          "count": 1
+        },
+        {
+          "before": "-DENABLE_BUILTIN_WEB_TIMERS=ON -DENABLE_BUILTIN_WEB_CRYPTO=ON \\",
+          "after": "-DENABLE_BUILTIN_WEB_TIMERS=ON -DENABLE_BUILTIN_WEB_CRYPTO=ON \\\n  -DNODE_COMPAT_LIFECYCLE_DIAGNOSTICS=ON -DENABLE_BUILTIN_DIAGNOSTICS_CLOCK_LIFECYCLE=ON -DENABLE_BUILTIN_WEB_PERFORMANCE=ON \\",
+          "count": 1
+        },
+        {
+          "before": "    'CMAKE_C_COMPILER_LAUNCHER':'', 'CMAKE_CXX_COMPILER_LAUNCHER':'',",
+          "after": "    'CMAKE_C_COMPILER_LAUNCHER':'', 'CMAKE_CXX_COMPILER_LAUNCHER':'',\n    'NODE_COMPAT_LIFECYCLE_DIAGNOSTICS':'ON','ENABLE_BUILTIN_DIAGNOSTICS_CLOCK_LIFECYCLE':'ON','ENABLE_BUILTIN_WEB_PERFORMANCE':'ON',",
+          "count": 1
+        },
+        {
+          "before": "assert digest(pathlib.Path(source_dir) / 'embedding/embedding.cpp') == layer.POLICY['embedding']['afterSha256']",
+          "after": "assert digest(pathlib.Path(source_dir) / 'embedding/embedding.cpp') == layer.POLICY['expectedComponentizeSourceManifest'][0]['sha256']\nmetadata['componentizeJsPatches'].append({'name':'clock-lifecycle-same-tu-diagnostics-v2','path':str(layer.HERE/'embedding-diagnostic.UNAPPLIED.patch'),'sha256':digest(layer.HERE/'embedding-diagnostic.UNAPPLIED.patch'),'baseRevision':componentize,'applied':True,'files':['embedding/embedding.cpp']})",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseVerified": true,
+      "intermediate": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-native-integration-candidate-v2/build-engine.sh",
+        "sha256": "12630092d0b4488095df531b378bf83d9ad2777ea9c43257c5b6e78bd48adea4",
+        "bytes": 56090
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-native-integration-candidate-v2/build-engine.sh",
+        "sha256": "ee9b3ba71e3323e2e5ca1e21cefbb09a3585e1e3a1d992202939a0cdcdfaa94c",
+        "bytes": 56107
+      }
+    }
+  ],
+  "recipeFinalGateRelocation": "Exact82 classifier moved after real last Rustup field and before exclusive sidecar publication",
+  "modelLiteralExtension": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-native-integration-candidate-v2/model-extension.template.py",
+    "sha256": "f08dd734f26f8ba25d50f8f4128a1fe162a5879304a3896673984503fd160b78",
+    "bytes": 5826
+  }
+}

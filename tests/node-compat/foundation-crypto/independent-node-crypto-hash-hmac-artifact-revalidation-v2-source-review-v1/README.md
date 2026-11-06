@@ -1,0 +1,7 @@
+# Independent corrected revalidation Source review
+
+Bounded Source PASS for `559d600d…`. The reviewer authenticated the full current boundary, then evaluated the actual Source `TMP_ALIAS_POLICY`, `physical` and `checked` definitions extracted by AST with their genuine stdlib imports. All 21,437 current inputs passed that guard, including every original 21,328 ledger row. Logical descriptor objects were checked unchanged. The two selected `/tmp` paths use the exact verified system alias; all 34 other recorded symlink paths were rejected. Additional policy/path/hash/size negatives and pure Root/peer negatives passed. No operational entry, bootstrap, admission, producer, archive verifier, callback, monitor, engine or guest was invoked.
+
+Prior peer `619de02f…` missed the operational boundary: its independent reader allowed the system tmp alias, while actual Source `175e4061…` rejected the two logical paths. Actual attempt 19977 failed before admission/output. Those records remain immutable; this peer does not relabel them or repair original BUILD4, whose recipe0/parents1+1/preservationfalse remain explicit.
+
+This Source approval grants no actual revalidation, freeze, component, runtime or adoption authority. The new read-only phase still requires Root authorization and actual raw0/clean/final protection evidence. An UNREVIEWED result file is insufficient. INIT/live EVP snapshot safety, alias/algorithm semantics, erasure/finalizers and public crypto admission remain open.

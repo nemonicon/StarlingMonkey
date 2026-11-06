@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "sourceOnly": true,
+  "sourceReviewPassed": true,
+  "parentDiagnosticSourceIndexSha256": "7aed33ec02b9024fb96ded8e77924a27ce7d54bf36102a5fd561a3e88f731e52",
+  "ownerActionsInvoked": false,
+  "compilerInvoked": false,
+  "nativeProbeInvoked": false,
+  "nativeClockRead": false,
+  "fixtureOrGuestExecuted": false,
+  "fullLifecycleGateAccepted": false,
+  "publicProfilePromotion": false,
+  "state": "INDEPENDENT_COMBINED_CLOCK_DIAGNOSTICS_SOURCE_REVIEW_PASSED_V2",
+  "sourceIndexSha256": "90efee09d98bd02411a07a5f3386beccc5dce46c91cace9364bbc0d9e434c6fb",
+  "sourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v2/index.json",
+    "sha256": "90efee09d98bd02411a07a5f3386beccc5dce46c91cace9364bbc0d9e434c6fb",
+    "bytes": 6593
+  },
+  "sourceArithmetic": {
+    "nativeSourceFiles": 357,
+    "retainedParentNativeFiles": 349,
+    "nativeAfterimages": 6,
+    "newNativePaths": 2,
+    "externalEmbeddingSources": 3
+  },
+  "verifiedInputDescriptors": 463,
+  "verifiedCompleteDonorFamilies": 3,
+  "indexedSourceMembers": 40,
+  "readHashAndReversalChecks": 1475,
+  "reversibleFileDerivations": 9,
+  "reversibleEdits": 7,
+  "sourceContract": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v2/future-source-review-contract.json",
+    "sha256": "91b044821b096353b51ecef68c32384a655a04544f19d022f7835e5a4dd94753",
+    "bytes": 952
+  },
+  "sourceResult": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v2/results.json",
+    "sha256": "a779ee34ef1feb4abb00eb7729fb68e7aa5e3d9089ffb48641a7972b9d1d9783",
+    "bytes": 3069
+  },
+  "sourceInputs": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v2/input-hashes.json",
+    "sha256": "9eddfdaa550f7726c1922ba9dfcec49bc36ce20ccfec1b4acc1d165503c586d2",
+    "bytes": 118611
+  },
+  "sourceDerivations": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v2/derivations.json",
+    "sha256": "30c44f600caed7a4d3f289bf57aabd38472df79937f36dcdc06d5fc916ca9bf7",
+    "bytes": 52448
+  },
+  "sourceInventory": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v2/proposed-source-inventory.json",
+    "sha256": "84d2ddf49404839e3c4d0c6f373b220b100f2a400b28e393c769db6bd79fdba9",
+    "bytes": 137816
+  },
+  "pureModels": {
+    "argv": [
+      "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+      "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v2/test-models.mjs"
+    ],
+    "rawExitCode": 0,
+    "node": {
+      "path": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+      "sha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+      "bytes": 108619024
+    },
+    "result": {
+      "schemaVersion": 1,
+      "state": "PRIVATE_DIAGNOSTIC_V2_SYNTHETIC_MODELS_PASSED",
+      "checks": 72,
+      "nativeProbeInvoked": false,
+      "nativeClockRead": false,
+      "compilerInvoked": false,
+      "guestExecuted": false,
+      "fullLifecycleGateAccepted": false
+    },
+    "stdout": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/independent-combined-clock-diagnostics-v2-source-review-v1/pure-model.stdout.log",
+      "sha256": "3e0c2857b9f5987d96b99c7d150287713f8a933c026be5b38facf37d3fd670e1",
+      "bytes": 219
+    },
+    "stderr": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/independent-combined-clock-diagnostics-v2-source-review-v1/pure-model.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "hostDataOnly": true,
+    "ownedWorkloadClaim": false
+  },
+  "semanticFindings": [
+    "Native sentinel allocation precedes enqueue; all temporary owners are released before actual AsyncTask::select(queue.get().tasks). The queued RefPtr vector owns each no-JS/no-pollable sentinel until invalid prune destroys it.",
+    "Probe requires Initialized/synchronous prefix, count1..8, inactive empty task vector, sole interest1, timer registry0 and quiescent internal ticks; existing void enqueue allocation failure remains fatal, not a recoverable transaction API.",
+    "Selected std::optional selector returns empty before host poll; diagnostics do not create/drop a WASI pollable or repair/clear queue state to fabricate success.",
+    "Native offset and native Performance::timeOrigin are read in their defining TUs; hooks instrument existing successful clock/max/embedding transitions without additional clock sampling. Signed origin units remain explicit.",
+    "Rooted JS serialization follows POD captures; no JS edges or task pointers are kept in the diagnostic POD ledger. Real ODR/link/shared-state identity remains unproved.",
+    "CMake flags default OFF; explicit Release/noDebug/noOOM/noGC-stress prerequisites and concrete performance-target link remain separate future build conditions."
+  ],
+  "qualifications": [
+    "Uncompiled Source only: no compiler/SDK frontend/link/ABI/engine/native probe/clock/guest run by reviewer.",
+    "This diagnostic357 is349+6+2 derived from combined355; it is not Hash/Hmac357 or an80/83 metadata projection.",
+    "The selector probe tests a synchronous owning-vector branch, not natural-loop Promise settlement, no-spin, host Store teardown or native resource destruction.",
+    "Explicit quiescence predicates cover task/tick/timer/interest state. Do not infer rejection of every other pending engine work class, including a separate finalization-registry cleanup vector.",
+    "Clock collectors check whole schema/arithmetic/counter consistency and selected retained monotonic relations; they do not independently close origin stability, snapshot resumption, native epoch or cross-clock-source requirements.",
+    "Clock observations contain last tuple/cumulative counts, not a complete trace. Performance float32 behavior and actual adapter/core source relationships need future runtime proof.",
+    "All17 lifecycle gates, producer/admission/recipe, embedding define propagation, new component/import graph, actual artifacts/Root/runtime/adoption remain open."
+  ],
+  "actionAuthority": false
+}

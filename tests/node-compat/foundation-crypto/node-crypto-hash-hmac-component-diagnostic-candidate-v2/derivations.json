@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "worker.mjs",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-component-diagnostic-candidate-v1/worker.mjs",
+        "sha256": "980c8210f12d6e89304eca9da8c59919c440a00ab7720f349d22fa8bda4592ef",
+        "bytes": 10741
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-component-diagnostic-candidate-v2/worker.mjs",
+        "sha256": "12cb8c5d4814dea5021725fa905d5da0c24446123e3e549f1934ab418e057705",
+        "bytes": 10769
+      },
+      "edits": [
+        {
+          "before": "if(mode==='jco-worker')detail={...detail,...await jcoChild(f,out,detail)};",
+          "after": "if(mode==='jco-worker'){const completed=await jcoChild(f,out,detail);detail={...detail,...completed};}"
+        },
+        {
+          "before": "EXPERIMENTAL_HASH_HMAC357_DIAGNOSTIC_PHASE_COMPLETE_UNREVIEWED_V1",
+          "after": "EXPERIMENTAL_HASH_HMAC357_DIAGNOSTIC_PHASE_COMPLETE_UNREVIEWED_V2"
+        },
+        {
+          "before": "EXPERIMENTAL_HASH_HMAC357_DIAGNOSTIC_PHASE_FAILED_UNACCEPTED_V1",
+          "after": "EXPERIMENTAL_HASH_HMAC357_DIAGNOSTIC_PHASE_FAILED_UNACCEPTED_V2"
+        }
+      ],
+      "forwardAndInverseWholeBytesVerified": true
+    },
+    {
+      "path": "entry.mjs",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-component-diagnostic-candidate-v1/entry.mjs",
+        "sha256": "b4b53df1a0df7a4142ee6e4c9a63d261dac7e8dad89e74da8c6dfde26df7e467",
+        "bytes": 12334
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-component-diagnostic-candidate-v2/entry.mjs",
+        "sha256": "281fb661768dda16f864e2e75f80ad79cfaa4fb63388d6ea4b854d336f996efe",
+        "bytes": 12516
+      },
+      "edits": [
+        {
+          "before": "root.state==='ROOT_REVIEWED_EXPERIMENTAL_HASH_HMAC357_DIAGNOSTIC_PHASE_V1'&&['bundle','construct','jco'].includes(root.phase)",
+          "after": "root.state==='ROOT_REVIEWED_EXPERIMENTAL_HASH_HMAC357_DIAGNOSTIC_PHASE_V2'&&root.phase==='jco'"
+        },
+        {
+          "before": "assert(['bundled','raw-fixture'].includes(root.arm)&&constructed.arm===root.arm&&constructed.phase==='construct'",
+          "after": "assert(same(constructed.sourceIndex,refs.constructorSourceIndex)&&same(root.actualComponent,refs.reusedConstructions[root.arm]?.component)&&same(root.actualConstructionResult,refs.reusedConstructions[root.arm]?.result)&&['bundled','raw-fixture'].includes(root.arm)&&constructed.arm===root.arm&&constructed.phase==='construct'"
+        }
+      ],
+      "forwardAndInverseWholeBytesVerified": true
+    },
+    {
+      "path": "references.json",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-component-diagnostic-candidate-v1/references.json",
+        "sha256": "11a25f5d68acf9bd74f700b9c833d5247e920586d771c3a309730fe25a64842c",
+        "bytes": 12200
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-component-diagnostic-candidate-v2/references.json",
+        "sha256": "41964902edcf97d6db26580160dcc0038e4c009587ef11c47bd8bfed9976f7ec",
+        "bytes": 15384
+      },
+      "scope": "new own runtime roots and explicit genuine7fb constructor/actual prior defect DATA; native/tool/oracle/comparator fields unchanged"
+    }
+  ],
+  "parentSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-crypto-hash-hmac-component-diagnostic-candidate-v1/index.json",
+    "sha256": "7fb5371b64ac41cdaa402c601cd45f758e9d41493988a3085b2d5366b35e4371",
+    "bytes": 4340
+  },
+  "nativeOrMetadataChanges": 0
+}

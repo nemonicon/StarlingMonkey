@@ -1,0 +1,68 @@
+--- a/embedding/embedding.cpp
++++ b/embedding/embedding.cpp
+@@ -1,4 +1,8 @@
+ #include "embedding.h"
++#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS
++#include "clock-lifecycle-diagnostics.h"
++namespace lifecycle_diag = diagnostics::clock_lifecycle;
++#endif
+ #include "debugger.h"
+ #include "builtins/web/performance.h"
+ #include "js/Conversions.h"
+@@ -184,13 +188,22 @@
+   // This is an actual deployed export entry, never initialize/bindExports.
+   sm_node_enter_deployed_execution();
+ #endif
++#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS
++  lifecycle_diag::observe_embedding_entry(Runtime.first_call, Runtime.clocks);
++#endif
+   if (Runtime.first_call) {
+     content_debugger::maybe_init_debugger(Runtime.engine, true);
+     js::ResetMathRandomSeed(Runtime.cx);
+     Runtime.first_call = false;
++#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS
++    lifecycle_diag::observe_embedding_first_call_cleared();
++#endif
+     if (Runtime.clocks) {
+       builtins::web::performance::Performance::timeOrigin.emplace(
+           std::chrono::high_resolution_clock::now());
++#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS
++      lifecycle_diag::observe_embedding_origin_emplaced();
++#endif
+     }
+   }
+   if (Runtime.cur_fn_idx != -1) {
+@@ -202,6 +215,9 @@
+     Runtime.engine->abort("entering an export with a nonempty internal tick FIFO");
+ #endif
+   Runtime.cur_fn_idx = fn_idx;
++#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS
++  lifecycle_diag::entered_call();
++#endif
+   if (argptr) {
+     Runtime.free_list.push_back(argptr);
+   }
+@@ -316,7 +332,13 @@
+   }
+ 
+   LOG("(call) driving event loop to promise completion");
++#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS
++  const bool diagnostic_loop_success = Runtime.engine->run_event_loop();
++  lifecycle_diag::after_loop(fn_idx, diagnostic_loop_success, Runtime.cur_fn_idx, Runtime.free_list.size());
++  if (!diagnostic_loop_success) {
++#else
+   if (!Runtime.engine->run_event_loop()) {
++#endif
+     Runtime.engine->abort("(call) event loop error");
+   }
+ #ifdef NODE_COMPAT_STRICT_INITIALIZATION
+@@ -387,6 +409,9 @@
+     cabi_free(ptr);
+   }
+   Runtime.free_list.clear();
++#ifdef NODE_COMPAT_LIFECYCLE_DIAGNOSTICS
++  lifecycle_diag::after_post_call(fn_idx, Runtime.cur_fn_idx, Runtime.free_list.size());
++#endif
+   RootedValue result(Runtime.cx);
+   LOG("(post_call) end");
+ }

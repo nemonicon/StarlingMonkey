@@ -4,6 +4,239 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-06. Overall roadmap: **in progress**.
 
+Latest actual result: [experimental native SHA256 Hash/Hmac](docs/node-compat/hash-hmac-results-2026-11-06.md)
+passes fourteen complete returns across retained/fresh Jco and stock Wasmtime,
+280 accepted Node-record comparisons and112 separate native-policy checks.
+Both zero-import components pass independent artifact and sequence reviews.
+Corrected runtime reports have truthful3/1 call counters. Direct bare/prefixed
+imports share functions/default objects but retain distinct namespace objects;
+that Node deviation stays explicit. These are pre-freeze experimental results,
+with production crypto deferred and lifecycle/cost/adoption gates still open.
+
+The clock diagnostic producer now has a runnable, independently reviewed
+[V3 Source](tests/node-compat/foundation-scheduler/combined-clock-diagnostics-native-integration-candidate-v3/README.md),
+index `3beebcf7`. The V2 attempt is held: its unsorted expected native manifest
+would fail the real helper's canonical-order predicate after compilation.
+V3 sorts the declared rows and updates every policy/helper/recipe digest join;
+the native C++ and external embedding payloads are unchanged.
+[Independent Source review](tests/node-compat/foundation-scheduler/independent-clock-diagnostic357-native-integration-v3-source-review-v1/results.json),
+index `a3c58ffd`, passes384 bounded checks, including the actual old-fail/new-pass
+predicate and fourteen Root authority models. Seven earlier SDK frontends passed
+syntax checks. No clock V3 source staging, native build or guest action has run.
+Its prospective357 native/three external/eleven manifest/82-field identity is
+separate from the experimental Hash/Hmac357/83 artifact.
+
+The unapplied [native namespace-cache correction](tests/node-compat/foundation-crypto/node-builtin-namespace-identity-candidate-v1/README.md)
+is sealed at `5342a356`. It canonicalizes a bare builtin cache key only when
+the explicitly registered `node:` key names the exact same rooted JSObject.
+It uses existing SpiderMonkey APIs and preserves the registered metadata key.
+One real SDK30 frontend accepts the afterimage `b399c648`; no object, link or
+guest test ran. The driver's later sorted-Path versus sorted-string assertion
+failure is retained. A separate read-only observer verifies unchanged protected
+inputs and exact2,147-file membership without rerunning the compiler.
+Fourteen synthetic model cases and two fixture grammar checks pass; the two
+raw import-order fixtures remain unexecuted. Current production and staged
+sources are unchanged; runtime namespace parity is still false for9aec.
+
+The [Hash/Hmac freezer Source](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-freezer-candidate-v1/README.md)
+is sealed at `45eef4b6`, with25 payloads. Its new callback preserves the real
+P3 owner and accepts only the new freeze-created root; it consumes corrected
+artifact review `a39cce0d` and retains the failed original BUILD history.
+The proposed frozen-only verifier reads copied roles and unchanged83-field
+pure models. Source checks cover63 bounded cases and21,475 current inputs,
+thirty families and eleven trees. The proposed copy includes1,642 source/tool
+files, three actual embedding sources, three historical staged references and
+169 selected WORK witnesses. Independent Source review, actual freeze and
+frozen-only verification remain unissued. No freezer/helper/guest action ran.
+
+The pre-commit closure audit verifies23 changed indexed families,623 payloads
+and31,457,812 payload bytes. It excludes only each outer family's own root
+index and checks nested copied indexes as ordinary payloads. All new binary
+artifacts remain external with descriptors. All writers and operational jobs
+are stopped for this checkpoint; full roadmap completion is not claimed.
+The staged whitespace check exits2 on six immutable evidence paths: the two
+byte-exact generated Jco files, three unapplied embedding patches and one sealed
+reviewer's extra EOF newline. Those recorded bytes are preserved; edited
+documentation and the new Root launcher have no whitespace warnings.
+
+Continuation after `e91cf013`: the previous goal turn made **progress**. It
+pushed the all-work checkpoint and fresh comprehensive Next.js/component
+regression evidence; remote `origin/main` matched
+`e91cf013ee926923c04a54cf0ca8e19d402169de`, with a clean worktree then.
+
+The actual [read-only Hash/Hmac revalidation attempt](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-artifact-revalidation-v1-root-results.json)
+now finishes at Root session19977/child15846, raw1, with clean owned-group
+shutdown and no timeout/signals. It fails in the Source-input path guard before
+creating its payload output, importing the producer helper or calling admission.
+The [Root diagnostic](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-artifact-revalidation-v1-path-guard-root-data.json)
+finds exactly two logical `/tmp` descriptors in the21,328-row ledger: the retained
+classic-streams and zlib admission readers. Their sole symlink ancestor is the
+system `/tmp`→`/private/tmp` alias. The actual guard rejects that alias, while
+the Source/peer readers had normalized it; their Source checks missed this
+operational mismatch. The failed175e attempt and619de Source review remain
+unchanged, qualified by this result. A minimal genuine successor will preserve
+the old descriptor paths and authenticate only that explicit system alias,
+with the actual guard tested over every input and negative alias cases. No
+artifact revalidation proof, freeze, engine or crypto execution is claimed.
+
+The genuine [v2 successor](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-artifact-revalidation-candidate-v2/README.md)
+is sealed at `559d600d`, with22 payloads and zero duplicated ledger tables.
+Its actual guard passes all21,328 retained rows, accepts only the two selected
+`/tmp` descriptors and refuses34 real alias paths/48 negative cases. The
+[independent Source peer](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-artifact-revalidation-v2-source-review-v1/results.json)
+passes at `31d9b3f8`, exercising the genuine guard across21,437 current inputs,
+27 families and11 trees. It retains the old619de parity miss explicitly.
+Root [actual retry54289](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-artifact-revalidation-v2-root-results.json)
+now finishes raw0/child20222, clean, in88.957 operational seconds. The original
+P3 `admit` API returns its whole genuine V3 DATA, retaining owner2ebe. Result
+`e55c5de6` preserves raw83 metadata2b725,357+3 inputs/twelve manifests,
+all21,451 current inputs, seven whole distributions and4,650 OpenSSL sources.
+The six payloads and five monitor files are retained byte-exact at
+[Root evidence index40c9d46c](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-artifact-revalidation-v2-root-evidence/index.json),
+7,293,857 payload bytes. [Independent actual DATA review](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-artifact-revalidation-v2-results-review-v1/results.json)
+reports DATA pass at index `61250674`. A subsequent actual caller-contract
+check finds its result lacks the `coverage` field required by its indexed
+contract. Its underlying observations remain valid, but the complete consumer
+wire is unaccepted pending a minimal genuine publication successor. No caller
+action was issued against the incomplete pair. The correction will derive
+coverage from the retained actual observations and test the unchanged real
+`Capture.proof` consumer, including old-pair and mutated-coverage refusals.
+The [publication successor](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-artifact-revalidation-v2-results-review-v2/results.json)
+now closes that join at index `a39cce0d`, preserving every original observation
+and adding derived coverage. The [actual consumer test](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-artifact-revalidation-v2-results-review-v2-consumer-join-check-v2.json)
+uses the unchanged extracted caller class: old pair refused, corrected pair and
+private recheck passed, consistently mutated coverage refused. Its first test
+assumed a more specific assertion message; the external harness correction and
+original failed receipt are retained. The complete new pair is consumable;
+old6125 remains immutable and consumer-incomplete.
+It checks all21,451 files/2,408,228,664 logical bytes twice,28 declared families,
+11 trees,35 aliases and an archive hardlink; the current742-entry Git index
+matches baseline path/mode/OID/stage semantics at the explicit600-mode exception.
+Whole stdout/result/producer return, all12 manifests and raw83 bytes reconcile.
+Current distribution hashes/digests are independent DATA checks; archive
+correspondence retains its reviewed-Source dependence, without rerunning the
+archive verifier. Eight consistent semantic mutations are refused. This is
+successful read-only revalidation, with no guest, crypto or freeze execution;
+original BUILD4 recipe0/parents1+1/preservationfalse remain unchanged.
+
+The compact experimental [component caller](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-component-diagnostic-candidate-v1/README.md)
+is sealed at `7fb5371b`: real full12-manifest bundling, whole pre-audit component
+capture, distinct bundled/direct-native arms and isolated retained/fresh Jco
+workers. Actual descriptor guards21,451/three tool-tree digests,27 pure cases,
+four Node grammar checks and two Python ASTs pass. These are host-only checks;
+all actual component and guest slots remain unissued. Independent Source
+preinspection finds no remaining caller API defect and holds final acceptance
+on the artifact coverage publication join above. A reusable [DATA comparator](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-data-comparator-candidate-v1/README.md)
+is sealed at `a6b89157`:60 DATA checks/55 refusals and grammar checks pass.
+Its native seven-call records are synthetic; actual guest records remain NULL.
+It compares the full20 accepted records, eight native policy cases and real
+alias/namespace/typed-constant observations with appropriate Node parity scope.
+
+The [caller Source peer](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-component-diagnostic-source-review-v1/results.json)
+then passes at `1448646b` with the corrected artifact pair. Actual [bundle61516](tests/node-compat/foundation-crypto/node-crypto-hash-hmac357-diagnostic-bundle-v1-root-results.json)
+finishes raw0/clean:16,479-byte source `6b8f9a5f` retains only native
+`node:crypto`/`node:buffer` imports. [Independent bundle DATA review](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac357-diagnostic-bundle-results-review-v1.json)
+passes780 checks. Actual [construction77438](tests/node-compat/foundation-crypto/node-crypto-hash-hmac357-diagnostic-construct-bundled-v1-root-results.json)
+finishes raw0/clean. Component `2e538349` is13,240,343 bytes, imports nothing
+and exports only `run() -> string`. [Independent artifact review](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac357-diagnostic-component-artifact-review-v1.json)
+passes895 checks, including exact whole core `434c9479`, canonical ABI, no core
+imports and generated ESM with only the Node FS byte loader/empty utility helper.
+The component is an experimental pre-freeze diagnostic; it admits no profile.
+
+Actual [ordinary Jco98316](tests/node-compat/foundation-crypto/node-crypto-hash-hmac357-diagnostic-jco-bundled-v1-root-results.json)
+finishes raw0/clean and returns three retained plus one fresh complete strings.
+Their comparisons pass80 accepted Node-record checks,32 separate native policy
+checks,13 aliases per call,68/71 namespace/default names and nine typed guest
+header constants. This is the first actual guest Hash/Hmac execution. A harness
+success-path bookkeeping defect is found: `detail={...detail,...await
+jcoChild(...)}` snapshots primitive counters before the awaited helper mutates
+them, then overwrites those mutations. The shared raw-string arrays retain3/1
+records and all comparisons pass, while published child counters/import flags
+incorrectly stay0/false. The original7fb/1448 packets and actual results remain
+unchanged and qualified. Full runtime-phase acceptance is withheld; a minimal
+caller successor will preserve counters after awaiting and repeat only ordinary
+Jco calls with the same component. No engine rebuild/revalidation/construction
+rerun is needed. Stock Wasmtime3-fresh and direct-native-alias checks remain next.
+
+The separately tagged [direct-native constructor14719](tests/node-compat/foundation-crypto/node-crypto-hash-hmac357-diagnostic-construct-raw-v1-root-results.json)
+also finishes raw0/clean using exact16b fixture text, bypassing bundler alias
+canonicalization. Component `793c9cb1` is13,250,961 bytes, has no imports and
+the same sole scalar ABI. [Independent artifact review](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac357-diagnostic-raw-component-artifact-review-v1.json)
+passes891 checks; original7fb construction provenance is explicit and the known
+Jco-reporting defect does not affect construction. Direct-native runtime alias
+behavior is still unexecuted. [Independent original Jco DATA review](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac357-diagnostic-jco-v1-data-review.json)
+passes the bounded80/32 raw-output evidence and exact process/publication joins,
+while keeping phase/runtime acceptance false for stale counters. A separately
+reviewed [stock-host companion](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-wasmtime-diagnostic-candidate-v1/README.md)
+is prepared for three fresh Wasmtime calls with strict whole WAVE decoding and
+full same-arm Jco equality; its activation waits for corrected truthful Jco data.
+
+That boundary now closes with [Jco-only Source v2](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-component-diagnostic-candidate-v2/README.md),
+index `48b15d2f`, and [independent delta peer](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-component-diagnostic-v2-source-review-v1.json)
+`90f80848`. The actual await/merge regression reproduces old primitive loss and
+preserves new success/throw/shared-array state; nine seam and eight genuine
+constructor/arm binding cases pass. No native data/tree authoring replay or
+engine reconstruction occurs. Corrected [bundled Jco6202](tests/node-compat/foundation-crypto/node-crypto-hash-hmac357-diagnostic-jco-bundled-v2-root-results.json)
+and [raw Jco29069](tests/node-compat/foundation-crypto/node-crypto-hash-hmac357-diagnostic-jco-raw-v2-root-results.json)
+both finish raw0/clean, each with correct3/1 import/attempt/return/string/comparison
+counters and zero throws. Each yields80 accepted/32 policy checks, with complete
+fresh1 equal to retained1. Native namespace identity is true for bundled
+canonical imports and false for direct bare/prefixed imports; all13 named/default
+and alias identities are true in both arms.
+
+Separate [stock Wasmtime bundled96372](tests/node-compat/foundation-crypto/node-crypto-hash-hmac357-diagnostic-wasmtime-bundled-v1-root-results.json)
+and [raw36308](tests/node-compat/foundation-crypto/node-crypto-hash-hmac357-diagnostic-wasmtime-raw-v1-root-results.json)
+each finish raw0/clean with three fresh processes and strict full WAVE decoding.
+All six literal returns equal the corresponding same-arm fresh Jco return.
+[Bundled sequence review](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac357-diagnostic-bundled-jco-wasmtime-sequence-review-v1.json)
+`ee79868d` and [raw sequence review](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac357-diagnostic-raw-jco-wasmtime-sequence-review-v1.json)
+`49b6c11b` pass each616 DATA checks: fourteen total strings,280 accepted/112
+separate policy checks, eight whole same-ordinal guest comparisons, exact source/
+component/native tuples and clean process evidence. The [portable dataset](tests/node-compat/foundation-crypto/node-crypto-hash-hmac357-runtime-validation-v1/index.json)
+is sealed as `3bdfaa5f`:142 payloads/9,759,458 bytes. It contains exact typed/raw
+strings, streams, comparisons, source inputs and Root observations; no Wasm
+binary is copied. The [read-only retained checker](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-retained-results-check-v1/README.md)
+now passes its28 DATA tests, including relocation, missing/tampered records,
+versions, duplicate roles and changed ordinals/types. Root's [actual one-command
+recheck](tests/node-compat/foundation-crypto/node-crypto-hash-hmac357-retained-check-root-results-v1.json)
+exits0 for all142 payload hashes/membership and14/280/112 semantics. It imports
+the pinned pure comparator, performs no workload and leaves provider/lifecycle/
+process/provenance conclusions to separate actual reviews.
+Public adoption, frozen reproduction, live-EVP snapshot safety, GC/erasure,
+allocation-boundary and performance gates remain open. This does not validate
+the full Next server or a new wasmCloud application.
+
+The separate [private clock diagnostic v2 Source peer](tests/node-compat/foundation-scheduler/independent-combined-clock-diagnostics-v2-source-review-v1/results.json)
+passes at index `2ed8d692`:40 Source members,463 inputs, three donor families,
+1,475 read/hash/reversal checks and72 genuine pure collector cases. This covers
+the bounded owning-vector sentinels and last-clock/SAME-TU source design; it
+does not prove linking, clock execution, natural-loop settlement, broad internal
+quiescence, Store death or any of the17 runtime gates. Its Source README's39
+member count is clerical; primary result/receipt and actual intake record40.
+Fresh [SDK syntax/type checks](tests/node-compat/foundation-scheduler/combined-clock-diagnostics-sdk-syntax-v2/results.json)
+now pass for all seven changed translation units: six native and one separately
+configured external embedding unit, with actual WASI SDK30/LLVM21 frontends,
+empty streams, raw0 and clean groups. Source90ef and peer2ed8 are bound by
+index `c669522f`,54 payloads. [Root readback](tests/node-compat/foundation-scheduler/combined-clock-diagnostics-sdk-syntax-v2-root-observation.json)
+rehashes all11,721 protected originals and31 SDK aliases, checks exact actual
+started argv/terminal pairs and all seven empty streams. The first inline Root
+reader mistook an alias count for a boolean; it stopped before publication and
+was corrected to exact31 without rerunning the compiler. There is no object,
+link, ODR/shared-state, engine, guest or clock result. Older v1 syntax evidence
+remains separate.
+
+Engineering sequencing decision: once actual read-only357/83 revalidation and
+its independent DATA review pass, an isolated ordinary-call Hash/Hmac component
+may run before the full distribution freeze. The caller must preserve the full
+83-field metadata/current357+3 source protection, select the actual twelve
+manifests with `builtinMap`/`bundleProfile`, and use the genuine componentizer
+with raw partial capture, an empty selected-interface set and an audited
+`run() -> string` component. The current fixture16b creates no EVP contexts at
+module initialization. This diagnostic can expose algorithm/binding bugs early;
+full freeze/reproduction, native live-EVP snapshot policy, secret ownership,
+GC/lifecycle, cost and release gates remain required for profile adoption.
+The old355/80 tooling and its fixed manifest catalogue remain closed.
+
 All work through checkpoint `77659217c92019d5471570b937d69f6352cbe4e5` is
 committed and pushed; remote `origin/main` matched and the worktree was clean.
 The subsequent [fresh comprehensive Next.js checks](docs/node-compat/nextjs-results-2026-11-06.md)
@@ -30,8 +263,8 @@ their external locations and hashes remain recorded.
 
 Completion audit: the requested commit/push and comprehensive application
 experiment have concrete results, including retained failures and reusable
-comparators. The full roadmap is incomplete. Native crypto revalidation/freeze/
-guest execution, native clock lifecycle and request-context/ALS gates remain
+comparators. The full roadmap is incomplete. Native crypto full freeze,
+snapshot/lifetime/cost/adoption, native clock lifecycle and request-context/ALS gates remain
 open; optional filesystem, Node HTTP/network/process profiles and same-component
 both-host release gates remain pending. Full Next server execution and adoption
 of a broader runtime profile are unproved. These are outstanding work, not
@@ -53,10 +286,11 @@ Immediate remaining work:
    snapshot-clock and surviving-job tests passed their bounded reviews; fatal
    cause, native pollable/drop/interest, invalid-queue, offset and teardown proof
    remain open. Failed-instance reuse and request isolation remain unproved.
-2. Revalidate and freeze the compiled experimental Hash/Hmac candidate after the
-   retained wrapper integrity failure, verify component imports, then run
-   ordinary-call Node differentials. Compilation/link and raw83 metadata review
-   are complete; guest crypto has not executed.
+2. Complete a reproducible freeze of the revalidated experimental Hash/Hmac
+   candidate after the retained wrapper integrity failure. Raw83 metadata review,
+   zero-import component inspection and fourteen ordinary-call Node differentials
+   have passed their experimental reviews. A frozen-only verifier and native
+   module namespace-alias correction are in preparation; neither is adopted.
    Define and enforce live EVP-context initialization/snapshot policy before any
    public crypto admission; borrowing, secret erasure and cost gates stay open.
 3. Admit any new profile only after its required correctness, capability, lifecycle
@@ -118,8 +352,9 @@ full future-freezer distribution proof. A compact separate [read-only revalidati
 Source](tests/node-compat/foundation-crypto/node-crypto-hash-hmac-artifact-revalidation-candidate-v1/README.md)
 is sealed at `175e4061`, with25 payloads. [Independent Source review](tests/node-compat/foundation-crypto/independent-node-crypto-hash-hmac-artifact-revalidation-source-review-v1/results.json)
 passes at `619de02f`, covering21,398 files/24 families,11 trees,34 aliases,
-six active ASTs and32 independent pure cases. Actual artifact revalidation
-remains unissued; neither this review nor the author checks execute the adapter.
+six active ASTs and32 independent pure cases. The later actual attempt fails
+before admission on the path-guard mismatch described above; neither Source
+review nor author checks establish a successful artifact revalidation.
 Its134,641 author checks cover21,372 current inputs/23 families/11 trees;
 41 pure cases pass. No operational adapter call has run. It may establish
 a new proof with an exact index hash/mode exception and fresh full before/final

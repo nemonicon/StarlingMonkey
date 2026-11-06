@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "before": {
+    "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v1-source/runtime/script_loader.cpp",
+    "sha256": "479c23822b5e8b5ec9ea2b449d45905b455cad953a02d3208268d54f03645413",
+    "bytes": 18010
+  },
+  "liveBefore": {
+    "path": "/Users/dan/dev/StarlingMonkey/runtime/script_loader.cpp",
+    "sha256": "479c23822b5e8b5ec9ea2b449d45905b455cad953a02d3208268d54f03645413",
+    "bytes": 18010
+  },
+  "after": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/node-builtin-namespace-identity-candidate-v1/script_loader.cpp",
+    "sha256": "b399c648323e44983345036bc01d679fb3e4618514fc4990e4c2ea7a2d984625",
+    "bytes": 19128
+  },
+  "edits": [
+    {
+      "before": "#include <js/ScriptPrivate.h>\n",
+      "after": "#include <js/ScriptPrivate.h>\n#include <js/String.h>\n"
+    },
+    {
+      "before": "    RootedValue specifier_val(cx, StringValue(specifier));\n    RootedObject builtin_obj(cx, &builtin_val.toObject());\n    RootedObject result(cx, get_builtin_module(cx, specifier_val, builtin_obj));",
+      "after": "    RootedValue specifier_val(cx, StringValue(specifier));\n    RootedObject builtin_obj(cx, &builtin_val.toObject());\n    // Share one module-record cache key only for explicitly registered aliases\n    // whose builtin values are the exact same object. Other builtin IDs retain\n    // their original module records and import.meta lookup keys.\n    if (!std::string_view(path.get()).starts_with(\"node:\")) {\n      RootedString node_prefix(cx, JS_NewStringCopyZ(cx, \"node:\"));\n      if (!node_prefix) {\n        return false;\n      }\n      // Concatenate JS strings so Unicode and embedded NULs are not truncated.\n      RootedString canonical_specifier(cx, JS_ConcatStrings(cx, node_prefix, specifier));\n      if (!canonical_specifier) {\n        return false;\n      }\n      RootedValue canonical_id(cx, StringValue(canonical_specifier));\n      RootedValue canonical_builtin(cx);\n      if (!JS::MapGet(cx, builtinModules, canonical_id, &canonical_builtin)) {\n        return false;\n      }\n      if (canonical_builtin.isObject() && &canonical_builtin.toObject() == builtin_obj.get()) {\n        // This outer root remains live across module compilation/allocation.\n        specifier_val.set(canonical_id);\n      }\n    }\n    RootedObject result(cx, get_builtin_module(cx, specifier_val, builtin_obj));"
+    }
+  ],
+  "forwardAndInverseWholeBytesVerified": true,
+  "productionOrStagedFilesChanged": false
+}

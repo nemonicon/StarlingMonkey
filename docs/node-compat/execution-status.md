@@ -2,6 +2,13 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
+Latest [experimental native Hash/Hmac](hash-hmac-results-2026-11-06.md) passes
+independent complete-sequence review on retained/fresh Jco and stock Wasmtime:
+14 strings/280 accepted records/112 separate policy checks. Corrected call
+counters and the direct-alias namespace-object deviation are retained. These
+diagnostic passes leave freeze, snapshot/lifetime/GC/erasure/cost and production
+adoption incomplete.
+
 The [2026-11-06 application replay](nextjs-results-2026-11-06.md) repeats the
 comprehensive Next fixture after push `77659217`. Node build/HTTP/browser
 controls pass on the untouched replay;17 main and seven optional guest failures
@@ -63,13 +70,23 @@ now compiles and links: engine `9aec9297` is10,024,185 bytes with the complete
 83-field sidecar `2b725c11` and357 native inputs. The recipe exits0; both wrappers
 exit1 on the staged Git-index hash/mode protection check. Independent failure
 review validates the compiled bytes and retains that failure. Read-only artifact
-revalidation Source passes independent review; actual revalidation, freeze,
-admission and guest execution remain
-pending. The pinned Node oracle passes60 accepted observations and retains24
+revalidation first fails before admission on two retained `/tmp` paths. The
+narrow v2 guard correction passes full-input tests and independent Source peer;
+its actual API retry exits0 with whole raw83 output and21,451 protected inputs.
+Independent actual DATA checks at `61250674` have a coverage-publication defect;
+the genuine `a39cce0d` successor passes the unchanged whole-contract consumer.
+Actual zero-import component `2e538349` passes independent artifact review.
+Its first ordinary Jco phase returns80 Node-equal accepted records/32 separate
+policy checks, but a primitive-counter publication bug withholds full phase
+acceptance. A minimal caller fix and fresh calls against the same component
+are next. Stock-host/direct-alias, freeze, lifecycle and operational admission
+remain pending. The pinned Node oracle passes60 accepted observations and retains24
 separate policy observations, with independent DATA review passed. Host results
 do not validate guest crypto. The private
 [clock diagnostic v2](../../tests/node-compat/foundation-scheduler/combined-clock-diagnostics-candidate-v2/README.md)
-is uncompiled Source. Crypto snapshot/provider/ownership/GC/cost gates and the
+passes independent Source review and seven actual SDK syntax/type frontends,
+with Root readback of actual argv, raw0/empty streams and11,721 protected files.
+It has no new native link or runtime result. Crypto snapshot/provider/ownership/GC/cost gates and the
 remaining native clock lifecycle gates stay open.
 
 The [Next.js application experiment](../../tests/node-compat/frameworks/nextjs/README.md)
