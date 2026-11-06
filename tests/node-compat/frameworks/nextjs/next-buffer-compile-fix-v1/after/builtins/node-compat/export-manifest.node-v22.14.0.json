@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "profileVersion": "sm-node-22.14.0-m0.22",
+  "nodeVersion": "v22.14.0",
+  "status": "UNCOMPILED Next-source-driven byte codecs/copy/search/write/validation candidate; host controls only.",
+  "moduleContract": "ESM with explicit named exports and default data-property object; no dynamic CommonJS require or syncBuiltinESMExports",
+  "modules": {
+    "node:child_process": {
+      "aliases": [
+        "child_process"
+      ],
+      "status": "import-only",
+      "exports": [
+        "ChildProcess",
+        "_forkChild",
+        "default",
+        "exec",
+        "execFile",
+        "execFileSync",
+        "execSync",
+        "fork",
+        "spawn",
+        "spawnSync"
+      ],
+      "callablePolicy": "Every non-default export is a function that immediately throws ERR_SM_NODE_UNSUPPORTED on invocation or construction, including during snapshot initialization"
+    },
+    "node:buffer": {
+      "aliases": [
+        "buffer"
+      ],
+      "globals": [
+        "Buffer (only if profile selected)"
+      ],
+      "status": "partial",
+      "exports": [
+        "Blob",
+        "Buffer",
+        "File",
+        "INSPECT_MAX_BYTES",
+        "SlowBuffer",
+        "atob",
+        "btoa",
+        "constants",
+        "default",
+        "isAscii",
+        "isUtf8",
+        "kMaxLength",
+        "kStringMaxLength",
+        "resolveObjectURL",
+        "transcode"
+      ],
+      "supportedStatic": [
+        "alloc(size:number-integer, fill?:number)",
+        "from(string, utf8|utf-8|hex)",
+        "from(Uint8Array): copy",
+        "from(ArrayBuffer, integerOffset?, integerLength?): shared view",
+        "isBuffer",
+        "isEncoding: profile encodings only",
+        "byteLength(string|Uint8Array|ArrayBuffer, encoding?)",
+        "allocUnsafe(finite nonnegative number <=16777216): truncate length; fresh zeroed owned Buffer; no pool",
+        "concat(dense Array<fixed Buffer|Uint8Array>, integerTotalLength?): copy visible windows; truncate/zero-pad; empty ignores length",
+        "from(string,base64|base64url|latin1|binary|ascii|utf16le|ucs2 aliases)",
+        "byteLength supported encodings (base64 uses Node estimated length)",
+        "compare(fixed Uint8Array, fixed Uint8Array)",
+        "isAscii/isUtf8(fixed Uint8Array|ArrayBuffer)"
+      ],
+      "supportedPrototype": [
+        "toString supported encodings/integer ranges",
+        "copy with numeric finite indices; overlap memmove",
+        "equals,compare,indexOf,includes",
+        "fill bounded strings/numbers/fixed Uint8Array",
+        "write using actual native TextEncoder.encodeInto for UTF8",
+        "utf8Slice/latin1Slice/asciiSlice/ucs2Slice/hexSlice/base64Slice/base64urlSlice",
+        "corresponding encoding Write methods",
+        "slice/subarray shared views"
+      ],
+      "encodingNames": [
+        "utf8",
+        "utf-8",
+        "hex",
+        "base64",
+        "base64url",
+        "latin1",
+        "binary",
+        "ascii",
+        "utf16le",
+        "utf-16le",
+        "ucs2",
+        "ucs-2"
+      ],
+      "limits": {
+        "MAX_LENGTH": 16777216,
+        "MAX_STRING_LENGTH": 33554432,
+        "MAX_SOURCE_CODE_UNITS": 1048576,
+        "poolSize": 0,
+        "MAX_CONCAT_ITEMS": 65536
+      },
+      "numericExports": {
+        "INSPECT_MAX_BYTES": 50,
+        "kMaxLength": 16777216,
+        "kStringMaxLength": 33554432
+      },
+      "importOnlyExports": [
+        "Blob",
+        "File",
+        "SlowBuffer",
+        "atob",
+        "btoa",
+        "resolveObjectURL",
+        "transcode"
+      ],
+      "unsupportedStatic": [
+        "copyBytesFrom",
+        "of",
+        "allocUnsafeSlow"
+      ],
+      "unsupportedPrototypePolicy": "Every other own Node Buffer prototype function is explicitly installed as a throwing function; inventory checked against pinned Node at test time",
+      "deviations": [
+        "No deprecated Buffer or SlowBuffer constructor",
+        "No slab allocator or uninitialized storage; allocUnsafe guarantees fresh zeroed exact backing at offset 0 and ignores poolSize",
+        "No arrays, array-like inputs, DataView, non-Uint8 typed arrays, SharedArrayBuffer or resizable backing stores",
+        "No copying slice: Buffer.slice shares storage",
+        "Source strings limited to 1048576 UTF-16 code units",
+        "Only allocUnsafe truncates finite nonnegative fractional sizes; other fractional sizes/index coercions remain outside the declared overloads",
+        "Default object and constants frozen; CJS mutation synchronization unsupported",
+        "Detached/shared/resizable ArrayBuffers and views fail ERR_SM_NODE_UNSUPPORTED; inherited Uint8Array APIs keep engine behavior",
+        "allocUnsafe validates the raw requested size before truncation; requests above 16777216 reject even if their truncated length would fit",
+        "allocUnsafe uses captured constructors and own data code/module/operation fields for validation; detailed Node error text and pooled backing semantics differ",
+        "allocUnsafeSlow remains explicitly deferred; no legacy Buffer constructor or other method support follows",
+        "concat output and every visible input are bounded to16MiB; at most65536 dense own-data items.",
+        "concat rejects sparse/accessor lists, shadowed typed metadata, shared/resizable/detached backing. Proxy/custom prototype/metadata getter timing is not Node parity.",
+        "concat snapshots validated input references before allocation; Node list access/allocation/error-message timing and caller-replaced allocUnsafe semantics are not reproduced.",
+        "concat preserves its existing constructor property slot; output is fresh exact zeroed fixed backing, never Node slab storage.",
+        "16MiB visible/output byte cap;1MiB source UTF16 unit cap;no shared/resizable/detached backing or shadowed typed metadata",
+        "64Mi comparison budget for native search; explicit ERR_SM_NODE_LIMIT",
+        "Numeric finite index subset; unsupported legacy coercions stay explicit rather than full Node parity",
+        "Only fixed Uint8Array and ArrayBuffer validation inputs; other views deferred",
+        "UTF16LE search, lastIndexOf, numeric read/write and general Array/from iterable deferred",
+        "No guarantee of Node message text, warning/pooling/unsafe-memory behavior"
+      ]
+    }
+  },
+  "requiredHostInterfaces": []
+}

@@ -6,27 +6,31 @@ The [Next priority roadmap](nextjs-priority-roadmap.md) orders implementation by
 actual application dependencies. The experimental435-input engine now links;
 its component imports exactly13 selected WASI0.2.10 interfaces and passes16
 dependency controls over three real requests. These results do not promote the
-accepted production matrix. Full Next startup remains blocked by core-language
-Unicode regex behavior. A separate actual component also confirms the V8
-structured-stack behavior required by Next's send/depd dependency is absent.
+accepted production matrix. The Intl-enabled V7 engine now starts real Next
+and passes11/24 HTTP checks. Response piping, file-stream options and POST view
+handling remain blockers; cache/strict-stream/browser stages are incomplete.
 
 | Experimental API/language gate | Strategy and capability | Current status and deviation | Validation |
 | --- | --- | --- | --- |
 | Node `global` alias | Small pure guest entry facade; no host capability | Bounded: exact self-alias descriptor; other Node globals have separate contracts | Pinned Node descriptor/private-realm tests; first real Next failure removed |
-| CommonJS JS/JSON, aliases and demanded Buffer operations | Native loader/P2 read-only filesystem plus native byte kernels | Partial; basic loads/codecs/identities work, full Next dependency graph remains gated | Three actual component requests,16 controls each; Next reaches its Zod dependency |
+| CommonJS JS/JSON, aliases and demanded Buffer operations | Native loader/P2 read-only filesystem plus native byte kernels | Partial; basic loads/codecs/identities work; Unicode CJS literal and POST-view observations need isolation |48 component controls pass; real Next SSR runs, full contract11/24 |
 | ALS await, ticks, timers, bind/snapshot | Native Promise/task context propagation; clock/poll interfaces only for scheduled controls | Partial; default Node22 `exit()` semantics retained; broader overlap/disable/GC/lifecycle tests remain | Actual distinct-store capture/restoration and scheduled controls pass in all three requests |
 | WASI request-body EOF | Audited guest facade over `wasi:io/streams@0.2.10` | Bounded typed `ComponentError.payload` handling; unknown throws remain failures |50 host checks plus actual GET/GET/POST;21-byte POST and all48 control records pass |
-| Unicode property regex literals/constructors | Native SpiderMonkey plus Unicode data; no additional host interface | Unavailable in current no-Intl engine; exact Zod identifier pattern rejects |12-case Node/guest differential,36 captured records:21 property SyntaxErrors |
-| Unicode ignore-case matching | Native SpiderMonkey regex engine; no host interface | Partial: `/^k$/iu` misses Kelvin sign `K` compared with pinned Node22 | Same differential captures the mismatch on all three requests; comparator remains failed |
-| `Error.captureStackTrace` and selected CallSite methods | Native SavedFrame capture plus bounded guest facade; no new host capability | Current deployed candidate supplies eager strings and ignores hooks. New provenance API compiles in the guest-library variant; native consumer build/runtime gates remain. Eval origins/receivers/native/async flags stay deferred with explicit call errors | Actual three-request baseline:12/12 differences and exact depd TypeError. Facade host tests64/64 after retained provider failures; patched-library CI22 clean0 phases. New component semantics remain untested |
+| Unicode property regex literals/constructors | Native SpiderMonkey plus ICU/ICU4X; no additional host interface | Selected expressions supported in experimental V7; older no-Intl failures retained | Strict12-case differential passes36/36 records, including invalid-property controls |
+| Unicode ignore-case matching | Native SpiderMonkey regex engine; no host interface | Selected Kelvin folding now matches pinned Node22 in V7 | Three requests match; no complete Unicode/RegExp conformance claim |
+| `Error.captureStackTrace` and selected CallSite methods | Native SavedFrame capture plus bounded guest facade and explicit guest-SM provenance API; no new host capability | Partial: lazy hooks, descriptors, thrown identity and exact depd extraction work. Anonymous inferred function-name type differs. Eval origins/receivers/native/async flags remain deferred | Actual9/12 selected records match; strict run remains raw1 for three name differences.64 facade host checks pass; native and patched-library builds pass |
+| `ReadableStream.pipeTo` with AbortSignal | Small guest semantics facade over existing native streams; no additional host interface | Unavailable on current path: genuine signal is rejected, blocking JSON routes. Guest facade under development | Exact Next failure cause retained; cancellation/backpressure/error/cleanup differential required |
+| `fs.createReadStream` send options | Audited options facade over native WASI filesystem/streams | Partial: current finite option validator rejects send's `root`; normalize irrelevant policy keys while preserving actual FS checks | Public asset failure retained; exact Node option/getter/stream tests and real asset/browser checks required |
 
 The language baseline is a dependency gate alongside the API/export inventory.
 Fix Unicode support through coherent Intl/ICU-enabled guest artifacts and the
 existing native/Rust integration; the [build plan](nextjs-intl-build-plan.md)
 keeps host interfaces and target hosts unchanged. No dependency source rewriting
 or JavaScript replacement of the regex parser is part of that plan. The first
-Intl C++ library builds in CI; the84-package Rust graph passes locked offline
-resolution. Neither result promotes the current guest's regex/stack status.
+Intl C++ libraries and84-package single-Rust aggregate now compile and link.
+The [actual runtime baseline](../../tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/actual-review/README.md)
+retains selected successes and remaining failures. These results do not promote
+the accepted production profile or establish complete Buffer/Node support.
 
 The [optional package-bundler follow-on](../../tests/node-compat/frameworks/package-bundler-execution-v1/README.md)
 runs native CommonJS interop, supported modules and real React creation with

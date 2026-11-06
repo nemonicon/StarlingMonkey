@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "nodePrimary": [
+    {
+      "url": "https://raw.githubusercontent.com/nodejs/node/v22.14.0/lib/internal/fs/streams.js",
+      "retained": "primary/node22-fs-streams.js",
+      "sha256": "f7ac2da0b2e371f93dc55a9134201dffc359d0e3fdb9b6f1df8adf39e89b32bd",
+      "bytes": 15271
+    },
+    {
+      "url": "https://raw.githubusercontent.com/nodejs/node/v22.14.0/lib/internal/fs/utils.js",
+      "retained": "primary/node22-fs-utils.js",
+      "sha256": "8c78e61079769355dbbf0b819d818113e4ddbe282189332c54561a60d9b0b724",
+      "bytes": 27292
+    },
+    {
+      "url": "https://raw.githubusercontent.com/nodejs/node/v22.14.0/lib/internal/streams/readable.js",
+      "retained": "primary/node22-readable.js",
+      "sha256": "1bb258e37a503bf1c32caffd373c4db975c8f169ffded976710846319fd7143b",
+      "bytes": 51284
+    }
+  ],
+  "sendSource": {
+    "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/compiled/send/index.js",
+    "sha256": "ddc4e19179327567e36c902d9ced4332bcaa97d360e8c55157aa002366738aa5",
+    "bytes": 67386,
+    "excerpts": [
+      {
+        "line": 59,
+        "excerpt": "SendStream.prototype.send=function send(e,t){var a=t.size;var i=this.options;var r={};var o=this.res;var p=this.req;var s=p.headers.range;var c=i.start||0;if(headersSent(o)){this.headersAlreadySent();return}n('pipe \"%s\"',e);this.setHeader(e,t);this.type(e);if(this.isConditionalGET()){if(this.isPreconditionFailure()){this.error(412);return}if(this.isCachable()&&this.isFresh()){this.notModified();return}}a=Math.max(0,a-c);if(i.end!==undefined){var l=i.end-c+1;if(a>l)a=l}if(this._acceptRanges&&_.test(s)){s=f(a,s,{combine:true});if(!this.isRangeFresh()){n(\"range stale\");s=-2}if(s===-1){n(\"range unsatisfiable\");o.setHeader(\"Content-Range\",contentRange(\"bytes\",a));return this.error(416,{headers:{\"Content-Range\":o.getHeader(\"Content-Range\")}})}if(s!==-2&&s.length===1){n(\"range %j\",s);o.statusCode=206;o.setHeader(\"Content-Range\",contentRange(\"bytes\",a,s[0]));c+=s[0].start;a=s[0].end-s[0].start+1}}for(var d in i){r[d]=i[d]}r.start=c;r.end=Math.max(c,c+a-1);o.setHeader(\"Content-Length\",a);if(p.method===\"HEAD\"){o.end();return}this.stream(e,r)};"
+      },
+      {
+        "line": 59,
+        "excerpt": "SendStream.prototype.stream=function stream(e,t){var a=this;var i=this.res;var stream=d.createReadStream(e,t);this.emit(\"stream\",stream);stream.pipe(i);function cleanup(){o(stream,true)}v(i,cleanup);stream.on(\"error\",(function onerror(e){cleanup();a.onStatError(e)}));stream.on(\"end\",(function onend(){a.emit(\"end\")}))};"
+      }
+    ]
+  },
+  "observedFailure": "node:fs.createReadStream.root is outside this bounded profile",
+  "runtimeBaselineIndex": "tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/actual-review/index.json",
+  "actualOptionValuesObserved": false,
+  "sourceImpliesEnumerableSendOptionsForwarded": true
+}

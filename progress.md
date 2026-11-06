@@ -43,6 +43,33 @@ isolation before attributing this to Buffer. The rejected POST value is a
 native ArrayBuffer view, with its exact view type still being diagnosed.
 Diagnostic function wrappers are not a production acceptance claim.
 
+DiagnosticV2 narrows those two issues further: the POST input's intrinsic brand
+is Uint8Array but its prototype differs from the captured constructor; backing
+is an ordinary ArrayBuffer. The supplied CommonJS compile source contains the
+correct U+20AC. The exact guest fork's `FunctionCompiler::addFunctionBody` passes
+`SourceText<Utf8Unit>::get()` to the Latin1 `StringBuilder::append(char*)`
+overload. A UTF16 native compiler input is being prepared, alongside a bounded
+guest dispatch for testing. No application literals will be rewritten.
+
+Checkpoint `0e97b1d1` is committed and pushed. The independent native-build,
+four-constructor and five-runtime DATA readers pass. The latter's reader
+validates retained selected projections and recorded input-preservation facts;
+it does not execute a fresh guest or independently recreate historical
+bookends. Its [scope and future-check instructions](tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/README.md)
+keep the11/24 Next result and9/12 stack result explicitly failed.
+
+The first combined entry-facade experiment constructs/validates successfully
+but regresses startup:23/23 initial HTTP cases fail because the nonASCII
+`Function` fallback gives send's real frames eval provenance, and its depd
+path requests the explicitly unsupported `getEvalOrigin`. That failed
+prototype remains unchanged; no provenance or application-source workaround
+will be counted as success. The native UTF16 module-compiler afterimage is now
+prepared. A separate limited one-object rebuild/relink is being prepared from
+the actual V7 CMake recipe, reusing audited archives/tools read-only. It has its
+own proposed1GiB start/800MiB sampled floor and<100MiB persistent-output budget;
+temporary peak remains unmeasured. The full builder's2/3GiB guard is unchanged.
+The request for2GiB more headroom remains pending. No limited build has run yet.
+
 The first [Intl-enabled guest library CI build](https://github.com/nemonicon/StarlingMonkey/actions/runs/42272037547)
 now succeeds at pushed commit`dc7bad5c`:17 raw0 owned phases, baseFirefox9dab,
 library archive2508af52/222,772,017 bytes. Its complete Actions ZIP is downloaded
