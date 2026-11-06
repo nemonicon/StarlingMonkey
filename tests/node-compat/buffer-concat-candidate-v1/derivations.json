@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "builtins/node-compat/buffer-facade.mjs",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/builtins/node-compat/buffer-facade.mjs",
+        "sha256": "8ebfa0253a85bc9b2e91b65391c9f85c26594d107ad0d016cd0351dad89dd235",
+        "bytes": 13582
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/buffer-concat-candidate-v1/native/builtins/node-compat/buffer-facade.mjs",
+        "sha256": "652f9a8a7430bac1c0abfdbe308551675d154ce5118499d43dc9b12d456e0a21",
+        "bytes": 17535
+      },
+      "edits": [
+        {
+          "before": "  for (const name of ['copyBytesFrom', 'of', 'allocUnsafe', 'allocUnsafeSlow', 'compare', 'concat']) {",
+          "after": "\n  // Native copying is private; all user list/property activity finishes before\n  // its pointer-borrowing phase. Promote only the existing concat slot below.\n  const concatApply=Reflect.apply,concatIsArray=Array.isArray,ConcatArray=Array;\n  const concatOwn=Object.getOwnPropertyDescriptor,concatDefine=Object.defineProperty,concatHasOwn=Object.hasOwn;\n  const concatFinite=Number.isFinite,concatInteger=Number.isInteger;\n  const ConcatTypeError=TypeError,ConcatRangeError=RangeError;\n  const concatKernel=kernel.concat,MaxConcatItems=65536;\n  function concatFail(Ctor,code,message) {\n    const e=new Ctor(message);\n    concatDefine(e,'code',{__proto__:null,value:code,writable:true,configurable:true,enumerable:true});\n    concatDefine(e,'module',{__proto__:null,value:'node:buffer',writable:true,configurable:true,enumerable:true});\n    concatDefine(e,'operation',{__proto__:null,value:'Buffer.concat',writable:true,configurable:true,enumerable:true});\n    throw e;\n  }\n  function concatUnsupported(message) { concatFail(ConcatTypeError,'ERR_SM_NODE_UNSUPPORTED',message); }\n  function concatView(view,index) {\n    let name,buffer,length;\n    try { name=concatApply(typedName,view,[]);length=concatApply(typedByteLength,view,[]);buffer=concatApply(typedBuffer,view,[]); }\n    catch { concatFail(ConcatTypeError,'ERR_INVALID_ARG_TYPE',`list[${index}] must be a Buffer or Uint8Array`); }\n    if(name!=='Uint8Array')concatFail(ConcatTypeError,'ERR_INVALID_ARG_TYPE',`list[${index}] must be a Buffer or Uint8Array`);\n    for(const key of ['length','byteLength','byteOffset','buffer'])if(concatOwn(view,key))concatUnsupported('Shadowed typed-array metadata is outside Buffer.concat');\n    try { concatApply(abByteLength,buffer,[]); }\n    catch { concatUnsupported('Shared or invalid Buffer.concat backing'); }\n    if(abResizable&&concatApply(abResizable,buffer,[]))concatUnsupported('Resizable Buffer.concat backing');\n    if(abDetached&&concatApply(abDetached,buffer,[]))concatUnsupported('Detached Buffer.concat backing');\n    if(!abDetached&&length===0)try{new U8(buffer,0,0);}catch{concatUnsupported('Detached Buffer.concat backing');}\n    if(length>MAX_LENGTH)concatFail(ConcatRangeError,'ERR_OUT_OF_RANGE','Buffer.concat input exceeds16MiB');\n    return length;\n  }\n  function concat(list,length) {\n    if(!concatIsArray(list))concatFail(ConcatTypeError,'ERR_INVALID_ARG_TYPE','list must be an Array');\n    const count=concatOwn(list,'length').value;\n    // Node ignores length completely for an empty array, even if it is invalid.\n    if(count===0)return tagTrusted(new U8(0));\n    if(count>MaxConcatItems)concatFail(ConcatRangeError,'ERR_SM_NODE_LIMIT','Buffer.concat chunk count exceeds65536');\n    if(length!==undefined) {\n      if(typeof length!=='number')concatFail(ConcatTypeError,'ERR_INVALID_ARG_TYPE','length must be a number');\n      if(!concatFinite(length)||!concatInteger(length)||length<0||length>MAX_LENGTH)concatFail(ConcatRangeError,'ERR_OUT_OF_RANGE','length must be an integer between0and16777216');\n    }\n    const snapshot=new ConcatArray(count);let sum=0;\n    for(let i=0;i<count;i++) {\n      const item=concatOwn(list,i);\n      if(!item||!concatHasOwn(item,'value'))concatUnsupported('Sparse/accessor Buffer.concat list is outside this profile');\n      const value=item.value;\n      // Preserve Node's uncoded null/undefined .length TypeError in omitted-\n      // length calls; invalid non-null element kinds use ERR_INVALID_ARG_TYPE.\n      if(length===undefined&&value==null)value.length;\n      const bytes=concatView(value,i);\n      if(length===undefined) {if(bytes>MAX_LENGTH-sum)concatFail(ConcatRangeError,'ERR_OUT_OF_RANGE','Buffer.concat total exceeds16MiB');sum+=bytes;}\n      concatDefine(snapshot,i,{__proto__:null,value,writable:false,configurable:false,enumerable:true});\n    }\n    return tagTrusted(concatApply(concatKernel,undefined,[snapshot,length===undefined?sum:length]));\n  }\n\n  for (const name of ['copyBytesFrom', 'of', 'allocUnsafe', 'allocUnsafeSlow', 'compare', 'concat']) {",
+          "count": 1
+        },
+        {
+          "before": "Buffer[name] = name === 'allocUnsafe' ? allocUnsafe : unavailable",
+          "after": "Buffer[name] = name === 'allocUnsafe' ? allocUnsafe : name === 'concat' ? concat : unavailable",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "path": "builtins/node-compat/buffer.cpp",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/builtins/node-compat/buffer.cpp",
+        "sha256": "7f73ce790e6b23195a9bfa583bacdbf45dfb9fa9aed00489f66952d93ca37cf8",
+        "bytes": 6986
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/buffer-concat-candidate-v1/native/builtins/node-compat/buffer.cpp",
+        "sha256": "0791c18f67c3197fe5bbf5ede588ecb61bd875e29ac2580f54b0dce9843a8cc6",
+        "bytes": 10261
+      },
+      "edits": [
+        {
+          "before": "#include \"js/MemoryFunctions.h\"",
+          "after": "#include \"js/MemoryFunctions.h\"\n#include \"js/Array.h\"\n#include \"js/GCVector.h\"\n#include <algorithm>\n#include <cmath>\n#include <cstring>",
+          "count": 1
+        },
+        {
+          "before": "JSObject *create_kernel(JSContext *cx) {",
+          "after": "\n// Facade supplies an inaccessible dense snapshot, but native types/backing and\n// arithmetic are checked independently. No pointer survives an allocation.\nstatic bool concat_bytes(JSContext *cx,unsigned argc,JS::Value *vp) {\n  auto args=JS::CallArgsFromVp(argc,vp);\n  if(!args.requireAtLeast(cx,\"concat\",2))return false;\n  if(!args[0].isObject()||!args[1].isNumber())return buffer_error(cx,InvalidInput,\"ERR_INVALID_ARG_TYPE\");\n  JS::RootedObject list(cx,&args[0].toObject());bool array=false;\n  if(!JS::IsArrayObject(cx,list,&array))return false;\n  if(!array)return buffer_error(cx,InvalidInput,\"ERR_INVALID_ARG_TYPE\");\n  double number=args[1].toNumber();\n  if(!std::isfinite(number)||number<0||number>MaxLength||std::floor(number)!=number)return buffer_error(cx,AllocationLimit,\"ERR_OUT_OF_RANGE\");\n  size_t length=static_cast<size_t>(number);uint32_t count=0;\n  if(!JS::GetArrayLength(cx,list,&count))return false;\n  if(count>65536)return buffer_error(cx,AllocationLimit,\"ERR_SM_NODE_LIMIT\");\n  JS::RootedObjectVector sources(cx);\n  for(uint32_t i=0;i<count;i++) {\n    JS::RootedValue value(cx);if(!JS_GetElement(cx,list,i,&value))return false;\n    if(!value.isObject())return buffer_error(cx,InvalidInput,\"ERR_INVALID_ARG_TYPE\");\n    JS::RootedObject view(cx,&value.toObject());size_t bytes=0;bool shared=false;uint8_t *ignored=nullptr;\n    if(!JS_GetObjectAsUint8Array(view,&bytes,&shared,&ignored))return buffer_error(cx,InvalidInput,\"ERR_INVALID_ARG_TYPE\");\n    if(shared||JS::IsResizableArrayBufferView(view))return buffer_error(cx,UnsupportedBacking,\"ERR_SM_NODE_UNSUPPORTED\");\n    JS::RootedObject backing(cx,JS_GetArrayBufferViewBuffer(cx,view,&shared));if(!backing)return false;\n    if(shared||JS::IsDetachedArrayBufferObject(backing))return buffer_error(cx,UnsupportedBacking,\"ERR_SM_NODE_UNSUPPORTED\");\n    if(bytes>MaxLength)return buffer_error(cx,AllocationLimit,\"ERR_OUT_OF_RANGE\");\n    if(!sources.append(view)){JS_ReportOutOfMemory(cx);return false;}\n  }\n  JS::RootedObject output(cx,JS_NewUint8Array(cx,length));if(!output)return false;\n  // Recheck after result allocation/possible moving GC, before any borrow.\n  for(size_t i=0;i<sources.length();i++) {\n    JS::RootedObject view(cx,sources[i]);bool shared=false;\n    JS::RootedObject backing(cx,JS_GetArrayBufferViewBuffer(cx,view,&shared));if(!backing)return false;\n    if(shared||JS::IsResizableArrayBufferView(view)||JS::IsDetachedArrayBufferObject(backing))return buffer_error(cx,UnsupportedBacking,\"ERR_SM_NODE_UNSUPPORTED\");\n  }\n  {\n    JS::AutoCheckCannotGC nogc(cx);bool shared=false;\n    uint8_t *destination=JS_GetUint8ArrayData(output,&shared,nogc);MOZ_ASSERT(!shared);\n    if(length)std::memset(destination,0,length);\n    size_t position=0;\n    for(size_t i=0;i<sources.length();i++) {\n      size_t bytes=JS_GetTypedArrayByteLength(sources[i]);\n      size_t take=std::min(bytes,length-position);\n      if(take){const uint8_t *source=JS_GetUint8ArrayData(sources[i],&shared,nogc);MOZ_ASSERT(!shared);std::memcpy(destination+position,source,take);}\n      position+=take;\n    }\n  }\n  args.rval().setObject(*output);return true;\n}\n\nJSObject *create_kernel(JSContext *cx) {",
+          "count": 1
+        },
+        {
+          "before": "    JS_FN(\"hexDecode\", hex_decode, 1, JSPROP_ENUMERATE),",
+          "after": "    JS_FN(\"hexDecode\", hex_decode, 1, JSPROP_ENUMERATE),\n    JS_FN(\"concat\", concat_bytes, 2, JSPROP_ENUMERATE),",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "path": "builtins/node-compat/generate-factories.mjs",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/builtins/node-compat/generate-factories.mjs",
+        "sha256": "46b0e0a40d3a50dae58e0d833c4861d1344df045eaf490f74060bbccc1a4561e",
+        "bytes": 5323
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/buffer-concat-candidate-v1/native/builtins/node-compat/generate-factories.mjs",
+        "sha256": "7bc0aceba4ad55c390b3a286d440dbaf37d09cd8dd55fa76e0638470a76093b7",
+        "bytes": 5452
+      },
+      "edits": [
+        {
+          "before": "// The optional Path header is independent:",
+          "after": "// --core-only skips optional generators only for isolated core Source packaging.\nif (!process.argv.includes('--core-only')) {\n// The optional Path header is independent:",
+          "count": 1
+        },
+        {
+          "before": "  import('./generate-stream-web-factory.mjs'),\n]);",
+          "after": "  import('./generate-stream-web-factory.mjs'),\n]);\n}",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "manifestBefore": {
+    "path": "/Users/dan/dev/StarlingMonkey/builtins/node-compat/export-manifest.node-v22.14.0.json",
+    "sha256": "abfcc6a07e1b3d2e0877293a7c5fe02bc1ff971a7703c5860d8385b3ad510872",
+    "bytes": 4265
+  },
+  "manifestAfter": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/buffer-concat-candidate-v1/native/builtins/node-compat/export-manifest.node-v22.14.0.json",
+    "sha256": "aededd6e042aeaf96023f8c866b834f92576d183fe1dff64ea25ba0017c106e0",
+    "bytes": 5047
+  },
+  "generatedHeaderPending": true
+}

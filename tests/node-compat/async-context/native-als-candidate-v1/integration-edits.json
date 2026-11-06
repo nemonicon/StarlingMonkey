@@ -1,0 +1,297 @@
+{
+  "schemaVersion": 1,
+  "sourceOnly": true,
+  "uncompiled": true,
+  "files": [
+    {
+      "path": "include/extension-api.h",
+      "beforeSha256": "d743a7fcc0566eb85f382fec2f82b4c768a1043ca29b26e9fdef6f576e6789b8",
+      "beforeBytes": 7219,
+      "afterSha256": "0088b48c2100b7a5c82ab02023860ef70f0adbcb0241a43f01d54b02e1e6b995",
+      "afterBytes": 8016,
+      "edits": [
+        {
+          "before": "  AsyncTask() = default;",
+          "after": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n  JS::PersistentRootedObject async_context_;\n#endif\n  explicit AsyncTask(JS::HandleObject resource = JS::NullHandleObject) {\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n    MOZ_RELEASE_ASSERT(resource);\n    async_context_.init(Engine::cx(), resource);\n#else\n    (void)resource;\n#endif\n  }\n  // Capture BEFORE constructors subscribe/commit host handles. Requeues retain\n  // the same native cell; PersistentRooted covers every native owner/tracer.\n  static bool capture_context(JSContext* cx, JS::MutableHandleObject resource);\n  static bool context_from_promise(JSContext* cx, JS::HandleObject promise,\n                                    JS::MutableHandleObject resource);\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n  JS::HandleObject async_context() const { return async_context_; }\n#endif"
+        }
+      ]
+    },
+    {
+      "path": "runtime/engine.cpp",
+      "beforeSha256": "bb96b3e0cfa681c59e7d4dfbb0fe6d4a213a76b868dda4d296845cfa5e90633b",
+      "beforeBytes": 26262,
+      "afterSha256": "0362834baa14cfe4fa7ab480cfb6789af2089a23c5cbf7de777934d618bc057b",
+      "afterBytes": 27587,
+      "edits": [
+        {
+          "before": "#include \"event_loop.h\"",
+          "after": "#include \"event_loop.h\"\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n#include \"async_context_runtime.h\"\n#endif\n"
+        },
+        {
+          "before": "  if (!js::UseInternalJobQueues(cx) || !JS::InitSelfHostedCode(cx)) {",
+          "after": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n  if (!core::async_context::prepare_before_self_hosted(cx)) return false;\n#else\n  if (!js::UseInternalJobQueues(cx)) return false;\n#endif\n  if (!JS::InitSelfHostedCode(cx)) {"
+        },
+        {
+          "before": "  JSAutoRealm ar(cx, GLOBAL);\n\n  JS::SetPromiseRejectionTrackerCallback",
+          "after": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n  if (!core::async_context::initialize_realms(cx, GLOBAL, INIT_SCRIPT_GLOBAL)) return false;\n#endif\n  JSAutoRealm ar(cx, GLOBAL);\n\n  JS::SetPromiseRejectionTrackerCallback"
+        },
+        {
+          "before": "void Engine::queue_async_task(const RefPtr<AsyncTask>& task) {",
+          "after": "bool api::AsyncTask::capture_context(JSContext* cx, JS::MutableHandleObject resource) {\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n  return core::async_context::store().capture(cx, resource);\n#else\n  resource.set(nullptr);return true;\n#endif\n}\nbool api::AsyncTask::context_from_promise(JSContext* cx, JS::HandleObject promise,\n                                         JS::MutableHandleObject resource) {\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n  JS::RootedObject captured(cx, js::GetAllocationMetadata(promise));\n  if (!core::async_context::ResourceStore::is_resource(captured))\n    return core::InternalTickQueue::fail(cx, JSEXN_TYPEERR,\n        \"ERR_SM_NODE_ASYNC_CONTEXT_UNSUPPORTED\", \"Untracked operation Promise\");\n  // The operation Promise was captured at actual fetch registration. Retain\n  // that genuine cell without allocating after a streaming handle is closed.\n  resource.set(captured);return true;\n#else\n  resource.set(nullptr);return true;\n#endif\n}\nvoid Engine::queue_async_task(const RefPtr<AsyncTask>& task) {"
+        }
+      ]
+    },
+    {
+      "path": "runtime/event_loop.cpp",
+      "beforeSha256": "2230e3fe751ee323e7e60a0e609aaa652006f2f6fd26e965766b9f09700d3182",
+      "beforeBytes": 12504,
+      "afterSha256": "7a96cc5e4258a74773e0dccc5b1a027425bd5c69fb75fb92d9b0dddc7e77db33",
+      "afterBytes": 13202,
+      "edits": [
+        {
+          "before": "#include \"event_loop.h\"",
+          "after": "#include \"event_loop.h\"\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n#include \"async_context_runtime.h\"\n#endif\n"
+        },
+        {
+          "before": "  MOZ_ASSERT(task);\n  queue.get().tasks.emplace_back(task);",
+          "after": "  MOZ_ASSERT(task);\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n  MOZ_RELEASE_ASSERT(task->async_context());\n#endif\n  queue.get().tasks.emplace_back(task);"
+        },
+        {
+          "before": "      task->cancel(engine);",
+          "after": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n      core::async_context::ResourceStore::Scope context(engine->cx(), core::async_context::store(), task->async_context());\n#endif\n      task->cancel(engine);"
+        },
+        {
+          "before": "    bool success = task->run(engine);",
+          "after": "    bool success;\n    {\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n      core::async_context::ResourceStore::Scope context(cx, core::async_context::store(), task->async_context());\n#endif\n      success = task->run(engine);\n    }"
+        },
+        {
+          "before": "  for (const auto& task : q.tasks) {\n    task->cancel(engine);",
+          "after": "  for (const auto& task : q.tasks) {\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n    core::async_context::ResourceStore::Scope context(engine->cx(), core::async_context::store(), task->async_context());\n#endif\n    task->cancel(engine);"
+        }
+      ]
+    },
+    {
+      "path": "runtime/node_tick_queue.h",
+      "beforeSha256": "1ba57af75273fb8f2142e87d1731a1c20b930e5aaa92da60cee8b12a2608a8e1",
+      "beforeBytes": 1629,
+      "afterSha256": "fe328bdb3e1acafe880fb471edd720a17b1d03d33c57c051186a302448413767",
+      "afterBytes": 1718,
+      "edits": [
+        {
+          "before": "    JS::Heap<JSObject*> arguments{nullptr};",
+          "after": "    JS::Heap<JSObject*> arguments{nullptr};\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n    JS::Heap<JSObject*> resource{nullptr};\n#endif"
+        }
+      ]
+    },
+    {
+      "path": "runtime/node_tick_queue.cpp",
+      "beforeSha256": "33efec1a06f09bf3680aaaa710f74253a527f5480285d02dce7ffc3e317e0336",
+      "beforeBytes": 5293,
+      "afterSha256": "f32e2ed530daad0bfaf96a89b0f221ec7605e434bb5f8baf3b4a8ed0ec8dc509",
+      "afterBytes": 6045,
+      "edits": [
+        {
+          "before": "#include \"event_loop.h\"",
+          "after": "#include \"event_loop.h\"\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n#include \"async_context_runtime.h\"\n#endif\n"
+        },
+        {
+          "before": "  TraceEdge(trc, &arguments, \"internal tick private argument array\");",
+          "after": "  TraceEdge(trc, &arguments, \"internal tick private argument array\");\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n  TraceEdge(trc, &resource, \"internal tick async resource\");\n#endif"
+        },
+        {
+          "before": "  Tick& tick = slots_[(head_ + count_) % MaxPending];",
+          "after": "  RootedObject resource(cx);\n  if (!api::AsyncTask::capture_context(cx, &resource)) return false;\n  Tick& tick = slots_[(head_ + count_) % MaxPending];\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n  tick.resource = resource;\n#endif"
+        },
+        {
+          "before": "for (auto& tick : slots_) { tick.callback = nullptr; tick.arguments = nullptr; tick.argc = 0; }",
+          "after": "for (auto& tick : slots_) {\n    tick.callback = nullptr;tick.arguments = nullptr;tick.argc = 0;\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n    tick.resource = nullptr;\n#endif\n  }"
+        },
+        {
+          "before": "    const uint32_t argc = tick.argc;",
+          "after": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n    RootedObject resource(cx, tick.resource);\n#endif\n    const uint32_t argc = tick.argc;"
+        },
+        {
+          "before": "    head_ = (head_ + 1) % MaxPending; --count_; ++executed;",
+          "after": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n    tick.resource = nullptr;\n#endif\n    head_ = (head_ + 1) % MaxPending; --count_; ++executed;"
+        },
+        {
+          "before": "    JSAutoRealm realm(cx, callback);",
+          "after": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n    core::async_context::ResourceStore::Scope context(cx, core::async_context::store(), resource);\n#endif\n    JSAutoRealm realm(cx, callback);"
+        }
+      ]
+    },
+    {
+      "path": "builtins/web/timers.cpp",
+      "beforeSha256": "2995842e10417b53cb02ed6d48bfa49b8bc0c076637e928f8c457e47e9e91294",
+      "beforeBytes": 7130,
+      "afterSha256": "1e314878f60e2a8a80ee0271fd8895a71059d476e49f9605e94df94ba58c506a",
+      "afterBytes": 7287,
+      "edits": [
+        {
+          "before": "JS::HandleValueVector args)\n      : timer_id_",
+          "after": "JS::HandleValueVector args, HandleObject resource)\n      : api::AsyncTask(resource), timer_id_"
+        },
+        {
+          "before": "  auto *const timer = js_new<TimerTask>(delay, repeat, handler, handle_args);",
+          "after": "  RootedObject resource(cx);\n  if (!api::AsyncTask::capture_context(cx, &resource)) return false;\n  auto *const timer = js_new<TimerTask>(delay, repeat, handler, handle_args, resource);"
+        }
+      ]
+    },
+    {
+      "path": "builtins/web/streams/buf-reader.cpp",
+      "beforeSha256": "022b6d9ee025ca52952d3a7195b78bf6a0115471a52483ba7054225efdd4d324",
+      "beforeBytes": 4561,
+      "afterSha256": "cf4291c6bde9dcc9004c64b9658a5abd5e09771efd4305553f75685d8d008b4d",
+      "afterBytes": 4718,
+      "edits": [
+        {
+          "before": "explicit StreamTask(const HandleObject reader) : reader_(reader)",
+          "after": "explicit StreamTask(const HandleObject reader, HandleObject resource) : api::AsyncTask(resource), reader_(reader)"
+        },
+        {
+          "before": "  api::Engine::get(cx)->queue_async_task(js_new<StreamTask>(owner));",
+          "after": "  RootedObject resource(cx);\n  if (!api::AsyncTask::capture_context(cx, &resource)) return false;\n  api::Engine::get(cx)->queue_async_task(js_new<StreamTask>(owner, resource));"
+        }
+      ]
+    },
+    {
+      "path": "builtins/web/fetch/request-response.h",
+      "beforeSha256": "1bf4120a089d14aca5b86d6409a51a27c61b3c6d1f073b55805277be494df401",
+      "beforeBytes": 10525,
+      "afterSha256": "827b76a48f855b553efa41105ff44a54a9922d4df06cc14191245aad20208c63",
+      "afterBytes": 10548,
+      "edits": [
+        {
+          "before": "host_api::FutureHttpIncomingResponse *future);",
+          "after": "host_api::FutureHttpIncomingResponse *future, HandleObject resource);"
+        }
+      ]
+    },
+    {
+      "path": "builtins/web/fetch/request-response.cpp",
+      "beforeSha256": "82c93feef45b8603ae1e6641ce9140d660cd8f8baf7334856e5aa17a55e7a7f7",
+      "beforeBytes": 122958,
+      "afterSha256": "b6862f52a1fdea959198b748a7da86f4d7b87ce9da9a49e99f0e9b420b04cab2",
+      "afterBytes": 123629,
+      "edits": [
+        {
+          "before": "explicit BodyFutureTask(const HandleObject body_source) : body_source_(body_source)",
+          "after": "explicit BodyFutureTask(const HandleObject body_source, HandleObject resource) : api::AsyncTask(resource), body_source_(body_source)"
+        },
+        {
+          "before": "    ENGINE->queue_async_task(js_new<ResponseFutureTask>(body_owner, pending_handle));",
+          "after": "    RootedObject promise(cx, Request::response_promise(body_owner)), resource(cx);\n    if (!api::AsyncTask::context_from_promise(cx, promise, &resource)) return false;\n    ENGINE->queue_async_task(js_new<ResponseFutureTask>(body_owner, pending_handle, resource));"
+        },
+        {
+          "before": "  ENGINE->queue_async_task(js_new<BodyFutureTask>(source));",
+          "after": "  RootedObject resource(cx);\n  if (!api::AsyncTask::capture_context(cx, &resource)) return false;\n  ENGINE->queue_async_task(js_new<BodyFutureTask>(source, resource));"
+        },
+        {
+          "before": "ResponseFutureTask::ResponseFutureTask(const HandleObject request, host_api::FutureHttpIncomingResponse *future)\n      : request_(request)",
+          "after": "ResponseFutureTask::ResponseFutureTask(const HandleObject request, host_api::FutureHttpIncomingResponse *future, HandleObject resource)\n      : api::AsyncTask(resource), request_(request)"
+        },
+        {
+          "before": "auto res = dest_body->append(ENGINE, source_body, callback, callback_receiver);\n  if (const auto *err = res.to_err()) {",
+          "after": "auto res = dest_body->append(ENGINE, source_body, callback, callback_receiver);\n  if (const auto *err = res.to_err()) {\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n    if (JS_IsExceptionPending(cx)) return false;\n#endif"
+        },
+        {
+          "before": "write_all_finish_callback, then_handler);\n  if (const auto *err = res.to_err()) {",
+          "after": "write_all_finish_callback, then_handler);\n  if (const auto *err = res.to_err()) {\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n    if (JS_IsExceptionPending(cx)) return false;\n#endif"
+        },
+        {
+          "before": "auto res = dest_body->append(ENGINE, source_body, finish_outgoing_body_streaming, nullptr);\n    if (const auto *err = res.to_err()) {",
+          "after": "auto res = dest_body->append(ENGINE, source_body, finish_outgoing_body_streaming, nullptr);\n    if (const auto *err = res.to_err()) {\n#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n      if (JS_IsExceptionPending(cx)) return false;\n#endif"
+        }
+      ]
+    },
+    {
+      "path": "builtins/web/fetch/fetch-api.cpp",
+      "beforeSha256": "0992832f377bd45986e79447f463f1de2ff609f32d53723e0ef04de2c7178cf2",
+      "beforeBytes": 13280,
+      "afterSha256": "358dbf52f59fd06456c3585b45453ecd36bb3e4dde4d575cbe993c1aeb509769",
+      "afterBytes": 13411,
+      "edits": [
+        {
+          "before": "  unique_ptr<host_api::HttpHeaders> headers =",
+          "after": "  RootedObject resource(cx);\n  if (!api::AsyncTask::context_from_promise(cx, response_promise, &resource)) return false;\n  unique_ptr<host_api::HttpHeaders> headers ="
+        },
+        {
+          "before": "js::MakeUnique<ResponseFutureTask>(request_obj, pending_handle)",
+          "after": "js::MakeUnique<ResponseFutureTask>(request_obj, pending_handle, resource)"
+        }
+      ]
+    },
+    {
+      "path": "host-apis/wasi-0.2.0/host_api.cpp",
+      "beforeSha256": "10ccb1f84f659195eddc1dab5f8152cdfaa21da660345d07563fa867e87e0a4c",
+      "beforeBytes": 36424,
+      "afterSha256": "6f7e6251584b6f9b8b2fc1ef10a79d55c8ba4a9ded08ac91a915a8fda8124004",
+      "afterBytes": 36820,
+      "edits": [
+        {
+          "before": "HandleObject callback_receiver)\n      : outgoing_body_",
+          "after": "HandleObject callback_receiver, HandleObject resource)\n      : api::AsyncTask(resource), outgoing_body_"
+        },
+        {
+          "before": "  engine->queue_async_task(new BodyWriteAllTask(this, std::move(bytes), callback, cb_receiver));",
+          "after": "  JS::RootedObject resource(engine->cx());\n  if (!api::AsyncTask::capture_context(engine->cx(), &resource)) return Result<Void>::err(154);\n  engine->queue_async_task(new BodyWriteAllTask(this, std::move(bytes), callback, cb_receiver, resource));"
+        },
+        {
+          "before": "HandleObject callback_receiver)\n      : incoming_body_",
+          "after": "HandleObject callback_receiver, HandleObject resource)\n      : api::AsyncTask(resource), incoming_body_"
+        },
+        {
+          "before": "  engine->queue_async_task(new BodyAppendTask(engine, other, this, callback, callback_receiver));",
+          "after": "  JS::RootedObject resource(engine->cx());\n  if (!api::AsyncTask::capture_context(engine->cx(), &resource)) return Result<Void>::err(154);\n  engine->queue_async_task(new BodyAppendTask(engine, other, this, callback, callback_receiver, resource));"
+        }
+      ]
+    },
+    {
+      "path": "CMakeLists.txt",
+      "beforeSha256": "880dbef157355efd97802fc630e5d61ffd97940ea9b7dbba42f1f0d077454df9",
+      "beforeBytes": 5686,
+      "afterSha256": "a57dcd8300062e1a98c1f4bd871373f111e39c78c9544ee98de73956ce91d6ab",
+      "afterBytes": 5965,
+      "edits": [
+        {
+          "before": "target_link_libraries(starling-raw.wasm PRIVATE host_api extension_api builtins spidermonkey rust-crates)",
+          "after": "if(NODE_COMPAT_ASYNC_LOCAL_STORAGE)\n    target_sources(starling-raw.wasm PRIVATE runtime/async_context_store.cpp\n        runtime/async_context_queue.cpp runtime/async_context_runtime.cpp)\n    target_compile_definitions(host_api PRIVATE NODE_COMPAT_ASYNC_LOCAL_STORAGE=1)\nendif()\ntarget_link_libraries(starling-raw.wasm PRIVATE host_api extension_api builtins spidermonkey rust-crates)"
+        }
+      ]
+    },
+    {
+      "path": "cmake/builtins.cmake",
+      "beforeSha256": "a618223e12d63b698062747f11ba047ec84f858bea752466730712817b3edac2",
+      "beforeBytes": 10521,
+      "afterSha256": "96ec9079a19b4e9c4d57a7822e386d309267753228d86e7ae2cf9f9a4e39afe3",
+      "afterBytes": 11120,
+      "edits": [
+        {
+          "before": "# UNAPPLIED classic source candidate: pure JS state machines",
+          "after": "# Experimental native ALS: no JS stack emulation or new host imports.\noption(NODE_COMPAT_ASYNC_LOCAL_STORAGE \"Enable experimental native AsyncLocalStorage\" OFF)\nif(NODE_COMPAT_ASYNC_LOCAL_STORAGE AND NOT CMAKE_SCRIPT_MODE_FILE)\n    if(NOT TARGET builtin_node_compat OR NOT NODE_COMPAT_INTERNAL_TICKS)\n        message(FATAL_ERROR \"Native ALS requires Node compatibility and private tick checkpoints\")\n    endif()\n    target_compile_definitions(extension_api INTERFACE NODE_COMPAT_ASYNC_LOCAL_STORAGE=1)\n    target_include_directories(builtin_node_compat PRIVATE ${CMAKE_SOURCE_DIR}/runtime)\nendif()\n\n# UNAPPLIED classic source candidate: pure JS state machines"
+        }
+      ]
+    },
+    {
+      "path": "builtins/node-compat/register.cpp",
+      "beforeSha256": "2848f059fb5693aa37c54945bff685444c8431007ceaec59d3335d01f7aced4a",
+      "beforeBytes": 11557,
+      "afterSha256": "a189aaff4f55acaed07d4cf67d907117d64b5d3a4baa59c44bae1f33a59dc836",
+      "afterBytes": 12321,
+      "edits": [
+        {
+          "before": "namespace builtins::node_compat {",
+          "after": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n#include \"async-hooks-factory.generated.h\"\n#include \"async_context_runtime.h\"\n#endif\nnamespace builtins::node_compat {"
+        },
+        {
+          "before": "#ifdef NODE_COMPAT_PATH\nstatic bool install_path",
+          "after": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\nstatic bool install_async_local_storage(api::Engine* engine) {\n  auto* cx = engine->cx();\n  JS::RootedObject kernel(cx, core::async_context::create_kernel(cx));\n  if (!kernel) return false;\n  JS::RootedValue argument(cx, JS::ObjectValue(*kernel)), module(cx);\n  if (!evaluate_factory(cx, kAsyncLocalStorageFactorySource, argument, &module)) return false;\n  return engine->define_builtin_module(\"node:async_hooks\", module) &&\n         engine->define_builtin_module(\"async_hooks\", module);\n}\n#endif\n#ifdef NODE_COMPAT_PATH\nstatic bool install_path"
+        },
+        {
+          "before": "  return JS_DefineProperty(cx, engine->global(), \"Buffer\", buffer_constructor, 0);",
+          "after": "#ifdef NODE_COMPAT_ASYNC_LOCAL_STORAGE\n  if (!install_async_local_storage(engine)) return false;\n#endif\n  return JS_DefineProperty(cx, engine->global(), \"Buffer\", buffer_constructor, 0);"
+        }
+      ]
+    }
+  ]
+}

@@ -2,6 +2,11 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
+The [Next priority roadmap](nextjs-priority-roadmap.md) now orders implementation
+by actual application dependencies. Host HTTP/Module controls and new SDK syntax
+checks do not promote API support in this matrix; new capabilities still need
+the joined native build, emitted-import audit and real component tests.
+
 The [optional package-bundler follow-on](../../tests/node-compat/frameworks/package-bundler-execution-v1/README.md)
 runs native CommonJS interop, supported modules and real React creation with
 complete Node/Jco/Wasmtime agreement. Its pure-profile ReactDOM clock trap

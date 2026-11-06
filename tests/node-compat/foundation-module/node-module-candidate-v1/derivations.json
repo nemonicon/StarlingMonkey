@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "runtime/script_loader.h",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-freeze/source/runtime/script_loader.h",
+        "sha256": "814a1b0fbf0b30ac264f49e3c1875b934d74a9a47a4e5e1b400bd71fabe64824",
+        "bytes": 1526
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/after/runtime/script_loader.h",
+        "sha256": "a483f3decbe0d70539cb1d27f2a7eddb8b412dad40af5db435ff923c0157bc81",
+        "bytes": 1780
+      },
+      "edits": [
+        {
+          "before": "  static bool define_builtin_module(const char* id, HandleValue builtin);",
+          "after": "  static bool define_builtin_module(const char* id, HandleValue builtin);\n#ifdef NODE_COMPAT_MODULE\n  // New private guest CJS provider seam; no new component/host export.\n  static bool lookup_registered_builtin(JSContext *cx, JS::HandleString id,\n                                         JS::MutableHandleValue result);\n#endif",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseVerified": true
+    },
+    {
+      "path": "runtime/script_loader.cpp",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-freeze/source/runtime/script_loader.cpp",
+        "sha256": "479c23822b5e8b5ec9ea2b449d45905b455cad953a02d3208268d54f03645413",
+        "bytes": 18010
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/after/runtime/script_loader.cpp",
+        "sha256": "4a4c48c2b760df3c799631b827f134435819b237d4fa563d62ee39655fa54696",
+        "bytes": 18308
+      },
+      "edits": [
+        {
+          "before": "bool ScriptLoader::define_builtin_module(const char *id, HandleValue builtin) {",
+          "after": "#ifdef NODE_COMPAT_MODULE\nbool ScriptLoader::lookup_registered_builtin(JSContext *cx, JS::HandleString id,\n                                              JS::MutableHandleValue result) {\n  JS::RootedValue key(cx, JS::StringValue(id));\n  return JS::MapGet(cx, builtinModules, key, result);\n}\n#endif\n\nbool ScriptLoader::define_builtin_module(const char *id, HandleValue builtin) {",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseVerified": true
+    },
+    {
+      "path": "builtins/node-compat/register.cpp",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-freeze/source/builtins/node-compat/register.cpp",
+        "sha256": "7698e61ebf3dac01903d4b6567df76adc460a9c3da8f94dd1c9e528dc0ecbe4a",
+        "bytes": 16262
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/after/builtins/node-compat/register.cpp",
+        "sha256": "b3e6b3a6e2899a31572415d30f021504fb7f819f659e6e1400d36ce6bffe4eeb",
+        "bytes": 16944
+      },
+      "edits": [
+        {
+          "before": "#include \"factories.generated.h\"",
+          "after": "#include \"factories.generated.h\"\n#ifdef NODE_COMPAT_MODULE\n#include \"module-factory.generated.h\"\n#endif",
+          "count": 1
+        },
+        {
+          "before": "namespace builtins::node_compat {\nJSObject *create_kernel(JSContext *cx);",
+          "after": "namespace builtins::node_compat {\nJSObject *create_kernel(JSContext *cx);\n#ifdef NODE_COMPAT_MODULE\nJSObject *create_module_kernel(JSContext *cx);\n#endif",
+          "count": 1
+        },
+        {
+          "before": "#ifdef NODE_COMPAT_CRYPTO_HASH_HMAC\nstatic bool install_crypto_hash_hmac",
+          "after": "#ifdef NODE_COMPAT_MODULE\nstatic bool install_module(api::Engine *engine) {\n  auto *cx=engine->cx();\n  JS::RootedObject kernel(cx,create_module_kernel(cx));if(!kernel)return false;\n  JS::RootedValue value(cx,JS::ObjectValue(*kernel)),record(cx);\n  if(!evaluate_factory(cx,kModuleFactorySource,value,&record))return false;\n  return engine->define_builtin_module(\"node:module\",record) &&\n         engine->define_builtin_module(\"module\",record);\n}\n#endif\n\n#ifdef NODE_COMPAT_CRYPTO_HASH_HMAC\nstatic bool install_crypto_hash_hmac",
+          "count": 1
+        },
+        {
+          "before": "  return JS_DefineProperty(cx, engine->global(), \"Buffer\", buffer_constructor, 0);",
+          "after": "#ifdef NODE_COMPAT_MODULE\n  if (!install_module(engine)) return false;\n#endif\n  return JS_DefineProperty(cx, engine->global(), \"Buffer\", buffer_constructor, 0);",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseVerified": true
+    },
+    {
+      "path": "cmake/builtins.cmake",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-freeze/source/cmake/builtins.cmake",
+        "sha256": "f1d5721b4d58184a8ec30a3e421e1288fdcf1131f9035a4b8a3f6ca00bfeb76f",
+        "bytes": 14056
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/after/cmake/builtins.cmake",
+        "sha256": "2d59001b3462e8b0ad47fb87221b5b82f2341ccf3a6131f17b47db4de08100a2",
+        "bytes": 14528
+      },
+      "edits": [
+        {
+          "before": "if(TARGET builtin_node_compat)\n    option(NODE_COMPAT_CRYPTO_HASH_HMAC",
+          "after": "option(NODE_COMPAT_MODULE \"Experimental synchronous CommonJS node:module\" OFF)\nif(NODE_COMPAT_MODULE AND NOT TARGET builtin_node_compat AND NOT CMAKE_SCRIPT_MODE_FILE)\n    message(FATAL_ERROR \"NODE_COMPAT_MODULE requires ENABLE_BUILTIN_NODE_COMPAT=ON\")\nendif()\nif(TARGET builtin_node_compat)\n    if(NODE_COMPAT_MODULE)\n        target_sources(builtin_node_compat PRIVATE builtins/node-compat/module-kernel.cpp)\n        target_compile_definitions(extension_api INTERFACE NODE_COMPAT_MODULE=1)\n    endif()\n    option(NODE_COMPAT_CRYPTO_HASH_HMAC",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseVerified": true
+    },
+    {
+      "path": "include/node-compat-entropy.h",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-freeze/source/include/node-compat-entropy.h",
+        "sha256": "6414e413a377aa21a039c175e90e26916911e88a071f29042cd1c47cfbee0fae",
+        "bytes": 889
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/after/include/node-compat-entropy.h",
+        "sha256": "9be3ad9fd2a461dc81d9f115fce8dea993a8c6e64d39f4a43779cf47966087f8",
+        "bytes": 996
+      },
+      "edits": [
+        {
+          "before": "void begin_engine(bool pre_initialize);",
+          "after": "void begin_engine(bool pre_initialize);\n// Read-only deployed-entry state; independent of entropy availability.\nbool deployed_execution_started();",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseVerified": true
+    },
+    {
+      "path": "builtins/node-compat/entropy-policy.cpp",
+      "before": {
+        "path": "/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-freeze/source/builtins/node-compat/entropy-policy.cpp",
+        "sha256": "efdff496d591ce01a5841dcf38aeed61228ec0d330b39931cca627d8520edeb8",
+        "bytes": 2146
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/after/builtins/node-compat/entropy-policy.cpp",
+        "sha256": "df24bacd70eee56ad4544e7f579338d521893cae684edc7e109bec6d284cc208",
+        "bytes": 2201
+      },
+      "edits": [
+        {
+          "before": "void begin_engine(bool pre_initialize) { deployed = !pre_initialize; }",
+          "after": "void begin_engine(bool pre_initialize) { deployed = !pre_initialize; }\nbool deployed_execution_started() { return deployed; }",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseVerified": true
+    }
+  ],
+  "newSourcePaths": [
+    {
+      "path": "builtins/node-compat/module-kernel.cpp",
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/module-kernel.cpp",
+        "sha256": "092e1bbe782b5f3e64f87674216275e7426c50545fd02faebde8568de87c82c0",
+        "bytes": 7478
+      }
+    },
+    {
+      "path": "builtins/node-compat/module-core.mjs",
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/module-core.mjs",
+        "sha256": "1e037e0e2cd1897acb7d0cf1646f8457da716920b2dbc333701c9e6fb7ab1ccb",
+        "bytes": 13810
+      }
+    },
+    {
+      "path": "builtins/node-compat/module-factory.generated.h",
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/module-factory.generated.h",
+        "sha256": "0ab73749b6b193720bcc3d9d2bd4d55ef897e22920aebe6fbbc67c840c4541fa",
+        "bytes": 15529
+      }
+    },
+    {
+      "path": "builtins/node-compat/generate-module-factory.mjs",
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/generate-module-factory.mjs",
+        "sha256": "3c567eb18a73c60ca3f32ea052a0c586e2c61f8f5bb97eb643c471540ec69910",
+        "bytes": 1503
+      }
+    },
+    {
+      "path": "builtins/node-compat/export-manifest.module.node-v22.14.0.json",
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/export-manifest.module.node-v22.14.0.json",
+        "sha256": "2bdcbf870b1deba5099439b2a964e861b916da573e982b5d1c8edcc5998278e6",
+        "bytes": 3353
+      }
+    },
+    {
+      "path": "builtins/node-compat/module.LICENSE.node",
+      "origin": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/module.LICENSE.node",
+        "sha256": "21a82bbee91262a076c2e34533d51d73475d55e889f1c42cf884c86b2a0d5773",
+        "bytes": 1076
+      }
+    }
+  ]
+}

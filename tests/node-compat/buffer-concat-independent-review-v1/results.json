@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "state": "INDEPENDENT_BUFFER_CONCAT_SOURCE_AND_SDK_SYNTAX_REVIEW_PASSED_V1",
+  "sourceReviewPassed": true,
+  "sdkSyntaxEvidenceVerified": true,
+  "sourceOnly": true,
+  "reviewerAuthoredCandidate": false,
+  "sourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/buffer-concat-candidate-v1/index.json",
+    "sha256": "1c7b431e3b131a11fc4edba0f83a25b8e0eb5891c67e37e8a1a18ca24a0ba155",
+    "bytes": 5659
+  },
+  "sourceResult": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/buffer-concat-candidate-v1/results.json",
+    "sha256": "5ade4d9f7ac6a267b3a6a766d4e8af7245ccdbde4a9f63fa9ef5b4676be94a50",
+    "bytes": 982
+  },
+  "derivations": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/buffer-concat-candidate-v1/derivations.json",
+    "sha256": "66f762cc7e84db0ab7ceeb26869666c3bee617831db992d0016588d864d20641",
+    "bytes": 11255
+  },
+  "sourceMembership": {
+    "indexedFiles": 34,
+    "actualFiles": 35,
+    "exactClosedSet": true
+  },
+  "fiveAfterimages": [
+    "buffer-facade.mjs",
+    "buffer.cpp",
+    "export-manifest.node-v22.14.0.json",
+    "factories.generated.h",
+    "generate-factories.mjs"
+  ],
+  "exactForwardAndInverseDerivations": 3,
+  "manifestTransitionReviewed": true,
+  "generatedHeaderIndependentlyReconstructed": true,
+  "hostEvidence": {
+    "nodeBinary": {
+      "path": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+      "sha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+      "bytes": 108619024
+    },
+    "nodeDifferentialCases": 38,
+    "profileCases": 12,
+    "actualRetainedComparisonsEqual": true,
+    "kernelProvider": "TEST-ONLY JS typed-byte-copy model",
+    "nativeKernelExecuted": false,
+    "rerunByReviewer": false
+  },
+  "sdkEvidence": {
+    "compilerPid": 4005,
+    "rawCompilerExitCode": 0,
+    "originalDriverExitCode": 1,
+    "driverFailure": "NameError after compiler terminal: undefined key in preservation comprehension",
+    "driverFailureEvidence": "Root retained collection plus exact preserved original driver source; no separate raw driver stderr retained in this family.",
+    "collector": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/buffer-concat-sdk-v1/collect.py",
+      "sha256": "98ac6dd7070858a53cf860436d204ee0eb91d2cf869066d72959808e0ab08289",
+      "bytes": 2686
+    },
+    "originalDriver": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/buffer-concat-sdk-v1/attempt1-driver.py",
+      "sha256": "83edaf853c0f8f9612894b98e062eeb04f9760a1c7dd74e0fdb01ba9f43819ab",
+      "bytes": 5043
+    },
+    "actualAuthority": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/buffer-concat-sdk-v1/results/authority.json",
+      "sha256": "4b68dca457d2e7eb1d1cf3c4c748040b45a9d9186843868de9410eb58a246cd3",
+      "bytes": 6698
+    },
+    "started": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/buffer-concat-sdk-v1/results/started.json",
+      "sha256": "267f9d1c938ff50f25233b212403877fce6ef41448ce2e25d8f741a86d52ed24",
+      "bytes": 2860
+    },
+    "terminal": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/buffer-concat-sdk-v1/results/terminal.json",
+      "sha256": "8acb8373d3f38cf39f9349bb03d0ef4d173ec236a4574b4a93f5d18812652c64",
+      "bytes": 1360
+    },
+    "collection": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/buffer-concat-sdk-v1/results/results.json",
+      "sha256": "0fc6d99223029758755d71200af30cb31d145a00f43706c0c7cec1417fa94f87",
+      "bytes": 294711
+    },
+    "dependencyFile": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/buffer-concat-sdk-v1/results/dependencies.d",
+      "sha256": "562d6a73e55f24baa3d70fd20a23d7aace1acd9843bf113dae58fda9405c74a9",
+      "bytes": 161009
+    },
+    "dependencyRows": 1020,
+    "allDependencyHashesMatchCurrent": true,
+    "allOwnedGroupsClean": true,
+    "streamsEmpty": true,
+    "exactCompileDatabaseFlagDerivation": true,
+    "compilerReplayPerformed": false
+  },
+  "pureClippedCopyArithmeticCases": 2560,
+  "sourceFindings": [
+    "Sources remain rooted in RootedObjectVector across result allocation; result is rooted.",
+    "Types, fixed/nonshared/nondetached backing and visible input limits are checked; backing is checked again after result allocation.",
+    "Pointers are reacquired only inside AutoCheckCannotGC; no JS callbacks, property access or allocation occur in the memcpy region.",
+    "Visible-window data pointers plus clipped lengths preserve byte offsets, truncation, zero tail and source/output independence.",
+    "Facade snapshots dense own-data entries; sparse/accessor/shadowed/shared/resizable/detached input policies are explicit.",
+    "No public export name, native source path, CMake flag or host import is added."
+  ],
+  "limitations": [
+    "Host38+12 evaluate the real facade/generated factory with a TEST-ONLY JavaScript copy model; they do not execute C++.",
+    "SDK result is one syntax/type frontend; no object, link, native runtime, guest, GC/fault/OOM or Next execution proof.",
+    "Dependency bytes were captured after the compiler. Current1020 hashes are verified; whole-SDK before/after identity preservation is not claimed.",
+    "Proxy/custom prototype/getter timing, Node slabs, detailed allocation/error ordering and caller-replaced allocUnsafe are outside the declared profile.",
+    "Existing unsupported helper error profile remains m0.11 while the versioned packaging manifest is m0.18; this candidate preserves existing unsupported paths.",
+    "derivations.json generatedHeaderPending is historical preparation metadata; final receipt, byte reconstruction and header check establish the later generated header."
+  ],
+  "materialBlockers": [],
+  "candidateUnchanged": true,
+  "productionSourceEdited": false,
+  "reviewerCompilerInvoked": false,
+  "reviewerHostFormatterOrBufferWorkloadInvoked": false,
+  "nativeKernelExecuted": false,
+  "guestExecuted": false,
+  "engineLinked": false,
+  "nativeBuildAcceptance": false,
+  "operationalAdmission": false
+}

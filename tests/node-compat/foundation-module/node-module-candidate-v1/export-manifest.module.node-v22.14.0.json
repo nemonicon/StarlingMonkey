@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "profileVersion": "sm-node-22.14.0-m0.17",
+  "nodeVersion": "v22.14.0",
+  "status": "UNEXECUTED native-provider candidate; host-only loader tests do not establish linked guest support.",
+  "moduleContract": "Real guest CommonJS +JSON loader over native JSAPI/standard-WASI filesystem; mutable Next require hooks; finite POSIX scope, no npm ESM/native addons.",
+  "modules": {
+    "node:module": {
+      "aliases": [
+        "module"
+      ],
+      "status": "partial",
+      "exports": [
+        "Module",
+        "SourceMap",
+        "_cache",
+        "_debug",
+        "_extensions",
+        "_findPath",
+        "_initPaths",
+        "_load",
+        "_nodeModulePaths",
+        "_pathCache",
+        "_preloadModules",
+        "_resolveFilename",
+        "_resolveLookupPaths",
+        "builtinModules",
+        "constants",
+        "createRequire",
+        "default",
+        "enableCompileCache",
+        "findPackageJSON",
+        "findSourceMap",
+        "flushCompileCache",
+        "getCompileCacheDir",
+        "getSourceMapsSupport",
+        "globalPaths",
+        "isBuiltin",
+        "register",
+        "runMain",
+        "setSourceMapsSupport",
+        "stripTypeScriptTypes",
+        "syncBuiltinESMExports"
+      ],
+      "supportedStatic": [
+        "Module",
+        "createRequire",
+        "isBuiltin",
+        "_cache",
+        "_extensions",
+        "_load",
+        "_nodeModulePaths",
+        "_resolveFilename",
+        "_resolveLookupPaths",
+        "_pathCache",
+        "builtinModules",
+        "globalPaths",
+        "default",
+        "constants"
+      ],
+      "supportedPrototype": [
+        "require",
+        "load",
+        "_compile"
+      ],
+      "importOnlyExports": [
+        "SourceMap",
+        "_debug",
+        "_findPath",
+        "_initPaths",
+        "_preloadModules",
+        "enableCompileCache",
+        "findPackageJSON",
+        "findSourceMap",
+        "flushCompileCache",
+        "getCompileCacheDir",
+        "getSourceMapsSupport",
+        "register",
+        "runMain",
+        "setSourceMapsSupport",
+        "stripTypeScriptTypes",
+        "syncBuiltinESMExports"
+      ],
+      "callablePolicy": "Synchronous CJS and JSON; actual native defaults for registered Node builtins, real Module cache/cycles and resolver interposition. Unimplemented operations throw ERR_SM_NODE_UNSUPPORTED.",
+      "limits": {
+        "pathCodeUnits": 4096,
+        "sourceBytes": 16777216,
+        "moduleCacheEntries": 8192
+      },
+      "deviations": [
+        "POSIX only; NODE_PATH/global home search is not provided.",
+        "Synchronous npm ESM, package imports (#), source-map/loader hooks, TypeScript, compile cache and native addon execution are not implemented.",
+        "Prefix-only Node builtins are known, but unavailable installed native bindings refuse; no builtin JS adapter or empty success stub.",
+        "CJS circular-warning Proxy behavior is not implemented; partial cached exports are preserved.",
+        "Native provider currently requires valid UTF8 files and uses generic IO errors for nonmissing native filesystem errors.",
+        "Static Node constants describe enum values only, not operational compile-cache support."
+      ]
+    }
+  },
+  "requiredHostInterfaces": [
+    "wasi:filesystem/types@0.2.10",
+    "wasi:filesystem/preopens@0.2.10"
+  ]
+}

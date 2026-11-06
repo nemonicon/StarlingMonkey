@@ -1,5 +1,13 @@
 # Next.js capability checks after checkpoint 77659217
 
+Follow-on work is now ordered by the [Next.js execution roadmap](nextjs-priority-roadmap.md).
+The [real HTTP bridge and CommonJS controls](../../tests/node-compat/frameworks/nextjs/http-bridge-candidate-v1/README.md)
+subsequently pass the full24 HTTP checks and both browser interactions on Node,
+including406 JS modules loaded through the new candidate Module core. Native
+Module/Buffer kernels have SDK syntax evidence; FS/ALS are unfinished drafts.
+These are additional host/source/frontend results. The historical Wasm failures
+below remain unchanged, and a full Next component is still outstanding.
+
 The comprehensive Next.js project works on stock Node, but its full server still
 does not compile to a component. The tests below were executed after committing
 and pushing `77659217c92019d5471570b937d69f6352cbe4e5`. They exercise accepted
@@ -93,6 +101,7 @@ baseline; do not delete failing observations to make a check pass.
 Next work is to instrument browser request lifecycle/teardown phases while
 retaining abort failures, implement demanded `util.format` semantics, and resolve
 the real bundler, loader, request-context and selected WASI HTTP requirements.
-Native Hash/Hmac still needs actual read-only artifact revalidation, freeze,
-component execution and snapshot/ownership/cost gates before any new framework
-profile can select it. The complete roadmap remains in progress.
+Native Hash/Hmac now has separately recorded artifact revalidation, frozen
+evidence and component returns; snapshot/ownership/cost/adoption gates remain
+open. The Next priority roadmap specifies the required IO, crypto and compression
+subset for the next application generation. The complete roadmap is in progress.

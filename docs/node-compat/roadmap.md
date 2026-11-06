@@ -1,5 +1,11 @@
 # Dependency ordered implementation roadmap
 
+**Current execution priority:** follow the [Next.js priority roadmap](nextjs-priority-roadmap.md)
+to run the complete existing application in a real component. It defines the
+dependency order, success gate, verified controls and remaining work. Generic
+diagnostics and unrelated compatibility expansion move behind Next dependencies;
+the chronological evidence below remains historical context.
+
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
 Measured application demand now includes the [Next16.4.5 regression project](../../tests/node-compat/frameworks/nextjs/README.md).

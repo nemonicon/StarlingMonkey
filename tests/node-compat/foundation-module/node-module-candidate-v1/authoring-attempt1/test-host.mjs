@@ -1,0 +1,72 @@
+// Host-only differential. Never imports Next server or invokes guest native code.
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {join,dirname} from 'node:path';
+import {pathToFileURL,fileURLToPath} from 'node:url';
+import {createHash} from 'node:crypto';
+import * as NodeModule from 'node:module';
+import {createModuleAPI} from './module-core.mjs';
+import {hostProvider} from './test-provider.mjs';
+assert.equal(process.version,'v22.14.0');
+const here=dirname(fileURLToPath(import.meta.url)),inventory=JSON.parse(fs.readFileSync(join(here,'node-inventory.json'),'utf8'));
+const base=fs.mkdtempSync('/private/tmp/starling-node-compat/node-module-v1-host-tests-');
+const write=(p,s)=>{fs.mkdirSync(dirname(join(base,p)),{recursive:true,mode:0o700});fs.writeFileSync(join(base,p),s,{mode:0o600,flag:'wx'});};
+write('package.json','{"type":"commonjs"}');write('main.cjs','module.exports="main"');
+write('plain.js','exports.value=7;exports.filename=__filename;exports.dirname=__dirname;exports.receiver=this===exports;exports.resolve=require.resolve("./data");');
+write('data.json','\uFEFF{"answer":42}');write('bad.json','{bad');
+write('a.js','exports.phase="partial";exports.b=require("./b");exports.phase="done";');
+write('b.js','module.exports={seen:require("./a").phase};');
+write('replacement.js','module.exports=function named(){return 5};exports.ignored=9;');
+write('throw.js','globalThis.__moduleFailureRuns=(globalThis.__moduleFailureRuns||0)+1;throw false;');
+write('bom.js','\uFEFF#!/usr/bin/env node\nmodule.exports="bom"');
+write('node_modules/legacy/package.json','{"name":"legacy","main":"lib"}');write('node_modules/legacy/lib/index.js','module.exports="legacy"');
+write('node_modules/conditional/package.json','{"name":"conditional","exports":{".":{"import":"./bad.mjs","require":"./require.cjs"},"./part/*":"./lib/*.cjs"}}');
+write('node_modules/conditional/require.cjs','module.exports="require-condition"');write('node_modules/conditional/lib/a.cjs','module.exports="pattern"');
+write('node_modules/conditional/private.js','module.exports="private"');
+write('node_modules/@scope/pkg/package.json','{"name":"@scope/pkg","main":"index.cjs"}');write('node_modules/@scope/pkg/index.cjs','module.exports="scoped"');
+write('optional.node','not a native addon');write('deferred.cjs','exports.load=()=>require("./absent");');
+write('extension.foo','custom');fs.symlinkSync('plain.js',join(base,'linked.js'));
+write('self/package.json','{"name":"self","exports":{".":"./index.cjs"}}');write('self/index.cjs','module.exports="self"');write('self/entry.cjs','module.exports=require("self");');
+const api=createModuleAPI(hostProvider(base),inventory.builtinNames,inventory.prefixOnlyNames,inventory.namespaceKeys,inventory.constants),M=api.default;
+const guest=M.createRequire(join(base,'main.cjs')),node=NodeModule.createRequire(join(base,'main.cjs'));
+const cases=[];function test(name,fn){fn();cases.push({name,passed:true});}
+function differential(name,fn){const expected=fn(node,NodeModule.default),actual=fn(guest,M);assert.deepEqual(actual,expected,name);cases.push({name,passed:true,node:expected,actual});}
+differential('CommonJS wrapper/logical filenames/receiver',r=>r('./plain'));
+differential('JSON BOM and cached object',r=>({value:r('./data'),same:r('./data')===r('./data.json')}));
+differential('cycle sees partial exports then completes',r=>r('./a'));
+differential('module.exports replacement',r=>({value:r('./replacement')(),ignored:r('./replacement').ignored??null}));
+differential('shebang and BOM source',r=>r('./bom'));
+differential('legacy package main directory',r=>r('legacy'));
+differential('require package condition',r=>r('conditional'));
+differential('package export pattern',r=>r('conditional/part/a'));
+differential('scoped package',r=>r('@scope/pkg'));
+differential('package self reference',r=>r('./self/entry.cjs'));
+differential('bare/prefixed builtin default identity',r=>({path:r('path')===r('node:path'),buffer:r('buffer')===r('node:buffer'),module:r('module')===r('node:module')}));
+differential('builtin resolve returns requested ID',r=>[r.resolve('path'),r.resolve('node:path'),r.resolve.paths('node:path')] );
+differential('canonical file cache identity through symlink',r=>r('./plain')===r('./linked'));
+differential('extension search',r=>r.resolve('./plain'));
+differential('node module search paths',(_r,m)=>m._nodeModulePaths(join(base,'node_modules/a/lib')));
+differential('require.resolve options paths',r=>r.resolve('conditional',{paths:[base]}));
+differential('missing dependency error code',r=>{try{r('./absent');}catch(e){return e.code;}throw new Error('must throw');});
+differential('blocked package export error code',r=>{try{r('conditional/private.js');}catch(e){return e.code;}throw new Error('must throw');});
+test('failure cache eviction and exact falsy throw',()=>{globalThis.__moduleFailureRuns=0;for(let i=0;i<2;i++){let seen=false;try{guest('./throw');}catch(e){seen=true;assert.equal(e,false);}assert(seen);assert(!Object.hasOwn(M._cache,guest.resolve('./throw')));}assert.equal(globalThis.__moduleFailureRuns,2);delete globalThis.__moduleFailureRuns;});
+test('actual addon refusal only when required',()=>{assert.equal(guest('./deferred').load instanceof Function,true);assert.equal(guest.resolve('./optional.node'),node.resolve('./optional.node'));assert.throws(()=>guest('./optional.node'),{code:'ERR_SM_NODE_NATIVE_ADDON_UNSUPPORTED'});assert.throws(()=>guest('./deferred').load(),{code:'MODULE_NOT_FOUND'});});
+test('custom extensions are real mutable dispatch',()=>{M._extensions['.foo']=(mod,filename)=>{mod.exports=fs.readFileSync(filename,'utf8')+'-loaded';};assert.equal(guest('./extension'),'custom-loaded');});
+test('createRequire file URL and trailing directory',()=>{assert.equal(M.createRequire(pathToFileURL(join(base,'main.cjs')))('./data').answer,42);assert.equal(M.createRequire(pathToFileURL(base+'/'))('./data').answer,42);});
+test('invalid createRequire shapes and encoded separator',()=>{assert.throws(()=>M.createRequire('relative'),{code:'ERR_INVALID_ARG_VALUE'});assert.throws(()=>M.createRequire('https://example.com/a'),{code:'ERR_INVALID_ARG_VALUE'});assert.throws(()=>M.createRequire('file:///x%2fa'),{code:'ERR_INVALID_ARG_VALUE'});});
+test('prefix-only Node builtin inventory does not reserve npm test',()=>{assert(M.isBuiltin('node:test'));assert(!M.isBuiltin('test'));assert(M.isBuiltin('node:sea'));assert(!M.isBuiltin('sea'));});
+test('unsupported ESM is explicit and uncached',()=>{write('esm/package.json','{"type":"module"}');write('esm/index.js','export default 1');assert.throws(()=>guest('./esm/index.js'),{code:'ERR_SM_NODE_REQUIRE_ESM_UNSUPPORTED'});assert(!Object.hasOwn(M._cache,guest.resolve('./esm/index.js')));});
+test('namespace export inventory; deferred operations throw',()=>{assert.deepEqual(Object.keys(api).sort(),inventory.namespaceKeys);assert.throws(()=>api.register('x'),{code:'ERR_SM_NODE_UNSUPPORTED'});assert.equal(api.Module,M);assert.equal(api.default,M);});
+// Actual retained Next hook Source, invoked only through this isolated host
+// adapter. Its mutations affect our Module class, never host Module globals.
+const hook='/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/application/node_modules/next/dist/server/require-hook.js';
+const hookBytes=fs.readFileSync(hook),hookSHA=createHash('sha256').update(hookBytes).digest('hex');
+write('node_modules/next/package.json','{"name":"next"}');write('node_modules/next/dist/server/route-modules/pages/vendored/contexts/example.js','module.exports="shared-runtime-target"');
+test('actual Next require-hook replaces mutable resolver and prototype require',()=>{const originalResolve=M._resolveFilename,originalRequire=M.prototype.require;const hooks=guest(hook);assert.notEqual(M._resolveFilename,originalResolve);assert.notEqual(M.prototype.require,originalRequire);hooks.addHookAliases([['next-loader-sentinel',join(base,'data.json')]]);assert.equal(guest('next-loader-sentinel').answer,42);assert.equal(guest('example.shared-runtime'),'shared-runtime-target');assert.equal(guest('module'),M);});
+// Exact generated runtime Source, synthetic chunk DATA only. No app/page import.
+const webpack='/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/application/.next/server/webpack-runtime.js';
+const webpackBytes=fs.readFileSync(webpack);write('webpack-runtime.js',webpackBytes);write('chunks/1.js','exports.ids=[1];exports.modules={123(module){module.exports="dynamic-real-webpack-chunk"}};');
+test('actual webpack runtime dynamic chunk require',()=>{const r=guest('./webpack-runtime');assert.equal(r.X(0,[1],()=>r(123)),'dynamic-real-webpack-chunk');});
+test('all final loaded cache modules hold actual JS objects/functions',()=>{assert(Object.values(M._cache).every(m=>m instanceof M&&m.loaded===true));});
+assert.equal(createHash('sha256').update(fs.readFileSync(hook)).digest('hex'),hookSHA);
+console.log(JSON.stringify({schemaVersion:1,state:'HOST_ONLY_MODULE_SOURCE_DIFFERENTIAL_PASSED',checks:cases.length,cases,temporaryRoot:base,actualNextHook:{path:hook,sha256:hookSHA,bytes:hookBytes.length},actualWebpackRuntime:{path:webpack,sha256:createHash('sha256').update(webpackBytes).digest('hex'),bytes:webpackBytes.length},runtimeProvider:'TEST-ONLY real Node host FS +vm.compileFunction',nativeGuestProviderExecuted:false,nextApplicationServerExecuted:false,compilerOrComponentOrGuestExecuted:false}));

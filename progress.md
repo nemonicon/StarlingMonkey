@@ -4,6 +4,146 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-06. Overall roadmap: **in progress**.
 
+Current priority, at the user's request: **get the actual comprehensive Next.js
+application running successfully in Wasm**. The previous goal turn made progress
+and pushed `4a3c6a7b`; the current checkout was clean before this work. No clock
+component construction or further generic crypto integration has been issued.
+Those follow-ons move behind dependencies needed by the Next app.
+
+The Next success gate remains the complete existing fixture: all24 HTTP/action
+contracts, cache reuse/invalidation, real client hydration/click and form action,
+public/static assets, request cookies/headers, dynamic rendering, filesystem/SHA
+route and streamed Suspense. A generated bundle, Node-host result or isolated
+React render does not satisfy that gate. Original failures remain regression
+baselines until a genuine new guest artifact passes them.
+
+Dependency order is now: fix actual packaging/resolution defects; implement
+real CommonJS/createRequire/cache/chunk loading and required process/URL APIs;
+provide explicitly selected standard filesystem/RNG/HTTP capabilities; connect
+Next's real custom-server router to a Node-shaped request/response bridge;
+integrate correct promise/timer/I/O/tick AsyncLocalStorage; build a new guest
+profile and run the full application contracts on real components. Native
+Hash/Hmac work proceeds only for required app crypto operations. Existing
+production foundations-v13 remains accepted; new app/runtime code is experimental.
+
+One packaging defect is fixed: the optional package bundler now resolves
+asset-looking names before classifying targets, allowing genuine Next
+`.node.js` sources while refusing actual native addons. All44 host checks pass;
+the [new diagnostic](tests/node-compat/frameworks/nextjs/standalone-bundler-diagnostic-v1/README.md)
+retains14 earlier bundle attempts and exact traced-versus-broad graph results.
+Standalone's `createRequire`, computed webpack chunks and missing native modules
+remain actual blockers; no permissive diagnostic is admitted as a guest bundle.
+
+The [HTTP message bridge candidate](tests/node-compat/frameworks/nextjs/http-bridge-candidate-v1/bridge.mjs)
+now runs the actual unmodified Next custom-server router on host Node, through
+Web Request/Response messages. First attempt95089 finishes1 with22 failed HTTP
+observations: null-prototype request headers and missing `_implicitHeader`
+break real Next/compression. Its exact executed sources/raw output are retained.
+The corrected run96179 finishes0 clean:24/24 contracts pass, including a real
+build-derived action POST, filesystem/SHA and cache generation1→2. Five actual
+stream chunks put shell in0 and ready in2. Its result `2ad0232c`/18,212 bytes and
+monitor `974f7b92` remain external; eighteen host bridge checks also pass.
+The third run97040 finishes0 clean with24/24 HTTP and2/2 browser interactions:
+actual hydrated counter0→1 and a real form-action POST/redirect pass with no
+browser or network errors. Five streamed chunks retain shell0/ready2 and cache
+generation1→2. [Portable results](tests/node-compat/frameworks/nextjs/http-bridge-candidate-v1/results/summary.json)
+retain all three runs, including the failed first attempt, raw bodies/chunks,
+screenshots and monitors:108 copied files/275,808 bytes.
+This is **host message-bridge validation, not Wasm execution**. Guest native
+loader/FS/process/context integration remains outstanding.
+
+The [Next.js priority roadmap](docs/node-compat/nextjs-priority-roadmap.md) is
+the active dependency order and full-app success contract. Native CommonJS
+Source is sealed with42 host cases but remains uncompiled; FS and actual native
+ALS integration are in progress. Bounded native Buffer.concat is now an explicit
+Next blocker. Existing one-shot zlib evidence does not implement Next's streaming
+gzip path. These genuine runtime needs take precedence over generic diagnostics.
+The standard WASI HTTP adapter now has13 host ownership checks, including status
+failure before response transfer, EOF/cancellation, write limits and stream-error
+resource disposal. Its WIT and guest smoke are uncompiled. An initial fake-resource
+test harness method-name collision was corrected; it was not a native failure.
+
+The [full Module-core host control](tests/node-compat/frameworks/nextjs/http-bridge-candidate-v1/module-results/summary.json)
+now finishes0 clean at2073, with24/24 HTTP,2/2 browser, cache1→2 and incremental
+Suspense. All application CommonJS loads use the actual candidate core, compiling
+406 JS files and caching412 modules. Test-only Node FS/compiler/builtins/globals
+remain explicit; this is not native/guest evidence. Its47 portable copied files
+retain198,961 bytes. Root's [Module Source review](tests/node-compat/foundation-module/independent-source-review-v1/README.md)
+checks76 candidate payloads,363 prospective hashes and six reversible derivations,
+but **holds** the sealed v1: its installed generator needs an inventory JSON file
+missing from the prospective native cut. A compact v2 successor is in progress.
+
+The [Buffer.concat Source](tests/node-compat/buffer-concat-candidate-v1/README.md)
+is now sealed, index `1c7b431e`: actual rooted native memcpy implementation and
+precise facade/manifest/generated afterimages, with38 pinned Node differentials
+and12 profile/generated checks passed. Its16MiB/fixed-backing/dense-list subset
+remains uncompiled/unapplied. No new native build or component ran in this phase.
+
+The [Module v2 inventory fix](tests/node-compat/foundation-module/node-module-candidate-v2/README.md)
+is sealed at `c69350e3`; [Root Source review](tests/node-compat/foundation-module/independent-source-review-v1/results-v2.json)
+passes its corrected364=351+6+7 cut, explicit versioned inventory and whole-input
+digest. The original v1 HOLD remains intact. Actual new [Module kernel SDK syntax](tests/node-compat/foundation-module/module-sdk-v1/README.md)
+finishes5054/raw0 with empty streams and1045 dependency hashes. Only that kernel
+and proposed declaration headers were checked; registration/link/guest are open.
+
+The actual [Buffer.concat SDK frontend](tests/node-compat/buffer-concat-sdk-v1/README.md)
+also finishes4005/raw0 clean with empty streams and1020 dependency hashes. Its
+Root driver exits1 afterwards on a reporting comprehension NameError. The exact
+executed driver is retained; a separate read-only collector verifies recorded
+source/compiler/database bookends and raw output without replaying the compiler.
+Header hashes in both checks are captured after compilation, not a full-SDK
+preservation proof. No object, new engine or guest ran.
+
+Filesystem and ALS are deliberately checkpointed as **unfinished drafts**.
+[FS status](tests/node-compat/foundation-fs/next-fs-candidate-v1/checkpoint-status.json)
+records an uncompiled direct-P2 native provider, including private stream handles;
+the public facade, actual ReadStream/callback delivery, registration/CMake and
+real FS differentials remain unwritten. Two error-preservation paths need fixes.
+[ALS status](tests/node-compat/async-context/native-als-candidate-v1/source-status.json)
+records24 afterimages,14 existing-file derivations/41 reversible edits and53
+synchronous models. Native Promise/task/tick/fresh-request code exists, but final
+cross-file audits, request-owner tests, metadata/producer integration, frontend,
+link and actual async propagation remain open. Neither draft has Source PASS
+or runtime authority; current production C++ and accepted engines are unchanged.
+
+[Independent bridge review](tests/node-compat/frameworks/nextjs/http-bridge-independent-review-v1/README.md)
+passes155 copied files/474,769 bytes across all four actual host attempts and
+their complete fixed outcomes. The retained checker now rejects empty/missing
+runs, a disabled browser gate and relabeling the first failure; a copied positive
+control plus all four negatives pass. The current runner's top-level boolean only
+requires complete streamed output; the stricter retained checker also requires
+ready after shell. All three actual successes meet that stricter condition, but
+future live/component acceptance must enforce it directly. Native/WASI/ALS/TLS
+scope remains unchanged. The early deployment gate now explicitly requires real
+filesystem-rights and instance-lifetime probes before the combined engine build;
+earlier stock-host counters1 prove neither reuse nor the new filesystem setup.
+
+The [actual Next startup/API inventory](tests/node-compat/frameworks/nextjs/startup-api-demand-v1/README.md)
+parses all406 loaded JS inputs/4,439,412 bytes with pinned Rolldown/Oxc: no parse
+errors,40 observed builtin-load spellings,78 statically resolved API paths and56
+exact source citations. Nine full Node22 export inventories are retained. Method
+calls and conditional branches are **source demand, not measured invocations**.
+This tightens the next work to mutable process/env/cwd and truthful OS data;
+genuine nextTick/Immediate ordering and mutable timer modules; URL formatting/
+file helpers; HTTP Agents/backpressure; and streaming gzip/deflate cleanup.
+No attributable node:url.parse call or Brotli token was found in the examined
+cut; broader support is deferred. Conditional cache serialization also needs
+Buffer base64 support. The build volume now reports about12GiB free; lack of
+space is no longer the immediate blocker. Native integration is still blocked
+by unfinished runtime dependencies, not claimed complete.
+
+[Independent Buffer.concat Source/SDK review](tests/node-compat/buffer-concat-independent-review-v1/README.md)
+passes at `f7a92a66`, without rerunning the compiler: exact34 Source members,
+five afterimages,38+12 retained model checks,1020 current dependency hashes and
+2560 bounded arithmetic layouts. No material Source blocker was found. Native
+runtime/GC/link/component and full Next acceptance remain open.
+
+Checkpoint validation preserves eight staged whitespace warnings across five
+byte-exact copied-source/license/raw-log paths. Authored documentation and code
+pass the working diff check; historical bytes and draft derivation hashes are
+preserved. All delegated writers and operational jobs have stopped for commit.
+The full roadmap and complete Next-in-Wasm success gate remain in progress.
+
 Latest actual result: [experimental native SHA256 Hash/Hmac](docs/node-compat/hash-hmac-results-2026-11-06.md)
 passes fourteen complete returns across retained/fresh Jco and stock Wasmtime,
 280 accepted Node-record comparisons and112 separate native-policy checks.

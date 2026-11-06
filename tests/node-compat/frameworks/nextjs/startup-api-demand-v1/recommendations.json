@@ -1,0 +1,1127 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_DEMAND_INVENTORY_NO_GUEST_PROOF",
+  "readOnly": true,
+  "allWorkloadExecutions": false,
+  "applicationOrTargetEngineImported": false,
+  "node": "22.14.0",
+  "next": "16.4.5",
+  "report": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/http-bridge-candidate-v1/module-results/next-http-bridge-module-v1/result.json",
+    "sha256": "d6c7f391320fe34ce2c75f7b6af7a3524a7d341e872beae2d993b4fc11d778c0",
+    "bytes": 81230
+  },
+  "compiledFiles": 406,
+  "sourceBytes": 4439412,
+  "observedBuiltinLoadSpellings": 40,
+  "resolvedASTAPIPaths": 78,
+  "runtimeMethodInvocationsObserved": null,
+  "findings": [
+    {
+      "id": "process-startup",
+      "apis": [
+        "env (mutable reads/writes/enumeration)",
+        "cwd/chdir",
+        "versions.node/platform/argv/pid/title",
+        "on/once/off/listeners/emit/removeAllListeners",
+        "stdout/stderr.write",
+        "exit"
+      ],
+      "evidence": [
+        {
+          "api": "process.env",
+          "astDemand": "process.env",
+          "staticCalls": 5,
+          "staticConstructs": 0,
+          "staticReads": 524,
+          "staticWrites": 23,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/.next/server/chunks/430.js",
+            "line": 26,
+            "column": 41597,
+            "utf16Start": 67701,
+            "source": "process.env.VERCEL",
+            "insideFunction": true,
+            "conditionalSyntax": [],
+            "use": "read"
+          }
+        },
+        {
+          "api": "process.cwd",
+          "astDemand": "process.cwd",
+          "staticCalls": 25,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/.next/server/app/api/fs-crypto/route.js",
+            "line": 1,
+            "column": 1555,
+            "utf16Start": 1554,
+            "source": "process.cwd()",
+            "insideFunction": true,
+            "conditionalSyntax": [],
+            "use": "call"
+          }
+        },
+        {
+          "api": "process.chdir",
+          "astDemand": "process.chdir",
+          "staticCalls": 2,
+          "staticConstructs": 0,
+          "staticReads": 1,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/compiled/cross-spawn/index.js",
+            "line": 1,
+            "column": 2980,
+            "utf16Start": 2979,
+            "source": "process.chdir",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "LogicalExpression",
+                "source": "i&&process.chdir!==undefined&&!process.chdir.disabled"
+              },
+              {
+                "kind": "LogicalExpression",
+                "source": "i&&process.chdir!==undefined"
+              }
+            ],
+            "use": "read"
+          }
+        },
+        {
+          "api": "process.versions.node",
+          "astDemand": "process.versions.node",
+          "staticCalls": 0,
+          "staticConstructs": 0,
+          "staticReads": 1,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/server/config.js",
+            "line": 1090,
+            "column": 33,
+            "utf16Start": 64904,
+            "source": "process.versions.node",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "IfStatement",
+                "source": "if (pluginRuntimeStrategy === 'workerThreads' || pluginRuntimeStrategy === 'forceWorkerThreads') { result.experimental.turbopackPluginRuntimeS"
+              },
+              {
+                "kind": "IfStatement",
+                "source": "if (!process.versions.bun && !process.versions.deno) { const nodeVersion = process.versions.node; const affectedNodeRange = '>"
+              }
+            ],
+            "use": "read"
+          }
+        },
+        {
+          "api": "process.on",
+          "astDemand": "process.on",
+          "staticCalls": 13,
+          "staticConstructs": 0,
+          "staticReads": 1,
+          "staticWrites": 3,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js",
+            "line": 11,
+            "column": 18753,
+            "utf16Start": 335921,
+            "source": "process.on(\"unhandledRejection\",e)",
+            "insideFunction": true,
+            "conditionalSyntax": [],
+            "use": "call"
+          }
+        },
+        {
+          "api": "process.listeners",
+          "astDemand": "process.listeners",
+          "staticCalls": 4,
+          "staticConstructs": 0,
+          "staticReads": 1,
+          "staticWrites": 2,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js",
+            "line": 11,
+            "column": 18659,
+            "utf16Start": 335827,
+            "source": "process.listeners(\"unhandledRejection\")",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "LogicalExpression",
+                "source": "void 0!==e&&process.listeners(\"unhandledRejection\").includes(e)"
+              }
+            ],
+            "use": "call"
+          }
+        },
+        {
+          "api": "process.stderr.write",
+          "astDemand": "process.stderr.write",
+          "staticCalls": 2,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/compiled/debug/index.js",
+            "line": 1,
+            "column": 6848,
+            "utf16Start": 6847,
+            "source": "process.stderr.write(n.format(...e)+\"\\n\")",
+            "insideFunction": true,
+            "conditionalSyntax": [],
+            "use": "call"
+          }
+        },
+        {
+          "api": "process.exit",
+          "astDemand": "process.exit",
+          "staticCalls": 15,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/lib/bundler.js",
+            "line": 140,
+            "column": 9,
+            "utf16Start": 4673,
+            "source": "process.exit(1)",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "IfStatement",
+                "source": "if (bundlerFlags.size > 1) { console.error(`Multiple bundler flags set: ${Array.from(bundlerFlags.values()).flat().join(', ')}. Edit your com"
+              }
+            ],
+            "use": "call"
+          }
+        }
+      ],
+      "conditions": "Environment reads occur in module-level config construction. chdir, signals/IPC and exit paths are separate deferred/conditional demand. No per-method runtime trace was retained.",
+      "proposal": "Provide one mutable real process object and require-alias identity; env/argv/initial cwd come from selected standard CLI environment. Coordinate cwd with native Module and FS. Reuse EventEmitter semantics, then connect actual engine rejection/error delivery; a local emitter alone does not implement process exception handling. stdout/stderr need actual standard streams and defined lifecycle.",
+      "standards": [
+        "wasi:cli/environment@0.2.10",
+        "wasi:cli/stdout+stderr@0.2.10",
+        "wasi:io/streams+poll@0.2.10",
+        "filesystem/types+preopens for guest cwd rights"
+      ],
+      "unavailable": [
+        "host pid/platform/title claims without a truthful virtual-profile contract",
+        "spawn/fork/kill/signals/IPC",
+        "host fd access via fabricated stdout.fd",
+        "Node fatal recovery or exception semantics from EventEmitter alone",
+        "exit without explicit selected cli/exit lifecycle"
+      ]
+    },
+    {
+      "id": "nexttick-immediate",
+      "apis": [
+        "process.nextTick(callback,...args)",
+        "globalThis.setImmediate/clearImmediate",
+        "mutable node:timers and node:timers/promises methods",
+        "util.promisify.custom",
+        "Immediate ref/unref/hasRef/Symbol.dispose"
+      ],
+      "evidence": [
+        {
+          "path": "node_modules/next/dist/server/node-environment-extensions/fast-set-immediate.external.js",
+          "line": 50,
+          "utf8Offset": 1909,
+          "token": "nextTick: process.nextTick",
+          "source": "earImmediate: globalThis.clearImmediate,     nextTick: process.nextTick }); let wasEnabledAtLeastOnce = false; let pendingNextTicks = 0; let currentExecution = null; const originalSetImmediate = originals.setImmediate; const origin",
+          "inputSha256": "817bfe89b26a0dd52233e75c2331db338d6d03f986efd100313850cdbf758918"
+        },
+        {
+          "path": "node_modules/next/dist/server/node-environment-extensions/fast-set-immediate.external.js",
+          "line": 67,
+          "utf8Offset": 2743,
+          "token": "const nodeTimers = require('node:timers')",
+          "source": "nstalling fast setImmediate patch');         const nodeTimers = require('node:timers');         globalThis.setImmediate = nodeTimers.setImmediate = // Workaround for missing __promisify__ which is not a real property         patchedSetImmediate; ",
+          "inputSha256": "817bfe89b26a0dd52233e75c2331db338d6d03f986efd100313850cdbf758918"
+        },
+        {
+          "path": "node_modules/next/dist/server/node-environment-extensions/fast-set-immediate.external.js",
+          "line": 72,
+          "utf8Offset": 3107,
+          "token": "nodeTimersPromises.setImmediate = patchedSetImmediatePromise",
+          "source": "s = require('node:timers/promises');         nodeTimersPromises.setImmediate = patchedSetImmediatePromise;         process.nextTick = patchedNextTick;     } } function DANGEROUSLY_runPendingImmediatesAfterCurrentTask() {     if (process.env.NEXT_RUNTIME === 'edge')",
+          "inputSha256": "817bfe89b26a0dd52233e75c2331db338d6d03f986efd100313850cdbf758918"
+        },
+        {
+          "path": "node_modules/next/dist/server/node-environment-extensions/fast-set-immediate.external.js",
+          "line": 73,
+          "utf8Offset": 3177,
+          "token": "process.nextTick = patchedNextTick",
+          "source": "ediate = patchedSetImmediatePromise;         process.nextTick = patchedNextTick;     } } function DANGEROUSLY_runPendingImmediatesAfterCurrentTask() {     if (process.env.NEXT_RUNTIME === 'edge') {         throw new _invarianterror.Invaria",
+          "inputSha256": "817bfe89b26a0dd52233e75c2331db338d6d03f986efd100313850cdbf758918"
+        },
+        {
+          "path": "node_modules/next/dist/server/node-environment-extensions/fast-set-immediate.external.js",
+          "line": 165,
+          "utf8Offset": 7518,
+          "token": "this.sentinel.unref()",
+          "source": "if (this.listeners.size === 0) {             this.sentinel.unref();         }     }     constructor(){         this.sentinel = null;         this.needsAnotherCheck = false;         this.listeners = new Set();         this.chec",
+          "inputSha256": "817bfe89b26a0dd52233e75c2331db338d6d03f986efd100313850cdbf758918"
+        },
+        {
+          "path": "node_modules/next/dist/server/node-environment-extensions/fast-set-immediate.external.js",
+          "line": 58,
+          "utf8Offset": 2268,
+          "token": "originalSetImmediate[_nodeutil.promisify.custom]",
+          "source": "typeof originalSetImmediate === 'function' ? originalSetImmediate[_nodeutil.promisify.custom] : // and won't ever enable the patch, so this can be a dummy value undefined; function install() {     if (process.env.NEXT_RUNTIME === 'edge') {         // No",
+          "inputSha256": "817bfe89b26a0dd52233e75c2331db338d6d03f986efd100313850cdbf758918"
+        },
+        {
+          "path": "node_modules/next/dist/server/node-environment-extensions/fast-set-immediate.external.js",
+          "line": 216,
+          "utf8Offset": 9936,
+          "token": "originalNextTick(()=>",
+          "source": "that, so this won't loop infinitely)         originalNextTick(()=>{             // We're now in a nextTick, which means that we're executing inside `processTicksAndRejections`:             // https://github.com/nodejs/node/blo",
+          "inputSha256": "817bfe89b26a0dd52233e75c2331db338d6d03f986efd100313850cdbf758918"
+        },
+        {
+          "path": "node_modules/next/dist/server/node-environment-extensions/fast-set-immediate.external.js",
+          "line": 628,
+          "utf8Offset": 29650,
+          "token": "install();",
+          "source": "/ ========================================== install();  //# sourceMappingURL=fast-set-immediate.external.js.map",
+          "inputSha256": "817bfe89b26a0dd52233e75c2331db338d6d03f986efd100313850cdbf758918"
+        }
+      ],
+      "conditions": "install() executes at module evaluation outside edge mode. Individual callbacks and tracking branches remain deferred. Source comments require sync -> nextTick -> microtasks -> nextTick ordering.",
+      "proposal": "Real guest nextTick and immediate queues integrated with actual Engine task/microtask bookends; do not alias nextTick to queueMicrotask. Preserve callback args/receiver, ALS capture, exceptions, abort and ref ownership. CJS timers objects must be mutable and shared with globals because Next patches them.",
+      "standards": [
+        "wasi:clocks/monotonic-clock@0.2.10 for delayed tasks",
+        "wasi:io/poll@0.2.10 for external progress"
+      ],
+      "unavailable": [
+        "Node scheduling order from setTimeout/Promises alone",
+        "interest/drop/Storedeath proof from JS handle flags",
+        "snapshot admission with live scheduler interests"
+      ]
+    },
+    {
+      "id": "timers-performance",
+      "apis": [
+        "setTimeout/clearTimeout/setInterval/clearInterval",
+        "queueMicrotask",
+        "global performance.now/timeOrigin/measure",
+        "process.hrtime.bigint"
+      ],
+      "evidence": [
+        {
+          "api": "timers.setTimeout",
+          "astDemand": "timers.setTimeout",
+          "staticCalls": 34,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/.next/server/app/stream/page.js",
+            "line": 1,
+            "column": 2612,
+            "utf16Start": 2611,
+            "source": "setTimeout(a,30)",
+            "insideFunction": true,
+            "conditionalSyntax": [],
+            "use": "call"
+          }
+        },
+        {
+          "api": "timers.setInterval",
+          "astDemand": "timers.setInterval",
+          "staticCalls": 3,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js",
+            "line": 2,
+            "column": 25490,
+            "utf16Start": 38767,
+            "source": "setInterval(()=>{this._onInterval()},this._interval)",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "LogicalExpression",
+                "source": "this._isIntervalIgnored||void 0!==this._intervalId||(this._intervalId=setInterval(()=>{this._onInterval()},this._interval),this._intervalEnd=Date.now("
+              }
+            ],
+            "use": "call"
+          }
+        },
+        {
+          "api": "timers.clearTimeout",
+          "astDemand": "timers.clearTimeout",
+          "staticCalls": 21,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/.next/server/chunks/430.js",
+            "line": 64,
+            "column": 51389,
+            "utf16Start": 338250,
+            "source": "clearTimeout(r)",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "LogicalExpression",
+                "source": "null!==r&&clearTimeout(r)"
+              }
+            ],
+            "use": "call"
+          }
+        },
+        {
+          "api": "timers.queueMicrotask",
+          "astDemand": "timers.queueMicrotask",
+          "staticCalls": 16,
+          "staticConstructs": 0,
+          "staticReads": 6,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/.next/server/chunks/430.js",
+            "line": 63,
+            "column": 24958,
+            "utf16Start": 285944,
+            "source": "queueMicrotask(()=>{e.syncDynamicErrorWithStackPostMicrotask=!0})",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "LogicalExpression",
+                "source": "e&&null===e.syncDynamicErrorWithStack&&(e.syncDynamicErrorWithStack=c,queueMicrotask(()=>{e.syncDynamicErrorWithStackPostMicrotask=!0}))"
+              }
+            ],
+            "use": "call"
+          }
+        },
+        {
+          "api": "perf_hooks.performance.now",
+          "astDemand": "perf_hooks.performance.now",
+          "staticCalls": 50,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/.next/server/chunks/124.js",
+            "line": 23,
+            "column": 12180,
+            "utf16Start": 21332,
+            "source": "performance.now()",
+            "insideFunction": true,
+            "conditionalSyntax": [],
+            "use": "call"
+          }
+        },
+        {
+          "api": "perf_hooks.performance.timeOrigin",
+          "astDemand": "perf_hooks.performance.timeOrigin",
+          "staticCalls": 0,
+          "staticConstructs": 0,
+          "staticReads": 39,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/.next/server/chunks/124.js",
+            "line": 23,
+            "column": 12157,
+            "utf16Start": 21309,
+            "source": "performance.timeOrigin",
+            "insideFunction": true,
+            "conditionalSyntax": [],
+            "use": "read"
+          }
+        },
+        {
+          "api": "perf_hooks.performance.measure",
+          "astDemand": "perf_hooks.performance.measure",
+          "staticCalls": 10,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/.next/server/chunks/970.js",
+            "line": 11,
+            "column": 10834,
+            "utf16Start": 70899,
+            "source": "performance.measure(`${j}:next-${(b.split(\".\").pop()||\"\").replace(/[A-Z]/g,a=>\"-\"+a.toLowerCase())}`,{start:c,end:performance.now()})",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "LogicalExpression",
+                "source": "!d&&(d=!0,v.delete(A),c&&performance.measure(`${j}:next-${(b.split(\".\").pop()||\"\").replace(/[A-Z]/g,a=>\"-\"+a.toLowerCase())}`,{start:c,end:performance"
+              },
+              {
+                "kind": "LogicalExpression",
+                "source": "c&&performance.measure(`${j}:next-${(b.split(\".\").pop()||\"\").replace(/[A-Z]/g,a=>\"-\"+a.toLowerCase())}`,{start:c,end:performance.now()})"
+              }
+            ],
+            "use": "call"
+          }
+        },
+        {
+          "api": "process.hrtime.bigint",
+          "astDemand": "process.hrtime.bigint",
+          "staticCalls": 21,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/.next/server/app/api/cache/route.js",
+            "line": 1,
+            "column": 1250,
+            "utf16Start": 1249,
+            "source": "process.hrtime.bigint()",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "LogicalExpression",
+                "source": "v.isDev&&(0,g.addRequestMeta)(a,\"devRequestTimingInternalsEnd\",process.hrtime.bigint())"
+              }
+            ],
+            "use": "call"
+          }
+        }
+      ],
+      "conditions": "Some hrtime sites are dev-only; measure is gated by NEXT_OTEL_PERFORMANCE_PREFIX. The retained builtin-load list contains no perf_hooks spelling: most identified performance demand is global, not a node:perf_hooks import.",
+      "proposal": "Reuse actual native clocks/timers after admission; implement true monotonic nanoseconds and measurement entries/validation if metrics are enabled. Establish deployed timeOrigin with correct wall/monotonic relation, separately from Date and snapshot offsets. Existing native global performance now/timeOrigin does not implement measure or prove epoch correctness.",
+      "standards": [
+        "wasi:clocks/monotonic-clock@0.2.10",
+        "wasi:clocks/wall-clock@0.2.10",
+        "wasi:io/poll@0.2.10"
+      ],
+      "unavailable": [
+        "host epoch from steady_clock.time_since_epoch",
+        "full perf_hooks observers/GC/eventLoopUtilization",
+        "snapshot/resumption/interest/teardown acceptance without native evidence"
+      ]
+    },
+    {
+      "id": "os",
+      "apis": [
+        "cpus/EOL/homedir/networkInterfaces/platform/freemem/totalmem"
+      ],
+      "evidence": [
+        {
+          "api": "os.cpus",
+          "astDemand": "os.cpus",
+          "staticCalls": 2,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/server/config-shared.js",
+            "line": 223,
+            "column": 70,
+            "utf16Start": 6565,
+            "source": "_os.default.cpus()",
+            "insideFunction": false,
+            "conditionalSyntax": [
+              {
+                "kind": "LogicalExpression",
+                "source": "Number(process.env.CIRCLE_NODE_TOTAL) || (_os.default.cpus() || { length: 1 }).length"
+              },
+              {
+                "kind": "LogicalExpression",
+                "source": "_os.default.cpus() || { length: 1 }"
+              }
+            ],
+            "use": "call"
+          }
+        },
+        {
+          "api": "os.EOL",
+          "astDemand": "os.EOL",
+          "staticCalls": 0,
+          "staticConstructs": 0,
+          "staticReads": 3,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/lib/typescript/writeAppTypeDeclarations.js",
+            "line": 23,
+            "column": 15,
+            "utf16Start": 816,
+            "source": "_os.default.EOL",
+            "insideFunction": true,
+            "conditionalSyntax": [],
+            "use": "read"
+          }
+        },
+        {
+          "api": "os.homedir",
+          "astDemand": "os.homedir",
+          "staticCalls": 1,
+          "staticConstructs": 0,
+          "staticReads": 1,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/lib/find-root.js",
+            "line": 90,
+            "column": 27,
+            "utf16Start": 2785,
+            "source": "(0, _os.homedir)()",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "LogicalExpression",
+                "source": "toRealPath((0, _os.homedir)()) || undefined"
+              }
+            ],
+            "use": "call"
+          }
+        },
+        {
+          "api": "os.networkInterfaces",
+          "astDemand": "os.networkInterfaces",
+          "staticCalls": 1,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/lib/get-network-host.js",
+            "line": 18,
+            "column": 24,
+            "utf16Start": 456,
+            "source": "_os.default.networkInterfaces()",
+            "insideFunction": true,
+            "conditionalSyntax": [],
+            "use": "call"
+          }
+        },
+        {
+          "api": "os.platform",
+          "astDemand": "os.platform",
+          "staticCalls": 1,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/server/lib/start-server.js",
+            "line": 500,
+            "column": 27,
+            "utf16Start": 23813,
+            "source": "_os.default.platform()",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "IfStatement",
+                "source": "if (process.env.NEXT_PRIVATE_WORKER && process.send) { // Output is piped to the CLI to hold it while the upgrade menu is open. if (process.en"
+              },
+              {
+                "kind": "IfStatement",
+                "source": "if (msg && typeof msg === 'object' && msg.nextWorkerOptions && process.send) { let enabledFeaturesFromParent = {}; if (process"
+              }
+            ],
+            "use": "call"
+          }
+        },
+        {
+          "api": "os.freemem",
+          "astDemand": "os.freemem",
+          "staticCalls": 1,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/server/lib/start-server.js",
+            "line": 501,
+            "column": 42,
+            "utf16Start": 23878,
+            "source": "_os.default.freemem()",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "IfStatement",
+                "source": "if (process.env.NEXT_PRIVATE_WORKER && process.send) { // Output is piped to the CLI to hold it while the upgrade menu is open. if (process.en"
+              },
+              {
+                "kind": "IfStatement",
+                "source": "if (msg && typeof msg === 'object' && msg.nextWorkerOptions && process.send) { let enabledFeaturesFromParent = {}; if (process"
+              }
+            ],
+            "use": "call"
+          }
+        },
+        {
+          "api": "os.totalmem",
+          "astDemand": "os.totalmem",
+          "staticCalls": 1,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/server/lib/start-server.js",
+            "line": 502,
+            "column": 43,
+            "utf16Start": 23944,
+            "source": "_os.default.totalmem()",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "IfStatement",
+                "source": "if (process.env.NEXT_PRIVATE_WORKER && process.send) { // Output is piped to the CLI to hold it while the upgrade menu is open. if (process.en"
+              },
+              {
+                "kind": "IfStatement",
+                "source": "if (msg && typeof msg === 'object' && msg.nextWorkerOptions && process.send) { let enabledFeaturesFromParent = {}; if (process"
+              }
+            ],
+            "use": "call"
+          }
+        }
+      ],
+      "conditions": "config-shared default object evaluates os.cpus unless CIRCLE_NODE_TOTAL short-circuits it. NIC and free/total RAM methods appear in helper/worker/server branches; compilation does not prove calls.",
+      "proposal": "Provide env/path-derived homedir and explicit guest EOL/platform policy. WASI 0.2.10 does not expose host CPU topology, NIC inventory or host RAM. Decide truthful virtual resource semantics or explicit refusals. Setting a documented Next deployment variable may avoid a conditional call but is not os.cpus support.",
+      "standards": [
+        "wasi:cli/environment@0.2.10",
+        "wasi:filesystem/types+preopens@0.2.10 for paths"
+      ],
+      "unavailable": [
+        "invented host cpu model/times/count",
+        "host network-interface enumeration",
+        "host free/total RAM inferred from Wasm linear memory",
+        "fake host hostname/OS facts"
+      ]
+    },
+    {
+      "id": "url",
+      "apis": [
+        "global URL/URLSearchParams incl URL.canParse",
+        "node:url.format",
+        "node:url.fileURLToPath/pathToFileURL"
+      ],
+      "evidence": [
+        {
+          "api": "url.URL",
+          "astDemand": "url.URL",
+          "staticCalls": 0,
+          "staticConstructs": 161,
+          "staticReads": 9,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/.next/server/app/api/json/route.js",
+            "line": 1,
+            "column": 8445,
+            "utf16Start": 8444,
+            "source": "new URL(a.url)",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "LogicalExpression",
+                "source": "new URL(a.url).searchParams.get(\"q\")??\"\""
+              }
+            ],
+            "use": "construct"
+          }
+        },
+        {
+          "api": "url.URL.canParse",
+          "astDemand": "url.URL.canParse",
+          "staticCalls": 4,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/lib/load-custom-routes.js",
+            "line": 385,
+            "column": 62,
+            "utf16Start": 16916,
+            "source": "URL.canParse(config.assetPrefix)",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "IfStatement",
+                "source": "if (config.assetPrefix) { let prefix = config.assetPrefix; if ((0, _url.isFullStringUrl)(config.assetPrefix) && URL.canParse(config.as"
+              },
+              {
+                "kind": "IfStatement",
+                "source": "if ((0, _url.isFullStringUrl)(config.assetPrefix) && URL.canParse(config.assetPrefix)) { prefix = new URL(config.assetPrefix).pathname; "
+              },
+              {
+                "kind": "LogicalExpression",
+                "source": "(0, _url.isFullStringUrl)(config.assetPrefix) && URL.canParse(config.assetPrefix)"
+              }
+            ],
+            "use": "call"
+          }
+        },
+        {
+          "api": "url.URLSearchParams",
+          "astDemand": "url.URLSearchParams",
+          "staticCalls": 0,
+          "staticConstructs": 18,
+          "staticReads": 5,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/.next/server/app/actions/page.js",
+            "line": 1,
+            "column": 428,
+            "utf16Start": 427,
+            "source": "URLSearchParams",
+            "insideFunction": true,
+            "conditionalSyntax": [],
+            "use": "read"
+          }
+        },
+        {
+          "api": "url.format",
+          "astDemand": "url.format",
+          "staticCalls": 5,
+          "staticConstructs": 0,
+          "staticReads": 3,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/server/base-server.js",
+            "line": 207,
+            "column": 27,
+            "utf16Start": 10608,
+            "source": "(0, _url.format)(parsed)",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "IfStatement",
+                "source": "if (req.url) { const parsed = (0, _parseurl.parseUrl)(req.url); parsed.pathname = parsedUrl.pathname; "
+              }
+            ],
+            "use": "call"
+          }
+        },
+        {
+          "api": "url.fileURLToPath",
+          "astDemand": "url.fileURLToPath",
+          "staticCalls": 5,
+          "staticConstructs": 0,
+          "staticReads": 3,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js",
+            "line": 2,
+            "column": 277680,
+            "utf16Start": 290957,
+            "source": "(0,i.fileURLToPath)(e)",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "ConditionalExpression",
+                "source": "e.startsWith(\"file://\")?(0,i.fileURLToPath)(e):e"
+              }
+            ],
+            "use": "call"
+          }
+        },
+        {
+          "api": "url.pathToFileURL",
+          "astDemand": "url.pathToFileURL",
+          "staticCalls": 7,
+          "staticConstructs": 0,
+          "staticReads": 6,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/build/next-config-ts/transpile-config.js",
+            "line": 74,
+            "column": 42,
+            "utf16Start": 2876,
+            "source": "(0, _nodeurl.pathToFileURL)(nextConfigPath)",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "IfStatement",
+                "source": "if (process.env.__NEXT_NODE_NATIVE_TS_LOADER_ENABLED === 'true') { try { // Node.js v22.10.0+ // Value is "
+              },
+              {
+                "kind": "IfStatement",
+                "source": "if (process.features.typescript) { // Run import() here to catch errors and fallback to legacy resolution. ret"
+              }
+            ],
+            "use": "call"
+          }
+        },
+        {
+          "path": "node_modules/next/dist/shared/lib/router/utils/parse-url.js",
+          "line": 17,
+          "utf8Offset": 438,
+          "token": "const parsedURL = new URL(url)",
+          "source": "elativeurl.parseRelativeUrl)(url);     }     const parsedURL = new URL(url);     const username = parsedURL.username;     const password = parsedURL.password;     const auth = username ? password ? `${username}:${password}` : username ",
+          "inputSha256": "d5204b7ea71016ac7e2ea4b847bba28639ea90fb17cc1a528d0ed669e8463978"
+        }
+      ],
+      "conditions": "Legacy format receives URL-shaped router objects. File URL helpers support dynamic/cache-handler paths. Actual Next parseUrl uses global URL/parseRelativeUrl; no attributable node:url.parse/resolve/urlToHttpOptions call was found in this cut, and dynamic dataflow remains unproven.",
+      "proposal": "Reuse actual native WHATWG URL, add real legacy format and file URL conversion with percent/Unicode/POSIX/Windows validation. Bind actual constructor/default/named identities. Keep legacy parse/resolve/urlToHttpOptions as explicit broader Node API backlog rather than claiming current invocation.",
+      "standards": [
+        "No host import for URL parsing/formatting",
+        "guest cwd only where a relative file path requires it"
+      ],
+      "unavailable": [
+        "legacy format as URL.toString shortcut",
+        "node:url.parse runtime observation in this dataset",
+        "arbitrary host path interpretation",
+        "full Node parity from export names"
+      ]
+    },
+    {
+      "id": "http-https",
+      "apis": [
+        "new http.Agent/https.Agent",
+        "http.createServer/https.createServer",
+        "request method/url/headers/body/abort",
+        "response status/headers/write/end/flushHeaders/destroy/events/backpressure"
+      ],
+      "evidence": [
+        {
+          "api": "http.Agent",
+          "astDemand": "http.Agent",
+          "staticCalls": 0,
+          "staticConstructs": 1,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/server/setup-http-agent-env.js",
+            "line": 23,
+            "column": 36,
+            "utf16Start": 732,
+            "source": "new _http.Agent(config.httpAgentOptions)",
+            "insideFunction": true,
+            "conditionalSyntax": [],
+            "use": "construct"
+          }
+        },
+        {
+          "api": "https.Agent",
+          "astDemand": "https.Agent",
+          "staticCalls": 0,
+          "staticConstructs": 1,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/server/setup-http-agent-env.js",
+            "line": 24,
+            "column": 37,
+            "utf16Start": 810,
+            "source": "new _https.Agent(config.httpAgentOptions)",
+            "insideFunction": true,
+            "conditionalSyntax": [],
+            "use": "construct"
+          }
+        },
+        {
+          "api": "http.createServer",
+          "astDemand": "http.createServer",
+          "staticCalls": 1,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/server/lib/start-server.js",
+            "line": 232,
+            "column": 27,
+            "utf16Start": 9077,
+            "source": "_http.default.createServer(requestListener)",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "ConditionalExpression",
+                "source": "selfSignedCertificate ? _https.default.createServer({ key: _fs.default.readFileSync(selfSignedCertificate.key), cert: _fs.default.read"
+              }
+            ],
+            "use": "call"
+          }
+        },
+        {
+          "api": "https.createServer",
+          "astDemand": "https.createServer",
+          "staticCalls": 1,
+          "staticConstructs": 0,
+          "staticReads": 0,
+          "staticWrites": 0,
+          "example": {
+            "path": "/private/tmp/starling-node-compat/next-http-bridge-module-v1/application/node_modules/next/dist/server/lib/start-server.js",
+            "line": 229,
+            "column": 44,
+            "utf16Start": 8888,
+            "source": "_https.default.createServer({ key: _fs.default.readFileSync(selfSignedCertificate.key), cert: _fs.default.readFileSync(selfSignedCertificate.cert) }, requestListener)",
+            "insideFunction": true,
+            "conditionalSyntax": [
+              {
+                "kind": "ConditionalExpression",
+                "source": "selfSignedCertificate ? _https.default.createServer({ key: _fs.default.readFileSync(selfSignedCertificate.key), cert: _fs.default.read"
+              }
+            ],
+            "use": "call"
+          }
+        },
+        {
+          "path": "node_modules/next/dist/server/next-server.js",
+          "line": 491,
+          "utf8Offset": 25580,
+          "token": "(0, _setuphttpagentenv.setHttpClientAndAgentOptions)(this.nextConfig)",
+          "source": "are set when loadConfig isn't called         (0, _setuphttpagentenv.setHttpClientAndAgentOptions)(this.nextConfig);         // Intercept fetch and other testmode apis.         if (this.serverOptions.experimentalTestProxy) {             process.env.NEXT_PRIVATE_TEST_PROXY = ",
+          "inputSha256": "b213afa46803f94a38aa506c6b130eeb94841d7e1ca37686357adf2637cce69e"
+        },
+        {
+          "path": "node_modules/next/dist/server/pipe-readable.js",
+          "line": 79,
+          "utf8Offset": 3282,
+          "token": "const ok = res.write(chunk)",
+          "source": "         }             try {                 const ok = res.write(chunk);                 // Added by the `compression` middleware, this is a function that will                 // flush the partially-compressed response to the clien",
+          "inputSha256": "bedc0f8cafeb73b6e48dcfd509ca21b42b9b2a5234aa7925a2283185ae486d07"
+        },
+        {
+          "path": "node_modules/next/dist/server/pipe-readable.js",
+          "line": 88,
+          "utf8Offset": 3792,
+          "token": "await drained.promise",
+          "source": "              if (!ok) {                     await drained.promise;                     // Reset the drained promise so that we can wait for the next drain event.                     drained = (0, _promisewithresolvers.createP",
+          "inputSha256": "bedc0f8cafeb73b6e48dcfd509ca21b42b9b2a5234aa7925a2283185ae486d07"
+        },
+        {
+          "path": "node_modules/next/dist/server/lib/start-server.js",
+          "line": 251,
+          "utf8Offset": 9754,
+          "token": "server.listen(port, hostname)",
+          "source": "            portRetryCount += 1;             server.listen(port, hostname);         } else {             _log.error(`Failed to start server`);             console.error(err);             process.exit(1);         }     });     let clea",
+          "inputSha256": "2beb0e087fc69702d0eb7b67e5fd0f95fa216d6463dc3732c9a2966310aea5ad"
+        }
+      ],
+      "conditions": "Agent construction is a concrete startup site. createServer/listen belongs to deferred startServer; the retained host bridge used NextCustomServer.getRequestHandler without a guest TCP listener. Request/response parameter methods are not captured by imported-module alias analysis.",
+      "proposal": "Run unchanged full Next handler over genuine Node-shaped request/response implementations backed by standard incoming HTTP. Preserve multiheaders/status, streaming/drain/finish/close/error/abort and ALS. Agents need actual outgoingHTTP transport/options behavior, not blank objects. Same-origin action redirect fetch needs real outgoingHTTP or a separately justified full-semantic same-app path.",
+      "standards": [
+        "wasi:http/incoming-handler+types@0.2.10",
+        "wasi:http/outgoing-handler@0.2.10 for actual outgoing fetch",
+        "wasi:io/streams+poll@0.2.10"
+      ],
+      "unavailable": [
+        "guest TCP listen or raw sockets/TLS from incoming-handler alone",
+        "Agent/socket behavior without implementation",
+        "upgrade/WebSocket/connect/tunnels",
+        "native guest HTTP proof from the host-only 24-request run"
+      ]
+    },
+    {
+      "id": "streaming-zlib",
+      "apis": [
+        "createGzip/createDeflate(options)",
+        "Transform flush/write/end/on(data,end,drain)/pause/resume/destroy",
+        "conditional sync inflateSync/deflateSync and base64 Buffer conversions"
+      ],
+      "evidence": [
+        {
+          "path": "node_modules/next/dist/compiled/compression/index.js",
+          "line": 22,
+          "utf8Offset": 2536,
+          "token": "var l=i(106)",
+          "source": "27)(\"compression\");var t=i(286);var r=i(321);var l=i(106);a.exports=compression;a.exports.filter=shouldCompress;var u=/(?:^|,)\\s*?no-transform\\s*?(?:,|$)/;function compression(a){var e=a||{};var i=e.filter||shouldComp",
+          "inputSha256": "8e7c2ec6982978c754c00388e0d1d3ff46d7aae99945d060f6f1052954c24e29"
+        },
+        {
+          "path": "node_modules/next/dist/compiled/compression/index.js",
+          "line": 22,
+          "utf8Offset": 4081,
+          "token": "x=u===\"gzip\"?l.createGzip(e):l.createDeflate(e)",
+          "source": "ot acceptable\");return}p(\"%s compression\",u);x=u===\"gzip\"?l.createGzip(e):l.createDeflate(e);addListeners(x,x.on,d);o.setHeader(\"Content-Encoding\",u);o.removeHeader(\"Content-Length\");x.on(\"data\",(function onStreamData(a){if(b.call(o,a)===false){x.pause",
+          "inputSha256": "8e7c2ec6982978c754c00388e0d1d3ff46d7aae99945d060f6f1052954c24e29"
+        },
+        {
+          "path": "node_modules/next/dist/compiled/compression/index.js",
+          "line": 22,
+          "utf8Offset": 2864,
+          "token": "o.flush=function flush(){if(x){x.flush()}}",
+          "source": "];var x;var v=o.end;var f=o.on;var b=o.write;o.flush=function flush(){if(x){x.flush()}};o.write=function write(a,e){if(u){return false}if(!this._header){this._implicitHeader()}return x?x.write(toBuffer(a,e)):b.call(this,a,e)};o.end=function end(a,",
+          "inputSha256": "8e7c2ec6982978c754c00388e0d1d3ff46d7aae99945d060f6f1052954c24e29"
+        },
+        {
+          "path": "node_modules/next/dist/compiled/compression/index.js",
+          "line": 22,
+          "utf8Offset": 4281,
+          "token": "x.pause()",
+          "source": "tion onStreamData(a){if(b.call(o,a)===false){x.pause()}}));x.on(\"end\",(function onStreamEnd(){v.call(o)}));f.call(o,\"drain\",(function onResponseDrain(){x.resume()}))}));c()}}function addListeners(a,e,i){for(var n=0",
+          "inputSha256": "8e7c2ec6982978c754c00388e0d1d3ff46d7aae99945d060f6f1052954c24e29"
+        },
+        {
+          "path": "node_modules/next/dist/compiled/compression/index.js",
+          "line": 22,
+          "utf8Offset": 4388,
+          "token": "x.resume()",
+          "source": "f.call(o,\"drain\",(function onResponseDrain(){x.resume()}))}));c()}}function addListeners(a,e,i){for(var n=0;n<i.length;n++){e.apply(a,i[n])}}function chunkLength(a,e){if(!a){return 0}return!s.isBuffer(a)?s.byteLengt",
+          "inputSha256": "8e7c2ec6982978c754c00388e0d1d3ff46d7aae99945d060f6f1052954c24e29"
+        },
+        {
+          "path": "node_modules/next/dist/compiled/compression/index.js",
+          "line": 58,
+          "utf8Offset": 18911,
+          "token": "a.exports=require(\"zlib\")",
+          "source": "xports=require(\"path\")},106:a=>{\"use strict\";a.exports=require(\"zlib\")},281:a=>{\"use strict\";a.exports=JSON.parse('{\"application/1d-interleaved-parityfec\":{\"source\":\"iana\"},\"application/3gpdash-qoe-report+xml\":{\"source\":\"iana\",\"ch",
+          "inputSha256": "8e7c2ec6982978c754c00388e0d1d3ff46d7aae99945d060f6f1052954c24e29"
+        },
+        {
+          "path": "node_modules/next/dist/server/lib/router-server.js",
+          "line": 144,
+          "utf8Offset": 7061,
+          "token": "compress = (0, _compression.default)()",
+          "source": "id 0 : config.compress) !== false) {         compress = (0, _compression.default)();     }     const fsChecker = await (0, _filesystem.setupFsCheck)({         dev: opts.dev,         dir: opts.dir,         config,         minimalMode: opts.mini",
+          "inputSha256": "1e47a889c1e72ca6fdd571553c4eb1d89e2d2a1892e16da78bba1e9bd90f1c37"
+        },
+        {
+          "path": "node_modules/next/dist/server/lib/release-compression-stream.js",
+          "line": 21,
+          "utf8Offset": 689,
+          "token": "maybeStream.destroy()",
+          "source": "ff('drain', noop);         return;     }     maybeStream.destroy(); }  //# sourceMappingURL=release-compression-stream.js.map",
+          "inputSha256": "656d85ad4ef537a90d6f9edb21586ab4533325cf8551880c16a40e93241cb509"
+        },
+        {
+          "path": "node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js",
+          "line": 18,
+          "utf8Offset": 512968,
+          "token": "let{inflateSync:e}=a(\"node:zlib\")",
+          "source": "w Map,imageResponses:new Map};let n=e;if(!r){let{inflateSync:e}=a(\"node:zlib\"),r=t?5*t:524288e3;try{n=e(Buffer.from(n,\"base64\"),{maxOutputLength:r}).toString(\"utf-8\")}catch(e){if(e instanceof RangeError&&\"ERR_BUFFER_TOO_LARGE\"===e.code)th",
+          "inputSha256": "73d1cbb842583340ffde959a86d7932115b81b68e8d0a0e2759990fc108c0194"
+        },
+        {
+          "path": "node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js",
+          "line": 18,
+          "utf8Offset": 514709,
+          "token": "let{deflateSync:t}=a(\"node:zlib\")",
+          "source": "nge.`)}o=function(e){{if(\"null\"===e)return e;let{deflateSync:t}=a(\"node:zlib\");return t(e).toString(\"base64\")}}(o)}return s+o}async function ni(e,t,r,n,a,i,s=!1){let o=JSON.stringify([t,e]);if(!r||0===r.size)return na(o,n,a,i,s);let l=JSO",
+          "inputSha256": "73d1cbb842583340ffde959a86d7932115b81b68e8d0a0e2759990fc108c0194"
+        }
+      ],
+      "conditions": "Webpack module106 joins actual zlib. Middleware installs when compress!==false. Codec selection requires compressible/large-enough response and accepted gzip/deflate; no invocation trace exists. This exact middleware has no createBrotliCompress or Z_SYNC_FLUSH token. Sync RSC-cache branches also request string/base64 support.",
+      "proposal": "Genuine guest zlib per-instance state in a real Transform, with correct flush/final/output/error ordering, bounds, backpressure and exactly-once native end/destroy. Preserve instanceof Duplex: Next close cleanup recovers the wrapped stream through res.on(drain) and destroys it. Keep live codec creation deployed-only until snapshot ownership is proven. Existing finite sync codecs do not implement this contract.",
+      "standards": [
+        "No host compression adapter/new WASI import for guest codec work",
+        "standard HTTP streams/poll for network progress, not compression"
+      ],
+      "unavailable": [
+        "streaming APIs from wrapping sync codecs in Promises",
+        "Brotli demand inferred from this middleware",
+        "Node flush-default/options/errors without tests",
+        "native leak/Storedeath/snapshot proof from JS events alone"
+      ]
+    }
+  ],
+  "nextImplementationOrder": [
+    "process/env/cwd + truthful OS startup policy",
+    "nextTick/immediate/timer handles + ALS/task/microtask integration",
+    "node:url format/file helpers",
+    "HTTP request/response + Agent/outgoingHTTP behavior",
+    "streaming gzip/deflate/close cleanup",
+    "performance measure/origin/monotonic/snapshot verification"
+  ],
+  "remainingFullAppDependencies": [
+    "Module native frontend/link/runtime proof (host JS core ran the unchanged app)",
+    "real FS + ALS + Buffer.concat + util.format successors",
+    "actual crypto/RNG/WebCrypto/AES-GCM where app source requires them",
+    "full unchanged routes/actions/cache/stream/FS/browser guest differential",
+    "explicit new profile/capabilities/whole native metadata; no accepted-v13 replacement claim"
+  ],
+  "qualifications": [
+    "All findings are source-based; method invocation was not traced. AST reference counts include separate call/member-read sites and are not unique runtime calls.",
+    "Seven cards are not a complete builtin or capability closure. Arbitrary wrapper/numeric-webpack dataflow and dynamic names are not resolved by this finite analyzer.",
+    "Node export file records complete own ESM export names and separately CJS enumerable keys, not complete descriptors/behavior.",
+    "A first curation authoring command failed a literal-token lookup before writing output; this source uses verified actual tokens. The AST/parser pass succeeded first attempt."
+  ]
+}

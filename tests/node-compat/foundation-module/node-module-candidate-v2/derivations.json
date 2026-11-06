@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "parentIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/index.json",
+    "sha256": "29f603f7652acabef8adfa12217c70cec177d8aaf07f177f0d09031f2a99009e",
+    "bytes": 12561
+  },
+  "generatorBefore": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/generate-module-factory.mjs",
+    "sha256": "3c567eb18a73c60ca3f32ea052a0c586e2c61f8f5bb97eb643c471540ec69910",
+    "bytes": 1503
+  },
+  "generatorAfter": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v2/generate-module-factory.mjs",
+    "sha256": "90428918f46ebb215f3c9221d65accb46aa1fc5fe42b5f53b21ba5e81a55dfff",
+    "bytes": 1819
+  },
+  "edits": [
+    {
+      "before": "const inventory=JSON.parse(await readFile(new URL('./node-inventory.json',import.meta.url),'utf8'));",
+      "after": "const inventorySource=await readFile(new URL('./module-builtin-inventory.node-v22.14.0.json',import.meta.url),'utf8');\nconst inventory=JSON.parse(inventorySource);\nif(inventory.schemaVersion!==1||inventory.inventoryVersion!=='node-module-builtin-exports-v22.14.0-v1')throw new Error('Unexpected versioned builtin inventory');",
+      "count": 1
+    },
+    {
+      "before": "createHash('sha256').update(source).digest('hex')",
+      "after": "createHash('sha256').update('module-core.mjs\\0'+source+'\\0module-builtin-inventory.node-v22.14.0.json\\0'+inventorySource+'\\0').digest('hex')",
+      "count": 1
+    }
+  ],
+  "canonicalInventoryBefore": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/node-inventory.json",
+    "sha256": "164489298c3fc6746a36c1c5c1d3b7e486c568d1e7dfff17763f99599ab5c4fe",
+    "bytes": 2736
+  },
+  "versionedInventory": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v2/module-builtin-inventory.node-v22.14.0.json",
+    "sha256": "a321061fbd31f409c18b4b0ee6d29e69111111c310d9296ea1ac56c62a1977f4",
+    "bytes": 2823
+  },
+  "headerBefore": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v1/module-factory.generated.h",
+    "sha256": "0ab73749b6b193720bcc3d9d2bd4d55ef897e22920aebe6fbbc67c840c4541fa",
+    "bytes": 15529
+  },
+  "headerAfter": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-module/node-module-candidate-v2/module-factory.generated.h",
+    "sha256": "3a1496ac5166ce0b3819d613fbbf0c882a162601b2b0068afc7a52abe3aed2a2",
+    "bytes": 15529
+  },
+  "generatedFunctionBodyByteIdentical": true,
+  "guestCoreAndKernelAndSixExistingAfterimagesByteIdentical": true
+}

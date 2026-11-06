@@ -2,6 +2,12 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
+**Current priority: get the full Next.js app running in Wasm.** Follow the
+[Next execution roadmap](nextjs-priority-roadmap.md). The real HTTP bridge and
+candidate CommonJS core now pass all24 HTTP and both browser checks on Node;
+native Buffer/Module kernels pass SDK syntax. Filesystem and ALS are unfinished
+drafts. A full Next Wasm component and its deployment checks remain outstanding.
+
 The [experimental Hash/Hmac results](hash-hmac-results-2026-11-06.md) now cover
 fourteen complete Jco/stock-Wasmtime returns:280 accepted Node-record comparisons
 and112 separate native-policy checks. Both components import nothing; direct

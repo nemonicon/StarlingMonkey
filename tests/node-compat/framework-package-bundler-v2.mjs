@@ -45,7 +45,7 @@ export async function bundlePackages({rolldown,parseAst,require:toolRequire,inpu
   const canonicalNatives=[...new Set(Object.values(admitted))];
   const plugin={
     name:PACKAGE_BUNDLER_VERSION,
-    resolveId(source,importer) {
+    async resolveId(source,importer) {
       if(Object.hasOwn(admitted,source)) {
         decisions.push({source,importer:importer??null,canonical:admitted[source],kind:'native-external'});
         // The builtin plugin must own its externals. An early external:true
@@ -54,7 +54,20 @@ export async function bundlePackages({rolldown,parseAst,require:toolRequire,inpu
       }
       if(source.startsWith('node:') || nodeBuiltins.has(source))refusal(`Node builtin is not admitted by this profile: ${source}`);
       if(/^(?:jco:|wasmcloud:)/.test(source))refusal(`Nonstandard host adapter is not admitted: ${source}`);
-      if(/\.(?:node|wasm)(?:\?|$)/.test(source))refusal(`Native addon or executable asset is outside this package contract: ${source}`);
+      if(/\.(?:node|wasm)(?:\?|$)/.test(source)) {
+        // Node requests such as ./stream-ops.node can resolve to ordinary
+        // ./stream-ops.node.js. Classify the actual target, not that request.
+        const target=await this.resolve(source,importer,{skipSelf:true});
+        if(!target)refusal(`Unresolved package or asset is outside this package contract: ${source}`);
+        if(target.external)refusal(`Unexpected external asset is outside this package contract: ${source}`);
+        if(/\.(?:node|wasm)(?:\?|$)/.test(target.id))refusal(`Native addon or executable asset is outside this package contract: ${target.id}`);
+        return target;
+      }
+      return null;
+    },
+    load(id) {
+      // Also cover package main/exports that hide a binary behind a bare name.
+      if(/\.(?:node|wasm)(?:\?|$)/.test(id))refusal(`Native addon or executable asset is outside this package contract: ${id}`);
       return null;
     },
     transform(code,id) {
