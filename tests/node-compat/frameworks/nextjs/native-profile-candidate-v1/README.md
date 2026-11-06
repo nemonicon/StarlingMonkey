@@ -1,15 +1,32 @@
-This is the first combined experimental Next native Source generation. It is
-**not a linked engine or successful Next guest**. The accepted foundations-v13
-engine remains unchanged.
+This is the combined experimental Next native Source workflow. Engine
+`c2bff940` now links and executes real components. The selected profile passes
+16 dependency controls on GET, GET and POST;48 actual records pass. Next itself
+reaches its unchanged loader, then is blocked by Unicode property regex syntax
+in the no-Intl SpiderMonkey build. No successful Next contract or production
+profile promotion is claimed. Accepted foundations-v13 remains unchanged.
 
-Current successor Source V5 has435 policy inputs plus three embedding inputs.
+Current Source V6 has435 policy inputs and three embedding inputs. Its only
+changes from V5 are the FS generator/header's explicit transfer of four native
+dependencies. Actual Wizer INIT on the V5 engine exposed the object-spread bug.
+Nine descriptor
+regressions,41 FS host checks and nine installed generators pass. The fresh V6
+engine `c2bff940` links successfully:10,255,826 bytes, six0/clean phases and2,631
+protected inputs unchanged. Caller preopen/cwd corrections now allow both JS
+entries to construct and validate with13 exact standard0.2.10 imports. The pure
+Node-global alias and typed-WASI EOF fixes live in the selected entry facade;
+the unmodified Next application remains deployed filesystem input.
+`compose-successor.py` preserves V5 and its original inputs.
+
+The first linked engine came from Source V5:435 policy inputs plus three embedding inputs.
 It includes bounded Readable.toWeb, the ALS strict-definition CMake correction,
 three authenticated existing compile headers and Performance's include-path
 correction. Eight installed checks pass. Independent read-only review confirms
 the exact435 paths and unchanged81 C/C++ bodies relative to V4. The earlier13
 SDK frontends and changed registrar passed. Three actual build/configure
-failures remain retained; the corrected fourth build is running. No linked
-artifact or Next guest success is claimed here. `prepare-build-v5.py` records
+failures remain retained; the corrected fourth build passes all six phases.
+Engine `84d70a77` is10,255,733 bytes with2,173 protected inputs unchanged.
+`retain-build-v5.py` retains exact compressed actual metadata/result/phase logs;
+no engine invocation or Next guest success is claimed here. `prepare-build-v5.py` records
 the exact input delta and fresh build receipt; it executes no compiler.
 
 Fresh matched selected/stock host controls both pass24HTTP+2browser, cache and
@@ -17,8 +34,9 @@ strict streaming. An earlier browser abort remains a preserved failure with an
 unresolved cause. The compatible selective guest adapter is built and core-
 validated at`d30ade5b`. A small real C component now constructs and validates
 with twelve selected standard0.2.10 imports and passes three stock Wasmtime
-requests with retained counters1,2,3. Final SpiderMonkey/Next construction and
-execution remain separate gates.
+requests with retained counters1,2,3. Actual JavaScript component construction
+and the bounded16-control runtime baseline now pass separately. Full Next
+startup/routes/actions/cache/browser success remains an open gate.
 
 `compose.py` derives a new Source tree from the exact frozen9aec357 lineage.
 It preserves Hash/Hmac, owned timers, classic streams, consumers and sync zlib,

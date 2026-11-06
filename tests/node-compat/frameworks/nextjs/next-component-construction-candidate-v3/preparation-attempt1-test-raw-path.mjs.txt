@@ -1,0 +1,36 @@
+// Execute only the installed API's isolated path/argv preparation statements.
+// No componentize import, Wasm, Wizer, engine or filesystem workload is run.
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {readFile} from 'node:fs/promises';
+import {join,dirname,resolve,relative} from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+const here=dirname(fileURLToPath(import.meta.url)),p=JSON.parse(await readFile(join(here,'plan.json'),'utf8'));
+for(const r of [p.pins.packageEntry,p.pins.rawPathPlatformModule]){
+  const b=await readFile(r.path);assert.equal(b.length,r.bytes);assert.equal(createHash('sha256').update(b).digest('hex'),r.sha256);
+}
+const text=await readFile(p.pins.packageEntry.path,'utf8');
+const begin='  sourcePath = maybeWindowsPath(sourcePath);',end='  let postProcess;';
+assert.equal(text.split(begin).length,2);assert.equal(text.split(end).length,2);
+const statements=text.slice(text.indexOf(begin),text.indexOf(end));
+const model=new Function('opts','sourcePath','sourcesDir','sourceName','initializerPath','runtimeArgs','cwd','maybeWindowsPath','dirname','resolve','relative',
+  statements+'\nreturn {sourcePath,workspacePrefix,args,runtimeArgs,preopens};');
+const {maybeWindowsPath}=await import(pathToFileURL(p.pins.rawPathPlatformModule.path).href);
+const oldOutput=dirname(p.priorFailedResult.path),sourcesDir=join(oldOutput,'tmp','host-data-only-model','sources');
+const original=process.cwd();let oldModel,newModel;const cases=[];
+function evaluate(cwd,name='source.js'){
+  process.chdir(cwd);
+  return model({enableAot:false},join(sourcesDir,name),sourcesDir,name,join(sourcesDir,'initializer.js'),undefined,
+    process.cwd,maybeWindowsPath,dirname,resolve,relative);
+}
+try{
+  oldModel=evaluate(oldOutput);assert.equal(oldModel.sourcePath,'');assert.equal(oldModel.workspacePrefix,oldOutput);cases.push('actual old cwd empties raw-string sourceName');
+  assert.equal(oldModel.preopens[1],'--mapdir=/::'+oldOutput);cases.push('actual old Wizer rootmap becomes parent output');
+  newModel=evaluate(here);assert.equal(newModel.sourcePath,'source.js');assert.equal(newModel.workspacePrefix,sourcesDir);cases.push('held Source cwd keeps default sourceName intact');
+  assert(newModel.args.endsWith(' source.js'));assert.equal(newModel.runtimeArgs,newModel.args);cases.push('real path block retains nonempty script argument');
+  assert.deepEqual(newModel.preopens,['--dir='+sourcesDir,'--mapdir=/::'+sourcesDir]);cases.push('real path block rootmaps only sourcesDir');
+  assert.equal(evaluate(here,'entry.mjs').sourcePath,'entry.mjs');cases.push('alternate finite raw sourceName also retained');
+  assert.equal(p.nodeWorkingDirectory,here);assert(!sourcesDir.startsWith(here));cases.push('planned fixed cwd outside owned TMPDIR');
+}finally{process.chdir(original);}
+console.log(JSON.stringify({schemaVersion:1,passed:true,cases,exactInstalledStatementsSha256:createHash('sha256').update(statements).digest('hex'),
+  oldModel,newModel,scope:'Real installed JS path/argv block plus actual inert platform helper, host DATA only; no API/Wizer/engine/guest invocation.'}));

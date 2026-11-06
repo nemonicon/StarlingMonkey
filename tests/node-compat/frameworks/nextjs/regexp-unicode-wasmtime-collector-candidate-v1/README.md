@@ -1,0 +1,17 @@
+This is dormant Source for an isolated three-request RegExp diagnostic on the pinned c2bff940 engine. No component, oracle, listener or guest was executed while preparing this family. The application and its failures remain unchanged.
+
+Root must supply a new authority matching `root-authority-template.json`, with this exact index and plan, a fresh run ID, the exact b74a7297 dedicated constructor index, and actual construction/component/audit descriptors. The constructor must report `regex-probe`, the unchanged 802595f5 input family and d3d124a1 entry, the pinned engine/metadata/adapter, incoming-handler as the sole export and emitted imports confined to the selected thirteen standard 0.2.10 interfaces. Both retained audit tool terminals must be genuine clean original0af records.
+
+The authority must also bind the full stdout and clean original0af terminal from the separately authorized pinned Node22 oracle Source. Its stdout must contain the identity and three complete typed string frames. The collector does not execute the oracle. The future invocation is:
+
+```sh
+python3 -I -B /ABSOLUTE/PATH/run-owned.py /ABSOLUTE/PATH/issued-root-authority.json
+```
+
+The original six-argument 0af monitor bounds the Node collector and its Wasmtime child to 180 seconds. A single ephemeral loopback lease selects the address; a bind race fails rather than selecting a second address. Wasmtime42 uses stdio, no application/source filesystem preopens, no DNS/TCP/UDP capability, reuse count 32 and idle timeout 60 seconds. The three sequential GETs each have a ten-second deadline. Their complete byte bodies, statuses, headers and transport failures are saved before any oracle JSON parsing or comparison. Existing output roots are refused. The server receives graceful SIGINT; timeout, forced cleanup, an early exit, interruptions, changed inputs or an unexpected semantic difference refuse the diagnostic result.
+
+Each payload must contain all twelve exact cases and ordinal 1/2/3. The source-derived case contract contains metadata only. Comparisons retain full guest and Node records. Seven explicitly listed Unicode-property cases may be classified `expected-noIntl-property-rejection` when Node compiled the expression and the guest reports a typed SyntaxError. That classification is a source-coupled expected profile gap, not independent proof of a parser cause. Invalid-property negatives, ordinary Unicode/codepoint controls and ignore-case behavior must match Node. Error message wording is retained but is excluded from semantic equality; thrown type/nullness/name/code remain compared. Any other difference is preserved and requires review.
+
+A zero collector exit means complete diagnostic observations and clean cleanup/protection. It can coexist with `nodeSelectedParity:false` and explicitly counted expected property gaps. It never means Next.js compatibility, a dependencies pass, deployment acceptance or adoption. The full Next.js attempts are separate retained failures. This diagnostic does not rewrite Next, Zod, SpiderMonkey, the component or either runtime.
+
+Source checks authenticate the pinned binaries/families, the exact helper lines reused from deployment v4, the twelve source-derived case metadata entries and the capture-before-comparison fence. Node is used only with `--check`; Python uses AST parsing/data assertions. Root alone may issue the separate actual oracle/probe authority.

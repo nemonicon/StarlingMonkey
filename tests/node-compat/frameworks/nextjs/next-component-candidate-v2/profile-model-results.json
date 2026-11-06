@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "state": "NEXT_PROFILE_PRELUDE_AND_DEFAULT_NODE22_ALS_SOURCE_CHECKS_PASSED_V1",
+  "passed": true,
+  "nodeVersion": "v22.14.0",
+  "nodeExecutable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+  "nodeExecArgv": [],
+  "nodeOptionsPresent": false,
+  "cases": [
+    {
+      "name": "actual pinned Node main global descriptor is writable enumerable configurable self-alias",
+      "passed": true
+    },
+    {
+      "name": "prelude installs the same descriptor and is idempotent",
+      "passed": true
+    },
+    {
+      "name": "prelude does not mutate Object.prototype",
+      "passed": true
+    },
+    {
+      "name": "accessor collision refuses without invoking the getter",
+      "passed": true
+    },
+    {
+      "name": "wrong value or descriptor flags refuse rather than silently mask a collision",
+      "passed": true
+    },
+    {
+      "name": "invalid targets refuse",
+      "passed": true
+    },
+    {
+      "name": "actual Node private VM context has no implicit Node global alias",
+      "passed": true
+    },
+    {
+      "name": "explicit installation in a private VM realm stays in that realm",
+      "passed": true
+    },
+    {
+      "name": "default Node22 old snapshot/bind-inside-exit expectation is false",
+      "passed": true
+    }
+  ],
+  "alsOracle": {
+    "backend": "Node22 default async_hooks; no --experimental-async-context-frame",
+    "snapshotInsideExit": "undefined",
+    "boundInsideExit": "undefined",
+    "oldMarkerPredicate": false,
+    "corrected": {
+      "outerBefore": true,
+      "otherBefore": true,
+      "snapshotMarker": true,
+      "otherAfterSnapshot": true,
+      "boundMarker": true,
+      "otherAfterBound": true,
+      "outerAfter": true
+    },
+    "separateExitUndefined": true,
+    "afterExitMarkerRestored": true
+  },
+  "hostOnly": true,
+  "nativeVmOrAlsOrGuestExecuted": false,
+  "privateVMModel": "Actual host Node VM realms; not a nativeVM execution claim"
+}

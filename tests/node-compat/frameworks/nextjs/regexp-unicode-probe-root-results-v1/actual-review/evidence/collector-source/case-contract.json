@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "id": "ascii-identifier-control",
+      "method": "RegExp",
+      "source": "^[A-Za-z_$][A-Za-z0-9_$]*$",
+      "flags": "",
+      "inputs": [
+        "alpha",
+        "_x",
+        "$x",
+        "a1",
+        "1a",
+        "\u03c0",
+        "\u732b"
+      ]
+    },
+    {
+      "id": "unicode-codepoint-control",
+      "method": "RegExp",
+      "source": "^\\u{03C0}+$",
+      "flags": "u",
+      "inputs": [
+        "\u03c0",
+        "\u03c0\u03c0",
+        "\u03a0",
+        "a"
+      ]
+    },
+    {
+      "id": "astral-codepoint-control",
+      "method": "RegExp",
+      "source": "^\\u{1F600}$",
+      "flags": "u",
+      "inputs": [
+        "\ud83d\ude00",
+        "a",
+        ""
+      ]
+    },
+    {
+      "id": "id-start-property",
+      "method": "RegExp",
+      "source": "^[\\p{ID_Start}]$",
+      "flags": "u",
+      "inputs": [
+        "A",
+        "\u03c0",
+        "\u732b",
+        "1",
+        "_",
+        "$",
+        "\ud83d\ude00"
+      ]
+    },
+    {
+      "id": "id-continue-property",
+      "method": "RegExp",
+      "source": "^[\\p{ID_Continue}]$",
+      "flags": "u",
+      "inputs": [
+        "A",
+        "\u03c0",
+        "\u732b",
+        "1",
+        "_",
+        "\u0301",
+        "\u200c",
+        "\u200d"
+      ]
+    },
+    {
+      "id": "actual-zod-dynamic",
+      "method": "RegExp",
+      "source": "[$_\\p{ID_Start}][$\\u200c\\u200d\\p{ID_Continue}]*",
+      "flags": "u",
+      "inputs": [
+        "alpha",
+        "\u03c02",
+        "\u732b1",
+        "_x",
+        "$x",
+        "1a",
+        "a\u200c",
+        "\ud83d\ude00"
+      ]
+    },
+    {
+      "id": "actual-zod-literal-parser",
+      "method": "FunctionLiteral",
+      "source": "[$_\\p{ID_Start}][$\\u200c\\u200d\\p{ID_Continue}]*",
+      "flags": "u",
+      "literalBody": "return /[$_\\p{ID_Start}][$\\u200c\\u200d\\p{ID_Continue}]*/u;",
+      "inputs": [
+        "alpha",
+        "\u03c02",
+        "\u732b1",
+        "_x",
+        "$x",
+        "1a",
+        "a\u200d",
+        "\ud83d\ude00"
+      ]
+    },
+    {
+      "id": "unicode-letter-property",
+      "method": "RegExp",
+      "source": "^\\p{Letter}+$",
+      "flags": "u",
+      "inputs": [
+        "Hello",
+        "\u03c0",
+        "\u732b",
+        "\u00c9",
+        "e\u0301",
+        "12",
+        "\ud83d\ude00"
+      ]
+    },
+    {
+      "id": "unicode-script-property",
+      "method": "RegExp",
+      "source": "^\\p{Script=Greek}+$",
+      "flags": "u",
+      "inputs": [
+        "\u03b1\u03b2",
+        "\u03a0",
+        "abc",
+        "\u732b"
+      ]
+    },
+    {
+      "id": "zod-emoji-properties",
+      "method": "RegExp",
+      "source": "^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$",
+      "flags": "u",
+      "inputs": [
+        "\ud83d\ude00",
+        "\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc66",
+        "1",
+        "#",
+        "A",
+        "\u732b"
+      ]
+    },
+    {
+      "id": "unicode-ignorecase-control",
+      "method": "RegExp",
+      "source": "^k$",
+      "flags": "iu",
+      "inputs": [
+        "k",
+        "K",
+        "\u212a",
+        "a"
+      ]
+    },
+    {
+      "id": "invalid-property-negative",
+      "method": "RegExp",
+      "source": "[\\p{Not_A_Unicode_Property}]",
+      "flags": "u",
+      "inputs": [
+        "a"
+      ]
+    }
+  ],
+  "source": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/regexp-unicode-probe-candidate-v1/cases.mjs",
+    "sha256": "62dca88dacefa46e3b564521e54abe0996944010ad8e49f3b05a6ec03c79a748",
+    "bytes": 3199
+  },
+  "derivedWithoutExecution": true
+}

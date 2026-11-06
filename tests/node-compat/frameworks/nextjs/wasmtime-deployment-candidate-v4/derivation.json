@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "donorIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v3/index.json",
+    "sha256": "9bc3abef369da67a24609ebae5719851c2e4efa7c836a9ef1990342c8f2f62d6",
+    "bytes": 1932
+  },
+  "files": [
+    {
+      "path": "deploy.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v3/deploy.mjs",
+        "sha256": "ab9d619e50fab2f26f741493a057d19ca98293acbe633e5e0e2b5f7841847713",
+        "bytes": 14873
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v4/deploy.mjs",
+        "sha256": "022a1df742fa936c11a2111479a8ae93f84bf035649658061bcc6645cb475faf",
+        "bytes": 16496
+      },
+      "edits": [
+        {
+          "before": "assert(authority.constructionCallerIndex&&typeof authority.constructionCallerIndex.path==='string','Exact late Root constructor index is mandatory');\nassert.equal(resolve(authority.constructionCallerIndex.path),authority.constructionCallerIndex.path);assert.equal(await realpath(authority.constructionCallerIndex.path),authority.constructionCallerIndex.path);assert.equal(authority.constructionCallerIndex.path.split('/').at(-1),'index.json');\nasync function protect(){await family(authority.sourceIndex);await family(authority.constructionCallerIndex);for(const ref of plan.sourceFamilies)await family(ref);for(const r of plan.protectedInputs)await verify(r);}",
+          "after": "assert(typeof authority.runId==='string'&&/^[a-z0-9][a-z0-9-]{0,47}$/.exec(authority.runId)?.[0]===authority.runId,'Mandatory safe fresh runId');\nfor(const key of ['constructionCallerIndex','inputSourceIndex','inputEntry']){const ref=authority[key];assert(ref&&typeof ref.path==='string'&&/^[a-f0-9]{64}$/.test(ref.sha256)&&Number.isSafeInteger(ref.bytes)&&ref.bytes>=0,'Exact late Root descriptor required:'+key);assert.equal(resolve(ref.path),ref.path);assert.equal(await realpath(ref.path),ref.path);if(key!=='inputEntry')assert.equal(ref.path.split('/').at(-1),'index.json');}\nasync function entrySelection(){await family(authority.inputSourceIndex);await verify(authority.inputEntry);const base=dirname(authority.inputSourceIndex.path),rel=relative(base,authority.inputEntry.path);assert(rel&&!rel.startsWith('../')&&!rel.startsWith('/'));const members=(await read(authority.inputSourceIndex.path)).files,member=members.find(r=>r.path===rel);assert(member,'Selected real-next entry must be indexed in selected Source family');assert.deepEqual({...member,path:join(base,member.path)},authority.inputEntry);}\nasync function protect(){await family(authority.sourceIndex);await family(authority.constructionCallerIndex);await entrySelection();for(const ref of plan.sourceFamilies)await family(ref);for(const r of plan.protectedInputs)await verify(r);}",
+          "count": 1
+        },
+        {
+          "before": "assert.deepEqual(construction.artifacts.inputEntry,plan.guestEntry);",
+          "after": "assert.deepEqual(construction.artifacts.inputEntry,authority.inputEntry);assert.deepEqual(construction.artifacts.inputSourceIndex,authority.inputSourceIndex);\nconst constructorPlan=await read(construction.plan.path);assert.equal(constructorPlan.worldName,plan.fixedWit.worldName);assert.deepEqual([...constructorPlan.selectedInterfaces].sort(),[...plan.selectedInterfaces].sort());\nasync function witBookend(){const tree=await walk(constructorPlan.witDirectory);assert.equal(tree.links.length,0);assert.deepEqual(tree.files.filter(x=>x.endsWith('.wit')).sort(),plan.fixedWit.files.map(x=>x.path).sort());for(const ref of plan.fixedWit.files)await verify({...ref,path:join(constructorPlan.witDirectory,ref.path)});}\nawait witBookend();",
+          "count": 1
+        },
+        {
+          "before": "const output=plan.outputRoot,app=join(output,'app'),cache=join(output,'cache');",
+          "after": "const output=resolve(plan.outputPrefix+'-'+authority.runId);assert.equal(output,plan.outputPrefix+'-'+authority.runId);const app=join(output,'app'),cache=join(output,'cache');",
+          "count": 1
+        },
+        {
+          "before": "state:'NEXT_WASMTIME_DEPLOYMENT_IN_PROGRESS_V2',component:",
+          "after": "state:'NEXT_WASMTIME_DEPLOYMENT_IN_PROGRESS_V2',runId:authority.runId,outputRoot:output,inputEntry:authority.inputEntry,inputSourceIndex:authority.inputSourceIndex,component:",
+          "count": 1
+        },
+        {
+          "before": " await protect();await artifactBookend();",
+          "after": " await protect();await artifactBookend();await witBookend();",
+          "count": 1
+        },
+        {
+          "before": "join(output,'client'),plan.browserTools],'client'",
+          "after": "join(output,'client'),plan.browserTools,authority.runId],'client'",
+          "count": 1
+        },
+        {
+          "before": "await sourceBookend();await protect();await artifactBookend();result.originalInputsPreserved",
+          "after": "await sourceBookend();await protect();await artifactBookend();await witBookend();result.originalInputsPreserved",
+          "count": 1
+        }
+      ],
+      "forwardInverseExact": true
+    },
+    {
+      "path": "run-contracts.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v3/run-contracts.mjs",
+        "sha256": "b0e6c70e26c5498177fc03ae2600a1df57762014018be04203a3f3ae80fc36dc",
+        "bytes": 6512
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v4/run-contracts.mjs",
+        "sha256": "2429150b1f2af2a34fc52cbf383382cee7582e12a5ae87baf6eb229a69d0bb09",
+        "bytes": 6608
+      },
+      "edits": [
+        {
+          "before": "assert.equal(process.version,'v22.14.0');assert.equal(process.argv.length,5);",
+          "after": "assert.equal(process.version,'v22.14.0');assert.equal(process.argv.length,6);const runId=process.argv[5];assert(/^[a-z0-9][a-z0-9-]{0,47}$/.exec(runId)?.[0]===runId);",
+          "count": 1
+        },
+        {
+          "before": "assert.equal(root,'/private/tmp/starling-node-compat/next-wasmtime-deployment-v2/client');",
+          "after": "assert.equal(root,'/private/tmp/starling-node-compat/next-wasmtime-deployment-'+runId+'/client');",
+          "count": 1
+        }
+      ],
+      "forwardInverseExact": true
+    },
+    {
+      "path": "run-owned.py",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v3/run-owned.py",
+        "sha256": "3f9b2fc6e0082702c6869ce891d761b0da3fd13955643c4828812824e921c932",
+        "bytes": 3652
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v4/run-owned.py",
+        "sha256": "246ebcea64c366f8c06ec4f20b2a501ddb28cda75c1679aab300ca977e58a208",
+        "bytes": 4267
+      },
+      "edits": [
+        {
+          "before": "import os\n",
+          "after": "import os\nimport re\n",
+          "count": 1
+        },
+        {
+          "before": "    caller=a['constructionCallerIndex'];assert isinstance(caller,dict) and set(caller)=={'path','sha256','bytes'}\n    caller_path=Path(caller['path']);assert caller_path.is_absolute() and caller_path.name=='index.json' and str(caller_path.resolve())==str(caller_path)\n    def protect():\n        family(a['sourceIndex']);family(caller)",
+          "after": "    run_id=a['runId'];assert isinstance(run_id,str) and re.fullmatch('[a-z0-9][a-z0-9-]{0,47}',run_id)\n    for key in ['constructionCallerIndex','inputSourceIndex','inputEntry']:\n        ref=a[key];assert isinstance(ref,dict) and set(ref)=={'path','sha256','bytes'}\n        path=Path(ref['path']);assert path.is_absolute() and str(path.resolve())==str(path)\n        if key!='inputEntry':assert path.name=='index.json'\n    def protect():\n        family(a['sourceIndex']);family(a['constructionCallerIndex']);family(a['inputSourceIndex']);verify(a['inputEntry'])\n        entry_base=Path(a['inputSourceIndex']['path']).parent;entry_relative=Path(a['inputEntry']['path']).relative_to(entry_base).as_posix()\n        entry=next(r for r in read(a['inputSourceIndex']['path'])['files'] if r['path']==entry_relative)\n        assert dict(entry,path=str(entry_base/entry_relative))==a['inputEntry']",
+          "count": 1
+        },
+        {
+          "before": "protect();output=Path(plan['outputRoot']);outer=Path(plan['monitorOutputRoot']);",
+          "after": "protect();output=Path(plan['outputPrefix']+'-'+run_id);outer=Path(str(output)+'-external-root');",
+          "count": 1
+        },
+        {
+          "before": "state='ROOT_NEXT_WASMTIME_DEPLOYMENT_OBSERVATION_V2',rawExitCode=",
+          "after": "state='ROOT_NEXT_WASMTIME_DEPLOYMENT_OBSERVATION_V2',runId=run_id,outputRoot=str(output),rawExitCode=",
+          "count": 1
+        }
+      ],
+      "forwardInverseExact": true
+    }
+  ],
+  "scope": "Root-issued runId fresh namespace and exact reviewed raw-entry/Source-family pair, preserving fixed WIT13 and complete contracts",
+  "oldActualFailurePreserved": true,
+  "operationalActionsInvoked": false
+}

@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "parentIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/dependencies-wasmtime-candidate-v3/index.json",
+    "sha256": "bdf22bb04d77e2dd3ca5e56115b63faa53a22a7270b03478bfe5c5e60bddbbf7",
+    "bytes": 1453
+  },
+  "files": [
+    {
+      "path": "serve.mjs",
+      "parent": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/dependencies-wasmtime-candidate-v3/serve.mjs",
+        "sha256": "b3d83296b55f808ffc4311e586912c5fc088928753925f86f14b1ff574c54603",
+        "bytes": 14268
+      },
+      "edits": [
+        {
+          "before": "ROOT_NEXT_DEPENDENCIES_WASMTIME_AUTHORIZED_V3",
+          "after": "ROOT_NEXT_DEPENDENCIES_WASMTIME_AUTHORIZED_V4"
+        },
+        {
+          "before": "p.applicationInputs,p.dependencyEntry,a.engine,a.nativeMetadata,p.inputSourceIndex",
+          "after": "p.applicationInputs,a.engine,a.nativeMetadata"
+        },
+        {
+          "before": "await family(a.constructorSourceIndex);for(const r of fixed)",
+          "after": "await family(a.constructorSourceIndex);await family(a.inputSourceIndex);await verify(a.inputEntry);const index=await read(a.inputSourceIndex.path);assert(index.files.some(r=>join(dirname(a.inputSourceIndex.path),r.path)===a.inputEntry.path&&r.sha256===a.inputEntry.sha256&&r.bytes===a.inputEntry.bytes),'Exact late entry must be an indexed family member');for(const r of fixed)"
+        },
+        {
+          "before": "inputEntry:p.dependencyEntry,inputSourceIndex:p.inputSourceIndex",
+          "after": "inputEntry:a.inputEntry,inputSourceIndex:a.inputSourceIndex"
+        },
+        {
+          "before": "inputEntry:p.dependencyEntry,requests:[]",
+          "after": "inputEntry:a.inputEntry,inputSourceIndex:a.inputSourceIndex,requests:[]"
+        },
+        {
+          "before": "NEXT_NATIVE_DEPENDENCIES_WASMTIME_RUNNING_V3",
+          "after": "NEXT_NATIVE_DEPENDENCIES_WASMTIME_RUNNING_V4"
+        },
+        {
+          "before": "NEXT_NATIVE_DEPENDENCIES_WASMTIME_PASSED_UNREVIEWED_V3",
+          "after": "NEXT_NATIVE_DEPENDENCIES_WASMTIME_PASSED_UNREVIEWED_V4"
+        },
+        {
+          "before": "NEXT_NATIVE_DEPENDENCIES_WASMTIME_FAILED_UNACCEPTED_V3",
+          "after": "NEXT_NATIVE_DEPENDENCIES_WASMTIME_FAILED_UNACCEPTED_V4"
+        }
+      ]
+    },
+    {
+      "path": "run-owned.py",
+      "parent": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/dependencies-wasmtime-candidate-v3/run-owned.py",
+        "sha256": "1d412cde3ec4bf017c47204ee61479f85eb3a84bd1ce5e2dc220e0b82b535ef6",
+        "bytes": 6040
+      },
+      "edits": [
+        {
+          "before": "ROOT_NEXT_DEPENDENCIES_WASMTIME_AUTHORIZED_V3",
+          "after": "ROOT_NEXT_DEPENDENCIES_WASMTIME_AUTHORIZED_V4"
+        },
+        {
+          "before": "family(a['constructorSourceIndex'])",
+          "after": "family(a['constructorSourceIndex']);family(a['inputSourceIndex']);verify(a['inputEntry'])\n  entries=read(a['inputSourceIndex']['path'])['files'];entry_root=Path(a['inputSourceIndex']['path']).parent\n  assert any(dict(path=str(entry_root/r['path']),sha256=r['sha256'],bytes=r['bytes'])==a['inputEntry']for r in entries),'Exact late entry must be an indexed family member'"
+        },
+        {
+          "before": "'applicationInputs','dependencyEntry','inputSourceIndex'",
+          "after": "'applicationInputs'"
+        },
+        {
+          "before": "NEXT_NATIVE_DEPENDENCIES_WASMTIME_PASSED_UNREVIEWED_V3",
+          "after": "NEXT_NATIVE_DEPENDENCIES_WASMTIME_PASSED_UNREVIEWED_V4"
+        },
+        {
+          "before": "NEXT_DEPENDENCIES_WASMTIME_ROOT_OBSERVATION_V3",
+          "after": "NEXT_DEPENDENCIES_WASMTIME_ROOT_OBSERVATION_V4"
+        }
+      ]
+    },
+    {
+      "path": "test-response.mjs",
+      "parent": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/dependencies-wasmtime-candidate-v3/test-response.mjs",
+        "sha256": "041cc3414f07bc1d27df22ab23aa729a82285c3b2940cfe08408733e3f18673c",
+        "bytes": 1587
+      },
+      "edits": []
+    }
+  ],
+  "planDelta": "oldfixed dependencyEntry removed; inputEntry/inputSourceIndex NULL; stateV4; freshV4output prefix; remaining values identical",
+  "authorityDelta": "stateV4; mandatory late exact inputEntry/inputSourceIndex NULL untilRoot grant",
+  "constructionResultProtocolUnchanged": "NEXT_NATIVE_COMPONENT_CONSTRUCTION_PASSED_UNREVIEWED_V2",
+  "componentAuditProtocolUnchanged": "NEXT_NATIVE_COMPONENT_DATA_AUDIT_PASSED_V1",
+  "canonicalRecordIds": [
+    "fs-and-commonjs-json",
+    "commonjs-execution",
+    "native-aliases",
+    "buffer-concat-codecs",
+    "als-await",
+    "als-next-tick",
+    "als-immediate",
+    "als-timer",
+    "als-snapshot-bind",
+    "als-exit",
+    "als-disable",
+    "vm-real-js-copyout",
+    "zlib-sync",
+    "zlib-transform",
+    "rng-deployed-shapes",
+    "http-adapter"
+  ],
+  "strictMarker": "NEXT_NATIVE_DEPENDENCIES_OK",
+  "sourceOnly": true
+}

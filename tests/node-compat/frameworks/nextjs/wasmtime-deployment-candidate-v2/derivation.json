@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "donorIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v1/index.json",
+    "sha256": "c5a47faaa606736c662238746d593da725231117d8ea3985ec88bf8ef34ed06e",
+    "bytes": 3120
+  },
+  "files": [
+    {
+      "path": "deploy.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v1/deploy.mjs",
+        "sha256": "9aa2c5c113c0f404698b8eaf6b659216bb8f03b965c9feb9d998f6b8a9ba7e48",
+        "bytes": 14347
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v2/deploy.mjs",
+        "sha256": "1c7e34845db32c0479917be39ca52238782b8df56900631bd50e36caacfeb30b",
+        "bytes": 14376
+      },
+      "edits": [
+        {
+          "before": "ROOT_NEXT_WASMTIME_DEPLOYMENT_AUTHORIZED_V1",
+          "after": "ROOT_NEXT_WASMTIME_DEPLOYMENT_AUTHORIZED_V2",
+          "count": 1
+        },
+        {
+          "before": "NEXT_NATIVE_COMPONENT_CONSTRUCTION_PASSED_UNREVIEWED_V1",
+          "after": "NEXT_NATIVE_COMPONENT_CONSTRUCTION_PASSED_UNREVIEWED_V2",
+          "count": 1
+        },
+        {
+          "before": "const input=await read(join(here,'application-inputs.json'));",
+          "after": "await verify(plan.applicationInputs);const input=await read(plan.applicationInputs.path);",
+          "count": 1
+        },
+        {
+          "before": "NEXT_WASMTIME_DEPLOYMENT_IN_PROGRESS_V1",
+          "after": "NEXT_WASMTIME_DEPLOYMENT_IN_PROGRESS_V2",
+          "count": 1
+        },
+        {
+          "before": "'--max-instance-reuse-count','32'",
+          "after": "'--max-instance-reuse-count','128'",
+          "count": 1
+        },
+        {
+          "before": "NEXT_WASMTIME_DEPLOYMENT_CONTRACTS_PASSED_UNREVIEWED_V1",
+          "after": "NEXT_WASMTIME_DEPLOYMENT_CONTRACTS_PASSED_UNREVIEWED_V2",
+          "count": 1
+        },
+        {
+          "before": "NEXT_WASMTIME_DEPLOYMENT_FAILED_UNACCEPTED_V1",
+          "after": "NEXT_WASMTIME_DEPLOYMENT_FAILED_UNACCEPTED_V2",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseExact": true
+    },
+    {
+      "path": "run-contracts.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v1/run-contracts.mjs",
+        "sha256": "73c358f893366903d1f497efa86c4a02db4cdfb94e62f835c3e776b1027a52ed",
+        "bytes": 6506
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v2/run-contracts.mjs",
+        "sha256": "b0e6c70e26c5498177fc03ae2600a1df57762014018be04203a3f3ae80fc36dc",
+        "bytes": 6512
+      },
+      "edits": [
+        {
+          "before": "/private/tmp/starling-node-compat/next-wasmtime-deployment-v1/client",
+          "after": "/private/tmp/starling-node-compat/next-wasmtime-deployment-v2/client",
+          "count": 1
+        },
+        {
+          "before": "ACTUAL_NEXT_WASMTIME_FULL_CONTRACT_CLIENT_V1",
+          "after": "ACTUAL_NEXT_WASMTIME_FULL_CONTRACT_CLIENT_V2",
+          "count": 1
+        },
+        {
+          "before": "ACTUAL_NEXT_WASMTIME_CONTRACT_CLIENT_PASSED",
+          "after": "ACTUAL_NEXT_WASMTIME_CONTRACT_CLIENT_PASSED_V2",
+          "count": 1
+        },
+        {
+          "before": "ACTUAL_NEXT_WASMTIME_CONTRACT_CLIENT_FAILED",
+          "after": "ACTUAL_NEXT_WASMTIME_CONTRACT_CLIENT_FAILED_V2",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseExact": true
+    },
+    {
+      "path": "run-owned.py",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v1/run-owned.py",
+        "sha256": "6cb0cbd571ee8a99c45da947d06bd5fc4085feae8e7fbcb8ae9336b1925b1e3d",
+        "bytes": 3369
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v2/run-owned.py",
+        "sha256": "57d838708ba80cab4a530aea318c7d66fbf45bf27162dab3d662e40a2dc7bc38",
+        "bytes": 3369
+      },
+      "edits": [
+        {
+          "before": "ROOT_NEXT_WASMTIME_DEPLOYMENT_AUTHORIZED_V1",
+          "after": "ROOT_NEXT_WASMTIME_DEPLOYMENT_AUTHORIZED_V2",
+          "count": 1
+        },
+        {
+          "before": "ROOT_NEXT_WASMTIME_DEPLOYMENT_OBSERVATION_V1",
+          "after": "ROOT_NEXT_WASMTIME_DEPLOYMENT_OBSERVATION_V2",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseExact": true
+    }
+  ],
+  "scope": "New actual constructorV2 state/index;128 reuse policy;fresh v2 Root/output namespace; shared exact old app inventory descriptor",
+  "oldDeploymentImmutable": true,
+  "operationsInvoked": false
+}

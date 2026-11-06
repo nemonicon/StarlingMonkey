@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "donorIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v2/index.json",
+    "sha256": "c1b9f455a687bd0c4916b5ba3df17f31bf2737ea03211ffd7f9fbfd47c63c856",
+    "bytes": 2453
+  },
+  "files": [
+    {
+      "path": "deploy.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v2/deploy.mjs",
+        "sha256": "1c7e34845db32c0479917be39ca52238782b8df56900631bd50e36caacfeb30b",
+        "bytes": 14376
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v3/deploy.mjs",
+        "sha256": "ab9d619e50fab2f26f741493a057d19ca98293acbe633e5e0e2b5f7841847713",
+        "bytes": 14873
+      },
+      "edits": [
+        {
+          "before": "async function protect(){await family(authority.sourceIndex);for(const ref of plan.sourceFamilies)await family(ref);for(const r of plan.protectedInputs)await verify(r);}",
+          "after": "assert(authority.constructionCallerIndex&&typeof authority.constructionCallerIndex.path==='string','Exact late Root constructor index is mandatory');\nassert.equal(resolve(authority.constructionCallerIndex.path),authority.constructionCallerIndex.path);assert.equal(await realpath(authority.constructionCallerIndex.path),authority.constructionCallerIndex.path);assert.equal(authority.constructionCallerIndex.path.split('/').at(-1),'index.json');\nasync function protect(){await family(authority.sourceIndex);await family(authority.constructionCallerIndex);for(const ref of plan.sourceFamilies)await family(ref);for(const r of plan.protectedInputs)await verify(r);}",
+          "count": 1
+        },
+        {
+          "before": "assert.deepEqual(construction.callerIndex,plan.constructionCallerIndex);",
+          "after": "assert.deepEqual(construction.callerIndex,authority.constructionCallerIndex);",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseExact": true,
+      "byteIdentical": false
+    },
+    {
+      "path": "run-owned.py",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v2/run-owned.py",
+        "sha256": "57d838708ba80cab4a530aea318c7d66fbf45bf27162dab3d662e40a2dc7bc38",
+        "bytes": 3369
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v3/run-owned.py",
+        "sha256": "3f9b2fc6e0082702c6869ce891d761b0da3fd13955643c4828812824e921c932",
+        "bytes": 3652
+      },
+      "edits": [
+        {
+          "before": "    def protect():\n        family(a['sourceIndex'])",
+          "after": "    caller=a['constructionCallerIndex'];assert isinstance(caller,dict) and set(caller)=={'path','sha256','bytes'}\n    caller_path=Path(caller['path']);assert caller_path.is_absolute() and caller_path.name=='index.json' and str(caller_path.resolve())==str(caller_path)\n    def protect():\n        family(a['sourceIndex']);family(caller)",
+          "count": 1
+        }
+      ],
+      "forwardAndInverseExact": true,
+      "byteIdentical": false
+    },
+    {
+      "path": "run-contracts.mjs",
+      "donor": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v2/run-contracts.mjs",
+        "sha256": "b0e6c70e26c5498177fc03ae2600a1df57762014018be04203a3f3ae80fc36dc",
+        "bytes": 6512
+      },
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v3/run-contracts.mjs",
+        "sha256": "b0e6c70e26c5498177fc03ae2600a1df57762014018be04203a3f3ae80fc36dc",
+        "bytes": 6512
+      },
+      "edits": [],
+      "forwardAndInverseExact": true,
+      "byteIdentical": true
+    }
+  ],
+  "scope": "Mandatory exact late Root constructor index; full family preimport/action/final; construction.callerIndex equality. DeploymentV2 wire/output namespace remains unexecuted and unchanged.",
+  "oldDeploymentV2Immutable": true,
+  "operationsInvoked": false
+}

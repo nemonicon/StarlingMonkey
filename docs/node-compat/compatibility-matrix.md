@@ -2,10 +2,27 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
-The [Next priority roadmap](nextjs-priority-roadmap.md) now orders implementation
-by actual application dependencies. Host HTTP/Module controls and new SDK syntax
-checks do not promote API support in this matrix; new capabilities still need
-the joined native build, emitted-import audit and real component tests.
+The [Next priority roadmap](nextjs-priority-roadmap.md) orders implementation by
+actual application dependencies. The experimental435-input engine now links;
+its component imports exactly13 selected WASI0.2.10 interfaces and passes16
+dependency controls over three real requests. These results do not promote the
+accepted production matrix. Full Next startup remains blocked by core-language
+Unicode regex behavior, despite its module exports being available.
+
+| Experimental API/language gate | Strategy and capability | Current status and deviation | Validation |
+| --- | --- | --- | --- |
+| Node `global` alias | Small pure guest entry facade; no host capability | Bounded: exact self-alias descriptor; other Node globals have separate contracts | Pinned Node descriptor/private-realm tests; first real Next failure removed |
+| CommonJS JS/JSON, aliases and demanded Buffer operations | Native loader/P2 read-only filesystem plus native byte kernels | Partial; basic loads/codecs/identities work, full Next dependency graph remains gated | Three actual component requests,16 controls each; Next reaches its Zod dependency |
+| ALS await, ticks, timers, bind/snapshot | Native Promise/task context propagation; clock/poll interfaces only for scheduled controls | Partial; default Node22 `exit()` semantics retained; broader overlap/disable/GC/lifecycle tests remain | Actual distinct-store capture/restoration and scheduled controls pass in all three requests |
+| WASI request-body EOF | Audited guest facade over `wasi:io/streams@0.2.10` | Bounded typed `ComponentError.payload` handling; unknown throws remain failures |50 host checks plus actual GET/GET/POST;21-byte POST and all48 control records pass |
+| Unicode property regex literals/constructors | Native SpiderMonkey plus Unicode data; no additional host interface | Unavailable in current no-Intl engine; exact Zod identifier pattern rejects |12-case Node/guest differential,36 captured records:21 property SyntaxErrors |
+| Unicode ignore-case matching | Native SpiderMonkey regex engine; no host interface | Partial: `/^k$/iu` misses Kelvin sign `K` compared with pinned Node22 | Same differential captures the mismatch on all three requests; comparator remains failed |
+
+The language baseline is a dependency gate alongside the API/export inventory.
+Fix Unicode support through coherent Intl/ICU-enabled guest artifacts and the
+existing native/Rust integration; the [build plan](nextjs-intl-build-plan.md)
+keeps host interfaces and target hosts unchanged. No dependency source rewriting
+or JavaScript replacement of the regex parser is part of that plan.
 
 The [optional package-bundler follow-on](../../tests/node-compat/frameworks/package-bundler-execution-v1/README.md)
 runs native CommonJS interop, supported modules and real React creation with
@@ -17,9 +34,9 @@ Guarded secret355 component/runtime and three fresh stock-host validations pass
 independent review. These experimental results do not implement Node crypto or
 promote new API statuses; foundations-v13 remains accepted.
 
-The [Next.js application experiment](../../tests/node-compat/frameworks/nextjs/README.md)
-now has two real Node production builds,24 HTTP and two browser checks per run,
-and19 isolated Wasm attempts. Full Next/React entries fail at the current CommonJS
+The earlier [Next.js application experiment](../../tests/node-compat/frameworks/nextjs/README.md)
+recorded two real Node production builds,24 HTTP and two browser checks per run,
+and19 isolated Wasm attempts. Those full Next/React entries failed at the CommonJS
 bundler boundary; eight unavailable Node module imports refuse explicitly. The
 shared application function builds a zero-import component but fails on deferred
 `util.format`; a caught-error diagnostic identifies that refusal. A separate

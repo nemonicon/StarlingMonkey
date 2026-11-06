@@ -4,21 +4,84 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-06. Overall roadmap: **in progress**.
 
-Next.js remains the immediate priority. The new runtime is **not yet linked**
-and the comprehensive Next app has **not yet run in Wasm**. The next gate is one
-combined source/build generation, dependency controls inside a real component,
-then the unchanged24 HTTP/action and2 browser contracts. Generic crypto/API
-expansion and cost work stay behind this gate.
+Next.js remains the immediate priority. The experimental engine now links, and
+both real JavaScript component entries construct and validate with exactly13
+selected standard WASI0.2.10 imports. The profile globals prelude fixes the first
+actual Next startup failure (`global` missing). The second actual attempt then
+fails parsing Unicode property regex syntax in Next's Zod dependency. All23
+initial HTTP cases return500; missing SSR action markup blocks the24th action
+POST, cache comparison, strict-stream and browser stages. No successful Next
+contract is claimed. The immediate requirement is an Intl-enabled SpiderMonkey
+guest build, followed by the unchanged full24 HTTP/action and2 browser contract.
+Generic crypto/API expansion and cost work stay behind this gate.
 
-Current native generation is435 inputs/embedding3, Source V5. It includes the
+The native dependency component now [passes all16 controls on GET, GET and
+POST](tests/node-compat/frameworks/nextjs/dependencies-wasmtime-root-results-v3/actual-review/README.md):48 actual records, HTTP200 each, POST21 bytes, clean0 owned shutdown and
+original/read-only app preserved. The initial ALS failure was an incorrect
+oracle: pinned default Node22.14 disables the instance inside `exit()`. The
+corrected test verifies snapshot/bind capture and caller restoration from a
+distinct enabled store. A second failure exposed the real WASI binding's own
+`ComponentError.payload` wrapper around normal EOF; the bounded adapter fix now
+passes actual POST. Earlier failures remain unchanged. These controls do not
+prove the full Next app, exhaustive GC/snapshot/reset or same-instance identity.
+
+Actual SM147 headers have Intl disabled; matching native parser branches reject
+Unicode property classes. Next's unchanged dependency contains
+`[$_\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*` with `u`.
+The actual12-case guest/Node differential captures all36 records over three
+HTTP200 responses, with guest counters1,2,3. Seven property-expression cases
+reject per request (21 SyntaxErrors). It also finds a Kelvin-sign ignore-case
+mismatch on all three calls; the comparator correctly remains failed and the
+extra differences are [retained with the second actual Next failure](tests/node-compat/frameworks/nextjs/regexp-unicode-probe-root-results-v1/actual-review/README.md).
+Basic Unicode/ASCII and invalid-property controls match. The
+[guest Intl build plan](docs/node-compat/nextjs-intl-build-plan.md) pins fork
+commit`9dab3d6f`, bundled ICU78.1 and the required ICU4X/unicode-bidi single-Rust-
+aggregate integration. Only about3.2GiB is free; a request for20GiB build headroom
+or another writable volume is pending. Heavy source fetch/build has not started.
+
+Current native Source candidate is435 inputs/embedding3, V6. Its V5 base includes the
 bounded Readable.toWeb extension, ALS's real strict-definition guard, three
 authenticated existing compile headers and Performance's actual include-path
-correction. All eight installed generators pass. An independent read-only
-review confirms the exact435 files, unchanged81 C/C++ bodies and three embedding
+correction. V5 passed eight installed generators. An independent read-only
+review confirmed its exact435 files, unchanged81 C/C++ bodies and three embedding
 files relative to V4. The [closure audit](tests/node-compat/frameworks/nextjs/next-native-header-closure-audit-v1/README.md)
 checks1,400 actual old dependencies,80 compile rows and661 quoted includes.
-The fresh fourth native build is running with386 support inputs. No linked
-engine or Next guest is accepted yet.
+The fresh fourth native build **passes** with386 support inputs. Engine
+`84d70a77` is10,255,733 bytes; all six owned phases finish0/clean and2,173
+protected inputs remain unchanged. Exact compressed metadata, build result,
+Source composition and phase logs are [retained](tests/node-compat/frameworks/nextjs/next-native-build-v3-source435-v5-root-results/actual/observation.json).
+This is the first linked experimental Next engine. Component construction,
+complete native runtime semantics and successful Next execution remain unverified. The first
+dependency component attempt fails before Wizer/engine entry: direct
+ComponentizeJS leaves its parser shim's filesystem preopens empty, so the
+existing absolute WIT directory is invisible (errno44). Raw failure and clean
+terminal are preserved. A caller successor will use the installed documented
+`_setPreopens` API for that exact WIT directory only; the runtime world stays
+unchanged. That V2 caller now reaches Wizer and exposes a genuine INIT defect:
+the FS generated factory spreads non-enumerable native dependency fields away,
+so `Readable` is undefined. The failed old engine/attempt stays preserved.
+
+[FS V4](tests/node-compat/foundation-fs/next-fs-candidate-v4/README.md) fixes the
+generator and generated header with four explicit dependency transfers. Nine
+native-shaped descriptor regressions and41 FS host cases pass. V6 overlays only
+those two files on immutable V5: same435 paths, C++ bodies, manifests and flags.
+All nine installed generators pass, now including FS. WORK5's full build passes:
+engine `c2bff940`,10,255,826 bytes, six clean0 phases and2,631 protected inputs
+unchanged. Its actual Wizer attempt passes builtin installation, then fails to
+find the top-level script. Source inspection identifies ComponentizeJS's raw
+string path-slicing bug when TMPDIR is under the caller cwd. A caller successor
+will run from a held directory outside its owned temporary output; no engine
+rebuild or world change is needed. That caller V3 succeeds: dependency component
+`5526fccd` is15,824,544 bytes; real Next component `f71cf62f` is15,809,047 bytes.
+Both have13 exact0.2.10 imports and only incoming-handler exported. All three
+construction/validation phases finish0/clean per entry. Their deployed failures
+and the next globals/probe corrections are summarized above.
+
+To provide build space, only duplicate SDK/Rust installations in failed WORK1–3
+were cleaned. Their3,252 retained source/log/metadata files match before/after;
+the [cleanup receipt](tests/node-compat/frameworks/nextjs/next-native-build-v3-source435-v5-root-results/failed-tool-cache-cleanup.json)
+explicitly records which historical tool paths no longer exist. The successful
+engine, its complete WORK4 and canonical toolchains remain available.
 
 Three failed attempts stay preserved: missing Rust `.in` support templates;
 ALS checking an unset CMake variable instead of the actual strict compile

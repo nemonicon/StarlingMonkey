@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "parentInputSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v2/index.json",
+    "sha256": "4f13b697301d04e1d543ad4d4c2204ba11e2970909b3a7973d9d0ca9f1d1228a",
+    "bytes": 4477
+  },
+  "parentAdapter": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v2/adapter-descendant.mjs",
+    "sha256": "d12a0f0f966f1da8edf8c5ac30df02539fdde376d7c8efb6c0cc185f1eff6219",
+    "bytes": 5941
+  },
+  "parentSourceStatus": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v2/source-status.json",
+    "sha256": "323c98da2b773a4f0b615cdbd4a9dbb8d67e891df8c7530b00538f59b51ef860",
+    "bytes": 1146
+  },
+  "bindingPrimarySources": [
+    {
+      "path": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-source/crates/spidermonkey-embedding-splicer/src/bindgen.rs",
+      "sha256": "83e8d84799650050e60629be29f02831e0434a0bc928fa345d4f05c3e640e75b",
+      "bytes": 55854
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-build/vendor/js-component-bindgen-2.11.0/src/function_bindgen.rs",
+      "sha256": "ed4cb66e55468c822cf5d3be96f7d2199051fe6262ecb5d6e9b17ab9140733a6",
+      "bytes": 190541
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-build/vendor/js-component-bindgen-2.11.0/src/intrinsics/mod.rs",
+      "sha256": "2b4b74e403d1094d52eeb5759a31f15e09f4543aed8870c150b642f5f71e705b",
+      "bytes": 117543
+    }
+  ],
+  "installedPrivateSplicer": {
+    "path": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-package/lib/spidermonkey-embedding-splicer.core.wasm",
+    "sha256": "61685a01168e4f3ed12cf701bcde1a568992ea16d4a33266cbd2784fc1532abb",
+    "bytes": 5583293
+  },
+  "bindingEvidence": {
+    "importBindgenAbi": "GuestExport",
+    "resultErrorHandling": "ThrowResultErr",
+    "noComponentErrorWrapping": false,
+    "wrapper": "ComponentError extends Error; own DATA payload",
+    "sourceLines": [
+      "bindgen.rs:727-745,903,951",
+      "function_bindgen.rs:2576-2611",
+      "intrinsics/mod.rs:345-355"
+    ]
+  },
+  "edits": [
+    {
+      "file": "adapter-descendant.mjs",
+      "before": "function streamFailure(value) {\n  if (value?.tag === 'last-operation-failed') {\n    let message = 'WASI HTTP stream operation failed';\n    try { message = value.val.toDebugString(); } finally { drop(value.val); }\n    return new Error(message);\n  }\n  return value instanceof Error ? value : new Error('WASI HTTP stream failure: ' + value?.tag);\n}\n",
+      "after": "// js-component-bindgen throws ComponentError with an own DATA payload.\n// Only these explicit WIT stream-error records are interpreted. Unknown throws\n// (including falsy values) keep their original identity; no message coercion.\nfunction ownData(value,key) {\n  if(value===null || (typeof value!=='object' && typeof value!=='function'))return undefined;\n  const descriptor=Object.getOwnPropertyDescriptor(value,key);\n  return descriptor && Object.prototype.hasOwnProperty.call(descriptor,'value')?descriptor.value:undefined;\n}\nfunction streamError(value) {\n  const payload=ownData(value,'payload');\n  const variant=payload===undefined?value:payload;\n  const tag=ownData(variant,'tag');\n  if(tag==='closed')return {tag};\n  if(tag==='last-operation-failed') {\n    const resource=ownData(variant,'val');\n    if(resource!==null && (typeof resource==='object' || typeof resource==='function'))return {tag,val:resource};\n  }\n  return undefined;\n}\nfunction diagnosticMethod(resource,name) {\n  for(let object=resource,depth=0;object!==null && depth<4;object=Object.getPrototypeOf(object),depth++) {\n    const descriptor=Object.getOwnPropertyDescriptor(object,name);\n    if(descriptor) {\n      if(Object.prototype.hasOwnProperty.call(descriptor,'value') && typeof descriptor.value==='function')return descriptor.value;\n      throw new TypeError('WASI diagnostic method must be a DATA function');\n    }\n  }\n  throw new TypeError('WASI diagnostic method missing');\n}\nfunction streamFailure(value) {\n  const variant=streamError(value);\n  if(variant?.tag==='last-operation-failed') {\n    const resource=variant.val;\n    let message;\n    try {\n      message=Reflect.apply(diagnosticMethod(resource,'toDebugString'),resource,[]);\n      if(typeof message!=='string')throw new TypeError('WASI diagnostic must return a synchronous string');\n    } finally {drop(resource);}\n    const error=new Error(message);\n    Object.defineProperty(error,'cause',{value,configurable:true,writable:true});\n    return error;\n  }\n  return value;\n}\n"
+    },
+    {
+      "file": "adapter-descendant.mjs",
+      "before": "if (error?.tag === 'closed')",
+      "after": "if (streamError(error)?.tag === 'closed')"
+    }
+  ],
+  "actualEngineProof": null,
+  "actualComponentProof": null,
+  "actualRuntimeProof": null,
+  "rootAuthority": null,
+  "operationsAllowed": false,
+  "retainedFailedDependencyRun": {
+    "result": {
+      "path": "/private/tmp/starling-node-compat/next-dependencies-wasmtime-v4-enginec2bff940-profile2-first/result.json",
+      "sha256": "27fd90203221b18b107069dcf97e4cf25cbe7dc7db0d222060c8b19f0244ebe5",
+      "bytes": 11622
+    },
+    "stderr": {
+      "path": "/private/tmp/starling-node-compat/next-dependencies-wasmtime-v4-enginec2bff940-profile2-first/wasmtime.stderr.log",
+      "sha256": "6f3b2648a118633ae6880dcca974aedfe46769f225171d6c55056e06a44bb2f3",
+      "bytes": 918
+    },
+    "firstGet": {
+      "path": "/private/tmp/starling-node-compat/next-dependencies-wasmtime-v4-enginec2bff940-profile2-first/response-1.body",
+      "sha256": "5f1ee1987a8e83ff0715aa0bc6ca47643bc68a21ef502c431c6332840182933b",
+      "bytes": 1247
+    },
+    "secondGet": {
+      "path": "/private/tmp/starling-node-compat/next-dependencies-wasmtime-v4-enginec2bff940-profile2-first/response-2.body",
+      "sha256": "5f1ee1987a8e83ff0715aa0bc6ca47643bc68a21ef502c431c6332840182933b",
+      "bytes": 1247
+    },
+    "post500": {
+      "path": "/private/tmp/starling-node-compat/next-dependencies-wasmtime-v4-enginec2bff940-profile2-first/response-3.body",
+      "sha256": "224094d372afcadc166a3071a3659b8dd47c88f28985c1fdf24d46faa673ea8e",
+      "bytes": 205
+    }
+  },
+  "actualThrownOwnShapeRetained": false,
+  "failureDiagnosisQualification": "Source-coupled WIT error representation mismatch; actual failed run did not retain thrown own-property shape.",
+  "hostNode": {
+    "path": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+    "sha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+    "bytes": 108619024
+  }
+}
