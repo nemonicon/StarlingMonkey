@@ -1,0 +1,1 @@
+Root-issued actual Intl/structured-stack engine construction authorities. Four unchanged entry constructions are separate from ordinary runtime acceptance. Native engine e7baa5a9, metadata cb473c72, exact selected standard WASI 0.2.10 world. No application mount at initialization. Results are retained under each authority outputRoot.

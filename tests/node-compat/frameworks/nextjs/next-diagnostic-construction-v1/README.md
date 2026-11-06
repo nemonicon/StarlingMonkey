@@ -1,0 +1,1 @@
+Code-identical Intl constructor retarget for diagnostic entry only. Root late authority required. Native engine remains e7baa5a9. No application mount/ordinary calls at INIT. Fullreturn/validate/WIT audit unchanged. Diagnostic execution is not acceptance.

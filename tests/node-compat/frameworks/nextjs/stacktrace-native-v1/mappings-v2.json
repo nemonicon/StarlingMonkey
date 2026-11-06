@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "state": "NATIVE_STACK_CAPTURE_EVAL_PROVENANCE_SOURCE_ONLY_UNCOMPILED",
+  "installedPath": "builtins/node-compat/next-startup.cpp",
+  "beforePrototype": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/stacktrace-native-v1/after/next-startup.cpp",
+    "bytes": 14826,
+    "sha256": "376f79670af6709fd9daaa1a4f0090e4e055c8ea2848a3521e9f9d3f82a6cda9"
+  },
+  "originalV6": {
+    "path": "/private/tmp/starling-node-compat/next-native-profile-v6/source/builtins/node-compat/next-startup.cpp",
+    "bytes": 10116,
+    "sha256": "3e6bb3f67df0fd41cf6a16e307d0f42ce1e001fd330af6e299501fec3fe483f0"
+  },
+  "after": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/stacktrace-native-v1/after-v2/next-startup.cpp",
+    "bytes": 15192,
+    "sha256": "d714c3087c830915af7e64021e58288c3b004a67d1f1e51b2d4e0d034b0b297d"
+  },
+  "guestPatchIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/stacktrace-native-v1/spidermonkey-patch/index.json",
+    "bytes": 4455,
+    "sha256": "531bcc7e777b8451d903da23c13bc6e3a005d2a63e90aab1569167d9d25b8a23"
+  },
+  "requiredActualHeader": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/stacktrace-native-v1/spidermonkey-patch/after/js/public/SavedFrameAPI.h",
+    "bytes": 7304,
+    "sha256": "fc3b58f8706814517ae9c12a218c0df6a4df943874f59cdf70054e7f7db75934"
+  },
+  "newApi": "JS::GetSavedFrameIsEval(cx, principals, frame, bool*, JS::SavedFrameSelfHosted::Exclude)",
+  "requiredCapabilityMacro": {
+    "name": "JS_HAS_SAVEDFRAME_IS_EVAL",
+    "value": 1
+  },
+  "exactEdits": [
+    {
+      "before": "#include \"js/SavedFrameAPI.h\"\n",
+      "after": "#include \"js/SavedFrameAPI.h\"\n#if !defined(JS_HAS_SAVEDFRAME_IS_EVAL) || JS_HAS_SAVEDFRAME_IS_EVAL != 1\n#error Stack capture v2 requires the genuine guest SavedFrame isEval provenance API\n#endif\n"
+    },
+    {
+      "before": "\"SavedFrame access was denied by the current realm's principal/self-hosted filter\"",
+      "after": "\"SavedFrame metadata was inaccessible, filtered, or has unknown eval provenance\""
+    },
+    {
+      "before": "  uint32_t line=0;\n",
+      "after": "  uint32_t line=0;\n  bool is_eval=false;\n"
+    },
+    {
+      "before": "     JS::GetSavedFrameFunctionDisplayName(cx,principals.get(),frame,&function_name,self_hosted)!=JS::SavedFrameResult::Ok||\n",
+      "after": "     JS::GetSavedFrameFunctionDisplayName(cx,principals.get(),frame,&function_name,self_hosted)!=JS::SavedFrameResult::Ok||\n     JS::GetSavedFrameIsEval(cx,principals.get(),frame,&is_eval,self_hosted)!=JS::SavedFrameResult::Ok||\n"
+    },
+    {
+      "before": "  value.setObject(*record);\n",
+      "after": "  value.setBoolean(is_eval);if(!put(cx,record,\"isEval\",value))return false;\n  value.setObject(*record);\n"
+    }
+  ],
+  "exactInverseRestoresV1": true,
+  "policy": {
+    "emitFramesMax": 128,
+    "startAfterCaptureBudget": 512,
+    "zeroEarlyArray": true,
+    "unknownOrDeniedProvenanceThrows": true,
+    "outputRecordFields": [
+      "source",
+      "functionName",
+      "line",
+      "column",
+      "isEval"
+    ]
+  },
+  "unchangedV1SdkProofRetained": true,
+  "v2CompilerInvoked": false,
+  "newGuestLibraryBuilt": false,
+  "engineOrGuestInvoked": false,
+  "finalRuntimeAcceptance": false,
+  "requirements": [
+    "Build the full coherent four-file guest SpiderMonkey patch; a substituted header alone is insufficient for linking or runtime.",
+    "Use matching new headers/library and genuine native producer; never inject the capability macro into old SDK flags.",
+    "New frontend/link/engine/guest and unchanged Next regressions remain future evidence."
+  ]
+}

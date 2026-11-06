@@ -1,0 +1,493 @@
+{
+  "phases": [
+    {
+      "name": "host-compiler",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 2,
+      "diskSamples": 1,
+      "minimumSampledFreeBytes": 88822747136,
+      "argv": [
+        "/usr/bin/clang++",
+        "--version"
+      ],
+      "terminal": {
+        "path": "host-compiler/owned-monitor/terminal.json",
+        "bytes": 1786,
+        "sha256": "ac115613c596e9122e3f29e42806605f2de8c057bc7feef4680316d078ae4076"
+      },
+      "commandLog": {
+        "path": "host-compiler/command.log",
+        "bytes": 110,
+        "sha256": "3635b8631d4ebcd8ed7586f4e01e7a6b44407de9d38db6e01daca9c242ed7a53"
+      }
+    },
+    {
+      "name": "cmake-version",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 2,
+      "diskSamples": 1,
+      "minimumSampledFreeBytes": 88822710272,
+      "argv": [
+        "/usr/local/bin/cmake",
+        "--version"
+      ],
+      "terminal": {
+        "path": "cmake-version/owned-monitor/terminal.json",
+        "bytes": 1784,
+        "sha256": "757bc06dd41b6e269d6bbbcb6b088fce50eabd14c3f94d25579b7462b6e50711"
+      },
+      "commandLog": {
+        "path": "cmake-version/command.log",
+        "bytes": 91,
+        "sha256": "f6e81c2559f3ce00c5fdad01d7b226c301f5d6b07ee04f65db6dbfdc1cc5970b"
+      }
+    },
+    {
+      "name": "sdk-download",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 2,
+      "diskSamples": 1,
+      "minimumSampledFreeBytes": 88822673408,
+      "argv": [
+        "/usr/bin/curl",
+        "--fail",
+        "--location",
+        "--retry",
+        "2",
+        "--output",
+        "/home/runner/work/_temp/spidermonkey-intl/wasi-sdk.tar.gz",
+        "https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-30/wasi-sdk-30.0-x86_64-linux.tar.gz"
+      ],
+      "terminal": {
+        "path": "sdk-download/owned-monitor/terminal.json",
+        "bytes": 1781,
+        "sha256": "76ca0380d1a964f3c5fb46826d0300d46d99b0884ba247f99ddf218f1aff658f"
+      },
+      "commandLog": {
+        "path": "sdk-download/command.log",
+        "bytes": 476,
+        "sha256": "c043e9ea78dd56d7c11d7d3fe76e376b4da7ff1f0d83b597abff113c7b69180a"
+      }
+    },
+    {
+      "name": "sdk-extract",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 3,
+      "diskSamples": 3,
+      "minimumSampledFreeBytes": 88382414848,
+      "argv": [
+        "/usr/bin/tar",
+        "-xzf",
+        "/home/runner/work/_temp/spidermonkey-intl/wasi-sdk.tar.gz",
+        "-C",
+        "/home/runner/work/_temp/spidermonkey-intl"
+      ],
+      "terminal": {
+        "path": "sdk-extract/owned-monitor/terminal.json",
+        "bytes": 1915,
+        "sha256": "dacbec28117b8995715b0020fa96c88a8fe235a0ce6d5833f1b8b16b6e8d2d4f"
+      },
+      "commandLog": {
+        "path": "sdk-extract/command.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "rust-install",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 2,
+      "diskSamples": 10,
+      "minimumSampledFreeBytes": 87510953984,
+      "argv": [
+        "/home/runner/.cargo/bin/rustup",
+        "toolchain",
+        "install",
+        "1.88.0",
+        "--profile",
+        "minimal",
+        "--no-self-update",
+        "--target",
+        "wasm32-wasip1"
+      ],
+      "terminal": {
+        "path": "rust-install/owned-monitor/terminal.json",
+        "bytes": 1783,
+        "sha256": "67a8f7136803259331d4e0b8977dd92e21904275f755f1b7308cea6e6c0e8baa"
+      },
+      "commandLog": {
+        "path": "rust-install/command.log",
+        "bytes": 320,
+        "sha256": "38eb3a3f6a5571b574e427e19f7a936343a07275e4ba334d1f29b546d7a79788"
+      }
+    },
+    {
+      "name": "rust-version",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 2,
+      "diskSamples": 1,
+      "minimumSampledFreeBytes": 87623663616,
+      "argv": [
+        "/home/runner/.cargo/bin/rustup",
+        "run",
+        "1.88.0",
+        "rustc",
+        "--version",
+        "--verbose"
+      ],
+      "terminal": {
+        "path": "rust-version/owned-monitor/terminal.json",
+        "bytes": 1782,
+        "sha256": "7cb1a219ddc95fad3d3889aa80aa414bf6c25093c80946657e11ddc6fed868cf"
+      },
+      "commandLog": {
+        "path": "rust-version/command.log",
+        "bytes": 196,
+        "sha256": "2775ffb86baebfb4c9959501cdd336fe315dd8e1229ffaede4f428f33862f10d"
+      }
+    },
+    {
+      "name": "cargo-version",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 2,
+      "diskSamples": 1,
+      "minimumSampledFreeBytes": 87623626752,
+      "argv": [
+        "/home/runner/.cargo/bin/rustup",
+        "run",
+        "1.88.0",
+        "cargo",
+        "--version",
+        "--verbose"
+      ],
+      "terminal": {
+        "path": "cargo-version/owned-monitor/terminal.json",
+        "bytes": 1784,
+        "sha256": "ae812cd0304ae3b200dcec0f3c43bd0c85b074fe60fbf13d642547f0345cbcfd"
+      },
+      "commandLog": {
+        "path": "cargo-version/command.log",
+        "bytes": 336,
+        "sha256": "afbf09b72118669bd34e0e664424acd0d876ead7c68ab708a77e72b012b06ae3"
+      }
+    },
+    {
+      "name": "sdk-version",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 2,
+      "diskSamples": 1,
+      "minimumSampledFreeBytes": 87623589888,
+      "argv": [
+        "/home/runner/work/_temp/spidermonkey-intl/wasi-sdk-30.0-x86_64-linux/bin/clang",
+        "--version"
+      ],
+      "terminal": {
+        "path": "sdk-version/owned-monitor/terminal.json",
+        "bytes": 1780,
+        "sha256": "0a66f4f53cdf989b786a3bb7a8512b29315bb93986dda165c8d87b365d6397ce"
+      },
+      "commandLog": {
+        "path": "sdk-version/command.log",
+        "bytes": 348,
+        "sha256": "ca64731fa084c07e8720957f32047a17272aa15df4b1c75367dda8ff2c0f9b39"
+      }
+    },
+    {
+      "name": "python-version",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 2,
+      "diskSamples": 1,
+      "minimumSampledFreeBytes": 87623553024,
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+        "--version"
+      ],
+      "terminal": {
+        "path": "python-version/owned-monitor/terminal.json",
+        "bytes": 1787,
+        "sha256": "19a1e050d3883162646f1f3a7e81edc4a71e4974f4fef5cad2ad2c8b7e1226d9"
+      },
+      "commandLog": {
+        "path": "python-version/command.log",
+        "bytes": 15,
+        "sha256": "9d0ae83e540febd225949f3df4aba97c7a9f79fcf745d6c835780f52a57b50cf"
+      }
+    },
+    {
+      "name": "cbindgen-install",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 48,
+      "diskSamples": 112,
+      "minimumSampledFreeBytes": 87444369408,
+      "argv": [
+        "/home/runner/.cargo/bin/rustup",
+        "run",
+        "1.88.0",
+        "cargo",
+        "install",
+        "--locked",
+        "--version",
+        "0.29.1",
+        "--root",
+        "/home/runner/work/_temp/spidermonkey-intl/tools",
+        "cbindgen"
+      ],
+      "terminal": {
+        "path": "cbindgen-install/owned-monitor/terminal.json",
+        "bytes": 8175,
+        "sha256": "c41affa85920262f9f25b5fd5dbc33bc4410bff0f3663fbef5e213985e34feac"
+      },
+      "commandLog": {
+        "path": "cbindgen-install/command.log",
+        "bytes": 3019,
+        "sha256": "335b60bb0d494c3cdff04b4016361adcac211c8cd0757f22d794b83f6674d8fd"
+      }
+    },
+    {
+      "name": "cbindgen-version",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 2,
+      "diskSamples": 1,
+      "minimumSampledFreeBytes": 87558369280,
+      "argv": [
+        "/home/runner/work/_temp/spidermonkey-intl/tools/bin/cbindgen",
+        "--version"
+      ],
+      "terminal": {
+        "path": "cbindgen-version/owned-monitor/terminal.json",
+        "bytes": 1793,
+        "sha256": "cae8822e7b8619fdc0354a2a31fb8a12fb3b72a6279437ffff53a96473315b2f"
+      },
+      "commandLog": {
+        "path": "cbindgen-version/command.log",
+        "bytes": 16,
+        "sha256": "ccba2367a9b38a10ecf2b8e590cd8d9182c5311a52447c59563583e689407f4a"
+      }
+    },
+    {
+      "name": "configure",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 8,
+      "diskSamples": 114,
+      "minimumSampledFreeBytes": 82130427904,
+      "argv": [
+        "/usr/local/bin/cmake",
+        "-S",
+        "/home/runner/work/_temp/spidermonkey-intl/project",
+        "-B",
+        "/home/runner/work/_temp/spidermonkey-intl/build",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DSPIDERMONKEY_BUILD_FROM_SOURCE=ON",
+        "-DSPIDERMONKEY_INTL=ON",
+        "-DSTARLING_SOURCE_ROOT=/home/runner/work/StarlingMonkey/StarlingMonkey",
+        "-DCMAKE_TOOLCHAIN_FILE=/home/runner/work/_temp/spidermonkey-intl/wasi-sdk-30.0-x86_64-linux/share/cmake/wasi-sdk.cmake",
+        "-DSM_HOST_CC=/usr/bin/clang",
+        "-DSM_HOST_CXX=/usr/bin/clang++"
+      ],
+      "terminal": {
+        "path": "configure/owned-monitor/terminal.json",
+        "bytes": 2612,
+        "sha256": "d1889ec945f032a3d71447501dc1e596b1b977926266209219e23fc7e77eab8c"
+      },
+      "commandLog": {
+        "path": "configure/command.log",
+        "bytes": 915,
+        "sha256": "b0d9e57b20e461703eeb43a3e8110b7cea140f92e2292af12a0f6183866b97bd"
+      }
+    },
+    {
+      "name": "source-revision",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 2,
+      "diskSamples": 1,
+      "minimumSampledFreeBytes": 82073051136,
+      "argv": [
+        "/usr/bin/git",
+        "-C",
+        "/home/runner/work/_temp/spidermonkey-intl/project/deps/spidermonkey-source",
+        "rev-parse",
+        "HEAD"
+      ],
+      "terminal": {
+        "path": "source-revision/owned-monitor/terminal.json",
+        "bytes": 1785,
+        "sha256": "3dda9d540df0d1a316ffddd121eb86a291dd9e4301fe59342d0fac0a156123e7"
+      },
+      "commandLog": {
+        "path": "source-revision/command.log",
+        "bytes": 41,
+        "sha256": "7b40f71779bb4850834a2393da45155f81b6b1267ff5a59fde45731e420178e6"
+      }
+    },
+    {
+      "name": "build",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 1162,
+      "diskSamples": 1863,
+      "minimumSampledFreeBytes": 77780750336,
+      "argv": [
+        "/usr/local/bin/cmake",
+        "--build",
+        "/home/runner/work/_temp/spidermonkey-intl/build",
+        "--target",
+        "spidermonkey_build",
+        "--parallel",
+        "1"
+      ],
+      "terminal": {
+        "path": "build/owned-monitor/terminal.json",
+        "bytes": 163371,
+        "sha256": "42ac34842429c359c60779aa86f3e96bb7a7cfba56a80ea32cb81ce82666530c"
+      },
+      "commandLog": {
+        "path": "build/command.log",
+        "bytes": 30756,
+        "sha256": "167dcd6aca06d03c63fcbfc2d241f5488002f75c2c9e8d13867dcdb4b5327bdd"
+      }
+    },
+    {
+      "name": "static-members",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 2,
+      "diskSamples": 1,
+      "minimumSampledFreeBytes": 77766426624,
+      "argv": [
+        "/home/runner/work/_temp/spidermonkey-intl/wasi-sdk-30.0-x86_64-linux/bin/llvm-ar",
+        "t",
+        "/home/runner/work/_temp/spidermonkey-intl/build/spidermonkey-obj/dist/libjs_static.a"
+      ],
+      "terminal": {
+        "path": "static-members/owned-monitor/terminal.json",
+        "bytes": 1795,
+        "sha256": "beafa61cb308a3a48b8c5a9397162e4ee059d739fe804810df20a2b6bff67091"
+      },
+      "commandLog": {
+        "path": "static-members/command.log",
+        "bytes": 8083,
+        "sha256": "4f82c989ca430ca2fccccbcad18ea9260febc1eacfdaf003b6334be9585d4e00"
+      }
+    },
+    {
+      "name": "merged-members",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 2,
+      "diskSamples": 1,
+      "minimumSampledFreeBytes": 77766385664,
+      "argv": [
+        "/home/runner/work/_temp/spidermonkey-intl/wasi-sdk-30.0-x86_64-linux/bin/llvm-ar",
+        "t",
+        "/home/runner/work/_temp/spidermonkey-intl/spidermonkey-dist-release-intl/libspidermonkey.a"
+      ],
+      "terminal": {
+        "path": "merged-members/owned-monitor/terminal.json",
+        "bytes": 1796,
+        "sha256": "2feecc7dbd36ef88b018a1657ae74374f36c8490219f46853688be9f7e1ca3db"
+      },
+      "commandLog": {
+        "path": "merged-members/command.log",
+        "bytes": 8415,
+        "sha256": "88f112d9ad308f53b1892d35fc9a5bd710fac3d9b72b0bd7464634b369576c63"
+      }
+    },
+    {
+      "name": "source-clean",
+      "rawExitCode": 0,
+      "rawChildExitCode": 0,
+      "observedProcesses": 2,
+      "diskSamples": 1,
+      "minimumSampledFreeBytes": 77543563264,
+      "argv": [
+        "/usr/bin/git",
+        "-C",
+        "/home/runner/work/_temp/spidermonkey-intl/project/deps/spidermonkey-source",
+        "diff",
+        "--exit-code",
+        "HEAD"
+      ],
+      "terminal": {
+        "path": "source-clean/owned-monitor/terminal.json",
+        "bytes": 1788,
+        "sha256": "f690f35836b880a8e42696056ccf97037abecf79b1f36f23390b9ae09d5a6e13"
+      },
+      "commandLog": {
+        "path": "source-clean/command.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "phaseCount": 17,
+  "allOriginalRawZeroAndRecordedCleanupClean": true,
+  "descriptorJoins": 85,
+  "ownedProcessRecords": 1247,
+  "diskSamples": 2114,
+  "minimumSampledFreeBytes": 77543563264,
+  "startFreeBytes": 88822759424,
+  "endFreeBytes": 77543546880,
+  "sampledDiskIsNotMeasuredPeak": true,
+  "sourceHead": "9dab3d6f643e926a340c391ea30968e940390dec",
+  "trackedSourceDiffEmpty": true,
+  "untrackedSourceAbsenceProved": false,
+  "staticMembers": 533,
+  "mergedMembers": 555,
+  "extraMergedObjects": [
+    "Unified_cpp_memory_build0.o",
+    "Unified_cpp_memory_mozalloc0.o",
+    "Unified_cpp_mfbt0.o",
+    "Unified_cpp_mfbt1.o",
+    "AutoProfilerLabel.o",
+    "ConditionVariable_noop.o",
+    "Debug.o",
+    "Decimal.o",
+    "MmapFaultHandler.o",
+    "Mutex_noop.o",
+    "Now.o",
+    "Printf.o",
+    "SIMD.o",
+    "StackWalk.o",
+    "TimeStamp.o",
+    "TimeStamp_posix.o",
+    "Uptime.o",
+    "lz4.o",
+    "lz4frame.o",
+    "lz4hc.o",
+    "xxhash.o",
+    "Unified_cpp_third_party_fmt0.o"
+  ],
+  "icuCommonObjects": 176,
+  "icuI18nObjects": 191,
+  "icuDataObjects": [
+    "icu_data.o"
+  ],
+  "generatedIntlHeader": true,
+  "generatedIcu4xDefine": true,
+  "generatedV8IntlCompileDefine": true,
+  "wholeCompilerArgvClosureClaimed": false,
+  "historicDriverSha256": "a5486e5011284fcdad6945952b2d088387effb50c49a86395d1fb296af9ae108",
+  "engineOrGuestExecuted": false,
+  "runtimeAdmission": false,
+  "textPayloads": 1374,
+  "textPayloadBytes": 1367046,
+  "artifactId": 13534080477,
+  "githubRun": 42272037547,
+  "binaryArchivesIndependentlyStreamed": false,
+  "sourceCodeExecuted": false
+}

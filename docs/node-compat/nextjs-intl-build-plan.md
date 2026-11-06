@@ -1,7 +1,8 @@
 # Next.js: Intl-enabled SpiderMonkey 147 build plan
 
-Status: **first unpatched Intl library built in CI;84-package Rust graph
-resolves offline. Guest SavedFrame extension and full native engine pending.**
+Status: **unpatched and SavedFrame-enabled Intl libraries built in CI;
+84-package Rust graph resolves offline; fresh V7 native engine builds and links
+in six clean phases. New component and Next runtime gates remain pending.**
 The current WASI 0.2.10 world and stock
 Wasmtime/wasmCloud hosts remain unchanged. No application/regex rewriting or JS
 compatibility shim is proposed.
@@ -59,7 +60,7 @@ retain the actual header evidence and the separate unexecuted-probe status.
    and a new locked dependency graph, using the upstream vendored sources.
    Do not simply link another `jsrust` staticlib alongside the current
    aggregate: duplicate Rust runtime/hooks and allocator ownership need an
-   explicit coherent solution. This proposed join remains uncompiled.
+   explicit coherent solution. The V7 build now compiles this single aggregate.
 5. Produce coherent new `include/`, generated `js-config.h`/`js-confdefs.h`
    and `libspidermonkey.a`. The existing `SPIDERMONKEY_BINARIES` mechanism
    accepts this distribution. The current Next runner sets that variable from
@@ -120,11 +121,16 @@ these are dependency-resolution results, not Rust compilation/FFI link proof.
 The [structured-stack failure](../../tests/node-compat/frameworks/nextjs/stacktrace-probe-root-results-v1/actual-review/README.md)
 adds a coherent guest-library requirement. The
 [four-file guest patch](../../tests/node-compat/frameworks/nextjs/stacktrace-native-v1/spidermonkey-patch/README.md)
-introduces a **new**, currently uncompiled `GetSavedFrameIsEval` API; existing
+introduces a **new** `GetSavedFrameIsEval` API; existing
 SavedFrame APIs cannot provide truthful eval provenance. It changes no host
 interface. The next opt-in CI build applies exactly that sealed patch to9dab,
 requires matching installed headers/library, and records a distinct variant.
 The first unpatched Intl artifact remains an honest separate checkpoint.
+The [opt-in run42281671898](https://github.com/nemonicon/StarlingMonkey/actions/runs/42281671898)
+also succeeds:22 clean0 phases, matching API headerfc3b58f8 and libraryca04fe5e,
+637,175,630 bytes. The archive is222,806,343 bytes/SHA256e1f1e208. All596 staged
+files match the downloaded variant. The full V7 native consumer now compiles
+and links; source/compiler success does not establish the API's runtime behavior.
 
 The [bounded local tool preflight](../../tests/node-compat/frameworks/nextjs/spidermonkey-intl-tool-preflight-v1/README.md)
 executes 17 read-only tool/version commands and verifies Make 3.81, SDK 27 and
@@ -139,8 +145,8 @@ fork can use standard Ubuntu runners, avoiding a local source/compiler peak.
 The job requires 20 GiB free initially and a 4 GiB floor, retains raw failure
 evidence and uploads artifacts only. No repository setting, release workflow,
 host interface or runtime policy is changed. Compilation is verified for the
-first unpatched library. Patched compilation and the complete
-native/guest runtime gates remain pending. The first Linux run starts with
+unpatched and patched libraries and the V7 engine. The complete guest runtime
+gates remain pending. The first Linux run starts with
 88,822,759,424 bytes free and ends with77,543,546,880; this is a measured run,
 not a universal platform/peak guarantee.
 
@@ -149,7 +155,7 @@ not a universal platform/peak guarantee.
 Retain generated Intl configuration, actual `V8_INTL_SUPPORT` compile rows,
 ICU/data/Rust archive identities, whole link commands, all raw failures and
 source/tool bookends. The first C++/ICU guest library compiles; the separate
-single-Rust aggregate and whole-engine FFI link remain untested. Audit the
+single-Rust aggregate and whole-engine FFI link now compile. Audit the
 new engine/component's actual imports without widening the current 13-interface
 world by assumption. Run the isolated Unicode-property probe, then the
 unchanged full Next application/contracts. Neither a defined `Intl` global
@@ -162,4 +168,9 @@ root patch/vendor requirements and offline Source tests. It consumes Root's
 `SPIDERMONKEY_INTL` selector without editing the SpiderMonkey workflow or build
 options. That immutable companion's original input slots remain unissued;
 the actual84-package resolution/vendor/offline evidence above is a separate
-successor, still awaiting native compilation and FFI link validation.
+successor, now consumed by the successfully linked V7 native engine. All four
+new components validate with the same13 standard WASI0.2.10 imports. The strict
+Unicode differential passes36/36 selected records. The unchanged full Next
+attempt passes11/24 HTTP cases; response piping, file-stream options and
+Buffer/decoder behavior are the next demonstrated blockers. No full Next or
+production-profile acceptance follows from these partial results.

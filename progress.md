@@ -11,16 +11,44 @@ actual Next startup failure (`global` missing). The second actual attempt then
 fails parsing Unicode property regex syntax in Next's Zod dependency. All23
 initial HTTP cases return500; missing SSR action markup blocks the24th action
 POST, cache comparison, strict-stream and browser stages. No successful Next
-contract is claimed. The immediate requirement is an Intl-enabled SpiderMonkey
-guest build, followed by the unchanged full24 HTTP/action and2 browser contract.
+contract is claimed from that older run. The Intl-enabled V7 engine now builds;
+the current full-app result and remaining blockers are recorded below.
 Generic crypto/API expansion and cost work stay behind this gate.
+
+**Current actual Next milestone:** the rebuilt V7 engine runs the unchanged
+Next application and passes11 of24 HTTP cases, including home/nested/dynamic
+SSR, query, action-form SSR, client-counter SSR, completed Suspense, redirects
+and404s. The run remains raw1/unaccepted. JSON responses fail in the response
+pipe; public assets hit the bounded `fs.createReadStream.root` refusal; a
+Buffer/string-decoder Unicode assertion and a POST Buffer input refusal also
+appear. Cache parsing stops subsequent streaming/browser checks. All24 HTTP
+requests are retained, shutdown is clean and original/read-only app inputs are
+preserved. Fix these demonstrated paths before unrelated module expansion.
+
+The new isolated Unicode component passes all36 selected semantic records
+(12 cases across three requests), including Unicode properties and Kelvin
+folding, against Node22.14: raw0, strict paritytrue, counters1,2,3 and clean
+owned shutdown. Dependency controls also pass all48 records across GET/GET/POST.
+Stack controls match9 of12 records: lazy hooks, descriptors, thrown identity
+and depd location extraction now work; the remaining three differences are
+an anonymous frame name reported as a SpiderMonkey inferred string versus
+Node's null. The strict stack run remains raw1/parityfalse. The
+full-app failure is preserved under
+`next-wasmtime-deployment-enginee7baa5a9-intl-stack-v1`; a separate diagnostic
+entry will report own-data error causes/input shapes while retaining thrown
+identity. That diagnostic confirms `pipeTo()` rejects Next's AbortSignal.
+The decoder assertion's actual value is correct `€`, while the expected CJS
+literal appears as UTF8 bytes decoded as Latin1; source decoding needs
+isolation before attributing this to Buffer. The rejected POST value is a
+native ArrayBuffer view, with its exact view type still being diagnosed.
+Diagnostic function wrappers are not a production acceptance claim.
 
 The first [Intl-enabled guest library CI build](https://github.com/nemonicon/StarlingMonkey/actions/runs/42272037547)
 now succeeds at pushed commit`dc7bad5c`:17 raw0 owned phases, baseFirefox9dab,
 library archive2508af52/222,772,017 bytes. Its complete Actions ZIP is downloaded
 and matches published ae81c73e/227,191,494 bytes. This is C++/ICU library evidence,
-not a new native engine or successful Next run. Artifact closure review is in
-progress; local capacity is no longer blocking that guest-library prerequisite.
+not successful Next execution. Its artifact closure review now passes; local
+capacity is no longer blocking that guest-library prerequisite.
 
 Actual Cargo resolution/vendor/offline-locked metadata now passes with84
 packages, all49 old versions preserved.76 external packages/2,278 files/
@@ -30,7 +58,8 @@ control captures the feature differences: old Serde adds derive/serde_derive,
 Smallvec adds union, Syn adds full, and serde_derive becomes selected. The
 control's erroneous49-lock==metadata-count assertion stays failed; its actual
 Cargo command is0/clean and separate DATA reconciliation records48 old versus84
-new metadata nodes. No Rust compilation or FFI linkage has run.
+new metadata nodes. The subsequent V7 engine build now compiles and links this
+single aggregate; ordinary guest behavior remains a separate gate.
 
 The [actual structured-stack component probe](tests/node-compat/frameworks/nextjs/stacktrace-probe-root-results-v1/actual-review/README.md)
 confirms another startup requirement: three HTTP200 responses/counters1,2,3,
@@ -40,10 +69,37 @@ with clean owned shutdown and preserved inputs; Root's portable DATA reader
 passes. The proposed native capture/facade passes64 host checks after three
 retained bad-provider failures. SavedFrame lacks truthful eval provenance, so
 a sealed four-file **guest SpiderMonkey** patch adds a new API;112 Source/model
-checks and a16-case actual Node oracle pass, but that API is still uncompiled.
-The next opt-in CI build will produce coherent patched headers/library before
-the full native engine link. No host modification or additional WASI import is
+checks and a16-case actual Node oracle pass. The subsequent opt-in CI and V7
+engine builds compile the new API with coherent patched headers/library.
+Ordinary component differentials remain pending. No host modification is
 introduced. Complete V8 Error/CallSite semantics are not claimed.
+
+That [patched CI run42281671898](https://github.com/nemonicon/StarlingMonkey/actions/runs/42281671898)
+now succeeds at pushed commit`bb2526b7`:22 raw0 owned phases, exact9dab plus
+patch1a571a89. ZIPabbbd377/227,965,139 bytes matches GitHub; compressed library
+e1f1e208/222,806,343 bytes streams directly into the checked596-file distribution.
+Libraryca04fe5e is637,175,630 bytes and installed API headerfc3b58f8 matches the
+sealed afterimage exactly. The new guest API is compiled; its runtime behavior
+is not yet admitted. Raw result, four-file source checks and full diff remain.
+
+The five-file [V7 source graft](tests/node-compat/frameworks/nextjs/next-intl-native-profile-v1/README.md)
+is composed as435 native+embedding3, with one extra Cargo template extending
+support386→387. All10 installed canonical generators pass. The
+[disk-frugal V4 caller](tests/node-compat/frameworks/nextjs/next-native-build-candidate-v4/README.md)
+passes69 Source/model checks, including real CMake branch tests. It supplies an
+explicit direct-Rust path because Corrosion otherwise invokes Rustup even with
+toolchain resolution disabled. Root checked10 shared read-only inventories and
+3,542 descriptors. The fresh full native build in
+`next-native-intl-build-v1` now passes all six owned phases raw0/clean, with
+80 fresh native compile rows and one separate embedding compile. It uses the
+exact84-package lock/six roots, patched libraryca04fe5e and headerfc3b58f8.
+The resulting engine is `e7baa5a9…`,31,324,485 bytes; metadata is
+`cb473c72…`. Independent actual-build review is in progress. Root issued four
+INIT-only construction authorities for Unicode, stack, dependency and full
+Next entries. All four now construct, validate and audit successfully with
+exactly13 selected standard0.2.10 imports/incoming-handler only. Unicode parity
+passes, dependency48/48 passes, stack9/12 with a named-frame deviation; the full24+2 Next contract remains
+outstanding. No engine or guest is executed by the native builder itself.
 
 The native dependency component now [passes all16 controls on GET, GET and
 POST](tests/node-compat/frameworks/nextjs/dependencies-wasmtime-root-results-v3/actual-review/README.md):48 actual records, HTTP200 each, POST21 bytes, clean0 owned shutdown and

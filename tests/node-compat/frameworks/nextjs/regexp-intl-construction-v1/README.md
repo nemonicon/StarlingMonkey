@@ -1,0 +1,9 @@
+# regexp-intl-construction-v1
+
+Dormant Source retarget. `entry.mjs`, `capture.mjs` and `run.py` are byte-identical copies from the exact donor recorded in derivation.json. Their original Root V2 authority/result and audit V1 wire, API calls, typed whole-return capture, raw monitored phases, package protections and failures are unchanged. No constructor/package/engine/guest/oracle was invoked during preparation.
+
+Only the finite Source plan has new cwd/output/prior roles and null late-native slots. Input entries, their full Source family, eight WIT files, world `next-http`, exact 13 standard0.2.10 allowlist and adapter/package pins remain unchanged. Raw source and WIT descriptors are in derivation.json. The caller cwd stays outside output/tmp. The old failed construction evidence remains historical DATA, not a new outcome.
+
+Root must separately grant construction with this new caller index, exact actual Intl engine and whole metadata kind `EXPERIMENTAL_NEXT_INTL_NATIVE_BUILD_ACTUAL_V1`. Root must include that kind in nonempty `metadataExpectedFixedValues`, and bind genuine complete headers/library/84-lock build and Source evidence via the existing engineBuildEvidence/newSourceEvidence arrays (including the eight WIT files when input and WIT families differ). The unchanged caller checks the Root-supplied fixed fields; the descriptive new plan requirement is not a new executable metadata classifier. No old c2 engine or old metadata frame is assumed.
+
+Future invocation remains `python3 -I -B run.py --authority EXACT_ROOT.json --sha256 ROOT_SHA`. All prospective engine/metadata/Root/component/runtime slots here are null. Actual component validation/WIT audit and subsequent runtime review remain separate. No native production promotion or application acceptance is claimed.

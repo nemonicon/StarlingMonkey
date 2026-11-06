@@ -1,0 +1,1 @@
+Dedicated four-case structured-stack constructor. Executable constructor/capture bytes are identical to the prior regex caller. Only the finite plan is retargeted. INIT-only; ordinary serving requires a separate Root action. Same pinned eight WIT files and 13 standard interfaces. No Next acceptance.
