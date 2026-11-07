@@ -1,7 +1,31 @@
 # Next.js execution priority
 
-Updated 2026-11-07. The complete existing **Next 16.4.5 / React 19.3.1 App Router
-application now passes the selected experimental Wasmtime smoke contract**:
+Updated 2026-11-07. The current critical path is the optional persistent cache
+profile on the corrected native loader. Engine2251/metadataafb pass full-build
+DATA review; component08ce passes construction review and all16 declared
+CJS/fileURL cases in one real Wasmtime GET (runtime review030fad8b). This is a
+bounded loader result. The latest full Next regression still fails cache1→1,
+and earlier strict Server Action aborts remain unresolved.
+
+Next actions, in dependency order:
+
+1. Construct the real-Next component on2251 with the unchanged73b/1e49 entry,
+   standard13@0.2.10 world and accepted16-case prerequisite.
+2. Finish the bounded CacheHandlerV2 and31-file fixture. Preserve28 original
+   files, dependencies, legacy routes and UI. Keep the route delegate read-only;
+   allow mutations only for the two declared primary FETCH tags.
+3. Build the genuine standalone app, inspect its traced handler/delegate and
+   emitted relative paths, then run the same five nonce requests against Node
+   and Wasm with fresh owned cache storage.
+4. Rerun all original24 HTTP/cache-generation/stream/two strict browser/six
+   supplemental contracts. Preserve existing failures and report the new nonce
+   gate separately. Then check wasmCloud, lifecycle/resource limits and costs.
+
+The completed probe and source-only cache plan are committed and pushed through
+`b00d9de9`; [progress.md](../../progress.md) tracks current work and closed evidence.
+
+The retained first fresh **Next 16.4.5 / React 19.3.1 App Router application
+passes the selected experimental Wasmtime smoke contract**:
 24/24 HTTP checks, cache generation 1 → 2, five incremental Suspense chunks,
 and both browser interactions, with zero recorded browser or observer errors.
 A stock Node 22.14.0 control passes the same browser worker, readiness checks,
@@ -21,9 +45,9 @@ Node/Buffer compatibility. Server JavaScript executes in SpiderMonkey inside
 Wasm; the browser executes ordinary Next client JavaScript. This is neither
 JavaScript AOT compilation nor a client-side Wasm port.
 
-## Exact passing generation
+## Retained passing generation
 
-The current fresh-app component is `1c3108d2…` (37,214,251 bytes), engine `4623640b…`
+The retained first fresh-app component is `1c3108d2…` (37,214,251 bytes), engine `4623640b…`
 (31,324,051 bytes), and incremental metadata `726d69cf…`. The engine retains the
 coherent patched Intl/SavedFrame V7 build and its 80 native compile rows plus
 separate embedding as ancestry. One fresh UTF-16 Module translation unit and a

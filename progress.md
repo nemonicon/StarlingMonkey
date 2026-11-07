@@ -16,14 +16,14 @@ Current next steps and outstanding work:
   a SpiderMonkey handle signature check. A separate correction passes frontend,
   generators and full compile/link. Coordinated full-build DATA reviewb9aad169
   passes. The16-case deployed Wasm probe now passes in one GET, raw0/clean,
-  with native/world guards preserved; bounded runtime DATA review is closing.
+  with native/world guards preserved; bounded runtime DATA review030fad8b passes.
   The optional cache facade passes40 in-memory model
   checks only; real storage/Next/WASI validation remains open.
 - **After loader validation:** explicit Next CacheHandler scenario with shared
   tag epochs, differential/real-component tests, target-host checks and measurements.
 - **Still open:** broader lifecycle/resource coverage, clean-machine bootstrap,
   performance/size evaluation and any production promotion. Foundations-v13 remains
-  the accepted checkpoint. Completed snapshots through7db67041 are committed and pushed.
+  the accepted checkpoint. Completed snapshots throughb00d9de9 are committed and pushed.
 
 The corrected2251/afb build is accepted as build DATA only. A separately sealed
 [interop constructorV2](tests/node-compat/frameworks/nextjs/next-module-fileurl-interop-probe-construction-v2/README.md)
@@ -38,7 +38,22 @@ GET200/7152 bytes contains all16 ordered passing cases, result4c919dbf and
 response5ebcea5a. All1739 protected inputs and complete world/native guards
 match before/final. This validates the selected default-only CJS/fileURL
 contract and explicit refusals; it does not establish full Node/Next parity.
-Independent bounded runtime DATA review is closing.
+Independent bounded runtime DATA review030fad8b passes. New real-Next
+constructorSource344d6d5f keeps73b/1e49 unchanged and requires that actual16-case
+proof. Root preparation6d8e20d4 enforces it and protects it as the13th Source
+role. Construction finishes Root97759/original82335/2400 raw0/clean, all three
+inner commands0. Component4e6582ee is37,235,395 bytes, resultca4b8e81, exactly13
+standard0.2.10 imports; coordinated construction DATA review7381338c passes.
+HandlerV2 c5210cc5 is sealed after72 explicit fake-model checks and Source
+semantics/closure review. Catalogue8a2cce89 completes31 files/24 directories,
+28 parent files unchanged; thin builder022d823b changes only its catalogue path.
+Root19036 then builds the genuine standalone app once: four owned phases0/clean,
+resultabdca858/inventoryf8058b47,2,186 files/427 directories/48,755,844 bytes.
+Next traces exactc1013ea6 handler and real FileSystemCache delegate; generated
+config uses ../cache-handler.cjs/maxMemory0. BuildIDuj_9wJGt4Jh1d8BV6oSsU and
+action4018730ebe8dc9bc100be933e21dabdfa132c639ab are fresh actual values.
+App-build DATA review is in progress. Five nonce requests and the full unchanged
+legacy gates have not run on this output; no new Next application acceptance.
 The older
 failed25c constructor remains unchanged and unexecuted. The current volume has
 about15GiB free, so storage is no longer blocking this step.

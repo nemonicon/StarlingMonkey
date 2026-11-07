@@ -39,7 +39,10 @@ ordered cases passes. The collector checks every observation against the
 sealed comparison contract. Full-native/whole-world guards and1739 protected
 descriptors match before/final; eight fresh fixtures retain their physical
 mode and source/destination separation. Independent bounded runtime DATA
-review is closing. No retry, app/bootstrap, browser or Node control runs here.
+review030fad8b passes, including complementary16-outcome review181ba668.
+The concrete authority's peer read occurred after the run and is recorded as
+post-run DATA; original guards authenticated it before/final during execution.
+No retry, app/bootstrap, browser or Node control runs here.
 
 This accepts only the declared default-only CJS/fileURL profile, including its
 intentional refusal deviations. Real storage, the optional Next CacheHandler,

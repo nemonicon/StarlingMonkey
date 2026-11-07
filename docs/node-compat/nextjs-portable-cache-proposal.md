@@ -82,7 +82,7 @@ check and now compiles/links as core2251f11a, with full-build DATA reviewb9aad16
 passed. A new component08ce7388 then validates with exactly13 standard WASI
 imports, and its one deployed GET passes all16 declared interoperability cases
 with clean ownership and preserved guards (result4c919dbf). Bounded runtime
-DATA review is closing. This clears the selected loader prerequisite;
+DATA review030fad8b passes. This clears the selected loader prerequisite;
 the CacheHandler and full application gates remain open. See
 [the probe results](../../tests/node-compat/frameworks/nextjs/next-module-fileurl-interop-probe-root-results-v1/README.md).
 
