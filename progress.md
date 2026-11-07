@@ -4,6 +4,21 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-07. Overall roadmap: **in progress**.
 
+Current next steps and outstanding work:
+
+- **Complete:** guarded native build, real-Next component construction, and one
+  full deployed regression. HTTP/stream/browser checks pass in that sample;
+  cache1→1 keeps the full suite failed. Prior browser failures remain unresolved.
+- **Ready for deployed testing:** the guard-only probe component has passed
+  typed-return, import, owner/world and package DATA review. Its request has not run.
+- **In progress:** immutable result packets, deployed probe harness and portable
+  build integration for the uncompiled bounded CJS/fileURL prototype.
+- **After loader validation:** explicit Next CacheHandler scenario with shared
+  tag epochs, differential/real-component tests, target-host checks and measurements.
+- **Still open:** broader lifecycle/resource coverage, clean-machine bootstrap,
+  performance/size evaluation and any production promotion. Foundations-v13 remains
+  the accepted checkpoint. Completed work through38d05887 is committed and pushed.
+
 Execution resumed after the user freed the current volume. Native admission
 observed 23,397,662,720 free bytes. Both first real request-regression arms have
 now completed, and **both strict results fail**. Each records 80 passing checks
@@ -120,20 +135,46 @@ The fresh real-Next INIT constructor also completes0/clean/protected: component
 49013f31/37,217,436 bytes validates with exactly13 selected standard0.2.10 imports
 and only incoming-handler export. Coordinated typed-return/full-metadata review
 17afbe24, independent owner/world87713051 and current packagec415d9e2 reviews pass.
-No app was mounted at INIT and no ordinary export ran. A fresh full unchanged
-Next regression is in preparation; no guarded import-safety or runtime result
-exists yet. The172-text Source-stage
+No app was mounted at INIT and no ordinary export ran. The first fresh full unchanged Next regression now completes as Root
+session23385/original19988/600: raw1/clean/protected/fullworld unchanged,
+result2f3c0918. All24HTTP/80supplemental/five-stream checks and both strict
+browser interactions pass with empty error arrays. Cache generation1→1 still
+fails, so the suite remains failed; this single browser positive neither proves
+a fix nor accepts earlier failures. Independent bounded runtime DATA review435dced8 now passes physical outcomes,
+original owner/world,4,520 finite inputs and all2,181 app copies. It accepts
+the failed result as recorded, not the cache gate or overall suite. No guarded
+import-safety result exists yet. The172-text Source-stage
 capsule passes its current reader and Root independently reads all172 members
 and live originals/modes; it does not accept the native build.
+The guarded native build is now retained in a sealed2,364-text DATA packet
+(20,838,442 logical bytes; archive9c88e937/2,873,584 bytes). Default/current
+readers and independent Source/DATA review pass. Root independently rereads
+all2,364 archived/current original bytes and modes with unchanged nanosecond
+physical bookends. The packet excludes binaries/825 payload rehash and accepts
+no import/runtime behavior.
+Checkpoint38d05887 is now committed and pushed:264 files retain the action
+transport controls, guarded full-build/INIT evidence and bounded import Sources.
 The native fileURL/CJS prototype is separately sealed at3856b027 after static
 review/60 Source checks, with the initial incorrect compiler-guard draft retained.
-It is uncompiled and excluded from this guarded build. No suspected-invalid-
-referrer import probe or prototype runtime action has run.
+It is uncompiled and excluded from this guarded build. A separate guard-only probe INIT now completes0/clean under Rootsession13386/
+original20407/2400. Componente1bddfbc/37,141,676 bytes validates with the same
+thirteen standard imports and incoming-handler export. Coordinated typed/full-
+metadata review6b4affe3, independent owner/worlda2171853 and fresh packagea5ef2369
+reviews pass. No fixture was mounted at INIT, and no deployed
+referrer probe or prototype runtime action has run.
+A separate genuine Node22.14 control completes0/clean under original22178/120
+using the same sealed CommonJS driver and eight fresh physical read-only fixture
+copies. Natural CJS import(fileURL) succeeds, default equals require exports and
+repeated namespace identity holds. It uses a canonical host fixture URL, not a
+guest /probe emulation. Fifteen retained original text records/10,083 bytes pass
+Root current DATA replay; independent peer/family sealing are pending. This
+reference does not accept the guest guard refusal or uncompiled interop profile.
 The prior capacity observations below
 are historical; the storage blocker is resolved for this execution.
 
-**Next.js is the immediate priority.** The next deliverables are a full guarded-component regression, a deployed
-checked-referrer probe and then a bounded shared-cache implementation, using
+**Next.js is the immediate priority.** Next: retain the new failed full
+regression, run the deployed checked-referrer probe, compile/test the bounded
+CJS/fileURL bridge, then implement the explicit shared-cache scenario, using
 standard WASI and unchanged stock hosts. Resolve demonstrated response/resource
 issues before expanding APIs. A future portable cache scenario must use a new
 versioned fixture and genuine Next extension; it cannot relabel the failed

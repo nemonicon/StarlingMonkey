@@ -143,9 +143,17 @@ The [exact-action transport EOF control](nextjs-action-transport-2026-11-07.md)
 now passes both predeclared native/Node arms0/clean/protected, with valid complete
 chunked/gzip messages and2963 opaque decoded bytes each. This is a separate
 draining client without navigation, not a cause proof or old-browser waiver.
-The next implementation order is: retain those packets; compile/audit the
-checked loader-referrer boundary; implement and test real bounded CJS/fileURL
-handler loading; then build an explicitly configured portable cache scenario
+Its182-member packet is sealed and passes independent/current-original readback.
+The checked loader-referrer boundary now compiles in a separately accepted full
+buildca84/e674 (825 inputs,80 native TUs plus embedding); fresh INIT component49013f31
+passes complete typed-return/standard13-import/world/package DATA review.
+Its first full unchanged deployed regression finishes1/clean/protected:24HTTP/
+80supplemental/stream and both strict browser tests pass, but cache1→1 still
+fails. Independent DATA review is pending; no browser reliability/fix claim
+follows. Construction and that Next run have not exercised the selected
+invalid-referrer import. The next implementation order is: retain this result; run the
+separate two-case deployed checked-referrer probe; compile and test the sealed,
+currently uncompiled bounded CJS/fileURL prototype; then build an explicitly configured portable cache scenario
 through Next's actual CacheHandler extension. Do not patch global state or
 change host scheduling to simulate one Node process.
 
