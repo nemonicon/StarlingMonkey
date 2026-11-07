@@ -1,0 +1,8 @@
+// Bootstrap and compressor allocation occur only after deployed entry.
+async function prepareServer() {
+  const process = bootstrap();
+  if (globalThis.process !== process) throw new Error('Native process identity mismatch');
+  const webHandler = createServerHandler(() => createGzipCompositionHandler(__gzipProbeZlib));
+  return createWasiHttpHandler(webHandler, types, runFreshRequest);
+}
+export const incomingHandler = createNeutralReadyHandler({runNeutralServer,prepareServer,disposeBeforeEntry});

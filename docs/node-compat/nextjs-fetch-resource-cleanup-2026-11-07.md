@@ -29,6 +29,11 @@ failure and its bounded configuration correction are also retained. Further
 native ownership expansion is deferred behind investigation of these two
 remaining application gaps.
 
+Recorded artifact sizes increase from31,341,287 to31,347,353 bytes for the engine
+(+6,066), and37,235,395 to37,241,086 for the unchanged-entry Next component
+(+5,691). These are actual artifact comparisons, not a startup, memory or
+throughput benchmark; those measurements remain outstanding.
+
 The existing deployed profile can render the comprehensive Next.js fixture,
 serve its HTTP contracts, stream HTML and perform both browser interactions.
 Its persistent-cache scenario passes. The corrected pinned Node control passes

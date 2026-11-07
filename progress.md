@@ -59,7 +59,9 @@ Current next steps and outstanding work:
   Target-host checks and measurements remain separate.
 - **Still open:** broader lifecycle/resource coverage, clean-machine bootstrap,
   performance/size evaluation and any production promotion. Foundations-v13 remains
-  the accepted checkpoint. Reviewed snapshots through172f5690 are committed and pushed.
+  the accepted checkpoint. Reviewed build, lifecycle and failed Next snapshots
+  through1b06d3c2 are committed and pushed. The next gzip-composition probe is
+  uncompiled Source work in progress.
 
 The corrected2251/afb build is accepted as build DATA only. A separately sealed
 [interop constructorV2](tests/node-compat/frameworks/nextjs/next-module-fileurl-interop-probe-construction-v2/README.md)
@@ -206,8 +208,17 @@ React19.3.1 is the installed dependency, while actual captured shared browser
 assets contain Next-vendored19.3.0-canary-278794d7-20261002 (Roota6c81d confirms).
 The [response-path audit](docs/node-compat/nextjs-response-completion-next-steps.md)
 separates the outer JS WASI adapter from native Fetch body owners. A proposed
-normal-input gzip-tail/backpressure probe is being prepared as uncompiled
-Source; no extra runtime change or test execution is implied.
+normal-input gzip-tail/backpressure probe is now sealed as uncompiled Source92aa205a:
+15 payloads/103,900 bytes,34 Python Source/artificial-DATA checks, no Node or
+guest execution. It retains the V5 adapter and existing hosting API, compares
+53-byte/2-MiB generated responses to an independent Node gzip reference, and
+requires observed write(false)/drain to claim backpressure coverage. The future
+host argument contract explicitly requires standard --no-logging-prefix for
+public markers. Constructor/controller/grants, real imports and runtime results
+remain outstanding; README's no-index statement describes its preseal draft.
+A separate current-cohort action-wire control is also being prepared to isolate
+HTTP/gzip EOF without browser navigation. No extra native patch or runtime
+acceptance follows from either preparation.
 Commit4ffa8659 is pushed to origin/main; live
 build logs and the unfinished runtime controller were excluded from that cut.
 GeneratorV5 runs all ten checks successfully under original4023/900, result795dab0e;
