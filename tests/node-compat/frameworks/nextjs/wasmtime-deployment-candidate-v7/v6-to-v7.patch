@@ -1,0 +1,114 @@
+--- V6/deploy.mjs
++++ V7/deploy.mjs
+@@ -16,6 +16,43 @@
+ async function family(ref){await verify(ref);const root=dirname(ref.path),j=await read(ref.path),names=j.files.map(x=>x.path);assert.equal(new Set(names).size,names.length);const actual=await walk(root);assert.deepEqual(actual.files.filter(x=>x!=='index.json').sort(),[...names].sort());assert.equal(actual.links.length,0);for(const r of j.files){assert(!r.path.startsWith('/')&&!r.path.split('/').includes('..'));await verify({...r,path:join(root,r.path)});}}
+ async function walk(root){const out={files:[],dirs:['.'],links:[]};async function visit(dir){for(const name of(await readdir(dir)).sort()){const path=join(dir,name),s=await lstat(path),r=relative(root,path);if(s.isSymbolicLink())out.links.push(r);else if(s.isDirectory()){out.dirs.push(r);await visit(path);}else{assert(s.isFile(),'Only regular files/directories');out.files.push(r);}}}await visit(root);return out;}
+ const errorData=e=>({name:e?.name??'Error',message:e?.message??String(e),stack:e?.stack??null});
++// Pure fresh-app DATA policy, inlined into the authenticated actor.
++function relativeMember(name){
++ assert.equal(typeof name,'string');assert(name&&!name.includes('\\')&&!name.includes('\0'));
++ assert(name.split('/').every(x=>x!==''&&x!=='.'&&x!=='..'));return name;
++}
++function sourceDirectoryNames(input){
++ const names=input.directories.map(x=>relativeMember(x.path));assert.equal(new Set(names).size,names.length);
++ return ['.',...names].sort();
++}
++function ownedDirectoryNames(input,policy){
++ assert.deepEqual(policy.additionalDirectories,['.next/cache']);
++ const names=sourceDirectoryNames(input);assert(names.includes('.next'));assert(!names.includes('.next/cache'));
++ assert(!input.files.some(x=>x.path==='.next/cache'||x.path.startsWith('.next/cache/')));
++ return [...names,'.next/cache'].sort();
++}
++function validateFreshInput(input,build,plan){
++ const policy=plan.applicationSchema;
++ assert.equal(policy.name,'fresh-next-standalone-root-excluded-v1');assert.equal(input.schemaVersion,1);
++ assert.equal(policy.sourceDirectoriesExcludeRoot,true);assert.equal(input.root,plan.applicationSource);
++ assert.equal(input.regularFiles,input.files.length);assert.equal(input.regularFiles,policy.files);
++ assert.equal(input.bytes,input.files.reduce((sum,x)=>sum+x.bytes,0));assert.equal(input.bytes,policy.bytes);
++ assert.equal(input.directories.length,policy.directoriesExcludingRoot);assert.deepEqual(input.symlinks,[]);
++ assert.equal(new Set(input.files.map(x=>relativeMember(x.path))).size,input.files.length);
++ const dirs=sourceDirectoryNames(input);assert(!input.directories.some(x=>x.path==='.'));
++ assert(input.files.every(x=>!dirs.includes(x.path)));
++ const owned=ownedDirectoryNames(input,policy);assert.equal(owned.length,policy.ownedDirectoriesIncludingRoot);
++ assert.equal(build.schemaVersion,1);assert.equal(build.state,'NEXT_APP_BUILD_PASSED_UNREVIEWED_V1');
++ assert.equal(build.passed,true);assert.deepEqual(build.errors,[]);assert.equal(build.originalInputsPreserved,true);
++ assert.equal(build.outputRoot,plan.applicationBuildOutputRoot);assert.equal(build.sourceOnlyPreparation,false);
++ assert.deepEqual(build.applicationInventoryDescriptor,plan.applicationInputs);assert.deepEqual(build.applicationInventory,input);
++ const versions={next:'16.4.5',react:'19.3.1','react-dom':'19.3.1'};
++ assert.deepEqual(build.installedVersions,versions);assert.deepEqual(build.installedVersionsBeforeNextBuild,versions);
++ const root=plan.applicationRootIdentity;
++ assert.deepEqual(Object.keys(root).sort(),['dev','ino','mode','nlink']);
++ for(const value of Object.values(root))assert(Number.isSafeInteger(value)&&value>=0);
++ assert(root.ino>0&&root.nlink>0&&root.mode<=0o777);return true;
++}
+ const authorityPath=resolve(process.argv[2]),authority=await read(authorityPath),plan=await read(join(here,'plan.json'));
+ assert.equal(authority.state,'ROOT_NEXT_WASMTIME_DEPLOYMENT_AUTHORIZED_V2');
+ assert.deepEqual(authority.sourceIndex,await row(join(here,'index.json')));assert.deepEqual(authority.plan,await row(join(here,'plan.json')));
+@@ -26,6 +63,7 @@
+ async function entrySelection(){await family(authority.inputSourceIndex);await verify(authority.inputEntry);const base=dirname(authority.inputSourceIndex.path),rel=relative(base,authority.inputEntry.path);assert(rel&&!rel.startsWith('../')&&!rel.startsWith('/'));const members=(await read(authority.inputSourceIndex.path)).files,member=members.find(r=>r.path===rel);assert(member,'Selected real-next entry must be indexed in selected Source family');assert.deepEqual({...member,path:join(base,member.path)},authority.inputEntry);}
+ async function protect(){await family(authority.sourceIndex);await family(authority.constructionCallerIndex);await entrySelection();for(const ref of plan.sourceFamilies)await family(ref);for(const r of plan.protectedInputs)await verify(r);}
+ await protect();await verify(authority.constructionResult);await verify(authority.component);await verify(authority.componentAudit);
++assert.deepEqual({sha256:authority.component.sha256,bytes:authority.component.bytes},plan.expectedComponent);
+ const construction=await read(authority.constructionResult.path),audit=await read(authority.componentAudit.path);
+ assert.equal(construction.state,'NEXT_NATIVE_COMPONENT_CONSTRUCTION_PASSED_UNREVIEWED_V2');assert.equal(construction.passed,true);assert.equal(construction.entryMode,'real-next');
+ assert.deepEqual(construction.artifacts.component,authority.component);assert.deepEqual(construction.artifacts.componentAudit,authority.componentAudit);
+@@ -46,23 +84,41 @@
+ assert(Array.isArray(audit.unusedSelectedInterfaces));assert.deepEqual([...audit.unusedSelectedInterfaces].sort(),plan.selectedInterfaces.filter(x=>!audit.emittedImports.includes(x)).sort());
+ assert.deepEqual(audit.exports,['wasi:http/incoming-handler@0.2.10']);assert.equal(audit.allEmittedVersion,'0.2.10');assert.equal(audit.noExternalPreview1OrCustomImports,true);
+ for(const key of ['validateTerminal','witTerminal']){await verify(audit[key]);const t=await read(audit[key].path);assert.equal(t.rawExitCode,0);assert.equal(t.timeout,false);assert.equal(t.forcedCleanup,false);assert.equal(t.parentOwnedGroupGone,true);assert.equal(t.allObservedOwnedGroupsGone,true);for(const k of ['signals','errors','interruptedSignals','remainingObservedPids'])assert.deepEqual(t[k],[]);artifactRefs.push(audit[key],t.stdout,t.stderr);}
+-await verify(plan.applicationInputs);const input=await read(plan.applicationInputs.path);assert.equal(input.root,plan.applicationSource);
+-async function sourceBookend(){assert.equal(await realpath(input.root),input.root);const tree=await walk(input.root);assert.equal(tree.links.length,0);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),input.directories.map(x=>x.path).sort());for(const r of input.files){const path=join(input.root,r.path),s=await lstat(path);await verify({path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);assert.equal(s.nlink,r.nlink);}for(const r of input.directories){const s=await lstat(join(input.root,r.path));assert.equal(s.mode&0o777,r.mode);assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);}}
++await verify(plan.applicationInputs);await verify(plan.applicationBuildResult);
++const input=await read(plan.applicationInputs.path),appBuild=await read(plan.applicationBuildResult.path);validateFreshInput(input,appBuild,plan);
++async function sourceBookend(){
++ assert.equal(await realpath(input.root),input.root);const rootStat=await lstat(input.root);assert(rootStat.isDirectory()&&!rootStat.isSymbolicLink());
++ assert.deepEqual({dev:rootStat.dev,ino:rootStat.ino,mode:rootStat.mode&0o777,nlink:rootStat.nlink},plan.applicationRootIdentity);
++ const tree=await walk(input.root);assert.equal(tree.links.length,0);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),sourceDirectoryNames(input));
++ for(const r of input.files){const path=join(input.root,r.path),s=await lstat(path);assert(s.isFile()&&!s.isSymbolicLink());await verify({path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);assert.equal(s.nlink,r.nlink);assert.equal(s.nlink,1);}
++ for(const r of input.directories){const path=join(input.root,r.path),s=await lstat(path);assert(s.isDirectory()&&!s.isSymbolicLink());assert.equal(await realpath(path),path);assert.equal(s.mode&0o777,r.mode);assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);}
++}
+ await sourceBookend();
+ const output=resolve(plan.outputPrefix+'-'+authority.runId);assert.equal(output,plan.outputPrefix+'-'+authority.runId);const app=join(output,'app'),cache=join(output,'cache');await mkdir(output,{mode:0o700});
+-const result={schemaVersion:1,state:'NEXT_WASMTIME_DEPLOYMENT_IN_PROGRESS_V2',runId:authority.runId,outputRoot:output,inputEntry:authority.inputEntry,inputSourceIndex:authority.inputSourceIndex,component:authority.component,componentAudit:authority.componentAudit,constructionResult:authority.constructionResult,rootAuthority:await row(authorityPath),sourceIndex:authority.sourceIndex,selectedInterfaces:plan.selectedInterfaces,emittedImports:audit.emittedImports,errors:[],server:null,client:null,originalInputsPreserved:false,readonlyAppPreserved:false,adoption:false};
++const result={schemaVersion:1,state:'NEXT_WASMTIME_DEPLOYMENT_IN_PROGRESS_V2',runId:authority.runId,outputRoot:output,inputEntry:authority.inputEntry,inputSourceIndex:authority.inputSourceIndex,component:authority.component,componentAudit:authority.componentAudit,constructionResult:authority.constructionResult,rootAuthority:await row(authorityPath),sourceIndex:authority.sourceIndex,selectedInterfaces:plan.selectedInterfaces,emittedImports:audit.emittedImports,errors:[],server:null,client:null,originalInputsPreserved:false,readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationInputs:plan.applicationInputs,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],adoption:false};
+ const save=()=>writeFile(join(output,'result.json'),JSON.stringify(result,null,2)+'\n',{mode:0o600});await save();
+ const pause=ms=>new Promise(r=>setTimeout(r,ms));
+ async function boundedWait(promise,ms){let timer;try{await Promise.race([promise,new Promise(resolve=>{timer=setTimeout(resolve,ms);})]);}finally{clearTimeout(timer);}}
+ const handles=[];let host,hostExit=null,hostDone,stopping=false,lease;
+ async function launch(exe,args,id){const stdout=join(output,id+'.stdout.log'),stderr=join(output,id+'.stderr.log'),out=await open(stdout,'wx',0o600),err=await open(stderr,'wx',0o600);handles.push(out,err);const child=spawn(exe,args,{cwd:output,stdio:['ignore',out.fd,err.fd],env:{...process.env,XDG_CACHE_HOME:join(output,'xdg-cache'),XDG_CONFIG_HOME:join(output,'xdg-config'),XDG_DATA_HOME:join(output,'xdg-data')}});let status=null;const done=new Promise(resolve=>{child.once('error',error=>{status={code:null,signal:null,error:errorData(error)};resolve(status);});child.once('exit',(code,signal)=>{status={code,signal,error:null};resolve(status);});});return{child,done,stdout,stderr,get status(){return status;},command:[exe,...args]};}
+-async function readonlyBookend(){const tree=await walk(app);assert.equal(tree.links.length,0);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),input.directories.map(x=>x.path).sort());for(const r of input.files){const q=join(app,r.path),s=await lstat(q);await verify({path:q,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,0o444);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}for(const r of input.directories)assert.equal((await lstat(join(app,r.path))).mode&0o777,0o555);}
++async function prepareReadonlyCopy(){
++ await cp(input.root,app,{recursive:true,force:false,errorOnExist:true,verbatimSymlinks:true,mode:fsConstants.COPYFILE_FICLONE});
++ // This empty mountpoint belongs ONLY to the owned copy, never the Source inventory.
++ await mkdir(join(app,'.next/cache'),{mode:0o700});assert.deepEqual(await readdir(join(app,'.next/cache')),[]);
++ for(const r of input.files)await chmod(join(app,r.path),0o444);
++ for(const name of ownedDirectoryNames(input,plan.applicationSchema).sort((a,b)=>b.length-a.length))await chmod(join(app,name),0o555);
++}
++async function readonlyBookend(){
++ const tree=await walk(app);assert.equal(tree.links.length,0);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),ownedDirectoryNames(input,plan.applicationSchema));
++ for(const r of input.files){const path=join(app,r.path),s=await lstat(path);assert(s.isFile()&&!s.isSymbolicLink());await verify({path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,0o444);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}
++ for(const name of ownedDirectoryNames(input,plan.applicationSchema)){const path=join(app,name),s=await lstat(path);assert(s.isDirectory()&&!s.isSymbolicLink());assert.equal(await realpath(path),path);assert.equal(s.mode&0o777,0o555);}
++ assert.deepEqual(await readdir(join(app,'.next/cache')),[]);
++}
+ try{
+- await cp(input.root,app,{recursive:true,force:false,errorOnExist:true,verbatimSymlinks:true,mode:fsConstants.COPYFILE_FICLONE});
+- for(const r of input.files)await chmod(join(app,r.path),0o444);for(const r of [...input.directories].sort((a,b)=>b.path.length-a.path.length))await chmod(join(app,r.path),0o555);
++ await prepareReadonlyCopy();
+  await readonlyBookend();await mkdir(cache,{mode:0o700});assert.equal((await lstat(cache)).mode&0o777,0o700);
+  assert((await lstat(join(app,'.next/cache'))).isDirectory(),'Readonly parent/cache path must physically exist');
+- result.mounts=[{host:app,guest:'/app',physicalDirectoryMode:'0555',physicalFileMode:'0444'},{host:cache,guest:'/app/.next/cache',physicalRootMode:'0700'}];result.applicationCopy={files:input.regularFiles,bytes:input.bytes,byteIdentical:true,independentInodes:true};
++ result.mounts=[{host:app,guest:'/app',physicalDirectoryMode:'0555',physicalFileMode:'0444'},{host:cache,guest:'/app/.next/cache',physicalRootMode:'0700'}];result.applicationCopy={files:input.regularFiles,bytes:input.bytes,sourceDirectoriesExcludingRoot:input.directories.length,ownedDirectoriesIncludingRoot:plan.applicationSchema.ownedDirectoriesIncludingRoot,byteIdentical:true,independentInodes:true};result.ownedAdditionalDirectories=[{path:'.next/cache',sourceInventoryMember:false,empty:true,mode:0o555,purpose:'underlying mountpoint for separately writable cache preopen'}];
+  lease=createServer();lease.on('error',()=>{});await new Promise((resolve,reject)=>{lease.once('error',reject);lease.listen({host:'127.0.0.1',port:0,exclusive:true},resolve);});const address=lease.address();assert(address&&typeof address==='object'&&address.address==='127.0.0.1');
+  const origin='http://127.0.0.1:'+address.port;result.portLease={address:address.address,port:address.port,origin,heldUntilImmediatelyBeforeSingleLaunch:true,fallbackAllowed:false};await save();
+  const args=['serve','--addr',address.address+':'+address.port,'-S','cli=y,tcp=n,udp=n,allow-ip-name-lookup=n','--env','STARLING_NEXT_ORIGIN='+origin,'--env','NODE_ENV=production','--env','NEXT_TELEMETRY_DISABLED=1','--dir',app+'::/app','--dir',cache+'::/app/.next/cache','--max-instance-reuse-count','128','--idle-instance-timeout','60s',authority.component.path];
+--- V6/run-contracts.mjs
++++ V7/run-contracts.mjs
+@@ -66,7 +66,7 @@
+     complete: text.includes('NEXT_STREAM_SHELL') && text.includes('NEXT_STREAM_READY'),
+     incrementalDeliveryObserved: ready > shell && shell >= 0};
+   if (browserTools) {
+-    const args = [join(here, '../browser-hydration-candidate-v2/browser-check.mjs'), '--origin', result.origin,
++    const args = [join(here, '../browser-hydration-candidate-v3/browser-check.mjs'), '--origin', result.origin,
+       '--tools', browserTools, '--output', join(root, 'browser')];
+     result.browserArgv = [process.execPath, ...args];
+     const child = spawn(process.execPath, args, {stdio: ['ignore', 'inherit', 'inherit']});

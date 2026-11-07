@@ -238,11 +238,27 @@ C independently rechecked the DATA package and exact current source/tool/app
 membership; no material flaw was found. C authored the app CLI/acquisition, so
 this is independent of the DATA curator, not an independent approval of C's
 own implementation.
-Fresh runtime/stock/browser Source successors are in preparation: they must
-explicitly handle the new root-excluding directory schema, declare the empty
-owned-copy cache mountpoint and replace two of five browser asset pins. Existing
-dynamic action-ID extraction stays unchanged. No engine/component rebuild is
-needed merely to load the new `/app` tree; actual runtime acceptance is open.
+Fresh runtimeV7/stockV3/browserV3 [Source successors](tests/node-compat/frameworks/nextjs/next-app-runtime-root-results-v1/README.md)
+are now sealed and independently reviewed: bd785648/3720,41361ae1/3071 and
+5faa8f5d/3219. They explicitly handle the root-excluding schema and current
+source-root identity, declare only the owned native copy's empty cache
+mountpoint before chmod, and replace two of five browser asset pins. Native
+owned directory count is427 including root; source425 excludes root. Existing
+dynamic action-ID extraction,24HTTP/cache/stream/two-browser assertions,
+20s/500ms limits, strict error gates and600/300s owners stay unchanged. Root
+readback and C independent reviews pass31 native inert,20 stock read-only/inert
+and18 observer checks; this executes no copy/server/browser/guest. No
+engine/component rebuild is needed merely to load `/app`.
+The new [fresh-app regression CLI](tests/node-compat/frameworks/nextjs/run-fresh-next-regression.py)
+pins the reviewed generation, requires a fresh run ID, preserves raw results
+through the existing guarded runner, and has an explicit conservative1GiB Root
+launch floor. It is not a clean-machine bootstrap or continuous space guard.
+Its real `--prepare-only` passes(raw0/request3facd984), duplicate preparation
+refuses without changing the request, and an inert mocked-zero-space case
+refuses before request/actor. C's read-only grant/CLI review and AST checks pass.
+Actual preparation free space was280,678,400 bytes; fresh-app runtime remains
+unperformed. Late grants are prepared for matched Node first, then Wasm once
+headroom permits; no favorable retry or error filter is introduced.
 An official Node22.14 archive and published HTTPS SHA sum now supply npm10.9.2
 in a fresh private prefix;2,379 npm files and the existing Node binary's exact
 match to the archive entry are verified without executing npm. No OpenPGP

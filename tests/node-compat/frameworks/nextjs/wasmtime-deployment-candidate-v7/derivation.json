@@ -1,0 +1,426 @@
+{
+  "schemaVersion": 1,
+  "sourceOnly": true,
+  "parentIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v6/index.json",
+    "sha256": "a434358176304cec003896ea3a5c9fa517fb418b5d69d668e7d9cf35cb585cdf",
+    "bytes": 1795
+  },
+  "freshBuildResult": {
+    "path": "/private/tmp/starling-node-compat/next-app-build-v1-first/result.json",
+    "sha256": "fe0e0bdb63db86e921811f70b237812407ed1134eda7af917a2df0420706fbc7",
+    "bytes": 709565
+  },
+  "freshInventory": {
+    "path": "/private/tmp/starling-node-compat/next-app-build-v1-first/application-inputs.json",
+    "sha256": "b4c53ac0f8e7fab31ee172c96d81f4b08778a3cfd9e4546c91b8b111cb0f78e9",
+    "bytes": 659175
+  },
+  "sourceRootIdentityObservedNow": {
+    "dev": 16777234,
+    "ino": 173620604,
+    "mode": 493,
+    "nlink": 8
+  },
+  "rootIdentityIsNotInventedPrebuildHistory": true,
+  "browserSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-hydration-candidate-v3/index.json",
+    "sha256": "5faa8f5d86881239ff5812a7cabcdb536eb30aa20278c2abdab84e4125306e3a",
+    "bytes": 3219
+  },
+  "browserWorker": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-hydration-candidate-v3/browser-check.mjs",
+    "sha256": "e3248453ffab97305c85652b9d0e6e3a928139fe9ce01ace0bb9d0bb39ab89a7",
+    "bytes": 26493
+  },
+  "purePolicy": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v7/app-policy.mjs",
+    "sha256": "d835be43d9e048785a7cbc5bffbacced646f1ac52847079d7fc9798822f585dc",
+    "bytes": 2759
+  },
+  "exactDeployReplacements": [
+    {
+      "before": "const errorData=e=>({name:e?.name??'Error',message:e?.message??String(e),stack:e?.stack??null});",
+      "after": "const errorData=e=>({name:e?.name??'Error',message:e?.message??String(e),stack:e?.stack??null});\n// Pure fresh-app DATA policy, inlined into the authenticated actor.\nfunction relativeMember(name){\n assert.equal(typeof name,'string');assert(name&&!name.includes('\\\\')&&!name.includes('\\0'));\n assert(name.split('/').every(x=>x!==''&&x!=='.'&&x!=='..'));return name;\n}\nfunction sourceDirectoryNames(input){\n const names=input.directories.map(x=>relativeMember(x.path));assert.equal(new Set(names).size,names.length);\n return ['.',...names].sort();\n}\nfunction ownedDirectoryNames(input,policy){\n assert.deepEqual(policy.additionalDirectories,['.next/cache']);\n const names=sourceDirectoryNames(input);assert(names.includes('.next'));assert(!names.includes('.next/cache'));\n assert(!input.files.some(x=>x.path==='.next/cache'||x.path.startsWith('.next/cache/')));\n return [...names,'.next/cache'].sort();\n}\nfunction validateFreshInput(input,build,plan){\n const policy=plan.applicationSchema;\n assert.equal(policy.name,'fresh-next-standalone-root-excluded-v1');assert.equal(input.schemaVersion,1);\n assert.equal(policy.sourceDirectoriesExcludeRoot,true);assert.equal(input.root,plan.applicationSource);\n assert.equal(input.regularFiles,input.files.length);assert.equal(input.regularFiles,policy.files);\n assert.equal(input.bytes,input.files.reduce((sum,x)=>sum+x.bytes,0));assert.equal(input.bytes,policy.bytes);\n assert.equal(input.directories.length,policy.directoriesExcludingRoot);assert.deepEqual(input.symlinks,[]);\n assert.equal(new Set(input.files.map(x=>relativeMember(x.path))).size,input.files.length);\n const dirs=sourceDirectoryNames(input);assert(!input.directories.some(x=>x.path==='.'));\n assert(input.files.every(x=>!dirs.includes(x.path)));\n const owned=ownedDirectoryNames(input,policy);assert.equal(owned.length,policy.ownedDirectoriesIncludingRoot);\n assert.equal(build.schemaVersion,1);assert.equal(build.state,'NEXT_APP_BUILD_PASSED_UNREVIEWED_V1');\n assert.equal(build.passed,true);assert.deepEqual(build.errors,[]);assert.equal(build.originalInputsPreserved,true);\n assert.equal(build.outputRoot,plan.applicationBuildOutputRoot);assert.equal(build.sourceOnlyPreparation,false);\n assert.deepEqual(build.applicationInventoryDescriptor,plan.applicationInputs);assert.deepEqual(build.applicationInventory,input);\n const versions={next:'16.4.5',react:'19.3.1','react-dom':'19.3.1'};\n assert.deepEqual(build.installedVersions,versions);assert.deepEqual(build.installedVersionsBeforeNextBuild,versions);\n const root=plan.applicationRootIdentity;\n assert.deepEqual(Object.keys(root).sort(),['dev','ino','mode','nlink']);\n for(const value of Object.values(root))assert(Number.isSafeInteger(value)&&value>=0);\n assert(root.ino>0&&root.nlink>0&&root.mode<=0o777);return true;\n}"
+    },
+    {
+      "before": "await protect();await verify(authority.constructionResult);await verify(authority.component);await verify(authority.componentAudit);",
+      "after": "await protect();await verify(authority.constructionResult);await verify(authority.component);await verify(authority.componentAudit);\nassert.deepEqual({sha256:authority.component.sha256,bytes:authority.component.bytes},plan.expectedComponent);"
+    },
+    {
+      "before": "await verify(plan.applicationInputs);const input=await read(plan.applicationInputs.path);assert.equal(input.root,plan.applicationSource);",
+      "after": "await verify(plan.applicationInputs);await verify(plan.applicationBuildResult);\nconst input=await read(plan.applicationInputs.path),appBuild=await read(plan.applicationBuildResult.path);validateFreshInput(input,appBuild,plan);"
+    },
+    {
+      "before": "async function sourceBookend(){assert.equal(await realpath(input.root),input.root);const tree=await walk(input.root);assert.equal(tree.links.length,0);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),input.directories.map(x=>x.path).sort());for(const r of input.files){const path=join(input.root,r.path),s=await lstat(path);await verify({path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);assert.equal(s.nlink,r.nlink);}for(const r of input.directories){const s=await lstat(join(input.root,r.path));assert.equal(s.mode&0o777,r.mode);assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);}}",
+      "after": "async function sourceBookend(){\n assert.equal(await realpath(input.root),input.root);const rootStat=await lstat(input.root);assert(rootStat.isDirectory()&&!rootStat.isSymbolicLink());\n assert.deepEqual({dev:rootStat.dev,ino:rootStat.ino,mode:rootStat.mode&0o777,nlink:rootStat.nlink},plan.applicationRootIdentity);\n const tree=await walk(input.root);assert.equal(tree.links.length,0);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),sourceDirectoryNames(input));\n for(const r of input.files){const path=join(input.root,r.path),s=await lstat(path);assert(s.isFile()&&!s.isSymbolicLink());await verify({path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);assert.equal(s.nlink,r.nlink);assert.equal(s.nlink,1);}\n for(const r of input.directories){const path=join(input.root,r.path),s=await lstat(path);assert(s.isDirectory()&&!s.isSymbolicLink());assert.equal(await realpath(path),path);assert.equal(s.mode&0o777,r.mode);assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);}\n}"
+    },
+    {
+      "before": "readonlyAppPreserved:false,adoption:false",
+      "after": "readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationInputs:plan.applicationInputs,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],adoption:false"
+    },
+    {
+      "before": "async function readonlyBookend(){const tree=await walk(app);assert.equal(tree.links.length,0);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),input.directories.map(x=>x.path).sort());for(const r of input.files){const q=join(app,r.path),s=await lstat(q);await verify({path:q,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,0o444);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}for(const r of input.directories)assert.equal((await lstat(join(app,r.path))).mode&0o777,0o555);}",
+      "after": "async function prepareReadonlyCopy(){\n await cp(input.root,app,{recursive:true,force:false,errorOnExist:true,verbatimSymlinks:true,mode:fsConstants.COPYFILE_FICLONE});\n // This empty mountpoint belongs ONLY to the owned copy, never the Source inventory.\n await mkdir(join(app,'.next/cache'),{mode:0o700});assert.deepEqual(await readdir(join(app,'.next/cache')),[]);\n for(const r of input.files)await chmod(join(app,r.path),0o444);\n for(const name of ownedDirectoryNames(input,plan.applicationSchema).sort((a,b)=>b.length-a.length))await chmod(join(app,name),0o555);\n}\nasync function readonlyBookend(){\n const tree=await walk(app);assert.equal(tree.links.length,0);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),ownedDirectoryNames(input,plan.applicationSchema));\n for(const r of input.files){const path=join(app,r.path),s=await lstat(path);assert(s.isFile()&&!s.isSymbolicLink());await verify({path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,0o444);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}\n for(const name of ownedDirectoryNames(input,plan.applicationSchema)){const path=join(app,name),s=await lstat(path);assert(s.isDirectory()&&!s.isSymbolicLink());assert.equal(await realpath(path),path);assert.equal(s.mode&0o777,0o555);}\n assert.deepEqual(await readdir(join(app,'.next/cache')),[]);\n}"
+    },
+    {
+      "before": " await cp(input.root,app,{recursive:true,force:false,errorOnExist:true,verbatimSymlinks:true,mode:fsConstants.COPYFILE_FICLONE});\n for(const r of input.files)await chmod(join(app,r.path),0o444);for(const r of [...input.directories].sort((a,b)=>b.path.length-a.path.length))await chmod(join(app,r.path),0o555);",
+      "after": " await prepareReadonlyCopy();"
+    },
+    {
+      "before": "result.applicationCopy={files:input.regularFiles,bytes:input.bytes,byteIdentical:true,independentInodes:true};",
+      "after": "result.applicationCopy={files:input.regularFiles,bytes:input.bytes,sourceDirectoriesExcludingRoot:input.directories.length,ownedDirectoriesIncludingRoot:plan.applicationSchema.ownedDirectoriesIncludingRoot,byteIdentical:true,independentInodes:true};result.ownedAdditionalDirectories=[{path:'.next/cache',sourceInventoryMember:false,empty:true,mode:0o555,purpose:'underlying mountpoint for separately writable cache preopen'}];"
+    }
+  ],
+  "exactClientReplacement": {
+    "before": "../browser-hydration-candidate-v2/browser-check.mjs",
+    "after": "../browser-hydration-candidate-v3/browser-check.mjs",
+    "occurrences": 1
+  },
+  "runnerByteIdentical": true,
+  "planDeltas": [
+    {
+      "field": "state",
+      "before": "DORMANT_NEXT_CDP_HYDRATION_DEPLOYMENT_SOURCE_V6",
+      "after": "DORMANT_FRESH_APP_NEXT_WASMTIME_DEPLOYMENT_SOURCE_V7"
+    },
+    {
+      "field": "applicationSource",
+      "before": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/application/.next/standalone",
+      "after": "/private/tmp/starling-node-compat/next-app-build-v1-first/application/.next/standalone"
+    },
+    {
+      "field": "applicationInputs",
+      "before": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v1/application-inputs.json",
+        "sha256": "871579d9adaf8ef093de4e7c1f8f26ca30127d51d21d451021648a66248ff86c",
+        "bytes": 677652
+      },
+      "after": {
+        "path": "/private/tmp/starling-node-compat/next-app-build-v1-first/application-inputs.json",
+        "sha256": "b4c53ac0f8e7fab31ee172c96d81f4b08778a3cfd9e4546c91b8b111cb0f78e9",
+        "bytes": 659175
+      }
+    },
+    {
+      "field": "sourceFamilies",
+      "before": [
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-phase-matched-host-candidate-v1/index.json",
+          "sha256": "10ae569eece2d1d3ae1cb350a098f142258c81418aad30d0944420ca806635b1",
+          "bytes": 4955
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v1/index.json",
+          "sha256": "4863932f13c880f1ec92cc98a7bcba4956e2bfcc904940506cdb82332a3b4eeb",
+          "bytes": 3917
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-build-controller-candidate-v1/index.json",
+          "sha256": "0afae87d0a1d7d32b272005cf6b252f9a318ed1799ff4c4605686c507d947f1b",
+          "bytes": 3391
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v1/index.json",
+          "sha256": "c5a47faaa606736c662238746d593da725231117d8ea3985ec88bf8ef34ed06e",
+          "bytes": 3120
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v2/index.json",
+          "sha256": "c1b9f455a687bd0c4916b5ba3df17f31bf2737ea03211ffd7f9fbfd47c63c856",
+          "bytes": 2453
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v3/index.json",
+          "sha256": "9bc3abef369da67a24609ebae5719851c2e4efa7c836a9ef1990342c8f2f62d6",
+          "bytes": 1932
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-hydration-candidate-v2/index.json",
+          "sha256": "dc842f79eab088c147a1e924f5dff2ae98d5fa3dcb82a760b8925760fe5ec364",
+          "bytes": 3234
+        }
+      ],
+      "after": [
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-phase-matched-host-candidate-v1/index.json",
+          "sha256": "10ae569eece2d1d3ae1cb350a098f142258c81418aad30d0944420ca806635b1",
+          "bytes": 4955
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v1/index.json",
+          "sha256": "4863932f13c880f1ec92cc98a7bcba4956e2bfcc904940506cdb82332a3b4eeb",
+          "bytes": 3917
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-build-controller-candidate-v1/index.json",
+          "sha256": "0afae87d0a1d7d32b272005cf6b252f9a318ed1799ff4c4605686c507d947f1b",
+          "bytes": 3391
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v1/index.json",
+          "sha256": "c5a47faaa606736c662238746d593da725231117d8ea3985ec88bf8ef34ed06e",
+          "bytes": 3120
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v2/index.json",
+          "sha256": "c1b9f455a687bd0c4916b5ba3df17f31bf2737ea03211ffd7f9fbfd47c63c856",
+          "bytes": 2453
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v3/index.json",
+          "sha256": "9bc3abef369da67a24609ebae5719851c2e4efa7c836a9ef1990342c8f2f62d6",
+          "bytes": 1932
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-hydration-candidate-v3/index.json",
+          "sha256": "5faa8f5d86881239ff5812a7cabcdb536eb30aa20278c2abdab84e4125306e3a",
+          "bytes": 3219
+        }
+      ]
+    },
+    {
+      "field": "protectedInputs",
+      "before": [
+        {
+          "path": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+          "sha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+          "bytes": 108619024
+        },
+        {
+          "path": "/private/tmp/starling-node-compat/bin/wasmtime-v42.0.1-aarch64-macos/wasmtime",
+          "sha256": "a85dec9fcbbad23d0e038e5a99604114dbe9aa77bc784e4bce0f33013eb33c1c",
+          "bytes": 50820352
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-build-controller-candidate-v1/monitor.py",
+          "sha256": "86913867251bc889701859ca6a361ccf9c17288a6a3bfc7a5c8d8e5bbe5c4cbe",
+          "bytes": 15094
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/fixture-contract.json",
+          "sha256": "d6399e901a0612f672ee176e9ded84fcc19e3f4016059e5d5f728596b0b807f2",
+          "bytes": 8158
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-phase-matched-host-candidate-v1/browser-check.mjs",
+          "sha256": "cd402aeb2a812d7254d5bd0000c4b1995a7fa00dde692842fdced50c0768aea3",
+          "bytes": 12020
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v1/guest-entry.mjs",
+          "sha256": "d5a3b325e332b79ff0b917192b7b29dbfcbc4dbc50690c26800e505bed61b068",
+          "bytes": 10171
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v1/profile.wit",
+          "sha256": "16a48929ffde984be31ad094003fcd639be53ba38a9851e8cad85747f1b2cd98",
+          "bytes": 581
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v1/component-inputs.json",
+          "sha256": "df003682b90538d9472feffde8509f465b50c20db32f2018740d4c82e1373754",
+          "bytes": 5298
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/probe-v1/run-wasmtime.mjs",
+          "sha256": "7da8f65570e45dc47fa7f9597cd605e8c9f003f8419a0ad35334ae51fa880ccd",
+          "bytes": 5806
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/probe-v1/results/deployment-host-wasmtime-v1/result.json",
+          "sha256": "5e2c824cc7e182204d78d526ade988fd12f440291e73131228b9f92161fa7d72",
+          "bytes": 9614
+        },
+        {
+          "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/package.json",
+          "sha256": "7b241bd7c3c2a45f0484ccd799fd5f6fa6ce517d70278a7a92f26b7b2e882661",
+          "bytes": 164
+        },
+        {
+          "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/package-lock.json",
+          "sha256": "f8dd9d403df7dc61de13badeefa22da1e639f5eb8117537a39fa864f9a37ba8f",
+          "bytes": 714
+        },
+        {
+          "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/node_modules/playwright-core/package.json",
+          "sha256": "8aa1c9863fa8dea324e674254158cdc79440f4124ef2d84d38053013541cb7d6",
+          "bytes": 876
+        },
+        {
+          "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/node_modules/playwright-core/index.js",
+          "sha256": "a58fb2cec4293e7dcf73c58a179898a4f3986666451a19da4e731fa3af63265b",
+          "bytes": 697
+        },
+        {
+          "path": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+          "sha256": "2a2d660daf7f2a6e405fc6b885c996eca0ac71dd9f52d326e06d4d602ce9352c",
+          "bytes": 367696
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-root-results-v1/first-actual-review/index.json",
+          "sha256": "363db88a05a91041c02fd25636756a0a5b609c2f63c89eadbb907031a0ce804a",
+          "bytes": 7571
+        }
+      ],
+      "after": [
+        {
+          "path": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+          "sha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+          "bytes": 108619024
+        },
+        {
+          "path": "/private/tmp/starling-node-compat/bin/wasmtime-v42.0.1-aarch64-macos/wasmtime",
+          "sha256": "a85dec9fcbbad23d0e038e5a99604114dbe9aa77bc784e4bce0f33013eb33c1c",
+          "bytes": 50820352
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-crypto/ownership-gc-build-controller-candidate-v1/monitor.py",
+          "sha256": "86913867251bc889701859ca6a361ccf9c17288a6a3bfc7a5c8d8e5bbe5c4cbe",
+          "bytes": 15094
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/fixture-contract.json",
+          "sha256": "d6399e901a0612f672ee176e9ded84fcc19e3f4016059e5d5f728596b0b807f2",
+          "bytes": 8158
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-phase-matched-host-candidate-v1/browser-check.mjs",
+          "sha256": "cd402aeb2a812d7254d5bd0000c4b1995a7fa00dde692842fdced50c0768aea3",
+          "bytes": 12020
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v1/guest-entry.mjs",
+          "sha256": "d5a3b325e332b79ff0b917192b7b29dbfcbc4dbc50690c26800e505bed61b068",
+          "bytes": 10171
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v1/profile.wit",
+          "sha256": "16a48929ffde984be31ad094003fcd639be53ba38a9851e8cad85747f1b2cd98",
+          "bytes": 581
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-component-candidate-v1/component-inputs.json",
+          "sha256": "df003682b90538d9472feffde8509f465b50c20db32f2018740d4c82e1373754",
+          "bytes": 5298
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/probe-v1/run-wasmtime.mjs",
+          "sha256": "7da8f65570e45dc47fa7f9597cd605e8c9f003f8419a0ad35334ae51fa880ccd",
+          "bytes": 5806
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/probe-v1/results/deployment-host-wasmtime-v1/result.json",
+          "sha256": "5e2c824cc7e182204d78d526ade988fd12f440291e73131228b9f92161fa7d72",
+          "bytes": 9614
+        },
+        {
+          "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/package.json",
+          "sha256": "7b241bd7c3c2a45f0484ccd799fd5f6fa6ce517d70278a7a92f26b7b2e882661",
+          "bytes": 164
+        },
+        {
+          "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/package-lock.json",
+          "sha256": "f8dd9d403df7dc61de13badeefa22da1e639f5eb8117537a39fa864f9a37ba8f",
+          "bytes": 714
+        },
+        {
+          "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/node_modules/playwright-core/package.json",
+          "sha256": "8aa1c9863fa8dea324e674254158cdc79440f4124ef2d84d38053013541cb7d6",
+          "bytes": 876
+        },
+        {
+          "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/node_modules/playwright-core/index.js",
+          "sha256": "a58fb2cec4293e7dcf73c58a179898a4f3986666451a19da4e731fa3af63265b",
+          "bytes": 697
+        },
+        {
+          "path": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+          "sha256": "2a2d660daf7f2a6e405fc6b885c996eca0ac71dd9f52d326e06d4d602ce9352c",
+          "bytes": 367696
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-root-results-v1/first-actual-review/index.json",
+          "sha256": "363db88a05a91041c02fd25636756a0a5b609c2f63c89eadbb907031a0ce804a",
+          "bytes": 7571
+        },
+        {
+          "path": "/private/tmp/starling-node-compat/next-app-build-v1-first/application-inputs.json",
+          "sha256": "b4c53ac0f8e7fab31ee172c96d81f4b08778a3cfd9e4546c91b8b111cb0f78e9",
+          "bytes": 659175
+        },
+        {
+          "path": "/private/tmp/starling-node-compat/next-app-build-v1-first/result.json",
+          "sha256": "fe0e0bdb63db86e921811f70b237812407ed1134eda7af917a2df0420706fbc7",
+          "bytes": 709565
+        }
+      ]
+    },
+    {
+      "field": "actualDeclaredSource",
+      "before": {
+        "files": 2218,
+        "bytes": 48808299,
+        "directories": 455,
+        "symlinks": 0,
+        "staticPublicAndFixtureIncluded": true
+      },
+      "after": {
+        "files": 2181,
+        "bytes": 48714867,
+        "directories": 425,
+        "directoryCountExcludesRoot": true,
+        "symlinks": 0,
+        "staticPublicAndFixtureIncluded": true
+      }
+    },
+    {
+      "field": "applicationBuildResult",
+      "before": null,
+      "after": {
+        "path": "/private/tmp/starling-node-compat/next-app-build-v1-first/result.json",
+        "sha256": "fe0e0bdb63db86e921811f70b237812407ed1134eda7af917a2df0420706fbc7",
+        "bytes": 709565
+      }
+    },
+    {
+      "field": "applicationBuildOutputRoot",
+      "before": null,
+      "after": "/private/tmp/starling-node-compat/next-app-build-v1-first"
+    },
+    {
+      "field": "applicationRootIdentity",
+      "before": null,
+      "after": {
+        "dev": 16777234,
+        "ino": 173620604,
+        "mode": 493,
+        "nlink": 8
+      }
+    },
+    {
+      "field": "applicationSchema",
+      "before": null,
+      "after": {
+        "name": "fresh-next-standalone-root-excluded-v1",
+        "sourceDirectoriesExcludeRoot": true,
+        "files": 2181,
+        "bytes": 48714867,
+        "directoriesExcludingRoot": 425,
+        "additionalDirectories": [
+          ".next/cache"
+        ],
+        "ownedDirectoriesIncludingRoot": 427
+      }
+    },
+    {
+      "field": "expectedComponent",
+      "before": null,
+      "after": {
+        "sha256": "1c3108d2fdce72a1bfa8cc64a0e6e0645acd71223b26b6dc11d037d4a95efe83",
+        "bytes": 37214251
+      }
+    }
+  ],
+  "actorInvoked": false
+}

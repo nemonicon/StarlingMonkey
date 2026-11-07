@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "scope": "Pinned local primary implementation/type DATA only, no browser API execution",
+  "playwrightVersion": "1.64.1",
+  "files": {
+    "playwrightPackage": {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/node_modules/playwright-core/package.json",
+      "sha256": "8aa1c9863fa8dea324e674254158cdc79440f4124ef2d84d38053013541cb7d6",
+      "bytes": 876
+    },
+    "playwrightTypes": {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/node_modules/playwright-core/types/types.d.ts",
+      "sha256": "c458c9da21dde7732dd440f4f2f861ec66ef89813955a591157ec30e4a90186e",
+      "bytes": 1150893
+    },
+    "protocolTypes": {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/node_modules/playwright-core/types/protocol.d.ts",
+      "sha256": "ccd722dea5eca655cf111348ec27a38a376d467407c4cc763d31514550d04d5d",
+      "bytes": 819286
+    },
+    "clientImplementation": {
+      "path": "/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/node_modules/playwright-core/lib/coreBundle.js",
+      "sha256": "829521b67ed7be90c7d6d6098ff39f2241562d47e4ad7ccab13710924a56001d",
+      "bytes": 3585406
+    }
+  },
+  "api": [
+    "BrowserContext.newCDPSession(page)",
+    "CDPSession.on(event,listener)",
+    "CDPSession.send(method,params?)"
+  ],
+  "readOnlyCommands": [
+    "Network.enable",
+    "Page.enable"
+  ],
+  "events": [
+    "Network.requestWillBeSent",
+    "Network.responseReceived",
+    "Network.dataReceived",
+    "Network.loadingFinished",
+    "Network.loadingFailed",
+    "Page.navigatedWithinDocument",
+    "Page.frameNavigated"
+  ],
+  "excerpts": [
+    {
+      "sourceRole": "playwrightTypes",
+      "lineStart": 10376,
+      "lineEnd": 10386,
+      "text": "\n  /**\n   * **NOTE** CDP sessions are only supported on Chromium-based browsers.\n   *\n   * Returns the newly created session.\n   * @param page Target to create new session for. For backwards-compatibility, this parameter is named `page`, but it can be a\n   * `Page` or `Frame` type.\n   */\n  newCDPSession(page: Page|Frame): Promise<CDPSession>;\n\n  /**\n"
+    },
+    {
+      "sourceRole": "playwrightTypes",
+      "lineStart": 18388,
+      "lineEnd": 18428,
+      "text": " * Useful links:\n * - Documentation on DevTools Protocol can be found here:\n *   [DevTools Protocol Viewer](https://chromedevtools.github.io/devtools-protocol/).\n * - Getting Started with DevTools Protocol:\n *   https://github.com/aslushnikov/getting-started-with-cdp/blob/master/README.md\n *\n * ```js\n * const client = await page.context().newCDPSession(page);\n * await client.send('Animation.enable');\n * client.on('Animation.animationCreated', () => console.log('Animation created!'));\n * const response = await client.send('Animation.getPlaybackRate');\n * console.log('playback rate is ' + response.playbackRate);\n * await client.send('Animation.setPlaybackRate', {\n *   playbackRate: response.playbackRate / 2\n * });\n * ```\n *\n */\nexport interface CDPSession {\n  on<T extends keyof Protocol.Events | symbol>(event: T, listener: (payload: T extends symbol ? any : Protocol.Events[T extends keyof Protocol.Events ? T : never]) => void): this;\n  addListener<T extends keyof Protocol.Events | symbol>(event: T, listener: (payload: T extends symbol ? any : Protocol.Events[T extends keyof Protocol.Events ? T : never]) => void): this;\n  off<T extends keyof Protocol.Events | symbol>(event: T, listener: (payload: T extends symbol ? any : Protocol.Events[T extends keyof Protocol.Events ? T : never]) => void): this;\n  removeListener<T extends keyof Protocol.Events | symbol>(event: T, listener: (payload: T extends symbol ? any : Protocol.Events[T extends keyof Protocol.Events ? T : never]) => void): this;\n  once<T extends keyof Protocol.Events | symbol>(event: T, listener: (payload: T extends symbol ? any : Protocol.Events[T extends keyof Protocol.Events ? T : never]) => void): this;\n  /**\n   * @param method Protocol method name.\n   * @param params Optional method parameters.\n   */\n  send<T extends keyof Protocol.CommandParameters>(\n    method: T,\n    params?: Protocol.CommandParameters[T]\n  ): Promise<Protocol.CommandReturnValues[T]>;\n  /**\n   * Emitted when the session is closed, either because the target was closed or `session.detach()` was called.\n   */\n  on(event: 'close', listener: (cdpSession: CDPSession) => any): this;\n\n  /**\n   * Emitted for every CDP event received from the session. Allows subscribing to all CDP events at once without knowing\n   * their names ahead of time.\n   *\n"
+    },
+    {
+      "sourceRole": "protocolTypes",
+      "lineStart": 12058,
+      "lineEnd": 12085,
+      "text": "     * Fired when data chunk was received over the network.\n     */\n    export type dataReceivedPayload = {\n      /**\n       * Request identifier.\n       */\n      requestId: RequestId;\n      /**\n       * Timestamp.\n       */\n      timestamp: MonotonicTime;\n      /**\n       * Data chunk length.\n       */\n      dataLength: number;\n      /**\n       * Actual bytes received (might be less than dataLength for compressed encodings).\n       */\n      encodedDataLength: number;\n      /**\n       * Data that was received.\n       */\n      data?: binary;\n    }\n    /**\n     * Fired when EventSource message is received.\n     */\n    export type eventSourceMessageReceivedPayload = {\n"
+    },
+    {
+      "sourceRole": "protocolTypes",
+      "lineStart": 12108,
+      "lineEnd": 12159,
+      "text": "     * Fired when HTTP request has failed to load.\n     */\n    export type loadingFailedPayload = {\n      /**\n       * Request identifier.\n       */\n      requestId: RequestId;\n      /**\n       * Timestamp.\n       */\n      timestamp: MonotonicTime;\n      /**\n       * Resource type.\n       */\n      type: ResourceType;\n      /**\n       * Error message. List of network errors: https://cs.chromium.org/chromium/src/net/base/net_error_list.h\n       */\n      errorText: string;\n      /**\n       * True if loading was canceled.\n       */\n      canceled?: boolean;\n      /**\n       * The reason why loading was blocked, if any.\n       */\n      blockedReason?: BlockedReason;\n      /**\n       * The reason why loading was blocked by CORS, if any.\n       */\n      corsErrorStatus?: CorsErrorStatus;\n    }\n    /**\n     * Fired when HTTP request has finished loading.\n     */\n    export type loadingFinishedPayload = {\n      /**\n       * Request identifier.\n       */\n      requestId: RequestId;\n      /**\n       * Timestamp.\n       */\n      timestamp: MonotonicTime;\n      /**\n       * Total number of bytes received for this request.\n       */\n      encodedDataLength: number;\n    }\n    /**\n     * Fired if request ended up loading from cache.\n     */\n"
+    },
+    {
+      "sourceRole": "protocolTypes",
+      "lineStart": 12169,
+      "lineEnd": 12221,
+      "text": "    export type requestWillBeSentPayload = {\n      /**\n       * Request identifier.\n       */\n      requestId: RequestId;\n      /**\n       * Loader identifier. Empty string if the request is fetched from worker.\n       */\n      loaderId: LoaderId;\n      /**\n       * URL of the document this request is loaded for.\n       */\n      documentURL: string;\n      /**\n       * Request data.\n       */\n      request: Request;\n      /**\n       * Timestamp.\n       */\n      timestamp: MonotonicTime;\n      /**\n       * Timestamp.\n       */\n      wallTime: TimeSinceEpoch;\n      /**\n       * Request initiator.\n       */\n      initiator: Initiator;\n      /**\n       * In the case that redirectResponse is populated, this flag indicates whether\nrequestWillBeSentExtraInfo and responseReceivedExtraInfo events will be or were emitted\nfor the request which was just redirected.\n       */\n      redirectHasExtraInfo: boolean;\n      /**\n       * Redirect response data.\n       */\n      redirectResponse?: Response;\n      /**\n       * Type of this resource.\n       */\n      type?: ResourceType;\n      /**\n       * Frame identifier.\n       */\n      frameId?: Page.FrameId;\n      /**\n       * Whether the request is initiated by a user gesture. Defaults to false.\n       */\n      hasUserGesture?: boolean;\n      /**\n       * The render-blocking behavior of the request.\n"
+    },
+    {
+      "sourceRole": "protocolTypes",
+      "lineStart": 12258,
+      "lineEnd": 12285,
+      "text": "    export type responseReceivedPayload = {\n      /**\n       * Request identifier.\n       */\n      requestId: RequestId;\n      /**\n       * Loader identifier. Empty string if the request is fetched from worker.\n       */\n      loaderId: LoaderId;\n      /**\n       * Timestamp.\n       */\n      timestamp: MonotonicTime;\n      /**\n       * Resource type.\n       */\n      type: ResourceType;\n      /**\n       * Response data.\n       */\n      response: Response;\n      /**\n       * Indicates whether requestWillBeSentExtraInfo and responseReceivedExtraInfo events will be\nor were emitted for this request.\n       */\n      hasExtraInfo: boolean;\n      /**\n       * Frame identifier.\n"
+    },
+    {
+      "sourceRole": "protocolTypes",
+      "lineStart": 15316,
+      "lineEnd": 15333,
+      "text": "    export type frameNavigatedPayload = {\n      /**\n       * Frame object.\n       */\n      frame: Frame;\n      type: NavigationType;\n    }\n    /**\n     * Fired when opening document to write to.\n     */\n    export type documentOpenedPayload = {\n      /**\n       * Frame object.\n       */\n      frame: Frame;\n    }\n    export type frameResizedPayload = void;\n    /**\n"
+    },
+    {
+      "sourceRole": "protocolTypes",
+      "lineStart": 15570,
+      "lineEnd": 15594,
+      "text": "    export type navigatedWithinDocumentPayload = {\n      /**\n       * Id of the frame.\n       */\n      frameId: FrameId;\n      /**\n       * Frame's new url.\n       */\n      url: string;\n      /**\n       * Navigation type\n       */\n      navigationType: \"fragment\"|\"historyApi\"|\"other\";\n    }\n    /**\n     * Compressed image data requested by the `startScreencast`.\n     */\n    export type screencastFramePayload = {\n      /**\n       * Base64-encoded compressed image.\n       */\n      data: binary;\n      /**\n       * Screencast frame metadata.\n       */\n"
+    },
+    {
+      "sourceRole": "clientImplementation",
+      "lineStart": 61534,
+      "lineEnd": 61544,
+      "text": "      }\n      async headerValues(name) {\n        return (await this._actualHeaders()).getAll(name);\n      }\n      async finished() {\n        return await this.request()._targetClosedScope().race(this._finishedPromise);\n      }\n      async body() {\n        return (await this._channel.body({}, kNoTimeout)).binary;\n      }\n      async text() {\n"
+    },
+    {
+      "sourceRole": "clientImplementation",
+      "lineStart": 63886,
+      "lineEnd": 63905,
+      "text": "      _onRequestFailed(request2, responseEndTiming, failureText, page) {\n        request2._failureText = failureText || null;\n        request2._setResponseEndTiming(responseEndTiming);\n        this.emit(Events.BrowserContext.RequestFailed, request2);\n        if (page)\n          page.emit(Events.Page.RequestFailed, request2);\n      }\n      _onRequestFinished(params2) {\n        const { responseEndTiming } = params2;\n        const request2 = Request2.from(params2.request);\n        const response2 = Response3.fromNullable(params2.response);\n        const page = Page3.fromNullable(params2.page);\n        request2._setResponseEndTiming(responseEndTiming);\n        this.emit(Events.BrowserContext.RequestFinished, request2);\n        if (page)\n          page.emit(Events.Page.RequestFinished, request2);\n        if (response2)\n          response2._finishedPromise.resolve(null);\n      }\n      async _onRoute(route2) {\n"
+    }
+  ],
+  "responseFinishedQualification": "Pinned client _onRequestFinished resolves response._finishedPromise; _onRequestFailed does not. Response.finished races that promise against target closure.",
+  "protocolRequestIdsEqualPlaywrightIds": false,
+  "protocolClockEqualNodeHrtime": false,
+  "originalWireJsonBytesClaimed": false
+}

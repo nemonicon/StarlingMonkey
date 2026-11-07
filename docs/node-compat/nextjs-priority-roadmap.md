@@ -84,9 +84,11 @@ substitutes for this application contract.
 The next execution target is the **fresh isolated app build**, not another
 engine build or unrelated API expansion. Its four owned host-build phases pass;
 the [actual DATA review](../../tests/node-compat/frameworks/nextjs/next-app-build-root-results-v1/actual-review/README.md)
-retains the genuine2,181-file inventory and new build/action IDs. Prepare new
-native, matched-Node and browser Sources for its root-excluding directory schema,
-empty owned-copy cache mountpoint and two changed script pins. Then run the
+retains the genuine2,181-file inventory and new build/action IDs. The new
+nativeV7, matched-NodeV3 and browserV3 Sources now pass independent review for
+the root-excluding schema, empty owned-copy cache mountpoint and two changed
+script pins. The [reusable fresh-app command](../../tests/node-compat/frameworks/nextjs/next-app-runtime-root-results-v1/README.md)
+passes preparation-only checks and preserves fresh results. Next run the
 unchanged24HTTP/cache/stream/2browser contract against both hosts and retain every
 failure. This reuses component1c3108d2 and engine4623640b; the raw deployed loader
 already reads `/app`. No fresh-app runtime acceptance is claimed yet.
@@ -100,7 +102,7 @@ deleted to manufacture headroom.
 
 | Priority | Work | Completion gate |
 | --- | --- | --- |
-| 1 | Run the freshly built unchanged Next app in Wasm | Admit its genuine2,181-file inventory with explicit root/cache handling and two refreshed browser pins. Compare the same24HTTP/cache/stream/2strict-browser contract on Node and component1c3108d2. Preserve old2,218-file evidence and every new failure. Source successors are in preparation; capacity guards must pass before execution. |
+| 1 | Run the freshly built unchanged Next app in Wasm | Fresh nativeV7/stockV3/browserV3 Sources and the reusable regression CLI pass review/preparation checks. Compare the same24HTTP/cache/stream/2strict-browser contract on Node and component1c3108d2. Preserve old2,218-file evidence and every new failure. Live execution is unperformed: available280,678,400 bytes is below the conservative1GiB Root launch floor. |
 | 2 | Resolve browser failure and establish reliability | Integrated1c3108d2 first failed the strict browser gate despite24HTTP/two functional successes. One later paired CDP trial passes the unchanged strict contract on Node and the same component. That does not explain or fix the earlier abort. Investigate with retained transport evidence and controlled comparisons; keep zero-error gates and existing time limits. |
 | 3 | Regress the fresh app on the second host | Cold8 already passes on stock wasmCloud2.11.0/embedded Wasmtime48.0.7 with both55f05 and the integrated1c31 component. Bind a genuine fresh-app successor before repeating that finite contract. Retained-cache/browser acceptance is separate from cold requests; the original host404/SIGINT130 failure stays retained. |
 | 4 | Close response, context and resource boundaries | The [native-stream probe](../../tests/node-compat/frameworks/nextjs/native-pipe-root-results-v1/README.md) matches36 actual Node records in a real component; isolated I/O-abort controls pass eight responses. Broader cancellation/compression, AsyncResource, native handle counts, trailers and teardown remain open. Guest facade results do not prove native private-state/resource counts. |

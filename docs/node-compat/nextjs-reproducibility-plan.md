@@ -132,7 +132,11 @@ cannot be made portable by replacing strings or expected hashes.
    new build/action IDs. Its directory schema omits the root and its tree lacks
    a warmed `.next/cache`: runtime admission must explicitly handle the root
    identity and declare an empty cache mountpoint in the owned copy. Two of five
-   browser asset pins changed. This new app has not yet been served in Wasm.
+   browser asset pins changed. New nativeV7/stockV3/browserV3 Sources and the
+   [fresh-app regression CLI](../../tests/node-compat/frameworks/nextjs/next-app-runtime-root-results-v1/README.md)
+   now pass independent review and preparation checks. Actual serving is held
+   below the conservative1GiB Root launch floor. This new app has not yet been
+   served in Wasm.
    The historical accepted app has2218 files/48,808,299 bytes; its inode/mode/path
    records cannot be cast into evidence for this new build.
 
