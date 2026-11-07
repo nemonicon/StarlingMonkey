@@ -71,8 +71,13 @@ cannot be made portable by replacing strings or expected hashes.
    retains all22 successful phases, coherent headers and the defined accessor
    symbol. Its library is `ca04fe5e…`, 637,175,630 bytes. The binary distribution
    and four-directory Firefox FFI payload remain external, descriptor-bound
-   archives; committed text evidence is not those binaries. Artifact retention
-   and a durable download/bootstrap path must be handled explicitly. The
+   archives; committed text evidence is not those binaries. The original
+   Actions artifact expires on2026-11-09. Its exact227,965,139-byte ZIP is now
+   [retained in a draft release](../../tests/node-compat/frameworks/nextjs/native-bootstrap-artifact-retention-v1/README.md):
+   release437352699/asset719685339, matching SHAabbbd377. Uploaded asset digests
+   match local files and independent readback passes. Restoration through that
+   API requires repository authentication; the draft remains unpublished.
+   No archive was repacked and no new library/engine build followed. The
    workflow's 20GiB start/4GiB floor is policy, not measured peak demand.
 
 3. **Restore the single Rust aggregate and offline inputs.**
@@ -138,8 +143,15 @@ cannot be made portable by replacing strings or expected hashes.
    retain their real Cargo/offline and finite binary transformation mechanisms.
    Source afterimages and pins are committed; the package installation, vendor,
    native CLI and adapter binaries are external. npm install alone does not
-   establish that private package/splicer identity. A portable tool-package
-   reconstruction and artifact distribution step is still required.
+   establish that private package/splicer identity. The baseline source
+   acquisition gap is now closed: [the exact upstream commit archive](../../tests/node-compat/frameworks/nextjs/componentize-source-origin-v1.json)
+   for ComponentizeJS0.23.0/4d812f5a downloads publicly and byte-equals the
+   captured8178fb67 archive,162,093 bytes. Its270 regular files become271 only
+   after the later provenance marker is added. No extraction or package build
+   was performed for this acquisition check. Reconstructing the generated
+   61685 splicer/private package, offline tool dependencies and exact adapter
+   provenance remain separate requirements; npm install alone cannot replace
+   them.
 
 6. **Build the unchanged application and record fresh generated inputs.**
    [app-fixture](../../tests/node-compat/frameworks/nextjs/app-fixture/package.json)

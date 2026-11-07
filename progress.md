@@ -15,6 +15,27 @@ must not be reported as passed. Broader Node APIs, performance claims and
 production promotion follow these gates. See the updated
 [execution roadmap](docs/node-compat/nextjs-priority-roadmap.md).
 
+The prior goal turn made concrete progress: paired six-case regression Sources,
+reviewed commands, native build preparation/launcher and capacity refusals were
+committed and pushed ase0adca1c. Current capacity remains below1GiB; no new
+application trial has started. While launch is held, source/bootstrap work has
+removed two concrete acquisition risks. The exact patched SpiderMonkey CI ZIP
+was due to expire on2026-11-09. Root rehashed its existing227,965,139-byte copy
+and [preserved it in an authenticated draft release](tests/node-compat/frameworks/nextjs/native-bootstrap-artifact-retention-v1/README.md),
+release437352699/asset719685339. All three uploaded server asset digests match
+the local ZIP/checksum/provenance files, and independent readback passes. The
+archive was neither repacked nor downloaded again; no remote round-trip,
+public release, engine rebuild or runtime validation is claimed.
+
+The previously unresolved baseline ComponentizeJS source archive now has a
+[verified public acquisition record](tests/node-compat/frameworks/nextjs/componentize-source-origin-v1.json).
+The GitHub connector confirms release0.23.0 commit4d812f5a; a bounded HTTPS
+download of that exact commit archive returns200 and matches the captured
+archive byte-for-byte:8178fb67/162,093 bytes. Its270 original regular files plus
+a later marker account for the staged271 count;89 directory entries and no
+links are present. No archive was extracted or package/toolchain built. The
+generated private61685 splicer/package reproduction remains a separate gap.
+
 The **first fresh-build Next.js pair now passes on Node and real Wasm**. Each
 passes24/24 HTTP, cache generation1→2, five incremental stream chunks(shell0,
 ready2) and2/2 strict browser interactions with empty error arrays. The actual
