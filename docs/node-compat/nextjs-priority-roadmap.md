@@ -10,8 +10,9 @@ cohort passes native3/3 and stock2/3, leaving its combined all-six gate failed.
 The [fresh paired review](../../tests/node-compat/frameworks/nextjs/next-app-runtime-root-results-v1/first-pair-review/README.md)
 and [cohort review](../../tests/node-compat/frameworks/nextjs/next-browser-reliability-root-results-v1/cohort-review/README.md)
 retain these separate outcomes. Next.js execution takes priority over expanding
-unneeded Node APIs. The immediate next runtime check is concurrent request
-isolation and body recovery through the unchanged application.
+unneeded Node APIs. The first concurrent request/body/recovery pair now passes all 80 supplemental
+checks per arm but fails strict acceptance: native cache generation1→1, stock
+1→2, and browser action-response aborts in both. See the [actual results](nextjs-request-regression-2026-11-07.md).
 
 The accepted production checkpoint remains
 [foundations-v13](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md).
@@ -113,23 +114,21 @@ headroom. Do not wait for a stock-only diagnostic to finish before testing a
 new native application behavior; preserve its strict failure and unresolved
 cause. Every changed engine must rerun the complete app contract.
 
-Current admission headroom is about 0.61 GiB: priority 2 remains ready but
-requires 1 GiB to start; priority 3's full build requires 3 GiB. Keep those guards.
-The smaller source restoration has run once with exit 0 and the exact 84-package
-lock. Its first reader failed on APFS directory nlink 6→7 during receipt
-publication; the preserved receipt passes a separate corrected reader covering
-3,507 files, 464 directories including root, exact content/membership and current
-physical bookends. The genuine offline query now also passes with new metadata
-`65544c7b…`, all 84 logical identities/features/edges, six root dependencies and
-fresh manifest paths. The V3 builder now admits that selection, passes Source review and actual
-JSON-only preparation, and has a concrete unissued Root draft. Its read-only
-capacity check refuses below 3 GiB. No new native build or app run follows.
+The capacity hold ended after the user freed the volume: native admission
+observed23,397,662,720 free bytes. The first real request pair is complete and
+failed strictly as described above. The first full-build admission then found
+two missing empty SDK directories; their exact pinned-archive restoration is
+recorded without inventory or Source changes. The fresh full build now passes
+independent DATA review: engine02a6601d/31,324,563 bytes, full metadata9e960c41/
+4,877,968 bytes,80 native TUs plus separate embedding, all825 copies and protected
+inputs intact. A component built from this new engine is not yet validated or
+run. Keep the1GiB runtime/3GiB build admission policies on future actions.
 
 | Priority | Work | Completion gate |
 | --- | --- | --- |
 | 1 | Run the freshly built unchanged Next app in Wasm | **First actual pair passes** on nativeV7/stockV3/browserV3:24HTTP/cache1→2/five chunks/2strict-browser checks, raw0/clean/protected inputs. Genuine2,181-file inventory/new build+action IDs run on1c3108d2 without rebuilding the engine. The304-payload portable paired DATA review passes Root readback. Old2,218-file evidence and failures remain unchanged. |
-| 2 | Test real Next request isolation and body recovery | The reviewed [V8 request regression and matched Node control](../../tests/node-compat/frameworks/nextjs/next-app-request-isolation-root-results-v1/README.md) supplement every unchanged24HTTP/cache/stream/2browser check: two distinct cookie/header contexts, chunked Unicode JSON and malformed JSON concurrently, then empty-context and successful POST recovery. Source21/local fake62 checks pass, including partial-byte retention. Both reusable CLI preparations pass; native launch refuses before any actor at761,180,160 bytes below1GiB. StockV6 shares the same helper and preserves the normal CDP/strict gates. The reviewed V3 post-run reader passes178 DATA checks, but all six real cases and successful pair admission remain unexecuted. Client overlap does not prove same-Store concurrency. |
-| 3 | Rebuild the working engine from the portable source selection | All825 inputs reconstruct from Git; all ten fresh generator checks pass. [Actual generator DATA](../../tests/node-compat/frameworks/nextjs/next-native-portable-generator-root-results-v1/actual-review/README.md) passes Root readback. Reviewed V2 closes producer-plan/index/Root linkage and Root's [actual preparation](../../tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-root-results-v2/README.md) passes with the exactb209 selection and an unissued draft. The [external-input manifest](../../tests/node-compat/frameworks/nextjs/native-bootstrap-inputs-v1.json) now checks37 records/25 pins; the expiring SM ZIP is retained in an authenticated draft and the baseline Componentize source has a byte-identical public acquisition. The relocated source restoration and genuine offline metadata query now pass: 84 logical packages/features/edges, six root dependencies, fresh manifest roles and preserved inputs. The [reviewed V3 integration](../../tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-v3/README.md) now admits four relocated Cargo roles, full proof joins/base21, and separate wrapper Python 3.11/build-tool Python 3.9. [Actual JSON-only preparation](../../tests/node-compat/frameworks/nextjs/next-native-portable-build-root-results-v3/README.md), 33 Root policy checks and read-only input admission pass; the concrete draft remains unissued and the capacity check refuses at 659,873,792 bytes. Execute the 3 GiB-start/1 GiB-phase full build, then rerun the complete application on its new component. Other external acquisition/package gaps and clean-machine reproduction remain open. |
+| 2 | Resolve the actual request-regression failures | The [first real V8/V6 pair](nextjs-request-regression-2026-11-07.md) completes both arms. Each passes 80 supplemental checks, physical six-case outcomes, 24 individual HTTP checks, five stream chunks and two functional browser interactions. Native cache stays 1→1 (failed), stock advances 1→2; both strict browser gates retain action POST ERR_ABORTED/null body. The closed reader accepts capture integrity and rejects whole-pair admission. Preserve these failures; investigate cache/process-instance scope and browser cancellation without waivers or cause claims. |
+| 3 | Build and regress the genuinely rebuilt engine | The [SDK-restored full build](../../tests/node-compat/frameworks/nextjs/next-native-portable-build-sdk-restored-root-v1/README.md) now completes raw0/clean and passes coordinated independent DATA review: all825 inputs, 80 native TUs (79 C++/1 C) plus separate embedding, fresh locked Rust aggregate/link inputs and ten preserved trees. New engine02a6601d/full metadata9e960c41 remain distinct from old incremental462/726d. ConstructorV6 Source is reviewed with identical executable code and full-kind plan. Construct/audit its component and rerun the complete application; no new runtime acceptance or clean-machine reproduction is inferred. |
 | 4 | Close response, context and resource boundaries demanded by Next | The [native-stream probe](../../tests/node-compat/frameworks/nextjs/native-pipe-root-results-v1/README.md) matches36 Node records; context interleaving and isolated I/O-abort controls pass their bounded contracts. Broader cancellation/compression, AsyncResource, native handle counts, trailers and teardown remain open. Guest facade results do not prove native private-state/resource counts. Fix observed application failures before adding unrelated APIs. |
 | 5 | Investigate browser reliability without erasing the failure | The [fixed cohort](../../tests/node-compat/frameworks/nextjs/next-browser-reliability-root-results-v1/cohort-review/README.md) retains **5/6 strict passes and an unmet all-six gate**: native3/3, matched Node2/3. All144HTTP/12browser functions pass; p3-stock ERR_ABORTED/body unavailable stays failed. [One direct standalone control](../../tests/node-compat/frameworks/nextjs/direct-standalone-control-root-results-v1/actual-review/README.md) passes without the bridge; no cause follows. The reviewed [extra-CDP-session-off diagnostic](../../tests/node-compat/frameworks/nextjs/extra-cdp-off-root-results-v1/README.md) remains unexecuted after its1GiB capacity refusal. It does not block the demonstrated native milestone or the next native regression. |
 | 6 | Preserve the second-host boundary | **Fresh cold8 passes** on stock wasmCloud2.11.0/embedded Wasmtime48.0.7, including strict streaming and protected inputs. The [coldV4 review](../../tests/node-compat/frameworks/nextjs/wasmcloud-cold-root-results-v4/actual-review/README.md) passes Root readback. Retained-cache/browser acceptance remains separate: this host's selected P2 path does not retain an instance between requests. Do not change the host or widen the world to force that behavior. |

@@ -4,16 +4,44 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-07. Overall roadmap: **in progress**.
 
-Execution is **blocked by disk capacity** after repeated holds across goal
-turns. The latest [readiness revalidation](tests/node-compat/frameworks/nextjs/next-app-request-isolation-root-results-v1/readiness-disk-block-20261107.json)
-rehashes the runtime CLI's required pins and exits 2 at 665,825,280 free bytes,
-before request/output creation or actor startup. Independent review finds no
-additional preparation gap. The prepared request pair needs 1 GiB free; the
-full native build needs 3 GiB. No usable alternate work volume was provided.
-The prior turn completed substantive preparation; this continuation revalidates
-the same external blocker and does not add an application or build result.
-The complete roadmap remains unfinished. Resume execution when capacity is
-available; retain all existing failures and perform the normal action-time guards.
+Execution resumed after the user freed the current volume. Native admission
+observed 23,397,662,720 free bytes. Both first real request-regression arms have
+now completed, and **both strict results fail**. Each records 80 passing checks
+for the six concurrency/body/recovery cases, all 24 individual HTTP contracts,
+five incremental stream chunks and two functional browser interactions. Native
+cache generation remains 1→1 after revalidation (failed); stock Node advances
+1→2 (passed). Both strict browser gates retain a Server Action POST
+`ERR_ABORTED`, with unavailable response body/sizes. No failure was filtered or
+retried. The closed reader accepts both supplemental captures as intact and
+strictly passing for those six cases, then rejects whole-pair admission.
+Independent DATA review verifies the physical outcomes and preserves both
+failed original-contract gates. See [first real pair results](tests/node-compat/frameworks/nextjs/next-app-request-isolation-root-results-v1/first-real-pair-results/).
+
+The first actual V3 full-build admission also failed before WORK creation or
+compilation: the SDK was missing two empty archive-declared directories. All
+other common SDK entries matched, and the other nine declared trees matched.
+Root restored only those two mode0755 directories from their pinned archive
+metadata, without changing payload files, Source or inventories. All ten tree
+content checks now pass. The first failed attempt remains preserved. A fresh
+[SDK-restored build](tests/node-compat/frameworks/nextjs/next-native-portable-build-sdk-restored-root-v1/README.md)
+now completes with exit 0 under the unchanged d434 builder and original
+7200-second owner. Independent coordinated review passes: all 825 copies match,
+80 actual native TUs (79 C++/1 C) plus a separate embedding compile, fresh Rust
+aggregate and 1,078 link inputs, and all protected inputs/ten tool trees remain
+intact. New core engine `02a6601d…` is 31,324,563 bytes; actual full metadata
+`9e960c41…` is 4,877,968 bytes. This accepts build DATA only. No ordinary engine
+or guest export ran. The reviewed constructorV6 preserves all three existing
+executables and changes only the plan for genuine full-build metadata and a
+fresh namespace. Actual INIT construction, validation and WIT emission now all
+finish exit0 with clean ownership and protected inputs. Independent DATA review
+accepts component `4afeeb76…` (37,218,693 bytes), exactly13 selected standard
+WASI0.2.10 imports and only incoming-handler export; no app was mounted at INIT
+and no ordinary export or HTTP handler ran. The new runtime plan/Root guard are
+being closed before the first application trial on this artifact.
+
+The roadmap remains incomplete: construct/audit the new component, diagnose the
+cache/process-instance and browser-abort gaps, and rerun the full application gates. The prior capacity observations below
+are historical; the storage blocker is resolved for this execution.
 
 **Next.js is the immediate priority.** The next deliverable is a repeatable
 experimental Next application run, using the unchanged app and standard WASI
@@ -26,10 +54,9 @@ must not be reported as passed. Broader Node APIs, performance claims and
 production promotion follow these gates. See the updated
 [execution roadmap](docs/node-compat/nextjs-priority-roadmap.md).
 
-The next runtime gate remains the prepared NativeV8/StockV6 concurrent-request
-pair. The current volume has about 0.61 GiB free, below its unchanged 1 GiB
-start guard, so neither new application arm has run. The full native build
-still requires 3 GiB at admission. While those launches wait for capacity, the
+The earlier prepared NativeV8/StockV6 pair and full build were held below their
+1 GiB and 3 GiB start guards. Those holds preceded the actual results above.
+During that hold, the
 first [relocated Cargo source restoration](tests/node-compat/frameworks/nextjs/native-cargo-restore-root-results-v1/README.md)
 completed with exit 0 using 75 checksum-pinned cached registry archives, the
 exact Firefox FFI donor and 21 portable native source files. It created 3,506

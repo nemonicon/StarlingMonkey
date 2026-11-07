@@ -1,0 +1,13 @@
+# Full-build deployment actor V9 (unsealed draft)
+
+This successor selects the genuine completed full-build constructor V6 component through the exact `4afeeb76` / 37,218,693-byte content pin. Independent constructor DATA acceptance and final Root/Source peer review remain required; all operational roles remain late NULL. The current draft is not sealed or authorized to run.
+
+`deploy.mjs`, `run-owned.py` and `app-policy.mjs` are exact V8 byte copies. The client changes one import literal to the held V8 `supplemental.mjs` (`3dccf04b`); every other client byte is unchanged. StockV6 imports that same physical helper. The existing `sourceFamilies` and `protectedInputs` mechanism now also protects the complete indexed V8 family and exact helper before actions and finally. No helper, fake capture or historical test output is recopied. V8 ancestry stays indexed at its original location.
+
+The finite plan delta is Source state, expected component content pin, preserved V8 index, the added V8 family guard and the added helper descriptor. The fixed output prefix remains `next-wasmtime-deployment`; the existing validated late runId selects a fresh output and monitor namespace. There is no arbitrary output override, retry, namespace reuse, new host flag or capability.
+
+The fresh 2,181-file application, existing guest entry selection, thirteen WASI 0.2.10 interfaces, all original 24 HTTP assertions, generation-increase cache gate, strict streaming, two functional browser interactions and all browser error gates remain unchanged. The same six-case concurrent/context/body/recovery batch is retained and still contributes to overall acceptance. Its existing `componentOrEngineChanged:false` describes the supplemental feature itself; V9 as a whole will select a different full-build engine/component under separate Root evidence. The failed NativeV8 cache and both prior strict action-abort outcomes remain failed historical data. No Store affinity, shared module counter or abort-cause claim is made.
+
+Root must preserve the existing launch floor and original 600-second owner, bind the accepted full-build metadata/result/Source evidence, and retain the whole canonical `8025` world guard before and finally. The actor remains metadata-generic; the separate Root full-native admission is required. The existing package/API/audit wires and runtime contracts are not relaxed. Construction, host execution and runtime evidence are absent from this draft.
+
+Only grammar, AST and inert derivation checks are permitted here. No actor/helper entrypoint, browser, Next application, engine, server or network workload runs in these checks.
