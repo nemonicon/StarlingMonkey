@@ -6,7 +6,8 @@ retained in the [milestone report](nextjs-wasm-milestone-2026-11-06.md).
 **A clean-machine build has not been demonstrated.** The existing
 [regression command](../../tests/node-compat/frameworks/nextjs/run-native-next-regression.py)
 reuses exact private artifacts; it does not bootstrap them. This plan is a
-read-only source audit, not another build or a claim of bit-for-bit rebuilds.
+source audit with the isolated host app build now executed; it does not claim
+bit-for-bit rebuilds or a rebuilt native engine.
 Performance work is separate in the [measurement plan](nextjs-measurement-plan.md).
 
 ## Dependency order and existing mechanisms
@@ -122,10 +123,18 @@ cannot be made portable by replacing strings or expected hashes.
    Node/bundler corpus. The new [isolated app CLI](../../tests/node-compat/frameworks/nextjs/next-app-build-v1/README.md)
    extracts these stages with a read-only default/`--plan`, explicit Node/npm
    inputs, private cache/configs and a fresh `--output` build action. Its57
-   inert Source tests pass; **the npm/Next build path remains unexecuted**.
-   The working app inventory binds2218 files/48,808,299 bytes. Fresh generated
-   build/action IDs and file hashes require a genuine new inventory and checks;
-   old inode/mode/path records cannot be cast into evidence for a new build.
+   inert Source tests pass. The [first isolated actual build](../../tests/node-compat/frameworks/nextjs/next-app-build-root-results-v1/actual-review/README.md)
+   now passes four owned phases, raw0/clean, with original inputs preserved.
+   The [official Node/npm acquisition](../../tests/node-compat/frameworks/nextjs/next-app-tools-bootstrap-v1/README.md)
+   binds the Node22.14 archive to its published HTTPS checksum and extracts
+   npm10.9.2 privately; OpenPGP verification is not claimed. The fresh standalone
+   inventory binds2181 files/48,714,867 bytes,425 descendant directories and
+   new build/action IDs. Its directory schema omits the root and its tree lacks
+   a warmed `.next/cache`: runtime admission must explicitly handle the root
+   identity and declare an empty cache mountpoint in the owned copy. Two of five
+   browser asset pins changed. This new app has not yet been served in Wasm.
+   The historical accepted app has2218 files/48,808,299 bytes; its inode/mode/path
+   records cannot be cast into evidence for this new build.
 
 7. **Construct, audit, then run.** The committed raw
    [entry V4](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v4/index.json)

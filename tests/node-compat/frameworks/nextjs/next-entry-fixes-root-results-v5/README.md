@@ -21,8 +21,16 @@ A fresh diagnostic trial with the V2 CDP observer now passes the unchanged
 strict24HTTP/2browser contract on this same component, and its matched Node
 control also passes. Both record action network completion before same-document
 navigation; decoded action-body files are captured afterward. Neither trial
-establishes a fix or the cause of the earlier abort. Portable paired DATA review
-is being prepared; the failed first result remains unchanged.
+establishes a fix or the cause of the earlier abort. The [portable paired DATA
+review](../next-intl-runtime-root-results-v1/full-next-io-cdp-v6-review/README.md)
+retains299 records and passes Root readback; the failed first result remains
+unchanged.
+
+Permission scope differs: the native app copy uses0444/0555; the matched Node
+copy retains source permissions, with2,217 immutable files checked separately
+from its owned cache. The captured stock request's read-only wording was
+incorrect. Its bytes stay preserved; actual Source and DATA checks establish
+the narrower scope. No equivalent OS/WASI rights proof is claimed.
 
 Native handle counts, idle disconnect, trailers, clean-machine build,
 performance, browser-abort reliability and production promotion remain open.

@@ -38,9 +38,16 @@ are captured afterward. Their opaque action bodies have different hashes and
 are not normalized. This is a new observer trial with unchanged assertions,
 20s/500ms limits and strict failure gate; it **does not establish the cause,
 fix or reliability of the earlier abort**. Resultc737eaad/7450 bytes and matched
-Node51c54176/322922 bytes both finish raw0/clean with inputs preserved. Portable
-paired DATA review is in progress. Previous55f05 first/repeat passes and the
+Node51c54176/322922 bytes both finish raw0/clean with inputs preserved.
+The [portable paired DATA review](tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/full-next-io-cdp-v6-review/README.md)
+retains299 records and passes Root readback. Previous55f05 first/repeat passes and the
 failedV5 record remain unchanged.
+The native copy is physically0444/0555; the matched Node copy retains original
+source permissions and checks2,217 immutable files while excluding its owned
+cache. The captured stock request's prose incorrectly called that copy
+read-only; the request remains unchanged and the DATA review records this
+qualification. Neither result proves equivalent OS/WASI permission mechanisms
+or read-only WASI descriptor rights.
 The unchanged Next16.4.5/React19.3.1 standalone application runs in the real
 SpiderMonkey Wasm component on stock Wasmtime42.0.1, in two fresh successful
 runs. Native UTF16 engine
@@ -209,21 +216,46 @@ donors:435 native,387 support and3 embedding files,7,530,166 bytes. All content
 matches the actual V7 declarations plus the single UTF16 substitution. Its35
 source-only tests cover fresh copies, relocation and refusal cases; Root's
 read-only --check also passes. No compiler or guest ran. Builder integration,
-authenticated external tool/artifact materialization, fresh inventories and an
-actual isolated app-build execution remain outstanding; no clean build is claimed.
+authenticated external tool/artifact materialization and a full clean-machine
+engine build remain outstanding. The isolated app build below has run; no clean
+engine build is claimed.
 
 The [isolated app-builder Source](tests/node-compat/frameworks/nextjs/next-app-build-v1/README.md)
 is now implemented with a read-only default plan and explicit fresh-output build
 mode. It isolates the original locked npm/Next commands and standalone
-packaging from the historical corpus.57 inert tests and Root's read-only plan
-check pass; **the actual build path remains unexecuted**. It records fresh
-inventories/build/action IDs rather than reusing old2218-file identities.
+packaging from the historical corpus.57 inert tests and independent Source
+review pass. **The first actual isolated host app build now passes**: four
+original-owned phases(version probes, npm ci, Next webpack build) raw0/clean,
+package/lock/tool/source preservation and standalone packaging all pass.
+Resultfe0e0bdb/709565 bytes records2,181 fresh files/48,714,867 bytes,425
+directories(excluding root), no links, buildIDc2R8ovhEoFinJh6IvlO5M and actual
+action40ca0bda6c41d5a4ff46cda3035ad9babb89d96900. The new inventory is not the
+old2,218-file record and has not yet been served or accepted inside Wasm.
+The [sealed actual DATA review](tests/node-compat/frameworks/nextjs/next-app-build-root-results-v1/actual-review/README.md)
+retains78 text payloads and passes Root readback. It validates all four owned
+phases and fresh inventory without serving the app or executing a guest.
+C independently rechecked the DATA package and exact current source/tool/app
+membership; no material flaw was found. C authored the app CLI/acquisition, so
+this is independent of the DATA curator, not an independent approval of C's
+own implementation.
+Fresh runtime/stock/browser Source successors are in preparation: they must
+explicitly handle the new root-excluding directory schema, declare the empty
+owned-copy cache mountpoint and replace two of five browser asset pins. Existing
+dynamic action-ID extraction stays unchanged. No engine/component rebuild is
+needed merely to load the new `/app` tree; actual runtime acceptance is open.
 An official Node22.14 archive and published HTTPS SHA sum now supply npm10.9.2
 in a fresh private prefix;2,379 npm files and the existing Node binary's exact
 match to the archive entry are verified without executing npm. No OpenPGP
-verification is claimed. Root's concrete --plan passes. The actual app build
-did not start:1,019,109,376 free bytes is below the1GiB start floor. A request
-for more space/another volume is pending; no guard or old artifact was changed.
+verification is claimed. The [portable acquisition reader](tests/node-compat/frameworks/nextjs/next-app-tools-bootstrap-v1/README.md)
+passes Root readback. An initial app-build preflight held at1,019,109,376 bytes;
+later launch revalidation passed at1,075,671,040 bytes without changing the1GiB
+floor. The app build then ran once. Free space afterward is482,373,632 bytes;
+the request for3GiB/another volume remains relevant to further heavy/native
+work. A later `df` reports roughly201MiB available. No old proof, SDK, binary or
+shared cache was deleted. The [priority roadmap](docs/node-compat/nextjs-priority-roadmap.md)
+now puts fresh-app Wasm acceptance first, browser reliability second and the
+fresh second-host contract third; unrelated API expansion and a new engine build
+are outside that immediate critical path.
 
 The new read-only browser observer is Source-reviewed: seven bounded CDP event
 types plus requestfailed-aware observation completion, with unchanged actions,

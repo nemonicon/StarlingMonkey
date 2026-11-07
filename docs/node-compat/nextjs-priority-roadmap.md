@@ -79,15 +79,32 @@ The original foundations-v13 bundler corpus and its expected failures remain
 separate regression baselines. A React-only render or successful import never
 substitutes for this application contract.
 
+## Immediate Next.js critical path
+
+The next execution target is the **fresh isolated app build**, not another
+engine build or unrelated API expansion. Its four owned host-build phases pass;
+the [actual DATA review](../../tests/node-compat/frameworks/nextjs/next-app-build-root-results-v1/actual-review/README.md)
+retains the genuine2,181-file inventory and new build/action IDs. Prepare new
+native, matched-Node and browser Sources for its root-excluding directory schema,
+empty owned-copy cache mountpoint and two changed script pins. Then run the
+unchanged24HTTP/cache/stream/2browser contract against both hosts and retain every
+failure. This reuses component1c3108d2 and engine4623640b; the raw deployed loader
+already reads `/app`. No fresh-app runtime acceptance is claimed yet.
+
+Free space after the app build was482,373,632 bytes and later fell to roughly
+201MiB. Source preparation can continue; the next runtime/build action requires
+its original capacity guard to pass. No SDK, old proof or shared binary will be
+deleted to manufacture headroom.
+
 ## Priorities after the first pass
 
 | Priority | Work | Completion gate |
 | --- | --- | --- |
-| 1 | Make the passing generation reproducible | The portable source materializer reconstructs all825 matching inputs and passes35 tests. The [isolated app-build CLI](../../tests/node-compat/frameworks/nextjs/next-app-build-v1/README.md) now exists with57 inert tests; its actual build path remains unexecuted. The [dependency audit](nextjs-reproducibility-plan.md) keeps builder integration, authenticated tools, fresh actual app inputs and a full clean-machine run open. Historical failures remain unchanged. |
-| 2 | Regress response and compression semantics | The [twelve-case native-stream probe](../../tests/node-compat/frameworks/nextjs/native-pipe-root-results-v1/README.md) now matches all36 actual Node records in a real component, raw0/clean. It covers cancellation, abort, falsy errors, backpressure, final chunks and locks without expected-gap allowances. This validates the audited guest facade over native streams, not a new C++ pipeTo path or native resource-count/teardown proof. Broader cancellation/compression boundaries remain open. |
-| 3 | Close context and disconnect boundaries | Isolated I/O-abort controls pass eight responses. Integrated1c3108d2 first failed the strict browser gate despite24HTTP/two functional successes; the failed review stays retained. One new read-only CDP trial now passes the unchanged strict24+2 contract on both Node and the same Wasm component, with action transport completion before navigation. It does not explain or fix the earlier abort. Preserve this uncertainty and investigate before promotion. Native counts/teardown and broader AsyncResource remain open. |
-| 4 | Run unchanged Next on the second host | **Eight cold requests now pass** on stock wasmCloud2.11.0/embedded Wasmtime48.0.7 with the same55f05 component: health×3, SSR, JSON POST, filesystem/SHA, asset and strict streaming. Config/dev/outer0 and input/ownership bookends pass. V2 waits for the pinned post-registration CLI marker; the earlier eight host404s/SIGINT130 remain failed evidence. This closes the finite cold contract, while retained cache/browser acceptance remains separate. |
-| 5 | Make the successful profile buildable and measurable | Provide a clean-machine build path and execute the [paired measurement plan](nextjs-measurement-plan.md) for size, startup, public server RSS and route timing. That plan is unexecuted; functional success establishes no performance advantage or memory bound. |
+| 1 | Run the freshly built unchanged Next app in Wasm | Admit its genuine2,181-file inventory with explicit root/cache handling and two refreshed browser pins. Compare the same24HTTP/cache/stream/2strict-browser contract on Node and component1c3108d2. Preserve old2,218-file evidence and every new failure. Source successors are in preparation; capacity guards must pass before execution. |
+| 2 | Resolve browser failure and establish reliability | Integrated1c3108d2 first failed the strict browser gate despite24HTTP/two functional successes. One later paired CDP trial passes the unchanged strict contract on Node and the same component. That does not explain or fix the earlier abort. Investigate with retained transport evidence and controlled comparisons; keep zero-error gates and existing time limits. |
+| 3 | Regress the fresh app on the second host | Cold8 already passes on stock wasmCloud2.11.0/embedded Wasmtime48.0.7 with both55f05 and the integrated1c31 component. Bind a genuine fresh-app successor before repeating that finite contract. Retained-cache/browser acceptance is separate from cold requests; the original host404/SIGINT130 failure stays retained. |
+| 4 | Close response, context and resource boundaries | The [native-stream probe](../../tests/node-compat/frameworks/nextjs/native-pipe-root-results-v1/README.md) matches36 actual Node records in a real component; isolated I/O-abort controls pass eight responses. Broader cancellation/compression, AsyncResource, native handle counts, trailers and teardown remain open. Guest facade results do not prove native private-state/resource counts. |
+| 5 | Reproduce and measure the successful generation | All825 native source inputs reconstruct from Git, and official Node/npm acquisition plus the isolated host app build pass. Native builder integration, authenticated external prerequisites and a full clean-machine run remain open. Execute the [paired measurement plan](nextjs-measurement-plan.md) for size, startup, public server RSS and route timing after fresh-app acceptance. It is unexecuted; functional success establishes no performance advantage or memory bound. |
 | 6 | Prepare production promotion | Review exact selected manifests, defaults, build inputs, INIT barriers, facade limits and host rights; run required release and compatibility suites before profile/API promotion. Keep foundations-v13 accepted until this decision is explicit. |
 
 ## Per-surface depth
