@@ -258,8 +258,18 @@ root, stable root identity, exact membership and current physical bookends.
 Source-stage process observation and structural admission remain distinct.
 No Cargo metadata, compiler or guest result follows from this restoration.
 
-Remaining work includes a genuine offline Cargo metadata audit of those fresh
-roles and their integration into the complete native builder,
+The separate [actual offline metadata query](../../tests/node-compat/frameworks/nextjs/native-cargo-offline-verify-root-results-v2/README.md)
+now passes against those fresh roles: new `65544c7b…` metadata, all 84 logical
+packages/features/dependency edges, six root dependencies, exact fresh manifest
+paths, raw exit 0 and clean original ownership. Source/tool bookends pass.
+The complete 23-file output is retained as indexed DATA. The earlier V1 verifier
+failed before output or Cargo on a strict boolean flag bug; its failure remains
+preserved, and V2 changes only the two entry predicates. Cargo's observed
+`rustc` information query is not a source-compilation result.
+
+Remaining work includes implementing and reviewing the
+[V3 builder integration](../../tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-v3/change-plan.json)
+that consumes this actual proof and fresh roles,
 exact host-tool/cbindgen/Corrosion acquisition, generated61685 package rebuild,
 original988 adapter upstream provenance, and sufficient capacity for the fresh
 full native build and subsequent application gates. The committed988 bytes

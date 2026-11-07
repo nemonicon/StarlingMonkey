@@ -34,16 +34,39 @@ and retains the current full-root bookend guard. Root's genuine corrected
 readback now passes 3,507 files and 464 directories including the root, while
 reporting both link counts separately. It does not attest source process
 execution; the original terminal exit 0 and raw streams supply that separate
-observation. The next bounded step is an independently reviewed offline Cargo
-metadata query against these actual relocated inputs. That query, the complete
-native build and new Next request-pair results remain outstanding.
+observation. The relocated inputs now also pass a genuine offline Cargo query,
+as recorded below. The complete native build and new Next request-pair results
+remain outstanding.
 
 The first [offline metadata verifier launch](tests/node-compat/frameworks/nextjs/native-cargo-offline-verify-root-results-v1/README.md)
 exits 1 before creating output or starting Cargo. Its strict boolean guard
 incorrectly rejects Python's integer `sys.flags.isolated` value `1`, despite
 the actual `-I -B` command. The original Source, authority and raw failure
-are retained. A separate successor is being reviewed to correct both entry
-guards; no dependency query or native compilation occurred in that attempt.
+are retained; no dependency query or native compilation occurred in that
+attempt. The separately reviewed V2 corrects only those two guards and passes
+23 real-interpreter/inert flag checks.
+
+The [new actual metadata query](tests/node-compat/frameworks/nextjs/native-cargo-offline-verify-root-results-v2/README.md)
+now passes: Root, original process owner, worker and Cargo all exit 0, with
+clean cleanup and unchanged inputs. New metadata `65544c7b…` (352,680 bytes)
+matches all 84 logical packages, features, dependency aliases/kinds/edges and
+six root dependencies. Every manifest points to its fresh restored role; the
+old graph remains a comparison reference. Cargo made a sampled, observed
+`rustc` information query. No source-compilation command, engine build or guest
+execution was requested. The complete 23-file output is retained as an indexed
+DATA archive for future inspection; live source identities still require the
+separate admission API.
+
+The [V3 builder integration change plan](tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-v3/change-plan.json)
+is **unimplemented and unissued**. It replaces four old Cargo locations through
+the existing role-based build mechanisms, adds a validated Cargo selection,
+joins all 21 base files to the portable native selection, and uses a separately
+pinned Python 3.11 wrapper while preserving Python 3.9 as the native build tool.
+The new metadata is recorded as a candidate, not yet admitted by that consumer.
+Priority remains: run the prepared Next request pair as soon as 1 GiB is free;
+finish V3 integration and perform the full build when 3 GiB is free; rerun the
+complete application on its newly constructed component. No production default
+or compatibility claim has changed.
 
 The prior goal turn made concrete progress: paired six-case regression Sources,
 reviewed commands, native build preparation/launcher and capacity refusals were
