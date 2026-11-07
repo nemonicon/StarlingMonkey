@@ -1,5 +1,20 @@
 # First real concurrent Next.js request regression
 
+Subsequent checks on the same day preserve the original findings below. A
+genuine full native rebuild and INIT-only constructor pass their independent
+DATA gates (engine02a/component4afe). The first V9 application trial on that
+component still fails cache1→1 and strict action-body capture, while80
+supplemental/24HTTP/stream/two functional-browser checks pass. See the
+[full-build runtime record](../../tests/node-compat/frameworks/nextjs/next-full-build-runtime-root-results-v1/README.md).
+
+All three predeclared matched-Node extra-CDP-session-off controls then pass
+strictly. A separately declared native off-session control on the same4afe
+component still fails both cache and action capture, with clean ownership and
+protected inputs. See the [Node final audit](../../tests/node-compat/frameworks/nextjs/extra-cdp-off-root-results-v1/completed-final-audit.json)
+and [native control](../../tests/node-compat/frameworks/nextjs/next-native-extra-cdp-off-root-results-v1/README.md).
+The instrumentation change is not a sufficient fix for this native sample;
+neither unique cause nor reliability follows. The old failures remain failed.
+
 The NativeV8/StockV6 pair is **not accepted**. Both original process owners exit
 1 with clean cleanup and preserved inputs. Both supplemental captures pass all
 80 checks for the six new cases, but the original full-contract gates fail.

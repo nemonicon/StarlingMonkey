@@ -1,0 +1,11 @@
+# Cache affinity constructor (Source only)
+
+The three executable files are byte identical to held full-build constructor V6 (`4afe…`). Only seven plan roles change: state, diagnostic input Source index, input entry, output prefix, caller cwd, preserved prior caller index and input-delta explanation. After independent stopped-draft review and Root's no-additional-notes response, `inputSourceIndex` binds the actual held entry-family index. The preseal NULL-index draft is preserved under `history/`; it was a pending Source dependency, never a Root operational permission.
+
+The input is the diagnostic V5 descendant. The application, native engine/source, six facades, canonical `802595f5` world/eight WIT files/thirteen selected WASI0.2.10 interfaces, splicer `61685a01`, adapter `d30ade5b`, componentizer API, complete typed return capture, result/audit wires and timeouts remain unchanged. No extra interface, preopen or capability is selected. Only the standard stdout/random interfaces already in the world support the future diagnostic.
+
+All action-specific engine/metadata/Root/component/runtime slots remain NULL. Future Root authority must bind the reviewed actual full `02a6601d` build and full metadata kind `EXPERIMENTAL_NEXT_INTL_NATIVE_BUILD_ACTUAL_V1`, preserving actual80+1 compile arrays, Source/protection/build evidence and exact fixed values. No old incremental metadata or actual result is projected onto this Source. The constructor does not itself grant the Root-required1GiB start policy or whole28-member world guard; those must run before/finally under the existing Root owner. Ordinary guest execution, app mount, deployed nonce creation and workload are separate actions.
+
+The diagnostic marker must be absent from genuine INIT stdout. That future check does not by itself prove no INIT IO; it accompanies the Source barrier review and actual constructor/raw ownership evidence. No constructor, componentizer, monitor, entropy, resource, server or network operation has run for this candidate.
+
+`test-source.py` only reads Source/plan files and parses Python AST. Draft mode permits the explicitly pending entry-index dependency; final mode requires the exact closed entry family. It never imports constructor executables or invokes tools/actors. Independent Source review is required before final indexes and later Root actions.

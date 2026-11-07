@@ -1,0 +1,9 @@
+# Native extra CDP session off (Source-only diagnostic)
+
+This native-only diagnostic derives from BrowserV3/e324 using the stock off-control's exact diagnostic-session removal. It disables only the additional `context.newCDPSession(page)`, its seven subscriptions and its Network/Page enables. Playwright's built-in protocol and JavaScript remain enabled. It uses no routing, interception, cancellation hook, retry or error filter.
+
+Four exact spans change: the native diagnostic suite label, truthful off-session telemetry, the extra-session setup block, and explicit native-arm provenance. The original shared worker had `wasmBrowserRun:null`; this native-only worker records `true` as the selected arm and explicitly requires parent Root host/component evidence for actual Wasm execution. This field alone is not execution attestation. No stock-only provenance is imported.
+
+All remaining worker bytes are unchanged: both functional bodies, five asset pins, Playwright request/response/finished/failed listeners, failure-aware promise handling, raw bodies/headers/sizes, screenshots, 20-second tests, 500 ms pre-close drain, 2-second post-close observation drain and strict zero-error gate. The unchanged inlined observer still handles failure-before-response ordering; the unused CDP collector emits no synthetic events. Only grammar and inert Source/callback/error-gate tests run during preparation.
+
+One separately selected future native diagnostic is intended. It uses the same 4afe full-build component and unchanged application through its separate reviewed actor. It cannot waive the generation-increase cache gate, suppress action aborts, accept failed NativeV9 or establish a unique cause from the stock off observations. All operational slots remain NULL. No browser, actor, app copy, server, engine or network workload has run in this Source preparation.

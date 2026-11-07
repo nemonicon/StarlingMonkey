@@ -36,11 +36,38 @@ fresh namespace. Actual INIT construction, validation and WIT emission now all
 finish exit0 with clean ownership and protected inputs. Independent DATA review
 accepts component `4afeeb76…` (37,218,693 bytes), exactly13 selected standard
 WASI0.2.10 imports and only incoming-handler export; no app was mounted at INIT
-and no ordinary export or HTTP handler ran. The new runtime plan/Root guard are
-being closed before the first application trial on this artifact.
+and no ordinary export or HTTP handler ran during construction.
 
-The roadmap remains incomplete: construct/audit the new component, diagnose the
-cache/process-instance and browser-abort gaps, and rerun the full application gates. The prior capacity observations below
+The first application trial on that rebuilt component is now terminal, raw1
+with clean ownership and protected inputs. It again passes all80 supplemental
+checks,24HTTP checks, five incremental stream chunks and both functional browser
+interactions. Cache generation remains1→1 and strict action-response capture
+retains `ERR_ABORTED`/missing body and sizes. Independent physical DATA review
+confirms these failures; the full rebuild did not resolve them. See the
+[full-build runtime results](tests/node-compat/frameworks/nextjs/next-full-build-runtime-root-results-v1/).
+
+The three predeclared matched-Node controls with only the additional diagnostic
+CDP session disabled have also completed. Each passes24HTTP/cache1→2/five-chunk
+stream/two strict browser interactions, raw0/clean/protected. Root called the
+driver's genuine final audit through off3. These observations do not establish
+an abort cause or accept any earlier failed cohort. A separately versioned
+native control has now completed on the same component, app, world and strict
+gates. It exits1/clean/protected:80 supplemental/24HTTP/stream/two browser
+functions pass, while cache1→1 and the action POST `ERR_ABORTED` still fail.
+Disabling the extra session is not a sufficient fix in that native sample.
+See the [native control](tests/node-compat/frameworks/nextjs/next-native-extra-cdp-off-root-results-v1/README.md).
+See the [completed Node control audit](tests/node-compat/frameworks/nextjs/extra-cdp-off-root-results-v1/completed-final-audit.json).
+
+The roadmap remains incomplete: diagnose the cache/process-instance and
+browser-abort gaps, implement justified fixes, and rerun the full application
+gates. A bounded deployed-only JS-global affinity diagnostic is in Source
+preparation; it will not identify private native Store IDs or establish cache
+coherence. Its entry8f1a5b5f/constructor e0ec4689 Sources are now sealed and
+independently reviewed;74 inert helper checks pass. A fresh INIT-only constructor
+authority is prepared and under final review, with the same full native engine
+and standard world. No deployed affinity observation exists yet. See the
+[diagnostic plan](docs/node-compat/nextjs-cache-affinity-diagnostic-plan.md).
+The prior capacity observations below
 are historical; the storage blocker is resolved for this execution.
 
 **Next.js is the immediate priority.** The next deliverable is a repeatable

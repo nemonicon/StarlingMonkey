@@ -30,6 +30,26 @@ passes Root readback. The same fresh app/component passes the separate
 These positive finite observations do not explain or fix the earlier V5 action
 abort, prove reliability, or change any accepted API status.
 
+The [2026-11-07 request regression](nextjs-request-regression-2026-11-07.md)
+adds a stricter boundary. Both first V8/StockV6 arms pass all six supplemental
+cases/80 checks and individual HTTP/stream/function checks, but fail whole-pair
+acceptance. Native cache generation stays1→1; stock advances1→2. Both retain a
+strict browser action-response abort. A genuinely full native rebuild and
+component4afe/engine02a also pass build/construction DATA checks; its first V9
+run preserves the same two strict failures. No older positive result is erased,
+and no complete Next/Node or production support is inferred.
+
+| Additional experimental boundary | Strategy/capability | Status and deviation | Evidence / remaining validation |
+| --- | --- | --- | --- |
+| Request context and Unicode body recovery | Existing native/facade HTTP/streams/ALS; same thirteen WASI0.2.10 interfaces | Six measured end-to-end cases pass; client overlap does not identify a JS heap, Store or native owner | Both original arms80checks; fresh full-build V9 also80checks. Same-instance scheduling/lifetime still unproved |
+| Process/global state across HTTP instances | Guest JS state plus stock host deployment model | Per-instance state is distinct from a shared Node server process. P2 reuse/idle settings do not provide request affinity or one heap | Pinned Wasmtime source and observed cache failure; actual per-request instance selection remains untraced |
+| Default Next cache/tag coherence | Native filesystem with Next's existing JS FileSystemCache | Partial: files can be shared while invalidation epochs remain in a module-local Map. A lexical callback counter is also instance-local | Native1→1 gate remains failed; filesystem CacheHandler integration is a proposal, not implemented support or a fix for global counters |
+| Strict browser response capture | Unchanged functional/error/body contracts with declared instrumentation | Both interactions work, but default extra-CDP captures retain ERR_ABORTED/missing body. Node extra-CDP-off completes3/3 strict passes; one separately declared native off-session control still fails action capture/cache | Preserve all failures; this session change is not sufficient for the native sample. Independently review controls and investigate response completion; no unique cause or reliability claim |
+
+These rows are experimental deployment findings. They do not change the pinned
+Node inventory, accepted production export manifests or initial machine-readable
+API dispositions.
+
 | Experimental API/language gate | Strategy and capability | Current status and deviation | Validation |
 | --- | --- | --- | --- |
 | Node `global` alias | Pure guest entry facade; no additional host capability | Bounded exact self-alias descriptor; other Node globals retain separate contracts | Pinned Node descriptor/private-realm tests and successful full Next smoke |

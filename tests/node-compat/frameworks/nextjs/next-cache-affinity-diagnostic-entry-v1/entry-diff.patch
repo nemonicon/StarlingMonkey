@@ -1,0 +1,74 @@
+--- held-v5/guest-entry.mjs
++++ cache-affinity-v1/guest-entry.mjs
+@@ -499,6 +499,63 @@
+ function mayReturnHandledClosed({classified,cancelReturned,readerReleased,cleanupReturned,requestAborted,fatalSet}){
+   return classified===true&&cancelReturned===true&&readerReleased===true&&cleanupReturned===true&&requestAborted===true&&fatalSet===false;
+ }
++// No top-level state, entropy, clock, resource, task or IO operation.
++// The raw entry calls this private helper only after constructing its deployed Request.
++function recordCacheAffinityAdmission(method, url, inertBindings) {
++  const slot = '__STARLING_NEXT_CACHE_AFFINITY_DIAGNOSTIC_V1__';
++  if (typeof method !== 'string' || typeof url !== 'string')
++    throw new TypeError('Cache diagnostic requires the actual request method and URL');
++  // Only Source tests supply ordinary byte-fill/write callbacks. The raw entry
++  // always supplies exactly two arguments and uses genuine WebCrypto/stdout.
++  const target = inertBindings === undefined ? globalThis : inertBindings.target;
++  if (target === null || (typeof target !== 'object' && typeof target !== 'function'))
++    throw new TypeError('Cache diagnostic requires a global object');
++  const pathname = new URL(url).pathname;
++  let descriptor = Object.getOwnPropertyDescriptor(target, slot);
++  if (descriptor === undefined) {
++    const seed = new Uint8Array(16);
++    const filled = inertBindings === undefined
++      ? globalThis.crypto.getRandomValues(seed)
++      : inertBindings.fill(seed);
++    if (filled !== seed) throw new TypeError('Cache diagnostic entropy must return its input view');
++    const digits = '0123456789abcdef';
++    let nonce = '';
++    for (const byte of seed) nonce += digits[byte >>> 4] + digits[byte & 15];
++    const value = {};
++    Object.defineProperties(value, {
++      nonce: {value: nonce, enumerable: true, writable: false, configurable: false},
++      ordinal: {value: 0, enumerable: true, writable: true, configurable: false},
++    });
++    Object.preventExtensions(value);
++    Object.defineProperty(target, slot, {value, enumerable: false, writable: false, configurable: false});
++    descriptor = Object.getOwnPropertyDescriptor(target, slot);
++  }
++  if (!Object.hasOwn(descriptor, 'value') || descriptor.enumerable !== false ||
++      descriptor.writable !== false || descriptor.configurable !== false ||
++      descriptor.value === null || typeof descriptor.value !== 'object')
++    throw new TypeError('Conflicting cache diagnostic global slot');
++  const state = descriptor.value;
++  const properties = Object.getOwnPropertyDescriptors(state);
++  if (Object.keys(properties).sort().join(',') !== 'nonce,ordinal' ||
++      !Object.hasOwn(properties.nonce, 'value') || !Object.hasOwn(properties.ordinal, 'value') ||
++      properties.nonce.enumerable !== true || properties.nonce.writable !== false || properties.nonce.configurable !== false ||
++      properties.ordinal.enumerable !== true || properties.ordinal.writable !== true || properties.ordinal.configurable !== false ||
++      Object.isExtensible(state) || typeof properties.nonce.value !== 'string' ||
++      !/^[0-9a-f]{32}$/.test(properties.nonce.value) || !Number.isSafeInteger(properties.ordinal.value) ||
++      properties.ordinal.value < 0 || properties.ordinal.value >= Number.MAX_SAFE_INTEGER)
++    throw new TypeError('Invalid cache diagnostic global state');
++  const ordinal = properties.ordinal.value + 1;
++  state.ordinal = ordinal;
++  if (!((method === 'GET' && pathname === '/api/cache') ||
++        (method === 'POST' && pathname === '/api/revalidate'))) return;
++  const line = JSON.stringify({schemaVersion: 1, marker: 'NEXT_CACHE_AFFINITY_V1',
++    phase: 'request-admission', nonce: properties.nonce.value, ordinal, method, pathname,
++    identityScope: 'js-global-state-epoch'});
++  if (line.length > 512) throw new Error('Cache diagnostic line bound exceeded');
++  if (inertBindings === undefined) console.log(line);
++  else inertBindings.write(line);
++}
++
+ function createWasiHttpHandler(webHandler,types,runFreshRequest){
+   if(typeof runFreshRequest!=='function')throw new TypeError('Native request entry is required');
+   const{Fields,IncomingBody,OutgoingBody,OutgoingResponse,ResponseOutparam}=types;
+@@ -569,6 +626,7 @@
+         });
+       }
+       request=new Request(url,{method,headers,signal:ioAbort.signal,...(body?{body,duplex:'half'}:{})});
++      recordCacheAffinityAdmission(method,url);
+       const response=await webHandler(request);
+       if(primarySet)throw primaryValue;
+       const fields=[];

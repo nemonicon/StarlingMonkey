@@ -320,3 +320,30 @@ the audited policy into full Next entryV4 and rerunning24HTTP/2browser checks is
 the next implementation task. The full Next component55f05 remains unchanged.
 HTTP finish-future inspection, typed HTTP error extraction and the native
 resource/Store-death limits above remain open.
+
+### Current full-entry and multi-instance boundary
+
+The observed-I/O policy was subsequently integrated into full entryV5 and the
+unchanged fresh Next application. Earlier strict finite passes and failures are
+retained in the [priority roadmap](nextjs-priority-roadmap.md). The first real
+V8 concurrency/body/recovery pair and the full-build V9 application run now
+each report80 supplemental checks passed. These establish end-to-end responses,
+including distinct/empty contexts and Unicode/error recovery; they do not prove
+same-instance ALS interleaving, native cleanup counts or Store identity.
+
+The strict original contract remains failed in those native runs: cache
+generation stays1→1 and the browser action response aborts. Pinned stock
+Wasmtime P2 HTTP can allocate another Store when a worker is busy and provides
+no exposed request-affinity promise. Next's default tag invalidation Map and
+the fixture's callback counter are module-local; shared files alone do not
+establish shared process state. This source-based limit is distinct from a
+proven cause of either concrete failed run. See the
+[actual regression findings](nextjs-request-regression-2026-11-07.md).
+
+A possible ordinary public-API diagnostic would assign a JS-global label on
+the first deployed invocation and log a per-global request ordinal. It must
+capture no entropy, environment or live handles at INIT, must retain request
+boundaries, and must not claim a native Store ID. No such cache diagnostic is
+implemented by this document. The earlier no-DEBUG/GC-pressure/reset/resource-
+prototype restrictions remain in force; lifecycle and snapshot safety are not
+inferred from client overlap or a later healthy response.

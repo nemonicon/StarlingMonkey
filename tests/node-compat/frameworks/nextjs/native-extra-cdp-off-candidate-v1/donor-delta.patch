@@ -1,0 +1,32 @@
+--- browser-hydration-candidate-v3/browser-check.mjs
++++ native-extra-cdp-off-candidate-v1/browser-check.mjs
+@@ -18,10 +18,10 @@
+ const chrome='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',limit=20000;
+ await mkdir(output,{mode:0o700}); // Exclusive fresh output; never overwrite a prior run.
+ async function descriptor(path){const h=createHash('sha256');let bytes=0;for await(const b of createReadStream(path)){h.update(b);bytes+=b.length;}return{path,sha256:h.digest('hex'),bytes};}
+-const result={schemaVersion:1,suite:'nextjs-hydration-browser-diagnostic-v2',origin:origin.origin,playwrightVersion:null,browserVersion:null,
++const result={schemaVersion:1,suite:'nextjs-native-extra-cdp-off-diagnostic-v1',origin:origin.origin,playwrightVersion:null,browserVersion:null,
+   executable:null,tests:[],pageerrors:[],consoleerrors:[],failedrequests:[],actionPosts:[],errors:[],
+-  browserClosed:false,ephemeralContexts:true,userProfileUsed:false,perTestTimeoutMs:limit,wasmBrowserRun:null,targetRuntimeProvenance:'Parent Root records actual host; the browser origin alone does not identify it',
+-  cdpEvents:[],cdpCorrelations:[],cdpScope:{events:['Network.requestWillBeSent','Network.responseReceived','Network.dataReceived','Network.loadingFinished','Network.loadingFailed','Page.navigatedWithinDocument','Page.frameNavigated'],payloads:'Complete semantic protocol JSON; not original wire bytes',protocolClock:'CDP timestamps/monotonic seconds and wallTime retain original values; no conversion to Node hrtime',arrivalClock:'Node process.hrtime relative nanoseconds shared with Playwright trace',idCorrelation:'CDP IDs and per-test Playwright WeakMap IDs are distinct; URL/method matches are candidates only'},
++  browserClosed:false,ephemeralContexts:true,userProfileUsed:false,perTestTimeoutMs:limit,wasmBrowserRun:true,targetRuntimeProvenance:'Selected native-only diagnostic Source; actual Wasm execution and component identity require parent Root host/artifact evidence',
++  cdpEvents:[],cdpCorrelations:[],cdpScope:{extraSessionEnabled:false,events:[],disabledDiagnosticEvents:['Network.requestWillBeSent','Network.responseReceived','Network.dataReceived','Network.loadingFinished','Network.loadingFailed','Page.navigatedWithinDocument','Page.frameNavigated'],playwrightBuiltinProtocolUnchanged:true,scope:'Only the worker additional CDP session/subscriptions disabled; Playwright normal protocol remains active',payloads:'No extra-session protocol events captured in this control',idCorrelation:'No extra-session CDP IDs/correlation available'},
+   assetBodies:[],bodyCaptures:[],responseHeaders:[],trace:[],traceClock:'Node process.hrtime.bigint relative nanoseconds',responseFinishedObservations:[],
+   beforeCloseNetworkCompletionWait:false,responseCaptureDrainBeforeCloseLimitMs:500,responseFinishedDrainAfterCloseLimitMs:2000};
+ // Exact unchanged app's five client chunks. response.body gives decoded entity
+@@ -183,12 +183,9 @@
+       page.on('console',message=>{if(message.type()==='error')result.consoleerrors.push({test:id,text:message.text(),location:message.location()});});
+       page.on('requestfailed',request=>{const data=requestData(request),terminal=observer.requestFailed(request,data,request.failure());const failure={test:id,...data,failure:terminal.failure,phase,ns:terminal.arrivalNs};result.failedrequests.push(failure);trace(id,phase,'requestfailed',failure);});
+       if(id==='server-action')page.on('request',request=>{if(request.method()==='POST'){const bytes=request.postDataBuffer();result.actionPosts.push({url:request.url(),headers:request.headers(),bodyBase64:bytes?.toString('base64')??null,bytes:bytes?.length??null});}});
+-      mark('cdp-observer-setup');
+-      const cdp=await context.newCDPSession(page);
+-      for(const event of result.cdpScope.events)cdp.on(event,payload=>observer.cdp(event,payload,{test:id,phase}));
+-      cdp.on('close',()=>trace(id,phase,'cdp-session-close'));
+-      await cdp.send('Network.enable');await cdp.send('Page.enable');
+-      record.cdpEnabledBeforeFirstAppRequest=true;trace(id,phase,'cdp-enabled',{domains:['Network','Page'],interception:false});
++      mark('extra-cdp-disabled');
++      record.cdpEnabledBeforeFirstAppRequest=false;record.extraCDPSessionEnabled=false;
++      trace(id,phase,'extra-cdp-disabled',{extraSessionEnabled:false,playwrightBuiltinProtocolUnchanged:true,interception:false});
+       const observations=await body(page,mark,snapshot);mark('functional-complete');
+       mark('screenshot-start');const screenshot=join(output,id+'.png');await page.screenshot({path:screenshot,fullPage:true,timeout:5000});mark('screenshot-complete');
+       record.screenshot=await descriptor(screenshot);record.observations=observations;
