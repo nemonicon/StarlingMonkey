@@ -5,7 +5,34 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 Last updated: 2026-11-07. Overall roadmap: **in progress**.
 
 
-**Latest actual Next result:24/24 HTTP,2/2 browser; full selected contract passes.**
+**Last fully passing Next generation:24/24 HTTP,2/2 browser on55f05.**
+
+The new integrated observed-I/O adapter candidateV5 constructs as1c3108d2/
+37,214,251 bytes, same462 engine and13 standard WASI0.2.10 imports. Its first
+full Wasmtime run passes24/24 HTTP, cache1→2, five stream chunks(shell0/ready2)
+and both browser interactions, but the **strict overall result fails**:
+the browser action POST reports ERR_ABORTED after its200 response/URL change,
+followed by unavailable response-body capture. The abort precedes explicit
+context close; a later response.finished Targetclosed is secondary. No cause
+or benign exception is established, and no error is filtered. Result8fa934ee/
+7970 bytes and complete browser evidence remain retained. The [portable failed
+review](tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/full-next-io-v5-first-review/README.md)
+retains195 records and passes Root readback, without changing the runtime's
+raw1/strict-failure status. Process shutdown,
+inputs, app copy and whole-world/native guards pass. V4 had a similar abort
+pattern, so this observation alone does not establish an adapter regression.
+
+The same new component separately passes all8 cold wasmCloud requests, including
+strict streaming(three chunks/shell0/ready1), config/dev/outer0 with inputs and
+ownership preserved. That result e7c99602/46831 bytes does not accept the failed
+Wasmtime browser contract. The [cold DATA review](tests/node-compat/frameworks/nextjs/wasmcloud-cold-root-results-v3/actual-review/README.md)
+retains150 records and passes Root readback;175 selected current descriptors
+and both2218-file app trees pass separately. The failed full-run review above
+also passes evidence validation while retaining the strict failure.
+Read-only CDP network diagnostics and an observer failure-terminal correction
+are being prepared for causal evidence; existing assertions/time limits and
+the strict failure gate stay unchanged. The previous55f05 first/repeat passes
+below remain valid historical evidence and are not replaced by this candidate.
 The unchanged Next16.4.5/React19.3.1 standalone application runs in the real
 SpiderMonkey Wasm component on stock Wasmtime42.0.1, in two fresh successful
 runs. Native UTF16 engine
@@ -132,8 +159,9 @@ retains263 records and passes Root readback;289 selected current descriptors
 pass separately. The upload's already-errored reader cancel rejection and the
 host's IncompleteMessage line stay visible. Neither is counted as successful
 upload cancellation or native cleanup. This is an isolated JS-adapter regression over native
-APIs, not native resource-count/Store-death proof. **The full Next55f05 adapter
-still needs this change integrated and its24+2 contract rerun.**
+APIs, not native resource-count/Store-death proof. The policy is now integrated
+in candidate1c3108d2, whose first full regression remains a strict failure as
+reported above; fully passing55f05 is unchanged.
 The next host priority is a finite cold-instance wasmCloud check of the same
 unchanged full Next component. The first actual eight-request attempt failed:
 the harness mistook the early TCP listener for deployed-workload readiness.
@@ -176,11 +204,11 @@ read-only --check also passes. No compiler or guest ran. Builder integration,
 authenticated external tool/artifact materialization, fresh inventories and an
 isolated app-build command remain outstanding; no clean build is claimed.
 
-Full Next entryV5 integration is in progress. It preserves all six facades and
-the application, replaces only the WASI adapter with the audited observed-I/O
-policy, and keeps the standard13-interface world unchanged. The existing24+2
-runner will be reused under additional whole-world/native artifact guards;
-no new full-application result is claimed until construction and runtime finish.
+Full Next entryV5 integration is implemented and constructed. It preserves all
+six facades and the application, replaces only the WASI adapter with the audited
+observed-I/O policy, and keeps the standard13-interface world unchanged. The
+unchanged24+2 runner ran under whole-world/native artifact guards; the strict
+failure described above keeps this candidate outside the passing checkpoint.
 Earlier811–996MiB capacity holds ended
 when free space rose above the unchanged1,024MiB construction start guard; both
 constructors then ran. No proof or shared binary was deleted and no guard was

@@ -1,0 +1,11 @@
+--- wasmcloud-cold-candidate-v2/deploy.mjs
++++ wasmcloud-cold-candidate-v3/deploy.mjs
+@@ -29,7 +29,7 @@
+ assert.equal(ctorPlan.worldName,'next-http');assert.deepEqual([...ctorPlan.selectedInterfaces].sort(),[...plan.selectedInterfaces].sort());
+ let worldIdentityBefore;
+ async function witBookend(){
+- const ref=plan.worldFamily.sourceIndex,root=dirname(ref.path);assert.equal(ctorPlan.witDirectory,root);assert.deepEqual(ref,a.inputSourceIndex);assert.equal(await realpath(root),root);await family(ref);
++ const ref=plan.worldFamily.sourceIndex,root=dirname(ref.path);assert.equal(ctorPlan.witDirectory,root);assert.deepEqual(ref,ctorPlan.worldSourceIndex);assert.equal(await realpath(root),root);await family(ref);
+  const tree=await walk(root);assert.deepEqual(tree.links,[]);assert.deepEqual([...tree.dirs].sort(),plan.worldFamily.directories);
+  assert.deepEqual(tree.files.filter(x=>x.endsWith('.wit')).sort(),plan.fixedWit.files.map(x=>x.path).sort());for(const r of plan.fixedWit.files)await verify({...r,path:join(root,r.path)});
+  const identities=[];for(const name of [...tree.files,...tree.dirs].sort()){const path=join(root,name),s=await lstat(path);assert(!s.isSymbolicLink());assert.equal(await realpath(path),path);if(s.isFile())assert.equal(s.nlink,1);else assert(s.isDirectory());identities.push({relativePath:name,kind:s.isFile()?'file':'directory',mode:s.mode&0o777,dev:s.dev,ino:s.ino,nlink:s.nlink});}
