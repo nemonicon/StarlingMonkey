@@ -1,5 +1,21 @@
 # Cache affinity diagnostic
 
+The first deployed diagnostic is now terminal raw1/clean/protected on component
+811459ea. All80 supplemental checks,24HTTP contracts and five-chunk stream pass.
+Both strict browser interactions pass in this sample, with empty error arrays;
+that does not accept any earlier failed sample. Cache generation remains1→1,
+so the overall original gate fails.
+
+The actual stdout records four different nonces, one at each ordered cache-first,
+repeat, invalidation and after-revalidation admission. Each ordinal is7. This
+shows different observed JS-global state epochs at these admissions. It does
+not identify native Stores or trace callback execution/tag-map updates. Ordinary
+timing log lines remain retained alongside all four marker lines. Independent
+bounded owner/world/app/outcome review confirms these observations. Coordinated
+DATA review,34 pure marker-parser tests and both sealed capsule current readers
+pass. Root independently reads all300 constructor/runtime archive members and
+live originals/modes. These DATA passes preserve the failed runtime gate.
+
 The first native request regression, full-build V9 and native extra-CDP-off
 control all retain cache generation1→1 after a successful revalidation POST.
 Matched Node advances1→2. These are observed failures of the original contract.
@@ -27,8 +43,10 @@ diagnostic is fabricated after an error.
 
 There is only a function declaration at INIT. Existing RuntimeOnly native
 entropy policy and the same `wasi:random/random@0.2.10`/stdout imports apply.
-The first actual constructor must retain INIT logs without diagnostic lines,
-validate the component and audit the same thirteen standard imports. A later
+The first actual constructor now completes0/clean/protected for component
+811459ea/37,222,602 bytes. INIT construction, validation and WIT emission all
+pass; all six inner command streams lack the diagnostic marker, and the emitted
+imports remain exactly the same thirteen standard0.2.10 interfaces. A later
 deployed run is a separate action. Source review and absent log lines alone do
 not inspect private snapshot memory or establish complete lifecycle safety.
 

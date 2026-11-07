@@ -340,10 +340,16 @@ establish shared process state. This source-based limit is distinct from a
 proven cause of either concrete failed run. See the
 [actual regression findings](nextjs-request-regression-2026-11-07.md).
 
-A possible ordinary public-API diagnostic would assign a JS-global label on
-the first deployed invocation and log a per-global request ordinal. It must
-capture no entropy, environment or live handles at INIT, must retain request
-boundaries, and must not claim a native Store ID. No such cache diagnostic is
-implemented by this document. The earlier no-DEBUG/GC-pressure/reset/resource-
+A separately versioned ordinary public-API diagnostic now assigns a JS-global
+label on the first deployed invocation and logs a per-global request ordinal.
+Its INIT-only construction/validation/WIT pass on811459ea; original command
+streams contain no marker. The first deployed run logs four different epochs,
+each ordinal7, at the ordered cache/revalidation admissions; cache1→1 still
+fails. Both strict browser interactions pass in this diagnostic sample, with
+entropy/logging perturbation disclosed. See the
+[full diagnostic](nextjs-cache-affinity-diagnostic-plan.md). It captures no
+entropy/environment/live handle in its INIT declaration and makes no native
+Store-ID, callback-completion or sole-cause claim. The earlier
+no-DEBUG/GC-pressure/reset/resource-
 prototype restrictions remain in force; lifecycle and snapshot safety are not
 inferred from client overlap or a later healthy response.

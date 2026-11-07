@@ -128,6 +128,23 @@ checks,24HTTP, five chunks and two functional browser interactions pass, while
 cache1→1 and strict action-response capture fail. Keep the1GiB runtime/3GiB
 build admission policies on future actions.
 
+The separately declared affinity component811459ea now completes its first
+deployed run. All80 supplemental/24HTTP/stream checks pass; cache1→1 still
+fails. Its strict browser gate passes in this sample. Four admission records
+show different JS-global state epochs for cache-first, repeat, invalidation
+and after-revalidation, each with ordinal7. This does not identify private
+Stores or prove the callback/tag-map cause. Added logging may perturb timing;
+the browser positive does not accept prior failures. The
+[diagnostic plan/results](nextjs-cache-affinity-diagnostic-plan.md) and
+[optional shared-cache proposal](nextjs-portable-cache-proposal.md) keep the
+original failed process-counter contract separate from any future scenario.
+
+The next implementation order is now: verify/retain those diagnostics; perform
+the separately designed exact-action transport EOF control; resolve response
+completion issues that it demonstrates; then build an explicitly configured
+portable cache scenario through Next's actual CacheHandler extension. Do not
+patch global state or change host scheduling to simulate one Node process.
+
 | Priority | Work | Completion gate |
 | --- | --- | --- |
 | 1 | Run the freshly built unchanged Next app in Wasm | **First actual pair passes** on nativeV7/stockV3/browserV3:24HTTP/cache1→2/five chunks/2strict-browser checks, raw0/clean/protected inputs. Genuine2,181-file inventory/new build+action IDs run on1c3108d2 without rebuilding the engine. The304-payload portable paired DATA review passes Root readback. Old2,218-file evidence and failures remain unchanged. |

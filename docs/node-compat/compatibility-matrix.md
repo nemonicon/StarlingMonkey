@@ -50,6 +50,16 @@ These rows are experimental deployment findings. They do not change the pinned
 Node inventory, accepted production export manifests or initial machine-readable
 API dispositions.
 
+The later811459ea affinity diagnostic records four different JS-global state
+epochs at the four cache/revalidation admissions. Cache1→1 still fails; its
+strict browser sample passes with logging/entropy perturbation disclosed.
+Neither native Store identity nor unique cache cause follows. See the
+[diagnostic findings](nextjs-cache-affinity-diagnostic-plan.md). The proposed
+optional Next CacheHandler also requires genuine CJS/fileURL dynamic-import
+validation and a checked referrer failure boundary; no current support claim
+for that path or shared-cache implementation is made. The
+[source-based proposal](nextjs-portable-cache-proposal.md) retains these gates.
+
 | Experimental API/language gate | Strategy and capability | Current status and deviation | Validation |
 | --- | --- | --- | --- |
 | Node `global` alias | Pure guest entry facade; no additional host capability | Bounded exact self-alias descriptor; other Node globals retain separate contracts | Pinned Node descriptor/private-realm tests and successful full Next smoke |

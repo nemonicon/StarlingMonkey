@@ -60,25 +60,56 @@ See the [completed Node control audit](tests/node-compat/frameworks/nextjs/extra
 
 The roadmap remains incomplete: diagnose the cache/process-instance and
 browser-abort gaps, implement justified fixes, and rerun the full application
-gates. A bounded deployed-only JS-global affinity diagnostic is in Source
-preparation; it will not identify private native Store IDs or establish cache
+gates. A bounded deployed-only JS-global affinity diagnostic now runs; it does
+not identify private native Store IDs or establish cache
 coherence. Its entry8f1a5b5f/constructor e0ec4689 Sources are now sealed and
-independently reviewed;74 inert helper checks pass. A fresh INIT-only constructor
-authority is prepared and under final review, with the same full native engine
-and standard world. No deployed affinity observation exists yet. See the
+independently reviewed;74 inert helper checks pass. The fresh INIT-only constructor
+now completes0/clean/protected for component811459ea/37,222,602 bytes, using the
+same full native engine and standard world. Validation/WIT pass with exactly13
+standard0.2.10 imports and only incoming-handler export. All six inner command
+streams contain no affinity marker; coordinated DATA review passes.
+Its first deployed run exits1/clean/protected. All80 supplemental/24HTTP/stream
+checks and both strict browser interactions pass, but cache1→1 still fails.
+The four cache/revalidation admissions have different JS-global state-epoch
+nonces, each ordinal7. These are observed state boundaries, not private Store
+IDs, callback/tag-map traces or sole-cause proof. Added entropy/logging can
+perturb timing; this browser positive does not accept any earlier failure.
+Independent bounded outcome/owner/world/app review and coordinated DATA review
+pass. The marker parser passes34 pure-DATA checks; both sealed constructor/runtime
+capsule readers pass current-original checks. Root independently rereads all300
+members and their live originals/modes with unchanged read bookends. See the
 [diagnostic plan](docs/node-compat/nextjs-cache-affinity-diagnostic-plan.md).
+
+The full-build V9, three Node off-controls and failed native off-control are
+now retained as three sealed finite DATA capsules (750 members,13,713,561
+logical bytes). All three readers pass `--current`; Root independently rereads
+every archive member and live original with unchanged read bookends. Original
+failed gates and null action bodies remain intact. An exact captured-POST
+HTTP/gzip EOF diagnostic is in Source preparation, without browser navigation.
+The [portable-cache proposal](docs/node-compat/nextjs-portable-cache-proposal.md)
+records15 exact source descriptors and the genuine Next CacheHandler/build
+integration; no shared cache handler or new application scenario is implemented.
+Its real CommonJS/fileURL dynamic-import path is an unverified prerequisite.
+The generic loader's referrer-private assumption needs a checked error boundary
+before any suspected invalid-referrer path is exercised. An uncompiled native
+boundary template is in Source preparation; no fault probe or native change
+has run. Next also catches handler.set exceptions, so direct error tests must
+not equate every helper error with a failed application request.
+Checkpoint79cdaf6c is committed and pushed. The subsequent constructor/runtime
+records and five finite DATA capsules (1,050 members/32,633,279 logical bytes)
+are now prepared for this checkpoint. The exact-action wire Sources and native
+referrer-boundary template remain separate work in progress; no actual wire
+transport arm or new native guard build has run.
 The prior capacity observations below
 are historical; the storage blocker is resolved for this execution.
 
-**Next.js is the immediate priority.** The next deliverable is a repeatable
-experimental Next application run, using the unchanged app and standard WASI
-world. The fresh Wasm smoke and native three-run cohort already pass. Prioritize
-the concurrent request/body/recovery regression on the current artifact, while
-preparing the complete portable native build and regression on its new artifact.
-Broader cancellation/resource boundaries follow. The matched-Node-only browser
-abort investigation remains open alongside this work; its failed all-six gate
-must not be reported as passed. Broader Node APIs, performance claims and
-production promotion follow these gates. See the updated
+**Next.js is the immediate priority.** The next deliverables are the exact-action
+transport EOF control and an explicitly bounded shared-cache design, using
+standard WASI and unchanged stock hosts. Resolve demonstrated response/resource
+issues before expanding APIs. A future portable cache scenario must use a new
+versioned fixture and genuine Next extension; it cannot relabel the failed
+lexical-counter gate. Broader cancellation/resource boundaries, Node APIs,
+performance measurements and production promotion follow these gates. See the updated
 [execution roadmap](docs/node-compat/nextjs-priority-roadmap.md).
 
 The earlier prepared NativeV8/StockV6 pair and full build were held below their
