@@ -1,0 +1,229 @@
+--- donor/run-stock.mjs
++++ wire/run-stock.mjs
+@@ -8,7 +8,7 @@
+ import {createRequire} from 'node:module';
+ import {spawn} from 'node:child_process';
+ import {constants} from 'node:fs';
+-import {cp, mkdir, readFile, writeFile, rm, lstat, readdir, realpath} from 'node:fs/promises';
++import {cp, mkdir, readFile, writeFile, rm, lstat, readdir, realpath, open} from 'node:fs/promises';
+ import {dirname, join, resolve, relative} from 'node:path';
+ import {fileURLToPath} from 'node:url';
+ import {createRequestBridge} from '../http-bridge-candidate-v1/bridge.mjs';
+@@ -16,19 +16,18 @@
+ const here = dirname(fileURLToPath(import.meta.url));
+ const root = resolve(process.argv[2]);
+ const source = resolve(process.argv[3]);
+-const browserTools = process.argv[4],runId=process.argv[5];
++const runId=process.argv[4];
+ const plan = JSON.parse(await readFile(join(here, 'plans.json')));
+ function deriveOutput(prefix,id){
+-  assert.equal(prefix,'/private/tmp/starling-node-compat/next-browser-hydration-stock-v5');
++  assert.equal(prefix,'/private/tmp/starling-node-compat/next-action-wire-stock-v1');
+   assert(typeof id==='string'&&/^[a-z0-9][a-z0-9-]{0,47}$/.exec(id)?.[0]===id,'Explicit safe ASCII runId required');
+   return prefix+'-'+id;
+ }
+ assert.equal(process.version, 'v22.14.0');
+-assert.equal(process.argv.length,6);assert(browserTools,'Both browser checks mandatory');
++assert.equal(process.argv.length,5);
+ assert.equal(process.argv[2],root,'Output argument must be canonical');assert.equal(root,deriveOutput(plan.outputPrefix,runId));
+ assert(source.endsWith('/application/.next/standalone'));
+ await mkdir(root, {mode: 0o700});
+-await mkdir(join(root, 'responses'));
+ const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+ const descriptor = async path => { const b = await readFile(path); return {path, sha256: hash(b), bytes: b.length}; };
+ assert.deepEqual(await descriptor(plan.applicationInputs.path),plan.applicationInputs);
+@@ -69,11 +68,22 @@
+   for(const r of input.files){const path=join(application,r.path),s=await lstat(path);assert.deepEqual(await descriptor(path),{path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}
+   for(const r of input.directories)assert.equal((await lstat(join(application,r.path))).mode&0o777,r.mode);
+ }
+-const result = {schemaVersion: 1, suite: 'FULL_NEXT_STOCK_ORIGINAL_MODULE_BRIDGE_HYDRATION_BROWSER_CONTROL_V1',
++async function copiedApplicationFinalBookend(application){
++  const tree=await walk(application);assert.equal(tree.links.length,0);
++  const files=new Set(input.files.map(r=>r.path)),dirs=new Set(expectedDirectoryPaths(input));
++  const cachePath=name=>name==='.next/cache'||name.startsWith('.next/cache/')||name==='.next/server/route-cache'||name.startsWith('.next/server/route-cache/');
++  assert(tree.files.every(name=>files.has(name)||cachePath(name)));assert(tree.dirs.every(name=>dirs.has(name)||cachePath(name)));
++  for(const r of input.files){const path=join(application,r.path),s=await lstat(path);assert.deepEqual(await descriptor(path),{path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}
++  const rs=await lstat(application);assert(rs.isDirectory()&&!rs.isSymbolicLink());assert.equal(await realpath(application),application);assert.equal(rs.mode&0o777,plan.applicationRootIdentity.mode);assert.deepEqual({dev:rs.dev,ino:rs.ino},result.applicationCopy.ownedRootIdentity);
++  for(const r of input.directories){const path=join(application,r.path),ds=await lstat(path);assert(ds.isDirectory()&&!ds.isSymbolicLink());assert.equal(await realpath(path),path);assert.equal(ds.mode&0o777,r.mode);}
++  result.ownedCacheInventory=[];for(const name of tree.files.filter(name=>!files.has(name))){const path=join(application,name),s=await lstat(path);assert(s.isFile()&&s.nlink===1);result.ownedCacheInventory.push({...await descriptor(path),relativePath:name,mode:s.mode&0o777});}
++  result.copiedOriginalFilesPreserved=true;
++}
++const result = {schemaVersion: 1, suite: 'EXACT_ACTION_WIRE_STOCK_MODULE_BRIDGE_TRANSPORT_V1',
+   node: process.version, guestExecuted: false, applicationModified: false,
+   standaloneSource: source, sourceServer: await descriptor(join(source, 'server.js')),
+   bridge: await descriptor(join(here, '../http-bridge-candidate-v1/bridge.mjs')), harness: await descriptor(fileURLToPath(import.meta.url)),
+-  http: [], errors: [], transportErrors: [], prepared: false};
++  errors: [], transportErrors: [], prepared: false,browserInvoked:false,fullNextAcceptance:false,wireRequests:1,client:null};
+ const save = () => { if (result.moduleObservations?.snapshot) result.moduleSnapshot = result.moduleObservations.snapshot(); return writeFile(join(root, 'result.json'), JSON.stringify(result, null, 2) + '\n'); };
+ await save();
+ let server, app;
+@@ -82,7 +92,8 @@
+   await sourceBookend();
+   await cp(source, application, {recursive: true, force: false, errorOnExist: true, verbatimSymlinks: true,mode:constants.COPYFILE_FICLONE});
+   await copiedApplicationBookend(application);
+-  result.applicationCopy={files:input.regularFiles,bytes:input.bytes,byteIdentical:true,independentInodes:true,modesEqual:true,copyFlag:'COPYFILE_FICLONE',reflinkActuallyUsed:null,fallback:'Node ordinary byte copy if reflink unsupported'};
++  const ownedRoot=await lstat(application);
++  result.applicationCopy={files:input.regularFiles,bytes:input.bytes,byteIdentical:true,independentInodes:true,modesEqual:true,ownedRootIdentity:{dev:ownedRoot.dev,ino:ownedRoot.ino},copyFlag:'COPYFILE_FICLONE',reflinkActuallyUsed:null,fallback:'Node ordinary byte copy if reflink unsupported'};
+   assert.equal((await descriptor(join(application, 'server.js'))).sha256, result.sourceServer.sha256);
+   // A fresh logical server starts with an empty cache. Only its owned copy is reset.
+   await rm(join(application, '.next/cache'), {recursive: true, force: true});
+@@ -127,7 +138,9 @@
+   });
+   server.listen(0, '127.0.0.1');
+   await once(server, 'listening');
++  assert.equal(server.address().address,'127.0.0.1');
+   const port = server.address().port;
++  result.portLease={host:'127.0.0.1',port,kernelAssignedExclusiveListener:true,heldThroughRequest:true,fallbackAllowed:false};
+   result.origin = 'http://127.0.0.1:' + port;
+   const next = require('next');
+   app = next({dir: application, dev: false, webpack: true, hostname: '127.0.0.1', port});
+@@ -135,78 +148,25 @@
+   handler = createRequestBridge(app.getRequestHandler());
+   result.prepared = true;
+   await save();
+-  const contract = JSON.parse(await readFile(join(here, '../fixture-contract.json')));
+-  const bodies = new Map();
+-  for (const item of contract.requests) {
+-    const response = await fetch(result.origin + item.path, {method: item.method ?? 'GET',
+-      headers: item.headers, body: item.body, redirect: 'manual', signal: AbortSignal.timeout(20000)});
+-    const body = await response.text();
+-    const failures = [];
+-    if (response.status !== item.status) failures.push('status ' + response.status + ' != ' + item.status);
+-    for (const text of item.includes ?? []) if (!body.includes(text)) failures.push('missing ' + JSON.stringify(text));
+-    if (item.location && response.headers.get('location') !== item.location) failures.push('location mismatch');
+-    if (item.json) try {
+-      const actual = JSON.parse(body);
+-      for (const [key, value] of Object.entries(item.json)) if (JSON.stringify(actual[key]) !== JSON.stringify(value)) failures.push('JSON ' + key + ' mismatch');
+-    } catch (error) { failures.push(error.message); }
+-    for (const [key, value] of Object.entries(item.responseHeaders ?? {})) if (response.headers.get(key) !== value) failures.push('header ' + key + ' mismatch');
+-    for (const [key, values] of Object.entries(item.responseHeaderIncludes ?? {})) for (const value of values) if (!response.headers.get(key)?.includes(value)) failures.push('header ' + key + ' missing ' + value);
+-    if (item.equalJsonTo && body !== bodies.get(item.equalJsonTo)) failures.push('body differs from ' + item.equalJsonTo);
+-    bodies.set(item.id, body);
+-    await writeFile(join(root, 'responses', item.id + '.txt'), body);
+-    result.http.push({id: item.id, status: response.status, headers: Object.fromEntries(response.headers),
+-      bodyBytes: Buffer.byteLength(body), bodySha256: hash(body), passed: !failures.length, failures});
+-    await save();
+-  }
+-  const names = [...bodies.get('server-action-form-ssr').matchAll(/name="(\$ACTION_ID_[^"]+)"/g)].map(m => m[1]);
+-  assert.equal(names.length, 1);
+-  const form = new FormData();
+-  form.set(names[0], ''); form.set('value', 'fixture-action');
+-  const action = await fetch(result.origin + '/actions', {method: 'POST', body: form,
+-    headers: {origin: result.origin}, redirect: 'manual', signal: AbortSignal.timeout(20000)});
+-  const actionBody = await action.text();
+-  await writeFile(join(root, 'responses/server-action-submit.txt'), actionBody);
+-  result.http.push({id: 'server-action-submit', status: action.status, headers: Object.fromEntries(action.headers),
+-    bodyBytes: Buffer.byteLength(actionBody), bodySha256: hash(actionBody),
+-    passed: action.status === 303 && action.headers.get('location') === '/action-result?value=fixture-action'});
+-  const before = JSON.parse(bodies.get('cache-first')), after = JSON.parse(bodies.get('cache-after-revalidate'));
+-  result.cacheInvalidation = {before, after, passed: after.generation > before.generation};
+-  const streamed = await fetch(result.origin + '/stream', {signal: AbortSignal.timeout(20000)});
+-  const chunks = []; let text = '', shell = -1, ready = -1;
+-  const decoder = new TextDecoder();
+-  for await (const chunk of streamed.body) {
+-    text += decoder.decode(chunk, {stream: true});
+-    if (shell < 0 && text.includes('NEXT_STREAM_SHELL')) shell = chunks.length;
+-    if (ready < 0 && text.includes('NEXT_STREAM_READY')) ready = chunks.length;
+-    chunks.push({base64: Buffer.from(chunk).toString('base64'), bytes: chunk.length});
+-  }
+-  text += decoder.decode();
+-  await writeFile(join(root, 'stream-chunks.json'), JSON.stringify(chunks, null, 2) + '\n');
+-  result.streaming = {chunks: chunks.length, shellChunk: shell, readyChunk: ready,
+-    complete: text.includes('NEXT_STREAM_SHELL') && text.includes('NEXT_STREAM_READY'),
+-    incrementalDeliveryObserved: ready > shell && shell >= 0};
+-  if (browserTools) {
+-    const args = [join(here, 'browser-check.mjs'), '--origin', result.origin,
+-      '--tools', browserTools, '--output', join(root, 'browser')];
+-    result.browserArgv = [process.execPath, ...args];
+-    const child = spawn(process.execPath, args, {stdio: ['ignore', 'inherit', 'inherit']});
+-    const [code, signal] = await once(child, 'exit');
+-    result.browserExit = {code, signal};
+-    result.browser = JSON.parse(await readFile(join(root, 'browser/result.json')));
+-  }
++  const args=[join(here,'../next-action-wire-candidate-v1/wire-client.mjs'),result.origin,join(root,'transport')];
++  const out=await open(join(root,'wire-client.stdout.log'),'wx',0o600),err=await open(join(root,'wire-client.stderr.log'),'wx',0o600);
++  try {
++    const child=spawn(process.execPath,args,{stdio:['ignore',out.fd,err.fd]});
++    result.client={command:[process.execPath,...args],pid:child.pid??null};await save();
++    const [code,signal]=await once(child,'exit');result.client.exit={code,signal};
++    result.client.result=await descriptor(join(root,'transport/result.json'));result.wireTransport=JSON.parse(await readFile(result.client.result.path));
++    assert.deepEqual({code,signal},{code:0,signal:null});assert.equal(result.wireTransport.state,'ACTION_WIRE_TRANSPORT_PASSED_UNREVIEWED_V1');
++    assert.equal(result.wireTransport.passed,true);assert.equal(result.wireTransport.fullNextAcceptance,false);
++  } finally {await out.close();await err.close();result.client??={};result.client.stdout=await descriptor(join(root,'wire-client.stdout.log'));result.client.stderr=await descriptor(join(root,'wire-client.stderr.log'));}
+ } catch (error) {
+   result.errors.push({name: error.name, message: error.message, stack: error.stack});
+ } finally {
+-  if (server) { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
+-  if (app) await app.close();
++  if(server)try{server.closeAllConnections();await new Promise((resolve,reject)=>server.close(error=>error?reject(error):resolve()));result.serverClosed=true;}catch(error){result.errors.push({stage:'server-close',name:error.name,message:error.message,stack:error.stack});}
++  if(app)try{await app.close();result.appClosed=true;}catch(error){result.errors.push({stage:'app-close',name:error.name,message:error.message,stack:error.stack});}
+   try{await sourceBookend();result.originalApplicationInputsPreserved=true;}catch(error){result.originalApplicationInputsPreserved=false;result.errors.push({stage:'original-app-final-protection',name:error.name,message:error.message,stack:error.stack});}
+-  result.passed = result.prepared && result.http.length === 24 && result.http.every(x => x.passed)
+-    && result.cacheInvalidation?.passed === true && result.streaming?.complete === true && result.streaming?.incrementalDeliveryObserved === true
+-    && result.browserExit?.code === 0 && result.browser?.passed === true
+-    && result.originalApplicationInputsPreserved === true && result.errors.length === 0 && result.transportErrors.length === 0;
++  try{await copiedApplicationFinalBookend(join(root,'application'));}catch(error){result.copiedOriginalFilesPreserved=false;result.errors.push({stage:'owned-copy-final-protection',name:error.name,message:error.message,stack:error.stack});}
++  result.passed=result.prepared===true&&result.wireTransport?.passed===true&&result.client?.exit?.code===0&&result.client?.exit?.signal===null&&result.originalApplicationInputsPreserved===true&&result.copiedOriginalFilesPreserved===true&&result.serverClosed===true&&result.appClosed===true&&result.errors.length===0&&result.transportErrors.length===0;
+   await save();
+ }
+-console.log(JSON.stringify({state: result.passed ? 'FULL_NEXT_HOST_MESSAGE_BRIDGE_PASSED' : 'FULL_NEXT_HOST_MESSAGE_BRIDGE_FAILED',
+-  http: result.http.length, passedHttp: result.http.filter(x => x.passed).length,
+-  errors: result.errors, transportErrors: result.transportErrors, guestExecuted: false}));
+-process.exitCode = result.passed ? 0 : 1;
++console.log(JSON.stringify({state:result.passed?'ACTION_WIRE_STOCK_TRANSPORT_PASSED':'ACTION_WIRE_STOCK_TRANSPORT_FAILED',passed:result.passed,errors:result.errors,transportErrors:result.transportErrors,guestExecuted:false,fullNextAcceptance:false}));
++process.exitCode=result.passed?0:1;
+--- donor/run-owned.py
++++ wire/run-owned.py
+@@ -4,6 +4,7 @@
+ import json
+ import os
+ import re
++import shutil
+ from pathlib import Path
+ import sys
+ 
+@@ -25,21 +26,24 @@
+     run_id=authority['runId']
+     assert isinstance(run_id,str) and re.fullmatch('[a-z0-9][a-z0-9-]{0,47}',run_id)
+     assert all(key not in authority for key in ['outputRoot','monitorOutputRoot','argv'])
+-    assert plan['outputPrefix']=='/private/tmp/starling-node-compat/next-browser-hydration-stock-v5'
++    assert plan['outputPrefix']=='/private/tmp/starling-node-compat/next-action-wire-stock-v1'
+     selected=plan['arms']['stock']
+     assert selected['outputRoot'] is selected['monitorOutputRoot'] is selected['argv'] is None
+     assert selected['timeoutSeconds']==300
+     output=Path(plan['outputPrefix']+'-'+run_id)
+     monitor_output=Path(str(output)+'-monitor')
+-    argv=[plan['node']['path'],str(here/'run-stock.mjs'),str(output),plan['standaloneSource'],plan['browserTools'],run_id]
++    argv=[plan['node']['path'],str(here/'run-stock.mjs'),str(output),plan['standaloneSource'],run_id]
+     return output,monitor_output,argv
+ 
++def require_capacity(free):
++    assert type(free) is int and free>=1073741824,'Root conservative1GiB start guard'
+ def main():
+     assert __debug__ and sys.dont_write_bytecode and sys.flags.isolated and len(sys.argv)==3
+     arm=sys.argv[1];assert arm == 'stock';authority_path=Path(sys.argv[2]).resolve();authority_ref=row(authority_path);authority=read(authority_path);plan=read(HERE/'plans.json')
+     assert authority['state']=='ROOT_NEXT_BROWSER_PHASE_MATCHED_HOST_AUTHORIZED_V1' and authority['arm']==arm
+     assert authority['sourceIndex']==row(HERE/'index.json') and authority['plans']==row(HERE/'plans.json')
+-    assert authority['localhostServerAllowed'] is authority['browserAllowed'] is True
++    assert authority['localhostServerAllowed'] is authority['wireClientAllowed'] is True
++    assert authority['browserAllowed'] is False
+     for k in ['compilerAllowed','nativeBuildAllowed','guestAllowed','engineAllowed','externalApplicationDeploymentAllowed']:assert authority[k] is False
+     verify(authority_ref)
+     family(authority['sourceIndex'])
+@@ -47,6 +51,7 @@
+     for ref in plan['protectedInputs']:verify(ref)
+     output,monitor_output,argv=derive_invocation(authority,plan,HERE)
+     assert not output.exists() and not output.is_symlink() and not monitor_output.exists() and not monitor_output.is_symlink()
++    free=shutil.disk_usage(output.parent).free;require_capacity(free)
+     monitor_output.mkdir(mode=0o700)
+     spec=importlib.util.spec_from_file_location('original_owned_browser_phase_monitor',plan['monitor']['path']);monitor=importlib.util.module_from_spec(spec);spec.loader.exec_module(monitor)
+     env={k:os.environ[k] for k in ['HOME','USER','LOGNAME'] if k in os.environ};env.update(PATH=str(Path(plan['node']['path']).parent)+':/usr/bin:/bin',NODE_ENV='production',NEXT_TELEMETRY_DISABLED='1',CI='1')
+@@ -60,7 +65,7 @@
+     except BaseException:preserved=False
+     clean=terminal['parentOwnedGroupGone'] and terminal['allObservedOwnedGroupsGone'] and not terminal['forcedCleanup'] and not terminal['timeout'] and all(terminal[k]==[] for k in ['errors','signals','interruptedSignals','remainingObservedPids'])
+     result_path=output/'result.json';result=read(result_path) if result_path.exists() else None
+-    observation=dict(schemaVersion=1,state='ROOT_NEXT_BROWSER_PHASE_MATCHED_HOST_OBSERVATION_V1',arm=arm,runId=authority['runId'],outputRoot=str(output),monitorOutputRoot=str(monitor_output),rawExitCode=terminal['rawExitCode'],ownedGroupsClean=clean,protectedInputsPreserved=preserved,terminal=row(monitor_output/'terminal.json'),result=row(result_path) if result_path.exists() else None,hostExperimentPassed=bool(terminal['rawExitCode']==0 and clean and preserved and result and result['passed']),guestOrNativeExecuted=False)
++    observation=dict(schemaVersion=1,state='ROOT_NEXT_BROWSER_PHASE_MATCHED_HOST_OBSERVATION_V1',arm=arm,runId=authority['runId'],outputRoot=str(output),monitorOutputRoot=str(monitor_output),rawExitCode=terminal['rawExitCode'],ownedGroupsClean=clean,protectedInputsPreserved=preserved,terminal=row(monitor_output/'terminal.json'),result=row(result_path) if result_path.exists() else None,hostExperimentPassed=bool(terminal['rawExitCode']==0 and clean and preserved and result and result['passed']),guestOrNativeExecuted=False,fullNextAcceptance=False,freeBytesAtAdmission=free,minimumFreeBytes=1073741824)
+     (monitor_output/'observation.json').write_text(json.dumps(observation,indent=2)+'\n');print(json.dumps(observation),flush=True)
+     raise SystemExit(0 if observation['hostExperimentPassed'] else 1)
+ if __name__=='__main__':main()

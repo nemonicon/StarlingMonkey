@@ -1,0 +1,348 @@
+--- guarded-fbc1/runtime/script_loader.cpp
++++ uncompiled-interop/runtime/script_loader.cpp
+@@ -9,6 +9,18 @@
+ #include <cstdio>
+ #include <js/CompilationAndEvaluation.h>
+ #include <js/Exception.h>
++#ifdef NODE_COMPAT_MODULE
++#include "../builtins/node-compat/next-fs-native.h"
++#include <js/CallAndConstruct.h>
++#include <js/CharacterEncoding.h>
++#include <js/Equality.h>
++#include <js/PropertyDescriptor.h>
++#include <js/Proxy.h>
++#include <js/Realm.h>
++#include <jsapi.h>
++#include <cstring>
++#include <string_view>
++#endif
+ #include <js/MapAndSet.h>
+ #include <js/ScriptPrivate.h>
+ #include <js/String.h>
+@@ -39,6 +51,10 @@
+ DEF_ERR(BuiltinModuleExists, JSEXN_TYPEERR, "Builtin module \"{0}\" already exists", 1)
+ DEF_ERR(UnsupportedImportReferrer, JSEXN_TYPEERR,
+         "Non-builtin import requires object loader referrer metadata with a string id", 0)
++#ifdef NODE_COMPAT_MODULE
++DEF_ERR(UnsupportedCjsFileUrl, JSEXN_TYPEERR,
++        "CommonJS file URL import is unsupported: {0}", 1)
++#endif
+ }; // namespace ScriptLoaderErrors
+ 
+ // A release-build type boundary, not a CommonJS/file-URL loader bridge.
+@@ -81,6 +97,273 @@
+   saved.restore();
+   return false;
+ }
++
++#ifdef NODE_COMPAT_MODULE
++// New, UNCOMPILED guest loader internals. No public builtin/host export.
++static JS::PersistentRootedObject fileurl_module_record;
++static JS::PersistentRootedObject fileurl_url_record;
++static JS::PersistentRootedValue fileurl_create_require;
++static JS::PersistentRootedValue fileurl_to_path;
++static JS::PersistentRootedValue fileurl_from_path;
++static JS::PersistentRootedValue fileurl_url_string;
++static size_t fileurl_namespaces = 0;
++static bool fileurl_busy = false;
++static constexpr size_t MaxFileUrlNamespaces = 8192;
++static constexpr size_t MaxFileUrlBytes = 3 * builtins::node_compat::next_fs::MaxPathBytes + 8;
++
++static bool fileurl_error(JSContext *cx, JS::HandleValue specifier,
++                          const char *operation, const char *reason) {
++  if (JS_IsExceptionPending(cx)) return false;
++  api::throw_error(cx, ScriptLoaderErrors::UnsupportedCjsFileUrl, reason);
++  if (!JS_IsExceptionPending(cx) || JS_IsThrowingOutOfMemory(cx)) return false;
++  JS::RootedValue exception(cx);
++  if (!JS_GetPendingException(cx, &exception) || !exception.isObject()) return false;
++  JS::RootedObject object(cx, &exception.toObject());
++  JS::AutoSaveExceptionState saved(cx);
++  JS::RootedString code(cx, JS_NewStringCopyZ(cx, "ERR_SM_MODULE_FILE_URL_UNSUPPORTED"));
++  if (!code) { saved.drop(); return false; }
++  JS::RootedString op(cx, JS_NewStringCopyZ(cx, operation));
++  if (!op) { saved.drop(); return false; }
++  if (!JS_DefineProperty(cx, object, "code", code, JSPROP_ENUMERATE) ||
++      !JS_DefineProperty(cx, object, "module", specifier, JSPROP_ENUMERATE) ||
++      !JS_DefineProperty(cx, object, "operation", op, JSPROP_ENUMERATE)) {
++    saved.drop(); return false;
++  }
++  saved.restore();
++  return false;
++}
++
++static bool fileurl_content_realm(JSContext *cx, JSObject *object) {
++  auto *expected = JS::GetObjectRealmOrNull(ENGINE->global());
++  return expected && JS::GetCurrentRealmOrNull(cx) == expected &&
++         JS::GetObjectRealmOrNull(object) == expected;
++}
++
++static bool fileurl_own_data(JSContext *cx, JS::HandleObject object, const char *name,
++                             JS::MutableHandleValue value, JS::HandleValue specifier) {
++  JS::Rooted<mozilla::Maybe<JS::PropertyDescriptor>> descriptor(cx);
++  if (!JS_GetOwnPropertyDescriptor(cx, object, name, &descriptor)) return false;
++  if (descriptor.isNothing() || !descriptor->isDataDescriptor() || !descriptor->hasValue())
++    return fileurl_error(cx, specifier, "module_file_url", "Required own DATA property unavailable");
++  value.set(descriptor->value());
++  return true;
++}
++
++static bool fileurl_own_callback(JSContext *cx, JS::HandleObject object, const char *name,
++                                 JS::MutableHandleValue value, JS::HandleValue specifier) {
++  if (!fileurl_own_data(cx, object, name, value, specifier)) return false;
++  if (!value.isObject() || js::IsProxy(&value.toObject()) ||
++      !JS::IsCallable(&value.toObject()) || !fileurl_content_realm(cx, &value.toObject()))
++    return fileurl_error(cx, specifier, "module_file_url", "Genuine same-realm callable unavailable");
++  return true;
++}
++
++// Called only by real builtin registration, before the application entry runs.
++// Captured originals are private roots; public Module require hooks remain live.
++static bool fileurl_capture_builtin(JSContext *cx, const char *id, JS::HandleValue builtin) {
++  const bool module = std::strcmp(id, "node:module") == 0;
++  const bool url = std::strcmp(id, "node:url") == 0;
++  if (!module && !url) return true;
++  if (!builtin.isObject() || js::IsProxy(&builtin.toObject()) ||
++      !fileurl_content_realm(cx, &builtin.toObject()))
++    return fileurl_error(cx, JS::UndefinedHandleValue, "module_file_url_capture", "Builtin record unavailable");
++  JS::RootedObject record(cx, &builtin.toObject());
++  JS::RootedValue a(cx), b(cx), constructor(cx), prototype(cx), string(cx);
++  if (module) {
++    if (!fileurl_own_callback(cx, record, "createRequire", &a, JS::UndefinedHandleValue)) return false;
++    fileurl_module_record = record;
++    fileurl_create_require = a;
++  } else {
++    if (!fileurl_own_callback(cx, record, "fileURLToPath", &a, JS::UndefinedHandleValue) ||
++        !fileurl_own_callback(cx, record, "pathToFileURL", &b, JS::UndefinedHandleValue) ||
++        !fileurl_own_callback(cx, record, "URL", &constructor, JS::UndefinedHandleValue)) return false;
++    JS::RootedObject ctor(cx, &constructor.toObject());
++    if (!fileurl_own_data(cx, ctor, "prototype", &prototype, JS::UndefinedHandleValue)) return false;
++    if (!prototype.isObject() || js::IsProxy(&prototype.toObject()))
++      return fileurl_error(cx, JS::UndefinedHandleValue, "module_file_url_capture", "Native URL prototype unavailable");
++    JS::RootedObject proto(cx, &prototype.toObject());
++    if (!fileurl_own_callback(cx, proto, "toString", &string, JS::UndefinedHandleValue)) return false;
++    fileurl_url_record = record;
++    fileurl_to_path = a;
++    fileurl_from_path = b;
++    fileurl_url_string = string;
++  }
++  return true;
++}
++
++static bool fileurl_call(JSContext *cx, JS::HandleValue receiver, JS::HandleValue function,
++                         JS::HandleValue argument, JS::MutableHandleValue value) {
++  JS::RootedValueArray<1> args(cx);
++  args[0].set(argument);
++  return JS::Call(cx, receiver, function, args, value);
++}
++
++static bool fileurl_string(JSContext *cx, JS::HandleValue path,
++                           JS::MutableHandleValue value, JS::HandleValue specifier) {
++  JS::RootedValue receiver(cx, JS::ObjectValue(*fileurl_url_record)), url(cx);
++  if (!fileurl_call(cx, receiver, fileurl_from_path, path, &url)) return false;
++  if (!url.isObject() || !fileurl_content_realm(cx, &url.toObject()))
++    return fileurl_error(cx, specifier, "module_file_url", "Native URL result unavailable");
++  if (!JS::Call(cx, url, fileurl_url_string, JS::HandleValueArray::empty(), value)) return false;
++  if (!value.isString())
++    return fileurl_error(cx, specifier, "module_file_url", "Native URL string unavailable");
++  return true;
++}
++
++static bool fileurl_cache_entry(JSContext *cx, JS::HandleObject require,
++                                JS::HandleString filename, bool *found,
++                                JS::MutableHandleValue exports, JS::HandleValue specifier) {
++  *found = false;
++  JS::RootedValue cache(cx);
++  if (!fileurl_own_data(cx, require, "cache", &cache, specifier)) return false;
++  if (!cache.isObject() || js::IsProxy(&cache.toObject()) ||
++      !fileurl_content_realm(cx, &cache.toObject()))
++    return fileurl_error(cx, specifier, "module_file_url", "Genuine CommonJS cache unavailable");
++  JS::RootedObject table(cx, &cache.toObject());
++  JS::RootedId key(cx);
++  if (!JS_StringToId(cx, filename, &key)) return false;
++  JS::Rooted<mozilla::Maybe<JS::PropertyDescriptor>> descriptor(cx);
++  if (!JS_GetOwnPropertyDescriptorById(cx, table, key, &descriptor)) return false;
++  if (descriptor.isNothing()) return true;
++  if (!descriptor->isDataDescriptor() || !descriptor->hasValue() || !descriptor->value().isObject())
++    return fileurl_error(cx, specifier, "module_file_url", "Unsupported CommonJS cache record");
++  JS::RootedObject record(cx, &descriptor->value().toObject());
++  if (js::IsProxy(record) || !fileurl_content_realm(cx, record))
++    return fileurl_error(cx, specifier, "module_file_url", "Cross-realm or proxy cache record");
++  JS::RootedValue loaded(cx);
++  if (!fileurl_own_data(cx, record, "loaded", &loaded, specifier)) return false;
++  if (!loaded.isBoolean() || !loaded.toBoolean())
++    return fileurl_error(cx, specifier, "module_file_url", "In-progress CommonJS target is deferred");
++  if (!fileurl_own_data(cx, record, "exports", exports, specifier)) return false;
++  *found = true;
++  return true;
++}
++
++struct FileUrlScope {
++  FileUrlScope() { fileurl_busy = true; }
++  ~FileUrlScope() { fileurl_busy = false; } // No JSAPI/allocation in error cleanup.
++  FileUrlScope(const FileUrlScope &) = delete;
++  FileUrlScope &operator=(const FileUrlScope &) = delete;
++};
++
++static bool is_file_url_request(std::string_view value) {
++  return value.size() >= 5 && (value[0] == 'f' || value[0] == 'F') &&
++         (value[1] == 'i' || value[1] == 'I') && (value[2] == 'l' || value[2] == 'L') &&
++         (value[3] == 'e' || value[3] == 'E') && value[4] == ':';
++}
++
++static JSObject *get_cjs_file_url_module(JSContext *cx, JS::HandleObject request,
++                                        JS::HandleValue specifier) {
++  if (JS_IsExceptionPending(cx)) return nullptr;
++  if (!fileurl_content_realm(cx, request)) {
++    fileurl_error(cx, specifier, "module_file_url", "Cross-realm import is deferred"); return nullptr;
++  }
++  if (!builtins::node_compat::next_fs::check_deployed(cx, "module.fileURLImport")) return nullptr;
++  if (JS::GetModuleRequestType(cx, request) != JS::ModuleType::JavaScript) {
++    fileurl_error(cx, specifier, "module_file_url", "Non-JavaScript import attributes are deferred"); return nullptr;
++  }
++  if (fileurl_busy) {
++    fileurl_error(cx, specifier, "module_file_url", "Reentrant file URL import is deferred"); return nullptr;
++  }
++  FileUrlScope scope;
++  if (!fileurl_module_record || !fileurl_url_record || fileurl_create_require.isUndefined() ||
++      fileurl_to_path.isUndefined() || fileurl_from_path.isUndefined() || fileurl_url_string.isUndefined()) {
++    fileurl_error(cx, specifier, "module_file_url", "Private builtin callbacks were not captured"); return nullptr;
++  }
++  auto raw = core::encode(cx, specifier);
++  if (!raw) return nullptr;
++  std::string_view url(raw.ptr.get(), raw.len);
++  if (raw.len > MaxFileUrlBytes || std::memchr(raw.ptr.get(), 0, raw.len) ||
++      !url.starts_with("file:///") || url.find_first_of("?#") != std::string_view::npos) {
++    fileurl_error(cx, specifier, "module_file_url", "Only bounded canonical local file URLs without query/fragment are selected"); return nullptr;
++  }
++  for (size_t i = 0; i + 2 < url.size(); ++i) {
++    if (url[i] == '%' && url[i + 1] == '2' && (url[i + 2] == 'f' || url[i + 2] == 'F')) {
++      fileurl_error(cx, specifier, "module_file_url", "Encoded path separator is unsupported"); return nullptr;
++    }
++    if (url[i] == '%' && url[i + 1] == '5' && (url[i + 2] == 'c' || url[i + 2] == 'C')) {
++      fileurl_error(cx, specifier, "module_file_url", "Encoded path separator is unsupported"); return nullptr;
++    }
++  }
++  JS::RootedValue receiver(cx, JS::ObjectValue(*fileurl_url_record)), decoded(cx), normalized(cx);
++  if (!fileurl_call(cx, receiver, fileurl_to_path, specifier, &decoded)) return nullptr;
++  if (!decoded.isString()) {
++    fileurl_error(cx, specifier, "module_file_url", "File URL decoder returned a nonstring"); return nullptr;
++  }
++  auto path = core::encode(cx, decoded);
++  if (!path) return nullptr;
++  std::string_view path_view(path.ptr.get(), path.len);
++  if (!path.len || path.len > builtins::node_compat::next_fs::MaxPathBytes ||
++      path_view.front() != '/' || std::memchr(path.ptr.get(), 0, path.len) || !path_view.ends_with(".cjs")) {
++    fileurl_error(cx, specifier, "module_file_url", "Only bounded absolute .cjs files are selected"); return nullptr;
++  }
++  if (!fileurl_string(cx, decoded, &normalized, specifier)) return nullptr;
++  int32_t comparison = 0;
++  if (!JS_CompareStrings(cx, specifier.toString(), normalized.toString(), &comparison)) return nullptr;
++  if (comparison != 0) {
++    fileurl_error(cx, specifier, "module_file_url", "Noncanonical file URL spelling is deferred"); return nullptr;
++  }
++  builtins::node_compat::next_fs::Metadata st{};
++  if (!builtins::node_compat::next_fs::stat_path(cx, path.ptr.get(), path.len, true, &st)) return nullptr;
++  if (st.type != 6) {
++    fileurl_error(cx, specifier, "module_file_url", "File URL must name a regular file"); return nullptr;
++  }
++  JS::UniqueChars canonical;
++  size_t canonical_length = 0;
++  if (!builtins::node_compat::next_fs::realpath(cx, path.ptr.get(), path.len, &canonical, &canonical_length)) return nullptr;
++  if (!std::string_view(canonical.get(), canonical_length).ends_with(".cjs")) {
++    fileurl_error(cx, specifier, "module_file_url", "Canonical target must retain .cjs extension"); return nullptr;
++  }
++  JS::RootedString filename(cx, JS_NewStringCopyUTF8N(cx, JS::UTF8Chars(canonical.get(), canonical_length)));
++  if (!filename) return nullptr;
++  JS::RootedValue canonical_path(cx, JS::StringValue(filename)), canonical_url(cx);
++  if (!fileurl_string(cx, canonical_path, &canonical_url, specifier)) return nullptr;
++  static constexpr char prefix[] = "\0cjs-file-url:";
++  JS::RootedString tag(cx, JS_NewStringCopyN(cx, prefix, sizeof(prefix) - 1));
++  if (!tag) return nullptr;
++  JS::RootedString key_string(cx, JS_ConcatStrings(cx, tag, canonical_url.toString()));
++  if (!key_string) return nullptr;
++  JS::RootedValue key(cx, JS::StringValue(key_string)), cached(cx);
++  if (!JS::MapGet(cx, moduleRegistry, key, &cached)) return nullptr;
++  if (!cached.isUndefined()) {
++    if (!cached.isObject()) { fileurl_error(cx, specifier, "module_file_url", "Invalid private module cache value"); return nullptr; }
++    return &cached.toObject();
++  }
++  if (fileurl_namespaces >= MaxFileUrlNamespaces) {
++    fileurl_error(cx, specifier, "module_file_url", "File URL namespace limit reached"); return nullptr;
++  }
++  receiver.setObject(*fileurl_module_record);
++  JS::RootedValue require_value(cx), resolve_value(cx), resolved(cx), existing(cx), exports(cx), cached_exports(cx);
++  if (!fileurl_call(cx, receiver, fileurl_create_require, canonical_path, &require_value)) return nullptr;
++  if (!require_value.isObject() || js::IsProxy(&require_value.toObject()) ||
++      !JS::IsCallable(&require_value.toObject()) || !fileurl_content_realm(cx, &require_value.toObject())) {
++    fileurl_error(cx, specifier, "module_file_url", "createRequire returned an unsupported value"); return nullptr;
++  }
++  JS::RootedObject require(cx, &require_value.toObject());
++  if (!fileurl_own_callback(cx, require, "resolve", &resolve_value, specifier) ||
++      !fileurl_call(cx, JS::UndefinedHandleValue, resolve_value, canonical_path, &resolved)) return nullptr;
++  if (!resolved.isString()) { fileurl_error(cx, specifier, "module_file_url", "Resolver returned a nonstring"); return nullptr; }
++  if (!JS_CompareStrings(cx, filename, resolved.toString(), &comparison)) return nullptr;
++  if (comparison != 0) { fileurl_error(cx, specifier, "module_file_url", "Resolver retargeted the canonical file"); return nullptr; }
++  bool found = false;
++  if (!fileurl_cache_entry(cx, require, filename, &found, &existing, specifier)) return nullptr;
++  if (!fileurl_call(cx, JS::UndefinedHandleValue, require_value, canonical_path, &exports)) return nullptr;
++  if (!fileurl_cache_entry(cx, require, filename, &found, &cached_exports, specifier)) return nullptr;
++  bool same = false;
++  if (!found) { fileurl_error(cx, specifier, "module_file_url", "Require did not retain a completed cache record"); return nullptr; }
++  if (!JS::SameValue(cx, exports, cached_exports, &same)) return nullptr;
++  if (!same) { fileurl_error(cx, specifier, "module_file_url", "Require result does not match its successful cache record"); return nullptr; }
++  if (exports.isObject() && !fileurl_content_realm(cx, &exports.toObject())) {
++    fileurl_error(cx, specifier, "module_file_url", "Cross-realm CommonJS export is deferred"); return nullptr;
++  }
++  JS::RootedObject module(cx, JS::CreateDefaultExportSyntheticModule(cx, exports.get()));
++  if (!module) return nullptr;
++  JS::RootedValue module_value(cx, JS::ObjectValue(*module));
++  if (!JS::MapSet(cx, moduleRegistry, key, module_value)) return nullptr;
++  ++fileurl_namespaces;
++  return module;
++}
++#endif
+ 
+ class AutoCloseFile {
+   FILE *file;
+@@ -438,6 +721,14 @@
+     return FinishLoadingImportedModule(cx, referrer, module_reques, payload, result, false);
+   }
+ 
++#ifdef NODE_COMPAT_MODULE
++  if (is_file_url_request(std::string_view(path.get()))) {
++    RootedObject result(cx, get_cjs_file_url_module(cx, module_reques, path_val));
++    if (!result) return false;
++    return FinishLoadingImportedModule(cx, referrer, module_reques, payload, result, false);
++  }
++#endif
++
+   RootedValue ref_priv(cx);
+   if (referrer) {
+     ref_priv = JS::GetScriptPrivate(referrer);
+@@ -502,6 +793,16 @@
+   JSContext *cx = engine->cx();
+   moduleRegistry.init(cx, JS::NewMapObject(cx));
+   builtinModules.init(cx, JS::NewMapObject(cx));
++#ifdef NODE_COMPAT_MODULE
++  fileurl_module_record.init(cx);
++  fileurl_url_record.init(cx);
++  fileurl_create_require.init(cx);
++  fileurl_to_path.init(cx);
++  fileurl_from_path.init(cx);
++  fileurl_url_string.init(cx);
++  fileurl_namespaces = 0;
++  fileurl_busy = false;
++#endif
+   MOZ_RELEASE_ASSERT(moduleRegistry);
+   MOZ_RELEASE_ASSERT(builtinModules);
+   JSRuntime *rt = JS_GetRuntime(cx);
+@@ -535,6 +836,9 @@
+   if (!MapSet(cx, builtinModules, id_val, builtin)) {
+     return false;
+   }
++#ifdef NODE_COMPAT_MODULE
++  if (!fileurl_capture_builtin(cx, id, builtin)) return false;
++#endif
+   return true;
+ }
+ 

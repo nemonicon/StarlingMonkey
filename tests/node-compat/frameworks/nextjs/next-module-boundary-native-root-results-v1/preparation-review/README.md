@@ -1,0 +1,7 @@
+This review accepts the five genuine V4 preparation JSON files and the unissued e21c launcher input. The exact 825 selected Source files, 171 directory identities, 21 Rust-base pairs, 22 public and two private manifests, ten installed-generator command records, and original 84-package Cargo proof were checked without invoking preparation, generators, Cargo, tools or a build. All 953 selected file descriptors were re-read unchanged.
+
+The launcher differs from the successful SDK-restored launcher only in three SHA literals. All functions and the 3 GiB start / 1 GiB phase floor / 7200-second / jobs-one offline policy remain unchanged. Configure and build permissions are null; WORK and its monitor namespace were absent. The captured capacity-only CLI reported 19,344,932,864 free bytes and no issued authority or command.
+
+The eight reused non-Intl tree rows and 12 inherited facts exactly match the genuine previous successful authority. This review did not replay those tool/library payload trees. The actual build worker must admit them before creating WORK. It establishes no new compiler, engine, component, import or runtime result. The separate uncompiled .cjs interoperability prototype is outside this input.
+
+The reviewer authored predecessor materialization and build/launcher code. This is a current DATA and Source comparison, not independent Source authorship or observation of the previous process. Root controls any later issuance and action.

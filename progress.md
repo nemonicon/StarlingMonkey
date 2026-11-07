@@ -91,20 +91,49 @@ records15 exact source descriptors and the genuine Next CacheHandler/build
 integration; no shared cache handler or new application scenario is implemented.
 Its real CommonJS/fileURL dynamic-import path is an unverified prerequisite.
 The generic loader's referrer-private assumption needs a checked error boundary
-before any suspected invalid-referrer path is exercised. An uncompiled native
-boundary template is in Source preparation; no fault probe or native change
-has run. Next also catches handler.set exceptions, so direct error tests must
+before any suspected invalid-referrer path is exercised. The checked native boundary is now compiled in the separately reviewed ca84
+build below; no suspected-invalid-referrer runtime probe has run. Next also catches handler.set exceptions, so direct error tests must
 not equate every helper error with a failed application request.
 Checkpoint79cdaf6c is committed and pushed. The subsequent constructor/runtime
 records and five finite DATA capsules (1,050 members/32,633,279 logical bytes)
-are now prepared for this checkpoint. The exact-action wire Sources and native
-referrer-boundary template remain separate work in progress; no actual wire
-transport arm or new native guard build has run.
+are retained in pushed checkpoint2b097ac5. The exact-action wire protocol now
+completes its one native and one Node arm, both0/clean/protected. Native4afe
+delivers1956 wire/1488 gzip/2963 decoded bytes; Node1997/1489/2963. Both pass
+normal chunked-message EOF, dechunk equality, single-member gzip finish and
+CRC/ISIZE before private-Agent cleanup. This is transport-only, without browser
+navigation or React Flight parsing; original failures remain failed. Independent
+DATA verification and a sealed182-member packet now pass, including Root archive/current-original readback. See the
+[transport findings](docs/node-compat/nextjs-action-transport-2026-11-07.md).
+The checked native referrer-boundary template is sealed/reviewed at5e7b07a6
+with43 Source/API/symbolic checks. A fresh825 materialization now passes, with
+824 payloads unchanged and only script_loader.cpp622b→fbc1 (+2061 bytes).
+New selection456afe is genuinely admitted; all ten fresh generator checks
+pass0/clean/protected. Actual V4 JSON-only preparation produces new Cargo
+selectionc7e21d3e; independent/coordinated five-file, Source/Cargo and launcher
+reviews pass. The full guarded native build now completes0/clean as Rootsession25962
+under original owner96055/7200, unchanged3GiB start/1GiB phase/jobs1/offline
+policies. Six phases pass; all825 copies,1841 protected descriptors and ten
+trees remain intact. New coreca84baa1/31,326,382 bytes and actual fullmetadata
+e674f7d2/4,839,816 bytes record80 native TUs plus separate embedding. Coordinated
+Source/TU/link/Rust and independent owner/tree/build DATA reviews pass at a4c3c19b.
+The fresh real-Next INIT constructor also completes0/clean/protected: component
+49013f31/37,217,436 bytes validates with exactly13 selected standard0.2.10 imports
+and only incoming-handler export. Coordinated typed-return/full-metadata review
+17afbe24, independent owner/world87713051 and current packagec415d9e2 reviews pass.
+No app was mounted at INIT and no ordinary export ran. A fresh full unchanged
+Next regression is in preparation; no guarded import-safety or runtime result
+exists yet. The172-text Source-stage
+capsule passes its current reader and Root independently reads all172 members
+and live originals/modes; it does not accept the native build.
+The native fileURL/CJS prototype is separately sealed at3856b027 after static
+review/60 Source checks, with the initial incorrect compiler-guard draft retained.
+It is uncompiled and excluded from this guarded build. No suspected-invalid-
+referrer import probe or prototype runtime action has run.
 The prior capacity observations below
 are historical; the storage blocker is resolved for this execution.
 
-**Next.js is the immediate priority.** The next deliverables are the exact-action
-transport EOF control and an explicitly bounded shared-cache design, using
+**Next.js is the immediate priority.** The next deliverables are a full guarded-component regression, a deployed
+checked-referrer probe and then a bounded shared-cache implementation, using
 standard WASI and unchanged stock hosts. Resolve demonstrated response/resource
 issues before expanding APIs. A future portable cache scenario must use a new
 versioned fixture and genuine Next extension; it cannot relabel the failed

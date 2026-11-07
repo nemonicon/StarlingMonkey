@@ -1,0 +1,19 @@
+// Literal mode is selected by Source assembly, not a request parameter or environment.
+const fileUrlProbeMode = '@MODE@';
+async function prepareFileUrlProbe() {
+  bootstrap();
+  let calls = 0;
+  return createWasiHttpHandler(async request => {
+    const url = new URL(request.url);
+    if (request.method !== 'GET' || url.pathname !== '/probe' || url.search !== '')
+      return new Response('one predeclared GET /probe required', {status: 404});
+    if (++calls !== 1) return new Response('probe already called', {status: 409});
+    const result = await collectFileUrlProbe(fileUrlProbeMode);
+    return new Response(JSON.stringify({...result, call: calls}), {
+      status: 200, headers: {'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store'},
+    });
+  }, types, runFreshRequest);
+}
+export const incomingHandler = createNeutralReadyHandler({
+  runNeutralServer, prepareServer: prepareFileUrlProbe, disposeBeforeEntry,
+});

@@ -1,0 +1,94 @@
+--- donor/deploy.mjs
++++ wire/deploy.mjs
+@@ -56,7 +56,8 @@
+ const authorityPath=resolve(process.argv[2]),authority=await read(authorityPath),plan=await read(join(here,'plan.json'));
+ assert.equal(authority.state,'ROOT_NEXT_WASMTIME_DEPLOYMENT_AUTHORIZED_V2');
+ assert.deepEqual(authority.sourceIndex,await row(join(here,'index.json')));assert.deepEqual(authority.plan,await row(join(here,'plan.json')));
+-for(const key of ['localhostServeAllowed','actualNextGuestAllowed','browserAllowed'])assert.equal(authority[key],true);
++for(const key of ['localhostServeAllowed','actualNextGuestAllowed','wireClientAllowed'])assert.equal(authority[key],true);
++assert.equal(authority.browserAllowed,false);
+ for(const key of ['compilerAllowed','componentConstructionAllowed','externalDeploymentAllowed','adoptionAllowed'])assert.equal(authority[key],false);
+ assert(typeof authority.runId==='string'&&/^[a-z0-9][a-z0-9-]{0,47}$/.exec(authority.runId)?.[0]===authority.runId,'Mandatory safe fresh runId');
+ for(const key of ['constructionCallerIndex','inputSourceIndex','inputEntry']){const ref=authority[key];assert(ref&&typeof ref.path==='string'&&/^[a-f0-9]{64}$/.test(ref.sha256)&&Number.isSafeInteger(ref.bytes)&&ref.bytes>=0,'Exact late Root descriptor required:'+key);assert.equal(resolve(ref.path),ref.path);assert.equal(await realpath(ref.path),ref.path);if(key!=='inputEntry')assert.equal(ref.path.split('/').at(-1),'index.json');}
+@@ -95,7 +96,7 @@
+ }
+ await sourceBookend();
+ const output=resolve(plan.outputPrefix+'-'+authority.runId);assert.equal(output,plan.outputPrefix+'-'+authority.runId);const app=join(output,'app'),cache=join(output,'cache');await mkdir(output,{mode:0o700});
+-const result={schemaVersion:1,state:'NEXT_WASMTIME_DEPLOYMENT_IN_PROGRESS_V2',runId:authority.runId,outputRoot:output,inputEntry:authority.inputEntry,inputSourceIndex:authority.inputSourceIndex,component:authority.component,componentAudit:authority.componentAudit,constructionResult:authority.constructionResult,rootAuthority:await row(authorityPath),sourceIndex:authority.sourceIndex,selectedInterfaces:plan.selectedInterfaces,emittedImports:audit.emittedImports,errors:[],server:null,client:null,originalInputsPreserved:false,readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationInputs:plan.applicationInputs,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],adoption:false};
++const result={schemaVersion:1,state:'NEXT_ACTION_WIRE_NATIVE_TRANSPORT_IN_PROGRESS_V1',runId:authority.runId,outputRoot:output,inputEntry:authority.inputEntry,inputSourceIndex:authority.inputSourceIndex,component:authority.component,componentAudit:authority.componentAudit,constructionResult:authority.constructionResult,rootAuthority:await row(authorityPath),sourceIndex:authority.sourceIndex,selectedInterfaces:plan.selectedInterfaces,emittedImports:audit.emittedImports,errors:[],server:null,client:null,originalInputsPreserved:false,readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationInputs:plan.applicationInputs,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],adoption:false,fullNextAcceptance:false,browserInvoked:false,wireRequests:1};
+ const save=()=>writeFile(join(output,'result.json'),JSON.stringify(result,null,2)+'\n',{mode:0o600});await save();
+ const pause=ms=>new Promise(r=>setTimeout(r,ms));
+ async function boundedWait(promise,ms){let timer;try{await Promise.race([promise,new Promise(resolve=>{timer=setTimeout(resolve,ms);})]);}finally{clearTimeout(timer);}}
+@@ -128,7 +129,7 @@
+  const deadline=Date.now()+60000;let ready=false;
+  while(Date.now()<deadline){if(hostExit)throw Error('Wasmtime exited before readiness');let logs='';for(const path of [server.stdout,server.stderr]){const s=await lstat(path);assert(s.size<=8388608,'Readiness log exceeds8MiB; full bytes retained');logs+=await readFile(path,'utf8');}const found=/Serving HTTP on (http:\/\/127\.0\.0\.1:\d+)/.exec(logs)?.[1];if(found){assert.equal(found,origin,'Port lease race/origin mismatch: never fallback');ready=true;break;}await pause(50);}
+  assert(ready,'Wasmtime did not report exact listener within60s');result.server.readyOrigin=origin;await save();
+- const client=await launch(plan.node.path,[join(here,'run-contracts.mjs'),origin,join(output,'client'),plan.browserTools,authority.runId],'client');result.client={command:client.command,pid:client.child.pid??null,stdout:client.stdout,stderr:client.stderr};await save();const status=await client.done;result.client.exit=status;result.client.result=await row(join(output,'client/result.json'));const observed=await read(result.client.result.path);assert.deepEqual(status,{code:0,signal:null,error:null});assert.equal(observed.passed,true);assert.equal(hostExit,null,'Server must remain live through full contracts');result.contractsPassed=true;
++ const client=await launch(plan.node.path,[join(here,'../next-action-wire-candidate-v1/wire-client.mjs'),origin,join(output,'transport')],'client');result.client={command:client.command,pid:client.child.pid??null,stdout:client.stdout,stderr:client.stderr};await save();const status=await client.done;result.client.exit=status;result.client.result=await row(join(output,'transport/result.json'));const observed=await read(result.client.result.path);assert.deepEqual(status,{code:0,signal:null,error:null});assert.equal(observed.state,'ACTION_WIRE_TRANSPORT_PASSED_UNREVIEWED_V1');assert.equal(observed.passed,true);assert.equal(observed.fullNextAcceptance,false);assert.equal(hostExit,null,'Server must remain live through one wire diagnostic');result.transportPassed=true;
+ }catch(error){result.errors.push({stage:'deployment-or-contracts',...errorData(error)});}
+ finally{
+  if(lease)await new Promise(resolve=>lease.close(()=>resolve()));
+@@ -139,7 +140,7 @@
+  try{await sourceBookend();await protect();await artifactBookend();await witBookend();result.originalInputsPreserved=true;}catch(error){result.errors.push({stage:'source-final-protection',...errorData(error)});}
+  try{await readonlyBookend();result.readonlyAppPreserved=true;}catch(error){result.errors.push({stage:'readonly-app-final',...errorData(error)});}
+  result.cacheInventory=[];try{const tree=await walk(cache);assert.equal(tree.links.length,0);for(const name of tree.files){const path=join(cache,name);result.cacheInventory.push({...await row(path),relativePath:name,mode:(await lstat(path)).mode&0o777});}}catch(error){result.errors.push({stage:'cache-final-inventory',...errorData(error)});}
+- result.passed=result.contractsPassed===true&&result.errors.length===0&&result.originalInputsPreserved&&result.readonlyAppPreserved&&result.server?.shutdownRequested===true&&result.server?.sigintSent===true&&result.server?.forcedCleanup===false&&hostExit?.code===0&&hostExit?.signal===null&&hostExit?.error===null;
+- result.state=result.passed?'NEXT_WASMTIME_DEPLOYMENT_CONTRACTS_PASSED_UNREVIEWED_V2':'NEXT_WASMTIME_DEPLOYMENT_FAILED_UNACCEPTED_V2';await save();
++ result.passed=result.transportPassed===true&&result.errors.length===0&&result.originalInputsPreserved&&result.readonlyAppPreserved&&result.server?.shutdownRequested===true&&result.server?.sigintSent===true&&result.server?.forcedCleanup===false&&hostExit?.code===0&&hostExit?.signal===null&&hostExit?.error===null;
++ result.state=result.passed?'NEXT_ACTION_WIRE_NATIVE_TRANSPORT_PASSED_UNREVIEWED_V1':'NEXT_ACTION_WIRE_NATIVE_TRANSPORT_FAILED_UNACCEPTED_V1';await save();
+ }
+ console.log(JSON.stringify({state:result.state,passed:result.passed,errors:result.errors}));process.exitCode=result.passed?0:1;
+--- donor/run-owned.py
++++ wire/run-owned.py
+@@ -4,6 +4,7 @@
+ import json
+ import os
+ import re
++import shutil
+ from pathlib import Path
+ import sys
+ HERE=Path(__file__).resolve().parent
+@@ -16,13 +17,22 @@
+     assert set(names)|{'index.json'}=={x.relative_to(root).as_posix() for x in root.rglob('*') if x.is_file()}
+     for r in j['files']:
+         rel=Path(r['path']);assert not rel.is_absolute() and '..' not in rel.parts and not(root/rel).is_symlink();verify(dict(r,path=str(root/rel)))
++def require_capacity(free):
++    assert type(free) is int and free>=1073741824,'Root conservative1GiB start guard'
++def derive_invocation(authority,plan,here,authority_path):
++    run_id=authority['runId'];assert isinstance(run_id,str) and re.fullmatch('[a-z0-9][a-z0-9-]{0,47}',run_id)
++    assert all(key not in authority for key in ['outputRoot','monitorOutputRoot','argv'])
++    assert plan['outputPrefix']=='/private/tmp/starling-node-compat/next-action-wire-native-v1'
++    output=Path(plan['outputPrefix']+'-'+run_id)
++    return output,Path(str(output)+'-external-root'),[plan['node']['path'],str(here/'deploy.mjs'),str(authority_path)]
+ def main():
+     assert __debug__ and sys.dont_write_bytecode and sys.flags.isolated and len(sys.argv)==2
+     authpath=Path(sys.argv[1]).resolve();a=read(authpath);plan=read(HERE/'plan.json')
+     assert a['state']=='ROOT_NEXT_WASMTIME_DEPLOYMENT_AUTHORIZED_V2' and a['sourceIndex']==row(HERE/'index.json') and a['plan']==row(HERE/'plan.json')
+-    for k in ['localhostServeAllowed','actualNextGuestAllowed','browserAllowed']:assert a[k] is True
++    for k in ['localhostServeAllowed','actualNextGuestAllowed','wireClientAllowed']:assert a[k] is True
++    assert a['browserAllowed'] is False
+     for k in ['compilerAllowed','componentConstructionAllowed','externalDeploymentAllowed','adoptionAllowed']:assert a[k] is False
+-    run_id=a['runId'];assert isinstance(run_id,str) and re.fullmatch('[a-z0-9][a-z0-9-]{0,47}',run_id)
++    run_id=a['runId'];output,outer,argv=derive_invocation(a,plan,HERE,authpath)
+     for key in ['constructionCallerIndex','inputSourceIndex','inputEntry']:
+         ref=a[key];assert isinstance(ref,dict) and set(ref)=={'path','sha256','bytes'}
+         path=Path(ref['path']);assert path.is_absolute() and str(path.resolve())==str(path)
+@@ -35,15 +45,15 @@
+         for r in plan['protectedInputs']:verify(r)
+         for ref in plan['sourceFamilies']:family(ref)
+         for k in ['constructionResult','component','componentAudit']:verify(a[k])
+-    protect();output=Path(plan['outputPrefix']+'-'+run_id);outer=Path(str(output)+'-external-root');assert not output.exists() and not outer.exists();outer.mkdir(mode=0o700)
++    protect();assert not output.exists() and not output.is_symlink() and not outer.exists() and not outer.is_symlink();free=shutil.disk_usage(output.parent).free;require_capacity(free);outer.mkdir(mode=0o700)
+     spec=importlib.util.spec_from_file_location('genuine_next_wasmtime_outer_monitor',plan['monitor']['path']);monitor=importlib.util.module_from_spec(spec);spec.loader.exec_module(monitor)
+     env={k:os.environ[k] for k in ['HOME','USER','LOGNAME'] if k in os.environ};env.update(PATH=str(Path(plan['node']['path']).parent)+':/usr/bin:/bin',NODE_ENV='production',NEXT_TELEMETRY_DISABLED='1',CI='1')
+-    terminal=monitor.monitor([plan['node']['path'],str(HERE/'deploy.mjs'),str(authpath)],plan['cwd'],env,outer,600,row(authpath))
++    terminal=monitor.monitor(argv,plan['cwd'],env,outer,600,row(authpath))
+     preserved=True
+     try:protect()
+     except BaseException:preserved=False
+     clean=terminal['parentOwnedGroupGone'] and terminal['allObservedOwnedGroupsGone'] and not terminal['timeout'] and not terminal['forcedCleanup'] and all(terminal[k]==[] for k in ['errors','signals','interruptedSignals','remainingObservedPids'])
+     result=read(output/'result.json') if(output/'result.json').exists() else None
+-    observation=dict(schemaVersion=1,state='ROOT_NEXT_WASMTIME_DEPLOYMENT_OBSERVATION_V2',runId=run_id,outputRoot=str(output),rawExitCode=terminal['rawExitCode'],ownedGroupsClean=clean,protectedInputsPreserved=preserved,terminal=row(outer/'terminal.json'),result=row(output/'result.json') if result else None,passed=bool(terminal['rawExitCode']==0 and clean and preserved and result and result['passed']),adoption=False)
++    observation=dict(schemaVersion=1,state='ROOT_NEXT_WASMTIME_DEPLOYMENT_OBSERVATION_V2',runId=run_id,outputRoot=str(output),rawExitCode=terminal['rawExitCode'],ownedGroupsClean=clean,protectedInputsPreserved=preserved,terminal=row(outer/'terminal.json'),result=row(output/'result.json') if result else None,passed=bool(terminal['rawExitCode']==0 and clean and preserved and result and result['passed']),adoption=False,fullNextAcceptance=False,freeBytesAtAdmission=free,minimumFreeBytes=1073741824)
+     (outer/'observation.json').write_text(json.dumps(observation,indent=2)+'\n');print(json.dumps(observation),flush=True);raise SystemExit(0 if observation['passed'] else 1)
+ if __name__=='__main__':main()

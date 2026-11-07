@@ -1,0 +1,40 @@
+// A release-build type boundary, not a CommonJS/file-URL loader bridge.
+static bool unsupported_import_referrer(JSContext *cx, JS::HandleValue module_id,
+                                        const char *operation) {
+  // A real getter/VM error or OOM must never be replaced by this diagnostic.
+  if (JS_IsExceptionPending(cx)) {
+    return false;
+  }
+  api::throw_error(cx, ScriptLoaderErrors::UnsupportedImportReferrer);
+  if (!JS_IsExceptionPending(cx) || JS_IsThrowingOutOfMemory(cx)) {
+    return false;
+  }
+
+  JS::RootedValue exception(cx);
+  if (!JS_GetPendingException(cx, &exception) || !exception.isObject()) {
+    return false;
+  }
+  JS::RootedObject object(cx, &exception.toObject());
+  // Save/root the original exception and its associated stack; annotation APIs
+  // run with no pending exception. On failure drop only the saved diagnostic,
+  // preserving the new exception/OOM/uncatchable status exactly as produced.
+  JS::AutoSaveExceptionState saved(cx);
+  JS::RootedString code(cx, JS_NewStringCopyZ(cx, "ERR_SM_MODULE_IMPORT_REFERRER"));
+  if (!code) {
+    saved.drop();
+    return false;
+  }
+  JS::RootedString operation_string(cx, JS_NewStringCopyZ(cx, operation));
+  if (!operation_string) {
+    saved.drop();
+    return false;
+  }
+  if (!JS_DefineProperty(cx, object, "code", code, JSPROP_ENUMERATE) ||
+      !JS_DefineProperty(cx, object, "module", module_id, JSPROP_ENUMERATE) ||
+      !JS_DefineProperty(cx, object, "operation", operation_string, JSPROP_ENUMERATE)) {
+    saved.drop();
+    return false;
+  }
+  saved.restore();
+  return false;
+}

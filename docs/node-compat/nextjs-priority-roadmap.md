@@ -139,11 +139,15 @@ the browser positive does not accept prior failures. The
 [optional shared-cache proposal](nextjs-portable-cache-proposal.md) keep the
 original failed process-counter contract separate from any future scenario.
 
-The next implementation order is now: verify/retain those diagnostics; perform
-the separately designed exact-action transport EOF control; resolve response
-completion issues that it demonstrates; then build an explicitly configured
-portable cache scenario through Next's actual CacheHandler extension. Do not
-patch global state or change host scheduling to simulate one Node process.
+The [exact-action transport EOF control](nextjs-action-transport-2026-11-07.md)
+now passes both predeclared native/Node arms0/clean/protected, with valid complete
+chunked/gzip messages and2963 opaque decoded bytes each. This is a separate
+draining client without navigation, not a cause proof or old-browser waiver.
+The next implementation order is: retain those packets; compile/audit the
+checked loader-referrer boundary; implement and test real bounded CJS/fileURL
+handler loading; then build an explicitly configured portable cache scenario
+through Next's actual CacheHandler extension. Do not patch global state or
+change host scheduling to simulate one Node process.
 
 | Priority | Work | Completion gate |
 | --- | --- | --- |

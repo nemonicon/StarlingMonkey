@@ -1,0 +1,109 @@
+--- full02a/runtime/script_loader.cpp
++++ candidate/runtime/script_loader.cpp
+@@ -8,6 +8,7 @@
+ 
+ #include <cstdio>
+ #include <js/CompilationAndEvaluation.h>
++#include <js/Exception.h>
+ #include <js/MapAndSet.h>
+ #include <js/ScriptPrivate.h>
+ #include <js/String.h>
+@@ -36,7 +37,50 @@
+ DEF_ERR(ModuleLoadingError, JSEXN_REFERENCEERR,
+         "Error loading module \"{0}\" (resolved path \"{1}\"): {2}", 3)
+ DEF_ERR(BuiltinModuleExists, JSEXN_TYPEERR, "Builtin module \"{0}\" already exists", 1)
++DEF_ERR(UnsupportedImportReferrer, JSEXN_TYPEERR,
++        "Non-builtin import requires object loader referrer metadata with a string id", 0)
+ }; // namespace ScriptLoaderErrors
++
++// A release-build type boundary, not a CommonJS/file-URL loader bridge.
++static bool unsupported_import_referrer(JSContext *cx, JS::HandleValue module_id,
++                                        const char *operation) {
++  // A real getter/VM error or OOM must never be replaced by this diagnostic.
++  if (JS_IsExceptionPending(cx)) {
++    return false;
++  }
++  api::throw_error(cx, ScriptLoaderErrors::UnsupportedImportReferrer);
++  if (!JS_IsExceptionPending(cx) || JS_IsThrowingOutOfMemory(cx)) {
++    return false;
++  }
++
++  JS::RootedValue exception(cx);
++  if (!JS_GetPendingException(cx, &exception) || !exception.isObject()) {
++    return false;
++  }
++  JS::RootedObject object(cx, &exception.toObject());
++  // Save/root the original exception and its associated stack; annotation APIs
++  // run with no pending exception. On failure drop only the saved diagnostic,
++  // preserving the new exception/OOM/uncatchable status exactly as produced.
++  JS::AutoSaveExceptionState saved(cx);
++  JS::RootedString code(cx, JS_NewStringCopyZ(cx, "ERR_SM_MODULE_IMPORT_REFERRER"));
++  if (!code) {
++    saved.drop();
++    return false;
++  }
++  JS::RootedString operation_string(cx, JS_NewStringCopyZ(cx, operation));
++  if (!operation_string) {
++    saved.drop();
++    return false;
++  }
++  if (!JS_DefineProperty(cx, object, "code", code, JSPROP_ENUMERATE) ||
++      !JS_DefineProperty(cx, object, "module", module_id, JSPROP_ENUMERATE) ||
++      !JS_DefineProperty(cx, object, "operation", operation_string, JSPROP_ENUMERATE)) {
++    saved.drop();
++    return false;
++  }
++  saved.restore();
++  return false;
++}
+ 
+ class AutoCloseFile {
+   FILE *file;
+@@ -337,7 +381,7 @@
+   if (!core::async_context::is_data_realm(data_realm))
+     data_realm = JS::GetObjectRealmOrNull(module_reques);
+   if (!core::async_context::is_data_realm(data_realm) && referrer) {
+-    JS::Value marker = JS::GetScriptPrivate(referrer);
++    JS::RootedValue marker(cx, JS::GetScriptPrivate(referrer));
+     if (marker.isObject()) data_realm = JS::GetObjectRealmOrNull(&marker.toObject());
+   }
+   if (core::async_context::is_data_realm(data_realm)) {
+@@ -399,12 +443,17 @@
+     ref_priv = JS::GetScriptPrivate(referrer);
+   }
+ 
+-  MOZ_ASSERT(ref_priv.isObject(), "Module referrer must have an object private value");
++  if (!ref_priv.isObject()) {
++    return unsupported_import_referrer(cx, path_val, "module_load_hook");
++  }
+ 
+   RootedObject info(cx, &ref_priv.toObject());
+   RootedValue parent_path_val(cx);
+-  if (!JS_GetProperty(cx, info, "id", &parent_path_val) || !parent_path_val.isString()) {
+-    return false;
++  if (!JS_GetProperty(cx, info, "id", &parent_path_val)) {
++    return false;
++  }
++  if (!parent_path_val.isString()) {
++    return unsupported_import_referrer(cx, path_val, "module_load_hook");
+   }
+ 
+   HostString str = core::encode(cx, parent_path_val);
+@@ -421,13 +470,16 @@
+ }
+ 
+ bool module_metadata_hook(JSContext *cx, HandleValue ref_priv, HandleObject meta_obj) {
++  if (!ref_priv.isObject()) {
++    return unsupported_import_referrer(cx, JS::UndefinedHandleValue, "module_metadata_hook");
++  }
+   RootedObject info(cx, &ref_priv.toObject());
+   RootedValue parent_id_val(cx);
+   if (!JS_GetProperty(cx, info, "id", &parent_id_val)) {
+     return false;
+   }
+   if (!parent_id_val.isString()) {
+-    return false;
++    return unsupported_import_referrer(cx, JS::UndefinedHandleValue, "module_metadata_hook");
+   }
+   RootedValue builtin_val(cx);
+   if (!MapGet(cx, builtinModules, parent_id_val, &builtin_val)) {

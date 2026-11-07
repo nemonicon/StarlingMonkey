@@ -1,0 +1,11 @@
+# Checked boundary native integration — selected full-build route
+
+Root selected the full builder route with current capacity. This folder is an unissued Source plan, not a build/authority. `change-plan.json` binds the real full02a/9e baseline, sealed5e7b/fbc1 guard and exact proposed825 record delta. It records source-role counts, +2,061 logical bytes, new proposed fingerprint and the dependency order. No Source payload tree or native output is copied or produced.
+
+The existing full builder operational APIs are sufficient once a new Source-pinned policy admits the genuine new materialization. Materializer V2 adds exactly a seventh checked `runtime/script_loader.cpp` overlay. Builder V4 keeps worker/preparer/Cargo helper operational bytes and all CMake/Rust/monitor/disk policy unchanged. It carries a same-byte local read-only portable admission API solely for the unchanged generator's same-family policy requirement. New generator Source/physical receipts are separate; b209/f9e/d434 evidence is never recast.
+
+The Cargo graph itself is unchanged because all21 Rust-base rows remain identical. Fresh selection DATA must still be derived from genuine current restored/proof admission. Actual compiled Source metadata must be fresh after a real build; preparation may not claim80 fresh C++ rows or a new engine. After success, a new component/std13 audit and complete app regression are mandatory. The current02a engine remains unguarded; any suspect file-URL probe remains blocked until compiled guard admission and separate bounded workload authority.
+
+The old UTF16 one-TU runner is not drop-in: script_loader is a direct runtime link object, not a member of the15-object node archive. A hypothetical limited successor would need only compile/direct-object substitution/link/optimize and new truthful parent80+fresh1 metadata; it must claim79 reused parent TUs, reused embedding/Rust, not a fresh80+1 full build. That alternative is not selected or implemented here.
+
+Drafts stop for peer before indexes and require staged mechanical source-pin binding. No actual materialization, copy tree, generator, Cargo, CMake/compiler, native build, engine, component or guest action is authorized/performed.

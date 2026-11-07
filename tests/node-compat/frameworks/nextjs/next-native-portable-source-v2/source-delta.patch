@@ -1,0 +1,136 @@
+--- next-native-portable-source-v1/materialize.py
++++ next-native-portable-source-v2/materialize.py
+@@ -12,7 +12,7 @@
+ import stat
+ 
+ HERE = Path(__file__).absolute().parent
+-REL = 'tests/node-compat/frameworks/nextjs/next-native-portable-source-v1'
++REL = 'tests/node-compat/frameworks/nextjs/next-native-portable-source-v2'
+ ROLES = {'native-policy-source': 'source', 'build-support': 'build-support',
+          'componentize-embedding': 'componentize-source'}
+ COUNTS = {'native-policy-source': 435, 'build-support': 387,
+@@ -87,7 +87,7 @@
+         return data
+ 
+     spec = json.loads(get(REL + '/selection.json'))
+-    require(spec['schemaVersion'] == 1 and spec['state'] == 'WORKING_NEXT_V7_PLUS_UTF16_PORTABLE_SOURCE_SELECTION_V1', 'Wrong Source selection')
++    require(spec['schemaVersion'] == 1 and spec['state'] == 'WORKING_NEXT_FULL02A_PLUS_MODULE_BOUNDARY_PORTABLE_SOURCE_SELECTION_V2', 'Wrong Source selection')
+     require(spec['expectedCounts'] == COUNTS and spec['outputDirectories'] == ROLES,
+             'Role policy differs')
+     require(spec['nativeBuildOrCompilerOrGuestClaimed'] is False, 'Unexpected build claim')
+@@ -109,7 +109,31 @@
+         rows[key] = dict(role=role, path=name, sha256=r['sha256'], bytes=r['bytes'],
+                          mode=int(r['copyMode'], 8), repositoryDonor=donor['path'],
+                          gitBlobSha1=donor['gitBlobSha1'], origin='committed C2 donor')
+-    require(len(spec['overlays']) == 6 and len(spec['additions']) == 1
++    # The seventh overlay is a complete authenticated Source family, not a
++    # changed historical build input or an unreviewed pathname-only donor.
++    boundary_ref = spec['moduleBoundarySourceIndex']
++    boundary_index = json.loads(get(boundary_ref['repositoryPath'], boundary_ref))
++    require(boundary_index['state'] == 'MODULE_IMPORT_REFERRER_BOUNDARY_UNCOMPILED_SOURCE_HELD_V1', 'Wrong boundary Source family')
++    boundary_root = relative(boundary_ref['repositoryPath']).parent
++    names = {r['path'] for r in boundary_index['files']}
++    require(len(names) == len(boundary_index['files']), 'Duplicate boundary Source member')
++    nodes = list((repo / boundary_root).rglob('*'))
++    require(not any(p.is_symlink() for p in nodes) and all(p.is_file() or p.is_dir() for p in nodes)
++            and {p.relative_to(repo / boundary_root).as_posix() for p in nodes if p.is_file()} == names | {'index.json'},
++            'Boundary Source membership/aliases')
++    dirs = {p.as_posix() for name in names for p in Path(name).parents if p != Path('.')}
++    require({p.relative_to(repo / boundary_root).as_posix() for p in nodes if p.is_dir()} == dirs, 'Boundary Source directories')
++    for member in boundary_index['files']:
++        get((boundary_root / relative(member['path'])).as_posix(), member)
++    version_ref = spec['moduleBoundaryVersionManifest']
++    version_rows = [r for r in boundary_index['files'] if r['path'] == 'version-manifest.json']
++    require(version_ref['repositoryPath'] == (boundary_root / 'version-manifest.json').as_posix()
++            and len(version_rows) == 1 and all(version_rows[0][k] == version_ref[k] for k in ('sha256', 'bytes')), 'Indexed boundary version role')
++    boundary = json.loads(get(version_ref['repositoryPath'], version_ref))
++    require(boundary['state'] == 'MODULE_IMPORT_REFERRER_BOUNDARY_UNCOMPILED_SOURCE_V1'
++            and boundary['cppCompiled'] is False and boundary['actualEngine'] is None
++            and boundary['actualImportProbe'] is None, 'Boundary remains genuine uncompiled Source')
++    require(len(spec['overlays']) == 7 and len(spec['additions']) == 1
+             and len(graft['replacements']) == 5, 'Wrong overlay boundary')
+     joined = set()
+     for i, edit in enumerate(spec['overlays']):
+@@ -124,8 +148,14 @@
+                     and {k: g['before'][k] for k in ('sha256', 'bytes')} == edit['before']
+                     and all(g['after'][k] == edit['donor'][k] for k in ('sha256', 'bytes')),
+                     'V7 mapping join differs')
++        elif i == 5:
++            require(edit['path'] == 'builtins/node-compat/module-kernel.cpp', 'Wrong UTF16 target')
+         else:
+-            require(edit['path'] == 'builtins/node-compat/module-kernel.cpp', 'Wrong UTF16 target')
++            require(i == 6 and edit['path'] == 'runtime/script_loader.cpp', 'Wrong checked-referrer target')
++            require(edit['before'] == {k: boundary['compiledBase'][k] for k in ('sha256', 'bytes')}
++                    and all(edit['donor'][k] == boundary['after'][k] for k in ('sha256', 'bytes')), 'Boundary version join')
++            selected = [r for r in boundary_index['files'] if r['path'] == 'after/runtime/script_loader.cpp']
++            require(len(selected) == 1 and all(selected[0][k] == edit['donor'][k] for k in ('sha256', 'bytes')), 'Boundary indexed afterimage')
+         old.update(sha256=edit['donor']['sha256'], bytes=edit['donor']['bytes'], mode=edit['mode'],
+                    repositoryDonor=edit['donor']['repositoryPath'], origin=edit['reason'])
+         old.pop('gitBlobSha1', None)
+@@ -143,7 +173,7 @@
+             'Wrong whole selected role membership')
+     require(not {r['path'] for r in values if r['role'] == 'native-policy-source'} &
+             {r['path'] for r in values if r['role'] == 'build-support'}, 'Native/support overlap')
+-    require(sum(r['bytes'] for r in values) == spec['expectedBytes'] == 7530166
++    require(sum(r['bytes'] for r in values) == spec['expectedBytes'] == 7532227
+             and fingerprint(values) == spec['roleContentSha256'], 'Whole content fingerprint differs')
+     for r in values:
+         require(r['mode'] in (0o600, 0o644, 0o755), 'Unexpected copy mode')
+--- next-native-portable-source-v1/selection.json
++++ next-native-portable-source-v2/selection.json
+@@ -1,6 +1,6 @@
+ {
+   "schemaVersion": 1,
+-  "state": "WORKING_NEXT_V7_PLUS_UTF16_PORTABLE_SOURCE_SELECTION_V1",
++  "state": "WORKING_NEXT_FULL02A_PLUS_MODULE_BOUNDARY_PORTABLE_SOURCE_SELECTION_V2",
+   "baselineMap": {
+     "repositoryPath": "tests/node-compat/frameworks/nextjs/spidermonkey-intl-build-v1/portable-native-inputs.json",
+     "sha256": "320cbc45df3e3eb48baa5a82e68096455fa6039387ae8b036021db201c9bfda8",
+@@ -101,6 +101,21 @@
+       },
+       "mode": 384,
+       "reason": "Actual UTF16 Module compilation delta"
++    },
++    {
++      "role": "native-policy-source",
++      "path": "runtime/script_loader.cpp",
++      "before": {
++        "sha256": "622b2edff7d4d2e90a77cc3ded341a1ae301c2cdd59b1a4552397c333805e0e7",
++        "bytes": 20231
++      },
++      "donor": {
++        "repositoryPath": "tests/node-compat/frameworks/nextjs/next-module-fileurl-boundary-candidate-v1/after/runtime/script_loader.cpp",
++        "sha256": "fbc1d13eebc66d20b01b1828008f3918609752e060320dbd16837722d4216ab8",
++        "bytes": 22292
++      },
++      "mode": 384,
++      "reason": "Exact checked module-referrer boundary Source; not compiled"
+     }
+   ],
+   "additions": [
+@@ -121,12 +136,22 @@
+     "componentize-embedding": 3
+   },
+   "expectedFiles": 825,
+-  "expectedBytes": 7530166,
+-  "roleContentSha256": "47755843d22d8e0e355ddc56e263e30aa997b4bd963fac50609639913c5c35df",
++  "expectedBytes": 7532227,
++  "roleContentSha256": "cfbd75be70aeaa36006009fa6580b8f0f4bb789852e8d8201eefefd09d0a1550",
+   "outputDirectories": {
+     "native-policy-source": "source",
+     "build-support": "build-support",
+     "componentize-embedding": "componentize-source"
+   },
+-  "nativeBuildOrCompilerOrGuestClaimed": false
++  "nativeBuildOrCompilerOrGuestClaimed": false,
++  "moduleBoundarySourceIndex": {
++    "repositoryPath": "tests/node-compat/frameworks/nextjs/next-module-fileurl-boundary-candidate-v1/index.json",
++    "sha256": "5e7b07a64504efe25cade4199cc05a274bd9612ca9a6be7bf18c059bd068ef5d",
++    "bytes": 2741
++  },
++  "moduleBoundaryVersionManifest": {
++    "repositoryPath": "tests/node-compat/frameworks/nextjs/next-module-fileurl-boundary-candidate-v1/version-manifest.json",
++    "sha256": "ce3cc1101748b9d9b4f773fb15e8b4dc91ce67ecb4cfb4420b6a4e14f93d231f",
++    "bytes": 2275
++  }
+ }
