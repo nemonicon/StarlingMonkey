@@ -2,7 +2,13 @@
 
 The first isolated host build produced a new2,181-file standalone app. Its
 [actual build review](../next-app-build-root-results-v1/actual-review/README.md)
-passes; this directory does not yet contain a runtime result for that app.
+passes. The first actual paired runtime now also passes: StockV3 result1e02e583/
+323608 bytes and NativeV7 result650e7a91/8546 both pass24HTTP/cache1→2/five stream
+chunks(shell0/ready2)/2strict-browser checks, raw0/clean with protected inputs.
+Native app-copy and whole-world/native guards pass, server SIGINT exits0 and
+all error arrays are empty. The [portable paired DATA review](first-pair-review/README.md)
+retains304 logical payloads and passes Root readback. Both9-script decoded hash
+sets match; the2963-byte action bodies retain distinct hashes.
 
 `run-full-next-fresh-app.py` is the previously executed V6 diagnostic guard
 wrapper with only its actor selector changed to the new V7 native runtime
@@ -17,7 +23,8 @@ independently reviewed. Their indices are bd785648/3720,5faa8f5d/3219 and
 payloads. C's independent
 review also ran31 native inert checks,20 stock read-only/inert checks and18
 observer checks; no actor, copy or server ran. Late native and stock Root input
-documents are issued here, without an actual runtime invocation.
+documents are issued here and were used for that first pair. The native CLI
+creates its own fresh request from the pinned base document.
 
 Root requires at least1GiB free before launch as a conservative start admission,
 not a measured peak or continuous monitor floor. The original actor timeouts,
@@ -48,8 +55,10 @@ with free bytes mocked to0 refuses before a request or actor; it is not an
 actual disk-pressure workload. Duplicate preparation is refused and preserves
 the request. AST and C's independent read-only grant/CLI reviews pass. See
 `cli-preparation-observation.json` and complete raw preparation logs. Actual
-free space at preparation was280,678,400 bytes, below the launch floor; no live
-fresh-app trial has run.
+free space at preparation was280,678,400 bytes, below the launch floor. Later
+first-trial admission passed at1,638,600,704(stock) and1,578,336,256(native).
+`stock-v3-launch-admission.json`, `native-v7-first-cli.*` and the fresh native
+world-guard receipt retain those actual actions separately from preparation.
 
 Old55f05 passes, the first integrated1c31 browser failure and its later positive
 paired CDP trial remain distinct retained observations. A fresh app pass will

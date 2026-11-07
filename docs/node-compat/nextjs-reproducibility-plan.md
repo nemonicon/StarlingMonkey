@@ -134,9 +134,12 @@ cannot be made portable by replacing strings or expected hashes.
    identity and declare an empty cache mountpoint in the owned copy. Two of five
    browser asset pins changed. New nativeV7/stockV3/browserV3 Sources and the
    [fresh-app regression CLI](../../tests/node-compat/frameworks/nextjs/next-app-runtime-root-results-v1/README.md)
-   now pass independent review and preparation checks. Actual serving is held
-   below the conservative1GiB Root launch floor. This new app has not yet been
-   served in Wasm.
+   now pass independent review and their first actual matched Node/Wasmtime
+   pair passes24HTTP/cache/stream/2strict-browser checks. The fresh app also
+   passes cold8 on stock wasmCloud with the same1c31 component. Earlier capacity
+   holds ended above the unchanged1GiB Root start floor. The portable paired and
+   cold DATA readers both pass Root readback; no native engine rebuild or
+   clean-machine reproduction follows from these retained-artifact trials.
    The historical accepted app has2218 files/48,808,299 bytes; its inode/mode/path
    records cannot be cast into evidence for this new build.
 

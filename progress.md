@@ -4,13 +4,31 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-07. Overall roadmap: **in progress**.
 
-Current priority is fresh Next.js acceptance. The isolated host build passes
-with2,181 files; its Node/Wasm admission Sources and reusable regression CLI
-are reviewed. The fresh app has **not yet been served in Wasm**. Launch order is
-matched Node, Wasmtime, then the fresh wasmCloud cold contract. Browser failure
-investigation follows the first paired gate. The last preparation recorded
-280,678,400 free bytes, below the conservative1GiB Root launch floor. No launch
-or runtime result is inferred from Source/preparation checks.
+The **first fresh-build Next.js pair now passes on Node and real Wasm**. Each
+passes24/24 HTTP, cache generation1→2, five incremental stream chunks(shell0,
+ready2) and2/2 strict browser interactions with empty error arrays. The actual
+2,181-file app comes from the isolated build, with its new build/action IDs.
+Matched Node result1e02e583/323608 and native result650e7a91/8546 both finish
+raw0 with clean ownership and protected inputs. Native physical-copy and full
+world/native/constructor guards pass; server SIGINT exits0. The [portable paired
+DATA review](tests/node-compat/frameworks/nextjs/next-app-runtime-root-results-v1/first-pair-review/README.md)
+is sealed83988ce9/1712, retains304 logical payloads and passes Root readback.
+The earlier V5 abort remains unresolved.
+The stock copy retains source modes and gains owned runtime cache files under
+both `.next/cache` and `.next/server/route-cache`; its whole tree is not
+immutable. Native copy guards require exactly the2,181 input files plus the
+declared empty mountpoint; final copy checks pass, with a separately mounted
+writable cache. The
+matching cache API result is not a claim of identical filesystem layouts.
+
+Headroom recovered before launch: stock admitted1,638,600,704 free bytes and
+native1,578,336,256, above the unchanged1GiB Root start floor. These are start
+observations, not a measured peak or continuous disk guard. No new engine or
+component was built: existing1c3108d2 loads the genuinely fresh `/app` tree.
+The fresh wasmCloud cold8 trial also passes, as described below. Next is the
+predeclared browser cohort; safe repeat namespaces for matched Node are now
+Source-reviewed, with the reusable control CLI in review. Earlier capacity
+holds and preparation-only observations below retain their original scopes.
 
 
 **Established passing Next baseline:24/24 HTTP,2/2 browser on55f05.**
@@ -297,9 +315,18 @@ no added app path and a separate0700 host cache/preopen. The existing Wasmtime
 actor's declared empty-mountpoint policy stays unchanged and is not a universal
 host requirement. Root rehashed all26 payloads. Cold8/readiness60s/600s
 ownership/SIGINT gates, component1c31 and standard13-interface world stay exact.
-No cold Root grant or workload is issued here, and no nested-routing/cache
-persistence or rights proof follows from Source reasoning. The next live order
-remains fresh matched Node, Wasmtime, then the finite second-host gate.
+The [first actual coldV4 trial](tests/node-compat/frameworks/nextjs/wasmcloud-cold-root-results-v4/README.md)
+now passes all8 requests, including three-chunk streaming(shell0/ready1), on
+stock wasmCloud2.11.0/embedded Wasmtime48.0.7. Result6d959823/47822 and outer
+9497ad32/1723 finish raw0/clean with source/copy/world protected. Config/dev
+exit0, no extra HTTP readiness probes or retries, and SIGINT/owned shutdown
+pass. Launch admission recorded1,521,770,496 bytes above1GiB. Portable actual
+The [portable cold DATA review](tests/node-compat/frameworks/nextjs/wasmcloud-cold-root-results-v4/actual-review/README.md)
+retains175 exact files and passes Root readback;200 selected current references
+and both2,181-file trees pass the independent current audit. This finite cold8 result does not establish cache
+persistence, browser/retained24+2, private Store identity or general descriptor
+rights. The first fresh matched Node, Wasmtime and cold second-host gates have
+now run; earlier preparation statements retain their original scopes.
 
 The new read-only browser observer is Source-reviewed: seven bounded CDP event
 types plus requestfailed-aware observation completion, with unchanged actions,

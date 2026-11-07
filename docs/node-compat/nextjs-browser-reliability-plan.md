@@ -1,8 +1,9 @@
 # Next browser reliability: finite future control
 
-This is an **unexecuted plan**, with no grant, runner loop or new runtime result.
-It addresses priority2 after the first fresh-application paired gate. It does
-not change timeouts, acceptance rules, application code or existing evidence.
+The **three-pair cohort is unexecuted**. Its prerequisite first fresh-application
+pair now passes; the [sealed DATA reader](../../tests/node-compat/frameworks/nextjs/next-app-runtime-root-results-v1/first-pair-review/README.md)
+passes Root readback. This protocol does not change timeouts, acceptance rules,
+application code or existing evidence.
 
 The [first integrated V5 run](../../tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/full-next-io-v5-first-review/README.md)
 remains failed:24HTTP/cache/strict streaming and both browser functions passed,
@@ -18,15 +19,14 @@ races the retained failed terminal and handles the underlying promise, avoiding
 a later Targetclosed secondary. Original failed requests, unavailable bodies and
 observer errors still fail. This corrects diagnostic completion, not ERR_ABORTED.
 
-First close the fresh-app gate: independently retain and review one matched
-stock/native pair with the2181-file,48,714,867-byte application and425-directory
-inventory excluding root. Both arms must pass all24HTTP, dynamic Server Action,
-cache invalidation, strict shell-before-ready delivery and2browser interactions,
-with zero strict errors, clean original monitors and unchanged protected inputs.
-Use held [BrowserV3](../../tests/node-compat/frameworks/nextjs/browser-hydration-candidate-v3/README.md),
+The first fresh-app gate passed with the2181-file,48,714,867-byte application
+and425-directory inventory excluding root: both arms passed24HTTP, dynamic
+Server Action, cache invalidation, strict shell-before-ready delivery and2browser
+interactions, zero strict errors, clean original monitors and unchanged inputs.
+It used held [BrowserV3](../../tests/node-compat/frameworks/nextjs/browser-hydration-candidate-v3/README.md),
 [stockV3](../../tests/node-compat/frameworks/nextjs/browser-hydration-matched-host-candidate-v3/README.md)
 and [nativeV7](../../tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v7/README.md).
-Source readiness or a live launch is not this completed gate.
+Source readiness or a live launch alone would not close that gate.
 
 Only then predeclare **three additional pairs**, six fresh actor runs, in order:
 
@@ -37,9 +37,11 @@ Only then predeclare **three additional pairs**, six fresh actor runs, in order:
 |3|Stock Node|Native Wasmtime|
 
 Record the complete cohort's exact descriptors and output namespaces before
-starting. StockV3 currently hardcodes one fresh output path and refuses reuse.
-A genuine reviewed fresh-run-namespace Source successor is therefore required;
-there is no implemented repeat flag or permission to delete/reuse its output.
+starting. StockV3 hardcodes one output path and remains unchanged. The reviewed
+[StockV4 namespace successor](../../tests/node-compat/frameworks/nextjs/browser-hydration-matched-host-candidate-v4/README.md)
+now supplies safe run-ID-derived roots;73 inert selector checks pass. Its
+reusable control CLI passes preparation-only checks; no V4 actor has run yet.
+The cohort must use those new namespaces, never delete/reuse old outputs.
 Native runId selection likewise needs a distinct reviewed Root grant per run.
 No automatic loop, extra favorable retry or replacement of a failed pair is
 authorized by this document. An ownership/protection/unknown-state failure stops
