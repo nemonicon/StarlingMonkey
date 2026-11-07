@@ -1,11 +1,17 @@
 # Portable Next cache proposal
 
-Status: **engineering proposal, not implemented or validated**. The original
+Status: **engineering proposal with a model-tested Source prototype; no deployed cache handler accepted**. The original
 cache-generation gate remains failed. The deployed affinity diagnostic observed
 four different JS-global state epochs for its three cache reads and invalidation
 admission. It did not trace the callback or tag-map updates and cannot establish
 the sole cause. An arbitrary lexical counter cannot be made process-global by
 sharing cache files. Stock P2 host reuse settings provide no affinity promise.
+
+The optional handler now has a separately sealed Source prototype and forty
+passing in-memory model checks. Cache filesystem, entropy and Next calls in
+that model are explicit fakes; it has not loaded in a real Next application or
+Wasm component. Its declared new-route tag set needs a successor before the
+existing legacy cache routes can remain operational alongside the new scenario.
 
 Use Next16.4.5's actual `cacheHandler` extension for a separately configured
 application scenario. Do not patch Next internals, global Maps, app modules or
@@ -66,6 +72,15 @@ Do not execute a suspected invalid-referrer path as a fault experiment. First
 provide a checked, identifiable failure boundary, then implement/test the
 selected real CJS/default-binding contract through existing registration and
 module-cache mechanisms. Do not invent an embedding API or patch Next's loader.
+
+The checked-referrer boundary has since passed its two-case deployed test:
+builtin import works and file-URL import throws the identifiable TypeError.
+Pinned Node imports that target successfully, so this remains a compatibility
+gap. The first interoperability build failed a SpiderMonkey HandleString
+signature check. A separate rooted-string correction passes a one-TU frontend
+check and now compiles/links as core2251f11a, with full-build DATA review being
+closed. No interoperability component or sixteen-case deployed result exists
+yet. See [the corrected generation](../../tests/node-compat/frameworks/nextjs/next-module-fileurl-interop-native-root-results-v2/README.md).
 
 Next's `IncrementalCache.set` catches handler exceptions and logs a warning.
 Direct helper/error-observation tests must distinguish an identifiable thrown

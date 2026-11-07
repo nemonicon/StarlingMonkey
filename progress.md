@@ -12,9 +12,11 @@ Current next steps and outstanding work:
 - **Complete for its bounded contract:** the deployed two-case guard test passes
   builtin import and coded file-URL refusal with independent DATA review. This
   is an explicit compatibility gap against the successful pinned Node reference.
-- **In progress:** guard probe result retention and native generator/build
-  preparation for the uncompiled bounded CJS/fileURL prototype. Its825 source
-  files are freshly materialized and genuinely admitted; no interop guest has run.
+- **In progress:** the bounded CJS/fileURL bridge. Its first native build failed
+  a SpiderMonkey handle signature check. A separate correction passes frontend,
+  generators and full compile/link. Build DATA review and16-case Wasm probe remain.
+  No interop guest has run. The optional cache facade passes40 in-memory model
+  checks only; real storage/Next/WASI validation remains open.
 - **After loader validation:** explicit Next CacheHandler scenario with shared
   tag epochs, differential/real-component tests, target-host checks and measurements.
 - **Still open:** broader lifecycle/resource coverage, clean-machine bootstrap,
@@ -191,8 +193,47 @@ The initial inherited readback fails at stat_result equality, which included
 access time; its before/after values were not retained, so that cause remains
 a source-level inference. Original code/raw1 are preserved. New stable-field
 verifierd4d3eec5 passes0 without a second materialization or native/tool action.
-BuilderV5 policy-only Source passes Root review; its generator/preparation/native
-execution and the interop component/16-case probe are still outstanding.
+GeneratorV3 now passes ten30-second checks/outer26747/900, result9054c28e;
+coordinated/independent DATAafaa9dfb/90794dbc pass. Actual V5 JSON preparation
+finishes0 with five files, new Cargo selection3b53bc43, review04fb01ba.
+The first actual full interop native build completes Root7872/original28790/7200
+raw1/clean: build phase fails at script_loader.cpp324 because JS_ConcatStrings
+requires a HandleString and receives a raw JSString*. Other five phases finish0.
+All825 copies/1871 protected descriptors/ten trees remain unchanged; independent
+failure DATA reviewd2419fe2 verifies them. Genuine failure metadataBE397c3c is
+retained whole and unaccepted; engineCandidate is NULL and DB80 is configured
+inventory, not80 successfully compiled units. No constructor or guest followed.
+A separate sealed candidateV2 7dbad8b6 adds only a rooted string handle (+67B).
+Fresh Mat4 6d51906e produces825/7,548,976 bytes/fingerprint89331d92; summaryd0948dee,
+composition2ba95fc6 and genuineV6 selection06d0d597. All825 donor/target pairs
+pass Root stable-field readback,824 other payloads/21Rust unchanged. The single
+owned frontend-only check now finishes Root50200/original52221/180 raw0/clean,
+with fresh Source, complete SDK/SM trees and failed WORK snapshots unchanged.
+It produces no object/link/engine; coordinated owner/snapshot DATA review51f52a15
+passes. Fresh GenV4 finishes Root46354/original53305/900 raw0/clean for ten30-second
+checks, result5ebaaf31; deep/current and owner reviews50568cd3/d7c0bcc5 pass.
+Actual V6 JSON preparation finishes0 with new Cargo selectionf9a39f84, five
+outputs and reviewdce0cf7e. The corrected full native build now completes
+Root10067/original56661/7200 raw0/clean, all six phases0, all825 copies/1887
+protected files/ten trees unchanged. New core2251f11a is31,341,287 bytes and full
+metadataafb14d8a is4,861,271 bytes. Independent current payload/owner/tree DATA
+primary review0d23a90e passes; coordinated Source/TU/link/Rust review is being
+closed. This is build DATA only; no new component or16-case guest result yet.
+Optional CacheHandler Source1f8398a6 is sealed separately. Root's owned fake-Node
+model50293/120 passes40 assertions, with independent model/ledger review. All
+cache FS, entropy and Next calls are explicitly in-memory fakes (actual Source
+reads and Node SHA remain real). No real storage/Next/WASI or old cache-gate
+acceptance follows. Eight Source payloads/55,129 bytes retain their initial
+UNEXECUTED cutoff labels with a separate factual execution ledger.
+The failedInteropV1/frontendV2 packet is sealed at4a978157 (2,233 original
+records/42,758,939 logical bytes, archiveeb2f87f6/6,437,743 bytes). Default/current
+readers and final peer closure pass; Root independently rereads all2,233
+archive/current bytes/modes with stable full nanosecond bookends. The old build
+stays failed; the standalone frontend trial does not become a full build.
+The235-record guard INIT/runtime capsule is sealed at a5fb78c5 (20,870,204 logical
+bytes; archivef8c93bac/2,992,159 bytes). Default/current readers and final peer
+closure pass; Root independently reads all235 archive/current originals/modes
+with stable nanosecond physical bookends. Guard safe refusal remains the scope.
 The prior capacity observations below
 are historical; the storage blocker is resolved for this execution.
 

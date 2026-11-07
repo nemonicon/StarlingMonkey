@@ -1,0 +1,38 @@
+--- sealed-mat3/materialize.py
++++ unexecuted-mat4/materialize.py
+@@ -16,7 +16,7 @@
+ sys.dont_write_bytecode = True
+ 
+ HERE = Path(__file__).absolute().parent
+-REL = 'tests/node-compat/frameworks/nextjs/next-native-portable-source-v3'
++REL = 'tests/node-compat/frameworks/nextjs/next-native-portable-source-v4'
+ ROLES = {'native-policy-source': 'source', 'build-support': 'build-support',
+          'componentize-embedding': 'componentize-source'}
+ COUNTS = {'native-policy-source': 435, 'build-support': 387,
+@@ -108,7 +108,7 @@
+ 
+     spec = json.loads(get(REL + '/selection.json'))
+     require(spec['schemaVersion'] == 1 and spec['state'] ==
+-            'WORKING_GUARDED_CJS_FILE_URL_INTEROP_PORTABLE_SOURCE_SELECTION_V3', 'Wrong Source recipe')
++            'WORKING_GUARDED_CJS_FILE_URL_INTEROP_PORTABLE_SOURCE_SELECTION_V4', 'Wrong Source recipe')
+     require(spec['expectedCounts'] == COUNTS and spec['outputDirectories'] == ROLES
+             and spec['nativeBuildOrCompilerOrGuestClaimed'] is False, 'Role/action policy')
+     parent_index, parent_root, parent_members = family(spec['parentMaterializerIndex'])
+@@ -130,7 +130,7 @@
+         require(path not in inputs or inputs[path] == ref, 'Parent provenance conflict')
+         inputs[path] = ref
+     index, interop_root, members = family(spec['interopSourceIndex'])
+-    require(index['state'] == 'CJS_FILE_URL_INTEROP_UNCOMPILED_SOURCE_HELD_V1'
++    require(index['state'] == 'CJS_FILE_URL_INTEROP_ROOTED_CONCAT_UNCOMPILED_SOURCE_HELD_V2'
+             and index['cppCompiled'] is False, 'Sealed uncompiled interop Source')
+     version_ref = spec['interopVersionManifest']
+     require(version_ref['repositoryPath'] == (interop_root / 'version-manifest.json').as_posix()
+@@ -181,7 +181,7 @@
+                        repositoryDonor=donor['repositoryPath'], origin=edit['reason'], data=data)
+     require(collections.Counter(r['role'] for r in rows) == COUNTS and len(rows) == spec['expectedFiles'] == 825,
+             'Whole selected role membership')
+-    require(sum(r['bytes'] for r in rows) == spec['expectedBytes'] == 7548909
++    require(sum(r['bytes'] for r in rows) == spec['expectedBytes'] == 7548976
+             and fingerprint(rows) == spec['roleContentSha256'], 'Post-overlay content fingerprint')
+     get(REL + '/materialize.py')
+     return spec, rows, inputs

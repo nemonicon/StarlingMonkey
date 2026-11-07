@@ -19,6 +19,21 @@ There is no second materialization, compiler or guest retry.
 
 BuilderV5 is a policy-only successor with the four existing operational files
 and local admission API byte-identical. Root's finite Source/DATA check passes;
-fresh physical selection, generators, preparation, native compile/link and
-component construction remain pending. The16-case interop entry has not run.
-The separately accepted guard test establishes safe refusal only.
+fresh physical selection99a3 and ten generator checks9054 now pass. Actual V5
+JSON-only preparation0 produces fresh Cargo selection3b53 and two Intl inventories.
+Coordinated/independent generator and preparation DATA reviews pass.
+
+The first full native build fails under Root7872/original28790/7200, raw1/clean,
+with1871 protected files, ten trees and825 copies unchanged. The actual loader
+compile at113 fails because JS_ConcatStrings receives a raw string pointer in
+its third argument instead of the pinned API's HandleString. Genuine failure
+metadatabe397 is retained whole and unaccepted; engineCandidate is NULL. Its80
+compile-DB rows are configured inventory, not80 completed TUs. The other five
+phases finish0, including final Ninja-command collection. Independent failure
+DATA reviewd2419fe2 verifies the original outcomes/protection and available
+artifacts without a final-link claim. No constructor or guest followed.
+
+The separate successor [V2 generation](../next-module-fileurl-interop-native-root-results-v2/README.md)
+uses a minimal rooted-string fix. This failed Source, WORK and records stay
+unchanged. The16-case interop entry has not run. The separately accepted guard
+test establishes safe refusal only.
