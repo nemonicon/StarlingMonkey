@@ -4,6 +4,17 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-07. Overall roadmap: **in progress**.
 
+Execution is **blocked by disk capacity** after repeated holds across goal
+turns. The latest [readiness revalidation](tests/node-compat/frameworks/nextjs/next-app-request-isolation-root-results-v1/readiness-disk-block-20261107.json)
+rehashes the runtime CLI's required pins and exits 2 at 665,825,280 free bytes,
+before request/output creation or actor startup. Independent review finds no
+additional preparation gap. The prepared request pair needs 1 GiB free; the
+full native build needs 3 GiB. No usable alternate work volume was provided.
+The prior turn completed substantive preparation; this continuation revalidates
+the same external blocker and does not add an application or build result.
+The complete roadmap remains unfinished. Resume execution when capacity is
+available; retain all existing failures and perform the normal action-time guards.
+
 **Next.js is the immediate priority.** The next deliverable is a repeatable
 experimental Next application run, using the unchanged app and standard WASI
 world. The fresh Wasm smoke and native three-run cohort already pass. Prioritize
