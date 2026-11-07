@@ -167,9 +167,20 @@ reproduction measurement has run.
 The [clean-machine dependency audit](docs/node-compat/nextjs-reproducibility-plan.md)
 locates the committed824-source reconstruction map, V7 edits, patched
 SpiderMonkey/Rust build mechanisms, UTF16 delta, real app build and constructor.
-Portable composition, authenticated external tool/artifact materialization,
-fresh inventories/paths and an isolated app-build command remain outstanding;
-this audit has not executed a clean build.
+The new [portable source materializer](tests/node-compat/frameworks/nextjs/next-native-portable-source-v1/README.md)
+now reconstructs all825 declared inputs from repository-relative committed
+donors:435 native,387 support and3 embedding files,7,530,166 bytes. All content
+matches the actual V7 declarations plus the single UTF16 substitution. Its35
+source-only tests cover fresh copies, relocation and refusal cases; Root's
+read-only --check also passes. No compiler or guest ran. Builder integration,
+authenticated external tool/artifact materialization, fresh inventories and an
+isolated app-build command remain outstanding; no clean build is claimed.
+
+Full Next entryV5 integration is in progress. It preserves all six facades and
+the application, replaces only the WASI adapter with the audited observed-I/O
+policy, and keeps the standard13-interface world unchanged. The existing24+2
+runner will be reused under additional whole-world/native artifact guards;
+no new full-application result is claimed until construction and runtime finish.
 Earlier811–996MiB capacity holds ended
 when free space rose above the unchanged1,024MiB construction start guard; both
 constructors then ran. No proof or shared binary was deleted and no guard was

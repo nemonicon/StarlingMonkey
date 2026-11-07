@@ -17,7 +17,14 @@ document with genuine input descriptors, fresh output roots and current
 inventories. Historical authorities contain absolute workstation paths and
 cannot be made portable by replacing strings or expected hashes.
 
-1. **Recover the finite native sources.**
+1. **Recover the finite native sources.** The new
+   [portable materializer](../../tests/node-compat/frameworks/nextjs/next-native-portable-source-v1/README.md)
+   closes the source-content step for working V7 plus UTF16: default `--check`
+   reads only, and `--output /FRESH/ROOT` exclusively creates435 native,
+   387 support and3 embedding files from repository-relative donors. Its first
+   35 Source-only tests match all825 actual declared inputs and exercise the
+   real CLI from a relocated repository closure. No compiler or engine ran.
+   The underlying
    [reconstruct-native-inputs.py](../../tests/node-compat/frameworks/nextjs/spidermonkey-intl-build-v1/reconstruct-native-inputs.py)
    accepts `--check` or one fresh absolute output directory:
 
@@ -34,10 +41,11 @@ cannot be made portable by replacing strings or expected hashes.
    while native435/embedding3 stay unchanged.
    [compose-successor.py](../../tests/node-compat/frameworks/nextjs/native-profile-candidate-v1/compose-successor.py)
    takes `BASE_DIRECTORY OUTPUT_DIRECTORY REPAIR_PACKET_DIRECTORY` and verifies
-   before hashes. It currently expects an existing composition and the packet's
-   exact installed base path. Joining the reconstructed baseline to a relocated
-   V7 composition still needs an explicit portable composition step; invoking
-   the old script against an arbitrary reconstructed directory is insufficient.
+   before hashes. That historical composer expects an existing composition and
+   exact installed base path; the new materializer instead applies authenticated
+   finite replacements directly to the Git donor map. Its new source-only
+   composition and support descriptors still require reviewed integration with
+   the builder's path-bound late inputs; they are not compiled metadata.
 
 2. **Build or obtain the coherent guest SpiderMonkey prerequisite.** The manual
    [Intl workflow](../../.github/workflows/spidermonkey-intl.yml) invokes
