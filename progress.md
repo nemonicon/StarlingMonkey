@@ -113,12 +113,27 @@ lock release and cleanup. Unknown errors/cleanup failures remain failures;
 finish-future inspection remains deferred. [V3 Source](tests/node-compat/frameworks/nextjs/peer-disconnect-candidate-v3/README.md)
 passes independent review, including the exact-function inert cleanup case.
 It now constructs as643742a2/37,142,579 bytes: three commands and outer parent0/
-clean, same13standardimports and whole8025world unchanged. No ordinary V3
-workload has run yet. Independent review found that collectorV2 could permit
+clean, same13standardimports and whole8025world unchanged. Independent review
+found that collectorV2 could permit
 inspection after a normal output path with an unexpected aborted signal and
 no observed I/O abort. Its Source and unused Root runtime request are preserved;
-a narrow collectorV3 correction will require the expected fresh signal on that
+the narrow collectorV3 correction requires the expected fresh signal on that
 normal path, while retaining the stricter handled-close signal/cleanup proof.
+That one-line correction passes independent review and now ran once against
+the genuine component: **all eight peer-control responses pass**, two fresh
+hosts/four healthy controls, both observed-I/O signal paths and both same-factory
+fourth-call JS inspections. The upload1024-byte read failure aborts with the
+same reader error; outputclosed aborts and completes cancellation, lock release,
+ordered drop calls and the explicit handled normal return before inspection.
+Healthy and inspection requests keep fresh unaborted signals. Resultf25bed1f/
+1,127,253 bytes and outer parent exit0/clean with inputs preserved. The [portable
+actual DATA review](tests/node-compat/frameworks/nextjs/peer-disconnect-root-results-v3/actual-review/README.md)
+retains263 records and passes Root readback;289 selected current descriptors
+pass separately. The upload's already-errored reader cancel rejection and the
+host's IncompleteMessage line stay visible. Neither is counted as successful
+upload cancellation or native cleanup. This is an isolated JS-adapter regression over native
+APIs, not native resource-count/Store-death proof. **The full Next55f05 adapter
+still needs this change integrated and its24+2 contract rerun.**
 The next host priority is a finite cold-instance wasmCloud check of the same
 unchanged full Next component. The first actual eight-request attempt failed:
 the harness mistook the early TCP listener for deployed-workload readiness.

@@ -284,3 +284,30 @@ provides an independent peer-disconnect signal
 No immediate abort promise follows while idle code performs no I/O. Neither
 control proves post-Store-death disposal, native registry/root counts, GC/reset
 safety, owner expiry or same-Store overlapping HTTP execution.
+
+### Actual follow-up on 2026-11-07
+
+The [original component control](../../tests/node-compat/frameworks/nextjs/peer-disconnect-root-results-v1/actual-review/README.md)
+observed both I/O failures but stayed raw1/inconclusive after the output export
+failed. No inspection followed that failure. The separate
+[V3 adapter control](../../tests/node-compat/frameworks/nextjs/peer-disconnect-root-results-v3/README.md)
+now passes eight real responses across two fresh Wasmtime hosts, raw0/clean.
+Healthy EOF stays unaborted; a1024-byte partial upload aborts with the same
+reader error; closing output after4096 bytes produces `closed`, aborts, cancels
+the producer/reader, releases the lock and completes ordered disposal calls
+before a specific handled normal return. Both fourth-call inspections retain
+their JS factory history and start with fresh unaborted signals.
+
+An allocation-before-cleanup defect and an unknown-signal collector reuse gap
+were found before their respective runtime attempts. Their held Sources and
+unused requests remain preserved; narrow successors passed independent review
+before this actual run. The successful result is f25bed1f/1,127,253 bytes, with
+input protections intact. The [portable DATA review](../../tests/node-compat/frameworks/nextjs/peer-disconnect-root-results-v3/actual-review/README.md)
+retains263 records and passes readback. It preserves the upload reader's cancel
+rejection and host IncompleteMessage text separately from adapter cleanup success.
+
+This is the isolated diagnostic adapter over genuine native APIs. Integrating
+the audited policy into full Next entryV4 and rerunning24HTTP/2browser checks is
+the next implementation task. The full Next component55f05 remains unchanged.
+HTTP finish-future inspection, typed HTTP error extraction and the native
+resource/Store-death limits above remain open.

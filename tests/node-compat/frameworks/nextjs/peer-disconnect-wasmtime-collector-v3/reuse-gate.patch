@@ -1,0 +1,11 @@
+--- collector-v2/classification.mjs
++++ collector-v3/classification.mjs
+@@ -118,7 +118,7 @@
+    'inconclusive-output-error-abort-cancel-cleanup-or-return-path';
+  } else throw new Error('Unknown peer case kind');
+  const caseGate=kind==='upload-close'?result.ioPathObserved===true:
+-  kind==='output-close'?record.firstBodyBeforeClose===true:result.functionChecksPassed===true;
++  kind==='output-close'?record.firstBodyBeforeClose===true&&(handledPath||freshSignal):result.functionChecksPassed===true;
+  result.safeToRequestAgain=(normalPath||handledPath)&&caseGate&&record.clientCloseObserved===true&&
+   !record.transportOrCollectionError&&!record.frameDecodeError&&!record.forcedClientCleanup;
+  if(!identity)result.inconclusiveReason='missing-or-changed-js-factory-identity';

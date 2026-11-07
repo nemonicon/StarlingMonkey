@@ -1,0 +1,10 @@
+import {analyze,parseDiagnosticLog,marker} from './tests/node-compat/frameworks/nextjs/peer-disconnect-wasmtime-collector-v2/classification.mjs';
+import {readFileSync} from 'node:fs';
+const plan=JSON.parse(readFileSync('./tests/node-compat/frameworks/nextjs/peer-disconnect-wasmtime-collector-v2/plan.json'));
+const base={schemaVersion:1,marker,origin:'actual-wasi-guest',firstLabel:'first',ordinal:3,label:'third',route:'/output',context:null};
+const e=(phase,fields={})=>({...base,phase,...fields});
+const normal=[e('adapter-enter',{requestSignalLinkedToPeer:true,independentPeerDisconnectSignal:false,adapterPolicy:'observed-io-abort-specific-output-closed-v2'}),e('request-signal-created',{aborted:false,alreadyAbortedBeforeListener:false,reasonMatchesObservedIo:false}),e('handler-enter',{signalAborted:false,requestSignalLinkedToPeer:true,requestSignalPolicy:'observed-io-only',independentPeerDisconnectSignal:false}),e('handler-finally'),e('output-write-invocation-attempt',{bytes:4096}),e('output-write-returned'),e('outgoing-finish-returned'),e('response-reader-lock-release-returned'),e('adapter-finally-returned')];
+const bad=normal.map((v,i)=>({...v,...(v.phase==='request-signal-created'?{aborted:true,alreadyAbortedBeforeListener:true,reasonMatchesObservedIo:true}:v.phase==='handler-enter'?{signalAborted:true}:{}),sequence:i+1}));
+const parsed=parseDiagnosticLog(bad.map(v=>JSON.stringify(v)).join('\n')+'\n',plan.allowedGuestPhases);
+const result=analyze({label:'third',status:200,clientCloseObserved:true,forcedClientCleanup:false,firstBodyBeforeClose:true},parsed.events,{firstLabel:'first',ordinal:3,kind:'output-close'});
+console.log(JSON.stringify({parserAccepted:true,freshHealthySignalObserved:result.freshHealthySignalObserved,signalPolicyObserved:result.signalPolicyObserved,normalPath:result.knownNormalHandlerPath,handledPath:result.knownHandledOutputClosedPath,ioPathObserved:result.ioPathObserved,safeToRequestAgain:result.safeToRequestAgain,actualActorsOrResourcesInvoked:false}));
