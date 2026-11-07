@@ -67,8 +67,27 @@ four actual old-pass/new-refuse cases and stop-before-next-request controls.
 Only V2 was executed. Its [portable actual review](tests/node-compat/async-context/context-interleaving-root-results-v1/actual-review/README.md)
 is sealed and passes Root's DATA readback:154 retained records, all459 native
 assertions/87 edges and15 original-Node public projections, with918 host checks
-kept separate. The next separate Source workload tests preserving unref work across
-ordinary component calls and cancellation from a later request.
+kept separate.
+
+The [ordinary-call unref control](tests/node-compat/async-context/unref-reuse-root-results-v1/actual-review/README.md)
+also now passes in the real component: three calls,51 total call checks and9
+distinct cumulative callback checks, with exact original Node projections. The
+old A callback runs once during B with both original A markers; B cancels the
+candidate and C observes no delivery through its finite fence. Component29722cfb
+is37,138,315 bytes,13standardimports, constructor/runtime parents0/clean and
+whole-world guard unchanged. The162-record portable DATA reader passes Root
+readback. Local pending0/hasRef flags are not native queue/root counts, permanent
+cancellation, timer accuracy, physical Store identity or teardown proof.
+
+The [peer-disconnect diagnostic Source](tests/node-compat/frameworks/nextjs/peer-disconnect-candidate-v1/README.md)
+now has one real Node localhost reference with healthy controls, a partial upload
+read error and a later output-write error/cancellation. Its componentfaef5c87/
+37,142,088 bytes constructs in three phases plus parent0/clean with13standard
+imports, but no guest peer-disconnect workload has run. A two-cohort collector
+is being prepared: each case begins healthy and discards unknown/failed state,
+with after-return inspection only when its invocation outcome is understood.
+Current uninspected input-finish future and missing peer-linked Request.signal
+remain explicit baseline limits. No native cleanup claim follows from Node logs.
 Earlier811–996MiB capacity holds ended
 when free space rose above the unchanged1,024MiB construction start guard; both
 constructors then ran. No proof or shared binary was deleted and no guard was

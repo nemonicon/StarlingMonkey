@@ -158,3 +158,129 @@ Actual embedding SHA is `9dcb63be...`/22,252 bytes. Native engine `4623640b` cha
 only the Module compiler object relative to its documented baseline; the context,
 timer, HTTP and embedding seams above are unchanged. Historical SOURCE-only
 comments inside donor files are preserved text, not the current build status.
+
+## Peer-disconnect design review, 2026-11-07
+
+This section is a read-only adapter/WIT audit and a proposed next workload. No
+component Source, network control or target invocation was added. The successful
+first-five context result above does not cover either disconnect case.
+
+### What the current adapter can observe
+
+The installed V4 adapter reads `blockingRead`, recognizes the existing binding's
+own-data `payload` or direct stream-error variant, and treats input `closed` as
+stream EOF ([normalization:469–511](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v4/guest-entry.mjs#L469),
+[read:540–563](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v4/guest-entry.mjs#L540)).
+A successful empty byte list is not that `closed` result. Neither an empty read
+nor `closed` alone establishes that the HTTP message completed successfully or
+that the peer reset its connection. `last-operation-failed` is a failure with an
+owned I/O error resource; the adapter reads its real synchronous diagnostic and
+drops it once. Unknown or falsy throws retain their identity. Diagnostics must
+not inspect that already-disposed error resource again or parse its debug text
+to decide a machine error category.
+
+The input child must be disposed before `IncomingBody.finish` or body disposal.
+`finish` consumes the body and returns a future, rather than directly returning
+successful HTTP completion. Its `get` has readiness, get-once and body/trailer
+success/error layers; returned trailer fields are children of that future
+([incoming ownership:451–472](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v4/deps/wasi-http-0.2.10/package.wit#L451),
+[future:475–507](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v4/deps/wasi-http-0.2.10/package.wit#L475)).
+Current `releaseInput` immediately disposes the returned future without reading
+it ([entry:520–527](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v4/guest-entry.mjs#L520)).
+That is a concrete missing completion observation, not proof of a resource leak.
+A future diagnostic adapter may retain the whole result before disposal on its
+normal EOF path. It must not turn an earlier read error into success if a later
+completion result is empty. Borrowed `httpErrorCode(error)` is an available typed
+diagnostic before the I/O error is disposed
+([WIT:618–630](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v4/deps/wasi-http-0.2.10/package.wit#L618)).
+
+Output uses `blockingWriteAndFlush` with at most 4096 bytes per operation, not
+unchecked `write`. A write failure awaits real `responseReader.cancel(error)`,
+then rethrows, and `finally` attempts child-before-parent disposal
+([entry:575–599](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v4/guest-entry.mjs#L575)).
+Output `closed` remains a failure. `OutgoingBody.finish` consumes the body and
+signals completion; dropping an unfinished body deliberately represents an
+incomplete/corrupt HTTP body. The output child must be disposed first
+([WIT:546–585](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v4/deps/wasi-http-0.2.10/package.wit#L546)).
+After `ResponseOutparam.set` consumes the outparam, an error must not attempt a
+second response ([WIT:404–414](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v4/deps/wasi-http-0.2.10/package.wit#L404)).
+The classic response bridge's genuine Web-stream `cancel` calls response destroy
+([bridge:133–137](../../tests/node-compat/foundation-http/next-http-candidate-v1/bridge.mjs#L133));
+observing that call is distinct from proving native resources were released.
+
+The pinned stock Wasmtime42 implementation returns a received body error once,
+then stream closure; its trailers path does not necessarily repeat that error.
+Its output flush covers transfer into Hyper, not peer receipt, and body finish
+can succeed after the receiver disappears. Therefore neither successful flush
+nor finish is a remote-delivery acknowledgement.
+([incoming/error and trailers implementation](https://github.com/bytecodealliance/wasmtime/blob/v42.0.1/crates/wasi-http/src/body.rs#L159-L352),
+[output implementation](https://github.com/bytecodealliance/wasmtime/blob/v42.0.1/crates/wasi-http/src/body.rs#L467-L622)).
+These are host Source facts; actual propagation remains to be measured.
+
+### Two finite TCP controls and separate inspection
+
+Use the same reviewed P2 world and stock host, one bounded owned server, and
+fresh unique client case labels. Begin with a healthy full upload and complete
+streamed response. Assign a persistent module first-label and per-factory call
+ordinal without entropy or clock capture at INIT. Retain whole client bytes,
+socket outcomes and standard CLI stderr. Bounded JSON stderr events should
+record case, label, ordinal, phase, current ALS marker and typed error category;
+explicitly log attempted versus completed disposal/cancellation operations.
+Use ordinary handler/source callbacks and explicit diagnostic adapter call sites,
+not patched WASI resource prototypes or fabricated resource objects.
+
+1. **Partial Content-Length upload.** Send a valid request with a small declared
+   length, such as 8192, and a nonempty prefix strictly shorter than that length.
+   Keep the connection open until the guest logs receipt of prefix bytes and
+   entry into its next actual input read; then end the client connection
+   normally. Preserve that synchronization in the raw log, rather than sleeping
+   and assuming the read started. The handler retains all bytes received and
+   its own body-read `catch`/`finally` observations. Distinguish successful
+   stream EOF, a typed I/O/HTTP error and an unknown throw. An under-length EOF
+   must not be reported as a successfully received complete upload. If the host
+   rejects the malformed message before the guest read milestone, classify it
+   as a host/protocol result and leave guest cleanup coverage unproved. Preserve
+   the original failure even if cancellation or disposal also fails.
+
+2. **Output close after real first bytes.** Return a real Web ReadableStream with
+   a recognizable first chunk and a bounded sequence of later chunks, produced
+   lazily across ordinary scheduled yields. The client waits for actual first
+   body bytes, retains them, then closes its socket. Keep total production small
+   (for example at most eight 4096-byte chunks and eight live waits), with an
+   outer deadline. Record the actual later write/flush error, source `cancel`,
+   producer `finally`, handler completion/error and adapter cleanup events.
+   Do not inject a stream error or keep growing output to force pressure. If all
+   bounded writes are accepted before closure is observed, record disconnect
+   propagation as **inconclusive**; do not infer successful cancellation or
+   failure merely from the client's close. A write error must not be followed
+   by `OutgoingBody.finish` to manufacture successful completion.
+
+After each closed connection, make a separately tagged healthy inspection
+request only after the preceding handler/host has reached its observed outcome.
+It returns its first-label, ordinal and bounded retained event history. A new
+label/factory, missing history, trapped export or discarded Store leaves
+after-return cleanup inconclusive, even if the server remains healthy. Matching
+labels and ordinals show continuity of that JS factory's observations, not a
+native resource count or cryptographic Store identity. Always report the
+healthy response independently. An overall passing control requires the
+relevant positive synchronization and actual callback observations, not simply
+absence of stderr or a later HTTP200. Do not average the two cases.
+
+### Optional I/O-triggered abort policy is a separate Source change
+
+Current Request construction supplies no signal; the classic bridge listens
+only to that Request's signal
+([entry:563](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v4/guest-entry.mjs#L563),
+[bridge:78–109](../../tests/node-compat/foundation-http/next-http-candidate-v1/bridge.mjs#L78)).
+A possible successor creates one real AbortController inside the native fresh
+request, passes its signal to Request, and aborts once on an observed input
+failure, failed HTTP completion, or output failure. Normal input EOF and local
+application body cancellation are not independently evidence of peer loss.
+Unknown throws must still propagate, and cleanup/abort-listener failures must
+not erase the primary error. This policy requires review and explicit tests;
+it is not implemented by this plan. No selected P2 incoming-request method
+provides an independent peer-disconnect signal
+([incoming-request:249–275](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v4/deps/wasi-http-0.2.10/package.wit#L249)).
+No immediate abort promise follows while idle code performs no I/O. Neither
+control proves post-Store-death disposal, native registry/root counts, GC/reset
+safety, owner expiry or same-Store overlapping HTTP execution.

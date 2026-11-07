@@ -1,0 +1,171 @@
+--- tests/node-compat/frameworks/nextjs/next-component-candidate-v3/adapter-descendant.mjs
++++ adapter-diagnostic.mjs
+@@ -1,6 +1,14 @@
++import {errorData} from './diagnostic-common.mjs';
++export function createDiagnosticWasiHttpHandler(webHandler,types,runFreshRequest,state) {
+ // Standard WASI HTTP resource ownership -> ordinary Web Request/Response.
+ // `types` is the actual wasi:http/types@0.2.10 namespace in guest-entry.mjs.
+-const drop = value => { if (value) value[Symbol.dispose](); };
++function drop(value,kind='unclassified',record) {
++  if(!value)return;
++  state.emit(record,'dispose-invocation-attempt',{resource:kind});
++  try {value[Symbol.dispose]();}
++  catch(error){state.emit(record,'dispose-failed',{resource:kind,error:errorData(error)});throw error;}
++  state.emit(record,'dispose-returned',{resource:kind});
++}
+ function text(bytes) {
+   let out = '';
+   for (const byte of bytes) out += String.fromCharCode(byte);
+@@ -44,7 +52,7 @@
+   }
+   throw new TypeError('WASI diagnostic method missing');
+ }
+-function streamFailure(value) {
++function streamFailure(value,record) {
+   const variant=streamError(value);
+   if(variant?.tag==='last-operation-failed') {
+     const resource=variant.val;
+@@ -52,7 +60,7 @@
+     try {
+       message=Reflect.apply(diagnosticMethod(resource,'toDebugString'),resource,[]);
+       if(typeof message!=='string')throw new TypeError('WASI diagnostic must return a synchronous string');
+-    } finally {drop(resource);}
++    } finally {drop(resource,'io-error',record);}
+     const error=new Error(message);
+     Object.defineProperty(error,'cause',{value,configurable:true,writable:true});
+     return error;
+@@ -60,32 +68,39 @@
+   return value;
+ }
+ 
+-export function createWasiHttpHandler(webHandler, types, runFreshRequest) {
++function createWasiHttpHandler(webHandler, types, runFreshRequest) {
+   if (typeof runFreshRequest !== "function") throw new TypeError("Native request entry is required");
+   const {Fields, IncomingBody, OutgoingBody, OutgoingResponse, ResponseOutparam} = types;
+   async function handleResources(incoming, outparam) {
+       let inputBody, inputStream, outgoingResponse, outputBody, outputStream, responseReader;
+       let incomingEnded = false, responseSet = false, outputFinished = false;
++      let diagnostic;let inputBytes=0;
+       function releaseInput() {
+         const stream = inputStream; inputStream = undefined;
+-        drop(stream);
++        drop(stream,'stream',diagnostic);
+         const body = inputBody; inputBody = undefined;
+         if (body) {
+-          if (incomingEnded) drop(IncomingBody.finish(body));
+-          else drop(body);
++          if (incomingEnded) {
++            state.emit(diagnostic,'incoming-finish-invocation-attempt');
++            const future=IncomingBody.finish(body);
++            state.emit(diagnostic,'incoming-finish-returned',{completionResultInspected:false});
++            drop(future,'future-trailers-uninspected',diagnostic);
++          } else drop(body,'incoming-body-unfinished',diagnostic);
+         }
+       }
+       try {
+         const fieldResource = incoming.headers();
+         const headers = new Headers();
+         try { for (const [name, value] of fieldResource.entries()) headers.append(name, text(value)); }
+-        finally { drop(fieldResource); }
++        finally { drop(fieldResource,'request-headers',diagnostic); }
+         const scheme = incoming.scheme();
+         const protocol = scheme?.tag === 'other' ? scheme.val : scheme?.tag ?? 'http';
+         const authority = incoming.authority() ?? headers.get('host') ?? 'localhost';
+         const methodValue = incoming.method();
+         const method = methodValue.tag === 'other' ? methodValue.val : methodValue.tag.toUpperCase();
+         const url = protocol + '://' + authority + (incoming.pathWithQuery() ?? '/');
++        diagnostic=state.begin(headers.get('x-peer-case'),new URL(url).pathname);
++        state.emit(diagnostic,'adapter-enter',{requestSignalLinkedToPeer:false});
+         inputBody = incoming.consume();
+         let body;
+         if (!['GET', 'HEAD'].includes(method)) {
+@@ -93,7 +108,12 @@
+           body = new ReadableStream({
+             pull(controller) {
+               try {
+-                const chunk = inputStream.blockingRead(64n * 1024n);
++                state.emit(diagnostic,'input-read-invocation-attempt',{inputBytes,hostReadEnteredOrBlockedProved:false});
++                let chunk;
++                try {chunk=inputStream.blockingRead(64n*1024n);}
++                catch(error){state.emit(diagnostic,'input-read-failed',{error:errorData(error)});throw error;}
++                inputBytes+=chunk.length;
++                state.emit(diagnostic,'input-read-returned',{bytes:chunk.length,inputBytes});
+                 if (chunk.length) controller.enqueue(chunk);
+               } catch (error) {
+                 if (streamError(error)?.tag === 'closed') {
+@@ -102,15 +122,15 @@
+                   controller.close();
+                 } else {
+                   releaseInput();
+-                  controller.error(streamFailure(error));
++                  controller.error(streamFailure(error,diagnostic));
+                 }
+               }
+             },
+-            cancel() { releaseInput(); },
++            cancel(reason) {state.emit(diagnostic,'input-web-cancel-enter',{reason:errorData(reason)});releaseInput();state.emit(diagnostic,'input-web-cancel-returned');},
+           });
+         }
+         const request = new Request(url, {method, headers, ...(body ? {body, duplex: 'half'} : {})});
+-        const response = await webHandler(request);
++        const response = await webHandler(request,diagnostic);
+         const fields = [];
+         for (const [name, value] of response.headers) if (name !== 'set-cookie') fields.push([name, bytes(value)]);
+         const cookies = response.headers.getSetCookie?.() ?? (response.headers.get('set-cookie') ? [response.headers.get('set-cookie')] : []);
+@@ -128,24 +148,35 @@
+             const part = await responseReader.read();
+             if (part.done) break;
+             for (let offset = 0; offset < part.value.byteLength; offset += 4096) {
+-              outputStream.blockingWriteAndFlush(part.value.subarray(offset, offset + 4096));
++              state.emit(diagnostic,'output-write-invocation-attempt',{bytes:Math.min(4096,part.value.byteLength-offset)});
++              try {outputStream.blockingWriteAndFlush(part.value.subarray(offset,offset+4096));}
++              catch(error){state.emit(diagnostic,'output-write-failed',{error:errorData(error)});throw error;}
++              state.emit(diagnostic,'output-write-returned');
+             }
+           }
+         }
+         const stream = outputStream; outputStream = undefined;
+-        drop(stream);
++        drop(stream,'stream',diagnostic);
+         outputFinished = true;
+-        OutgoingBody.finish(outputBody, undefined);
++        state.emit(diagnostic,'outgoing-finish-invocation-attempt');
++        OutgoingBody.finish(outputBody,undefined);
++        state.emit(diagnostic,'outgoing-finish-returned',{peerReceiptProved:false});
+       } catch (error) {
+-        if (responseReader) try { await responseReader.cancel(error); } catch {}
+-        throw streamFailure(error);
++        state.emit(diagnostic,'adapter-failed',{error:errorData(error)});
++        if (responseReader) {
++          state.emit(diagnostic,'response-reader-cancel-invocation-attempt');
++          try {await responseReader.cancel(error);state.emit(diagnostic,'response-reader-cancel-returned');}
++          catch(secondary){state.emit(diagnostic,'response-reader-cancel-failed-suppressed',{error:errorData(secondary)});}
++        }
++        throw streamFailure(error,diagnostic);
+       } finally {
+         releaseInput();
+-        drop(outputStream);
+-        if (outputBody && !outputFinished) drop(outputBody);
+-        drop(outgoingResponse);
+-        if (!responseSet) drop(outparam);
+-        drop(incoming);
++        drop(outputStream,'output-stream',diagnostic);
++        if (outputBody && !outputFinished) drop(outputBody,'outgoing-body-unfinished',diagnostic);
++        drop(outgoingResponse,'untransferred-response',diagnostic);
++        if (!responseSet) drop(outparam,'unconsumed-outparam',diagnostic);
++        drop(incoming,'incoming-request',diagnostic);
++        state.emit(diagnostic,'adapter-finally-returned');
+       }
+   }
+   return {
+@@ -169,6 +200,9 @@
+ // itself refuses. Cleanup failure is diagnostic and cannot turn into success.
+ function disposeBeforeEntry(incoming,outparam) {
+   let failures=0;
+-  for(const value of [incoming,outparam])try{drop(value);}catch{failures++;}
++  for(const value of [incoming,outparam])try{drop(value,'pre-entry-resource',undefined);}catch{failures++;}
+   if(failures)try{console.error('NEXT_COMPONENT_PRE_ENTRY_DISPOSAL_FAILURE',failures);}catch{}
+ }
++
++return createWasiHttpHandler(webHandler,types,runFreshRequest);
++}

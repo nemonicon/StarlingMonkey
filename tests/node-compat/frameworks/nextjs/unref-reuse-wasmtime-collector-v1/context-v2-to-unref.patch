@@ -1,0 +1,364 @@
+--- contextV2/collect.mjs
++++ unrefV1/collect.mjs
+@@ -19,24 +19,25 @@
+ const errorData=e=>({name:e?.name??'Error',message:e?.message??String(e),stack:e?.stack??null});
+ const authpath=resolve(process.argv[2]),a=await read(authpath),plan=await read(join(here,'plan.json'));
+ const authorityRef=await row(authpath);
+-assert.equal(a.state,'ROOT_CONTEXT_INTERLEAVING_HTTP_PROBE_AUTHORIZED_V1');assert.deepEqual(a.sourceIndex,await row(join(here,'index.json')));assert.deepEqual(a.plan,await row(join(here,'plan.json')));
++assert.equal(a.state,'ROOT_UNREF_REUSE_HTTP_PROBE_AUTHORIZED_V1');assert.deepEqual(a.sourceIndex,await row(join(here,'index.json')));assert.deepEqual(a.plan,await row(join(here,'plan.json')));
+ assert(typeof a.runId==='string'&&/^[a-z0-9][a-z0-9-]{0,47}$/.exec(a.runId)?.[0]===a.runId);
++assert.equal(a.firstHostCase,'unref-'+a.runId);
+ for(const k of ['ordinaryProbeAllowed','loopbackServeAllowed'])assert.equal(a[k],true);
+ for(const k of ['appMountAllowed','componentConstructionAllowed','fullNextAcceptanceAllowed','adoptionAllowed'])assert.equal(a[k],false);
+ assert(Array.isArray(a.engineBuildEvidence)&&a.engineBuildEvidence.length>0);assert(Array.isArray(a.nativeProtectedInputs)&&a.nativeProtectedInputs.length>0);assert(Array.isArray(a.nativeSourceFamilies));
+ const extraArtifactRefs=[];
+-async function protect(){await verify(authorityRef);await family(a.sourceIndex);await family(a.constructionCallerIndex);for(const ref of [...plan.sourceFamilies,...a.nativeSourceFamilies])await family(ref);for(const key of ['node','wasmtime','monitor','adapter','nodeOracleSource','probeEntry','probeCases','nodeOracleData','nodeOracleRawIndex'])await verify(plan[key]);for(const key of ['engine','nativeMetadata','constructionResult','component','componentAudit','nodeOracleStdout','nodeOracleTerminal','nodeOracleStarted','nodeOracleHostChecks']){assert.equal(await realpath(a[key].path),a[key].path);await verify(a[key]);}for(const ref of [...extraArtifactRefs,...a.engineBuildEvidence,...a.nativeProtectedInputs])await verify(ref);}
++async function protect(){await verify(authorityRef);await family(a.sourceIndex);await family(a.constructionCallerIndex);for(const ref of [...plan.sourceFamilies,...a.nativeSourceFamilies])await family(ref);for(const key of ['node','wasmtime','monitor','adapter','nodeOracleSource','probeEntry','probeCases','probeValidator','runtimeContract','nodeOracleData','nodeOracleRawIndex'])await verify(plan[key]);for(const key of ['engine','nativeMetadata','constructionResult','component','componentAudit','nodeOracleStdout','nodeOracleTerminal','nodeOracleStarted','nodeOracleHostChecks']){assert.equal(await realpath(a[key].path),a[key].path);await verify(a[key]);}for(const ref of [...extraArtifactRefs,...a.engineBuildEvidence,...a.nativeProtectedInputs])await verify(ref);}
+ await protect();
+ const construction=await read(a.constructionResult.path),audit=await read(a.componentAudit.path);
+ for(const ref of [construction.rootAuthority,construction.plan,...construction.artifacts.engineBuildEvidence]){await verify(ref);extraArtifactRefs.push(ref);}
+ const constructorAuthority=await read(construction.rootAuthority.path),constructorPlan=await read(construction.plan.path);
+-assert.equal(constructorAuthority.state,'ROOT_NEXT_NATIVE_COMPONENT_CONSTRUCTION_V2');assert.deepEqual(constructorAuthority.callerIndex,a.constructionCallerIndex);assert.equal(constructorAuthority.entryMode,'context-interleaving');assert.equal(constructorAuthority.componentizeInitAllowed,true);for(const key of ['ordinaryExportsAllowed','httpServingAllowed','networkAllowed','nativeBuildAllowed','packageMutationAllowed','globalPinMutationAllowed','debugAllowed','applicationMountAtInitAllowed','deployedResnapshotAllowed'])assert.equal(constructorAuthority[key],false);
+-assert.deepEqual(constructorPlan.inputSourceIndex,plan.probeSourceIndex);assert.deepEqual(constructorPlan.entries,{'context-interleaving':plan.probeEntry});assert.equal(constructorPlan.worldName,'next-http');assert.equal(constructorPlan.witDirectory,plan.witDirectory);assert.deepEqual(constructorPlan.selectedInterfaces,plan.selectedInterfaces);
++assert.equal(constructorAuthority.state,'ROOT_NEXT_NATIVE_COMPONENT_CONSTRUCTION_V2');assert.deepEqual(constructorAuthority.callerIndex,a.constructionCallerIndex);assert.equal(constructorAuthority.entryMode,'unref-reuse');assert.equal(constructorAuthority.componentizeInitAllowed,true);for(const key of ['ordinaryExportsAllowed','httpServingAllowed','networkAllowed','nativeBuildAllowed','packageMutationAllowed','globalPinMutationAllowed','debugAllowed','applicationMountAtInitAllowed','deployedResnapshotAllowed'])assert.equal(constructorAuthority[key],false);
++assert.deepEqual(constructorPlan.inputSourceIndex,plan.probeSourceIndex);assert.deepEqual(constructorPlan.entries,{'unref-reuse':plan.probeEntry});assert.equal(constructorPlan.worldName,'next-http');assert.equal(constructorPlan.witDirectory,plan.witDirectory);assert.deepEqual(constructorPlan.selectedInterfaces,plan.selectedInterfaces);
+ const {validateNative}=await import('./native-model.mjs');validateNative(await read(a.nativeMetadata.path),a,constructorAuthority);
+-assert.equal(construction.state,'NEXT_NATIVE_COMPONENT_CONSTRUCTION_PASSED_UNREVIEWED_V2');assert.equal(construction.passed,true);assert.equal(construction.entryMode,'context-interleaving');assert.deepEqual(construction.callerIndex,a.constructionCallerIndex);assert.equal(construction.finalProtection.unchanged,true);assert.equal(construction.error,null);for(const key of ['ordinaryExportsInvoked','httpServed','appMountedAtInit','productionProfilePromoted'])assert.equal(construction[key],false);assert.deepEqual(construction.artifacts.engineBuildEvidence,a.engineBuildEvidence);
++assert.equal(construction.state,'NEXT_NATIVE_COMPONENT_CONSTRUCTION_PASSED_UNREVIEWED_V2');assert.equal(construction.passed,true);assert.equal(construction.entryMode,'unref-reuse');assert.deepEqual(construction.callerIndex,a.constructionCallerIndex);assert.equal(construction.finalProtection.unchanged,true);assert.equal(construction.error,null);for(const key of ['ordinaryExportsInvoked','httpServed','appMountedAtInit','productionProfilePromoted'])assert.equal(construction[key],false);assert.deepEqual(construction.artifacts.engineBuildEvidence,a.engineBuildEvidence);
+ for(const [key,value]of Object.entries({component:a.component,componentAudit:a.componentAudit,inputEntry:plan.probeEntry,inputSourceIndex:plan.probeSourceIndex,engine:a.engine,nativeMetadata:a.nativeMetadata,adapter:plan.adapter}))assert.deepEqual(construction.artifacts[key],value);
+ assert.equal(audit.state,'NEXT_NATIVE_COMPONENT_DATA_AUDIT_PASSED_V1');assert.equal(audit.passed,true);assert.deepEqual(audit.component,a.component);assert.deepEqual([...audit.selectedInterfaces].sort(),[...plan.selectedInterfaces].sort());assert.equal(new Set(audit.emittedImports).size,audit.emittedImports.length);assert(audit.emittedImports.every(x=>plan.selectedInterfaces.includes(x)&&x.endsWith('@0.2.10')));assert.deepEqual(audit.exports,['wasi:http/incoming-handler@0.2.10']);assert.equal(audit.noExternalPreview1OrCustomImports,true);
+-assert.equal(audit.allEmittedVersion,'0.2.10');assert.equal(audit.entryMode,'context-interleaving');
++assert.equal(audit.allEmittedVersion,'0.2.10');assert.equal(audit.entryMode,'unref-reuse');
+ const clean=t=>t.rawExitCode===0&&t.timeout===false&&t.forcedCleanup===false&&t.parentOwnedGroupGone===true&&t.allObservedOwnedGroupsGone===true&&['signals','errors','interruptedSignals','remainingObservedPids'].every(k=>Array.isArray(t[k])&&t[k].length===0);
+ assert.deepEqual(audit.engine,a.engine);assert.deepEqual(audit.nativeMetadata,a.nativeMetadata);
+ for(const key of ['validateTerminal','witTerminal']){await verify(audit[key]);const t=await read(audit[key].path);assert(clean(t));extraArtifactRefs.push(audit[key],t.stdout,t.stderr);}
+@@ -44,7 +45,7 @@
+ assert.deepEqual(construction.commands.map(x=>x.label),['componentize-init','component-validate','component-wit']);for(const command of construction.commands){await verify(command.terminal);const terminal=await read(command.terminal.path);assert(clean(terminal));assert.deepEqual(terminal.authority,construction.rootAuthority);assert.equal(command.rawExitCode,0);assert.equal(command.clean,true);assert.deepEqual(terminal.stdout,command.stdout);assert.deepEqual(terminal.stderr,command.stderr);extraArtifactRefs.push(command.terminal,terminal.stdout,terminal.stderr);}
+ const oracleTerminal=await read(a.nodeOracleTerminal.path);assert(clean(oracleTerminal));assert.deepEqual(oracleTerminal.stdout,a.nodeOracleStdout);extraArtifactRefs.push(oracleTerminal.stderr);
+ const oracleStarted=await read(a.nodeOracleStarted.path),hostChecks=await read(a.nodeOracleHostChecks.path),hostRawIndex=await read(plan.nodeOracleRawIndex.path);
+-assert.deepEqual(a.nodeOracleHostChecks,plan.nodeOracleHostChecks);assert.equal(hostChecks.hostOnly,true);assert.equal(hostChecks.guestOrEngineOrCompilerExecuted,false);assert.equal(hostChecks.passed,true);assert.equal(hostChecks.sourceProtectionPassed,true);
++assert.deepEqual(a.nodeOracleHostChecks,plan.nodeOracleHostChecks);assert.equal(hostChecks.hostOnly,true);assert.equal(hostChecks.guestOrEngineOrCompilerOrNetworkExecuted,false);assert.equal(hostChecks.passed,true);assert.equal(hostChecks.sourceProtectionPassed,true);
+ const oraclePhase=hostChecks.phases.find(x=>x.name==='node-oracle');assert(oraclePhase);assert.deepEqual(oraclePhase.argv,[plan.node.path,plan.nodeOracleSource.path]);assert.deepEqual(oraclePhase.terminal,a.nodeOracleTerminal);assert.deepEqual(oraclePhase.stdout,a.nodeOracleStdout);assert.deepEqual(oraclePhase.stderr,oracleTerminal.stderr);
+ assert.deepEqual(oracleStarted.argv,oraclePhase.argv);assert.equal(oracleStarted.pid,oracleTerminal.pid);assert.equal(oracleStarted.timeoutSeconds,120);assert.deepEqual(oracleStarted.authority,oracleTerminal.authority);await verify(oracleTerminal.authority);extraArtifactRefs.push(oracleTerminal.authority);
+ const startedRow=hostRawIndex.files.find(x=>x.path==='node-oracle/started.json');assert(startedRow);assert.deepEqual(a.nodeOracleStarted,{path:startedRow.originalPath,sha256:startedRow.sha256,bytes:startedRow.bytes});
+@@ -54,12 +55,12 @@
+ 
+ await protect();process.umask(0o077);
+ const output=plan.outputPrefix+'-'+a.runId;assert.equal(resolve(output),output);await mkdir(output,{mode:0o700});
+-const result={schemaVersion:1,state:'CONTEXT_INTERLEAVING_HTTP_PROBE_IN_PROGRESS_V1',runId:a.runId,rootAuthority:await row(authpath),sourceIndex:a.sourceIndex,component:a.component,componentAudit:a.componentAudit,engine:a.engine,nativeMetadata:a.nativeMetadata,engineBuildEvidence:a.engineBuildEvidence,constructionResult:a.constructionResult,constructionCallerIndex:a.constructionCallerIndex,probeSourceIndex:plan.probeSourceIndex,nodeOracleStdout:a.nodeOracleStdout,nodeOracleTerminal:a.nodeOracleTerminal,nodeOracleStarted:a.nodeOracleStarted,nodeOracleHostChecks:a.nodeOracleHostChecks,comparisonScope:'original-Node-public-projection-plus-independent-native-assertions',nativeBoundaryParityClaimed:false,nativeOwnerIdentityOrTeardownProved:false,responses:[],errors:[],server:null,applicationMounted:false,applicationImported:false,fullNextAcceptance:false,adoption:false};
++const result={schemaVersion:1,state:'UNREF_REUSE_HTTP_PROBE_IN_PROGRESS_V1',runId:a.runId,rootAuthority:await row(authpath),sourceIndex:a.sourceIndex,component:a.component,componentAudit:a.componentAudit,engine:a.engine,nativeMetadata:a.nativeMetadata,engineBuildEvidence:a.engineBuildEvidence,constructionResult:a.constructionResult,constructionCallerIndex:a.constructionCallerIndex,probeSourceIndex:plan.probeSourceIndex,nodeOracleStdout:a.nodeOracleStdout,nodeOracleTerminal:a.nodeOracleTerminal,nodeOracleStarted:a.nodeOracleStarted,nodeOracleHostChecks:a.nodeOracleHostChecks,firstHostCase:a.firstHostCase,comparisonScope:'original-Node-public-projection-plus-strict-Source-admission',nativeBoundaryParityClaimed:false,nativeOwnerIdentityOrTeardownProved:false,responses:[],errors:[],server:null,applicationMounted:false,applicationImported:false,fullNextAcceptance:false,adoption:false};
+ const save=()=>writeFile(join(output,'result.json'),JSON.stringify(result,null,2)+'\n',{mode:0o600});await save();
+ const pause=ms=>new Promise(r=>setTimeout(r,ms));const handles=[];let host,hostExit=null,hostDone,stopping=false,lease;
+ const {validate,compare,parseOracle,assessSafety}=await import('./comparison.mjs');
+ // Protected Source contract is loaded before any request/safety decision.
+-const contract=(await read(join(here,'control-contract.json'))).controls;
++const contract=await read(plan.runtimeContract.path);
+ try{
+  lease=createServer();lease.on('error',()=>{});await new Promise((resolve,reject)=>{lease.once('error',reject);lease.listen({host:'127.0.0.1',port:0,exclusive:true},resolve);});const address=lease.address();assert(address&&typeof address==='object'&&address.address==='127.0.0.1');const origin='http://127.0.0.1:'+address.port;result.portLease={origin,port:address.port,singleAttempt:true,fallbackAllowed:false};await save();
+  await protect();await new Promise((resolve,reject)=>lease.close(e=>e?reject(e):resolve()));lease=null;
+@@ -67,23 +68,22 @@
+  let ready=false;const deadline=Date.now()+30000;while(Date.now()<deadline){if(hostExit)throw Error('Server exited before readiness');let log='';for(const path of [server.stdout,server.stderr]){assert((await lstat(path)).size<=8388608);log+=await readFile(path,'utf8');}const found=/Serving HTTP on (http:\/\/127\.0\.0\.1:\d+)/.exec(log)?.[1];if(found){assert.equal(found,origin);ready=true;break;}await pause(50);}assert(ready,'Exact listener unavailable within30s');
+  for(let call=1;call<=3;call++){
+   const record={call};result.responses.push(record);
+-  try{const response=await fetch(origin+'/context-interleaving?call='+call,{signal:AbortSignal.timeout(10000)}),bytes=new Uint8Array(await response.arrayBuffer()),path=join(output,'response-'+call+'.body');await writeFile(path,bytes,{flag:'wx',mode:0o600});record.status=response.status;record.headers=Object.fromEntries(response.headers);record.body=await row(path);record.rawValueType='Uint8Array';}
++  try{const response=await fetch(origin+'/unref-reuse?phase='+plan.phases[call-1]+'&case='+encodeURIComponent(a.firstHostCase),{signal:AbortSignal.timeout(10000)}),bytes=new Uint8Array(await response.arrayBuffer()),path=join(output,'response-'+call+'.body');await writeFile(path,bytes,{flag:'wx',mode:0o600});record.status=response.status;record.headers=Object.fromEntries(response.headers);record.body=await row(path);record.rawValueType='Uint8Array';}
+   catch(error){record.transportError=errorData(error);}await save();
+   if(record.transportError){result.safetyStop={call,reason:'transport-failed-unknown-component-state'};result.discardOwnedServerRequired=true;await save();break;}
+-  record.safety=assessSafety(await readFile(record.body.path),record.status,call,contract);await save();
++  record.safety=assessSafety(await readFile(record.body.path),record.status,call,contract,a.firstHostCase);await save();
+   if(!record.safety.safeToReuse){result.safetyStop={call,...record.safety};result.discardOwnedServerRequired=true;await save();break;}
+  }
+  result.allThreeCaptureAttemptsComplete=result.responses.length===3;result.allThreePassingResponsesCaptured=result.responses.length===3&&result.responses.every(x=>x.safety?.safeToReuse===true);await save();
+  if(result.safetyStop)throw Error('Failed or unknown collection saved; further calls refused and owned server must be discarded: '+result.safetyStop.reason);
+  assert.equal(result.allThreePassingResponsesCaptured,true);
+  // NO oracle parsing or semantic comparison occurs above this fence.
+- const oracleBytes=await readFile(a.nodeOracleStdout.path);await writeFile(join(output,'node-oracle.stdout.jsonl'),oracleBytes,{flag:'wx',mode:0o600});const parsedOracle=parseOracle(new TextDecoder('utf-8',{fatal:true}).decode(oracleBytes),contract),frames=parsedOracle.frames;result.nodeOracleSummary=parsedOracle.summary;result.nodeHostAssertionsVerified=parsedOracle.hostAssertionsVerified;result.nodeHostCollectionsCaptured=6;result.nodeOracleOriginalCollections=parsedOracle.values;result.comparisons=[];
++ const oracleBytes=await readFile(a.nodeOracleStdout.path);await writeFile(join(output,'node-oracle.stdout.jsonl'),oracleBytes,{flag:'wx',mode:0o600});const parsedOracle=parseOracle(new TextDecoder('utf-8',{fatal:true}).decode(oracleBytes),contract);result.nodeOracleSummary=parsedOracle.summary;result.nodeHostCallChecksVerified=parsedOracle.hostCallChecks;result.nodeHostDistinctCallbackChecksVerified=parsedOracle.distinctCallbackChecks;result.nodeHostCallsCaptured=3;result.nodeOracleOriginalCollections=parsedOracle.values;result.comparisons=[];
+  for(let call=1;call<=3;call++){
+-  const record=result.responses[call-1];assert(!record.transportError);assert.equal(record.status,200);assert(record.headers['content-type']?.includes('application/json'));const value=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(await readFile(record.body.path))),frame=frames[call-1];assert.equal(frame.call,call);assert.equal(frame.kind,'whole-collection');assert.equal(frame.variant,'node-original');const expected=parsedOracle.values[call-1];record.typedPayload=value;await save();let verified;try{verified=validate(value,call,contract);}catch(error){record.originalValidationFailure=errorData(error);await save();throw error;}record.nativeAssertionsVerified=verified.assertions;record.requiredEdgesVerified=verified.edges;record.ordinalValidated=true;
+-  result.comparisons.push(...compare(value,expected,call,contract));
+-  await save();
++  const record=result.responses[call-1];assert(!record.transportError);assert.equal(record.status,200);assert(record.headers['content-type']?.includes('application/json'));const value=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(await readFile(record.body.path)));const expected=parsedOracle.values[call-1];record.typedPayload=value;await save();let verified;try{verified=validate(value,call,contract,a.firstHostCase);}catch(error){record.originalValidationFailure=errorData(error);await save();throw error;}record.callChecksVerified=verified.callChecks;record.cumulativeCallbackChecksVerified=verified.callbackChecks;record.ordinalValidated=true;
++  result.comparisons.push(compare(value,expected,call,contract,a.firstHostCase));await save();
+  }
+- result.nativeAssertionsVerified=result.responses.reduce((n,x)=>n+x.nativeAssertionsVerified,0);assert.equal(result.nativeAssertionsVerified,459);result.comparisonComplete=true;result.selectedDifferences=result.comparisons.filter(x=>x.classification==='difference-requires-review').map(x=>({call:x.call,id:x.id}));result.nodeSelectedParity=result.selectedDifferences.length===0;result.nodePublicProjectionParity=result.nodeSelectedParity;
++ result.nativeCallChecksVerified=result.responses.reduce((n,x)=>n+x.callChecksVerified,0);assert.equal(result.nativeCallChecksVerified,51);result.nativeDistinctCallbackChecksVerified=result.responses[2].cumulativeCallbackChecksVerified;assert.equal(result.nativeDistinctCallbackChecksVerified,9);assert.deepEqual(result.responses.map(x=>x.cumulativeCallbackChecksVerified),[0,7,9]);result.callbackInventoriesAreCumulativeNotSummed=true;result.comparisonComplete=true;result.selectedDifferences=result.comparisons.filter(x=>x.classification==='difference-requires-review').map(x=>({call:x.call,phase:x.phase}));result.nodeSelectedParity=result.selectedDifferences.length===0;result.nodePublicProjectionParity=result.nodeSelectedParity;
+ }catch(error){result.errors.push({stage:'probe-or-comparison',...errorData(error)});}
+ finally{
+  if(lease?.listening)await new Promise(resolve=>lease.close(()=>resolve()));
+@@ -92,6 +92,6 @@
+  for(const h of handles)try{await h.close();}catch(error){result.errors.push({stage:'raw-stream-close',...errorData(error)});}
+  try{await protect();result.inputsPreserved=true;}catch(error){result.errors.push({stage:'final-protection',...errorData(error)});}
+  result.observationsValid=result.comparisonComplete===true&&result.errors.length===0&&result.inputsPreserved===true&&result.server?.shutdownRequested===true&&result.server?.sigintSent===true&&result.server?.forcedCleanup===false&&hostExit?.code===0&&hostExit?.signal===null&&hostExit?.error===null;
+- result.state=result.observationsValid?(result.nodeSelectedParity?'CONTEXT_INTERLEAVING_SELECTED_PARITY_OBSERVED_V1':'CONTEXT_INTERLEAVING_SELECTED_DIFFERENCES_OBSERVED_V1'):'CONTEXT_INTERLEAVING_FAILED_OBSERVATION_PRESERVED_V1';await save();
++ result.state=result.observationsValid?(result.nodeSelectedParity?'UNREF_REUSE_SELECTED_PARITY_OBSERVED_V1':'UNREF_REUSE_SELECTED_DIFFERENCES_OBSERVED_V1'):'UNREF_REUSE_FAILED_OBSERVATION_PRESERVED_V1';await save();
+ }
+ console.log(JSON.stringify({state:result.state,observationsValid:result.observationsValid,nodeSelectedParity:result.nodeSelectedParity,selectedDifferences:result.selectedDifferences,errors:result.errors,fullNextAcceptance:false}));process.exitCode=result.observationsValid&&result.nodeSelectedParity?0:1;
+--- contextV2/comparison.mjs
++++ unrefV1/comparison.mjs
+@@ -1,59 +1,49 @@
+-// Pure DATA only. The genuine producer projection imports no platform services
+-// and runs no collection/timer/ALS work at import; only its projection is used.
++// Pure retained DATA only. Imports define functions; no workload/timer/store runs.
+ import assert from 'node:assert/strict';
+ import {isDeepStrictEqual} from 'node:util';
+-import {CONTEXT_CONTROL_IDS,contextPublicProjection} from '../../../async-context/context-interleaving-candidate-v1/cases.mjs';
+-const exact=(x,names)=>{assert(x&&typeof x==='object'&&!Array.isArray(x));assert.deepEqual(Object.keys(x).sort(),[...names].sort());};
+-const sorted=x=>[...x].sort();
+-const edgeKey=e=>JSON.stringify(e);
+-const fail=(control,reason)=>{throw new Error(control+': '+reason);};
+-export function validateCollection(value,call,contract,boundaryMode){
+- exact(value,['schemaVersion','suite','call','boundaryMode','records','passed','logicalBranchesOnly','actualHttpResourceConcurrencyProved','nativeOwnerIdentityOrTeardownProved','resetOrGcWorkload','peakPlannedWaits']);
+- assert.equal(value.schemaVersion,1);assert.equal(value.suite,'CONTEXT_INTERLEAVING_FIVE_CONTROLS_V1');assert.equal(value.call,call);assert.equal(value.boundaryMode,boundaryMode);assert.equal(value.passed,true);
+- assert.equal(value.logicalBranchesOnly,true);for(const k of ['actualHttpResourceConcurrencyProved','nativeOwnerIdentityOrTeardownProved','resetOrGcWorkload'])assert.equal(value[k],false);
+- assert(Number.isInteger(value.peakPlannedWaits)&&value.peakPlannedWaits>=0&&value.peakPlannedWaits<=8);
+- assert(Array.isArray(value.records));assert.deepEqual(value.records.map(r=>r.id),CONTEXT_CONTROL_IDS);assert.deepEqual(contract.map(r=>r.id),CONTEXT_CONTROL_IDS);
+- let assertions=0,edges=0;
+- for(let i=0;i<5;i++){
+-  const r=value.records[i],c=contract[i];exact(r,['id','passed','assertions','events','requiredEdges']);assert.equal(r.passed,true,r.id+': passed');
+-  assert(Array.isArray(r.assertions)&&Array.isArray(r.events)&&Array.isArray(r.requiredEdges));
+-  for(const a of r.assertions){exact(a,['id','passed']);assert.equal(typeof a.id,'string');if(a.passed!==true)fail(r.id,a.id+' is not literal true');}
+-  assert.equal(new Set(r.assertions.map(a=>a.id)).size,r.assertions.length,r.id+': duplicate assertions');
+-  assert.deepEqual(sorted(r.assertions.map(a=>a.id)),c.assertionIds,r.id+': assertion inventory');
+-  assert(r.events.every(x=>typeof x==='string'));assert.equal(new Set(r.events).size,r.events.length,r.id+': duplicate events');assert.deepEqual(sorted(r.events),c.eventIds,r.id+': event inventory');
+-  for(const e of r.requiredEdges){assert(Array.isArray(e)&&e.length===2&&e.every(x=>typeof x==='string'));if(r.events.indexOf(e[0])<0||r.events.indexOf(e[1])<0||r.events.indexOf(e[0])>=r.events.indexOf(e[1]))fail(r.id,'partial-order '+e[0]+' < '+e[1]);}
+-  const actualEdges=r.requiredEdges.map(edgeKey);assert.equal(new Set(actualEdges).size,actualEdges.length);assert.deepEqual(sorted(actualEdges),sorted(c.requiredEdges.map(edgeKey)),r.id+': required-edge inventory');
+-  assertions+=r.assertions.length;edges+=r.requiredEdges.length;
+- }
+- assert.equal(assertions,153);return{assertions,edges};
++import {validateUnrefCollection} from '../../../async-context/unref-reuse-candidate-v1/validation.mjs';
++import {unrefPublicProjection} from '../../../async-context/unref-reuse-candidate-v1/cases.mjs';
++const phases=['A','B','C'];
++const exact=(value,keys)=>{assert(value&&typeof value==='object'&&!Array.isArray(value));assert.deepEqual(Object.keys(value).sort(),[...keys].sort());};
++export function validateCollection(value,call,contract,hostCase,boundaryMode){
++ assert(Number.isInteger(call)&&call>=1&&call<=3);
++ validateUnrefCollection(value,phases[call-1],hostCase,boundaryMode,contract);
++ return{callChecks:value.checks.length,callbackChecks:value.callbackChecks.length};
+ }
+-// This is explicit failed/unknown-state DISPOSAL, not oracle comparison. It may
+-// run only after the complete response file is saved. Never project or resume a
+-// self-reported failed collection, inconsistent boolean, or transport error.
+-export function assessSafety(bytes,status,call,contract){
++export function validate(value,call,contract,hostCase){
++ exact(value,['schemaVersion','marker','call','method','collection']);assert.equal(value.schemaVersion,1);
++ assert.equal(value.marker,'NEXT_NATIVE_UNREF_REUSE_V1');assert.equal(value.call,call);assert.equal(value.method,'GET');
++ return validateCollection(value.collection,call,contract,hostCase,'actual-native-private-boundaries');
++}
++// Invoke only AFTER the complete raw body is durable. No projection/oracle work.
++export function assessSafety(bytes,status,call,contract,hostCase){
+  let value;
+  try{value=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));}
+  catch(error){return{safeToReuse:false,reason:'malformed-or-undecodable-response',error:String(error)};}
+- try{validate(value,call,contract);}
++ try{validate(value,call,contract,hostCase);}
+  catch(error){return{envelope:value,safeToReuse:false,reason:'strict-native-envelope-or-collection-refused',validationFailure:{name:error?.name??typeof error,message:error?.message??String(error),stack:error?.stack??null}};}
+  if(status!==200)return{envelope:value,safeToReuse:false,reason:'http-status-'+status,reportedPassed:value.collection.passed};
+  return{envelope:value,safeToReuse:true,reason:'strict-native-envelope-and-collection-validated'};
+ }
+-export function validate(value,call,contract){
+- exact(value,['schemaVersion','marker','call','method','collection']);assert.equal(value.schemaVersion,1);assert.equal(value.marker,'NEXT_NATIVE_CONTEXT_INTERLEAVING_V1');assert.equal(value.call,call);assert.equal(value.method,'GET');
+- return validateCollection(value.collection,call,contract,'actual-native-private-boundaries');
+-}
+-export function compare(actual,node,call,contract){
+- validate(actual,call,contract);validateCollection(node,call,contract,'node-public-empty-store-projection');
+- const ap=contextPublicProjection(actual.collection),np=contextPublicProjection(node);
+- return ap.records.map((r,i)=>({call,id:r.id,classification:isDeepStrictEqual(r,np.records[i])?'matches-node-public-projection':'difference-requires-review',actualProjection:r,nodeProjection:np.records[i],actualFullRecord:actual.collection.records[i],nodeOriginalFullRecord:node.records[i]}));
++export function compare(actual,node,call,contract,hostCase){
++ validate(actual,call,contract,hostCase);validateCollection(node,call,contract,node.firstHostCase,'node-public-empty-store-projection');
++ const actualProjection=unrefPublicProjection(actual.collection),nodeProjection=unrefPublicProjection(node);
++ return{call,phase:phases[call-1],classification:isDeepStrictEqual(actualProjection,nodeProjection)?'matches-node-public-projection':'difference-requires-review',
++  actualProjection,nodeProjection,actualWholeCollection:actual.collection,nodeOriginalWholeCollection:node};
+ }
+ export function parseOracle(text,contract){
+- assert.equal(typeof text,'string');const frames=text.trim().split('\n').map(x=>JSON.parse(x));assert.equal(frames.length,7);const original=[],facade=[];
+- for(let i=0;i<6;i++){const f=frames[i],call=i%3+1,variant=i<3?'node-original':'node-sealed-facade';exact(f,['kind','variant','call','observed']);assert.equal(f.kind,'whole-collection');assert.equal(f.variant,variant);assert.equal(f.call,call);validateCollection(f.observed,call,contract,'node-public-empty-store-projection');(i<3?original:facade).push(f.observed);}
+- const summary=frames[6];assert.equal(summary.schemaVersion,1);assert.equal(summary.state,'CONTEXT_INTERLEAVING_NODE22_REFERENCE_AND_SEALED_FACADE_HOST_PASSED_V1');assert.equal(summary.passed,true);assert.equal(summary.collections,6);assert.equal(summary.controlsPerCollection,5);assert.deepEqual(summary.variants,['node-original','node-sealed-facade']);assert.deepEqual(summary.calls,[1,2,3]);
+- assert.deepEqual(summary.selectedAssertionCounts,contract.map(r=>({id:r.id,assertions:r.assertionIds.length})));assert.equal(summary.nativeBoundaryParityClaimed,false);assert.equal(summary.guestOrEngineExecuted,false);assert.equal(summary.publicProjectionMatched,true);
+- assert.equal(summary.maxPlannedWaits,Math.max(...frames.slice(0,6).map(f=>f.observed.peakPlannedWaits)));
+- for(let i=0;i<3;i++)assert.deepEqual(contextPublicProjection(original[i]),contextPublicProjection(facade[i]));
+- return{frames,values:original,facade,summary,hostAssertionsVerified:918};
++ assert.equal(typeof text,'string');const frames=text.trim().split('\n').map(JSON.parse);assert.equal(frames.length,5);
++ const identity=frames[0];exact(identity,['kind','hostOnly','version','execArgv','hostCase','nativeOrGuestOrEngineExecuted']);
++ assert.equal(identity.kind,'identity');assert.equal(identity.hostOnly,true);assert.equal(identity.version,'v22.14.0');assert.deepEqual(identity.execArgv,[]);assert.equal(identity.nativeOrGuestOrEngineExecuted,false);
++ const values=[];
++ for(let call=1;call<=3;call++){
++  const f=frames[call];exact(f,['kind','phase','ordinal','observed']);assert.equal(f.kind,'whole-call');assert.equal(f.phase,phases[call-1]);assert.equal(f.ordinal,call);
++  validateCollection(f.observed,call,contract,identity.hostCase,'node-public-empty-store-projection');values.push(f.observed);
++ }
++ const summary=frames[4];exact(summary,['schemaVersion','state','passed','hostOnly','completed','calls','phases','hostCase','policy','finalCleanup','nativeOrGuestOrEngineExecuted','physicalStoreOrNativeOwnerIdentityProved','timerAccuracyOrPermanentCancellationProved']);
++ assert.equal(summary.schemaVersion,1);assert.equal(summary.state,'UNREF_REUSE_NODE22_HOST_REFERENCE_PASSED_V1');assert.equal(summary.passed,true);assert.equal(summary.hostOnly,true);assert.equal(summary.completed,3);assert.deepEqual(summary.calls,[1,2,3]);assert.deepEqual(summary.phases,phases);assert.equal(summary.hostCase,identity.hostCase);assert.equal(summary.policy,'preserve-old-unref-tasks');assert.deepEqual(summary.finalCleanup,values[2].finalCleanup);
++ for(const k of ['nativeOrGuestOrEngineExecuted','physicalStoreOrNativeOwnerIdentityProved','timerAccuracyOrPermanentCancellationProved'])assert.equal(summary[k],false);
++ const hostCallChecks=values.reduce((n,v)=>n+v.checks.length,0),distinctCallbackChecks=values[2].callbackChecks.length;
++ assert.equal(hostCallChecks,51);assert.equal(distinctCallbackChecks,9);assert.deepEqual(values.map(v=>v.callbackChecks.length),[0,7,9]);
++ return{frames,values,summary,identity,hostCallChecks,distinctCallbackChecks,callbackInventoriesAreCumulativeNotSummed:true};
+ }
+--- contextV2/run-owned.py
++++ unrefV1/run-owned.py
+@@ -13,23 +13,24 @@
+ def main():
+     assert __debug__ and sys.dont_write_bytecode and sys.flags.isolated and len(sys.argv)==2
+     os.umask(0o077)
+-    ap=Path(sys.argv[1]).resolve();authority=row(ap);a=read(ap);p=read(HERE/'plan.json');assert a['state']=='ROOT_CONTEXT_INTERLEAVING_HTTP_PROBE_AUTHORIZED_V1';assert a['sourceIndex']==row(HERE/'index.json')and a['plan']==row(HERE/'plan.json');assert isinstance(a['runId'],str)and re.fullmatch('[a-z0-9][a-z0-9-]{0,47}',a['runId'])
++    ap=Path(sys.argv[1]).resolve();authority=row(ap);a=read(ap);p=read(HERE/'plan.json');assert a['state']=='ROOT_UNREF_REUSE_HTTP_PROBE_AUTHORIZED_V1';assert a['sourceIndex']==row(HERE/'index.json')and a['plan']==row(HERE/'plan.json');assert isinstance(a['runId'],str)and re.fullmatch('[a-z0-9][a-z0-9-]{0,47}',a['runId'])
++    assert a['firstHostCase']=='unref-'+a['runId']
+     for k in ['ordinaryProbeAllowed','loopbackServeAllowed']:assert a[k]is True
+     for k in ['appMountAllowed','componentConstructionAllowed','fullNextAcceptanceAllowed','adoptionAllowed']:assert a[k]is False
+     def protect():
+         verify(authority)
+         family(a['sourceIndex']);family(a['constructionCallerIndex'])
+         for ref in p['sourceFamilies']+a['nativeSourceFamilies']:family(ref)
+-        for k in ['node','wasmtime','monitor','adapter','nodeOracleSource','probeEntry','probeCases','nodeOracleData','nodeOracleRawIndex']:verify(p[k])
++        for k in ['node','wasmtime','monitor','adapter','nodeOracleSource','probeEntry','probeCases','probeValidator','runtimeContract','nodeOracleData','nodeOracleRawIndex']:verify(p[k])
+         for k in ['engine','nativeMetadata','constructionResult','component','componentAudit','nodeOracleStdout','nodeOracleTerminal','nodeOracleStarted','nodeOracleHostChecks']:verify(a[k])
+         for ref in a['engineBuildEvidence']+a['nativeProtectedInputs']:verify(ref)
+     protect();output=Path(p['outputPrefix']+'-'+a['runId']);outer=Path(str(output)+'-external-root');assert not output.exists()and not outer.exists();outer.mkdir(mode=0o700)
+-    spec=importlib.util.spec_from_file_location('genuine_original_context_interleaving_outer',p['monitor']['path']);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
++    spec=importlib.util.spec_from_file_location('genuine_original_unref_reuse_outer',p['monitor']['path']);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+     env={k:os.environ[k]for k in ['HOME','USER','LOGNAME']if k in os.environ};env.update(PATH=str(Path(p['node']['path']).parent)+':/usr/bin:/bin',LC_ALL='C',LANG='C')
+     t=m.monitor([p['node']['path'],str(HERE/'collect.mjs'),str(ap)],p['cwd'],env,outer,180,authority);preserved=True
+     try:protect()
+     except BaseException:preserved=False
+     clean=t['parentOwnedGroupGone']and t['allObservedOwnedGroupsGone']and not t['timeout']and not t['forcedCleanup']and all(t[k]==[]for k in ['errors','signals','interruptedSignals','remainingObservedPids']);rp=output/'result.json';r=read(rp)if rp.exists()else None
+-    observation=dict(schemaVersion=1,state='ROOT_CONTEXT_INTERLEAVING_PROBE_OBSERVATION_V1',runId=a['runId'],rawExitCode=t['rawExitCode'],ownedGroupsClean=clean,protectedInputsPreserved=preserved,terminal=row(outer/'terminal.json'),result=row(rp)if r else None,observationsValid=bool(clean and preserved and r and r['observationsValid'] and t['rawExitCode']==(0 if r.get('nodeSelectedParity') else 1)),nodeSelectedParity=r.get('nodeSelectedParity')if r else None,fullNextAcceptance=False,adoption=False)
++    observation=dict(schemaVersion=1,state='ROOT_UNREF_REUSE_PROBE_OBSERVATION_V1',runId=a['runId'],rawExitCode=t['rawExitCode'],ownedGroupsClean=clean,protectedInputsPreserved=preserved,terminal=row(outer/'terminal.json'),result=row(rp)if r else None,observationsValid=bool(clean and preserved and r and r['observationsValid'] and t['rawExitCode']==(0 if r.get('nodeSelectedParity') else 1)),nodeSelectedParity=r.get('nodeSelectedParity')if r else None,fullNextAcceptance=False,adoption=False)
+     (outer/'observation.json').write_text(json.dumps(observation,indent=2)+'\n');print(json.dumps(observation),flush=True);raise SystemExit(0 if observation['observationsValid'] and observation['nodeSelectedParity'] else 1)
+ if __name__=='__main__':main()
+--- contextV2/test-data.mjs
++++ unrefV1/test-data.mjs
+@@ -1,83 +1,67 @@
+-// Pure retained/synthetic DATA mutations only, not ALS/timer/oracle execution.
++// Inert retained/synthetic DATA only. No oracle, timer, ALS, HTTP or guest action.
+ import assert from 'node:assert/strict';
+ import {readFile} from 'node:fs/promises';
+ import {compileFunction} from 'node:vm';
+ import {join} from 'node:path';
+ import {createHash} from 'node:crypto';
+-import {assessSafety as oldAssessSafety,validate as oldValidate} from '../context-interleaving-wasmtime-collector-v1/comparison.mjs';
+-import {assessSafety,validate,validateCollection,compare,parseOracle} from './comparison.mjs';
+-const contract=JSON.parse(await readFile(new URL('./control-contract.json',import.meta.url),'utf8')).controls;
++import {assessSafety,validate,compare,parseOracle} from './comparison.mjs';
++const contract=JSON.parse(await readFile(new URL('../../../async-context/unref-reuse-candidate-v1/future-runtime-contract.json',import.meta.url),'utf8'));
+ const raw=await readFile(new URL('./retained-node-oracle.stdout.jsonl',import.meta.url),'utf8');
+-const oracle=parseOracle(raw,contract),rows=[];
+-const copy=x=>structuredClone(x);
++const oracle=parseOracle(raw,contract),rows=[],hostCase='unref-inert-shape-test';
++const copy=x=>structuredClone(x),encoded=x=>new TextEncoder().encode(JSON.stringify(x));
+ function test(name,body){body();rows.push({name,passed:true});}
+-function envelope(call=1){const collection=copy(oracle.values[call-1]);collection.boundaryMode='actual-native-private-boundaries';return{schemaVersion:1,marker:'NEXT_NATIVE_CONTEXT_INTERLEAVING_V1',call,method:'GET',collection};}
+-const encoded=x=>new TextEncoder().encode(JSON.stringify(x));
+-for(let call=1;call<=3;call++)test('synthetic consumer shape from retained Node public DATA '+call,()=>{const value=envelope(call);assert.equal(validate(value,call,contract).assertions,153);assert(compare(value,oracle.values[call-1],call,contract).every(x=>x.classification==='matches-node-public-projection'));});
+-for(let i=0;i<5;i++)for(const bad of [false,0])test('literal boolean refusal '+contract[i].id+' '+bad,()=>{const value=envelope();value.collection.records[i].assertions[0].passed=bad;assert.throws(()=>validate(value,1,contract));assert.equal(assessSafety(encoded(value),200,1,contract).safeToReuse,false);});
+-let edgeTests=0;
+-for(let i=0;i<5;i++)for(const edge of contract[i].requiredEdges)test('partial-order reversal '+contract[i].id+' '+edge.join('<'),()=>{const value=envelope(),r=value.collection.records[i],a=r.events.indexOf(edge[0]),b=r.events.indexOf(edge[1]);[r.events[a],r.events[b]]=[r.events[b],r.events[a]];assert.throws(()=>validate(value,1,contract),/partial-order/);edgeTests++;});
+-test('independent event ordering is not a total-order gate',()=>{const value=envelope(),r=value.collection.records[0];let found=false;for(let i=0;i<r.events.length-1&&!found;i++){const changed=copy(value),events=changed.collection.records[0].events;[events[i],events[i+1]]=[events[i+1],events[i]];try{validate(changed,1,contract);assert(compare(changed,oracle.values[0],1,contract).every(x=>x.classification==='matches-node-public-projection'));found=true;}catch{}}assert(found);});
+-test('assertion ordering remains raw but public projection sorts it',()=>{const value=envelope();value.collection.records[0].assertions.reverse();assert(compare(value,oracle.values[0],1,contract).every(x=>x.classification==='matches-node-public-projection'));});
+-for(const[name,change]of [
+- ['missing assertion',v=>v.collection.records[0].assertions.pop()],['renamed assertion',v=>v.collection.records[0].assertions[0].id='unknown'],
+- ['duplicate assertion',v=>v.collection.records[0].assertions[0]=copy(v.collection.records[0].assertions[1])],['unknown event',v=>v.collection.records[0].events.push('unknown')],
+- ['missing edge',v=>v.collection.records[0].requiredEdges.pop()],['wrong native mode',v=>v.collection.boundaryMode='node-public-empty-store-projection'],
+- ['caller ordinal',v=>v.collection.call=2],['method',v=>v.method='POST'],['ownership overclaim',v=>v.collection.nativeOwnerIdentityOrTeardownProved=true],
+- ['failure field cannot be filtered',v=>v.collection.records[0].error={type:'null'}],
+-])test('full validation refusal '+name,()=>{const value=envelope();change(value);assert.throws(()=>validate(value,1,contract));});
+-for(const passed of [false,0,null,undefined])test('failed/unknown safety gate '+String(passed),()=>{const value=envelope();value.collection.passed=passed;value.collection.error={type:'null'};const s=assessSafety(encoded(value),500,1,contract);assert.equal(s.safeToReuse,false);assert.deepEqual(s.envelope,JSON.parse(JSON.stringify(value)));});
+-test('positive self-report with failure field still discards',()=>{const value=envelope();value.collection.error={type:'boolean',value:false};assert.equal(assessSafety(encoded(value),200,1,contract).safeToReuse,false);});
+-test('malformed and invalid UTF8 refuse reuse',()=>{assert.equal(assessSafety(new TextEncoder().encode('{bad'),200,1,contract).safeToReuse,false);assert.equal(assessSafety(Uint8Array.of(255),200,1,contract).safeToReuse,false);});
+-test('wrong status and transport-envelope uncertainty refuse reuse',()=>{const v=envelope();assert.equal(assessSafety(encoded(v),503,1,contract).safeToReuse,false);v.marker='unknown';assert.equal(assessSafety(encoded(v),200,1,contract).safeToReuse,false);});
+-for(const[name,change]of [
+- ['six frames not seven',f=>f.pop()],['wrong original variant',f=>f[0].variant='node-sealed-facade'],['bad original ordinal',f=>f[0].call=3],
+- ['failed summary',f=>f[6].passed=false],['invented native parity',f=>f[6].nativeBoundaryParityClaimed=true],
+- ['false facade assertion',f=>f[3].observed.records[0].assertions[0].passed=false],
+-])test('oracle refusal '+name,()=>{const f=raw.trim().split('\n').map(x=>JSON.parse(x));change(f);assert.throws(()=>parseOracle(f.map(x=>JSON.stringify(x)).join('\n'),contract));});
+-// Concrete old-pass/new-refuse witnesses from C's held-f35 review.
+-for(const[name,change]of [
+- ['missing boundaryMode',v=>delete v.collection.boundaryMode],
+- ['native owner overclaim',v=>v.collection.nativeOwnerIdentityOrTeardownProved=true],
+- ['empty assertion inventory',v=>v.collection.records[0].assertions=[]],
+- ['missing required edge',v=>v.collection.records[0].requiredEdges.pop()],
+-])test('actual V1 safety counterexample '+name,()=>{const v=envelope();change(v);assert.equal(oldAssessSafety(encoded(v),200,1).safeToReuse,true);assert.throws(()=>oldValidate(v,1,contract));assert.throws(()=>validate(v,1,contract));const a=assessSafety(encoded(v),200,1,contract);assert.equal(a.safeToReuse,false);assert.deepEqual(a.envelope,v);assert.equal(typeof a.validationFailure.message,'string');assert.equal(typeof a.validationFailure.stack,'string');});
+-for(const[name,change]of [
+- ['wrong boundary',v=>v.collection.boundaryMode='node-public-empty-store-projection'],
+- ['missing logical flag',v=>delete v.collection.logicalBranchesOnly],
+- ['false logical flag',v=>v.collection.logicalBranchesOnly=false],
+- ['missing HTTP scope flag',v=>delete v.collection.actualHttpResourceConcurrencyProved],
+- ['true HTTP scope flag',v=>v.collection.actualHttpResourceConcurrencyProved=true],
+- ['extra unknown scope',v=>v.collection.unknownScope=true],
+- ['missing assertion',v=>v.collection.records[0].assertions.pop()],
+- ['extra assertion ID',v=>v.collection.records[0].assertions.push({id:'unknown',passed:true})],
+- ['reversed edge',v=>{const r=v.collection.records[0],[a,b]=r.requiredEdges[0],i=r.events.indexOf(a),j=r.events.indexOf(b);[r.events[i],r.events[j]]=[r.events[j],r.events[i]];}],
+-])test('strict safety and full validator refusal '+name,()=>{const v=envelope();change(v);assert.throws(()=>validate(v,1,contract));const a=assessSafety(encoded(v),200,1,contract);assert.equal(a.safeToReuse,false);assert(a.validationFailure);assert.deepEqual(a.envelope,v);});
+-test('valid envelope non200 still refuses',()=>{const v=envelope();validate(v,1,contract);assert.equal(assessSafety(encoded(v),500,1,contract).safeToReuse,false);});
+-test('absent protected contract refuses instead of allowing reuse',()=>{const a=assessSafety(encoded(envelope()),200,1,undefined);assert.equal(a.safeToReuse,false);assert(a.validationFailure);});
+-// Exercise the ACTUAL V2 capture-loop text with inert in-memory transport/files,
+-// no host network, filesystem writes, timer, server or oracle invocation. Only
+-// the loop is compiled; none of collect.mjs's action-bearing top level runs.
+-const collector=await readFile(new URL('./collect.mjs',import.meta.url),'utf8');
+-const loop=collector.slice(collector.indexOf(' for(let call=1;call<=3;call++){'),collector.indexOf(' result.allThreeCaptureAttemptsComplete='));
++function envelope(call=1){const collection=copy(oracle.values[call-1]);collection.boundaryMode='actual-native-private-boundaries';collection.firstHostCase=collection.requestedHostCase=hostCase;return{schemaVersion:1,marker:'NEXT_NATIVE_UNREF_REUSE_V1',call,method:'GET',collection};}
++for(let call=1;call<=3;call++)test('retained host DATA native-shaped envelope '+call,()=>{
++ const value=envelope(call),v=validate(value,call,contract,hostCase);assert.equal(v.callChecks,[13,20,18][call-1]);assert.equal(v.callbackChecks,[0,7,9][call-1]);
++ assert.equal(assessSafety(encoded(value),200,call,contract,hostCase).safeToReuse,true);
++ assert.equal(compare(value,oracle.values[call-1],call,contract,hostCase).classification,'matches-node-public-projection');
++});
++for(let call=1;call<=3;call++)for(const[name,change]of[
++ ['missing boundary',v=>delete v.collection.boundaryMode],['wrong boundary',v=>v.collection.boundaryMode='node-public-empty-store-projection'],
++ ['wrong first tag',v=>v.collection.firstHostCase='other'],['wrong requested tag',v=>v.collection.requestedHostCase='other'],
++ ['wrong ordinal',v=>v.collection.ordinal=0],['wrong phase',v=>v.collection.phase='unknown'],
++ ['false collection',v=>v.collection.passed=false],['nonboolean collection',v=>v.collection.passed=1],
++ ['early delivery inconclusive',v=>v.collection.coverage='inconclusive-callback-before-B-entry'],
++ ['owner overclaim',v=>v.collection.physicalStoreOrNativeOwnerIdentityProved=true],['unknown scope',v=>v.collection.newScope=false],
++ ['empty check inventory',v=>v.collection.checks=[]],['missing check',v=>v.collection.checks.pop()],
++ ['extra check',v=>v.collection.checks.push({id:'extra',passed:true})],['false check',v=>v.collection.checks[0].passed=false],
++ ['nonboolean check',v=>v.collection.checks[0].passed=1],['wrong marker identity',v=>v.collection.observations[0].firstIdentity=false],
++ ['wrong context label',v=>v.collection.observations[0].firstLabel='wrong'],['candidate delivered',v=>v.collection.counts.candidate=1],
++ ['unknown pending count',v=>v.collection.plannedHandles.pending=99],['failure field',v=>v.collection.error={type:'null'}],
++])test('strict safety/full refusal '+call+' '+name,()=>{const v=envelope(call);change(v);assert.throws(()=>validate(v,call,contract,hostCase));const s=assessSafety(encoded(v),200,call,contract,hostCase);assert.equal(s.safeToReuse,false);assert.deepEqual(s.envelope,v);assert.equal(typeof s.validationFailure.message,'string');});
++test('missing distinct callback check refuses',()=>{const v=envelope(3);v.collection.callbackChecks.pop();assert.equal(assessSafety(encoded(v),200,3,contract,hostCase).safeToReuse,false);});
++test('unsafe final cleanup refuses',()=>{const v=envelope(3);v.collection.finalCleanup.workloadPendingAfterClear=1;assert.equal(assessSafety(encoded(v),200,3,contract,hostCase).safeToReuse,false);});
++for(const status of [400,500,503])test('whole valid envelope wrong HTTP status '+status,()=>{assert.equal(assessSafety(encoded(envelope()),status,1,contract,hostCase).safeToReuse,false);});
++test('missing protected contract refuses',()=>{assert.equal(assessSafety(encoded(envelope()),200,1,undefined,hostCase).safeToReuse,false);});
++test('malformed UTF8/JSON refuse',()=>{for(const b of [Uint8Array.of(255),new TextEncoder().encode('{bad')])assert.equal(assessSafety(b,200,1,contract,hostCase).safeToReuse,false);});
++for(const[name,change]of[
++ ['missing frame',f=>f.pop()],['wrong identity version',f=>f[0].version='v0'],['wrong first tag',f=>f[2].observed.firstHostCase='other'],
++ ['missing check',f=>f[1].observed.checks.pop()],['wrong call',f=>f[2].ordinal=1],['false summary',f=>f[4].passed=false],
++ ['invented ownership',f=>f[4].physicalStoreOrNativeOwnerIdentityProved=true],['wrong final cleanup',f=>f[4].finalCleanup.workloadPendingAfterClear=1],
++])test('oracle DATA refusal '+name,()=>{const f=raw.trim().split('\n').map(x=>JSON.parse(x));change(f);assert.throws(()=>parseOracle(f.map(x=>JSON.stringify(x)).join('\n'),contract));});
++// ACTUAL collector loop text, with inert in-memory transport/file/signal functions.
++const text=await readFile(new URL('./collect.mjs',import.meta.url),'utf8');
++const loop=text.slice(text.indexOf(' for(let call=1;call<=3;call++){'),text.indexOf(' result.allThreeCaptureAttemptsComplete='));
+ assert(loop.startsWith(' for(let call=1;call<=3;call++){')&&loop.endsWith(' }\n'));
+-const runLoop=compileFunction('return (async()=>{'+loop+';return result;})();',['result','fetch','origin','writeFile','row','join','output','errorData','save','assessSafety','readFile','contract','AbortSignal']);
+-async function loopTest(name,failedCall){
++const runLoop=compileFunction('return(async()=>{'+loop+';return result;})();',['result','fetch','origin','writeFile','row','join','output','errorData','save','assessSafety','readFile','contract','AbortSignal','plan','a']);
++async function loopTest(name,failCall,transport=false){
+  const result={responses:[]},files=new Map(),snapshots=[],decisions=[];let fetches=0;
+- const fetch=async url=>{fetches++;assert.equal(url,'http://pure-data.invalid/context-interleaving?call='+fetches);const v=envelope(fetches);if(fetches===failedCall)delete v.collection.boundaryMode;const bytes=encoded(v);return{status:200,headers:new Map([['content-type','application/json']]),arrayBuffer:async()=>bytes.buffer};};
++ const fetch=async url=>{fetches++;assert.equal(url,'http://pure-data.invalid/unref-reuse?phase='+['A','B','C'][fetches-1]+'&case='+hostCase);if(transport&&fetches===failCall)throw Error('inert transport failure');const v=envelope(fetches);if(fetches===failCall)delete v.collection.boundaryMode;const bytes=encoded(v);return{status:200,headers:new Map([['content-type','application/json']]),arrayBuffer:async()=>bytes.buffer};};
+  const write=async(path,bytes)=>{assert(!files.has(path));files.set(path,new Uint8Array(bytes));};
+  const row=async path=>({path,bytes:files.get(path).length,sha256:createHash('sha256').update(files.get(path)).digest('hex')});
+  const save=async()=>snapshots.push(copy(result));
+- const gate=(bytes,status,call,c)=>{const path='/pure-data/response-'+call+'.body';assert(files.has(path));assert(snapshots.some(s=>s.responses[call-1]?.body?.path===path));const a=assessSafety(bytes,status,call,c);decisions.push(a);return a;};
+- await runLoop(result,fetch,'http://pure-data.invalid',write,row,join,'/pure-data',e=>({message:String(e)}),save,gate,async path=>files.get(path),contract,{timeout(ms){assert.equal(ms,10000);return{inertTestSignal:true};}});
+- assert.equal(fetches,failedCall??3);assert.equal(result.responses.length,fetches);
+- if(failedCall){assert.equal(result.discardOwnedServerRequired,true);assert.equal(result.safetyStop.call,failedCall);assert(result.safetyStop.validationFailure);assert.equal(decisions.at(-1).safeToReuse,false);}
+- else{assert.equal(result.safetyStop,undefined);assert(decisions.every(x=>x.safeToReuse));}
++ const gate=(bytes,status,call,c,tag)=>{const path='/pure-data/response-'+call+'.body';assert(files.has(path));assert(snapshots.some(s=>s.responses[call-1]?.body?.path===path));const decision=assessSafety(bytes,status,call,c,tag);decisions.push(decision);return decision;};
++ await runLoop(result,fetch,'http://pure-data.invalid',write,row,join,'/pure-data',e=>({message:String(e)}),save,gate,async p=>files.get(p),contract,{timeout(ms){assert.equal(ms,10000);return{inertTestSignal:true};}},{phases:['A','B','C']},{firstHostCase:hostCase});
++ assert.equal(fetches,failCall??3);assert.equal(result.responses.length,fetches);
++ if(failCall){assert.equal(result.discardOwnedServerRequired,true);assert.equal(result.safetyStop.call,failCall);if(!transport){assert.equal(decisions.at(-1).safeToReuse,false);assert(result.safetyStop.validationFailure);}}
++ else{assert.equal(result.safetyStop,undefined);assert(decisions.every(d=>d.safeToReuse===true));}
+  rows.push({name,passed:true});
+ }
+-await loopTest('actual capture loop stops before second request on unknown first state',1);
+-await loopTest('actual capture loop stops before third request on unknown second state',2);
+-await loopTest('actual capture loop retains all three only on strict safety success',undefined);
+-
+-assert.equal(oracle.hostAssertionsVerified,918);
+-console.log(JSON.stringify({schemaVersion:1,pureDataCases:rows.length,passed:rows.length,requiredEdgeReversals:edgeTests,hostAssertionsRead:918,syntheticNativeShapes:3,actualGuestAssertionsVerified:0,rows,oracleInvoked:false,collectorInvoked:false,guestInvoked:false}));
++await loopTest('actual capture loop refuses unsafe first before request2',1);
++await loopTest('actual capture loop refuses unsafe second before request3',2);
++await loopTest('actual capture loop retains unsafe third and refuses comparison',3);
++await loopTest('actual capture loop stops on transport failure before request3',2,true);
++await loopTest('actual capture loop retains all3 on Source safety success',undefined);
++assert.equal(oracle.hostCallChecks,51);assert.equal(oracle.distinctCallbackChecks,9);
++console.log(JSON.stringify({passed:true,pureDataCases:rows.length,hostCallChecksRead:51,hostDistinctCallbackChecksRead:9,
++ cumulativeCallbackInventories:[0,7,9],syntheticNativeShapesOnly:true,oracleReexecuted:false,collectorInvoked:false,guestOrNetworkOrTimerWorkloadInvoked:false,rows}));

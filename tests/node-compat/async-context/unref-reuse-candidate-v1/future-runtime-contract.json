@@ -1,0 +1,451 @@
+{
+  "schemaVersion": 1,
+  "suite": "UNREF_ACROSS_ORDINARY_CALLS_V1",
+  "state": "UNREF_REUSE_ORDINARY_THREE_CALL_SOURCE_CONTRACT_V1",
+  "requiredKeys": [
+    "schemaVersion",
+    "suite",
+    "phase",
+    "ordinal",
+    "firstHostCase",
+    "requestedHostCase",
+    "policy",
+    "boundaryMode",
+    "delays",
+    "coverage",
+    "passed",
+    "checks",
+    "callbackChecks",
+    "observations",
+    "counts",
+    "plannedHandles",
+    "sameTagAndOrdinalContinuityOnly",
+    "asyncResourceIdsUsed",
+    "physicalStoreOrNativeOwnerIdentityProved",
+    "nativeQueueOrRetirementProved",
+    "exactTimerAccuracyOrPerformanceClaimed"
+  ],
+  "requiredConstants": {
+    "schemaVersion": 1,
+    "suite": "UNREF_ACROSS_ORDINARY_CALLS_V1",
+    "policy": "preserve-old-unref-tasks",
+    "delays": {
+      "oldCallbackMs": 100,
+      "cancelCandidateMs": 1000,
+      "bReferenceFenceMs": 1100,
+      "cReferenceFenceMs": 100
+    },
+    "coverage": "complete",
+    "passed": true,
+    "sameTagAndOrdinalContinuityOnly": true,
+    "asyncResourceIdsUsed": false,
+    "physicalStoreOrNativeOwnerIdentityProved": false,
+    "nativeQueueOrRetirementProved": false,
+    "exactTimerAccuracyOrPerformanceClaimed": false
+  },
+  "controls": {
+    "A": {
+      "ordinal": 1,
+      "checksIds": [
+        "phase-matches-ordinal",
+        "same-first-host-case",
+        "A:fresh-entry:first-identity",
+        "A:fresh-entry:second-identity",
+        "A-old:unref-returns-same",
+        "A-old:hasRef-false-at-arm",
+        "A-cancel-candidate:unref-returns-same",
+        "A-cancel-candidate:hasRef-false-at-arm",
+        "A:after-arms:first-identity",
+        "A:after-arms:second-identity",
+        "A:no-callback-before-return",
+        "A:caller-restored:first-identity",
+        "A:caller-restored:second-identity"
+      ],
+      "callbackChecksIds": [],
+      "observations": [
+        {
+          "sequence": 1,
+          "id": "A:fresh-entry",
+          "phase": "created",
+          "ordinal": 1,
+          "firstLabel": "undefined",
+          "secondLabel": "undefined"
+        },
+        {
+          "sequence": 2,
+          "id": "A:after-arms",
+          "phase": "A-active",
+          "ordinal": 1,
+          "firstLabel": "A:first",
+          "secondLabel": "A:second"
+        },
+        {
+          "sequence": 3,
+          "id": "A:caller-restored",
+          "phase": "A-active",
+          "ordinal": 1,
+          "firstLabel": "undefined",
+          "secondLabel": "undefined"
+        }
+      ],
+      "counts": {
+        "old": 0,
+        "candidate": 0,
+        "bReference": 0,
+        "cReference": 0
+      },
+      "plannedHandles": {
+        "pending": 2,
+        "peak": 2,
+        "totalScheduled": 2,
+        "clearAttempts": 0,
+        "clearErrors": []
+      }
+    },
+    "B": {
+      "ordinal": 2,
+      "checksIds": [
+        "phase-matches-ordinal",
+        "same-first-host-case",
+        "B:fresh-entry:first-identity",
+        "B:fresh-entry:second-identity",
+        "B:before-referenced-interest:first-identity",
+        "B:before-referenced-interest:second-identity",
+        "B-reference:ref-returns-same",
+        "B-reference:hasRef-true-at-arm",
+        "B:before-cross-call-clear:first-identity",
+        "B:before-cross-call-clear:second-identity",
+        "B:after-cross-call-clear:first-identity",
+        "B:after-cross-call-clear:second-identity",
+        "B:continuation-restored:first-identity",
+        "B:continuation-restored:second-identity",
+        "B:old-A-delivered-once-during-B",
+        "B:cancelled-candidate-not-delivered",
+        "B:referenced-callback-once",
+        "B:all-callback-context-observations-pass",
+        "B:caller-restored:first-identity",
+        "B:caller-restored:second-identity"
+      ],
+      "callbackChecksIds": [
+        "A-old:exactly-once",
+        "A-old:during-B-interest",
+        "A-old:origin-object-and-case-retained",
+        "A-old:captured-context:first-identity",
+        "A-old:captured-context:second-identity",
+        "B-reference:callback:first-identity",
+        "B-reference:callback:second-identity"
+      ],
+      "observations": [
+        {
+          "sequence": 1,
+          "id": "A:fresh-entry",
+          "phase": "created",
+          "ordinal": 1,
+          "firstLabel": "undefined",
+          "secondLabel": "undefined"
+        },
+        {
+          "sequence": 2,
+          "id": "A:after-arms",
+          "phase": "A-active",
+          "ordinal": 1,
+          "firstLabel": "A:first",
+          "secondLabel": "A:second"
+        },
+        {
+          "sequence": 3,
+          "id": "A:caller-restored",
+          "phase": "A-active",
+          "ordinal": 1,
+          "firstLabel": "undefined",
+          "secondLabel": "undefined"
+        },
+        {
+          "sequence": 4,
+          "id": "B:fresh-entry",
+          "phase": "A-returned",
+          "ordinal": 2,
+          "firstLabel": "undefined",
+          "secondLabel": "undefined"
+        },
+        {
+          "sequence": 5,
+          "id": "B:before-referenced-interest",
+          "phase": "B-active",
+          "ordinal": 2,
+          "firstLabel": "B:first",
+          "secondLabel": "B:second"
+        },
+        {
+          "sequence": 6,
+          "id": "B:before-cross-call-clear",
+          "phase": "B-active",
+          "ordinal": 2,
+          "firstLabel": "B:first",
+          "secondLabel": "B:second"
+        },
+        {
+          "sequence": 7,
+          "id": "B:after-cross-call-clear",
+          "phase": "B-active",
+          "ordinal": 2,
+          "firstLabel": "B:first",
+          "secondLabel": "B:second"
+        },
+        {
+          "sequence": 8,
+          "id": "A-old:captured-context",
+          "phase": "B-active",
+          "ordinal": 2,
+          "firstLabel": "A:first",
+          "secondLabel": "A:second"
+        },
+        {
+          "sequence": 9,
+          "id": "B-reference:callback",
+          "phase": "B-active",
+          "ordinal": 2,
+          "firstLabel": "B:first",
+          "secondLabel": "B:second"
+        },
+        {
+          "sequence": 10,
+          "id": "B:continuation-restored",
+          "phase": "B-active",
+          "ordinal": 2,
+          "firstLabel": "B:first",
+          "secondLabel": "B:second"
+        },
+        {
+          "sequence": 11,
+          "id": "B:caller-restored",
+          "phase": "B-active",
+          "ordinal": 2,
+          "firstLabel": "undefined",
+          "secondLabel": "undefined"
+        }
+      ],
+      "counts": {
+        "old": 1,
+        "candidate": 0,
+        "bReference": 1,
+        "cReference": 0
+      },
+      "plannedHandles": {
+        "pending": 0,
+        "peak": 3,
+        "totalScheduled": 3,
+        "clearAttempts": 1,
+        "clearErrors": []
+      }
+    },
+    "C": {
+      "ordinal": 3,
+      "checksIds": [
+        "phase-matches-ordinal",
+        "same-first-host-case",
+        "C:fresh-entry:first-identity",
+        "C:fresh-entry:second-identity",
+        "C:before-normal-grace:first-identity",
+        "C:before-normal-grace:second-identity",
+        "C-reference:ref-returns-same",
+        "C-reference:hasRef-true-at-arm",
+        "C:continuation-restored:first-identity",
+        "C:continuation-restored:second-identity",
+        "C:old-A-still-exactly-once",
+        "C:cancelled-candidate-still-zero",
+        "C:both-referenced-fences-once",
+        "C:all-callback-observations-pass",
+        "C:caller-restored:first-identity",
+        "C:caller-restored:second-identity",
+        "C:local-planned-handles-settled-or-cleared",
+        "C:clear-operations-did-not-throw"
+      ],
+      "callbackChecksIds": [
+        "A-old:exactly-once",
+        "A-old:during-B-interest",
+        "A-old:origin-object-and-case-retained",
+        "A-old:captured-context:first-identity",
+        "A-old:captured-context:second-identity",
+        "B-reference:callback:first-identity",
+        "B-reference:callback:second-identity",
+        "C-reference:callback:first-identity",
+        "C-reference:callback:second-identity"
+      ],
+      "observations": [
+        {
+          "sequence": 1,
+          "id": "A:fresh-entry",
+          "phase": "created",
+          "ordinal": 1,
+          "firstLabel": "undefined",
+          "secondLabel": "undefined"
+        },
+        {
+          "sequence": 2,
+          "id": "A:after-arms",
+          "phase": "A-active",
+          "ordinal": 1,
+          "firstLabel": "A:first",
+          "secondLabel": "A:second"
+        },
+        {
+          "sequence": 3,
+          "id": "A:caller-restored",
+          "phase": "A-active",
+          "ordinal": 1,
+          "firstLabel": "undefined",
+          "secondLabel": "undefined"
+        },
+        {
+          "sequence": 4,
+          "id": "B:fresh-entry",
+          "phase": "A-returned",
+          "ordinal": 2,
+          "firstLabel": "undefined",
+          "secondLabel": "undefined"
+        },
+        {
+          "sequence": 5,
+          "id": "B:before-referenced-interest",
+          "phase": "B-active",
+          "ordinal": 2,
+          "firstLabel": "B:first",
+          "secondLabel": "B:second"
+        },
+        {
+          "sequence": 6,
+          "id": "B:before-cross-call-clear",
+          "phase": "B-active",
+          "ordinal": 2,
+          "firstLabel": "B:first",
+          "secondLabel": "B:second"
+        },
+        {
+          "sequence": 7,
+          "id": "B:after-cross-call-clear",
+          "phase": "B-active",
+          "ordinal": 2,
+          "firstLabel": "B:first",
+          "secondLabel": "B:second"
+        },
+        {
+          "sequence": 8,
+          "id": "A-old:captured-context",
+          "phase": "B-active",
+          "ordinal": 2,
+          "firstLabel": "A:first",
+          "secondLabel": "A:second"
+        },
+        {
+          "sequence": 9,
+          "id": "B-reference:callback",
+          "phase": "B-active",
+          "ordinal": 2,
+          "firstLabel": "B:first",
+          "secondLabel": "B:second"
+        },
+        {
+          "sequence": 10,
+          "id": "B:continuation-restored",
+          "phase": "B-active",
+          "ordinal": 2,
+          "firstLabel": "B:first",
+          "secondLabel": "B:second"
+        },
+        {
+          "sequence": 11,
+          "id": "B:caller-restored",
+          "phase": "B-active",
+          "ordinal": 2,
+          "firstLabel": "undefined",
+          "secondLabel": "undefined"
+        },
+        {
+          "sequence": 12,
+          "id": "C:fresh-entry",
+          "phase": "B-returned",
+          "ordinal": 3,
+          "firstLabel": "undefined",
+          "secondLabel": "undefined"
+        },
+        {
+          "sequence": 13,
+          "id": "C:before-normal-grace",
+          "phase": "C-active",
+          "ordinal": 3,
+          "firstLabel": "C:first",
+          "secondLabel": "C:second"
+        },
+        {
+          "sequence": 14,
+          "id": "C-reference:callback",
+          "phase": "C-active",
+          "ordinal": 3,
+          "firstLabel": "C:first",
+          "secondLabel": "C:second"
+        },
+        {
+          "sequence": 15,
+          "id": "C:continuation-restored",
+          "phase": "C-active",
+          "ordinal": 3,
+          "firstLabel": "C:first",
+          "secondLabel": "C:second"
+        },
+        {
+          "sequence": 16,
+          "id": "C:caller-restored",
+          "phase": "C-active",
+          "ordinal": 3,
+          "firstLabel": "undefined",
+          "secondLabel": "undefined"
+        }
+      ],
+      "counts": {
+        "old": 1,
+        "candidate": 0,
+        "bReference": 1,
+        "cReference": 1
+      },
+      "plannedHandles": {
+        "pending": 0,
+        "peak": 3,
+        "totalScheduled": 4,
+        "clearAttempts": 5,
+        "clearErrors": []
+      }
+    }
+  },
+  "finalCleanup": {
+    "workloadClearAttempts": 9,
+    "workloadPendingAfterClear": 0,
+    "storesDisableCalls": 2,
+    "errors": [],
+    "nativeQueueOrRootReleaseProved": false
+  },
+  "derivation": {
+    "sharedSource": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/unref-reuse-candidate-v1/cases.mjs",
+      "bytes": 10555,
+      "sha256": "6f13c9b7166afb96d8be0dc42869fb8d42a778076cee023a05a3ec939eb9116a"
+    },
+    "actualHostOracle": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/unref-reuse-candidate-v1/node-oracle.stdout.jsonl",
+      "bytes": 12095,
+      "sha256": "b085710ad0f5a6e1a4e05ce67f5433972cea8cf43d3f5c5cc0bdc89af2d4279e"
+    },
+    "sourceContractInvariantsCheckedAgainstFirstActualHostObservations": true
+  },
+  "futureRequirements": {
+    "exactRootFirstHostCase": true,
+    "httpStatus200": true,
+    "fullBodyDurableBeforeValidation": true,
+    "validateUnrefCollectionBeforeNextRequest": true,
+    "unknownOrFailedStateDiscardImmediately": true,
+    "allThreePassingFullBodiesBeforeNodeProjection": true,
+    "compareOriginalNodeProjectionPerOrdinal": true,
+    "wholeRawPreserved": true,
+    "guestProofIsPending": true
+  }
+}
