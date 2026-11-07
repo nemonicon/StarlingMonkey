@@ -25,9 +25,16 @@ Headroom recovered before launch: stock admitted1,638,600,704 free bytes and
 native1,578,336,256, above the unchanged1GiB Root start floor. These are start
 observations, not a measured peak or continuous disk guard. No new engine or
 component was built: existing1c3108d2 loads the genuinely fresh `/app` tree.
-The fresh wasmCloud cold8 trial also passes, as described below. Next is the
-predeclared browser cohort; safe repeat namespaces for matched Node are now
-Source-reviewed, with the reusable control CLI in review. Earlier capacity
+The fresh wasmCloud cold8 trial also passes. The fixed three-pair browser
+cohort is now complete: **5/6 runs pass, so the all-six strict gate fails**. Native3/3 pass, matched
+Node2/3 pass. All144 HTTP checks and12 browser functions pass, but p3-stock
+reproduces action POST `ERR_ABORTED` with no captured body. All six cleanup,
+source/world and helper checks pass; no sample was retried or filtered. This
+reproduces the symptom under the matched Node bridge and does not identify its
+cause. The [portable cohort DATA review](tests/node-compat/frameworks/nextjs/next-browser-reliability-root-results-v1/cohort-review/README.md)
+is sealedd9ffd359/2008, retains580 logical records and passes Root readback with
+strictCohortGatePassed:false. Direct unmodified standalone Node comparison now
+also passes once, as described below; no cause is inferred. Earlier capacity
 holds and preparation-only observations below retain their original scopes.
 
 
@@ -300,12 +307,49 @@ fresh second-host contract third; unrelated API expansion and a new engine build
 are outside that immediate critical path.
 
 The [browser reliability protocol](docs/node-compat/nextjs-browser-reliability-plan.md)
-is now written and remains unexecuted. After first fresh-app paired acceptance,
-it predeclares three additional pairs in alternating arm order, retaining all
-outcomes without favorable replacement, error filtering or longer limits. The
-stock runner's fixed output namespace needs a genuine reviewed successor before
-that cohort; no repeat flag is invented. Three positive pairs would establish
-finite observations, not a cause, failure-rate bound or general reliability.
+has now run its exact three additional pairs in alternating arm order, retaining
+all outcomes without favorable replacement, error filtering or longer limits.
+StockV4/1770abb8 and its reusable control CLI provide reviewed safe namespaces;
+73 selector and76 single-member-launcher inert checks pass. Exact registry
+c185f2f8 fixes six authorities/argvs/outputs and23 shared inputs plus prerequisite
+review83988ce9. Root explicitly selected each member and audited all six, including
+the last. Final-audit state is COHORT_COMPLETE_STRICT_GATE_FAILED_V1: raw exits
+0,0,0,0,1,0. Native3/3, stock2/3, overall5/6 strict runs pass;144/144HTTP and
+12/12 browser functions pass. This does not meet the all-six strict gate.
+The p3-stock CDP candidate reports200/data/ERR_ABORTED,canceled:true and no
+loadingFinished, before explicit context closure. Its3 observer errors stay
+failed and no body/hash is invented from byte counters. Primary failure is
+about45.5ms before context close; arrival order is not cross-clock causality.
+This matched Node reproduction changes the investigation, not the error policy.
+Finite positive runs do not establish a cause, failure-rate bound or reliability.
+The [pinned client Source analysis](tests/node-compat/frameworks/nextjs/next-browser-reliability-root-results-v1/source-analysis-v1/README.md)
+is sealed841c597c/1031 and independently reviewed: the selected production POST
+has no signal, its compiled fetch wrapper is pass-through with cacheComponents
+false, and React can return the Flight root while its reader continues toward
+EOF. No explicit abort was identified on that path. History/context-close
+arrival order and equal byte counters are not causal or EOF proof.
+
+The [first direct unmodified standalone control](tests/node-compat/frameworks/nextjs/direct-standalone-control-root-results-v1/README.md)
+now passes the same24HTTP/cache/stream/2strict-browser contract, with empty
+error arrays. SourceV2e3988d57 and grant06af77ea run bare Node22.14 plus verbatim
+ownedserver.js, without Module provider/HTTP bridge/preload/IPC. Result13b50c79/
+6864 and outer61630087/5833 record controller/client0, declared serverSIGINT130,
+no exit signal/force and original source preserved. SIGINT130 is an explicit
+source-derived shutdown convention for this separate control, never a filter
+for HTTP/browser failure. V1's cleanup-status/raw0 reporting coupling was
+corrected in a genuine V2 before any direct actor; ownership-clean is now
+independent while acceptance still requires raw0. Launch admitted1,286,488,064
+bytes above1GiB. The [portable direct-control DATA review](tests/node-compat/frameworks/nextjs/direct-standalone-control-root-results-v1/actual-review/README.md)
+is sealed8b85ab6d/1715, retains143 logical originals and passes Root readback.
+This single positive
+comparison does not accept the failed cohort or identify its abort cause.
+The extra-CDP-session-off browser/stock controls are now held and independently
+reviewed: browserf73c2434/3413, workerd46dbb4b/26248 and stockV5de7f0b14/5224.
+Only the additional diagnostic session is disabled; Playwright's built-in
+protocol, all functional bodies, five pins,20s/500ms and request/body/error gates
+remain unchanged.42 browser and116 stock inert/read-only checks pass. No such
+actor has run yet, and a positive control cannot accept the failed original
+cohort. A finite separately declared stock-only comparison is next.
 The first V5 abort and later old-app CDP positives remain separate. Fresh-app
 wasmCloud admission [SourceV4](tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v4/README.md)
 is now sealed8236614e/4170 and independently reviewed, with31 inert checks,

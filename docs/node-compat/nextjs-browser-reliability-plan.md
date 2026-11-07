@@ -1,9 +1,13 @@
 # Next browser reliability: finite future control
 
-The **three-pair cohort is unexecuted**. Its prerequisite first fresh-application
-pair now passes; the [sealed DATA reader](../../tests/node-compat/frameworks/nextjs/next-app-runtime-root-results-v1/first-pair-review/README.md)
-passes Root readback. This protocol does not change timeouts, acceptance rules,
-application code or existing evidence.
+The **three-pair cohort is complete:5/6 runs pass, so the all-six strict gate fails**. Native3/3
+runs pass; matched Node2/3 pass. All144HTTP checks and12browser functions pass,
+but p3-stock records an action POST ERR_ABORTED and unavailable body. Its failure
+is preserved, all six cleanup/protection audits pass, and no member was retried.
+The prerequisite [first fresh-app paired DATA reader](../../tests/node-compat/frameworks/nextjs/next-app-runtime-root-results-v1/first-pair-review/README.md)
+passes Root readback. The [cohort DATA reader](../../tests/node-compat/frameworks/nextjs/next-browser-reliability-root-results-v1/cohort-review/README.md)
+validates580 logical records with strictCohortGatePassed:false. This protocol did not
+change timeouts, acceptance rules, application code or earlier evidence.
 
 The [first integrated V5 run](../../tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/full-next-io-v5-first-review/README.md)
 remains failed:24HTTP/cache/strict streaming and both browser functions passed,
@@ -28,19 +32,20 @@ It used held [BrowserV3](../../tests/node-compat/frameworks/nextjs/browser-hydra
 and [nativeV7](../../tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v7/README.md).
 Source readiness or a live launch alone would not close that gate.
 
-Only then predeclare **three additional pairs**, six fresh actor runs, in order:
+The predeclared **three additional pairs**, six fresh actor runs, ran in order:
 
 | Pair | First arm | Second arm |
 | --- | --- | --- |
-|1|Stock Node|Native Wasmtime|
-|2|Native Wasmtime|Stock Node|
-|3|Stock Node|Native Wasmtime|
+|1|Stock Node: pass|Native Wasmtime: pass|
+|2|Native Wasmtime: pass|Stock Node: pass|
+|3|Stock Node: strict fail|Native Wasmtime: pass|
 
 Record the complete cohort's exact descriptors and output namespaces before
 starting. StockV3 hardcodes one output path and remains unchanged. The reviewed
 [StockV4 namespace successor](../../tests/node-compat/frameworks/nextjs/browser-hydration-matched-host-candidate-v4/README.md)
 now supplies safe run-ID-derived roots;73 inert selector checks pass. Its
-reusable control CLI passes preparation-only checks; no V4 actor has run yet.
+reusable control CLI passes preparation-only checks, and the three V4 cohort
+actors are now complete with their actual outcomes above.
 The cohort must use those new namespaces, never delete/reuse old outputs.
 Native runId selection likewise needs a distinct reviewed Root grant per run.
 No automatic loop, extra favorable retry or replacement of a failed pair is
@@ -73,10 +78,13 @@ run. A functional navigation never excuses an abort or missing body.
 The finite gate closes only when all three declared pairs have complete reviewed
 records and both arms pass every unchanged strict condition. Publish every
 failure and denominator, including the original V5 failure, alongside positives.
+The present cohort does not close that gate: its fifth member remains failed.
 Three positive pairs establish those observations only: no general reliability,
 failure-rate bound, causal fix, native lifetime proof or production adoption.
 
-An optional later observer-on/off comparison needs separately reviewed exact
-Source variants preserving all functional assertions/error gates and a new
-predeclared cohort. It is not implemented here. This plan makes no performance
-or measurement claim and does not replace clean-machine build reproduction.
+The separately reviewed [extra-session-off Source](../../tests/node-compat/frameworks/nextjs/browser-extra-cdp-off-candidate-v1/README.md)
+now disables only the additional diagnostic CDP session, preserving all ordinary
+Playwright/functional/error gates. StockV5 binds it with fresh namespaces; no
+off-session actor has run yet. A distinct finite declaration is required and
+cannot replace the failed original cohort. This plan makes no performance or
+measurement claim and does not replace clean-machine reproduction.

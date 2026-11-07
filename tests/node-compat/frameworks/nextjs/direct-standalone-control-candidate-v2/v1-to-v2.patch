@@ -1,0 +1,13 @@
+--- V1/run-owned.py
++++ V2/run-owned.py
+@@ -53,8 +53,8 @@
+  finally:
+   try:protect();preserved=True
+   except BaseException as caught:error=dict(type=type(caught).__name__,message=str(caught))
+- clean=bool(terminal and terminal['rawExitCode']==0 and terminal['parentOwnedGroupGone']and terminal['allObservedOwnedGroupsGone']and not terminal['timeout']and not terminal['forcedCleanup']and all(terminal[k]==[]for k in ['errors','signals','interruptedSignals','remainingObservedPids']))
++ clean=bool(terminal and terminal['parentOwnedGroupGone']and terminal['allObservedOwnedGroupsGone']and not terminal['timeout']and not terminal['forcedCleanup']and all(terminal[k]==[]for k in ['errors','signals','interruptedSignals','remainingObservedPids']))
+  result=read(output/'result.json')if(output/'result.json').exists()else None
+- obs=dict(schemaVersion=1,state='ROOT_NEXT_DIRECT_STANDALONE_CONTROL_OBSERVATION_V1',runId=a['runId'],rawExitCode=terminal['rawExitCode']if terminal else None,ownedGroupsClean=clean,protectedInputsPreserved=preserved,error=error,freeBytesAtAdmission=free,continuousDiskGuardClaimed=False,terminal=row(outer/'terminal.json')if terminal else None,result=row(output/'result.json')if result else None,passed=bool(clean and preserved and error is None and result and result['passed']),guestExecuted=False,adoption=False)
++ obs=dict(schemaVersion=1,state='ROOT_NEXT_DIRECT_STANDALONE_CONTROL_OBSERVATION_V1',runId=a['runId'],rawExitCode=terminal['rawExitCode']if terminal else None,ownedGroupsClean=clean,protectedInputsPreserved=preserved,error=error,freeBytesAtAdmission=free,continuousDiskGuardClaimed=False,terminal=row(outer/'terminal.json')if terminal else None,result=row(output/'result.json')if result else None,passed=bool(terminal and terminal['rawExitCode']==0 and clean and preserved and error is None and result and result['passed']),guestExecuted=False,adoption=False)
+  (outer/'observation.json').write_text(json.dumps(obs,indent=2)+'\n');print(json.dumps(obs),flush=True);raise SystemExit(0 if obs['passed']else 1)
+ if __name__=='__main__':main()

@@ -22,6 +22,14 @@ client-Wasm, complete Node/Buffer compatibility or production promotion follows.
 The accepted foundations-v13 checkpoint and its machine-readable API statuses
 remain unchanged.
 
+The genuinely fresh2,181-file app build also passes the same strict24HTTP/cache/
+stream/2browser contract on matched Node and component1c3108d2 with the integrated
+V5 I/O adapter. Its [paired DATA review](../../tests/node-compat/frameworks/nextjs/next-app-runtime-root-results-v1/first-pair-review/README.md)
+passes Root readback. The same fresh app/component passes the separate
+[wasmCloud cold8 contract](../../tests/node-compat/frameworks/nextjs/wasmcloud-cold-root-results-v4/actual-review/README.md).
+These positive finite observations do not explain or fix the earlier V5 action
+abort, prove reliability, or change any accepted API status.
+
 | Experimental API/language gate | Strategy and capability | Current status and deviation | Validation |
 | --- | --- | --- | --- |
 | Node `global` alias | Pure guest entry facade; no additional host capability | Bounded exact self-alias descriptor; other Node globals retain separate contracts | Pinned Node descriptor/private-realm tests and successful full Next smoke |

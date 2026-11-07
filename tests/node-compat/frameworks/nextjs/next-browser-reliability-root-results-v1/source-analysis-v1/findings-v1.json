@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "state": "NEXT_CLIENT_ACTION_SOURCE_ANALYSIS_CAUSE_UNRESOLVED_V1",
+  "analysisOnly": true,
+  "newPassingGate": false,
+  "operationalAcceptance": false,
+  "artifactsModified": false,
+  "actorsInvoked": false,
+  "rawReferences": {
+    "p3StockResult": {
+      "path": "/private/tmp/starling-node-compat/next-browser-hydration-stock-v4-engine462-reliability-p3-stock/result.json",
+      "sha256": "ab8add03d783c66cd91c1aae11678e16c925143317034fe75f2f35b9c39b97ef",
+      "bytes": 341302
+    },
+    "p3BrowserResult": {
+      "path": "/private/tmp/starling-node-compat/next-browser-hydration-stock-v4-engine462-reliability-p3-stock/browser/result.json",
+      "sha256": "28e63a4cb622f2a81fbafe6c3de76659a61d7f42dbb68be0583c0fd047a1da5c",
+      "bytes": 234271
+    },
+    "p3Observation": {
+      "path": "/private/tmp/starling-node-compat/next-browser-hydration-stock-v4-engine462-reliability-p3-stock-monitor/observation.json",
+      "sha256": "605f281da32727627786af302240c4031a95a81e239e4602014cb4a749692772",
+      "bytes": 1052
+    },
+    "p2BrowserResult": {
+      "path": "/private/tmp/starling-node-compat/next-browser-hydration-stock-v4-engine462-reliability-p2-stock/browser/result.json",
+      "sha256": "c2dd7b6074f8bf59256552b1e74a5c2f254f1433c39fd870fac0e241bdff522f",
+      "bytes": 229560
+    },
+    "cohortRegistry": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-browser-reliability-root-results-v1/cohort.json",
+      "sha256": "c185f2f86d84d22e00fa80459ffea310215e9f030edd406660ad8f7252760fd1",
+      "bytes": 15342
+    }
+  },
+  "p3Outcome": {
+    "overallPassed": false,
+    "httpCount": 24,
+    "httpPassed": 24,
+    "cachePassed": true,
+    "strictStreamPassed": true,
+    "functionalBrowserPassed": true,
+    "strictBrowserPassed": false,
+    "failedRequests": 1,
+    "observerErrors": [
+      {
+        "stage": "server-action-response-body",
+        "message": "net::ERR_ABORTED"
+      },
+      {
+        "stage": "server-action-response-finished",
+        "message": "net::ERR_ABORTED"
+      },
+      {
+        "stage": "server-action-request-sizes",
+        "message": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  "timeline": {
+    "cdpRequestId": "66931.14",
+    "playwrightRequestIdCandidate": 7,
+    "requestIdentityProved": false,
+    "cdpEvents": [
+      {
+        "event": "Page.navigatedWithinDocument",
+        "arrivalNs": "1872785167",
+        "navigationType": "historyApi",
+        "pathname": "/actions",
+        "sameFrameAsActionRequest": true
+      },
+      {
+        "event": "Network.responseReceived",
+        "arrivalNs": "1949349833",
+        "protocolTimestamp": 903049.405508,
+        "status": 200,
+        "gzipHeaderObserved": true
+      },
+      {
+        "event": "Network.dataReceived",
+        "arrivalNs": "1949896458",
+        "protocolTimestamp": 903049.406687,
+        "dataLength": 2963,
+        "encodedDataLength": 1527
+      },
+      {
+        "event": "Network.loadingFailed",
+        "arrivalNs": "1950709375",
+        "protocolTimestamp": 903049.408335,
+        "errorText": "net::ERR_ABORTED",
+        "canceled": true
+      },
+      {
+        "event": "Page.navigatedWithinDocument",
+        "arrivalNs": "1953991875",
+        "navigationType": "historyApi",
+        "pathname": "/action-result",
+        "sameFrameAsActionRequest": true
+      }
+    ],
+    "playwrightEvents": [
+      {
+        "sequence": 125,
+        "ns": "1948697667",
+        "phase": "action-submit-and-navigation",
+        "event": "response",
+        "requestId": 7,
+        "status": 200
+      },
+      {
+        "sequence": 127,
+        "ns": "1950457042",
+        "phase": "action-submit-and-navigation",
+        "event": "requestfailed",
+        "requestId": 7,
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        }
+      },
+      {
+        "sequence": 128,
+        "ns": "1950596458",
+        "phase": "action-submit-and-navigation",
+        "event": "response-body-unavailable",
+        "requestId": 7,
+        "status": 200
+      },
+      {
+        "sequence": 129,
+        "ns": "1950615792",
+        "phase": "action-submit-and-navigation",
+        "event": "response.finished",
+        "requestId": 7,
+        "status": 200
+      },
+      {
+        "sequence": 132,
+        "ns": "1956715583",
+        "phase": "functional-complete",
+        "event": "phase"
+      },
+      {
+        "sequence": 136,
+        "ns": "1995978625",
+        "phase": "context-close-start",
+        "event": "phase"
+      }
+    ],
+    "withinWorkerArrivalOrder": "Loading failure arrived before target history event; requestfailed arrived before explicit contextclose. This is not cross-clock or cause proof."
+  },
+  "byteMetrics": {
+    "p3": {
+      "cdpDataReceivedDecodedBytesSum": 2963,
+      "cdpDataReceivedEncodedBytesSum": 1527,
+      "loadingFinishedObserved": false
+    },
+    "successfulP2": {
+      "cdpDataReceivedDecodedBytesSum": 2963,
+      "cdpDataReceivedEncodedBytesSum": 1527,
+      "loadingFinishedObserved": true
+    },
+    "interpretation": "Equal dataReceived byte sums do not prove transport EOF, gzip trailer completeness, body equality or an abort source."
+  },
+  "sourceFindings": [
+    "Selected Server Action POST has no signal/AbortController in its fetch init; active production wrapper delegates fetch unchanged.",
+    "Actual processFetch is passthrough/cacheData:null; optional staged clone/prefetch and dev/HMR cancellation paths are not identified as this action.",
+    "createFromFetch returns root model chunk0 while a separate reader.read loop continues to EOF/error. Functional result/navigation may therefore precede EOF, without explaining cancellation.",
+    "HistoryUpdater writes pushState/replaceState; inspected queue discard only discards state. No explicit abort identified on the selected production action path.",
+    "Function-valued React form actions prevent native form submission and call action(formData) through startHostTransition.",
+    "No benign classification or attribution to history/contextclose/guest/transport/observer follows. Primary ERR_ABORTED remains unresolved; strict failure remains failed."
+  ],
+  "nextComparison": {
+    "status": "Separate direct-standalone Source under preparation; no held descriptor or result claimed here",
+    "scope": "Same app/deps/worker/assertions via unmodified server.js/start-server; independently owned trial requires separate Root grant.",
+    "shutdown": "Expected direct server SIGINT exit130 is distinct from a clean outer parent0, not an allowance for failed HTTP/browser conditions."
+  },
+  "limitations": [
+    "Source reads cannot locate a Chromium internal cancellation cause or establish wire EOF.",
+    "CDP/PW IDs are separate namespaces; candidate correlation is not identity.",
+    "No live p3-native files or raw generated action keys copied."
+  ]
+}

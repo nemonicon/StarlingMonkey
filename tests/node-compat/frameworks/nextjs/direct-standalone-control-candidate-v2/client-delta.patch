@@ -1,0 +1,28 @@
+--- wasmtime-deployment-candidate-v7/run-contracts.mjs
++++ direct-standalone-control-candidate-v1/run-contracts.mjs
+@@ -1,5 +1,5 @@
+ // Reuses unchanged real24 HTTP/action/cache/strict-stream assertions.
+-// Standalone client only; server is the separately owned actual Wasmtime process.
++// Client only; server is separately owned unmodified Next standalone on host Node.
+ import assert from 'node:assert/strict';
+ import {createHash} from 'node:crypto';
+ import {once} from 'node:events';
+@@ -8,10 +8,10 @@
+ import {dirname,join,resolve} from 'node:path';
+ import {fileURLToPath} from 'node:url';
+ const here=dirname(fileURLToPath(import.meta.url)),origin=new URL(process.argv[2]),root=resolve(process.argv[3]),browserTools=process.argv[4];
+-assert.equal(process.version,'v22.14.0');assert.equal(process.argv.length,6);const runId=process.argv[5];assert(/^[a-z0-9][a-z0-9-]{0,47}$/.exec(runId)?.[0]===runId);assert.equal(origin.origin,process.argv[2]);assert.equal(origin.hostname,'127.0.0.1');assert.equal(origin.protocol,'http:');assert(browserTools);assert.equal(root,'/private/tmp/starling-node-compat/next-wasmtime-deployment-'+runId+'/client');
++assert.equal(process.version,'v22.14.0');assert.equal(process.argv.length,6);const runId=process.argv[5];assert(/^[a-z0-9][a-z0-9-]{0,47}$/.exec(runId)?.[0]===runId);assert.equal(origin.origin,process.argv[2]);assert.equal(origin.hostname,'127.0.0.1');assert.equal(origin.protocol,'http:');assert(browserTools);assert.equal(root,'/private/tmp/starling-node-compat/next-direct-standalone-control-'+runId+'/client');
+ await mkdir(root,{mode:0o700});await mkdir(join(root,'responses'));
+ const hash=b=>createHash('sha256').update(b).digest('hex');
+-const result={schemaVersion:1,suite:'ACTUAL_NEXT_WASMTIME_FULL_CONTRACT_CLIENT_V2',origin:origin.origin,node:process.version,http:[],errors:[],transportErrors:[],actualComponentExecutionClaimRequiresParentProof:true};
++const result={schemaVersion:1,suite:'ACTUAL_NEXT_DIRECT_STANDALONE_FULL_CONTRACT_CLIENT_V1',origin:origin.origin,node:process.version,http:[],errors:[],transportErrors:[],actualDirectHostExecutionClaimRequiresParentProof:true};
+ const errorData=e=>({name:e?.name??'Error',message:e?.message??String(e),stack:e?.stack??null});
+ const save=()=>writeFile(join(root,'result.json'),JSON.stringify(result,null,2)+'\n');await save();
+ try {
+@@ -79,4 +79,4 @@
+  result.passed=result.http.length===24&&result.http.every(x=>x.passed)&&result.cacheInvalidation?.passed===true&&result.streaming?.complete===true&&result.streaming?.incrementalDeliveryObserved===true&&result.browserExit?.code===0&&result.browser?.passed===true&&result.errors.length===0&&result.transportErrors.length===0;
+  await save();
+ }
+-console.log(JSON.stringify({state:result.passed?'ACTUAL_NEXT_WASMTIME_CONTRACT_CLIENT_PASSED_V2':'ACTUAL_NEXT_WASMTIME_CONTRACT_CLIENT_FAILED_V2',http:result.http.length,passedHttp:result.http.filter(x=>x.passed).length,errors:result.errors}));process.exitCode=result.passed?0:1;
++console.log(JSON.stringify({state:result.passed?'ACTUAL_NEXT_DIRECT_STANDALONE_CONTRACT_CLIENT_PASSED_V1':'ACTUAL_NEXT_DIRECT_STANDALONE_CONTRACT_CLIENT_FAILED_V1',http:result.http.length,passedHttp:result.http.filter(x=>x.passed).length,errors:result.errors}));process.exitCode=result.passed?0:1;

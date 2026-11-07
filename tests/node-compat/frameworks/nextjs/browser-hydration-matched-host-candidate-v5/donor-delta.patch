@@ -1,0 +1,22 @@
+--- browser-hydration-matched-host-candidate-v4/run-owned.py
++++ browser-hydration-matched-host-candidate-v5/run-owned.py
+@@ -25,7 +25,7 @@
+     run_id=authority['runId']
+     assert isinstance(run_id,str) and re.fullmatch('[a-z0-9][a-z0-9-]{0,47}',run_id)
+     assert all(key not in authority for key in ['outputRoot','monitorOutputRoot','argv'])
+-    assert plan['outputPrefix']=='/private/tmp/starling-node-compat/next-browser-hydration-stock-v4'
++    assert plan['outputPrefix']=='/private/tmp/starling-node-compat/next-browser-hydration-stock-v5'
+     selected=plan['arms']['stock']
+     assert selected['outputRoot'] is selected['monitorOutputRoot'] is selected['argv'] is None
+     assert selected['timeoutSeconds']==300
+--- browser-hydration-matched-host-candidate-v4/run-stock.mjs
++++ browser-hydration-matched-host-candidate-v5/run-stock.mjs
+@@ -19,7 +19,7 @@
+ const browserTools = process.argv[4],runId=process.argv[5];
+ const plan = JSON.parse(await readFile(join(here, 'plans.json')));
+ function deriveOutput(prefix,id){
+-  assert.equal(prefix,'/private/tmp/starling-node-compat/next-browser-hydration-stock-v4');
++  assert.equal(prefix,'/private/tmp/starling-node-compat/next-browser-hydration-stock-v5');
+   assert(typeof id==='string'&&/^[a-z0-9][a-z0-9-]{0,47}$/.exec(id)?.[0]===id,'Explicit safe ASCII runId required');
+   return prefix+'-'+id;
+ }
