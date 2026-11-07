@@ -34,5 +34,7 @@ New engine2251f11a is31,341,287 bytes; full metadataafb14d8a is4,861,271 bytes.
 Independent current payload/owner/tree DATA primary review0d23a90e and
 coordinated Source/TU/link/Rust review237cd3a3 pass. Aggregate build-only
 reviewb9aad169 accepts the complete corrected build DATA. No engine/guest export
-ran. The16-case component still needs construction and deployed validation.
+ran during this build. Subsequent component08ce/98fc construction review and
+the one-GET16-case pass4c919dbf are recorded in the separate
+[probe results](../next-module-fileurl-interop-probe-root-results-v1/README.md).
 The earlier build and its whole failure metadata stay failed.

@@ -15,8 +15,9 @@ Current next steps and outstanding work:
 - **In progress:** the bounded CJS/fileURL bridge. Its first native build failed
   a SpiderMonkey handle signature check. A separate correction passes frontend,
   generators and full compile/link. Coordinated full-build DATA reviewb9aad169
-  passes; the16-case Wasm probe remains.
-  No interop guest has run. The optional cache facade passes40 in-memory model
+  passes. The16-case deployed Wasm probe now passes in one GET, raw0/clean,
+  with native/world guards preserved; bounded runtime DATA review is closing.
+  The optional cache facade passes40 in-memory model
   checks only; real storage/Next/WASI validation remains open.
 - **After loader validation:** explicit Next CacheHandler scenario with shared
   tag epochs, differential/real-component tests, target-host checks and measurements.
@@ -28,7 +29,17 @@ The corrected2251/afb build is accepted as build DATA only. A separately sealed
 [interop constructorV2](tests/node-compat/frameworks/nextjs/next-module-fileurl-interop-probe-construction-v2/README.md)
 selects the unchanged16-case guest contract with the corrected RootedString
 native source. Root preparation00a2d33d binds31 actual metadata fields,39 fresh
-build roles and12 Source roles; construction has not yet launched. The older
+build roles and12 Source roles. Construction now finishes Root78265/original
+77890/2400 raw0/clean, all three inner commands0, protected inputs/world unchanged.
+Component08ce7388 is37,153,403 bytes and emits exactly13 standard0.2.10 imports;
+coordinated construction DATA review98fc2b09 passes. RuntimeSourcecf205656 and
+fresh authorityf2085bc9 then run Root87569/original80224/180 raw0/clean: one
+GET200/7152 bytes contains all16 ordered passing cases, result4c919dbf and
+response5ebcea5a. All1739 protected inputs and complete world/native guards
+match before/final. This validates the selected default-only CJS/fileURL
+contract and explicit refusals; it does not establish full Node/Next parity.
+Independent bounded runtime DATA review is closing.
+The older
 failed25c constructor remains unchanged and unexecuted. The current volume has
 about15GiB free, so storage is no longer blocking this step.
 
@@ -227,7 +238,8 @@ Root10067/original56661/7200 raw0/clean, all six phases0, all825 copies/1887
 protected files/ten trees unchanged. New core2251f11a is31,341,287 bytes and full
 metadataafb14d8a is4,861,271 bytes. Independent current payload/owner/tree DATA
 primary review0d23a90e and coordinated Source/TU/link/Rust review237cd3a3 pass.
-Aggregateb9aad169 accepts build DATA only; no new component or16-case guest result yet.
+Aggregateb9aad169 accepts build DATA only. Subsequent component08ce/98fc INIT
+review and one deployed16-case pass4c919dbf are recorded separately above.
 Optional CacheHandler Source1f8398a6 is sealed separately. Root's owned fake-Node
 model50293/120 passes40 assertions, with independent model/ledger review. All
 cache FS, entropy and Next calls are explicitly in-memory fakes (actual Source

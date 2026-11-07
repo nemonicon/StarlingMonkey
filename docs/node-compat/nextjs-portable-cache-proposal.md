@@ -79,8 +79,12 @@ Pinned Node imports that target successfully, so this remains a compatibility
 gap. The first interoperability build failed a SpiderMonkey HandleString
 signature check. A separate rooted-string correction passes a one-TU frontend
 check and now compiles/links as core2251f11a, with full-build DATA reviewb9aad169
-passed. No interoperability component or sixteen-case deployed result exists
-yet. See [the corrected generation](../../tests/node-compat/frameworks/nextjs/next-module-fileurl-interop-native-root-results-v2/README.md).
+passed. A new component08ce7388 then validates with exactly13 standard WASI
+imports, and its one deployed GET passes all16 declared interoperability cases
+with clean ownership and preserved guards (result4c919dbf). Bounded runtime
+DATA review is closing. This clears the selected loader prerequisite;
+the CacheHandler and full application gates remain open. See
+[the probe results](../../tests/node-compat/frameworks/nextjs/next-module-fileurl-interop-probe-root-results-v1/README.md).
 
 Next's `IncrementalCache.set` catches handler exceptions and logs a warning.
 Direct helper/error-observation tests must distinguish an identifiable thrown

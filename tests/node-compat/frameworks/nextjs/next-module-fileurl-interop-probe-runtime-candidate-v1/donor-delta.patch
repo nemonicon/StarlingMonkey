@@ -1,0 +1,163 @@
+--- before/run-owned.py
++++ after/run-owned.py
+@@ -1,4 +1,4 @@
+-"""Dormant single-GET guard probe; original0af owner, no constructor or Node control."""
++"""Dormant single-GET interop probe; original0af owner, no constructor or Node control."""
+ from pathlib import Path
+ import hashlib, importlib.util, json, os, re, sys
+ 
+@@ -61,7 +61,8 @@
+     assert __debug__ and sys.dont_write_bytecode and sys.flags.isolated == 1 and len(sys.argv) == 2
+     ap = Path(sys.argv[1]); verify(row(ap)); authority = row(ap); a = read(ap)
+     p = read(HERE / 'plan.json')
+-    assert a['state'] == 'ROOT_FILE_URL_GUARD_PROBE_AUTHORIZED_V1'
++    assert p['mode'] == 'interop' and p['prospectiveActualBindingsPending'] is False
++    assert a['state'] == 'ROOT_FILE_URL_INTEROP_PROBE_AUTHORIZED_V1'
+     assert a['sourceIndex'] == row(HERE / 'index.json') and a['plan'] == row(HERE / 'plan.json')
+     assert isinstance(a['runId'], str) and re.fullmatch('[a-z0-9][a-z0-9-]{0,47}', a['runId'])
+     for key in ['ordinaryProbeAllowed', 'loopbackServeAllowed', 'fixtureStagingAllowed']:
+@@ -95,7 +96,7 @@
+     terminal = None; primary_error = None; protection_error = None; result = None
+     try:
+         verify(p['monitor'])
+-        spec = importlib.util.spec_from_file_location('genuine_original_guard_probe_owner', p['monitor']['path'])
++        spec = importlib.util.spec_from_file_location('genuine_original_interop_probe_owner', p['monitor']['path'])
+         monitor = importlib.util.module_from_spec(spec); spec.loader.exec_module(monitor)
+         env = {k: os.environ[k] for k in ['HOME', 'USER', 'LOGNAME'] if k in os.environ}
+         env.update(PATH=str(Path(p['node']['path']).parent) + ':/usr/bin:/bin', LC_ALL='C', LANG='C',
+@@ -116,14 +117,14 @@
+         ownership_clean = bool(terminal and clean(terminal))
+         passed = bool(terminal and type(terminal['rawExitCode']) is int and terminal['rawExitCode'] == 0 and ownership_clean and primary_error is None and
+                       protection_error is None and result and result.get('observationsValid') is True and
+-                      result.get('guardProfileMatched') is True)
+-        observation = dict(schemaVersion=1, state='ROOT_GUARD_FILE_URL_PROBE_OBSERVATION_V1', runId=a['runId'],
++                      result.get('interopProfileMatched') is True)
++        observation = dict(schemaVersion=1, state='ROOT_INTEROP_FILE_URL_PROBE_OBSERVATION_V1', runId=a['runId'],
+                            rootAuthority=authority, sourceIndex=a['sourceIndex'], rawExitCode=terminal['rawExitCode'] if terminal else None,
+                            ownedGroupsClean=ownership_clean, protectedInputsPreserved=protection_error is None,
+                            primaryError=primary_error, protectionError=protection_error,
+                            terminal=row(outer / 'terminal.json') if (outer / 'terminal.json').exists() else None,
+                            result=row(output / 'result.json') if result else None, passed=passed,
+-                           guardProfileMatched=result.get('guardProfileMatched') if result else None,
++                           interopProfileMatched=result.get('interopProfileMatched') if result else None,
+                            nodeCompatibilityAccepted=False, fullNextAcceptance=False, adoption=False)
+         save(outer / 'observation.json', observation)
+     print(json.dumps(observation), flush=True)
+--- before/collect.mjs
++++ after/collect.mjs
+@@ -1,4 +1,4 @@
+-// Dormant single ordinary guard probe. No constructor, Node oracle or browser.
++// Dormant single ordinary interop probe. No constructor, Node oracle or browser.
+ import assert from 'node:assert/strict';
+ import {createHash} from 'node:crypto';
+ import {spawn} from 'node:child_process';
+@@ -66,14 +66,15 @@
+   assert.equal(process.env.NODE_OPTIONS, undefined); assert.equal(process.argv.length, 3);
+   const authpath = resolve(process.argv[2]), authority = await row(authpath), a = await read(authpath);
+   const plan = await read(join(HERE, 'plan.json'));
+-  assert.equal(a.state, 'ROOT_FILE_URL_GUARD_PROBE_AUTHORIZED_V1');
++  assert.equal(a.state, 'ROOT_FILE_URL_INTEROP_PROBE_AUTHORIZED_V1');
+   assert.deepEqual(a.sourceIndex, await row(join(HERE, 'index.json')));
+   assert.deepEqual(a.plan, await row(join(HERE, 'plan.json')));
+   assert(typeof a.runId === 'string' && /^[a-z0-9][a-z0-9-]{0,47}$/.exec(a.runId)?.[0] === a.runId);
+   for (const key of ['ordinaryProbeAllowed', 'loopbackServeAllowed', 'fixtureStagingAllowed']) assert.equal(a[key], true);
+   for (const key of ['componentConstructionAllowed', 'nodeControlAllowed', 'browserAllowed', 'appMountAllowed',
+     'networkBeyondLoopbackAllowed', 'fullNextAcceptanceAllowed', 'adoptionAllowed']) assert.equal(a[key], false);
+-  assert.equal(plan.mode, 'guard'); assert.equal(plan.requests, 1); assert.equal(plan.actionsAllowed, false);
++  assert.equal(plan.mode, 'interop'); assert.equal(plan.requests, 1); assert.equal(plan.actionsAllowed, false);
++  assert.equal(plan.prospectiveActualBindingsPending, false, 'Actual full build and INIT pins must be accepted before launch');
+   assert.deepEqual(a.engine, plan.expectedEngine); assert.deepEqual(a.nativeMetadata, plan.expectedNativeMetadata);
+   assert.deepEqual(a.component, plan.expectedComponent); assert.deepEqual(a.componentAudit, plan.expectedComponentAudit);
+   assert.deepEqual(a.constructionResult, plan.expectedConstructionResult);
+@@ -98,26 +99,28 @@
+   const construction = await read(a.constructionResult.path), ctorPlan = await read(plan.constructionPlan.path);
+   const ctorAuthority = await read(construction.rootAuthority.path), audit = await read(a.componentAudit.path);
+   const constructionReview = await read(a.constructionDataReview.path);
+-  assert.equal(constructionReview.state, 'COORDINATED_GUARD_PROBE_COMPONENT_INIT_DATA_REVIEW_PASSED_V1');
+-  assert.equal(constructionReview.verifiedPassed, true); assert.equal(constructionReview.entryMode, 'guard');
++  assert.equal(constructionReview.state, plan.expectedConstructionReviewState);
++  assert.equal(constructionReview.verifiedPassed, true); assert.equal(constructionReview.entryMode, 'interop');
+   for (const [key, expected] of Object.entries({actualResult: a.constructionResult, rootAuthority: construction.rootAuthority,
+     callerIndex: plan.constructionCallerIndex, plan: plan.constructionPlan, component: a.component,
+     componentAudit: a.componentAudit, engine: a.engine, nativeMetadata: a.nativeMetadata,
+     inputSourceIndex: plan.probeSourceIndex, inputEntry: plan.probeEntry, fullBuildReview: plan.fullBuildReview}))
+     assert.deepEqual(constructionReview[key], expected);
+   for (const key of ['ordinaryExportsInvoked', 'httpServed', 'appMountedAtInit', 'filesystemFixtureMountedAtInit',
+-    'deployedImportOrFilesystemProbeInvoked', 'runtimeAccepted', 'nodeParityProved', 'cjsInterop3856Selected',
++    'deployedImportOrFilesystemProbeInvoked', 'runtimeAccepted', 'nodeParityProved',
+     'productionProfilePromoted']) assert.equal(constructionReview[key], false);
++  for (const [key, expected] of Object.entries(plan.expectedConstructionReviewFixedValues))
++    assert.deepEqual(constructionReview[key], expected);
+   extra.push(construction.rootAuthority, construction.plan);
+   assert.equal(construction.passed, true); assert.equal(construction.error, null);
+   assert.equal(construction.state, 'NEXT_NATIVE_COMPONENT_CONSTRUCTION_PASSED_UNREVIEWED_V2');
+-  assert.equal(construction.entryMode, 'guard'); assert.deepEqual(construction.plan, plan.constructionPlan);
++  assert.equal(construction.entryMode, 'interop'); assert.deepEqual(construction.plan, plan.constructionPlan);
+   assert.deepEqual(construction.callerIndex, plan.constructionCallerIndex); assert.equal(construction.finalProtection.unchanged, true);
+   for (const key of ['ordinaryExportsInvoked', 'httpServed', 'appMountedAtInit', 'productionProfilePromoted']) assert.equal(construction[key], false);
+-  assert.deepEqual(ctorPlan.inputSourceIndex, plan.probeSourceIndex); assert.deepEqual(ctorPlan.entries, {guard: plan.probeEntry});
++  assert.deepEqual(ctorPlan.inputSourceIndex, plan.probeSourceIndex); assert.deepEqual(ctorPlan.entries, {interop: plan.probeEntry});
+   assert.deepEqual(ctorPlan.worldSourceIndex, plan.worldSourceIndex); assert.equal(ctorPlan.witDirectory, plan.witDirectory);
+   assert.deepEqual(ctorPlan.selectedInterfaces, plan.selectedInterfaces);
+-  assert.equal(ctorAuthority.state, 'ROOT_NEXT_NATIVE_COMPONENT_CONSTRUCTION_V2'); assert.equal(ctorAuthority.entryMode, 'guard');
++  assert.equal(ctorAuthority.state, 'ROOT_NEXT_NATIVE_COMPONENT_CONSTRUCTION_V2'); assert.equal(ctorAuthority.entryMode, 'interop');
+   assert.deepEqual(ctorAuthority.callerIndex, plan.constructionCallerIndex);
+   assert.deepEqual(construction.artifacts.engineBuildEvidence, a.engineBuildEvidence);
+   for (const [key, expected] of Object.entries({component: a.component, componentAudit: a.componentAudit,
+@@ -130,13 +133,13 @@
+   assert(Array.isArray(native.actualCompileRows) && native.actualCompileRows.length === 80);
+   assert(Array.isArray(native.actualSeparateEmbeddingCompileRows) && native.actualSeparateEmbeddingCompileRows.length === 1);
+   const loader = native.nativePolicyInputManifest.filter(ref => ref.path === 'runtime/script_loader.cpp');
+-  assert.equal(loader.length, 1); assert.equal(loader[0].sha256, 'fbc1d13eebc66d20b01b1828008f3918609752e060320dbd16837722d4216ab8');
++  assert.equal(loader.length, 1); assert.equal(loader[0].sha256, plan.interopLoaderAfterimage.sha256);
+   const review = await read(plan.fullBuildReview.path);
+   assert.equal(review.verifiedPassed, true); assert.deepEqual(review.engine, a.engine); assert.deepEqual(review.metadata, a.nativeMetadata);
+   assert(a.engineBuildEvidence.some(ref => ref.path === plan.fullBuildReview.path && ref.sha256 === plan.fullBuildReview.sha256 && ref.bytes === plan.fullBuildReview.bytes));
+   assert.equal(audit.state, 'NEXT_NATIVE_COMPONENT_DATA_AUDIT_PASSED_V1'); assert.equal(audit.passed, true);
+   assert.deepEqual(audit.component, a.component); assert.deepEqual(audit.engine, a.engine); assert.deepEqual(audit.nativeMetadata, a.nativeMetadata);
+-  assert.equal(audit.entryMode, 'guard'); assert.equal(audit.allEmittedVersion, '0.2.10');
++  assert.equal(audit.entryMode, 'interop'); assert.equal(audit.allEmittedVersion, '0.2.10');
+   assert.deepEqual([...audit.selectedInterfaces].sort(), [...plan.selectedInterfaces].sort()); assert.equal(plan.selectedInterfaces.length, 13);
+   assert.equal(new Set(audit.emittedImports).size, audit.emittedImports.length);
+   assert(audit.emittedImports.every(name => plan.selectedInterfaces.includes(name) && name.endsWith('@0.2.10')));
+@@ -161,11 +164,11 @@
+   assert.equal(process.env.TMPDIR, join(output, 'tmp'));
+   await mkdir(output, {mode: 0o700});
+   for (const name of ['tmp', 'xdg-cache', 'xdg-config', 'xdg-data']) await mkdir(join(output, name), {mode: 0o700});
+-  const result = {schemaVersion: 1, state: 'GUARD_FILE_URL_PROBE_IN_PROGRESS_V1', runId: a.runId, rootAuthority: authority,
++  const result = {schemaVersion: 1, state: 'INTEROP_FILE_URL_PROBE_IN_PROGRESS_V1', runId: a.runId, rootAuthority: authority,
+     sourceIndex: a.sourceIndex, probeSourceIndex: plan.probeSourceIndex, constructionResult: a.constructionResult,
+     component: a.component, componentAudit: a.componentAudit, engine: a.engine, nativeMetadata: a.nativeMetadata,
+     fixtures: null, response: null, errors: [], server: null, nodeControlExecuted: false,
+-    guardProfileMatched: false, nodeCompatibilityAccepted: false, fullNextAcceptance: false, adoption: false};
++    interopProfileMatched: false, nodeCompatibilityAccepted: false, fullNextAcceptance: false, adoption: false};
+   const save = () => durable(join(output, 'result.json'), JSON.stringify(result, null, 2) + '\n');
+   await save(); const handles = []; let lease, host, hostDone, hostExit = null, stopping = false;
+   async function fixtureRecords() {
+@@ -251,8 +254,9 @@
+     assert.equal(response.overflow, false); assert.equal(response.complete, true);
+     assert.equal(response.status, 200); assert.equal(response.headers['content-type']?.split(';', 1)[0].trim().toLowerCase(), 'application/json');
+     const payload = JSON.parse(new TextDecoder('utf-8', {fatal: true}).decode(await readFile(response.body.path)));
+-    const {validateGuardResponse} = await import('./comparison.mjs');
+-    result.validation = validateGuardResponse(payload); result.guardProfileMatched = result.validation.guardProfileMatched;
++    const {validateInteropResponse} = await import('./comparison.mjs');
++    assert.deepEqual(payload.records.map(record => record.id), plan.expectedCaseIds);
++    result.validation = validateInteropResponse(payload); result.interopProfileMatched = result.validation.interopProfileMatched;
+     result.response.payload = payload; await save();
+   } catch (error) { result.errors.push({stage: 'fixture-host-probe-or-validation', ...errorData(error)}); }
+   finally {
+@@ -277,11 +281,11 @@
+     result.observationsValid = result.errors.length === 0 && result.inputsPreserved === true && result.fixtureCopyPreserved === true &&
+       result.server?.shutdownRequested === true && result.server?.sigintSent === true && result.server?.forcedCleanup === false &&
+       hostExit?.code === 0 && hostExit?.signal === null && hostExit?.error === null;
+-    result.state = result.observationsValid && result.guardProfileMatched ? 'GUARD_SAFE_REFUSAL_AND_BUILTIN_OBSERVED_V1' : 'GUARD_PROBE_FAILED_RAW_PRESERVED_V1';
++    result.state = result.observationsValid && result.interopProfileMatched ? 'INTEROP_SELECTED_DEFAULT_NAMESPACE_PROFILE_OBSERVED_V1' : 'INTEROP_PROBE_FAILED_RAW_PRESERVED_V1';
+     await save();
+   }
+   console.log(JSON.stringify({state: result.state, observationsValid: result.observationsValid,
+-    guardProfileMatched: result.guardProfileMatched, errors: result.errors, nodeCompatibilityAccepted: false}));
+-  process.exitCode = result.observationsValid && result.guardProfileMatched ? 0 : 1;
++    interopProfileMatched: result.interopProfileMatched, errors: result.errors, nodeCompatibilityAccepted: false}));
++  process.exitCode = result.observationsValid && result.interopProfileMatched ? 0 : 1;
+ }
+ main().catch(error => { console.error(error); process.exitCode = 1; });

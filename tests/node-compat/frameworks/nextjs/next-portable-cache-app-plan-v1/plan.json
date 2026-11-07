@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_ONLY_OPTIONAL_PORTABLE_CACHE_APP_FORK_PLAN_V1",
+  "actionsAllowed": false,
+  "originalFixtureCatalogue": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-app-build-v1/fixture-inputs.json",
+    "sha256": "d9ae70e883a49d82239048e3feb54c9ee354cf8ee65d3ae2f43a872667638a97",
+    "bytes": 5707
+  },
+  "parentHandlerSource": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-portable-cache-handler-candidate-v1/index.json",
+    "sha256": "1f8398a6b89404f6ddf3fc187e6a3f595bc4ff9e4301f782f8edee2fed4452d5",
+    "bytes": 2025
+  },
+  "interopPrerequisiteSource": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-module-fileurl-interop-candidate-v2/index.json",
+    "sha256": "7dbad8b6f9f5471ea562646cc9eb31876d18f655320346affc79cc63a472a00c",
+    "bytes": 5871
+  },
+  "fixtureChange": {
+    "futureVersionedFixture": null,
+    "parentFiles": 29,
+    "unchangedParentFiles": 28,
+    "changedParentFiles": [
+      "next.config.mjs"
+    ],
+    "addedFiles": [
+      "cache-handler.cjs",
+      "app/api/portable-cache/route.js"
+    ],
+    "futureFiles": 31,
+    "dependenciesOrLockChanged": false,
+    "legacyRoutesAndUiChanged": false
+  },
+  "nextConfiguration": {
+    "output": "standalone",
+    "cacheHandler": "Local cache-handler.cjs filesystem path via existing fileURLToPath/newURL idiom; inspect genuine emitted relative path",
+    "cacheMaxMemorySize": 0,
+    "existingTracingRootAndFsFixtureIncludePreserved": true,
+    "cacheHandlersUsed": false
+  },
+  "handlerSuccessor": {
+    "futureSourceIndex": null,
+    "fixedNamespace": "portable-fetch-v2",
+    "explicitPrimaryTags": [
+      "next-runtime-fixture-v1",
+      "portable-fetch-v1"
+    ],
+    "getPrimaryGuard": "Exactly one primary tag; retained bounded declared soft tags and original precompute epochs",
+    "readEpochTags": [
+      "next-runtime-fixture-v1",
+      "portable-fetch-v1",
+      "_N_T_/layout",
+      "_N_T_/api/layout",
+      "_N_T_/api/cache/layout",
+      "_N_T_/api/cache/route",
+      "_N_T_/api/cache",
+      "_N_T_/api/portable-cache/layout",
+      "_N_T_/api/portable-cache/route",
+      "_N_T_/api/portable-cache"
+    ],
+    "mutationTags": [
+      "next-runtime-fixture-v1",
+      "portable-fetch-v1"
+    ],
+    "mutationPolicy": "Validate whole list before I/O/RNG/delegate. Reject every implicit _N_T_ and unknown tag; public path/route invalidation unsupported, no partial mutation of unsupported list.",
+    "primaryGuardMustChange": true,
+    "entrySlots": 64,
+    "associationLimit": 64,
+    "recordBytes": 65536,
+    "valueBytes": 32768,
+    "epochBytes": 2048,
+    "maximumCooperativeFiles": 148,
+    "maximumLogicalFileBytes": 8429568,
+    "routeDelegate": {
+      "actualClass": "Pinned genuine Next FileSystemCache default",
+      "maxMemoryCacheSize": 0,
+      "flushToDisk": false,
+      "designSelectedByRoot": true,
+      "actualValidated": false,
+      "routeWritesAndIsrPersistenceDeferred": true,
+      "implicitPathInvalidationSupported": false,
+      "newWritableServerMount": false
+    },
+    "fetchOuterFlushToDisk": true
+  },
+  "derivedOrdinaryReadRosters": [
+    {
+      "path": "/api/cache",
+      "page": "/api/cache/route",
+      "explicitTags": [
+        "next-runtime-fixture-v1"
+      ],
+      "softTags": [
+        "_N_T_/layout",
+        "_N_T_/api/layout",
+        "_N_T_/api/cache/layout",
+        "_N_T_/api/cache/route",
+        "_N_T_/api/cache"
+      ]
+    },
+    {
+      "path": "/api/portable-cache",
+      "page": "/api/portable-cache/route",
+      "explicitTags": [
+        "portable-fetch-v1"
+      ],
+      "softTags": [
+        "_N_T_/layout",
+        "_N_T_/api/layout",
+        "_N_T_/api/portable-cache/layout",
+        "_N_T_/api/portable-cache/route",
+        "_N_T_/api/portable-cache"
+      ]
+    }
+  ],
+  "newRoute": {
+    "runtime": "nodejs",
+    "dynamic": "force-dynamic",
+    "get": {
+      "api": "unstable_cache",
+      "keyParts": [
+        "portable-fetch-v1"
+      ],
+      "tags": [
+        "portable-fetch-v1"
+      ],
+      "revalidate": 3600,
+      "value": {
+        "marker": "NEXT_PORTABLE_CACHE_VALUE",
+        "nonce": "runtime callback randomBytes(32).toString(hex);64 lowercase hex"
+      },
+      "topLevelEntropy": false
+    },
+    "post": {
+      "api": "revalidateTag",
+      "tag": "portable-fetch-v1",
+      "profile": {
+        "expire": 0
+      },
+      "acknowledgement": {
+        "marker": "NEXT_PORTABLE_CACHE_REVALIDATED",
+        "tag": "portable-fetch-v1"
+      },
+      "ackNotDiskCommitAttestation": true
+    }
+  },
+  "finiteScenario": {
+    "requests": [
+      {
+        "id": "portable-first",
+        "method": "GET",
+        "path": "/api/portable-cache"
+      },
+      {
+        "id": "portable-repeat",
+        "method": "GET",
+        "path": "/api/portable-cache"
+      },
+      {
+        "id": "portable-revalidate",
+        "method": "POST",
+        "path": "/api/portable-cache"
+      },
+      {
+        "id": "portable-after",
+        "method": "GET",
+        "path": "/api/portable-cache"
+      },
+      {
+        "id": "portable-after-repeat",
+        "method": "GET",
+        "path": "/api/portable-cache"
+      }
+    ],
+    "allStatuses": 200,
+    "rawBeforeAssertions": true,
+    "noRetryPollingSleepOrFilter": true,
+    "nonceChecks": [
+      "first==repeat",
+      "after!=first",
+      "after==after-repeat"
+    ]
+  },
+  "reuse": {
+    "builder": "Genuine app-only next-app-build-v1 successor/new fixture catalogue",
+    "stock": "Genuine StockV6 successor",
+    "native": "Current reviewed native runner/guard successor",
+    "oneSharedFutureFiveCaseCollector": true,
+    "original24CacheStreamStrict2AndSupplemental6Preserved": true,
+    "newInventoryAndBrowserPinsRequired": true,
+    "noOldResultRetargeting": true
+  },
+  "prerequisites": [
+    "accepted corrected full native build and genuine probe constructor",
+    "genuine deployed16-case interop passes before actual new app build",
+    "reviewed successor model +real-FS/concurrent/corruption/public-path-refusal tests",
+    "normal Next build/trace/path/source bookends",
+    "new matched Node/native trials preserve all original gates and raw failures"
+  ],
+  "legacyCounterPolicy": "Legacy module-local generation comparison remains separate/strict; generation1\u21921 is failure. New nonce pass never converts a failed original contract or historical result to full acceptance.",
+  "actualHandlerSuccessor": null,
+  "actualInteropProbe": null,
+  "actualNewAppBuild": null,
+  "actualNodeScenario": null,
+  "actualNativeScenario": null,
+  "productionReady": false
+}
