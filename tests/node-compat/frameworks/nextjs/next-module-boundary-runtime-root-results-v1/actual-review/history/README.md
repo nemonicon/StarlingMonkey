@@ -1,0 +1,1 @@
+The prior reader70277c0f is retained as exact Source history only. Its relative HERE would refer to this history directory, so do not execute it here or rebind its globals. No prior actual record was defective. The current root check.py adds constructor-only replay joins requested before final sealing; runtime validation remains unchanged.

@@ -1,0 +1,235 @@
+--- next-native-portable-source-v2/materialize.py
++++ next-native-portable-source-v3/materialize.py
+@@ -7,12 +7,16 @@
+ import argparse
+ import collections
+ import hashlib
++import importlib.util
+ import json
+ import os
+ import stat
++import sys
++
++sys.dont_write_bytecode = True
+ 
+ HERE = Path(__file__).absolute().parent
+-REL = 'tests/node-compat/frameworks/nextjs/next-native-portable-source-v2'
++REL = 'tests/node-compat/frameworks/nextjs/next-native-portable-source-v3'
+ ROLES = {'native-policy-source': 'source', 'build-support': 'build-support',
+          'componentize-embedding': 'componentize-source'}
+ COUNTS = {'native-policy-source': 435, 'build-support': 387,
+@@ -74,115 +78,113 @@
+ 
+ 
+ def selection(repo):
+-    """Authenticate the genuine finite donor map and exact overlay guards."""
++    """Authenticate a sealed parent recipe and one sequential Source overlay."""
+     repo = canonical(repo)
+     inputs = {}
+ 
+     def get(name, expected=None):
+-        path = repo / relative(name)
+-        data, row = read_file(path, expected)
+-        if str(path) in inputs:
+-            require(inputs[str(path)] == row, 'Conflicting input descriptor')
+-        inputs[str(path)] = row
++        data, ref = read_file(repo / relative(name), expected)
++        require(ref['path'] not in inputs or inputs[ref['path']] == ref, 'Conflicting Source input')
++        inputs[ref['path']] = ref
+         return data
+ 
++    def family(ref):
++        index = json.loads(get(ref['repositoryPath'], ref))
++        root = relative(ref['repositoryPath']).parent
++        members = {r['path']: r for r in index['files']}
++        require(len(members) == len(index['files']) and 'index.json' not in members,
++                'Unique indexed Source members')
++        nodes = list((repo / root).rglob('*'))
++        require(not any(p.is_symlink() for p in nodes) and all(p.is_file() or p.is_dir() for p in nodes),
++                'Source aliases/specials refused')
++        require({p.relative_to(repo / root).as_posix() for p in nodes if p.is_file()} ==
++                {'index.json', *members}, 'Closed Source membership')
++        dirs = {p.as_posix() for n in members for p in relative(n).parents if p != Path('.')}
++        require({p.relative_to(repo / root).as_posix() for p in nodes if p.is_dir()} == dirs,
++                'Closed Source directory membership')
++        for name, member in members.items():
++            get((root / relative(name)).as_posix(), member)
++        return index, root, members
++
+     spec = json.loads(get(REL + '/selection.json'))
+-    require(spec['schemaVersion'] == 1 and spec['state'] == 'WORKING_NEXT_FULL02A_PLUS_MODULE_BOUNDARY_PORTABLE_SOURCE_SELECTION_V2', 'Wrong Source selection')
+-    require(spec['expectedCounts'] == COUNTS and spec['outputDirectories'] == ROLES,
+-            'Role policy differs')
+-    require(spec['nativeBuildOrCompilerOrGuestClaimed'] is False, 'Unexpected build claim')
+-    base = json.loads(get(spec['baselineMap']['repositoryPath'], spec['baselineMap']))
+-    graft = json.loads(get(spec['v7Mapping']['repositoryPath'], spec['v7Mapping']))
+-    require(base['state'] == 'EXACT_CURRENT_C2_BASELINE_PORTABLE_SOURCE_MAP_NO_INTL_OR_ERROR_OVERLAY'
+-            and len(base['files']) == 824, 'Wrong C2 baseline map')
+-    rows = {}
+-    for r in base['files']:
+-        role = r['role']
+-        require(role in ROLES, 'Unknown role')
+-        prefix = 'componentize-source/' if role == 'componentize-embedding' else 'native-source/'
+-        require(r['destination'].startswith(prefix), 'Wrong destination role')
+-        name = relative(r['destination'][len(prefix):]).as_posix()
+-        key = (role, name)
+-        require(key not in rows, 'Duplicate selected input')
+-        donor = r['repositoryDonor']
+-        require((donor['sha256'], donor['bytes']) == (r['sha256'], r['bytes']), 'Baseline donor mismatch')
+-        rows[key] = dict(role=role, path=name, sha256=r['sha256'], bytes=r['bytes'],
+-                         mode=int(r['copyMode'], 8), repositoryDonor=donor['path'],
+-                         gitBlobSha1=donor['gitBlobSha1'], origin='committed C2 donor')
+-    # The seventh overlay is a complete authenticated Source family, not a
+-    # changed historical build input or an unreviewed pathname-only donor.
+-    boundary_ref = spec['moduleBoundarySourceIndex']
+-    boundary_index = json.loads(get(boundary_ref['repositoryPath'], boundary_ref))
+-    require(boundary_index['state'] == 'MODULE_IMPORT_REFERRER_BOUNDARY_UNCOMPILED_SOURCE_HELD_V1', 'Wrong boundary Source family')
+-    boundary_root = relative(boundary_ref['repositoryPath']).parent
+-    names = {r['path'] for r in boundary_index['files']}
+-    require(len(names) == len(boundary_index['files']), 'Duplicate boundary Source member')
+-    nodes = list((repo / boundary_root).rglob('*'))
+-    require(not any(p.is_symlink() for p in nodes) and all(p.is_file() or p.is_dir() for p in nodes)
+-            and {p.relative_to(repo / boundary_root).as_posix() for p in nodes if p.is_file()} == names | {'index.json'},
+-            'Boundary Source membership/aliases')
+-    dirs = {p.as_posix() for name in names for p in Path(name).parents if p != Path('.')}
+-    require({p.relative_to(repo / boundary_root).as_posix() for p in nodes if p.is_dir()} == dirs, 'Boundary Source directories')
+-    for member in boundary_index['files']:
+-        get((boundary_root / relative(member['path'])).as_posix(), member)
+-    version_ref = spec['moduleBoundaryVersionManifest']
+-    version_rows = [r for r in boundary_index['files'] if r['path'] == 'version-manifest.json']
+-    require(version_ref['repositoryPath'] == (boundary_root / 'version-manifest.json').as_posix()
+-            and len(version_rows) == 1 and all(version_rows[0][k] == version_ref[k] for k in ('sha256', 'bytes')), 'Indexed boundary version role')
+-    boundary = json.loads(get(version_ref['repositoryPath'], version_ref))
+-    require(boundary['state'] == 'MODULE_IMPORT_REFERRER_BOUNDARY_UNCOMPILED_SOURCE_V1'
+-            and boundary['cppCompiled'] is False and boundary['actualEngine'] is None
+-            and boundary['actualImportProbe'] is None, 'Boundary remains genuine uncompiled Source')
+-    require(len(spec['overlays']) == 7 and len(spec['additions']) == 1
+-            and len(graft['replacements']) == 5, 'Wrong overlay boundary')
+-    joined = set()
+-    for i, edit in enumerate(spec['overlays']):
+-        key = (edit['role'], relative(edit['path']).as_posix())
+-        require(key in rows and key not in joined and edit['role'] == 'native-policy-source', 'Invalid replacement')
+-        joined.add(key)
+-        old = rows[key]
+-        require({k: old[k] for k in ('sha256', 'bytes')} == edit['before'], 'Replacement before guard')
+-        if i < 5:
+-            g = graft['replacements'][i]
+-            require(g['target'] == edit['path'] and g['newPath'] is False
+-                    and {k: g['before'][k] for k in ('sha256', 'bytes')} == edit['before']
+-                    and all(g['after'][k] == edit['donor'][k] for k in ('sha256', 'bytes')),
+-                    'V7 mapping join differs')
+-        elif i == 5:
+-            require(edit['path'] == 'builtins/node-compat/module-kernel.cpp', 'Wrong UTF16 target')
+-        else:
+-            require(i == 6 and edit['path'] == 'runtime/script_loader.cpp', 'Wrong checked-referrer target')
+-            require(edit['before'] == {k: boundary['compiledBase'][k] for k in ('sha256', 'bytes')}
+-                    and all(edit['donor'][k] == boundary['after'][k] for k in ('sha256', 'bytes')), 'Boundary version join')
+-            selected = [r for r in boundary_index['files'] if r['path'] == 'after/runtime/script_loader.cpp']
+-            require(len(selected) == 1 and all(selected[0][k] == edit['donor'][k] for k in ('sha256', 'bytes')), 'Boundary indexed afterimage')
+-        old.update(sha256=edit['donor']['sha256'], bytes=edit['donor']['bytes'], mode=edit['mode'],
+-                   repositoryDonor=edit['donor']['repositoryPath'], origin=edit['reason'])
+-        old.pop('gitBlobSha1', None)
+-    for edit in spec['additions']:
+-        name = relative(edit['path']).as_posix()
+-        key = (edit['role'], name)
+-        require(key not in rows and key == ('build-support', 'runtime/crates/staticlib-template/Cargo.intl.toml.in'), 'Invalid support addition')
+-        g = graft['extraBuildSupport']
+-        require(len(g) == 1 and g[0]['relativePath'] == name and g[0]['mode'] == edit['mode']
+-                and all(g[0]['source'][k] == edit['donor'][k] for k in ('sha256', 'bytes')), 'Extra support join')
+-        rows[key] = dict(role=edit['role'], path=name, sha256=edit['donor']['sha256'], bytes=edit['donor']['bytes'],
+-                         mode=edit['mode'], repositoryDonor=edit['donor']['repositoryPath'], origin='V7 extra Intl Cargo support')
+-    values = sorted(rows.values(), key=lambda r: (r['role'], r['path']))
+-    require(collections.Counter(r['role'] for r in values) == COUNTS and len(values) == spec['expectedFiles'] == 825,
+-            'Wrong whole selected role membership')
+-    require(not {r['path'] for r in values if r['role'] == 'native-policy-source'} &
+-            {r['path'] for r in values if r['role'] == 'build-support'}, 'Native/support overlap')
+-    require(sum(r['bytes'] for r in values) == spec['expectedBytes'] == 7532227
+-            and fingerprint(values) == spec['roleContentSha256'], 'Whole content fingerprint differs')
+-    for r in values:
+-        require(r['mode'] in (0o600, 0o644, 0o755), 'Unexpected copy mode')
+-        data = get(r['repositoryDonor'], r)
+-        if 'gitBlobSha1' in r:
+-            require(hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest() == r['gitBlobSha1'], 'Git blob differs')
+-        r['data'] = data
++    require(spec['schemaVersion'] == 1 and spec['state'] ==
++            'WORKING_GUARDED_CJS_FILE_URL_INTEROP_PORTABLE_SOURCE_SELECTION_V3', 'Wrong Source recipe')
++    require(spec['expectedCounts'] == COUNTS and spec['outputDirectories'] == ROLES
++            and spec['nativeBuildOrCompilerOrGuestClaimed'] is False, 'Role/action policy')
++    parent_index, parent_root, parent_members = family(spec['parentMaterializerIndex'])
++    require(parent_index['state'] == 'HELD_NEXT_PORTABLE_NATIVE_SOURCE_MATERIALIZER_V2', 'Sealed guarded parent')
++    for key, name in [('parentMaterializerModule', 'materialize.py'),
++                      ('parentMaterializerSelection', 'selection.json')]:
++        ref = spec[key]
++        require(ref['repositoryPath'] == (parent_root / name).as_posix() and
++                all(parent_members[name][k] == ref[k] for k in ('sha256', 'bytes')), 'Indexed parent role')
++    module_path = repo / relative(spec['parentMaterializerModule']['repositoryPath'])
++    module_spec = importlib.util.spec_from_file_location('sealed_guard825_parent_recipe', module_path)
++    parent = importlib.util.module_from_spec(module_spec)
++    module_spec.loader.exec_module(parent)
++    parent_spec, rows, parent_inputs = parent.selection(repo)
++    require(parent_spec == json.loads(get(spec['parentMaterializerSelection']['repositoryPath'],
++                                         spec['parentMaterializerSelection'])), 'Exact parent recipe')
++    require(parent.fingerprint(rows) == spec['parentRoleContentSha256'], 'Parent content fingerprint')
++    for path, ref in parent_inputs.items():
++        require(path not in inputs or inputs[path] == ref, 'Parent provenance conflict')
++        inputs[path] = ref
++    index, interop_root, members = family(spec['interopSourceIndex'])
++    require(index['state'] == 'CJS_FILE_URL_INTEROP_UNCOMPILED_SOURCE_HELD_V1'
++            and index['cppCompiled'] is False, 'Sealed uncompiled interop Source')
++    version_ref = spec['interopVersionManifest']
++    require(version_ref['repositoryPath'] == (interop_root / 'version-manifest.json').as_posix()
++            and all(members['version-manifest.json'][k] == version_ref[k] for k in ('sha256', 'bytes')),
++            'Indexed interop version manifest')
++    version = json.loads(get(version_ref['repositoryPath'], version_ref))
++    parent_guard = parent_spec['moduleBoundarySourceIndex']
++    historical_parent = version['parentSourceIndex']
++    parent_suffix = relative(parent_guard['repositoryPath']).parts
++    require(all(historical_parent[k] == parent_guard[k] for k in ('sha256', 'bytes'))
++            and Path(historical_parent['path']).parts[-len(parent_suffix):] == parent_suffix,
++            'Exact guarded Source ancestry; original absolute path is provenance only')
++    require(version['cppCompiled'] is False and version['newCompiledEngine'] is None
++            and version['actualLink'] is None and version['actualGuestProbe'] is None,
++            'No interop compilation/probe projection')
++    edit = spec['postOverlay']
++    require(edit['role'] == 'native-policy-source' and edit['path'] == 'runtime/script_loader.cpp'
++            and edit['mode'] == 0o600, 'Single exact post-overlay role')
++    selected = [r for r in rows if (r['role'], r['path']) == (edit['role'], edit['path'])]
++    require(len(selected) == 1 and {k: selected[0][k] for k in ('sha256', 'bytes')} == edit['before']
++            and all(version['before'][k] == edit['before'][k] for k in ('sha256', 'bytes')), 'Guarded before-image')
++    require(all(members['before/runtime/script_loader.cpp'][k] == edit['before'][k] for k in ('sha256', 'bytes'))
++            and get((interop_root / 'before/runtime/script_loader.cpp').as_posix()) == selected[0]['data'],
++            'Exact parent/before payload equality')
++    donor = edit['donor']
++    require(donor['repositoryPath'] == (interop_root / 'after/runtime/script_loader.cpp').as_posix()
++            and all(members['after/runtime/script_loader.cpp'][k] == donor[k] == version['after'][k]
++                    for k in ('sha256', 'bytes')), 'Indexed exact interop after-image')
++    witness_ref = version['compileRoleWitness']
++    require(all(members['compile-role-witness.json'][k] == witness_ref[k] for k in ('sha256', 'bytes')),
++            'Indexed compile-role witness')
++    witness = json.loads(get((interop_root / 'compile-role-witness.json').as_posix(), witness_ref))
++    require(version['compileGuard'] == 'NODE_COMPAT_MODULE common extension_api interface definition'
++            and version['privateFsHeaderRelativeToRuntime'] == witness['relativeHeaderFromRuntime'] ==
++            '../builtins/node-compat/next-fs-native.h'
++            and witness['correctedModuleGuardParticipatesInOriginalLoaderTu'] is True,
++            'MODULE-only/relative-header Source witness')
++    header = next(r for r in rows if r['path'] == 'builtins/node-compat/next-fs-native.h')
++    require(all(header[k] == witness['privateFsHeader'][k] for k in ('sha256', 'bytes')), 'Selected private FS header')
++    cmake = next(r for r in rows if r['path'] == 'cmake/builtins.cmake')
++    require(version['existingModuleRequiresFs'] is True and
++            all(cmake[k] == witness['existingCMake'][k] for k in ('sha256', 'bytes')),
++            'Existing selected module/FS CMake contract')
++    data = get(donor['repositoryPath'], donor)
++    require(b'#ifdef NODE_COMPAT_MODULE\n#include "../builtins/node-compat/next-fs-native.h"' in data,
++            'Exact common MODULE-only include boundary')
++    selected[0].update(sha256=donor['sha256'], bytes=donor['bytes'], mode=edit['mode'],
++                       repositoryDonor=donor['repositoryPath'], origin=edit['reason'], data=data)
++    require(collections.Counter(r['role'] for r in rows) == COUNTS and len(rows) == spec['expectedFiles'] == 825,
++            'Whole selected role membership')
++    require(sum(r['bytes'] for r in rows) == spec['expectedBytes'] == 7548909
++            and fingerprint(rows) == spec['roleContentSha256'], 'Post-overlay content fingerprint')
+     get(REL + '/materialize.py')
+-    return spec, values, inputs
++    return spec, rows, inputs
+ 
+ 
+ def recheck(inputs):

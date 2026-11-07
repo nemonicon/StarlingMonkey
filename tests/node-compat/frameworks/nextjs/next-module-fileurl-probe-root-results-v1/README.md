@@ -18,8 +18,16 @@ owner, every raw stream and complete28-member/eight-WIT world. Fresh package
 reviewa5ef2369 verifies4,889 files and21 confined links. Reviewer authorship and
 delegated scopes remain explicit in the three review records.
 
-The separate deployed harness is in Source preparation. It will stage eight
-fresh read-only physical fixture copies and execute exactly one ordinary GET
-for the two declared guard cases. Construction has not exercised dynamic
-import behavior. A successful coded refusal would establish bounded error
-behavior, not Node-compatible CJS/file-URL import support.
+The separately held runtime harnessf47a now completes one actual ordinary GET:
+Rootsession84379/original24048/180, raw0/clean/protected/full-native and whole-world
+guards unchanged. Eight independent physical fixture copies are0444 under0555.
+The complete1,065-byte responseb3f10854 passes both cases: real CJS dynamic import
+of node:path retains function identity, and natural file-URL import rejects with
+the exact TypeError/code/operation/actual module fields. Stock Wasmtime shuts
+down with intended SIGINT/code0. Independent finite DATA review55a449e6 verifies
+the original owner, world,84 inputs, all fixtures and raw response.
+
+This establishes selected builtin behavior and coded safe refusal. The separate
+pinned Node reference imports the same target successfully. No Node-compatible
+CJS/file-URL support,3856 interoperability, full Next acceptance or production
+promotion follows from this guard result.

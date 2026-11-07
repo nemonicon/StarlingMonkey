@@ -9,15 +9,17 @@ Current next steps and outstanding work:
 - **Complete:** guarded native build, real-Next component construction, and one
   full deployed regression. HTTP/stream/browser checks pass in that sample;
   cache1→1 keeps the full suite failed. Prior browser failures remain unresolved.
-- **Ready for deployed testing:** the guard-only probe component has passed
-  typed-return, import, owner/world and package DATA review. Its request has not run.
-- **In progress:** immutable result packets, deployed probe harness and portable
-  build integration for the uncompiled bounded CJS/fileURL prototype.
+- **Complete for its bounded contract:** the deployed two-case guard test passes
+  builtin import and coded file-URL refusal with independent DATA review. This
+  is an explicit compatibility gap against the successful pinned Node reference.
+- **In progress:** guard probe result retention and native generator/build
+  preparation for the uncompiled bounded CJS/fileURL prototype. Its825 source
+  files are freshly materialized and genuinely admitted; no interop guest has run.
 - **After loader validation:** explicit Next CacheHandler scenario with shared
   tag epochs, differential/real-component tests, target-host checks and measurements.
 - **Still open:** broader lifecycle/resource coverage, clean-machine bootstrap,
   performance/size evaluation and any production promotion. Foundations-v13 remains
-  the accepted checkpoint. Completed work through38d05887 is committed and pushed.
+  the accepted checkpoint. Completed snapshots through37e0ab52 are committed and pushed.
 
 Execution resumed after the user freed the current volume. Native admission
 observed 23,397,662,720 free bytes. Both first real request-regression arms have
@@ -152,6 +154,12 @@ readers and independent Source/DATA review pass. Root independently rereads
 all2,364 archived/current original bytes and modes with unchanged nanosecond
 physical bookends. The packet excludes binaries/825 payload rehash and accepts
 no import/runtime behavior.
+The guarded real-Next constructor/runtime packets are now sealed at120b8626/
+ae829e0e (197+314 original records;30,241,812 logical bytes). Final portable and
+current readers pass. Root independently rereads all511 archive/current original
+bytes/modes with stable nanosecond physical bookends. Constructor-only replay
+joins were strengthened before sealing, with prior reader Source preserved.
+The runtime packet keeps cache1→1/raw1 and its one strict-browser positive.
 Checkpoint38d05887 is now committed and pushed:264 files retain the action
 transport controls, guarded full-build/INIT evidence and bounded import Sources.
 The native fileURL/CJS prototype is separately sealed at3856b027 after static
@@ -160,15 +168,31 @@ It is uncompiled and excluded from this guarded build. A separate guard-only pro
 original20407/2400. Componente1bddfbc/37,141,676 bytes validates with the same
 thirteen standard imports and incoming-handler export. Coordinated typed/full-
 metadata review6b4affe3, independent owner/worlda2171853 and fresh packagea5ef2369
-reviews pass. No fixture was mounted at INIT, and no deployed
-referrer probe or prototype runtime action has run.
+reviews pass. No fixture was mounted at INIT. The first deployed guard request now completes
+Rootsession84379/original24048/180 raw0/clean/protected/full-native-world guarded.
+One GET returns1065 bytesb3f10854 with exactlytwo passing cases: node:path
+identity/join and TypeError ERR_SM_MODULE_IMPORT_REFERRER/module_load_hook/actual
+fileURL. Independent84-input owner/world/fixture/raw-response DATA review55a449e6
+passes. This accepts safe refusal only; Node parity and3856 interoperability remain
+false. No prototype runtime action has run.
 A separate genuine Node22.14 control completes0/clean under original22178/120
 using the same sealed CommonJS driver and eight fresh physical read-only fixture
 copies. Natural CJS import(fileURL) succeeds, default equals require exports and
 repeated namespace identity holds. It uses a canonical host fixture URL, not a
 guest /probe emulation. Fifteen retained original text records/10,083 bytes pass
-Root current DATA replay; independent peer/family sealing are pending. This
+Root current DATA replay. Independent Source/current-DATA review now passes,
+including the corrected reader's Source/fixture/URL joins; family82ddcf61 is sealed. This
 reference does not accept the guest guard refusal or uncompiled interop profile.
+The bounded interop source integration is now materialized once from sealed
+MatV3d6c8e96b:825 files/7,548,909 bytes/fingerprint77346c39. Exactly loaderfbc1→25c
+changes (+16,682 bytes);824 payloads and21 Rust base files match. Root
+independently rehashes all825 source/donor pairs with modes/distinct identities.
+The initial inherited readback fails at stat_result equality, which included
+access time; its before/after values were not retained, so that cause remains
+a source-level inference. Original code/raw1 are preserved. New stable-field
+verifierd4d3eec5 passes0 without a second materialization or native/tool action.
+BuilderV5 policy-only Source passes Root review; its generator/preparation/native
+execution and the interop component/16-case probe are still outstanding.
 The prior capacity observations below
 are historical; the storage blocker is resolved for this execution.
 

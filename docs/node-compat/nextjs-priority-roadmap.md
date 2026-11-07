@@ -150,10 +150,15 @@ passes complete typed-return/standard13-import/world/package DATA review.
 Its first full unchanged deployed regression finishes1/clean/protected:24HTTP/
 80supplemental/stream and both strict browser tests pass, but cache1→1 still
 fails. Independent DATA review is pending; no browser reliability/fix claim
-follows. Construction and that Next run have not exercised the selected
-invalid-referrer import. The next implementation order is: retain this result; run the
-separate two-case deployed checked-referrer probe; compile and test the sealed,
-currently uncompiled bounded CJS/fileURL prototype; then build an explicitly configured portable cache scenario
+follows. Both records now have sealed replayable DATA packets. The separate
+two-case deployed guard probe also passes0/clean/protected: builtin import works
+and natural CJS file-URL import rejects with the selected TypeError/code/operation/
+specifier. Independent DATA review passes. A genuine pinned Node reference
+imports that target successfully; safe refusal remains a compatibility gap.
+The bounded interop prototype's825 sources are now freshly materialized and
+admitted, with824 other payloads/21 Rust files unchanged. It remains uncompiled.
+The next implementation order is: run its unchanged generator checks and full
+native build; construct/test the sixteen-case interop component; then build an explicitly configured portable cache scenario
 through Next's actual CacheHandler extension. Do not patch global state or
 change host scheduling to simulate one Node process.
 
