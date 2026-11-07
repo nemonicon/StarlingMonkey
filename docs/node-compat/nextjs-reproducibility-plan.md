@@ -267,9 +267,14 @@ failed before output or Cargo on a strict boolean flag bug; its failure remains
 preserved, and V2 changes only the two entry predicates. Cargo's observed
 `rustc` information query is not a source-compilation result.
 
-Remaining work includes implementing and reviewing the
-[V3 builder integration](../../tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-v3/change-plan.json)
-that consumes this actual proof and fresh roles,
+The [reviewed V3 builder integration](../../tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-v3/README.md)
+now consumes that actual proof, verifies all 21 shared base files and selects
+the fresh roles. It keeps Python 3.11 for the wrapper and Python 3.9 for native
+build tools. The [actual five-JSON preparation and concrete unissued draft](../../tests/node-compat/frameworks/nextjs/next-native-portable-build-root-results-v3/README.md)
+pass read-only admission and review; the capacity check refuses below 3 GiB.
+This is preparation, not a native compile or new application result.
+
+Remaining work includes the full native build and regression on its new artifact,
 exact host-tool/cbindgen/Corrosion acquisition, generated61685 package rebuild,
 original988 adapter upstream provenance, and sufficient capacity for the fresh
 full native build and subsequent application gates. The committed988 bytes

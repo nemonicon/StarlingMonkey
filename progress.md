@@ -16,7 +16,7 @@ production promotion follow these gates. See the updated
 [execution roadmap](docs/node-compat/nextjs-priority-roadmap.md).
 
 The next runtime gate remains the prepared NativeV8/StockV6 concurrent-request
-pair. The current volume has about 0.65 GiB free, below its unchanged 1 GiB
+pair. The current volume has about 0.61 GiB free, below its unchanged 1 GiB
 start guard, so neither new application arm has run. The full native build
 still requires 3 GiB at admission. While those launches wait for capacity, the
 first [relocated Cargo source restoration](tests/node-compat/frameworks/nextjs/native-cargo-restore-root-results-v1/README.md)
@@ -57,16 +57,32 @@ execution was requested. The complete 23-file output is retained as an indexed
 DATA archive for future inspection; live source identities still require the
 separate admission API.
 
-The [V3 builder integration change plan](tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-v3/change-plan.json)
-is **unimplemented and unissued**. It replaces four old Cargo locations through
-the existing role-based build mechanisms, adds a validated Cargo selection,
-joins all 21 base files to the portable native selection, and uses a separately
-pinned Python 3.11 wrapper while preserving Python 3.9 as the native build tool.
-The new metadata is recorded as a candidate, not yet admitted by that consumer.
-Priority remains: run the prepared Next request pair as soon as 1 GiB is free;
-finish V3 integration and perform the full build when 3 GiB is free; rerun the
-complete application on its newly constructed component. No production default
-or compatibility claim has changed.
+The [V3 builder integration](tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-v3/README.md)
+is now **implemented, reviewed and held** at index `d4341284…`. It replaces
+four old Cargo locations through the existing build mechanisms, admits the
+actual offline metadata and live restored files, joins all 21 base files to
+the full portable source selection, and verifies their independent WORK copies.
+The Python 3.11 wrapper is separately pinned; Python 3.9 remains the native
+build tool. Both Source reviews pass, including 53 helper DATA checks and the
+specific CMake empty-feature equivalence; 19 operational functions and the
+same-role native command/environment behavior remain unchanged.
+
+The [actual V3 preparation](tests/node-compat/frameworks/nextjs/next-native-portable-build-root-results-v3/README.md)
+exits 0. It writes five JSON files and no source copies or native commands.
+The new Cargo selection is `1947c893…`; Root's concrete unissued draft is
+`1124aab9…`. Root's 33 inert checks, read-only launcher and input admission pass:
+435 native/387 support/3 embedding files, 22 public/2 private manifests, 1,825
+file descriptors and ten inventory descriptors. This does not replay every
+live tool-tree member. Final preparation/launcher review passes, and the five
+original JSON files are retained as indexed DATA.
+
+The actual **read-only capacity check exits 1** at 659,873,792 free bytes,
+below 3 GiB. No full build launch is attempted, authority issued, or native
+WORK/monitor directory created. Preparation is complete for this generation;
+the complete native build and new Next request pair remain outstanding.
+Priority remains: run the prepared request pair once 1 GiB is free, then run
+the full build when 3 GiB is free and test the complete application on the new
+component. No production default or compatibility claim has changed.
 
 The prior goal turn made concrete progress: paired six-case regression Sources,
 reviewed commands, native build preparation/launcher and capacity refusals were
