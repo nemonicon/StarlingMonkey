@@ -9,13 +9,25 @@ explicit `(void)` casts. A fresh full native build now exits0 and produces a
 31,347,353-byte candidate engine; coordinated build DATA review passes.
 The fresh interoperability component passes all16 deployed module cases in
 one GET (runtime review55a255e7). The separate public Fetch component passes
-INIT review4b3b0f43 with the full actual import audit; its eight lifecycle cases
-are awaiting execution. These components emit the same thirteen selected
+INIT review4b3b0f43 with the full actual import audit; its first actual Node/Wasm
+comparison now passes all eight public groups, raw0/clean/protected, with
+coordinated DATA review705270ee. These components emit the same thirteen selected
 standard WASI0.2.10 interfaces and only the incoming HTTP handler export.
 The accepted production checkpoint remains foundations-v13. The experimental
 Next.js profile still fails its legacy cache counter and strict Server Action
 response-capture gates. This change has no demonstrated causal relationship
 to either failure.
+
+The new real-Next componentd990ecc1 now completes the unchanged full suite:
+five persistent-cache requests/52 checks,24 HTTP checks,80 supplemental checks,
+five stream chunks and both functional browser interactions pass. Legacy
+generation stays1→1, and strict Server Action capture retains three
+`ERR_ABORTED` errors. Result2fb8d5fd/client55d29476 are overall failed, with
+clean ownership and preserved inputs; DATA reviewc3a8b95b independently verifies
+the failed trial. A separate pre-HTTP harness prefix
+failure and its bounded configuration correction are also retained. Further
+native ownership expansion is deferred behind investigation of these two
+remaining application gaps.
 
 The existing deployed profile can render the comprehensive Next.js fixture,
 serve its HTTP contracts, stream HTML and perform both browser interactions.

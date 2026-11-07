@@ -1,0 +1,417 @@
+{
+  "schemaVersion": 1,
+  "executor": "node22-global-fetch",
+  "origin": "http://127.0.0.1:50589",
+  "caseIds": [
+    "read-eof-metadata",
+    "bodyall-text",
+    "bodyall-json",
+    "bodyall-arraybuffer",
+    "repeat-read-eof",
+    "clone-one-cancel-other-drain",
+    "direct-reader-cancel-pending",
+    "direct-reader-cancel-after-read"
+  ],
+  "records": [
+    {
+      "id": "read-eof-metadata",
+      "observations": {
+        "before": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": false
+        },
+        "hex": "7b226d61726b6572223a224e4558545f4a534f4e5f474554222c227175657279223a226c6966656379636c652d7631227d",
+        "receivedBytes": 49,
+        "parts": [
+          49
+        ],
+        "eof": {
+          "done": true,
+          "valueUndefined": true,
+          "hex": null
+        },
+        "closed": {
+          "fulfilled": true,
+          "valueUndefined": true
+        },
+        "complete": true,
+        "after": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": true
+        }
+      },
+      "error": null,
+      "cleanupErrors": [],
+      "captureLogError": null
+    },
+    {
+      "id": "bodyall-text",
+      "observations": {
+        "before": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": false
+        },
+        "value": "{\"marker\":\"NEXT_JSON_GET\",\"query\":\"lifecycle-v1\"}",
+        "after": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": true
+        },
+        "secondRead": {
+          "fulfilled": false,
+          "error": {
+            "type": "object",
+            "isNull": false,
+            "isTypeError": true,
+            "name": "TypeError",
+            "message": "Body is unusable: Body has already been read",
+            "code": null
+          }
+        }
+      },
+      "error": null,
+      "cleanupErrors": [],
+      "captureLogError": null
+    },
+    {
+      "id": "bodyall-json",
+      "observations": {
+        "before": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": false
+        },
+        "value": {
+          "marker": "NEXT_JSON_GET",
+          "query": "lifecycle-v1"
+        },
+        "after": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": true
+        },
+        "secondRead": {
+          "fulfilled": false,
+          "error": {
+            "type": "object",
+            "isNull": false,
+            "isTypeError": true,
+            "name": "TypeError",
+            "message": "Body is unusable: Body has already been read",
+            "code": null
+          }
+        }
+      },
+      "error": null,
+      "cleanupErrors": [],
+      "captureLogError": null
+    },
+    {
+      "id": "bodyall-arraybuffer",
+      "observations": {
+        "before": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": false
+        },
+        "hex": "7b226d61726b6572223a224e4558545f4a534f4e5f474554222c227175657279223a226c6966656379636c652d7631227d",
+        "after": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": true
+        },
+        "secondRead": {
+          "fulfilled": false,
+          "error": {
+            "type": "object",
+            "isNull": false,
+            "isTypeError": true,
+            "name": "TypeError",
+            "message": "Body is unusable: Body has already been read",
+            "code": null
+          }
+        }
+      },
+      "error": null,
+      "cleanupErrors": [],
+      "captureLogError": null
+    },
+    {
+      "id": "repeat-read-eof",
+      "observations": {
+        "responses": [
+          {
+            "ordinal": 1,
+            "before": {
+              "status": 200,
+              "url": "http://127.0.0.1:50589/api/health",
+              "contentType": "application/json",
+              "bodyUsed": false
+            },
+            "hex": "7b226d61726b6572223a224e4558545f4845414c54485f4f4b222c226f6b223a747275657d",
+            "receivedBytes": 37,
+            "parts": [
+              37
+            ],
+            "eof": {
+              "done": true,
+              "valueUndefined": true,
+              "hex": null
+            },
+            "closed": {
+              "fulfilled": true,
+              "valueUndefined": true
+            },
+            "complete": true,
+            "after": {
+              "status": 200,
+              "url": "http://127.0.0.1:50589/api/health",
+              "contentType": "application/json",
+              "bodyUsed": true
+            }
+          },
+          {
+            "ordinal": 2,
+            "before": {
+              "status": 200,
+              "url": "http://127.0.0.1:50589/api/health",
+              "contentType": "application/json",
+              "bodyUsed": false
+            },
+            "hex": "7b226d61726b6572223a224e4558545f4845414c54485f4f4b222c226f6b223a747275657d",
+            "receivedBytes": 37,
+            "parts": [
+              37
+            ],
+            "eof": {
+              "done": true,
+              "valueUndefined": true,
+              "hex": null
+            },
+            "closed": {
+              "fulfilled": true,
+              "valueUndefined": true
+            },
+            "complete": true,
+            "after": {
+              "status": 200,
+              "url": "http://127.0.0.1:50589/api/health",
+              "contentType": "application/json",
+              "bodyUsed": true
+            }
+          },
+          {
+            "ordinal": 3,
+            "before": {
+              "status": 200,
+              "url": "http://127.0.0.1:50589/api/health",
+              "contentType": "application/json",
+              "bodyUsed": false
+            },
+            "hex": "7b226d61726b6572223a224e4558545f4845414c54485f4f4b222c226f6b223a747275657d",
+            "receivedBytes": 37,
+            "parts": [
+              37
+            ],
+            "eof": {
+              "done": true,
+              "valueUndefined": true,
+              "hex": null
+            },
+            "closed": {
+              "fulfilled": true,
+              "valueUndefined": true
+            },
+            "complete": true,
+            "after": {
+              "status": 200,
+              "url": "http://127.0.0.1:50589/api/health",
+              "contentType": "application/json",
+              "bodyUsed": true
+            }
+          },
+          {
+            "ordinal": 4,
+            "before": {
+              "status": 200,
+              "url": "http://127.0.0.1:50589/api/health",
+              "contentType": "application/json",
+              "bodyUsed": false
+            },
+            "hex": "7b226d61726b6572223a224e4558545f4845414c54485f4f4b222c226f6b223a747275657d",
+            "receivedBytes": 37,
+            "parts": [
+              37
+            ],
+            "eof": {
+              "done": true,
+              "valueUndefined": true,
+              "hex": null
+            },
+            "closed": {
+              "fulfilled": true,
+              "valueUndefined": true
+            },
+            "complete": true,
+            "after": {
+              "status": 200,
+              "url": "http://127.0.0.1:50589/api/health",
+              "contentType": "application/json",
+              "bodyUsed": true
+            }
+          }
+        ]
+      },
+      "error": null,
+      "cleanupErrors": [],
+      "captureLogError": null
+    },
+    {
+      "id": "clone-one-cancel-other-drain",
+      "observations": {
+        "before": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": false
+        },
+        "cloneBefore": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": false
+        },
+        "hex": "7b226d61726b6572223a224e4558545f4a534f4e5f474554222c227175657279223a226c6966656379636c652d7631227d",
+        "receivedBytes": 49,
+        "parts": [
+          49
+        ],
+        "eof": {
+          "done": true,
+          "valueUndefined": true,
+          "hex": null
+        },
+        "closed": {
+          "fulfilled": true,
+          "valueUndefined": true
+        },
+        "complete": true,
+        "cancel": {
+          "fulfilled": true,
+          "valueUndefined": true
+        },
+        "canceledClosed": {
+          "fulfilled": true,
+          "valueUndefined": true
+        },
+        "after": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": true
+        },
+        "cloneAfter": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": true
+        }
+      },
+      "error": null,
+      "cleanupErrors": [],
+      "captureLogError": null
+    },
+    {
+      "id": "direct-reader-cancel-pending",
+      "observations": {
+        "before": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": false
+        },
+        "pendingRead": {
+          "fulfilled": true,
+          "part": {
+            "done": true,
+            "valueUndefined": true,
+            "hex": null
+          }
+        },
+        "cancel": {
+          "fulfilled": true,
+          "valueUndefined": true
+        },
+        "readAfterCancel": {
+          "done": true,
+          "valueUndefined": true,
+          "hex": null
+        },
+        "closed": {
+          "fulfilled": true,
+          "valueUndefined": true
+        },
+        "after": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": true
+        }
+      },
+      "error": null,
+      "cleanupErrors": [],
+      "captureLogError": null
+    },
+    {
+      "id": "direct-reader-cancel-after-read",
+      "observations": {
+        "before": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": false
+        },
+        "firstRead": {
+          "done": false,
+          "valueUndefined": false,
+          "hex": "7b226d61726b6572223a224e4558545f4a534f4e5f474554222c227175657279223a226c6966656379636c652d7631227d"
+        },
+        "cancel": {
+          "fulfilled": true,
+          "valueUndefined": true
+        },
+        "readAfterCancel": {
+          "done": true,
+          "valueUndefined": true,
+          "hex": null
+        },
+        "closed": {
+          "fulfilled": true,
+          "valueUndefined": true
+        },
+        "after": {
+          "status": 200,
+          "url": "http://127.0.0.1:50589/api/json?q=lifecycle-v1",
+          "contentType": "application/json",
+          "bodyUsed": true
+        }
+      },
+      "error": null,
+      "cleanupErrors": [],
+      "captureLogError": null
+    }
+  ],
+  "allCasesAttempted": true,
+  "expectedJsonUrl": "http://127.0.0.1:50589/api/json?q=lifecycle-v1"
+}

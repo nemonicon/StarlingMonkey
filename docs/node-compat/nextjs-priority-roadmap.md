@@ -1,8 +1,15 @@
 # Next.js execution priority
 
-Updated 2026-11-07. The current critical path is bounded native Fetch resource
-ownership, followed by fresh component tests and the full Next.js regression.
-The optional persistent cache profile works on the corrected native loader.
+Updated 2026-11-07. The current critical path is the remaining request-state
+and Server Action response-completion gaps. Bounded Fetch cleanup compiles and
+passes its public tests; the fresh full Next.js run still fails both gates.
+Engine476b1c1d/metadata22f1d456, componentd990ecc1 and runtime result2fb8d5fd
+pass all five persistent-cache requests/52 checks,24 HTTP cases,80 supplemental
+checks, five stream chunks and both functional browser interactions. Legacy
+generation stays1→1 and strict POST7 capture retains three ERR_ABORTED errors.
+The first prefix-mismatched harness attempt remains a separate pre-HTTP failure.
+The following earlier2251/4e results remain as a separate baseline.
+The optional persistent cache profile works on that corrected native loader.
 Engine2251/metadataafb pass full-build
 DATA review; component08ce passes construction review and all16 declared
 CJS/fileURL cases in one real Wasmtime GET (runtime review030fad8b). The new
@@ -16,7 +23,7 @@ one sample. The failed Wasm full trial remains unaccepted. See
 
 Next actions, in dependency order:
 
-1. Compose and compile the reviewed six-file native Fetch cleanup source.
+1. **Completed:** compose and compile the reviewed six-file native Fetch cleanup source.
    Task retirement remains separate from terminal body cleanup; lazy metadata
    remains usable and native append is explicitly excluded. The source passes
    98 pure ownership-model checks. Two actual frontend checks pass; the third
@@ -25,22 +32,38 @@ Next actions, in dependency order:
    native build now exits0 with coordinated DATA review. A fresh interop
    component passes all16 deployed cases (review55a255e7); a separate public
    Fetch component passes INIT review4b3b0f43 with the complete actual import
-   audit. Its eight-case runtime comparison and fresh real-Next component
-   remain the next gates.
+   audit. Its eight public groups now pass the real Node/Wasm comparison,
+   raw0/clean/protected, with coordinated DATA review705270ee. A fresh real-Next
+   componentd990ecc1 also constructs/validates successfully; its completed full
+   application regression retains the two failures above.
    See the [bounded cleanup plan](nextjs-fetch-resource-cleanup-2026-11-07.md).
-2. Validate covered ordinary EOF, direct cancellation and future retirement through the normal
-   build/component mechanisms and explicit unchanged interfaces. Then rerun
-   the relevant declared application gates on the corrected generation.
-3. Keep process/module-state and browser-response gaps separate. The original
-   counter gate still fails; persistent nonce success never waives it. Inspect
-   guest export quiescence and host scheduling without assuming singleton
-   JavaScript state, new Store identity or a sole cause.
-4. Check wasmCloud, lifecycle/resource limits and measured costs after the
+2. **Completed public scope:** eight Fetch lifecycle groups/eleven requests per
+   Node and guest arm pass. The corrected full application suite then executes
+   and preserves the two failures above; coordinated DATA reviewc3a8b95b
+   verifies that failed trial. Durable raw records belong to these separate runs.
+3. **Next implementation priority:** inspect the pinned Next/React Server Action
+   consumer and guest outgoing-stream/compression/finish boundaries. Use the
+   retained POST7 trace to choose a concrete completion invariant and targeted
+   test before changing native code. Keep the strict browser assertions.
+   The [client audit](nextjs-server-action-next-steps.md) and
+   [response-path audit](nextjs-response-completion-next-steps.md) now identify
+   those boundaries; a normal-input gzip/backpressure probe is the next proposed
+   test. Declared React19.3.1 and the captured Next-vendored browser canary are
+   recorded separately.
+4. **Parallel compatibility priority:** distinguish module-local generation
+   from durable cache invalidation, then inspect guest export quiescence and
+   scheduling. Persistent nonce success never waives the original counter
+   failure. Per-instance reuse128 does not guarantee global request affinity;
+   Wasmtime's [serve options](https://raw.githubusercontent.com/bytecodealliance/wasmtime/v42.0.1/src/commands/serve.rs)
+   and [worker dispatch](https://raw.githubusercontent.com/bytecodealliance/wasmtime/v42.0.1/crates/wasi-http/src/handler.rs)
+   describe reuse and availability, not an observed Store identity in this run.
+   Preserve per-instance/process limitations explicitly.
+5. Check wasmCloud, lifecycle/resource limits and measured costs after the
    relevant application gates. Preserve the read-only route delegate, bounded
    two-primary-tag mutation contract, all failures and unchanged legacy app code.
 
 The implementation/build checkpoint is committed and pushed through
-`4ffa8659`; [progress.md](../../progress.md) tracks current work and closed evidence.
+`172f5690`; [progress.md](../../progress.md) tracks current work and closed evidence.
 
 The retained first fresh **Next 16.4.5 / React 19.3.1 App Router application
 passes the selected experimental Wasmtime smoke contract**:

@@ -7,11 +7,15 @@ Last updated: 2026-11-07. Overall roadmap: **in progress**.
 Latest result: native Fetch cleanup compiles and links, a fresh interoperability
 component passes INIT construction review, and all16 deployed module cases pass
 in one GET with independent runtime review55a255e7 accepted for that subset.
-A separate public Fetch lifecycle component now passes INIT construction review
-(`4b3b0f43`); its bound runtime harness is sealed and the concrete execution
-grants are being prepared. The eight lifecycle cases
-and the full Next.js rerun remain pending. The current full Next.js
-baseline still fails its legacy cache counter and strict Server Action response capture.
+A separate public Fetch lifecycle component passes INIT construction review
+(`4b3b0f43`); its first real runtime comparison now exits0 with all eight public
+test groups passing against the pinned Node reference; coordinated DATA
+review705270ee passes for that public subset. The fresh real-Next component also constructs and validates
+successfully (`d990ecc1`,37,241,086 bytes). A first pre-HTTP harness prefix
+failure is retained; a separate correction preserves every operational byte.
+The corrected full Next.js run now completes: all HTTP, supplemental,
+persistent-cache, streaming and functional browser checks pass. Legacy
+generation1→1 and strict Server Action `ERR_ABORTED` remain failed.
 
 Current next steps and outstanding work:
 
@@ -46,14 +50,16 @@ Current next steps and outstanding work:
   reviewe5712a58 passes for that frontend-only scope. The full native build now
   exits0; coordinated build DATA review41857258 passes. The new engine's
   sixteen module interoperability cases pass in a deployed component
-  (review55a255e7). Public Fetch execution remains pending.
+  (review55a255e7). All eight public Fetch lifecycle groups now pass in one
+  actual Node/Wasm comparison. The fresh full Next.js run retains the same
+  two failed gates; coordinated DATA reviewc3a8b95b verifies the failed outcome.
   Review caught an interaction with the existing
   native append path, now explicitly excluded from this bounded change.
   No cause for browser abort or module-state differences is established.
   Target-host checks and measurements remain separate.
 - **Still open:** broader lifecycle/resource coverage, clean-machine bootstrap,
   performance/size evaluation and any production promotion. Foundations-v13 remains
-  the accepted checkpoint. Reviewed snapshots through4ffa8659 are committed and pushed.
+  the accepted checkpoint. Reviewed snapshots through172f5690 are committed and pushed.
 
 The corrected2251/afb build is accepted as build DATA only. A separately sealed
 [interop constructorV2](tests/node-compat/frameworks/nextjs/next-module-fileurl-interop-probe-construction-v2/README.md)
@@ -153,8 +159,55 @@ all three inner commands0, component e0bb7bc6/37,148,543 bytes and result59562d8
 The actual return contains131 tuples; coordinated lifecycle INIT DATA
 review4b3b0f43 passes with complementary owner/world review130d3a39. Runtime
 Source41ad0bd9 is sealed. JSON-only Root preparatione1517c produces
-authoritydf18f1d8 with1,743 protected descriptors and three phase grants;
-no deployed lifecycle result exists yet.
+authoritydf18f1d8 with1,743 protected descriptors and three phase grants.
+Root4bbfd8/original40184/600 then exits0/clean/protected, result9f043eeb:
+eight public groups pass against the independent Node reference, using the same
+live control server. Twelve raw DATA copies (46,035 bytes) are retained with an
+offline verification command; this does not establish resource counts. Fresh
+real-Next preparation2d54ff/e7371c66 binds31/39/18 actual roles, including the
+new55a interop prerequisite. Root2b08c0/original40615/2400 constructs, validates
+and emits WIT raw0/clean: componentd990ecc1/37,241,086 bytes, resultc1bd0e4d;
+actual131 returned tuples and thirteen standard0.2.10 interfaces. Its complete
+INIT DATA review9256cdd5 passes with owner/world reviewe249469a. Full runtime
+Source7b719ac1/plan8d2251a8 preserves all six operational files, but its changed
+outputPrefix conflicts with the unchanged client's literal contract. Root
+preparation5007ea/authority4853261d protects1,781 descriptors; first launch
+80f2c2/original42322/600 exits1/clean/protected, resultabe0e953. Wasmtime42341
+stops normally0; client42361 exits1 before its first declared HTTP request
+(stderr c6a6cb6e/1,072 bytes), with no client result. Thus all application gates
+are unobserved in this attempt; no new runtime compatibility finding follows.
+The original failed Source, outputs and guards remain unchanged. A separate
+V2 plan will restore the original output prefix while preserving every client
+assertion and using a fresh runId/output. No component rebuild is needed.
+That separate correction is now executed: Source16d093e7/plancf7f39ec keeps all
+six operational files unchanged and adds a narrow literal-path regression
+check. Root preparationcec1b4/authority98a39cc9 derives the same1,781 fresh
+roles. Root6b9eb7/original43391/600 finishes raw1/clean/protected, result2fb8d5fd
+and client55d29476. Five requests/52 persistent-cache checks,24 HTTP cases,
+80 supplemental checks, five stream chunks and both functional browser tests
+pass. Legacygeneration1→1 and strict POST7 body/finished/sizes ERR_ABORTED errors
+persist; page/console/client transport errors remain empty. Owner/current-role
+review31017ce2 passes its scope; coordinated outcome reviewc3a8b95b independently
+verifies the failed trial. Lifecycle review705270ee separately accepts its
+eight public groups and binds owner37ab2610; no native resource count or full
+Next acceptance follows from either review.
+All62 client files (including2screenshots) plus7Root/world records are retained
+as69 raw payloads/1,555,648 bytes with manifest0e0a8e28. Root033101 independently
+compares all69 copies to their originals; the standalone offline checker passes
+3a9b94 and preserves both expected failures. Its first unsealed reader field
+error is recorded separately and does not alter runtime DATA. The new cleanup
+has not resolved either application gap. Next work audits request/module state
+and Server Action response consumption before adding more native APIs.
+The [client Source audit](docs/node-compat/nextjs-server-action-next-steps.md)
+finds no POST AbortSignal or explicit response cancellation in the inspected
+production action chain. Flight root/UI resolution may precede response EOF;
+this does not identify the abort cause. It also refines version reporting:
+React19.3.1 is the installed dependency, while actual captured shared browser
+assets contain Next-vendored19.3.0-canary-278794d7-20261002 (Roota6c81d confirms).
+The [response-path audit](docs/node-compat/nextjs-response-completion-next-steps.md)
+separates the outer JS WASI adapter from native Fetch body owners. A proposed
+normal-input gzip-tail/backpressure probe is being prepared as uncompiled
+Source; no extra runtime change or test execution is implied.
 Commit4ffa8659 is pushed to origin/main; live
 build logs and the unfinished runtime controller were excluded from that cut.
 GeneratorV5 runs all ten checks successfully under original4023/900, result795dab0e;

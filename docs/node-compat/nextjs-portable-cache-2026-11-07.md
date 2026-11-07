@@ -6,7 +6,35 @@ through its compatibility loader; a separately corrected StockV2 control now
 passes the same cache scenario and full original suite. The Wasm/control
 comparison still does not establish Node parity.
 
-## Pinned artifacts and scope
+## Latest cleanup generation
+
+Engine476b1c1d/metadata22f1d456 and componentd990ecc1
+(37,241,086 bytes) now complete a fresh full application trial. The same
+31-file application and existing six runtime/browser files are unchanged.
+Root6b9eb7/original43391/600 finishes raw1/clean/protected, result2fb8d5fd
+and client55d29476. All five persistent-cache requests/52 checks,24 HTTP
+contracts,80 supplemental checks, five streaming chunks and both functional
+browser interactions pass. Legacy generation remains1→1. Strict action POST7
+still reports `ERR_ABORTED` for body, completion and sizes; page and console
+error arrays are empty. The overall contract remains failed.
+
+Before this trial, a separate configuration attempt failed before HTTP because
+its plan changed a prefix hardcoded by the unchanged client. That failed
+attempt is retained. SourceV2 restores the original prefix and adds a focused
+regression check, preserving every operational byte and acceptance gate.
+See the [corrected runtime evidence](../../tests/node-compat/frameworks/nextjs/next-fetch-resource-cleanup-next-runtime-root-results-v2/README.md).
+
+The same cleanup engine separately passes the sixteen module interoperability
+cases and eight public Fetch lifecycle groups against Node. Those positive
+subsets do not fix or waive either application failure. No new Store identity,
+resource count, browser-cause or reliability conclusion follows.
+
+React19.3.1 is the declared dependency pin. The captured browser uses Next's
+vendored19.3.0-canary-278794d7-20261002 runtime, shared by both observed arms.
+The [client Source audit](nextjs-server-action-next-steps.md) distinguishes this
+from an unverified claim about every server layer.
+
+## Earlier2251 artifacts and scope
 
 - Node22.14.0, Next16.4.5, React/ReactDOM19.3.1; ComponentizeJS0.23.0,
   Jco1.40.0; stock Wasmtime42.0.1.
