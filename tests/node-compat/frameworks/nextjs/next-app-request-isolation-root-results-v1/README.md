@@ -53,3 +53,27 @@ Each arm must pass its own1GiB launch gate. Run each once in a fresh namespace
 and preserve every failure; these commands do not launch an automatic cohort
 or replace the earlier failed reliability gate. A future actual result must
 separately report the original contract and six-case validation.
+
+The [V3 read-only DATA checker](../next-request-regression-check-v3/README.md)
+now supplies the reusable comparison step. It requires both actual original
+owner observations and the native whole-world receipt:
+
+```sh
+python3 -I -B tests/node-compat/frameworks/nextjs/next-request-regression-check-v3/check.py pair \
+  --native-observation /ABS/native-external-root/observation.json \
+  --stock-observation /ABS/stock-monitor/observation.json \
+  --native-world-guard /ABS/run-id-full-world-guard.json
+```
+
+Its178 inert/retained-DATA checks and independent review pass. Older genuine
+runtime records exercise unchanged wire schemas only; they remain ineligible
+for this new pair. Root's readback checks a retained local positive capture,
+an intact partial-response failure and rejection of an older pair. Results are
+in `checker-v3-root-readback.json`: capture integrity can pass while strict
+semantics fail, and neither capture command admits a pair. The actual new
+V8/V6 successful-pair path remains **untested** until both application runs occur.
+
+Held V1/V2 readers remain preserved. V3 fixes the native path separator,
+strict permission/JSON boolean typing and origin joins, and reads finite numeric
+DOMException codes without coercion. The20/23 error probe only serializes
+constructed host objects; it does not run a timeout, abort or Next request.

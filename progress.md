@@ -36,6 +36,48 @@ a later marker account for the staged271 count;89 directory entries and no
 links are present. No archive was extracted or package/toolchain built. The
 generated private61685 splicer/package reproduction remains a separate gap.
 
+Future request-pair checks now have a reviewed
+[V3 DATA reader](tests/node-compat/frameworks/nextjs/next-request-regression-check-v3/README.md),
+index521ed6bd, with178 inert/retained-DATA checks and explicit separate capture
+and pair modes. It binds current V8/V6 Sources, original ownership/protection,
+all24 HTTP/cache/stream/2browser checks, physical six-case bytes, fixed native
+component/metadata/constructor and the standard13-interface world. Genuine
+older-generation wire audits are schema evidence only. Review found a missing
+native namespace separator, Python boolean/integer equality and missing origin
+joins before any actual pair was admitted; those V1 bytes remain held. V2's
+failed-capture parser rejected numeric DOMException codes, so the minimal V3
+preserves finite20/23 values with strict pair errors still required null.
+Constructed Node error serialization is not a timeout or abort experiment.
+
+Root's three read-only CLI checks validate a retained local positive capture,
+retain an intact partial response as integrity-valid/strict-failed, and refuse
+the older NativeV7/StockV4 pair at its Source-authority join. Every result has
+pairAdmission:false and no actor/network action. The actual new V8/V6 pair and
+successful real-pair admission remain unexecuted under the same capacity hold.
+All failed/limited Source generations are preserved; no target result is
+retargeted or relabelled.
+
+The [external bootstrap manifest](tests/node-compat/frameworks/nextjs/native-bootstrap-inputs-v1.json)
+and stdlib checker now pass independent review and51 DATA refusals. The default
+read-only check authenticates37 retained records, all25 payload pins through
+explicit witnesses,84 Cargo packages and76 vendor-checksum records. A small
+[installed-state npm lock capture](tests/node-compat/frameworks/nextjs/native-bootstrap-npm-installed-lock-v1.provenance.json)
+retains exact28d3/46,394 bytes and independently binds78 normalized transport
+rows; historical filesystem keys/extraneous tools remain DATA, not an npm-ci
+root lock or private package reconstruction. Review caught missing null-digest
+pin witnesses and Python boolean/integer row equality before final handoff;
+all25 changed-hash cases and the typed row counterexample now refuse.
+
+Root's actual `python3.12 -I -B .../check-native-bootstrap-inputs-v1.py --plan`
+readback with two explicit existing-payload hashes exits0. No payload is
+downloaded/extracted and no build/target tool runs. Python3.11+ is specific to
+this metadata reader; buildPython3.9 stays pinned. Rust's eight component rows
+remain reported metadata, with no snapshot or archive rehash claim. The
+manifest's eight-step restoration order keeps five gaps explicit: relocated
+locked vendor restore, exact host-tool acquisition, generated61685 package,
+original988 adapter provenance and capacity/full native build. Clean-machine
+restoration and new V8/V6 application results are still unproved.
+
 The **first fresh-build Next.js pair now passes on Node and real Wasm**. Each
 passes24/24 HTTP, cache generation1→2, five incremental stream chunks(shell0,
 ready2) and2/2 strict browser interactions with empty error arrays. The actual

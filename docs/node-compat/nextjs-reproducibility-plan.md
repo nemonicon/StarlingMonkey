@@ -224,3 +224,32 @@ outputs and actual metadata separate from captured successful artifacts. Pass
 the full contract on the genuinely rebuilt generation before calling this a
 clean-machine reproduction or considering production promotion. The accepted
 production checkpoint remains foundations-v13.
+
+The [bootstrap input manifest](../../tests/node-compat/frameworks/nextjs/native-bootstrap-inputs-v1.json)
+now records that external layer explicitly:25 payload pins with retained
+witnesses,84 aggregate Cargo packages,76 vendor-checksum records,78 npm transport
+rows and an eight-step restoration order. The read-only checker verifies37
+repository records and all25 pin joins;51 DATA refusal cases and independent
+review pass. Root's [actual readback](../../tests/node-compat/frameworks/nextjs/native-bootstrap-inputs-v1-root-readback.json)
+also passes, including optional hashes of the two existing SM/Componentize
+archives. It performs no acquisition, extraction, dependency resolution or build.
+
+```sh
+python3.12 -I -B tests/node-compat/frameworks/nextjs/check-native-bootstrap-inputs-v1.py --plan
+```
+
+This metadata helper needs Python3.11+ for `tomllib`; the pinned native build
+interpreter remains Python3.9. Optional `--verify-local ID=CANONICAL_FILE` hashes
+an already-owned payload. Availability is a dated metadata observation; the
+checker does not probe it live. The eight official Rust-component rows are
+reported metadata, with no channel-snapshot rehash or archive verification.
+
+The [captured installed npm lock](../../tests/node-compat/frameworks/nextjs/native-bootstrap-npm-installed-lock-v1.provenance.json)
+is now retained as exact text, and the78 normalized rows are independently
+rederived from it. Historical filesystem keys and extraneous earlier tools are
+preserved as DATA. It is not an npm-ci root lock or proof of a reconstructed
+private package. Remaining work is the relocated locked Cargo/vendor restore,
+exact host-tool/cbindgen/Corrosion acquisition, generated61685 package rebuild,
+original988 adapter upstream provenance, and sufficient capacity for the fresh
+full native build and subsequent application gates. The committed988 bytes
+remain available; a same-size official adapter cannot replace their identity.
