@@ -113,6 +113,16 @@ headroom. Do not wait for a stock-only diagnostic to finish before testing a
 new native application behavior; preserve its strict failure and unresolved
 cause. Every changed engine must rerun the complete app contract.
 
+Current admission headroom is about0.65GiB: priority2 remains ready but requires
+1GiB to start; priority3's full build requires3GiB. Do not lower those guards.
+The smaller source-restoration operation has now run once with raw0 and exact
+84-package lock. Its first V1 reader failed on APFS directory nlink6→7 during
+receipt publication. The preserved receipt now passes the separately reviewed
+V2 reader:3507 files,464 directories including root, exact content/membership
+and current physical bookends. The next useful capacity-independent build
+step is its bounded offline metadata query, then a builder selection that uses
+those genuinely relocated roles. Neither step substitutes for a new app run.
+
 | Priority | Work | Completion gate |
 | --- | --- | --- |
 | 1 | Run the freshly built unchanged Next app in Wasm | **First actual pair passes** on nativeV7/stockV3/browserV3:24HTTP/cache1→2/five chunks/2strict-browser checks, raw0/clean/protected inputs. Genuine2,181-file inventory/new build+action IDs run on1c3108d2 without rebuilding the engine. The304-payload portable paired DATA review passes Root readback. Old2,218-file evidence and failures remain unchanged. |

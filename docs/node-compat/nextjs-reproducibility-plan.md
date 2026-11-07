@@ -248,7 +248,18 @@ The [captured installed npm lock](../../tests/node-compat/frameworks/nextjs/nati
 is now retained as exact text, and the78 normalized rows are independently
 rederived from it. Historical filesystem keys and extraneous earlier tools are
 preserved as DATA. It is not an npm-ci root lock or proof of a reconstructed
-private package. Remaining work is the relocated locked Cargo/vendor restore,
+private package. The first [relocated Cargo source restoration](../../tests/node-compat/frameworks/nextjs/native-cargo-restore-root-results-v1/README.md)
+now completes raw0 from75 checksum-pinned registry archives plus authenticated
+Firefox/base donors. It restores3506 payload files with the exact final84-package
+lock. The original V1 readback failed on APFS root nlink6→7 after receipt
+publication; that failure and receipt remain unchanged. A separately reviewed
+V2 reader validates all3507 files including receipt,464 directories including
+root, stable root identity, exact membership and current physical bookends.
+Source-stage process observation and structural admission remain distinct.
+No Cargo metadata, compiler or guest result follows from this restoration.
+
+Remaining work includes a genuine offline Cargo metadata audit of those fresh
+roles and their integration into the complete native builder,
 exact host-tool/cbindgen/Corrosion acquisition, generated61685 package rebuild,
 original988 adapter upstream provenance, and sufficient capacity for the fresh
 full native build and subsequent application gates. The committed988 bytes

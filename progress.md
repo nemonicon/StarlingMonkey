@@ -15,6 +15,36 @@ must not be reported as passed. Broader Node APIs, performance claims and
 production promotion follow these gates. See the updated
 [execution roadmap](docs/node-compat/nextjs-priority-roadmap.md).
 
+The next runtime gate remains the prepared NativeV8/StockV6 concurrent-request
+pair. The current volume has about 0.65 GiB free, below its unchanged 1 GiB
+start guard, so neither new application arm has run. The full native build
+still requires 3 GiB at admission. While those launches wait for capacity, the
+first [relocated Cargo source restoration](tests/node-compat/frameworks/nextjs/native-cargo-restore-root-results-v1/README.md)
+completed with exit 0 using 75 checksum-pinned cached registry archives, the
+exact Firefox FFI donor and 21 portable native source files. It created 3,506
+payload files plus its receipt, with 47,176,588 logical payload bytes. No
+Cargo, compiler, network or guest ran in that source-only operation.
+
+The first V1 admission then failed: publishing the receipt changed the APFS
+root link count from 6 to 7. Its failure and original `42559665…` receipt are
+preserved unchanged. A separately reviewed
+[V2 read-only admission](tests/node-compat/frameworks/nextjs/native-cargo-restore-admission-v2/README.md)
+checks stable root device/inode/mode, every payload and exact membership,
+and retains the current full-root bookend guard. Root's genuine corrected
+readback now passes 3,507 files and 464 directories including the root, while
+reporting both link counts separately. It does not attest source process
+execution; the original terminal exit 0 and raw streams supply that separate
+observation. The next bounded step is an independently reviewed offline Cargo
+metadata query against these actual relocated inputs. That query, the complete
+native build and new Next request-pair results remain outstanding.
+
+The first [offline metadata verifier launch](tests/node-compat/frameworks/nextjs/native-cargo-offline-verify-root-results-v1/README.md)
+exits 1 before creating output or starting Cargo. Its strict boolean guard
+incorrectly rejects Python's integer `sys.flags.isolated` value `1`, despite
+the actual `-I -B` command. The original Source, authority and raw failure
+are retained. A separate successor is being reviewed to correct both entry
+guards; no dependency query or native compilation occurred in that attempt.
+
 The prior goal turn made concrete progress: paired six-case regression Sources,
 reviewed commands, native build preparation/launcher and capacity refusals were
 committed and pushed ase0adca1c. Current capacity remains below1GiB; no new
