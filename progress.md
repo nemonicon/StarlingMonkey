@@ -83,11 +83,25 @@ The [peer-disconnect diagnostic Source](tests/node-compat/frameworks/nextjs/peer
 now has one real Node localhost reference with healthy controls, a partial upload
 read error and a later output-write error/cancellation. Its componentfaef5c87/
 37,142,088 bytes constructs in three phases plus parent0/clean with13standard
-imports, but no guest peer-disconnect workload has run. A two-cohort collector
-is being prepared: each case begins healthy and discards unknown/failed state,
-with after-return inspection only when its invocation outcome is understood.
+imports. The independently reviewed two-cohort collector now ran once against
+the actual component. Both fresh servers passed healthy8192-byte upload and
+32768-byte output controls. A1024-byte partial upload produced a typed WASI
+last-operation-failed read, translated HttpProtocolError, handler catch/finally
+and a normal adapter path, followed by the permitted fourth-call JS inspection.
+Closing the output after4096 actual body bytes caused the second write to fail
+with closed; reader and producer cancellation returned and adapter finally ran.
+That export failed, so the harness sent no inspection request and discarded
+the owned server. The retained result is **valid inconclusive evidence**, raw1:
+both within-export I/O paths observed, functional controls passed, complete
+after-return coverage false. Runtime ownership and protected-input checks pass.
+The runtime result is e5e10dac/785436 bytes; portable DATA review is in progress.
 Current uninspected input-finish future and missing peer-linked Request.signal
 remain explicit baseline limits. No native cleanup claim follows from Node logs.
+The next host priority is a finite cold-instance wasmCloud check of the same
+unchanged full Next component. Its eight-request Source is being prepared;
+no deployment or second-host Next success is claimed yet. wasmCloud's P2
+fresh-Store behavior requires a separate contract from retained Wasmtime cache
+and browser acceptance.
 Earlier811–996MiB capacity holds ended
 when free space rose above the unchanged1,024MiB construction start guard; both
 constructors then ran. No proof or shared binary was deleted and no guard was
