@@ -1,0 +1,39 @@
+--- wasmtime-deployment-guard-candidate-v1/run-contracts.mjs
++++ next-portable-cache-native-candidate-v1/run-contracts.mjs
+@@ -8,6 +8,7 @@
+ import {dirname,join,resolve} from 'node:path';
+ import {fileURLToPath} from 'node:url';
+ import {collectSupplemental,validateSupplemental} from '../wasmtime-deployment-candidate-v8/supplemental.mjs';
++import {collectPortableCache,validatePortableCache} from '../next-portable-cache-http-collector-v1/collector.mjs';
+ const here=dirname(fileURLToPath(import.meta.url)),origin=new URL(process.argv[2]),root=resolve(process.argv[3]),browserTools=process.argv[4];
+ assert.equal(process.version,'v22.14.0');assert.equal(process.argv.length,6);const runId=process.argv[5];assert(/^[a-z0-9][a-z0-9-]{0,47}$/.exec(runId)?.[0]===runId);assert.equal(origin.origin,process.argv[2]);assert.equal(origin.hostname,'127.0.0.1');assert.equal(origin.protocol,'http:');assert(browserTools);assert.equal(root,'/private/tmp/starling-node-compat/next-wasmtime-deployment-'+runId+'/client');
+ await mkdir(root,{mode:0o700});await mkdir(join(root,'responses'));
+@@ -16,6 +17,10 @@
+ const errorData=e=>({name:e?.name??'Error',message:e?.message??String(e),stack:e?.stack??null});
+ const save=()=>writeFile(join(root,'result.json'),JSON.stringify(result,null,2)+'\n');await save();
+ try {
++  result.portableCache=await collectPortableCache({origin:result.origin,output:join(root,'portable-cache')});
++  await save(); // Whole five-request raw capture precedes semantic comparison.
++  result.portableCacheValidation=validatePortableCache(result.portableCache);
++  await save();
+   result.supplemental=await collectSupplemental({origin:result.origin,output:join(root,'supplemental')});
+   await save(); // Whole six-case raw capture precedes semantic comparison.
+   result.supplementalValidation=validateSupplemental(result.supplemental);
+@@ -71,7 +76,7 @@
+     complete: text.includes('NEXT_STREAM_SHELL') && text.includes('NEXT_STREAM_READY'),
+     incrementalDeliveryObserved: ready > shell && shell >= 0};
+   if (browserTools) {
+-    const args = [join(here, '../browser-hydration-candidate-v3/browser-check.mjs'), '--origin', result.origin,
++    const args = [join(here, './browser-check.mjs'), '--origin', result.origin,
+       '--tools', browserTools, '--output', join(root, 'browser')];
+     result.browserArgv = [process.execPath, ...args];
+     const child = spawn(process.execPath, args, {stdio: ['ignore', 'inherit', 'inherit']});
+@@ -83,7 +88,7 @@
+ finally {
+  result.passed=result.http.length===24&&result.http.every(x=>x.passed)&&result.cacheInvalidation?.passed===true&&result.streaming?.complete===true&&result.streaming?.incrementalDeliveryObserved===true&&result.browserExit?.code===0&&result.browser?.passed===true&&result.errors.length===0&&result.transportErrors.length===0;
+  result.originalContractPassed=result.passed;
+- result.passed=result.originalContractPassed&&result.supplementalValidation?.passed===true;
++ result.passed=result.originalContractPassed&&result.supplementalValidation?.passed===true&&result.portableCacheValidation?.passed===true;
+  await save();
+ }
+ console.log(JSON.stringify({state:result.passed?'ACTUAL_NEXT_WASMTIME_CONTRACT_CLIENT_PASSED_V2':'ACTUAL_NEXT_WASMTIME_CONTRACT_CLIENT_FAILED_V2',http:result.http.length,passedHttp:result.http.filter(x=>x.passed).length,errors:result.errors}));process.exitCode=result.passed?0:1;

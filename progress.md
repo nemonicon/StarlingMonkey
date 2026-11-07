@@ -12,18 +12,23 @@ Current next steps and outstanding work:
 - **Complete for its bounded contract:** the deployed two-case guard test passes
   builtin import and coded file-URL refusal with independent DATA review. This
   is an explicit compatibility gap against the successful pinned Node reference.
-- **In progress:** the bounded CJS/fileURL bridge. Its first native build failed
+- **Complete for the declared subset:** the bounded CJS/fileURL bridge. Its first native build failed
   a SpiderMonkey handle signature check. A separate correction passes frontend,
   generators and full compile/link. Coordinated full-build DATA reviewb9aad169
   passes. The16-case deployed Wasm probe now passes in one GET, raw0/clean,
   with native/world guards preserved; bounded runtime DATA review030fad8b passes.
   The optional cache facade passes40 in-memory model
   checks only; real storage/Next/WASI validation remains open.
-- **After loader validation:** explicit Next CacheHandler scenario with shared
-  tag epochs, differential/real-component tests, target-host checks and measurements.
+- **Complete:** corrected StockV2 VM import seam and owned cache-parent setup;
+  real Node seam0 and one fresh full control0 pass. The first Wasm cache scenario
+  passes; its legacy counter and strict browser failures remain open.
+- **Next:** bounded native Web fetch resource ownership cleanup. Source audit
+  identifies missing disposal paths; ownership/API design precedes any code.
+  No cause for browser abort or module-state differences is established.
+  Target-host checks and measurements remain separate.
 - **Still open:** broader lifecycle/resource coverage, clean-machine bootstrap,
   performance/size evaluation and any production promotion. Foundations-v13 remains
-  the accepted checkpoint. Completed snapshots throughb00d9de9 are committed and pushed.
+  the accepted checkpoint. Completed snapshots through76f296e6 are committed and pushed.
 
 The corrected2251/afb build is accepted as build DATA only. A separately sealed
 [interop constructorV2](tests/node-compat/frameworks/nextjs/next-module-fileurl-interop-probe-construction-v2/README.md)
@@ -52,8 +57,27 @@ resultabdca858/inventoryf8058b47,2,186 files/427 directories/48,755,844 bytes.
 Next traces exactc1013ea6 handler and real FileSystemCache delegate; generated
 config uses ../cache-handler.cjs/maxMemory0. BuildIDuj_9wJGt4Jh1d8BV6oSsU and
 action4018730ebe8dc9bc100be933e21dabdfa132c639ab are fresh actual values.
-App-build DATA review is in progress. Five nonce requests and the full unchanged
-legacy gates have not run on this output; no new Next application acceptance.
+App-build DATA review163133f1 passes (authorship-only successor to retained3641).
+Native full trial Root73058/original87752/600 now finishes raw1/clean/protected:
+five nonce requests/52 checks,24HTTP,80supplemental and five-chunk stream pass;
+two functional browser checks pass. Legacygeneration1→1 and strict Server Action
+ERR_ABORTED/three body/finished/sizes errors remain failed. Native result06ce2d99,
+client65bee544 and independent DATA reviews969e99fa/b860b1f2 retain those outcomes.
+Stock control Root78336/original88210/300 also finishes raw1/clean/protected:
+allfive500,23 baseHTTP observed/one assetpass, action/cachecompare/stream/browser
+unobserved. Result266d62ef/review5e709e41 identify the host compatibility loader's
+ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING; no Node parity acceptance follows.
+Separate StockV2 Sourcedf257054 then passes real Node VM seam original91470/120,
+resultb75a4064/review0ac120ab: olderrorreproduced, actualdefaultCJSclass/identity/
+construction verified, experimentalwarning preserved with noflags. Fresh control
+Root81654/original92341/300 finishes0/clean/protected, resultede853eb andreview
+d739eacc: five52/24HTTP/80supp/legacy1→2/stream/strict2browser allpass in one sample.
+Comparison991c9b93 preserves unavailable native body andseparateclocks/nocause.
+BothfailedV1recordsremainfailed; no fullWasm/Node parity orreliability acceptance.
+Native Source ownership audit finds finite Web fetch body/future disposal gaps,
+with design for read-based terminalcleanup underway before afterimages/builds;
+generic metadataGC/append/error-resource/clone/abort scopes remain explicit.
+See [first cache profile results](docs/node-compat/nextjs-portable-cache-2026-11-07.md).
 The older
 failed25c constructor remains unchanged and unexecuted. The current volume has
 about15GiB free, so storage is no longer blocking this step.

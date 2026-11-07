@@ -3,26 +3,34 @@
 Updated 2026-11-07. The current critical path is the optional persistent cache
 profile on the corrected native loader. Engine2251/metadataafb pass full-build
 DATA review; component08ce passes construction review and all16 declared
-CJS/fileURL cases in one real Wasmtime GET (runtime review030fad8b). This is a
-bounded loader result. The latest full Next regression still fails cache1→1,
-and earlier strict Server Action aborts remain unresolved.
+CJS/fileURL cases in one real Wasmtime GET (runtime review030fad8b). The new
+real-Next component4e and31-file standalone build are verified. Its first Wasm
+application trial passes all five nonce checks,24HTTP,80 supplemental and
+streaming checks, but still fails legacy cache1→1 and strict Server Action
+response capture. The first matched Node control's VM loader gap is corrected
+in a separate verified version: its new control passes every declared gate in
+one sample. The failed Wasm full trial remains unaccepted. See
+[current cache results](nextjs-portable-cache-2026-11-07.md).
 
 Next actions, in dependency order:
 
-1. Construct the real-Next component on2251 with the unchanged73b/1e49 entry,
-   standard13@0.2.10 world and accepted16-case prerequisite.
-2. Finish the bounded CacheHandlerV2 and31-file fixture. Preserve28 original
-   files, dependencies, legacy routes and UI. Keep the route delegate read-only;
-   allow mutations only for the two declared primary FETCH tags.
-3. Build the genuine standalone app, inspect its traced handler/delegate and
-   emitted relative paths, then run the same five nonce requests against Node
-   and Wasm with fresh owned cache storage.
-4. Rerun all original24 HTTP/cache-generation/stream/two strict browser/six
-   supplemental contracts. Preserve existing failures and report the new nonce
-   gate separately. Then check wasmCloud, lifecycle/resource limits and costs.
+1. Finish a bounded ownership design and Source correction for the concrete
+   native Web fetch body/future disposal gaps. Keep task retirement separate
+   from terminal body cleanup and preserve lazy headers/clone ownership. No
+   host modification, generic finalizer rewrite or claimed POST cause.
+2. Validate the covered ordinary EOF/cancel/abort operations through the normal
+   build/component mechanisms and explicit unchanged interfaces. Then rerun
+   the relevant declared application gates on the corrected generation.
+3. Keep process/module-state and browser-response gaps separate. The original
+   counter gate still fails; persistent nonce success never waives it. Inspect
+   guest export quiescence and host scheduling without assuming singleton
+   JavaScript state, new Store identity or a sole cause.
+4. Check wasmCloud, lifecycle/resource limits and measured costs after the
+   relevant application gates. Preserve the read-only route delegate, bounded
+   two-primary-tag mutation contract, all failures and unchanged legacy app code.
 
-The completed probe and source-only cache plan are committed and pushed through
-`b00d9de9`; [progress.md](../../progress.md) tracks current work and closed evidence.
+The implementation/build checkpoint is committed and pushed through
+`76f296e6`; [progress.md](../../progress.md) tracks current work and closed evidence.
 
 The retained first fresh **Next 16.4.5 / React 19.3.1 App Router application
 passes the selected experimental Wasmtime smoke contract**:

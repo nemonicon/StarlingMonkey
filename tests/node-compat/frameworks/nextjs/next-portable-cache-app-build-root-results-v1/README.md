@@ -21,9 +21,13 @@ FileSystemCache delegate427a5a07. Actual generated config selects
 `../cache-handler.cjs` and memory cache0. BuildID is `uj_9wJGt4Jh1d8BV6oSsU`;
 the action ID is `4018730ebe8dc9bc100be933e21dabdfa132c639ab`.
 
-Independent generated-output/owner/tool DATA review is in progress. This build
+Independent generated-output/owner/tool DATA review163133f1 passes. It preserves
+the original36414e4a report and corrects only authorship attribution plus
+supersession metadata. Root authored the fixture/thin builder, B the handler,
+and C the original builder and owner/tool review. This build
 executes Node/Next build and prerender code on the host. The producer's preserved
 `runtimeOrNativeEngineExecuted:false` excludes serving/native/guest execution;
-it does not mean no framework/application code ran. No HTTP, browser or Wasm
-application trial has run on this output. Five nonce requests and all original
-regression gates remain open; earlier failures are unchanged.
+it does not mean no framework/application code ran. Subsequent native trial
+06ce2d99 passes the five nonce scenario but fails legacy generation and strict
+browser gates; matched control266d62ef fails its VM import seam. Those serving
+results are separate from this accepted host build DATA.

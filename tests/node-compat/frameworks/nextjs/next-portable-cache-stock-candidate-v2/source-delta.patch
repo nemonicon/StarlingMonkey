@@ -1,0 +1,84 @@
+--- next-portable-cache-stock-candidate-v1/run-stock.mjs
++++ next-portable-cache-stock-candidate-v2/run-stock.mjs
+@@ -12,7 +12,7 @@
+ import {dirname, join, resolve, relative} from 'node:path';
+ import {fileURLToPath} from 'node:url';
+ import {createRequestBridge} from '../http-bridge-candidate-v1/bridge.mjs';
+-import {createHostModuleRequire} from '../http-bridge-candidate-v1/module-host-provider.mjs';
++import {createHostModuleRequire} from './module-host-provider.mjs';
+ import {collectSupplemental,validateSupplemental} from '../wasmtime-deployment-candidate-v8/supplemental.mjs';
+ import {collectPortableCache,validatePortableCache} from '../next-portable-cache-http-collector-v1/collector.mjs';
+ const here = dirname(fileURLToPath(import.meta.url));
+@@ -21,7 +21,7 @@
+ const browserTools = process.argv[4],runId=process.argv[5];
+ const plan = JSON.parse(await readFile(join(here, 'plans.json')));
+ function deriveOutput(prefix,id){
+-  assert.equal(prefix,'/private/tmp/starling-node-compat/next-portable-cache-stock-v1');
++  assert.equal(prefix,'/private/tmp/starling-node-compat/next-portable-cache-stock-v2');
+   assert(typeof id==='string'&&/^[a-z0-9][a-z0-9-]{0,47}$/.exec(id)?.[0]===id,'Explicit safe ASCII runId required');
+   return prefix+'-'+id;
+ }
+@@ -88,11 +88,19 @@
+   assert.equal((await descriptor(join(application, 'server.js'))).sha256, result.sourceServer.sha256);
+   // A fresh logical server starts with an empty cache. Only its owned copy is reset.
+   await rm(join(application, '.next/cache'), {recursive: true, force: true});
++  // Required owned parent for the explicit portable FETCH profile.
++  const ownedCacheParent=join(application,'.next/cache');
++  await mkdir(ownedCacheParent,{mode:0o700});
++  const ownedCacheStat=await lstat(ownedCacheParent);
++  assert(ownedCacheStat.isDirectory()&&!ownedCacheStat.isSymbolicLink());
++  assert.equal(await realpath(ownedCacheParent),ownedCacheParent);
++  assert.equal(ownedCacheStat.mode&0o777,0o700);
++  result.ownedPortableCacheParent={path:ownedCacheParent,mode:0o700,createdAfterOwnedReset:true};
+   result.freshOwnedCacheReset = true;
+   const moduleObservations = {};
+   const require = createHostModuleRequire(join(application, 'server.js'), moduleObservations);
+   result.moduleSource = await descriptor(join(here, '../../../foundation-module/node-module-candidate-v1/module-core.mjs'));
+-  result.hostModuleProvider = await descriptor(join(here, '../http-bridge-candidate-v1/module-host-provider.mjs'));
++  result.hostModuleProvider = await descriptor(join(here, './module-host-provider.mjs'));
+   result.moduleObservations = moduleObservations;
+   const installed = Object.fromEntries(['next', 'react', 'react-dom'].map(name => [name, require(name + '/package.json').version]));
+   assert.deepEqual(installed, {next: '16.4.5', react: '19.3.1', 'react-dom': '19.3.1'});
+--- next-portable-cache-stock-candidate-v1/run-owned.py
++++ next-portable-cache-stock-candidate-v2/run-owned.py
+@@ -25,7 +25,7 @@
+     run_id=authority['runId']
+     assert isinstance(run_id,str) and re.fullmatch('[a-z0-9][a-z0-9-]{0,47}',run_id)
+     assert all(key not in authority for key in ['outputRoot','monitorOutputRoot','argv'])
+-    assert plan['outputPrefix']=='/private/tmp/starling-node-compat/next-portable-cache-stock-v1'
++    assert plan['outputPrefix']=='/private/tmp/starling-node-compat/next-portable-cache-stock-v2'
+     selected=plan['arms']['stock']
+     assert selected['outputRoot'] is selected['monitorOutputRoot'] is selected['argv'] is None
+     assert selected['timeoutSeconds']==300
+--- http-bridge-candidate-v1/module-host-provider.mjs
++++ next-portable-cache-stock-candidate-v2/module-host-provider.mjs
+@@ -1,8 +1,8 @@
+-// TEST ONLY. Exercise the actual candidate loader on the entire real Next app.
++// TEST ONLY. Candidate synchronous CommonJS with Node main-context dynamic imports.
+ // Host FS, compiler, builtins and globals are used; this is not guest evidence.
+ import * as nodeModule from 'node:module';
+ import {readFileSync, statSync, realpathSync} from 'node:fs';
+-import {compileFunction} from 'node:vm';
++import {compileFunction, constants as vmConstants} from 'node:vm';
+ import {createModuleAPI} from '../../../foundation-module/node-module-candidate-v1/module-core.mjs';
+ 
+ const hostRequire = nodeModule.createRequire(import.meta.url);
+@@ -19,7 +19,7 @@
+     getBuiltin(id) { builtins.add(id); return hostRequire(id); },
+     compile(source, filename) {
+       compiled.add(filename);
+-      return compileFunction(source, ['exports', 'require', 'module', '__filename', '__dirname'], {filename});
++      return compileFunction(source, ['exports', 'require', 'module', '__filename', '__dirname'], {filename, importModuleDynamically: vmConstants.USE_MAIN_CONTEXT_DEFAULT_LOADER});
+     },
+   };
+   const api = createModuleAPI(provider, nodeModule.builtinModules,
+@@ -27,6 +27,9 @@
+   observations.sourceOnlyCandidate = true;
+   observations.nativeProviderExecuted = false;
+   observations.hostGlobalsAndNodeBuiltins = true;
++  // Configuration facts, not counters or an execution attestation.
++  observations.hostVmDynamicImportPolicy = 'Node22 main-context default ESM loader; compiled filename is referrer';
++  observations.candidateSynchronousRequireCacheRemainsSeparate = true;
+   observations.snapshot = () => ({builtins: [...builtins].sort(), compiled: [...compiled].sort(),
+     cachedModules: Object.keys(api.default._cache).length,
+     candidateModuleIdentity: api.default.createRequire(filename)('node:module') === api.default});
