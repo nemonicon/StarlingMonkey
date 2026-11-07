@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "sourceOnly": true,
+  "parentSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-hydration-candidate-v1/index.json",
+    "sha256": "b7f4ff002ea5732d1ee4a3b85359044bf0e2d37eb71d613884a7ba94a19aca5f",
+    "bytes": 1464
+  },
+  "parentWorker": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-hydration-candidate-v1/browser-check.mjs",
+    "sha256": "e00741b16dfb3ec77b7b4f322ae42313bc86724005366e7dde0211f3835b5bc7",
+    "bytes": 19175
+  },
+  "observerCore": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-hydration-candidate-v2/observer-core.mjs",
+    "sha256": "65e17a293d199f79652d1f612cb376b8efa2f51d5ccc6428a6256712d7e7903e",
+    "bytes": 3683
+  },
+  "worker": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/browser-hydration-candidate-v2/browser-check.mjs",
+    "sha256": "715b058c09032fbe6aed5a69a8113a15dba31e6586bd50fb42cef68fc638c3f0",
+    "bytes": 26493
+  },
+  "replacements": [
+    {
+      "before": "suite:'nextjs-hydration-browser-diagnostic-v1'",
+      "after": "suite:'nextjs-hydration-browser-diagnostic-v2'"
+    },
+    {
+      "before": "  assetBodies:[],bodyCaptures:[],responseHeaders:[],trace:[]",
+      "after": "  cdpEvents:[],cdpCorrelations:[],cdpScope:{events:['Network.requestWillBeSent','Network.responseReceived','Network.dataReceived','Network.loadingFinished','Network.loadingFailed','Page.navigatedWithinDocument','Page.frameNavigated'],payloads:'Complete semantic protocol JSON; not original wire bytes',protocolClock:'CDP timestamps/monotonic seconds and wallTime retain original values; no conversion to Node hrtime',arrivalClock:'Node process.hrtime relative nanoseconds shared with Playwright trace',idCorrelation:'CDP IDs and per-test Playwright WeakMap IDs are distinct; URL/method matches are candidates only'},\n  assetBodies:[],bodyCaptures:[],responseHeaders:[],trace:[]"
+    },
+    {
+      "before": "const traceStart=process.hrtime.bigint();let sequence=0;",
+      "after": "// Inert observer bookkeeping. Inlined unchanged into the standalone worker.\n// Operations are supplied by the browser worker; importing this file runs none.\nfunction createNetworkObserver({now,onCdp,onLimit,limits}) {\n  const states=new WeakMap();\n  const stats={events:0,payloadBytes:0,stopped:false,eventsAfterStop:0,overflow:null};\n  for(const key of ['maxEvents','maxEventBytes','maxPayloadBytes'])\n    if(!Number.isSafeInteger(limits[key])||limits[key]<1)throw new TypeError('Finite observer limit required');\n  function state(request,data){\n    if((typeof request!=='object'&&typeof request!=='function')||request===null)\n      throw new TypeError('Real request object identity required');\n    let value=states.get(request);\n    if(!value){\n      let resolveFailed;const failed=new Promise(resolve=>{resolveFailed=resolve;});\n      value={data:{...data},failed,resolveFailed,terminal:null};states.set(request,value);\n    }else if(value.data.requestId!==data.requestId)throw new Error('Request identity changed');\n    return value;\n  }\n  function requestFailed(request,data,failure){\n    const value=state(request,data);\n    if(value.terminal===null){\n      value.terminal={kind:'requestfailed',...value.data,failure,arrivalNs:now()};\n      value.resolveFailed({kind:'requestfailed',terminal:value.terminal,underlyingPromiseHandled:true});\n    }\n    return value.terminal;\n  }\n  async function raceFailure(request,data,operation){\n    const value=state(request,data);\n    // Attach BOTH settlement handlers immediately. If the failed terminal wins,\n    // later target-close rejection is consumed, not invented as a second error.\n    const observed=Promise.resolve().then(operation).then(\n      result=>({kind:'fulfilled',value:result,underlyingPromiseHandled:true}),\n      error=>({kind:'rejected',error,underlyingPromiseHandled:true}));\n    return Promise.race([observed,value.failed]);\n  }\n  function requireValue(outcome){\n    if(outcome.kind==='fulfilled')return outcome.value;\n    if(outcome.kind==='rejected')throw outcome.error;\n    if(outcome.kind!=='requestfailed')throw new Error('Unknown observer outcome');\n    const error=new Error(outcome.terminal.failure?.errorText??'Browser request failed');\n    error.code='ERR_BROWSER_REQUEST_FAILED';error.observationSource='Playwright.requestfailed';\n    error.requestFailedTerminal=outcome.terminal;throw error;\n  }\n  function cdp(event,payload,context){\n    if(stats.stopped){stats.eventsAfterStop++;return;}\n    let text,bytes;\n    try{text=JSON.stringify(payload);if(typeof text!=='string')throw new TypeError('CDP JSON payload required');bytes=Buffer.byteLength(text,'utf8');}\n    catch(error){return stop('payload-serialization',{event,message:String(error)});}\n    if(stats.events>=limits.maxEvents||bytes>limits.maxEventBytes||stats.payloadBytes+bytes>limits.maxPayloadBytes)\n      return stop('bounded-cdp-limit',{event,nextPayloadBytes:bytes,eventsRetained:stats.events,payloadBytesRetained:stats.payloadBytes,limits});\n    stats.events++;stats.payloadBytes+=bytes;\n    // CDP supplies JSON. Retain every field, including unknown future fields;\n    // this is semantic JSON data, not a claim to original transport wire bytes.\n    onCdp({sequence:stats.events,...context,event,arrivalNs:now(),payloadBytes:bytes,payload:JSON.parse(text)});\n  }\n  function stop(reason,detail){\n    if(stats.stopped)return;\n    stats.stopped=true;stats.overflow={reason,...detail,arrivalNs:now()};\n    const error=new Error('CDP observation stopped: '+reason);error.code='ERR_BROWSER_CDP_OBSERVER_LIMIT';\n    onLimit(error,stats.overflow);\n  }\n  return {noteRequest:state,requestFailed,raceFailure,requireValue,cdp,stats};\n}\n\nconst traceStart=process.hrtime.bigint();let sequence=0;"
+    },
+    {
+      "before": "    const mark=name=>{phase=name;trace(id,phase,'phase');};",
+      "after": "    let rejectObserver;\n    const observerFailed=new Promise((_,reject)=>{rejectObserver=reject;});void observerFailed.catch(()=>{});\n    const observer=createNetworkObserver({now:()=>(process.hrtime.bigint()-traceStart).toString(),\n      onCdp:event=>result.cdpEvents.push(event),\n      onLimit:(error,overflow)=>{result.errors.push({stage:id+'-cdp-observer',...errorData(error),overflow});rejectObserver(error);},\n      limits:{maxEvents:8000,maxEventBytes:262144,maxPayloadBytes:8388608}});\n    record.cdpObserver=observer.stats;\n    const mark=name=>{phase=name;trace(id,phase,'phase');};"
+    },
+    {
+      "before": "page.on('request',request=>trace(id,phase,'request',requestData(request)));",
+      "after": "page.on('request',request=>{const data=requestData(request);observer.noteRequest(request,data);trace(id,phase,'request',data);});"
+    },
+    {
+      "before": "try{const headers=await response.headersArray();",
+      "after": "try{const headers=observer.requireValue(await observer.raceFailure(request,data,()=>response.headersArray()));"
+    },
+    {
+      "before": "try{const body=await response.body();",
+      "after": "try{const bodyOutcome=await observer.raceFailure(request,data,()=>response.body());capture.bodyCompletion={kind:bodyOutcome.kind,requestFailedTerminal:bodyOutcome.terminal??null,underlyingPromiseHandled:bodyOutcome.underlyingPromiseHandled};const body=observer.requireValue(bodyOutcome);"
+    },
+    {
+      "before": "try{capture.encodedSizes=await request.sizes();",
+      "after": "try{const sizesOutcome=await observer.raceFailure(request,data,()=>request.sizes());capture.sizesCompletion={kind:sizesOutcome.kind,requestFailedTerminal:sizesOutcome.terminal??null,underlyingPromiseHandled:sizesOutcome.underlyingPromiseHandled};capture.encodedSizes=observer.requireValue(sizesOutcome);"
+    },
+    {
+      "before": "try{const error=await response.finished();const observation={...data,status:response.status(),error:error?errorData(error):null};result.responseFinishedObservations.push({test:id,phase,...observation});trace(id,phase,'response.finished',observation);if(error)result.errors.push({stage:id+'-response-finished',requestId:requestId(request),...errorData(error)});}catch(error){trace(id,phase,'response.finished-rejected',{...data,error:errorData(error)});result.errors.push({stage:id+'-response-finished-rejected',requestId:requestId(request),...errorData(error)});}",
+      "after": "try{\n            const completion=await observer.raceFailure(request,data,()=>response.finished());\n            const failure=completion.kind==='requestfailed'?{name:'RequestFailed',message:completion.terminal.failure?.errorText??'Browser request failed',stack:null,source:'Playwright.requestfailed'}:\n              completion.kind==='rejected'?errorData(completion.error):completion.value?errorData(completion.value):null;\n            const observation={...data,status:response.status(),completion:completion.kind,error:failure,requestFailedTerminal:completion.terminal??null,underlyingPromiseHandled:completion.underlyingPromiseHandled};\n            result.responseFinishedObservations.push({test:id,phase,...observation});trace(id,phase,'response.finished',observation);\n            if(failure)result.errors.push({stage:id+'-response-finished',requestId:requestId(request),...failure});\n          }catch(error){trace(id,phase,'response.finished-rejected',{...data,error:errorData(error)});result.errors.push({stage:id+'-response-finished-rejected',requestId:requestId(request),...errorData(error)});}"
+    },
+    {
+      "before": "page.on('requestfailed',request=>{const failure={test:id,...requestData(request),failure:request.failure(),phase,ns:(process.hrtime.bigint()-traceStart).toString()};result.failedrequests.push(failure);trace(id,phase,'requestfailed',failure);});",
+      "after": "page.on('requestfailed',request=>{const data=requestData(request),terminal=observer.requestFailed(request,data,request.failure());const failure={test:id,...data,failure:terminal.failure,phase,ns:terminal.arrivalNs};result.failedrequests.push(failure);trace(id,phase,'requestfailed',failure);});"
+    },
+    {
+      "before": "      const observations=await body(page,mark,snapshot);",
+      "after": "      mark('cdp-observer-setup');\n      const cdp=await context.newCDPSession(page);\n      for(const event of result.cdpScope.events)cdp.on(event,payload=>observer.cdp(event,payload,{test:id,phase}));\n      cdp.on('close',()=>trace(id,phase,'cdp-session-close'));\n      await cdp.send('Network.enable');await cdp.send('Page.enable');\n      record.cdpEnabledBeforeFirstAppRequest=true;trace(id,phase,'cdp-enabled',{domains:['Network','Page'],interception:false});\n      const observations=await body(page,mark,snapshot);"
+    },
+    {
+      "before": "await Promise.race([pending,new Promise((_,reject)=>",
+      "after": "await Promise.race([pending,observerFailed,new Promise((_,reject)=>"
+    },
+    {
+      "before": "  const counterAssets=result.assetBodies.filter",
+      "after": "  // URL/method matching supplies candidates only. Never merge protocol IDs,\n  // redirects, clocks or arrival order into a causal request identity claim.\n  for(const event of result.cdpEvents.filter(x=>x.event==='Network.requestWillBeSent')){\n    const p=event.payload,candidates=result.trace.filter(x=>x.test===event.test&&x.event==='request'&&x.url===p.request?.url&&x.method===p.request?.method);\n    result.cdpCorrelations.push({test:event.test,cdpRequestId:p.requestId,cdpSequence:event.sequence,cdpTimestamp:p.timestamp,cdpArrivalNs:event.arrivalNs,\n      url:p.request?.url??null,method:p.request?.method??null,playwrightCandidates:candidates.map(x=>({requestId:x.requestId,arrivalNs:x.ns})),identityProved:false,policy:'URL/method candidates only; independent ID and clock namespaces'});\n  }\n  const counterAssets=result.assetBodies.filter"
+    }
+  ],
+  "functionalTestSpanByteIdentical": true,
+  "actualBrowserExecuted": false
+}

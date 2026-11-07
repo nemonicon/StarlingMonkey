@@ -1,0 +1,7 @@
+# Native full Next observer successor V6 (Source only)
+
+V5 deploy.mjs and run-owned.py are byte identical. The sole run-contracts.mjs change selects the held BrowserV2 worker. Plan changes only its Source label and closed observer-family pin; all 24 HTTP contracts, cache invalidation, strict stream, browser assertions/deadlines/error gates, ownership and cleanup remain exact. The browser worker is the same715b payload selected by the separate matched Node V2 control. No app, native engine, component, entry, protocol or capability is changed.
+
+All operational slots remain NULL. Root must issue a fresh runId/authority selecting the reviewed actual1c310 V5 component and exact entry/constructor/native metadata/build records, plus the unchanged original start-disk and whole8025 world before/final guards. The historical V5 authority/wrapper and failed strict result remain immutable; Root copies its guarded wrapper separately. The generic output prefix is unchanged but the required fresh runId makes a new owned namespace.
+
+Only grammar/AST, literal inverse and source-family hash checks were run. No actor, browser, server, network, app copy, engine, constructor or guest was invoked by this Source preparation. BrowserV2 does not filter ERR_ABORTED or infer zero body bytes; every request/observer failure still fails the strict result. Fresh paired Node/native observations are required; no favorable-retry or runtime acceptance is claimed.

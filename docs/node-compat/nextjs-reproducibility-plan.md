@@ -118,8 +118,11 @@ cannot be made portable by replacing strings or expected hashes.
    the checkout, uses Node22.14's `npm-cli.js ci --ignore-scripts --no-audit
    --no-fund`, runs `next build --webpack`, then copies `.next/static` and
    `public` into `.next/standalone`. The fixture's `fixtures/message.txt` is part
-   of the runtime packaging contract. This driver also executes the historical
-   Node/bundler corpus; it is **not an isolated native-profile app-build CLI**.
+   of the runtime packaging contract. This historical driver also executes the
+   Node/bundler corpus. The new [isolated app CLI](../../tests/node-compat/frameworks/nextjs/next-app-build-v1/README.md)
+   extracts these stages with a read-only default/`--plan`, explicit Node/npm
+   inputs, private cache/configs and a fresh `--output` build action. Its57
+   inert Source tests pass; **the npm/Next build path remains unexecuted**.
    The working app inventory binds2218 files/48,808,299 bytes. Fresh generated
    build/action IDs and file hashes require a genuine new inventory and checks;
    old inode/mode/path records cannot be cast into evidence for a new build.

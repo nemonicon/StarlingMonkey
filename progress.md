@@ -5,7 +5,7 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 Last updated: 2026-11-07. Overall roadmap: **in progress**.
 
 
-**Last fully passing Next generation:24/24 HTTP,2/2 browser on55f05.**
+**Established passing Next baseline:24/24 HTTP,2/2 browser on55f05.**
 
 The new integrated observed-I/O adapter candidateV5 constructs as1c3108d2/
 37,214,251 bytes, same462 engine and13 standard WASI0.2.10 imports. Its first
@@ -30,9 +30,17 @@ retains150 records and passes Root readback;175 selected current descriptors
 and both2218-file app trees pass separately. The failed full-run review above
 also passes evidence validation while retaining the strict failure.
 Read-only CDP network diagnostics and an observer failure-terminal correction
-are being prepared for causal evidence; existing assertions/time limits and
-the strict failure gate stay unchanged. The previous55f05 first/repeat passes
-below remain valid historical evidence and are not replaced by this candidate.
+now have one actual paired trial: matched Node and the **same integrated1c31
+component** both pass24/24 HTTP, cache/stream and2/2 strict browser checks with
+empty error/failure arrays. Seven CDP event types record action network
+completion before same-document navigation in each trial;2963-byte body files
+are captured afterward. Their opaque action bodies have different hashes and
+are not normalized. This is a new observer trial with unchanged assertions,
+20s/500ms limits and strict failure gate; it **does not establish the cause,
+fix or reliability of the earlier abort**. Resultc737eaad/7450 bytes and matched
+Node51c54176/322922 bytes both finish raw0/clean with inputs preserved. Portable
+paired DATA review is in progress. Previous55f05 first/repeat passes and the
+failedV5 record remain unchanged.
 The unchanged Next16.4.5/React19.3.1 standalone application runs in the real
 SpiderMonkey Wasm component on stock Wasmtime42.0.1, in two fresh successful
 runs. Native UTF16 engine
@@ -202,7 +210,26 @@ matches the actual V7 declarations plus the single UTF16 substitution. Its35
 source-only tests cover fresh copies, relocation and refusal cases; Root's
 read-only --check also passes. No compiler or guest ran. Builder integration,
 authenticated external tool/artifact materialization, fresh inventories and an
-isolated app-build command remain outstanding; no clean build is claimed.
+actual isolated app-build execution remain outstanding; no clean build is claimed.
+
+The [isolated app-builder Source](tests/node-compat/frameworks/nextjs/next-app-build-v1/README.md)
+is now implemented with a read-only default plan and explicit fresh-output build
+mode. It isolates the original locked npm/Next commands and standalone
+packaging from the historical corpus.57 inert tests and Root's read-only plan
+check pass; **the actual build path remains unexecuted**. It records fresh
+inventories/build/action IDs rather than reusing old2218-file identities.
+An official Node22.14 archive and published HTTPS SHA sum now supply npm10.9.2
+in a fresh private prefix;2,379 npm files and the existing Node binary's exact
+match to the archive entry are verified without executing npm. No OpenPGP
+verification is claimed. Root's concrete --plan passes. The actual app build
+did not start:1,019,109,376 free bytes is below the1GiB start floor. A request
+for more space/another volume is pending; no guard or old artifact was changed.
+
+The new read-only browser observer is Source-reviewed: seven bounded CDP event
+types plus requestfailed-aware observation completion, with unchanged actions,
+asset pins,20-second limits,500ms drain and strict error gate.18 inert tests pass.
+The matched Node/native diagnostic trial now passes as described above;
+the earlier failedV5 remains failed and its cause remains open.
 
 Full Next entryV5 integration is implemented and constructed. It preserves all
 six facades and the application, replaces only the WASI adapter with the audited

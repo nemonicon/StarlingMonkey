@@ -17,7 +17,12 @@ including strict streaming, with clean process ownership and input protection.
 That finite result does not accept the failed browser contract. The fully
 passing original55f05 generation remains unchanged.
 
-Next: retain read-only CDP transport/navigation evidence under the same browser
-assertions, limits and error gate, and compare a matched Node control before
-choosing a fix. Native handle counts, idle disconnect, trailers, clean-machine
-build, performance and production promotion remain separate outstanding work.
+A fresh diagnostic trial with the V2 CDP observer now passes the unchanged
+strict24HTTP/2browser contract on this same component, and its matched Node
+control also passes. Both record action network completion before same-document
+navigation; decoded action-body files are captured afterward. Neither trial
+establishes a fix or the cause of the earlier abort. Portable paired DATA review
+is being prepared; the failed first result remains unchanged.
+
+Native handle counts, idle disconnect, trailers, clean-machine build,
+performance, browser-abort reliability and production promotion remain open.

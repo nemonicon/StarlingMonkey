@@ -1,0 +1,7 @@
+# Matched Node observer successor V2 (Source only)
+
+The owned runner and unissued Root template are byte identical to matched host V1. The new local browser worker is byte identical to held BrowserV2/715b, also selected by native deploymentV6. The only run-stock.mjs change is its fresh owned output namespace. Plan changes its Source label, closed observer-family pin and stock argv/output/monitor/worker descriptors. The entire real Node Module/HTTP bridge, untouched2218-file application, fresh copied cache, 24 HTTP contracts, cache/strict stream, browser interaction and strict zero-error gates remain unchanged. The original300s monitor,20s test,500ms capture and2000ms post-close drain limits remain.
+
+All Root/actual slots remain NULL. A separate reviewed Root grant is required for one fresh matched Node observation, paired with the separately granted native1c310 run. This family neither runs both implicitly nor retries any failed run. Both original V1 success and V5 native strict failure remain unchanged. Node uses its real stock streams/Web APIs/builtins, never claims guest parity, and preserves original app modes/inodes under its existing bookends.
+
+Preparation ran grammar/AST, exact inverse/copy and source-family hash checks only. No browser, server, network, app copy, native/engine/guest or other actor ran. BrowserV2 retains all request failures and unavailable-body errors; its new CDP observations and known-failure settlement do not relax acceptance.
