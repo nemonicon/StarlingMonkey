@@ -349,7 +349,16 @@ Only the additional diagnostic session is disabled; Playwright's built-in
 protocol, all functional bodies, five pins,20s/500ms and request/body/error gates
 remain unchanged.42 browser and116 stock inert/read-only checks pass. No such
 actor has run yet, and a positive control cannot accept the failed original
-cohort. A finite separately declared stock-only comparison is next.
+cohort. The [three-sample diagnostic](tests/node-compat/frameworks/nextjs/extra-cdp-off-root-results-v1/README.md)
+is declared79eb9dfa/8680 with11 shared inputs and reviewed single-member driver
+066350a3/13014(67 inert checks). Its first launch refused BEFORE any actor or
+output/monitor/launcher directory at the unchanged1GiB floor. Subsequent free
+space was673,460,224 bytes. All three members remain unexecuted; the same unused
+off1 request can resume when headroom returns. Earlier permission-null
+preparations were caught in pre-launch review and preserved unused; corrected
+V2 requests9fd6e9b6 explicitly select the intended two true permissions. No
+runtime failure, retry or gate relaxation is inferred from either preparation
+issue. Original cohort remains strict5/6 with its failed p3-stock retained.
 The first V5 abort and later old-app CDP positives remain separate. Fresh-app
 wasmCloud admission [SourceV4](tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v4/README.md)
 is now sealed8236614e/4170 and independently reviewed, with31 inert checks,
