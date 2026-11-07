@@ -28,7 +28,14 @@ The component emits exactly thirteen selected standard WASI **0.2.10** imports
 and the incoming-handler export. No custom host service, host modification,
 interface widening or raw socket/TLS implementation is used. wasmCloud's pinned
 P2 HTTP path creates a fresh instance per request and is not accepted for this
-retained-server/cache contract. The physical 0444/0555 modes do not establish
+retained-server/cache contract. A separate [eight-request cold control](wasmcloud-cold-candidate-v2/README.md)
+now passes on stock wasmCloud2.11.0/embedded Wasmtime48.0.7 using this same
+component: health×3, SSR, JSON POST, filesystem/SHA, assets and strict incremental
+streaming. Its runtime/CLI parents exit0 with inputs preserved. The [portable
+DATA review](wasmcloud-cold-root-results-v2/actual-review/README.md) retains117
+records and passes readback. The earlier
+TCP-only readiness attempt's eight host404s remain retained failures. No browser
+or retained cache assertion ran on wasmCloud. The physical 0444/0555 modes do not establish
 read-only capability rights on the WASI preopen descriptor. Production remains accepted **foundations-v13**;
 the experimental pass does not promote broad Node or Buffer support.
 

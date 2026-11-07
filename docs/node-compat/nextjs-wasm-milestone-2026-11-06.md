@@ -156,8 +156,12 @@ replace the runtime command above.
    now passes all36 selected records on2026-11-07. Broaden context, cancellation,
    overlapping-request and teardown checks. The passing sequential smoke and
    selected stream cases are not exhaustive lifetime evidence.
-3. Run the finite cold-instance wasmCloud contract against this same component,
-   retaining failures independently of the Wasmtime retained-instance result.
+3. The finite cold-instance wasmCloud contract now passes eight requests against
+   this same component on2026-11-07, including strict incremental streaming;
+   config/dev/outer0 and input/ownership bookends pass. The [portable DATA
+   review](../../tests/node-compat/frameworks/nextjs/wasmcloud-cold-root-results-v2/actual-review/README.md)
+   passes Root readback. The first attempt's premature TCP readiness/eight host404s
+   remains failed evidence. Retained cache/browser behavior is still separate.
    The real peer-disconnect baseline observes both I/O error paths, but cleanup
    after the failed output export remains inconclusive and its server was
    discarded without another request. I/O-driven cancellation and safe normal

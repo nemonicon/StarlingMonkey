@@ -1,0 +1,19 @@
+--- peer-disconnect-candidate-v2/adapter-diagnostic.mjs
++++ peer-disconnect-candidate-v3/adapter-diagnostic.mjs
+@@ -76,7 +76,7 @@
+       let inputBody, inputStream, outgoingResponse, outputBody, outputStream, responseReader;
+       let incomingEnded = false, responseSet = false, outputFinished = false;
+       let diagnostic;let inputBytes=0;
+-      const ioAbort=new AbortController();
++      let ioAbort;
+       let request,onRequestAbort,observedReason,observedIo=false;
+       let fatalSet=false,fatalValue,outputFailureObserved=false,outputFailureRaw,outputFailureTag;
+       let handledClosed=false,cancelReturned=false,readerReleased=false,cleanupReturned=false;
+@@ -109,6 +109,7 @@
+         }
+       }
+       try {
++        ioAbort=new AbortController();
+         const fieldResource = incoming.headers();
+         const headers = new Headers();
+         try { for (const [name, value] of fieldResource.entries()) headers.append(name, text(value)); }

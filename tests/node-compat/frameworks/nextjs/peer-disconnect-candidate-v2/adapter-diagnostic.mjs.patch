@@ -1,0 +1,149 @@
+--- peer-disconnect-candidate-v1/adapter-diagnostic.mjs
++++ peer-disconnect-candidate-v2/adapter-diagnostic.mjs
+@@ -1,4 +1,5 @@
+-import {errorData} from './diagnostic-common.mjs';
++import {isObservedClosedOutput,mayReturnHandledClosed} from './policy.mjs';
++import {errorData} from '../peer-disconnect-candidate-v1/diagnostic-common.mjs';
+ export function createDiagnosticWasiHttpHandler(webHandler,types,runFreshRequest,state) {
+ // Standard WASI HTTP resource ownership -> ordinary Web Request/Response.
+ // `types` is the actual wasi:http/types@0.2.10 namespace in guest-entry.mjs.
+@@ -75,6 +76,25 @@
+       let inputBody, inputStream, outgoingResponse, outputBody, outputStream, responseReader;
+       let incomingEnded = false, responseSet = false, outputFinished = false;
+       let diagnostic;let inputBytes=0;
++      const ioAbort=new AbortController();
++      let request,onRequestAbort,observedReason,observedIo=false;
++      let fatalSet=false,fatalValue,outputFailureObserved=false,outputFailureRaw,outputFailureTag;
++      let handledClosed=false,cancelReturned=false,readerReleased=false,cleanupReturned=false;
++      function rememberFatal(error){if(!fatalSet){fatalSet=true;fatalValue=error;}}
++      function abortObservedIo(reason) {
++        const firstObservation=!observedIo;
++        if(firstObservation){observedIo=true;observedReason=reason;}
++        state.emit(diagnostic,'io-abort-invocation-attempt',{firstObservation});
++        try {ioAbort.abort(reason);}
++        catch(error){rememberFatal(error);state.emit(diagnostic,'io-abort-failed',{error:errorData(error)});return false;}
++        const selected=request===undefined?ioAbort.signal:request.signal;
++        const propagated=selected.aborted&&selected.reason===observedReason;
++        state.emit(diagnostic,'io-abort-returned',{controllerAborted:ioAbort.signal.aborted,
++          requestCreated:request!==undefined,requestSignalAborted:request?.signal.aborted??null,
++          requestReasonMatchesFirstObservedIo:request?request.signal.reason===observedReason:null});
++        if(!propagated){rememberFatal(new Error('Observed I/O abort did not propagate'));return false;}
++        return true;
++      }
+       function releaseInput() {
+         const stream = inputStream; inputStream = undefined;
+         drop(stream,'stream',diagnostic);
+@@ -100,7 +120,7 @@
+         const method = methodValue.tag === 'other' ? methodValue.val : methodValue.tag.toUpperCase();
+         const url = protocol + '://' + authority + (incoming.pathWithQuery() ?? '/');
+         diagnostic=state.begin(headers.get('x-peer-case'),new URL(url).pathname);
+-        state.emit(diagnostic,'adapter-enter',{requestSignalLinkedToPeer:false});
++        state.emit(diagnostic,'adapter-enter',{requestSignalLinkedToPeer:true,independentPeerDisconnectSignal:false,adapterPolicy:'observed-io-abort-specific-output-closed-v2'});
+         inputBody = incoming.consume();
+         let body;
+         if (!['GET', 'HEAD'].includes(method)) {
+@@ -118,19 +138,31 @@
+               } catch (error) {
+                 if (streamError(error)?.tag === 'closed') {
+                   incomingEnded = true;
+-                  releaseInput();
+-                  controller.close();
++                  try{releaseInput();controller.close();}
++                  catch(secondary){rememberFatal(secondary);state.emit(diagnostic,'input-cleanup-failed',{error:errorData(secondary)});controller.error(secondary);}
+                 } else {
+-                  releaseInput();
+-                  controller.error(streamFailure(error,diagnostic));
++                  const variant=streamError(error);
++                  const primary=streamFailure(error,diagnostic);
++                  try{releaseInput();}
++                  catch(secondary){rememberFatal(secondary);state.emit(diagnostic,'input-cleanup-failed',{error:errorData(secondary)});}
++                  // Error the reader first. Abort propagation is synchronous in this
++                  // turn, before its queued rejection continuation can resume.
++                  controller.error(primary);
++                  if(variant?.tag==='last-operation-failed')abortObservedIo(primary);
+                 }
+               }
+             },
+             cancel(reason) {state.emit(diagnostic,'input-web-cancel-enter',{reason:errorData(reason)});releaseInput();state.emit(diagnostic,'input-web-cancel-returned');},
+           });
+         }
+-        const request = new Request(url, {method, headers, ...(body ? {body, duplex: 'half'} : {})});
++        request = new Request(url,{method,headers,signal:ioAbort.signal,...(body?{body,duplex:'half'}:{})});
++        onRequestAbort=()=>state.emit(diagnostic,'request-signal-abort-event',{
++          signalAborted:request.signal.aborted,reasonMatchesObservedIo:observedIo&&request.signal.reason===observedReason});
++        request.signal.addEventListener('abort',onRequestAbort,{once:true});
++        state.emit(diagnostic,'request-signal-created',{aborted:request.signal.aborted,
++          alreadyAbortedBeforeListener:request.signal.aborted,reasonMatchesObservedIo:observedIo&&request.signal.reason===observedReason});
+         const response = await webHandler(request,diagnostic);
++        if(fatalSet)throw fatalValue;
+         const fields = [];
+         for (const [name, value] of response.headers) if (name !== 'set-cookie') fields.push([name, bytes(value)]);
+         const cookies = response.headers.getSetCookie?.() ?? (response.headers.get('set-cookie') ? [response.headers.get('set-cookie')] : []);
+@@ -150,7 +182,7 @@
+             for (let offset = 0; offset < part.value.byteLength; offset += 4096) {
+               state.emit(diagnostic,'output-write-invocation-attempt',{bytes:Math.min(4096,part.value.byteLength-offset)});
+               try {outputStream.blockingWriteAndFlush(part.value.subarray(offset,offset+4096));}
+-              catch(error){state.emit(diagnostic,'output-write-failed',{error:errorData(error)});throw error;}
++              catch(error){outputFailureObserved=true;outputFailureRaw=error;outputFailureTag=streamError(error)?.tag;state.emit(diagnostic,'output-write-failed',{error:errorData(error)});throw error;}
+               state.emit(diagnostic,'output-write-returned');
+             }
+           }
+@@ -162,14 +194,35 @@
+         OutgoingBody.finish(outputBody,undefined);
+         state.emit(diagnostic,'outgoing-finish-returned',{peerReceiptProved:false});
+       } catch (error) {
+-        state.emit(diagnostic,'adapter-failed',{error:errorData(error)});
+-        if (responseReader) {
++        const observedOutput=outputFailureObserved&&outputFailureRaw===error;
++        const variant=observedOutput?streamError(error):undefined;
++        const primary=streamFailure(error,diagnostic);
++        if(observedOutput&&responseSet&&['closed','last-operation-failed'].includes(variant?.tag))abortObservedIo(primary);
++        if(isObservedClosedOutput({observed:outputFailureObserved,raw:outputFailureRaw,caught:error,
++            tag:outputFailureTag,responseSet})&&!fatalSet) {
++          state.emit(diagnostic,'known-output-closed-handling-enter');
++          // Only the classified real output import's closed case enters here.
++          // Cancellation, lock release or cleanup failures remain exceptions.
++          if(!responseReader)throw new Error('Closed output has no response reader');
+           state.emit(diagnostic,'response-reader-cancel-invocation-attempt');
+-          try {await responseReader.cancel(error);state.emit(diagnostic,'response-reader-cancel-returned');}
+-          catch(secondary){state.emit(diagnostic,'response-reader-cancel-failed-suppressed',{error:errorData(secondary)});}
+-        }
+-        throw streamFailure(error,diagnostic);
++          try{await responseReader.cancel(primary);cancelReturned=true;state.emit(diagnostic,'response-reader-cancel-returned');}
++          catch(secondary){state.emit(diagnostic,'response-reader-cancel-failed',{error:errorData(secondary)});throw secondary;}
++          responseReader.releaseLock();readerReleased=true;responseReader=undefined;
++          state.emit(diagnostic,'response-reader-lock-release-returned');
++          handledClosed=true;
++        } else {
++          state.emit(diagnostic,'adapter-failed',{error:errorData(error)});
++          if(responseReader){
++            state.emit(diagnostic,'response-reader-cancel-invocation-attempt');
++            try{await responseReader.cancel(primary);state.emit(diagnostic,'response-reader-cancel-returned');}
++            catch(secondary){state.emit(diagnostic,'response-reader-cancel-failed-suppressed',{error:errorData(secondary)});}
++          }
++          if(fatalSet)throw fatalValue;
++          throw primary;
++        }
+       } finally {
++        if(request&&onRequestAbort)request.signal.removeEventListener('abort',onRequestAbort);
++        if(responseReader){responseReader.releaseLock();responseReader=undefined;state.emit(diagnostic,'response-reader-lock-release-returned');}
+         releaseInput();
+         drop(outputStream,'output-stream',diagnostic);
+         if (outputBody && !outputFinished) drop(outputBody,'outgoing-body-unfinished',diagnostic);
+@@ -177,6 +230,16 @@
+         if (!responseSet) drop(outparam,'unconsumed-outparam',diagnostic);
+         drop(incoming,'incoming-request',diagnostic);
+         state.emit(diagnostic,'adapter-finally-returned');
++        cleanupReturned=true;
++      }
++      if(handledClosed){
++        if(!mayReturnHandledClosed({classified:handledClosed,cancelReturned,readerReleased,
++          cleanupReturned,requestAborted:request?.signal.aborted===true,fatalSet}))
++          throw new Error('Known output close cleanup incomplete');
++        state.emit(diagnostic,'known-output-closed-handled-return',{
++          requestSignalAborted:request.signal.aborted,adapterCleanupCallsReturned:true,
++          nativeResourceCountsOrStoreDeathProved:false,outgoingBodyFinished:false});
++        return;
+       }
+   }
+   return {

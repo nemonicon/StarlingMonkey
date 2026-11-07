@@ -102,6 +102,19 @@ and coverageComplete:false explicitly; its evidence-integrity pass is not a
 disconnect acceptance pass.
 Current uninspected input-finish future and missing peer-linked Request.signal
 remain explicit baseline limits. No native cleanup claim follows from Node logs.
+An [observed-I/O cancellation successor](tests/node-compat/frameworks/nextjs/peer-disconnect-candidate-v2/README.md)
+uses native AbortController/Request signals and a specific handled-output-close
+path. Review found a new allocation before its resource try/finally, which could
+skip incoming/outparam cleanup on a constructor throw. No V2 construction or
+workload ran; the Source, constructor and unused Root request remain retained.
+A narrow V3 correction moves allocation inside the existing cleanup block.
+Healthy EOF stays unaborted; handled output-close requires successful cancel,
+lock release and cleanup. Unknown errors/cleanup failures remain failures;
+finish-future inspection remains deferred. [V3 Source](tests/node-compat/frameworks/nextjs/peer-disconnect-candidate-v3/README.md)
+passes independent review, including the exact-function inert cleanup case.
+It now constructs as643742a2/37,142,579 bytes: three commands and outer parent0/
+clean, same13standardimports and whole8025world unchanged. No ordinary V3
+workload has run yet; the strict collector successor is being prepared.
 The next host priority is a finite cold-instance wasmCloud check of the same
 unchanged full Next component. The first actual eight-request attempt failed:
 the harness mistook the early TCP listener for deployed-workload readiness.
@@ -111,10 +124,27 @@ preserved. No successful Next handler or thirteen-interface instantiation is
 established by that attempt. Source/result1c691de2 are retained unchanged;
 a successor will wait for the pinned CLI's exact post-registration
 `listening for HTTP requests` marker and matching address before the first
-request, with the same eight assertions and no HTTP retries. Portable failed
-DATA review and the readiness correction are in progress. wasmCloud's P2
+request, with the same eight assertions and no HTTP retries. The [portable
+failed-DATA review](tests/node-compat/frameworks/nextjs/wasmcloud-cold-root-results-v1/actual-review/README.md)
+retains101 records and passes Root readback. It keeps the failed runtime result
+separate from evidence-integrity validation; the original Source review's
+missed registration gate is recorded. The [V2 readiness correction](tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v2/README.md)
+now ran successfully against the **same unchanged55f05 component** on stock
+wasmCloud2.11.0/embedded Wasmtime48.0.7: all8HTTP200/status/body assertions pass,
+including SSR, JSON POST, filesystem/SHA and assets. Suspense has three chunks,
+shell0/ready1. Config-show, wash-dev and outer parent exit0; owned shutdown,
+original/copied app and whole-world protections pass, no recorded errors.
+Result0d73be85/44509 bytes is retained. The [portable successful DATA review](tests/node-compat/frameworks/nextjs/wasmcloud-cold-root-results-v2/actual-review/README.md)
+retains117 records and passes Root readback;142 selected current descriptors
+and both2218-file app trees are checked separately. Both the original failure
+and its stricter readiness successor keep
+the same60-second registration cap and eight-request contract. wasmCloud's P2
 fresh-Store behavior requires a separate contract from retained Wasmtime cache
 and browser acceptance.
+The [measurement plan](docs/node-compat/nextjs-measurement-plan.md) defines
+separate launch/first-health/follow-up timing, paired Node/Wasmtime trials and
+sampled public server RSS. It is design only; no new performance or clean-machine
+reproduction measurement has run.
 Earlier811–996MiB capacity holds ended
 when free space rose above the unchanged1,024MiB construction start guard; both
 constructors then ran. No proof or shared binary was deleted and no guard was

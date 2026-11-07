@@ -1,0 +1,35 @@
+--- peer-disconnect-candidate-v1/diagnostic-handler.mjs
++++ peer-disconnect-candidate-v2/diagnostic-handler.mjs
+@@ -1,4 +1,4 @@
+-import {peerMarker,errorData} from './diagnostic-common.mjs';
++import {peerMarker,errorData} from '../peer-disconnect-candidate-v1/diagnostic-common.mjs';
+ 
+ // Uses genuine public Web streams and the supplied real ALS/timer backend.
+ export function createPeerWebHandler(state,{setTimeout,clearTimeout}) {
+@@ -9,7 +9,7 @@
+   return async function peerHandler(request,record) {
+     return state.storage.run(record.label,async()=>{
+       state.emit(record,'handler-enter',{signalAborted:request.signal.aborted,
+-        requestSignalLinkedToPeer:false});
++        requestSignalLinkedToPeer:true,requestSignalPolicy:'observed-io-only',independentPeerDisconnectSignal:false});
+       try {
+         const path=new URL(request.url).pathname;
+         if(path==='/inspect')return response({schemaVersion:1,marker:peerMarker,inspection:state.inspect()});
+@@ -26,7 +26,7 @@
+               if(received>8192)throw new RangeError('Upload exceeds8192');
+             }
+           } catch(error) {
+-            readFailed=true;readError=error;state.emit(record,'handler-read-failed',{error:errorData(error),received});
++            readFailed=true;readError=error;state.emit(record,'handler-read-failed',{error:errorData(error),received,signalAborted:request.signal.aborted,signalReasonMatchesReadError:request.signal.reason===error});
+           } finally {
+             if(reader) {
+               state.emit(record,'handler-reader-cancel-attempt');
+@@ -39,7 +39,7 @@
+           const complete=received===8192&&!readFailed;
+           return response({schemaVersion:1,marker:peerMarker,ordinal:record.ordinal,received,
+             complete,readFailure:readFailed?errorData(readError):null,
+-            requestSignalLinkedToPeer:false,signalAborted:request.signal.aborted},complete?200:400);
++            requestSignalLinkedToPeer:true,requestSignalPolicy:'observed-io-only',independentPeerDisconnectSignal:false,signalAborted:request.signal.aborted},complete?200:400);
+         }
+         if(path==='/output') {
+           let count=0,cancelled=false,timer,releaseWait;

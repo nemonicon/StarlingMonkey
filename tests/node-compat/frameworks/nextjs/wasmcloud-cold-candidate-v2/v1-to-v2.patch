@@ -1,0 +1,90 @@
+--- V1/models.mjs
++++ V2/models.mjs
+@@ -33,6 +33,23 @@
+  assert.equal(e.wit.skip_fetch,true);return true;
+ }
+ export function clean(t){return t.rawExitCode===0&&t.timeout===false&&t.forcedCleanup===false&&t.parentOwnedGroupGone===true&&t.allObservedOwnedGroupsGone===true&&['errors','signals','interruptedSignals','remainingObservedPids'].every(k=>Array.isArray(t[k])&&t[k].length===0);}
++// Exact pinned DevCommand::run completion event, after awaited reload_component
++// has required WorkloadState::Running. A listener/build event is insufficient.
++export function registrationFromLogs(logs,origin){
++ const events=[],messageLines=[];
++ for(const stream of ['stdout','stderr']){
++  assert.equal(typeof logs[stream],'string');const lines=logs[stream].split('\n');lines.pop();
++  for(let i=0;i<lines.length;i++){
++   const raw=lines[i].replace(/\r$/,''),line=raw.replace(/\u001b\[[0-9;]*m/g,'');
++   if(!/\bINFO\s+listening for HTTP requests\b/.test(line))continue;
++   messageLines.push({stream,lineNumber:i+1,line:raw});
++   const field=/(?:^|\s)address=(?:"([^"]+)"|(\S+))(?:\s|$)/.exec(line);if(!field)continue;
++   const address=field[1]??field[2];assert.equal(address,origin,'Unexpected post-registration origin; no fallback');
++   events.push({stream,lineNumber:i+1,line:raw,address});
++  }
++ }
++ return{registered:events.length>0,events,messageLines};
++}
+ export function validateSelection(c,audit,native,ctor,a,p){
+  assert.equal(c.state,'NEXT_NATIVE_COMPONENT_CONSTRUCTION_PASSED_UNREVIEWED_V2');assert.equal(c.passed,true);assert.equal(c.entryMode,'real-next');
+  assert.deepEqual(c.callerIndex,a.constructionCallerIndex);assert.equal(c.finalProtection.unchanged,true);assert.equal(c.error,null);
+--- V1/deploy.mjs
++++ V2/deploy.mjs
+@@ -20,7 +20,7 @@
+ async function entrySelection(){await family(a.inputSourceIndex);await verify(a.inputEntry);const base=dirname(a.inputSourceIndex.path),rel=relative(base,a.inputEntry.path);assert(rel&&!rel.startsWith('../')&&!rel.startsWith('/'));const member=(await read(a.inputSourceIndex.path)).files.find(x=>x.path===rel);assert(member);assert.deepEqual({...member,path:join(base,rel)},a.inputEntry);}
+ async function protect(){await verify(authorityRef);await family(a.sourceIndex);await family(a.constructionCallerIndex);await entrySelection();for(const ref of plan.protectedSourceReferences)await verify(ref);for(const k of ['node','monitor'])await verify(plan[k]);for(const k of Object.keys(plan.expectedArtifacts))await verify(a[k]);for(const ref of [...a.engineBuildEvidence,...a.nativeProtectedInputs,...extraRefs])await verify(ref);for(const ref of a.nativeSourceFamilies)await family(ref);}
+ await protect();
+-const {validateAuthority,validateSelection,configuration,validateEffective,clean,evaluate}=await import('./models.mjs');validateAuthority(a,plan);
++const {validateAuthority,validateSelection,configuration,validateEffective,clean,evaluate,registrationFromLogs}=await import('./models.mjs');validateAuthority(a,plan);
+ const construction=await read(a.constructionResult.path),audit=await read(a.componentAudit.path);
+ extraRefs.push(construction.rootAuthority,construction.plan,...construction.artifacts.engineBuildEvidence);
+ for(const k of ['returnedImports','returnedOwnShape'])extraRefs.push(construction.artifacts[k]);
+@@ -85,7 +85,14 @@
+  const show=await launch(['--user-config',empty,'-C',project,'--output','json','config','show'],'config-show');if(await boundedWait(show.done,plan.configSeconds*1000)===null){show.record.timeout=true;show.child.kill('SIGTERM');if(await boundedWait(show.done,1000)===null){show.record.forcedCleanup=true;show.child.kill('SIGKILL');await boundedWait(show.done,1000);}}show.record.exit=show.status;show.record.stdout=await row(show.record.stdout);show.record.stderr=await row(show.record.stderr);await save();assert.equal(show.record.timeout,false);assert.deepEqual(show.status,{code:0,signal:null,error:null});const shown=await read(show.record.stdout.path);assert.equal(shown.success,true);validateEffective(shown.data,configured);result.effectiveConfiguration=shown.data;result.configVerifiedBeforeDev=true;await save();
+  await protect();await sourceBookend();await witBookend();await new Promise((resolve,reject)=>lease.close(error=>error?reject(error):resolve()));lease=null;result.portLease.releasedImmediatelyBeforeSingleDevLaunch=true;await save();
+  host=await launch(['--user-config',empty,'-C',project,'--log-level','info','--meters','duration','dev'],'wash-dev');result.server=host.record;void host.done.then(status=>{if(!stopping)result.errors.push({stage:'server-exited-before-owned-shutdown',status});});await save();
+- const deadline=Date.now()+plan.listenerSeconds*1000;let ready=false;while(Date.now()<deadline){assert.equal(host.status,null,'wash exited before readiness');if(await tcpReady(address.port)){ready=true;break;}await pause(50);}assert(ready,'Exact TCP listener unavailable within60s');result.readiness={tcpConnect:true,extraHttpRequests:0,origin};await save();
++ const deadline=Date.now()+plan.listenerSeconds*1000;let ready=false;result.readiness={tcpConnect:false,workloadRegistered:false,extraHttpRequests:0,origin,polls:0,source:plan.readinessPolicy.sourceFile,completionEvents:[]};await save();
++ while(Date.now()<deadline){
++  assert.equal(host.status,null,'wash exited before workload-registration readiness');const logs={},sizes={};
++  for(const stream of ['stdout','stderr']){const path=host.record[stream],s=await lstat(path);assert(s.size<=8388608,'Readiness log exceeds8MiB; raw file retained');logs[stream]=await readFile(path,'utf8');sizes[stream]=s.size;}
++  const registered=registrationFromLogs(logs,origin);result.readiness.polls++;result.readiness.lastLogSizes=sizes;result.readiness.workloadRegistered=registered.registered;result.readiness.completionEvents=registered.events;result.readiness.matchingMessageLines=registered.messageLines;
++  if(registered.registered&&await tcpReady(address.port)){result.readiness.tcpConnect=true;ready=true;await save();break;}await save();await pause(50);
++ }
++ assert(ready,'Exact post-registration marker AND TCP listener unavailable within60s');
+  const contract=await read(join(here,'cold-contract.json'));assert.equal(contract.requests.length,8);for(const request of contract.requests){assert.equal(host.status,null,'wash exited during cold controls');await capture(request,origin);}
+  result.eightCaptured=result.responses.length===8&&result.responses.every(x=>x.complete===true);result.contractsPassed=result.eightCaptured&&result.responses.every(x=>x.contract.passed===true);result.selected13InstantiationDemonstrated=result.contractsPassed===true;await save();
+ }catch(error){result.errors.push({stage:'cold-deployment-or-contracts',...errorData(error)});}
+--- V1/test-data.mjs
++++ V2/test-data.mjs
+@@ -4,7 +4,7 @@
+ import {createHash} from 'node:crypto';
+ import {compileFunction} from 'node:vm';
+ import {join} from 'node:path';
+-import {permissions,validateAuthority,configuration,validateEffective,validateSelection,evaluate,clean} from './models.mjs';
++import {permissions,validateAuthority,configuration,validateEffective,validateSelection,evaluate,clean,registrationFromLogs} from './models.mjs';
+ const read=async name=>JSON.parse(await readFile(new URL(name,import.meta.url),'utf8'));
+ const plan=await read('./plan.json'),contract=await read('./cold-contract.json'),refs=(await read('./test-data-inputs.json')).inputs;
+ async function retained(key){const r=refs[key],b=await readFile(r.path);assert.equal(b.length,r.bytes);assert.equal(createHash('sha256').update(b).digest('hex'),r.sha256);return JSON.parse(b);}
+@@ -68,4 +68,25 @@
+ await captureTest('actual capture raw-before-contract/strict chunk semantics',[enc('NEXT_STREAM_SHELL'),enc('NEXT_STREAM_READY')]);
+ await captureTest('actual capture invalid UTF8 preserves offending raw chunk',[Uint8Array.of(255)],{failure:true});
+ await captureTest('actual capture byte limit honest partial boundary',[Uint8Array.of(1,2),Uint8Array.of(3,4)],{failure:true,limit:3});
++// Actual V1 failure is preserved: TCP was live but the deployed-workload marker
++// was absent. These are DATA reads, never an actual retry or log fabrication.
++const oldStdout=await readFile(refs.v1DevStdout.path,'utf8'),oldStderr=await readFile(refs.v1DevStderr.path,'utf8'),oldResult=await retained('v1FailedResult');
++const oldOrigin=oldResult.portLease.origin;
++test('actual V1 TCP positive is not post-registration readiness',()=>{assert.equal(oldResult.readiness.tcpConnect,true);assert.equal(registrationFromLogs({stdout:oldStdout,stderr:oldStderr},oldOrigin).registered,false);assert.equal(oldResult.passed,false);assert(oldResult.responses.every(r=>r.status===404&&r.body.bytes===0));assert.equal(oldResult.server.exit.code,130);});
++const line='2026-11-07T00:00:00Z  INFO listening for HTTP requests address='+oldOrigin+'\n';
++for(const [name,text]of [
++ ['early HTTP listener','INFO HTTP server listening addr='+new URL(oldOrigin).host+' protocol="HTTP"\n'],
++ ['build started','INFO development session started, building and deploying component...\n'],
++ ['build complete','INFO component build complete\n'],
++ ['routing warning','WARN failed to route incoming request err=no workload registered\n'],
++ ['missing address','INFO listening for HTTP requests\n'],
++ ['debug only',line.replace('INFO','DEBUG')],['partial final line',line.trimEnd()],
++])test('readiness refuses '+name,()=>assert.equal(registrationFromLogs({stdout:'',stderr:text},oldOrigin).registered,false));
++test('Source-derived exact completion marker and origin accepted as MODEL only',()=>{const x=registrationFromLogs({stdout:'',stderr:oldStderr+line},oldOrigin);assert.equal(x.registered,true);assert.equal(x.events.length,1);assert.equal(x.events[0].address,oldOrigin);assert.equal(x.events[0].stream,'stderr');});
++test('quoted and ANSI log formatting keeps exact address',()=>assert.equal(registrationFromLogs({stdout:'\u001b[32m'+line.replace('address='+oldOrigin,'address="'+oldOrigin+'"')+'\u001b[0m\n',stderr:''},oldOrigin).registered,true));
++test('different leased origin refuses without fallback',()=>assert.throws(()=>registrationFromLogs({stdout:'',stderr:line.replace(oldOrigin,'http://127.0.0.1:1')},oldOrigin)));
++test('pinned official source orders await running before readiness event',()=>{assert.equal(plan.listenerSeconds,60);assert.equal(plan.readinessPolicy.capSeconds,60);assert.equal(plan.readinessPolicy.extraHttpRequests,0);});
++const official=await readFile(new URL('./upstream/dev.rs',import.meta.url),'utf8'),provenance=JSON.parse(await readFile(new URL('./source-provenance.json',import.meta.url),'utf8'));
++test('exact Git blob Source publication and awaited running predicate',()=>{assert.equal(provenance.pinnedCommit,'bc5acfb8e15f7d6d199ca940354d82e590c2d5ff');assert.equal(createHash('sha256').update(official).digest('hex'),provenance.source.sha256);const reload=official.indexOf('let workload_id = reload_component(host.clone(), &workload, None).await?;'),marker=official.indexOf('"listening for HTTP requests"'),signal=official.indexOf('let shutdown = shutdown.ready();');assert(reload>=0&&reload<marker&&marker<signal);assert(official.includes('response.workload_status.workload_state != WorkloadState::Running'));});
++test('capture loop is strictly after combined registration and TCP gate',()=>{const gate=code.indexOf("if(registered.registered&&await tcpReady(address.port))"),refusal=code.indexOf("assert(ready,'Exact post-registration marker AND TCP listener unavailable within60s')"),first=code.indexOf('for(const request of contract.requests)');assert(gate>=0&&gate<refusal&&refusal<first);assert(!code.includes('if(await tcpReady(address.port)){ready=true'));});
+ console.log(JSON.stringify({passed:true,pureDataCases:rows.length,rows,actualHostOrCliOrGuestOrNetworkInvoked:false,actualFilesystemCopyInvoked:false,inertCaptureOnly:true}));

@@ -1,0 +1,8 @@
+/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v2/test-data.mjs:90
+test('exact Git blob Source publication and awaited running predicate',()=>{const provenance=JSON.parse(await readFile(new URL('./source-provenance.json',import.meta.url),'utf8'));assert.equal(provenance.pinnedCommit,'bc5acfb8e15f7d6d199ca940354d82e590c2d5ff');assert.equal(createHash('sha256').update(official).digest('hex'),provenance.source.sha256);const reload=official.indexOf('let workload_id = reload_component(host.clone(), &workload, None).await?;'),marker=official.indexOf('"listening for HTTP requests"'),signal=official.indexOf('let shutdown = shutdown.ready();');assert(reload>=0&&reload<marker&&marker<signal);assert(official.includes('response.workload_status.workload_state != WorkloadState::Running'));});
+                                                                                                        ^^^^^
+
+SyntaxError: Unexpected reserved word
+    at checkSyntax (node:internal/main/check_syntax:74:5)
+
+Node.js v22.14.0
