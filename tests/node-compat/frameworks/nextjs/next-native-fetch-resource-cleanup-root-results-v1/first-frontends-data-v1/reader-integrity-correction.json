@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "state": "UNSEALED_READER_INTEGRITY_GAP_CORRECTED_NO_RAW_DATA_CHANGE",
+  "priorReader": {
+    "path": "history/pre-integrity-check.py",
+    "sha256": "d186866a2ef144b9bf92fb28cf193b6f7636a5f49c4849f81c2fa282fe8fcfe7",
+    "bytes": 9918
+  },
+  "finding": "Member hashes were checked only against unpinned ledger; tarfile r:gz could stop at TAR EOF without refusing changed gzip headers or concatenated/trailing gzip/TAR data.",
+  "independentPeer": "C independently verified actualc8ee/6fb3 rawDATA intact (tool9849bb); this is a reader admission gap, not observed archive corruption.",
+  "correction": "Pin exact archive+ledger SHA256 and length before parsing, bounded one-member gzip eof/tail fence, explicit ordinary USTAR headers and complete zero-only canonical TAR ending.",
+  "archiveRepacked": false,
+  "ledgerOr47OriginalsChanged": false,
+  "producerOrCompilerOrTargetSourceEvaluated": false
+}

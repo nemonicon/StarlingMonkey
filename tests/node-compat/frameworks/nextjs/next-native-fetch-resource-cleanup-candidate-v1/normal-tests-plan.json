@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "state": "FUTURE_NORMAL_PUBLIC_OBSERVABLE_TEST_PLAN_NOT_EXECUTED",
+  "rootMustAuthorizeBuildComponentAndRuntimeSeparately": true,
+  "existingAppAndThirteenInterfacesOnly": true,
+  "newServerOrHostService": false,
+  "nativeResourceCountsProved": false,
+  "cases": [
+    {
+      "id": "read-eof-metadata",
+      "operation": "fetch existing /api/json; read body to EOF then inspect status/url/headers",
+      "required": "exact original bytes/metadata preserved; no new errors"
+    },
+    {
+      "id": "bodyall-eof",
+      "operation": "fetch existing /api/json independently for text/json/arrayBuffer",
+      "required": "same bytes/value and bodyUsed/second-read refusal behavior"
+    },
+    {
+      "id": "repeat-read-eof",
+      "operation": "finite repeated fetch/read on existing /api/health",
+      "required": "all declared responses complete; no retries or private-counter claims"
+    },
+    {
+      "id": "clone-one-cancel-other-drain",
+      "operation": "clone before reading, cancel exactly one branch, drain other",
+      "required": "surviving branch exact complete bytes; no first-branch native close"
+    },
+    {
+      "id": "direct-reader-cancel",
+      "operation": "reify native body, create read promise then cancel reader in same turn; separately cancel after a normal read",
+      "required": "normal cancellation result and settled public reads; retain actual branch/outcome, no invented task/handle identity"
+    }
+  ],
+  "deferredCases": [
+    "unreified postheader abort reason/reification",
+    "clone both-branch source cancellation",
+    "native fast append",
+    "actual transport fault/GC/OOM/DEBUG/reset experiments"
+  ],
+  "ordinaryFullNextRegressionStillRequired": true,
+  "priorNativeRaw1FailuresRetained": true,
+  "actualProtocol": null,
+  "actualResults": null
+}

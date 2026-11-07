@@ -17,18 +17,31 @@ Current next steps and outstanding work:
   generators and full compile/link. Coordinated full-build DATA reviewb9aad169
   passes. The16-case deployed Wasm probe now passes in one GET, raw0/clean,
   with native/world guards preserved; bounded runtime DATA review030fad8b passes.
-  The optional cache facade passes40 in-memory model
-  checks only; real storage/Next/WASI validation remains open.
+  The initial optional cache facade retains its40 in-memory model checks only.
+  Separate HandlerV2 real-storage and Next/WASI results are recorded below;
+  they do not promote that earlier prototype.
 - **Complete:** corrected StockV2 VM import seam and owned cache-parent setup;
   real Node seam0 and one fresh full control0 pass. The first Wasm cache scenario
   passes; its legacy counter and strict browser failures remain open.
+- **Complete:** the successful StockV2 control and real VM seam now have a closed
+  portable DATA archive and standalone reader. Offline/current checks pass for
+  137 retained originals, including two screenshots; Root independently compared
+  every archived member with the current original. The omitted application and
+  tool payloads are not reproduced by this archive.
 - **Next:** bounded native Web fetch resource ownership cleanup. Source audit
-  identifies missing disposal paths; ownership/API design precedes any code.
+  identifies missing disposal paths. Six-file afterimages and pure ownership
+  models are sealed after independent review. The actual frontend checks now
+  pass two translation units and fail the third on three ignored nodiscard
+  results. A separate18-byte source correction now passes all three frontend
+  checks, raw0 with clean ownership and unchanged guards; independent DATA
+  reviewe5712a58 passes for that frontend-only scope. No linked
+  engine or guest execution of the cleanup candidate has occurred. Review caught an interaction with the existing
+  native append path, now explicitly excluded from this bounded change.
   No cause for browser abort or module-state differences is established.
   Target-host checks and measurements remain separate.
 - **Still open:** broader lifecycle/resource coverage, clean-machine bootstrap,
   performance/size evaluation and any production promotion. Foundations-v13 remains
-  the accepted checkpoint. Completed snapshots through76f296e6 are committed and pushed.
+  the accepted checkpoint. Completed snapshots through064ab4a2 are committed and pushed.
 
 The corrected2251/afb build is accepted as build DATA only. A separately sealed
 [interop constructorV2](tests/node-compat/frameworks/nextjs/next-module-fileurl-interop-probe-construction-v2/README.md)
@@ -75,12 +88,37 @@ d739eacc: five52/24HTTP/80supp/legacy1→2/stream/strict2browser allpass in one 
 Comparison991c9b93 preserves unavailable native body andseparateclocks/nocause.
 BothfailedV1recordsremainfailed; no fullWasm/Node parity orreliability acceptance.
 Native Source ownership audit finds finite Web fetch body/future disposal gaps,
-with design for read-based terminalcleanup underway before afterimages/builds;
+with sealed read-based terminalcleanup afterimages and98 pure models before builds;
 generic metadataGC/append/error-resource/clone/abort scopes remain explicit.
 See [first cache profile results](docs/node-compat/nextjs-portable-cache-2026-11-07.md).
 The older
 failed25c constructor remains unchanged and unexecuted. The current volume has
-about15GiB free, so storage is no longer blocking this step.
+about14GiB free, so storage is no longer blocking this step. Fresh Mat5
+materialization now completes raw0:825 files/7,554,682 bytes, six changed and819
+byte-identical, independently checked against the old payloads and donors.
+New selectiona6b9e291 is genuinely admitted; Builder7 JSON-only Cargo preparation
+completes raw0 with original inputs preserved. No Cargo command ran during that
+JSON preparation. The first frontend harness attempt stopped before Popen on a
+missing monitor directory; its inputs and result remain preserved. A separately
+reviewed driver correction then runs three original180-second compiler owners,
+raw[0,0,1], clean groups and source/tool/failure guards unchanged. The third TU
+fails three nodiscard warnings treated as errors, not a host or ownership failure.
+Separate sealed cleanup SourceV2 explicitly discards those known-success booleans.
+Fresh Mat6 has825files/7,554,700 bytes, exactly one+18B replacement and824
+unchanged payloads; new selection0abc4eb4 is genuinely admitted. Corrected
+frontendV3 Rootf16b04/original7348,7371,7382/180 completes0/0/0, clean ownership
+and source/tool/failed-V2 guards unchanged; independent DATA reviewe5712a58 passes.
+GeneratorV6 on this corrected selection also passes all ten checks under
+original7942/900, result2ddbfa9e and independent owner/raw DATA reviewb420245f.
+Builder8 JSON-only preparation DATA review2f2d5f57 passes. Full native build
+admission103ac6dd passes; Root9eab2f/original11018/7200 is now running in fresh
+`next-native-intl-build-fetch-cleanup825-first`, after successful configuration.
+No terminal result or cleanup engine is accepted yet. Fresh components and
+public guest tests follow a successful reviewed build.
+GeneratorV5 runs all ten checks successfully under original4023/900, result795dab0e;
+this is not compiler or runtime acceptance. Full build and public component
+tests remain required. Prior
+2251/4e build and runtime results do not validate the new cleanup candidate.
 
 Execution resumed after the user freed the current volume. Native admission
 observed 23,397,662,720 free bytes. Both first real request-regression arms have

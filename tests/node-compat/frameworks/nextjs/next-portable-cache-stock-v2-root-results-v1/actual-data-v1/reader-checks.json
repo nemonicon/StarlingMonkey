@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "state": "DIRECT_READONLY_DATA_READER_CHECKS_BEFORE_SEAL",
+  "relationship": "B authored the packet reader; C independently read the complete reader and exact corrected delta, then ran only its stdlib DATA modes. C authored the Source/control predecessor and original outcome review.",
+  "reader": {
+    "path": "check.py",
+    "sha256": "6c2df2c0a350088a7fd659fae7ce0f67a3f9aa06486ec9d01fa19ffb1671f390",
+    "bytes": 33126
+  },
+  "interpreter": "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/bin/python3.11",
+  "checks": [
+    {
+      "label": "exact-two-line-delta-and-Python-AST",
+      "status": "fulfilled",
+      "value": {
+        "chunk_id": "cc6643",
+        "wall_time_seconds": 0.000004875,
+        "exit_code": 0,
+        "original_token_count": 528,
+        "output": "--- preserved-first\n+++ stopped-current\n@@ -176,10 +176,11 @@\n         observation = obj(observation_path)\n         need(observation['terminal'] == describe(where + '/terminal.json', data[where + '/terminal.json']) and observation['rawExitCode'] == 0, 'original observation terminal')\n         return observation, len(snapshots), terminal\n-    stock_argv = [plan['node']['path'], str(Path(index_ref['path']).parent / 'run-stock.mjs'), root, plan['applicationSource'], plan['browserTools'], authority['runId']]\n+    stock_argv = [plan['node']['path'], str(Path(index_ref['path']).parent / 'run-stock.mjs'), root, plan['standaloneSource'], plan['browserTools'], authority['runId']]\n     observation, frames, terminal = owner(monitor, 92341, 300, review['rootAuthority'], stock_argv, monitor + '/observation.json')\n     need(frames == 14 and observation['ownedGroupsClean'] is observation['protectedInputsPreserved'] is observation['hostExperimentPassed'] is True and observation['guestOrNativeExecuted'] is False and refobj(observation['result']) == result, 'actual stock owner completion')\n     vm_observation, vm_frames, vm_terminal = owner(seam + '/monitor', 91470, 120, vm_review['rootAuthority'], vm_authority['argv'], seam + '/observation.json')\n+    need(vm_observation['authority'] == vm_review['rootAuthority'] and vm_review['rootObservation'] == describe(seam + '/observation.json', data[seam + '/observation.json']), 'exact VM observation/authority')\n     need(vm_frames == 1 and vm_observation['clean'] is vm_observation['passed'] is vm_observation['inputsAndCopiesPreserved'] is True and vm_observation['appHttpBrowserGuestExecuted'] is False and refobj(vm_observation['result']) == vm, 'actual VM completion')\n     need(vm['passed'] is True and vm['errors'] == [] and vm['oldExpectedError']['code'] == 'ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING' and vm['oldExpectedError']['name'] == 'TypeError', 'real old VM error retained')\n     expected_class = dict(defaultSameAsRealNodeRequire=True, repeatedNamespaceIdentity=True, constructedValue='main-loader:7', candidateSynchronousRequireIsSeparate=True)\n\n"
+      }
+    },
+    {
+      "label": "draft-current",
+      "status": "fulfilled",
+      "value": {
+        "chunk_id": "70dee7",
+        "wall_time_seconds": 0.002421125,
+        "exit_code": 0,
+        "original_token_count": 202,
+        "output": "{\"capsuleSealed\": false, \"currentOriginalsChecked\": 137, \"dataConsistent\": true, \"members\": 137, \"scope\": {\"actorOrSourceEvaluatorInvoked\": false, \"cacheFiles\": 12, \"causeOrReliabilityOrFullNextOrAdoptionProved\": false, \"decodedBrowserBodies\": 10, \"legacyGeneration\": [1, 2], \"modeCorrectionRetained\": true, \"nativeOrOldFailuresAccepted\": false, \"nonceChecks\": 52, \"originalHttpPassed\": 24, \"originalRawExitCodes\": [0, 0], \"ownedFrames\": [1, 14], \"pinnedAssets\": 5, \"sourceWitnessesNotWholeClosures\": true, \"stockOwnerCap\": 300, \"strictBrowserTests\": 2, \"strictStreamChunks\": 5, \"supplementalChecks\": 80, \"underlyingAppNodeSdkOrNativePayloadsRevalidated\": false, \"vmNewClassObservationsMatched\": true, \"vmOldErrorRetained\": true, \"vmOwnerCap\": 120}, \"state\": \"RETAINED_STOCK_V2_AND_VM_DATA_CONSISTENT_V1\"}\n"
+      }
+    },
+    {
+      "label": "draft-offline",
+      "status": "fulfilled",
+      "value": {
+        "chunk_id": "9a1bb1",
+        "wall_time_seconds": 0.000009083,
+        "exit_code": 0,
+        "original_token_count": 201,
+        "output": "{\"capsuleSealed\": false, \"currentOriginalsChecked\": 0, \"dataConsistent\": true, \"members\": 137, \"scope\": {\"actorOrSourceEvaluatorInvoked\": false, \"cacheFiles\": 12, \"causeOrReliabilityOrFullNextOrAdoptionProved\": false, \"decodedBrowserBodies\": 10, \"legacyGeneration\": [1, 2], \"modeCorrectionRetained\": true, \"nativeOrOldFailuresAccepted\": false, \"nonceChecks\": 52, \"originalHttpPassed\": 24, \"originalRawExitCodes\": [0, 0], \"ownedFrames\": [1, 14], \"pinnedAssets\": 5, \"sourceWitnessesNotWholeClosures\": true, \"stockOwnerCap\": 300, \"strictBrowserTests\": 2, \"strictStreamChunks\": 5, \"supplementalChecks\": 80, \"underlyingAppNodeSdkOrNativePayloadsRevalidated\": false, \"vmNewClassObservationsMatched\": true, \"vmOldErrorRetained\": true, \"vmOwnerCap\": 120}, \"state\": \"RETAINED_STOCK_V2_AND_VM_DATA_CONSISTENT_V1\"}\n"
+      }
+    }
+  ],
+  "actualActorOrSourceEvaluatorInvoked": false,
+  "underlyingOmittedAppOrToolPayloadsRevalidated": false,
+  "initialAuthoringFailure": "history/check-first.py and history/first-reader-failure.json preserve B's reported combined tool84f219 KeyError before semantic result. No separate stdout/stderr files are invented."
+}

@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "state": "UNCOMPILED_MINIMAL_NODISCARD_SOURCE_SUCCESSOR_V2",
+  "actionsAllowed": false,
+  "parentSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-fetch-resource-cleanup-candidate-v1/index.json",
+    "sha256": "f52274f36a0b17058ea2f54579286333be9aa6bc81bd67a74dc4361b5d8cfca7",
+    "bytes": 4415
+  },
+  "parentAfterimages": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-fetch-resource-cleanup-candidate-v1/afterimages.json",
+    "sha256": "fc3304a2a67de17136502fbac84c34ec0b54e610cd799c064d406fac3ca67d28",
+    "bytes": 6239
+  },
+  "relativePath": "builtins/web/fetch/request-response.cpp",
+  "before": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-fetch-resource-cleanup-candidate-v2/before/builtins/web/fetch/request-response.cpp",
+    "sha256": "01f9e8696836277d6ede8479f7e4407c3ac6e32b4edd5631986c250e3e913722",
+    "bytes": 126114
+  },
+  "parentAfterimage": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-fetch-resource-cleanup-candidate-v1/after/builtins/web/fetch/request-response.cpp",
+    "sha256": "01f9e8696836277d6ede8479f7e4407c3ac6e32b4edd5631986c250e3e913722",
+    "bytes": 126114
+  },
+  "after": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-fetch-resource-cleanup-candidate-v2/after/builtins/web/fetch/request-response.cpp",
+    "sha256": "1fe296b8472f14e50556910227b184552e0a0ac424f97a0f170c4b91cfd35fa6",
+    "bytes": 126132
+  },
+  "knownFixes": [
+    {
+      "line": 3355,
+      "before": "    cancel(engine);\n    api::throw_error",
+      "after": "    (void)cancel(engine);\n    api::throw_error",
+      "scope": "ready-error terminal future retirement; bool was unused"
+    },
+    {
+      "line": 3368,
+      "before": "  cancel(engine); // Received response is independently owned; retire future first.",
+      "after": "  (void)cancel(engine); // Received response is independently owned; retire future first.",
+      "scope": "ready-response terminal future retirement; independently owned response retained"
+    },
+    {
+      "line": 3406,
+      "before": "  if (!engine->cancel_async_task(keep_alive)) cancel(engine);",
+      "after": "  if (!engine->cancel_async_task(keep_alive)) (void)cancel(engine);",
+      "scope": "already-running/nonqueued preheader abort fallback; same queued-cancel test preserved"
+    }
+  ],
+  "expectedAddedBytes": 18,
+  "inheritedAfterimages": [
+    {
+      "relativePath": "include/host_api.h",
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-fetch-resource-cleanup-candidate-v1/after/include/host_api.h",
+        "sha256": "45f5410f4d7b788f2786d0af5d16c73d476718d4ba3a569292dd183b18fc4d65",
+        "bytes": 17005
+      },
+      "origin": "unchanged sealed parent afterimage; payload not duplicated"
+    },
+    {
+      "relativePath": "host-apis/wasi-0.2.0/handles.h",
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-fetch-resource-cleanup-candidate-v1/after/host-apis/wasi-0.2.0/handles.h",
+        "sha256": "88218bdbcb28feeb3d71137b8a1bbc2b50ce576a811a2741070520696b27b547",
+        "bytes": 7963
+      },
+      "origin": "unchanged sealed parent afterimage; payload not duplicated"
+    },
+    {
+      "relativePath": "host-apis/wasi-0.2.0/host_api.cpp",
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-fetch-resource-cleanup-candidate-v1/after/host-apis/wasi-0.2.0/host_api.cpp",
+        "sha256": "a3fa4a116cbcbedb6cfd010dbed02248850a00c5fae2d54aba529b0ccdfd5611",
+        "bytes": 38597
+      },
+      "origin": "unchanged sealed parent afterimage; payload not duplicated"
+    },
+    {
+      "relativePath": "builtins/web/fetch/request-response.h",
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-fetch-resource-cleanup-candidate-v1/after/builtins/web/fetch/request-response.h",
+        "sha256": "a7a2aa0a8b718e656e0d59db566205515406ee7be783a64c47d7a9349c2515b5",
+        "bytes": 10598
+      },
+      "origin": "unchanged sealed parent afterimage; payload not duplicated"
+    },
+    {
+      "relativePath": "builtins/web/fetch/fetch-api.cpp",
+      "after": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-fetch-resource-cleanup-candidate-v1/after/builtins/web/fetch/fetch-api.cpp",
+        "sha256": "b031a041ea8c501f30865a9a7f640cdb1db1d6091b654e817736c06c75941b2c",
+        "bytes": 13671
+      },
+      "origin": "unchanged sealed parent afterimage; payload not duplicated"
+    }
+  ],
+  "ownershipPlanInherited": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-fetch-resource-cleanup-candidate-v1/ownership-plan.json",
+    "sha256": "8a397e2732e16020f1a90ba0d41678697901a5f87386fcd41cf61849d2c61319",
+    "bytes": 9577
+  },
+  "normalTestsPlanInherited": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-fetch-resource-cleanup-candidate-v1/normal-tests-plan.json",
+    "sha256": "368afdb11cb969c5ef90f91fd5394a14eb66a8d854f4d9c3fb9590cdce786e9c",
+    "bytes": 1827
+  },
+  "apiWitnessesInherited": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-fetch-resource-cleanup-candidate-v1/api-witnesses.json",
+    "sha256": "af6e181a8daeebb13e32ff2fe69eaf4bc02f73bcd38c42f1090cb9448062aff4",
+    "bytes": 18345
+  },
+  "inheritedSourceAndApiSemanticsUnchanged": true,
+  "publicApiAdded": false,
+  "newLifecycleOrCleanupPath": false,
+  "parentCompileFailureMustRemainFailed": true,
+  "selectedCountsUnchanged": {
+    "native": 435,
+    "support": 387,
+    "embedding": 3,
+    "total": 825
+  },
+  "currentBaseLoaderSha256": "40eeb699d87b30dd3c146421f189a99848715a19b2efc83b081f0d61d3832d67",
+  "actualMaterialization": null,
+  "actualFrontendCheck": null,
+  "actualFullBuild": null,
+  "actualComponent": null,
+  "actualGuest": null,
+  "adoption": false
+}

@@ -1,0 +1,20 @@
+// All routing configuration, bootstrap and fetch occur after deployed entry.
+async function prepareFetchLifecycleProbe() {
+  const process = bootstrap();
+  if (globalThis.process !== process) throw new Error('Native process identity mismatch');
+  const origin = lifecycleOrigin(process.env.STARLING_FETCH_CONTROL_ORIGIN);
+  let calls = 0;
+  return createWasiHttpHandler(async request => {
+    const url = new URL(request.url);
+    if (request.method !== 'GET' || url.pathname !== '/fetch-lifecycle' || url.search !== '')
+      return new Response('one predeclared GET /fetch-lifecycle required', {status: 404});
+    if (++calls !== 1) return new Response('probe already called', {status: 409});
+    const result = await collectFetchLifecycle(origin);
+    return new Response(JSON.stringify({...result, call: calls}), {
+      status: 200, headers: {'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store'},
+    });
+  }, types, runFreshRequest);
+}
+export const incomingHandler = createNeutralReadyHandler({
+  runNeutralServer, prepareServer: prepareFetchLifecycleProbe, disposeBeforeEntry,
+});

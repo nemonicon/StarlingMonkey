@@ -1,0 +1,513 @@
+--- a/include/host_api.h
++++ b/include/host_api.h
+@@ -244,7 +244,23 @@
+ void block_on_pollable_handle(PollableHandle handle);
+ 
+ class HttpIncomingBody final : public Pollable {
+-public:
++  std::optional<mozilla::WeakPtr<api::AsyncTask>> pending_read_;
++  bool terminal_ = false;
++  bool cancel_requested_ = false;
++  bool native_append_selected_ = false;
++  Result<Void> retire(bool eof);
++
++public:
++  api::AsyncTask* pending_read() const { return pending_read_ ? pending_read_->get() : nullptr; }
++  void set_pending_read(api::AsyncTask* task) { pending_read_.emplace(task); }
++  void clear_pending_read(api::AsyncTask* task) {
++    if (pending_read() == task) pending_read_.reset();
++  }
++  void request_cancel() { cancel_requested_ = true; }
++  bool cancel_requested() const { return cancel_requested_; }
++  bool terminal() const { return terminal_; }
++  void defer_read_cleanup_for_native_append() { native_append_selected_ = true; }
++  bool native_append_selected() const { return native_append_selected_; }
+   HttpIncomingBody() = delete;
+   explicit HttpIncomingBody(std::unique_ptr<HandleState> handle);
+ 
+@@ -261,8 +277,10 @@
+   /// Might return an empty string if no data is available.
+   Result<ReadResult> read(uint32_t chunk_size);
+ 
+-  /// Close this handle, and reset internal state to invalid.
++  /// Cancel the owned input stream/body, after any queued read was retired.
+   Result<Void> close();
++  /// EOF: finish the body and drop the uninspected trailers future.
++  Result<Void> finish();
+ 
+   Result<PollableHandle> subscribe() override;
+   void unsubscribe() override;
+@@ -326,6 +344,9 @@
+ public:
+   FutureHttpIncomingResponse() = delete;
+   explicit FutureHttpIncomingResponse(std::unique_ptr<HandleState> handle);
++  ~FutureHttpIncomingResponse() override;
++  /// Owns this future only: child subscription is retired before the future.
++  void close();
+ 
+   /// Returns the response if it is ready, or `nullopt` if it is not.
+   Result<optional<HttpIncomingResponse *>> maybe_response();
+--- a/host-apis/wasi-0.2.0/handles.h
++++ b/host-apis/wasi-0.2.0/handles.h
+@@ -225,6 +225,13 @@
+     stream_handle_ = stream;
+   }
+ 
++  bool stream_valid() const { return stream_handle_.__handle != POISONED_HANDLE; }
++  HandleOps<InputStream>::owned take_stream() {
++    const auto owned = stream_handle_;
++    stream_handle_ = {POISONED_HANDLE};
++    return owned;
++  }
++
+   static IncomingBodyHandle *cast(HandleState *handle) {
+     return reinterpret_cast<IncomingBodyHandle *>(handle);
+   }
+--- a/host-apis/wasi-0.2.0/host_api.cpp
++++ b/host-apis/wasi-0.2.0/host_api.cpp
+@@ -596,8 +596,12 @@
+ Result<Void> HttpOutgoingBody::append(api::Engine *engine, HttpIncomingBody *other,
+                                       api::TaskCompletionCallback callback,
+                                       HandleObject callback_receiver) {
++  if (other->pending_read() || other->terminal() || other->cancel_requested())
++    return Result<Void>::err(154);
+   JS::RootedObject resource(engine->cx());
+   if (!api::AsyncTask::capture_context(engine->cx(), &resource)) return Result<Void>::err(154);
++  // Sticky exclusion: this candidate does not own native append cancellation.
++  other->defer_read_cleanup_for_native_append();
+   engine->queue_async_task(new BodyAppendTask(engine, other, this, callback, callback_receiver, resource));
+   return {};
+ }
+@@ -798,6 +802,7 @@
+ Result<HttpIncomingBody::ReadResult> HttpIncomingBody::read(uint32_t chunk_size) {
+   typedef Result<ReadResult> Res;
+ 
++  if (terminal_) return Res::ok(ReadResult(true, nullptr, 0));
+   bindings_list_u8_t ret{};
+   wasi_io_streams_stream_error_t err{};
+   auto body_handle = IncomingBodyHandle::cast(handle_state_.get());
+@@ -813,26 +818,55 @@
+   return Res::ok(ReadResult(false, unique_ptr<uint8_t[]>(ret.ptr), ret.len));
+ }
+ 
+-// TODO: implement
+-Result<Void> HttpIncomingBody::close() { return {}; }
++Result<Void> HttpIncomingBody::retire(bool eof) {
++  if (terminal_) return {};
++  // A queued/running read must release its borrow/subscription first.
++  if (pending_read() || native_append_selected_) return Result<Void>::err(154);
++  unsubscribe();
++  auto *state = IncomingBodyHandle::cast(handle_state_.get());
++  const auto stream = state->take_stream();
++  const auto body = state->take();
++  terminal_ = true;
++  if (stream.__handle != POISONED_HANDLE) wasi_io_streams_input_stream_drop_own(stream);
++  if (eof) {
++    // This records EOF disposal, not successful typed trailer/delivery proof.
++    const auto trailers = wasi_http_types_static_incoming_body_finish(body);
++    wasi_http_types_future_trailers_drop_own(trailers);
++  } else {
++    wasi_http_types_incoming_body_drop_own(body);
++  }
++  return {};
++}
++Result<Void> HttpIncomingBody::close() { return retire(false); }
++Result<Void> HttpIncomingBody::finish() { return retire(true); }
+ 
+ Result<PollableHandle> HttpIncomingBody::subscribe() {
+-  auto body_handle = IncomingBodyHandle::cast(handle_state_.get());
+-  auto borrow = Borrow<InputStream>(body_handle->stream_handle_);
+-  auto pollable = wasi_io_streams_method_input_stream_subscribe(borrow);
+-  return Result<PollableHandle>::ok(pollable.__handle);
++  if (terminal_) return Result<PollableHandle>::err(154);
++  auto *state = IncomingBodyHandle::cast(handle_state_.get());
++  if (state->pollable_handle_ == INVALID_POLLABLE_HANDLE) {
++    auto borrow = Borrow<InputStream>(state->stream_handle_);
++    const auto pollable = wasi_io_streams_method_input_stream_subscribe(borrow);
++    state->pollable_handle_ = pollable.__handle;
++  }
++  return Result<PollableHandle>::ok(state->pollable_handle_);
+ }
+ void HttpIncomingBody::unsubscribe() {
+-  auto state = static_cast<IncomingBodyHandle *>(handle_state_.get());
+-  if (state->pollable_handle_ == INVALID_POLLABLE_HANDLE) {
+-    return;
+-  }
+-  wasi_io_poll_pollable_drop_own(own_pollable_t{state->pollable_handle_});
++  auto *state = IncomingBodyHandle::cast(handle_state_.get());
++  const auto pollable = state->pollable_handle_;
+   state->pollable_handle_ = INVALID_POLLABLE_HANDLE;
++  if (pollable != INVALID_POLLABLE_HANDLE) wasi_io_poll_pollable_drop_own(own_pollable_t{pollable});
+ }
+ 
+ FutureHttpIncomingResponse::FutureHttpIncomingResponse(std::unique_ptr<HandleState> state) {
+   handle_state_ = std::move(state);
++}
++FutureHttpIncomingResponse::~FutureHttpIncomingResponse() { close(); }
++void FutureHttpIncomingResponse::close() {
++  unsubscribe();
++  if (valid()) {
++    const auto future = WASIHandle<FutureHttpIncomingResponse>::cast(handle_state_.get())->take();
++    wasi_http_types_future_incoming_response_drop_own(future);
++  }
+ }
+ 
+ Result<optional<HttpIncomingResponse *>> FutureHttpIncomingResponse::maybe_response() {
+@@ -856,6 +890,7 @@
+ }
+ 
+ Result<PollableHandle> FutureHttpIncomingResponse::subscribe() {
++  if (!valid()) return Result<PollableHandle>::err(154);
+   if (pollable_handle_ == INVALID_POLLABLE_HANDLE) {
+     Borrow<FutureHttpIncomingResponse> borrow(handle_state_.get());
+     auto pollable = wasi_http_types_method_future_incoming_response_subscribe(borrow);
+@@ -864,10 +899,9 @@
+   return Result<PollableHandle>::ok(pollable_handle_);
+ }
+ void FutureHttpIncomingResponse::unsubscribe() {
+-  if (pollable_handle_ != INVALID_POLLABLE_HANDLE) {
+-    wasi_io_poll_pollable_drop_own(own_pollable_t{pollable_handle_});
+-    pollable_handle_ = INVALID_POLLABLE_HANDLE;
+-  }
++  const auto owned = pollable_handle_;
++  pollable_handle_ = INVALID_POLLABLE_HANDLE;
++  if (owned != INVALID_POLLABLE_HANDLE) wasi_io_poll_pollable_drop_own(own_pollable_t{owned});
+ }
+ 
+ HttpHeadersReadOnly::HttpHeadersReadOnly() { handle_state_ = nullptr; }
+--- a/builtins/web/fetch/request-response.h
++++ b/builtins/web/fetch/request-response.h
+@@ -4,6 +4,7 @@
+ #include "fetch-errors.h"
+ #include "headers.h"
+ #include "host_api.h"
++#include <memory>
+ 
+ 
+ 
+@@ -240,11 +241,11 @@
+ 
+ class ResponseFutureTask final : public api::AsyncTask {
+   Heap<JSObject *> request_;
+-  host_api::FutureHttpIncomingResponse *future_;
++  std::unique_ptr<host_api::FutureHttpIncomingResponse> future_;
+ 
+ public:
+   explicit ResponseFutureTask(HandleObject request,
+-                              host_api::FutureHttpIncomingResponse *future, HandleObject resource);
++                              std::unique_ptr<host_api::FutureHttpIncomingResponse> future, HandleObject resource);
+ 
+   [[nodiscard]] bool run(api::Engine *engine) override;
+   [[nodiscard]] bool cancel(api::Engine *engine) override;
+--- a/builtins/web/fetch/fetch-api.cpp
++++ b/builtins/web/fetch/fetch-api.cpp
+@@ -113,7 +113,7 @@
+     request->body();
+   }
+ 
+-  host_api::FutureHttpIncomingResponse *pending_handle = nullptr;
++  std::unique_ptr<host_api::FutureHttpIncomingResponse> pending_handle;
+   {
+     auto res = request->send();
+     if (const auto *err = res.to_err()) {
+@@ -121,14 +121,19 @@
+       return false;
+     }
+ 
+-    pending_handle = res.unwrap();
+-  }
++    pending_handle.reset(res.unwrap());
++  }
++
++  SetReservedSlot(request_obj, static_cast<uint32_t>(Request::Slots::ResponsePromise),
++                  ObjectValue(*response_promise));
++  SetReservedSlot(request_obj, static_cast<uint32_t>(Request::Slots::PendingResponseHandle),
++                  PrivateValue(nullptr));
+ 
+   // If the request body is streamed, we need to wait for streaming to complete
+   // before marking the request as pending.
+   if (!streaming) {
+     // TODO: what about non streaming?
+-    auto task = js::MakeUnique<ResponseFutureTask>(request_obj, pending_handle, resource);
++    auto task = js::MakeUnique<ResponseFutureTask>(request_obj, std::move(pending_handle), resource);
+     auto weak = mozilla::WeakPtr<ResponseFutureTask>(task.get());
+     ENGINE->queue_async_task(task.release());
+ 
+@@ -136,12 +141,11 @@
+     MOZ_ASSERT(signal);
+ 
+     AbortSignal::add_algorithm(signal, js::MakeUnique<Terminator>(weak));
+-  }
+-
+-  SetReservedSlot(request_obj, static_cast<uint32_t>(Request::Slots::ResponsePromise),
+-                  ObjectValue(*response_promise));
+-  SetReservedSlot(request_obj, static_cast<uint32_t>(Request::Slots::PendingResponseHandle),
+-                  PrivateValue(pending_handle));
++  } else {
++    // Streaming upload owns the future here until its existing EOF transfer.
++    SetReservedSlot(request_obj, static_cast<uint32_t>(Request::Slots::PendingResponseHandle),
++                    PrivateValue(pending_handle.release()));
++  }
+ 
+   return true;
+ }
+--- a/builtins/web/fetch/request-response.cpp
++++ b/builtins/web/fetch/request-response.cpp
+@@ -69,69 +69,82 @@
+ class BodyFutureTask final : public api::AsyncTask {
+   Heap<JSObject *> body_source_;
+   host_api::HttpIncomingBody *incoming_body_;
++  bool subscription_retired_ = false;
++
++  void retire_subscription() {
++    if (subscription_retired_) return;
++    subscription_retired_ = true;
++    handle_ = INVALID_POLLABLE_HANDLE;
++    incoming_body_->clear_pending_read(this);
++    incoming_body_->unsubscribe();
++  }
++  bool terminal_body(JSContext* cx, bool eof) {
++    auto result = eof ? incoming_body_->finish() : incoming_body_->close();
++    if (const auto* error = result.to_err()) {
++      if (!JS_IsExceptionPending(cx)) HANDLE_ERROR(cx, *error);
++      return false;
++    }
++    return true;
++  }
+ 
+ public:
+-  explicit BodyFutureTask(const HandleObject body_source, HandleObject resource) : api::AsyncTask(resource), body_source_(body_source) {
++  explicit BodyFutureTask(const HandleObject body_source, HandleObject resource)
++      : api::AsyncTask(resource), body_source_(body_source) {
+     auto *owner = streams::NativeStreamSource::owner(body_source_);
+     incoming_body_ = RequestOrResponse::incoming_body_handle(owner);
+-    auto res = incoming_body_->subscribe();
+-    MOZ_ASSERT(!res.is_err(), "Subscribing to a future should never fail");
+-    handle_ = res.unwrap();
+-  }
++    auto result = incoming_body_->subscribe();
++    MOZ_ASSERT(!result.is_err(), "Subscribing to a live body should never fail");
++    handle_ = result.unwrap();
++  }
++  ~BodyFutureTask() override { retire_subscription(); }
+ 
+   [[nodiscard]] bool run(api::Engine *engine) override {
+-    // MOZ_ASSERT(ready());
+     JSContext *cx = engine->cx();
+-    RootedObject owner(cx, streams::NativeStreamSource::owner(body_source_));
+-    RootedObject stream(cx, streams::NativeStreamSource::stream(body_source_));
+-    auto *body = RequestOrResponse::incoming_body_handle(owner);
+-
+-    auto read_res = body->read(HANDLE_READ_CHUNK_SIZE);
++    RootedObject source(cx, body_source_);
++    RootedObject owner(cx, streams::NativeStreamSource::owner(source));
++    RootedObject stream(cx, streams::NativeStreamSource::stream(source));
++    if (incoming_body_->cancel_requested()) {
++      retire_subscription();
++      return terminal_body(cx, false);
++    }
++    auto read_res = incoming_body_->read(HANDLE_READ_CHUNK_SIZE);
++    retire_subscription(); // A single read task never owns the body lifetime.
++    if (incoming_body_->cancel_requested()) return terminal_body(cx, false);
+     if (read_res.to_err()) {
+       const auto *receiver = Request::is_instance(owner) ? "request" : "response";
+       api::throw_error(cx, FetchErrors::IncomingBodyStreamError, receiver);
++      if (!terminal_body(cx, false)) return false;
+       return error_stream_controller_with_pending_exception(cx, stream);
+     }
+-
+     auto &chunk = read_res.unwrap();
+     if (chunk.done) {
++      if (!terminal_body(cx, true)) return false;
+       return JS::ReadableStreamClose(cx, stream);
+     }
+-
+-    // We don't release control of chunk's data until after we've checked that
+-    // the array buffer allocation has been successful, as that ensures that the
+-    // return path frees chunk automatically when necessary.
+     auto &bytes = chunk.bytes;
+-    RootedObject buffer(
+-        cx, JS::NewArrayBufferWithContents(cx, bytes.len, bytes.ptr.get(),
++    RootedObject buffer(cx, JS::NewArrayBufferWithContents(cx, bytes.len, bytes.ptr.get(),
+                                            JS::NewArrayBufferOutOfMemory::CallerMustFreeMemory));
+     if (!buffer) {
++      if (!terminal_body(cx, false)) return false;
+       return error_stream_controller_with_pending_exception(cx, stream);
+     }
+-
+-    // At this point `buffer` has taken full ownership of the chunk's data.
+     std::ignore = bytes.ptr.release();
+-
+     RootedObject byte_array(cx, JS_NewUint8ArrayWithBuffer(cx, buffer, 0, bytes.len));
+     if (!byte_array) {
+-      return false;
+-    }
+-
+-    RootedValue enqueue_val(cx);
+-    enqueue_val.setObject(*byte_array);
++      (void)terminal_body(cx, false);
++      return false;
++    }
++    RootedValue enqueue_val(cx, ObjectValue(*byte_array));
+     if (!JS::ReadableStreamEnqueue(cx, stream, enqueue_val)) {
++      if (!terminal_body(cx, false)) return false;
+       return error_stream_controller_with_pending_exception(cx, stream);
+     }
+-
+-    return cancel(engine);
+-  }
+-
+-  [[nodiscard]] bool cancel(api::Engine *engine) override {
+-    // TODO(TS): implement
+-    handle_ = -1;
+     return true;
+   }
+-
++  [[nodiscard]] bool cancel(api::Engine*) override {
++    retire_subscription(); // Also used for nonterminal read-task retirement.
++    return true;
++  }
+   void trace(JSTracer *trc) override { TraceEdge(trc, &body_source_, "body source for future"); }
+ };
+ 
+@@ -538,7 +551,8 @@
+     // Validate the operation resource before transferring the pending handle.
+     SetReservedSlot(body_owner, static_cast<uint32_t>(Request::Slots::PendingResponseHandle),
+                     PrivateValue(nullptr));
+-    ENGINE->queue_async_task(js_new<ResponseFutureTask>(body_owner, pending_handle, resource));
++    ENGINE->queue_async_task(js_new<ResponseFutureTask>(body_owner,
++        std::unique_ptr<host_api::FutureHttpIncomingResponse>(pending_handle), resource));
+   }
+ 
+   return true;
+@@ -1059,6 +1073,7 @@
+ }
+ 
+ bool do_body_source_pull(JSContext *cx, HandleObject source, HandleObject body_owner) {
++  auto *body = RequestOrResponse::incoming_body_handle(body_owner);
+   // If the stream has been piped to a TransformStream whose readable end was
+   // then passed to a Request or Response as the body, we can just append the
+   // entire source body to the destination using a single native hostcall, and
+@@ -1070,7 +1085,8 @@
+   // source ReadableStream is closed/canceled, so only one stream can ever be
+   // piped in at the same time.
+   RootedObject pipe_dest(cx, streams::NativeStreamSource::piped_to_transform_stream(source));
+-  if (pipe_dest && streams::TransformStream::readable_used_as_body(pipe_dest)) {
++  if (pipe_dest && streams::TransformStream::readable_used_as_body(pipe_dest) &&
++      !body->pending_read() && !body->native_append_selected()) {
+     MOZ_ASSERT(!streams::TransformStream::backpressure(pipe_dest));
+     RootedObject dest_owner(cx, streams::TransformStream::owner(pipe_dest));
+     MOZ_ASSERT(!JS_IsExceptionPending(cx));
+@@ -1084,7 +1100,11 @@
+ 
+   RootedObject resource(cx);
+   if (!api::AsyncTask::capture_context(cx, &resource)) return false;
+-  ENGINE->queue_async_task(js_new<BodyFutureTask>(source, resource));
++  if (body->terminal() || body->cancel_requested() || body->pending_read() ||
++      body->native_append_selected()) return true;
++  RefPtr<BodyFutureTask> task = js_new<BodyFutureTask>(source, resource);
++  body->set_pending_read(task.get());
++  ENGINE->queue_async_task(task);
+   return true;
+ }
+ 
+@@ -1134,7 +1154,29 @@
+                                                      JS::HandleObject stream,
+                                                      JS::HandleObject owner,
+                                                      JS::HandleValue reason) {
+-  // TODO: implement or add a comment explaining why no implementation is required.
++  if (RequestOrResponse::is_incoming(owner)) {
++    auto *body = RequestOrResponse::incoming_body_handle(owner);
++    if (body->native_append_selected()) {
++      // Preserve the deferred append path's old cancellation behavior.
++      args.rval().setUndefined();
++      return true;
++    }
++    body->request_cancel();
++    if (auto *pending = body->pending_read()) {
++      RefPtr<api::AsyncTask> keep_alive(pending);
++      // The genuine engine erases/root-copies the queued task before cancel().
++      // A task already running observes request_cancel at its safe boundary.
++      if (!ENGINE->cancel_async_task(keep_alive)) {
++        args.rval().setUndefined();
++        return true;
++      }
++    }
++    auto result = body->close();
++    if (const auto *error = result.to_err()) {
++      if (!JS_IsExceptionPending(cx)) HANDLE_ERROR(cx, *error);
++      return false;
++    }
++  }
+   args.rval().setUndefined();
+   return true;
+ }
+@@ -3292,9 +3334,10 @@
+   }
+ };
+ 
+-ResponseFutureTask::ResponseFutureTask(const HandleObject request, host_api::FutureHttpIncomingResponse *future, HandleObject resource)
+-      : api::AsyncTask(resource), request_(request), future_(future) {
+-    auto res = future->subscribe();
++ResponseFutureTask::ResponseFutureTask(const HandleObject request,
++    std::unique_ptr<host_api::FutureHttpIncomingResponse> future, HandleObject resource)
++      : api::AsyncTask(resource), request_(request), future_(std::move(future)) {
++    auto res = future_->subscribe();
+ 
+     MOZ_ASSERT(!res.is_err(), "Subscribing to a future should never fail");
+     handle_ = res.unwrap();
+@@ -3309,16 +3352,20 @@
+ 
+   auto res = future_->maybe_response();
+   if (res.is_err()) {
++    cancel(engine);
+     api::throw_error(cx, FetchErrors::FetchNetworkError);
+     return RejectPromiseWithPendingError(cx, response_promise);
+   }
+ 
+   auto maybe_response = res.unwrap();
+   if(!maybe_response.has_value()) {
+-    return cancel(engine);
++    // Not-ready is not terminal and must not consume the owned future.
++    engine->queue_async_task(this);
++    return true;
+   }
+ 
+   auto *response = maybe_response.value();
++  cancel(engine); // Received response is independently owned; retire future first.
+   RootedObject response_obj(cx, Response::create_incoming(cx, response));
+   if (!response_obj) {
+     return false;
+@@ -3339,9 +3386,12 @@
+   return cancel(engine);
+ }
+ 
+-bool ResponseFutureTask::cancel(api::Engine *engine) {
+-  // TODO(TS): implement
+-  handle_ = -1;
++bool ResponseFutureTask::cancel(api::Engine*) {
++  handle_ = INVALID_POLLABLE_HANDLE;
++  // Moving invalidates the task's ownership before any host drop. close() is
++  // idempotent; unique_ptr uses the matching existing C++ new/delete family.
++  auto owned = std::move(future_);
++  if (owned) owned->close();
+   return true;
+ }
+ 
+@@ -3352,13 +3402,9 @@
+   RootedObject promise(cx, Request::response_promise(request));
+   RootedValue error(cx, abort::AbortSignal::reason(signal));
+ 
+-  if (!fetch::abort_fetch(cx, promise, request, nullptr, error)) {
+-    return false;
+-  }
+-
+-  future_->unsubscribe();
+-  handle_ = INVALID_POLLABLE_HANDLE;
+-  return true;
++  RefPtr<api::AsyncTask> keep_alive(this);
++  if (!engine->cancel_async_task(keep_alive)) cancel(engine);
++  return fetch::abort_fetch(cx, promise, request, nullptr, error);
+ }
+ 
+ namespace request_response {

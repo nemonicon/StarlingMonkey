@@ -122,6 +122,24 @@ remain deferred. It adds no raw sockets, TLS, DNS or process services. Cross-
 request JavaScript identity, GC/resource bounds, reuse reliability, wasmCloud
 validation, clean-machine reproduction and performance remain separate gates.
 
+The configured Wasmtime42 reuse limit128 is a ceiling, not singleton-process
+affinity. Its P2 dispatcher permits one concurrent call per instance and can
+start another worker when none is available. Guest export quiescence and
+resource retirement therefore require their own evidence; the flag alone does
+not explain1→1 or prove a particular Store identity. See the pinned
+[serve configuration](https://raw.githubusercontent.com/bytecodealliance/wasmtime/v42.0.1/src/commands/serve.rs)
+and [worker scheduling](https://raw.githubusercontent.com/bytecodealliance/wasmtime/v42.0.1/crates/wasi-http/src/handler.rs).
+
+Source inspection now identifies missing explicit Web fetch body/future
+disposal paths. A [bounded ownership correction](nextjs-fetch-resource-cleanup-2026-11-07.md)
+uses existing standard WASI drops and the real guest task-cancellation API.
+Two frontend checks pass; a third fails ignored nodiscard results and needs a
+separate correction. No linked cleanup engine has run. Per-read task
+retirement must not close a body after every chunk. Metadata/headers and clone
+aliases must survive the operations that still permit inspection. These are
+Source findings and engineering work, not proof of the POST abort's cause or
+a runtime leak count. No current engine or earlier result is changed.
+
 Current component/app byte counts are measured artifacts, not startup, memory
 or throughput benchmarks. Foundations-v13 remains the accepted production
 checkpoint; complete Node, Buffer and Next compatibility are not claimed.

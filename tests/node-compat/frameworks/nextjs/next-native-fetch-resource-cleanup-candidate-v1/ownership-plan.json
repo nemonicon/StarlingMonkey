@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "state": "UNCOMPILED_READ_BASED_NATIVE_FETCH_OWNERSHIP_DESIGN_V1",
+  "sourceAfterimages": "afterimages.json",
+  "baseEngineSha256": "2251f11a2b8f737a11d960047f0996490ee3ca21e8a3679695cd8c046ca2f30a",
+  "baseNativeMetadata": {
+    "path": "/private/tmp/starling-node-compat/next-native-intl-build-interop-rooted825-first/metadata.json",
+    "sha256": "afb14d8abd47714a36e3c786fcfbd7805ae0e0601efdb3da16e5adbd24756637",
+    "bytes": 4861271
+  },
+  "selectedBindingsHeader": {
+    "path": "/private/tmp/starling-node-compat/next-native-intl-build-interop-rooted825-first/native-source/host-apis/wasi-0.2.10/bindings/bindings.h",
+    "sha256": "65d87ea7ee6f846139addc8177050fd4def9012de331c9997ccf80977105184e",
+    "bytes": 107308
+  },
+  "selectedBindingsImplementation": {
+    "path": "/private/tmp/starling-node-compat/next-native-intl-build-interop-rooted825-first/native-source/host-apis/wasi-0.2.10/bindings/bindings.c",
+    "sha256": "af92e5d6cd38f7463d8a6096dfa4f1d372f250dfc2c6a34b808fb3fe89d782da",
+    "bytes": 324214
+  },
+  "selectedHttpWit": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/regexp-unicode-probe-candidate-v1/deps/wasi-http-0.2.10/package.wit",
+    "sha256": "3e0c539616f3f1d677d530543dc41a7bb46787039a417c27976c119868bae7ea",
+    "bytes": 31611
+  },
+  "weakPointerHeader": {
+    "path": "/private/tmp/starling-node-compat/next-intl-ci-run42281671898-v1/distribution/spidermonkey-dist-release-intl-savedframe-eval/include/mozilla/WeakPtr.h",
+    "sha256": "3c2ce05eb6d720b703a0c1a231a6120647444ef43f5e7e3aacadf476ce95a1a3",
+    "bytes": 12332
+  },
+  "publicWasiApiSignatures": {
+    "pollableDrop": "void wasi_io_poll_pollable_drop_own(wasi_io_poll_own_pollable_t)",
+    "streamDrop": "void wasi_io_streams_input_stream_drop_own(wasi_io_streams_own_input_stream_t)",
+    "bodyCancel": "void wasi_http_types_incoming_body_drop_own(wasi_http_types_own_incoming_body_t)",
+    "bodyEof": "wasi_http_types_own_future_trailers_t wasi_http_types_static_incoming_body_finish(wasi_http_types_own_incoming_body_t)",
+    "trailersFutureDrop": "void wasi_http_types_future_trailers_drop_own(wasi_http_types_own_future_trailers_t)",
+    "responseFutureDrop": "void wasi_http_types_future_incoming_response_drop_own(wasi_http_types_own_future_incoming_response_t)"
+  },
+  "invariants": [
+    "Never change generic WASIHandle destruction or use drop_borrow as ownership release: generated borrow drops invoke the same resource-drop import.",
+    "BodyFutureTask completion/cancel retires only its subscription. A successful nonterminal chunk never finishes or drops its body.",
+    "A body caches at most one live subscription and a weak queued/running task association. Subscription invalidation and matching weak-clear precede host drop.",
+    "Direct underlying-source cancel promotes weak task to RefPtr and uses genuine Engine.cancel_async_task before body disposal; running task is asked to cancel and disposes at its safe post-borrow boundary.",
+    "EOF: subscription -> input-stream -> consumed incoming-body.finish -> uninspected future-trailers drop. Cancellation/error: subscription -> input-stream -> body drop. Never both body dispositions.",
+    "Task-owned future is unique_ptr from existing C++ new allocation; normal ready/error/cancel/abort retires subscription then owned future exactly once. Not-ready requeues without retirement.",
+    "Nonstreaming Request.PendingResponseHandle stays null once future moves to task. Normal streamed-upload EOF clears slot before unique ownership transfers into task.",
+    "Response/Headers native metadata pointers remain valid and cached; this candidate does not add/delete their native wrappers or change generic GC/finalizer ownership.",
+    "All body-task JS objects remain traced by actual task queue and rooted during execution; current ArrayBuffer ownership transfer remains unchanged. Cleanup host calls allocate no JS values and preserve pending exceptions.",
+    "WeakPtr registration follows the existing SupportsWeakPtr allocation family; queue commit remains the existing void/fatal allocation policy, not a new fallible-OOM guarantee.",
+    "At the genuine native append entry a sticky exclusion is set before append subscriptions are acquired. New read cancellation returns the original no-op behavior for such bodies; read terminal disposal refuses that owner. A pending ordinary read prevents new append acquisition and continues through the read path."
+  ],
+  "covered": [
+    {
+      "operation": "native Fetch future readiness",
+      "states": [
+        "not-ready requeue",
+        "ready response transfer",
+        "future-get error",
+        "task cancel",
+        "preheader task abort",
+        "task destructor"
+      ],
+      "owner": "ResponseFutureTask unique_ptr; subscription child before owned future"
+    },
+    {
+      "operation": "normal incoming body read",
+      "states": [
+        "ordinary chunk",
+        "zero-byte chunk",
+        "EOF",
+        "read error",
+        "ArrayBuffer/typed-view/enqueue failure"
+      ],
+      "owner": "HttpIncomingBody cached on metadata owner, per-read BodyFutureTask weak association"
+    },
+    {
+      "operation": "direct native underlying-source cancel",
+      "states": [
+        "no pending task",
+        "queued task",
+        "already running task",
+        "repeat cancel"
+      ],
+      "owner": "same HttpIncomingBody, no new parent owner"
+    },
+    {
+      "operation": "bodyAll text/json/arrayBuffer",
+      "states": [
+        "normal reified body read to EOF"
+      ],
+      "owner": "existing bodyAll reader consumes same native body source"
+    },
+    {
+      "operation": "Request pending future transfer",
+      "states": [
+        "unstreamed send to task",
+        "normal streamed-upload EOF to task"
+      ],
+      "owner": "slot OR task, never both"
+    }
+  ],
+  "deferred": [
+    {
+      "operation": "ResponseAborter / abort_fetch after headers",
+      "reason": "ReadableStreamError does not invoke underlying cancel; unreified body/reason/later reification semantics need a separate mapped hook. This candidate makes no immediate postheader-abort cleanup claim."
+    },
+    {
+      "operation": "Response.clone both-branch cancellation",
+      "reason": "Existing tee flags do not cancel original reader; no branch algorithm changed. One branch cancellation never closes shared native body. Normal EOF while another branch drains still uses covered source EOF."
+    },
+    {
+      "operation": "BodyAppendTask native fast forwarding",
+      "reason": "Existing forwarding/terminal algorithm remains deferred. A sticky exclusion marker at the real append entry prevents the new read/cancel/retire path from invalidating its independent cached subscriptions. No append cancellation or cleanup is claimed."
+    },
+    {
+      "operation": "streaming outgoing upload abort/error before pending-future transfer",
+      "reason": "Existing upload cancellation/finish semantics are unchanged; pending-slot terminal cleanup beyond normal EOF is not newly claimed."
+    },
+    {
+      "operation": "owned io-error and debug-string result disposal",
+      "reason": "Separate diagnostic error-resource family remains unchanged; original read-error conversion remains."
+    },
+    {
+      "operation": "Response/Headers native allocation ownership including unpublished-response OOM",
+      "reason": "No generic native metadata destruction/finalizer redesign; do not claim all native allocations or all HTTP handles are retired."
+    },
+    {
+      "operation": "engine reset / GC / host resource-count proof",
+      "reason": "No reset, forced GC, private handle counter or host modification is used or attested."
+    }
+  ],
+  "errorAndCompletionScope": "Incoming-body.finish returns a trailers future. Dropping it uninspected preserves existing JS EOF behavior, not verified typed HTTP/trailer delivery success. Cleanup errors never establish success; pending JS exceptions remain primary.",
+  "capabilities": {
+    "selectedInterfaceCountUnchangedIntended": 13,
+    "newHostService": false,
+    "newEmbeddingEntrypoint": false,
+    "old131ImportCountProjected": false,
+    "futureActualImportAudit": null
+  },
+  "actualBuild": null,
+  "actualComponent": null,
+  "actualRuntime": null,
+  "postAbortCauseClaim": false,
+  "globalCounterCauseClaim": false,
+  "allHttpCleanupClaim": false,
+  "initialStoppedDraftCorrection": "Independent C peer found that the new global Fetch cancel hook could reach a live deferred append owner. The unsealed successor adds explicit append-owner exclusion/admission and pure cross-path regression; no native execution or existing artifact was changed.",
+  "actualLocalHostApiTranslationUnitHeader": {
+    "path": "/private/tmp/starling-node-compat/next-native-intl-build-interop-rooted825-first/native-source/host-apis/wasi-0.2.0/bindings/bindings.h",
+    "sha256": "fcf11b6625f733be508de1f47d8d7bf8d1d9db46430d631d670fe8ea08ebc993",
+    "bytes": 163358
+  },
+  "actualLinkedBindingTranslationUnitHeader": {
+    "path": "/private/tmp/starling-node-compat/next-native-intl-build-interop-rooted825-first/native-source/host-apis/wasi-0.2.10/bindings/bindings.h",
+    "sha256": "65d87ea7ee6f846139addc8177050fd4def9012de331c9997ccf80977105184e",
+    "bytes": 107308
+  },
+  "includeLinkQualification": "The existing host_api.cpp local include is0.2.0, linked generated bindings are0.2.10. Only the six added owned API declarations were compared identically; no generalized cross-version ABI or direct0.2.10 include claim."
+}

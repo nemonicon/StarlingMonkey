@@ -1,0 +1,29 @@
+--- a/builtins/web/fetch/request-response.cpp
++++ b/builtins/web/fetch/request-response.cpp
+@@ -3352,7 +3352,7 @@
+ 
+   auto res = future_->maybe_response();
+   if (res.is_err()) {
+-    cancel(engine);
++    (void)cancel(engine);
+     api::throw_error(cx, FetchErrors::FetchNetworkError);
+     return RejectPromiseWithPendingError(cx, response_promise);
+   }
+@@ -3365,7 +3365,7 @@
+   }
+ 
+   auto *response = maybe_response.value();
+-  cancel(engine); // Received response is independently owned; retire future first.
++  (void)cancel(engine); // Received response is independently owned; retire future first.
+   RootedObject response_obj(cx, Response::create_incoming(cx, response));
+   if (!response_obj) {
+     return false;
+@@ -3403,7 +3403,7 @@
+   RootedValue error(cx, abort::AbortSignal::reason(signal));
+ 
+   RefPtr<api::AsyncTask> keep_alive(this);
+-  if (!engine->cancel_async_task(keep_alive)) cancel(engine);
++  if (!engine->cancel_async_task(keep_alive)) (void)cancel(engine);
+   return fetch::abort_fetch(cx, promise, request, nullptr, error);
+ }
+ 
