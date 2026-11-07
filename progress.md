@@ -14,14 +14,23 @@ Current next steps and outstanding work:
   is an explicit compatibility gap against the successful pinned Node reference.
 - **In progress:** the bounded CJS/fileURL bridge. Its first native build failed
   a SpiderMonkey handle signature check. A separate correction passes frontend,
-  generators and full compile/link. Build DATA review and16-case Wasm probe remain.
+  generators and full compile/link. Coordinated full-build DATA reviewb9aad169
+  passes; the16-case Wasm probe remains.
   No interop guest has run. The optional cache facade passes40 in-memory model
   checks only; real storage/Next/WASI validation remains open.
 - **After loader validation:** explicit Next CacheHandler scenario with shared
   tag epochs, differential/real-component tests, target-host checks and measurements.
 - **Still open:** broader lifecycle/resource coverage, clean-machine bootstrap,
   performance/size evaluation and any production promotion. Foundations-v13 remains
-  the accepted checkpoint. Completed snapshots through37e0ab52 are committed and pushed.
+  the accepted checkpoint. Completed snapshots through7db67041 are committed and pushed.
+
+The corrected2251/afb build is accepted as build DATA only. A separately sealed
+[interop constructorV2](tests/node-compat/frameworks/nextjs/next-module-fileurl-interop-probe-construction-v2/README.md)
+selects the unchanged16-case guest contract with the corrected RootedString
+native source. Root preparation00a2d33d binds31 actual metadata fields,39 fresh
+build roles and12 Source roles; construction has not yet launched. The older
+failed25c constructor remains unchanged and unexecuted. The current volume has
+about15GiB free, so storage is no longer blocking this step.
 
 Execution resumed after the user freed the current volume. Native admission
 observed 23,397,662,720 free bytes. Both first real request-regression arms have
@@ -217,8 +226,8 @@ outputs and reviewdce0cf7e. The corrected full native build now completes
 Root10067/original56661/7200 raw0/clean, all six phases0, all825 copies/1887
 protected files/ten trees unchanged. New core2251f11a is31,341,287 bytes and full
 metadataafb14d8a is4,861,271 bytes. Independent current payload/owner/tree DATA
-primary review0d23a90e passes; coordinated Source/TU/link/Rust review is being
-closed. This is build DATA only; no new component or16-case guest result yet.
+primary review0d23a90e and coordinated Source/TU/link/Rust review237cd3a3 pass.
+Aggregateb9aad169 accepts build DATA only; no new component or16-case guest result yet.
 Optional CacheHandler Source1f8398a6 is sealed separately. Root's owned fake-Node
 model50293/120 passes40 assertions, with independent model/ledger review. All
 cache FS, entropy and Next calls are explicitly in-memory fakes (actual Source

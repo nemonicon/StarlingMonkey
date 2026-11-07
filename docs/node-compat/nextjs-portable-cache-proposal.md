@@ -78,8 +78,8 @@ builtin import works and file-URL import throws the identifiable TypeError.
 Pinned Node imports that target successfully, so this remains a compatibility
 gap. The first interoperability build failed a SpiderMonkey HandleString
 signature check. A separate rooted-string correction passes a one-TU frontend
-check and now compiles/links as core2251f11a, with full-build DATA review being
-closed. No interoperability component or sixteen-case deployed result exists
+check and now compiles/links as core2251f11a, with full-build DATA reviewb9aad169
+passed. No interoperability component or sixteen-case deployed result exists
 yet. See [the corrected generation](../../tests/node-compat/frameworks/nextjs/next-module-fileurl-interop-native-root-results-v2/README.md).
 
 Next's `IncrementalCache.set` catches handler exceptions and logs a warning.
