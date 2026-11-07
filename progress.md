@@ -55,7 +55,8 @@ runtime now passes all459 native assertions across three HTTP calls, with29
 required event edges per call and exact original-Node public projections.
 Runtime/parent0, clean owned shutdown and input preservation pass. These are
 genuine native logical branches within an export; actual same-Store HTTP
-concurrency, unref-across-calls and peer-disconnect teardown remain open.
+concurrency and native peer-disconnect teardown remain open. The separate
+unref-across-calls result below closes its finite ordinary-call control.
 Independent review found that the first
 collector's positive self-report gate could reuse a structurally unknown
 collection before later strict validation rejected it. No runtime was launched
@@ -94,12 +95,24 @@ That export failed, so the harness sent no inspection request and discarded
 the owned server. The retained result is **valid inconclusive evidence**, raw1:
 both within-export I/O paths observed, functional controls passed, complete
 after-return coverage false. Runtime ownership and protected-input checks pass.
-The runtime result is e5e10dac/785436 bytes; portable DATA review is in progress.
+The runtime result is e5e10dac/785436 bytes. The [portable DATA review](tests/node-compat/frameworks/nextjs/peer-disconnect-root-results-v1/actual-review/README.md)
+retains186 text/source records and passes Root readback; its212 selected current
+descriptors pass separately. The reader reports the actual collector's raw1
+and coverageComplete:false explicitly; its evidence-integrity pass is not a
+disconnect acceptance pass.
 Current uninspected input-finish future and missing peer-linked Request.signal
 remain explicit baseline limits. No native cleanup claim follows from Node logs.
 The next host priority is a finite cold-instance wasmCloud check of the same
-unchanged full Next component. Its eight-request Source is being prepared;
-no deployment or second-host Next success is claimed yet. wasmCloud's P2
+unchanged full Next component. The first actual eight-request attempt failed:
+the harness mistook the early TCP listener for deployed-workload readiness.
+All eight responses were empty host404s; config-show exited0, wash exited130
+after SIGINT during startup, outer raw1 with owned groups gone and inputs
+preserved. No successful Next handler or thirteen-interface instantiation is
+established by that attempt. Source/result1c691de2 are retained unchanged;
+a successor will wait for the pinned CLI's exact post-registration
+`listening for HTTP requests` marker and matching address before the first
+request, with the same eight assertions and no HTTP retries. Portable failed
+DATA review and the readiness correction are in progress. wasmCloud's P2
 fresh-Store behavior requires a separate contract from retained Wasmtime cache
 and browser acceptance.
 Earlier811–996MiB capacity holds ended

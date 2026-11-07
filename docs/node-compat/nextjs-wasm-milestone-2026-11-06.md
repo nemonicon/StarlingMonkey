@@ -156,13 +156,19 @@ replace the runtime command above.
    now passes all36 selected records on2026-11-07. Broaden context, cancellation,
    overlapping-request and teardown checks. The passing sequential smoke and
    selected stream cases are not exhaustive lifetime evidence.
-3. Integrate or retain each audited facade through an explicit production
+3. Run the finite cold-instance wasmCloud contract against this same component,
+   retaining failures independently of the Wasmtime retained-instance result.
+   The real peer-disconnect baseline observes both I/O error paths, but cleanup
+   after the failed output export remains inconclusive and its server was
+   discarded without another request. I/O-driven cancellation and safe normal
+   completion of specifically classified disconnects need a successor test.
+4. Integrate or retain each audited facade through an explicit production
    decision, preserving error semantics, native roots/ownership and named ESM
    bindings. Run the required production suites before changing the accepted
    checkpoint.
-4. Measure component size, startup, memory and throughput against declared
+5. Measure component size, startup, memory and throughput against declared
    controls. The sizes above are artifact measurements, not performance gains.
-5. Track deeper Next features and other hosts separately. General Node APIs,
+6. Track deeper Next features separately. General Node APIs,
    full Buffer/streams/CallSite semantics, TLS, middleware/image transforms,
    arbitrary packages and wasmCloud retained P2 execution are not established.
 
