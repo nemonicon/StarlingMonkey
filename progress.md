@@ -114,7 +114,11 @@ finish-future inspection remains deferred. [V3 Source](tests/node-compat/framewo
 passes independent review, including the exact-function inert cleanup case.
 It now constructs as643742a2/37,142,579 bytes: three commands and outer parent0/
 clean, same13standardimports and whole8025world unchanged. No ordinary V3
-workload has run yet; the strict collector successor is being prepared.
+workload has run yet. Independent review found that collectorV2 could permit
+inspection after a normal output path with an unexpected aborted signal and
+no observed I/O abort. Its Source and unused Root runtime request are preserved;
+a narrow collectorV3 correction will require the expected fresh signal on that
+normal path, while retaining the stricter handled-close signal/cleanup proof.
 The next host priority is a finite cold-instance wasmCloud check of the same
 unchanged full Next component. The first actual eight-request attempt failed:
 the harness mistook the early TCP listener for deployed-workload readiness.
@@ -145,6 +149,12 @@ The [measurement plan](docs/node-compat/nextjs-measurement-plan.md) defines
 separate launch/first-health/follow-up timing, paired Node/Wasmtime trials and
 sampled public server RSS. It is design only; no new performance or clean-machine
 reproduction measurement has run.
+The [clean-machine dependency audit](docs/node-compat/nextjs-reproducibility-plan.md)
+locates the committed824-source reconstruction map, V7 edits, patched
+SpiderMonkey/Rust build mechanisms, UTF16 delta, real app build and constructor.
+Portable composition, authenticated external tool/artifact materialization,
+fresh inventories/paths and an isolated app-build command remain outstanding;
+this audit has not executed a clean build.
 Earlier811–996MiB capacity holds ended
 when free space rose above the unchanged1,024MiB construction start guard; both
 constructors then ran. No proof or shared binary was deleted and no guard was
