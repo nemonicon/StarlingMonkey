@@ -5,7 +5,13 @@ on three ignored `[[nodiscard]]` results under `-Werror`. The separate
 [minimal correction](../../tests/node-compat/frameworks/nextjs/next-native-fetch-resource-cleanup-candidate-v2/README.md)
 is sealed and now passes all three fresh frontend checks, with clean ownership
 and unchanged guards; independent frontend DATA review passes. It adds only three
-explicit `(void)` casts; no linked cleanup engine or guest result exists.
+explicit `(void)` casts. A fresh full native build now exits0 and produces a
+31,347,353-byte candidate engine; coordinated build DATA review passes.
+The fresh interoperability component passes all16 deployed module cases in
+one GET (runtime review55a255e7). The separate public Fetch component passes
+INIT review4b3b0f43 with the full actual import audit; its eight lifecycle cases
+are awaiting execution. These components emit the same thirteen selected
+standard WASI0.2.10 interfaces and only the incoming HTTP handler export.
 The accepted production checkpoint remains foundations-v13. The experimental
 Next.js profile still fails its legacy cache counter and strict Server Action
 response-capture gates. This change has no demonstrated causal relationship

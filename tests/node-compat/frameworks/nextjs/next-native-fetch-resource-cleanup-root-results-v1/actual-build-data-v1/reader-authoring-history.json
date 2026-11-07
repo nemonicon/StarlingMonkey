@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "scope": "Reader authoring/tool-version errors only. No completed native build DATA changed and no producer/compiler/engine/runtime was invoked. Archive never repacked.",
+  "failures": [
+    {
+      "toolCall": "2bc3c2",
+      "argvDescription": "python3 -I -B check.py --draft",
+      "reportedRawExitCode": 1,
+      "sourcePreimage": {
+        "path": "history/check-initial.py",
+        "sha256": "ec4103bbba9f6354d1cb19ea31a0d34736c70890b950e4a34e1b280db1046294",
+        "bytes": 33826
+      },
+      "stdout": {
+        "path": "draft.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "draft.stderr.log",
+        "sha256": "c6ee97108d71098d743d605f0c17e199fd1d2990cfacb968fe2fc1653b106a3e",
+        "bytes": 279
+      },
+      "explanation": "The default python3 was Python3.9 and lacked stdlib tomllib; this reader requires Python3.11+. No target operation occurred."
+    },
+    {
+      "toolCall": "aa3610",
+      "argvDescription": "pinned Python3.11 -I -B check.py --draft",
+      "reportedRawExitCode": 1,
+      "sourcePreimage": {
+        "path": "history/check-initial.py",
+        "sha256": "ec4103bbba9f6354d1cb19ea31a0d34736c70890b950e4a34e1b280db1046294",
+        "bytes": 33826
+      },
+      "stdout": {
+        "path": "draft-python311.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "draft-python311.stderr.log",
+        "sha256": "efb057b4d75540a78fa0b0af3de35eb2ef11094bf3e09bab7a5f175b1d5b0327",
+        "bytes": 788
+      },
+      "explanation": "Reader wrongly treated preparationOnly as boolean and selected it as an issued change. Actual prose is unchanged; state and two permission flags change."
+    },
+    {
+      "toolCall": "1e9ef7",
+      "argvDescription": "pinned Python3.11 -I -B check.py --draft",
+      "reportedRawExitCode": 1,
+      "sourcePreimage": {
+        "path": "history/check-authority-corrected.py",
+        "sha256": "cd93a2ba51fee40efd0417222b18ffd066f1dcecd5e75e4dc37b07bd78e5b3f6",
+        "bytes": 33816
+      },
+      "stdout": {
+        "path": "draft-corrected.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "draft-corrected.stderr.log",
+        "sha256": "0474cc223c2a85a667208d9f63815bbf78854b1d6c5d859fb894505a9f6cc0e8",
+        "bytes": 812
+      },
+      "explanation": "Reader wrongly expected825 final native descriptors. The genuine result has825 copy records and435 native final rows."
+    },
+    {
+      "toolCall": "40ffa7",
+      "argvDescription": "pinned Python3.11 -I -B check.py --draft",
+      "reportedRawExitCode": 1,
+      "sourcePreimage": {
+        "path": "history/check-native-after-corrected.py",
+        "sha256": "611e6e4e9d59f79ebb2a643c0489f38cb0ca8c8ce17a91f26b32795b35a70280",
+        "bytes": 33839
+      },
+      "stdout": {
+        "path": "draft-wire-corrected.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "draft-wire-corrected.stderr.log",
+        "sha256": "e6c7284b5e3784737804cfb73595991f76c28df7d92b892d8890e5996dccb083",
+        "bytes": 805
+      },
+      "explanation": "Reader wrongly expected textual identity between Ninja and compile DB commands. Ninja additionally records exactly -MD/-MT output/-MF output.d."
+    },
+    {
+      "toolCall": "ed118f",
+      "argvDescription": "pinned Python3.11 -I -B check.py --draft",
+      "reportedRawExitCode": 1,
+      "sourcePreimage": {
+        "path": "history/check-ninja-corrected.py",
+        "sha256": "d122a93f77a4396906720fdfa5a407673aa7edc02469be14030fe31d308f74b5",
+        "bytes": 34645
+      },
+      "stdout": {
+        "path": "draft-ninja-corrected.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "draft-ninja-corrected.stderr.log",
+        "sha256": "8771ea2d600de28b45f9ad72e72f6932dee4c20955b9969e73b9330dbc9db0d0",
+        "bytes": 821
+      },
+      "explanation": "Reader wrongly required global lexical tree order. Genuine preserved inventory order is not globally lexical; exact original order/content and unique safe paths remain checked."
+    }
+  ],
+  "intermediateSuccess": {
+    "toolCall": "025fdb",
+    "reportedRawExitCode": 0,
+    "stdout": {
+      "path": "draft-final.stdout.log",
+      "sha256": "4f160b5dbc5206c1749b7c98272bd42bdccba35f63c3608d2a8b77947791e839",
+      "bytes": 802
+    },
+    "stderr": {
+      "path": "draft-final.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "qualification": "Intermediate tree-order-corrected reader before ordered1931descriptor reconstruction; its exact Source preimage was not separately saved. Final-source evidence is the current/default replay below."
+  }
+}

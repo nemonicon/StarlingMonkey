@@ -4,6 +4,15 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-07. Overall roadmap: **in progress**.
 
+Latest result: native Fetch cleanup compiles and links, a fresh interoperability
+component passes INIT construction review, and all16 deployed module cases pass
+in one GET with independent runtime review55a255e7 accepted for that subset.
+A separate public Fetch lifecycle component now passes INIT construction review
+(`4b3b0f43`); its bound runtime harness is sealed and the concrete execution
+grants are being prepared. The eight lifecycle cases
+and the full Next.js rerun remain pending. The current full Next.js
+baseline still fails its legacy cache counter and strict Server Action response capture.
+
 Current next steps and outstanding work:
 
 - **Complete:** guarded native build, real-Next component construction, and one
@@ -34,14 +43,17 @@ Current next steps and outstanding work:
   pass two translation units and fail the third on three ignored nodiscard
   results. A separate18-byte source correction now passes all three frontend
   checks, raw0 with clean ownership and unchanged guards; independent DATA
-  reviewe5712a58 passes for that frontend-only scope. No linked
-  engine or guest execution of the cleanup candidate has occurred. Review caught an interaction with the existing
+  reviewe5712a58 passes for that frontend-only scope. The full native build now
+  exits0; coordinated build DATA review41857258 passes. The new engine's
+  sixteen module interoperability cases pass in a deployed component
+  (review55a255e7). Public Fetch execution remains pending.
+  Review caught an interaction with the existing
   native append path, now explicitly excluded from this bounded change.
   No cause for browser abort or module-state differences is established.
   Target-host checks and measurements remain separate.
 - **Still open:** broader lifecycle/resource coverage, clean-machine bootstrap,
   performance/size evaluation and any production promotion. Foundations-v13 remains
-  the accepted checkpoint. Completed snapshots through064ab4a2 are committed and pushed.
+  the accepted checkpoint. Reviewed snapshots through4ffa8659 are committed and pushed.
 
 The corrected2251/afb build is accepted as build DATA only. A separately sealed
 [interop constructorV2](tests/node-compat/frameworks/nextjs/next-module-fileurl-interop-probe-construction-v2/README.md)
@@ -111,10 +123,40 @@ and source/tool/failed-V2 guards unchanged; independent DATA reviewe5712a58 pass
 GeneratorV6 on this corrected selection also passes all ten checks under
 original7942/900, result2ddbfa9e and independent owner/raw DATA reviewb420245f.
 Builder8 JSON-only preparation DATA review2f2d5f57 passes. Full native build
-admission103ac6dd passes; Root9eab2f/original11018/7200 is now running in fresh
-`next-native-intl-build-fetch-cleanup825-first`, after successful configuration.
-No terminal result or cleanup engine is accepted yet. Fresh components and
-public guest tests follow a successful reviewed build.
+admission103ac6dd passes; Root9eab2f/original11018/7200 now exits0 in fresh
+`next-native-intl-build-fetch-cleanup825-first`. All six inner/outer phases
+return0 with clean groups; result ece47f14 reports1,931 protected inputs and ten
+tool trees unchanged. Candidate engine476b1c1d is31,347,353 bytes and metadata
+22f1d456 is4,859,179 bytes. Coordinated terminal DATA review41857258 passes,
+binding independent owner54d1e14d and source/compiler/linkd0cbd1cf lanes. No
+engine/guest export has run. Fresh components and public guest tests follow
+a successful reviewed build. A new unchanged16-case interop constructor
+selector896379c0 is sealed; its concrete Root authority600289c7 is prepared
+with31 fresh metadata values,39 build roles and17 protected Source roles,
+passes action-admission reviewf852e3ff. Rootb40054/original32323/2400 then
+constructs, validates and emits WIT raw0/clean, with all three inner commands0.
+Componenta65097fd is37,159,178 bytes, result0d535aa1; its observed complete
+return has131 function tuples and its WIT emits the selected13standard0.2.10
+interfaces/onlyincominghandler. Coordinated construction DATA review8ed98322
+passes, joining independent typed/package and owner/world6b19ad6e lanes. A
+schema-only successor44c37d97 adds the existing collector's truthful
+`deployedImportOrFilesystemProbeInvoked:false` field; the original review and
+all facts remain unchanged. No
+ordinary probe was accepted from that INIT review. A separately reviewed runtime
+authorityb10d2c84/3eb5bc8e then runs Root9edf23/original35819/180 raw0/clean with
+full native/world guards unchanged: GET200/7,152 bytes, all16 cases pass,
+result663a47b1/response5ebcea5a. Coordinated runtime DATA review55a255e7 passes,
+joining outcome and ownership/current-roleef9d3608 lanes. No Fetch cleanup or
+full Next result is inferred. A separate lifecycle constructorb0d54ea2 and
+authority08fff56b/3f27a0cd then run Rootbb5143/original36952/2400 raw0/clean,
+all three inner commands0, component e0bb7bc6/37,148,543 bytes and result59562d8c.
+The actual return contains131 tuples; coordinated lifecycle INIT DATA
+review4b3b0f43 passes with complementary owner/world review130d3a39. Runtime
+Source41ad0bd9 is sealed. JSON-only Root preparatione1517c produces
+authoritydf18f1d8 with1,743 protected descriptors and three phase grants;
+no deployed lifecycle result exists yet.
+Commit4ffa8659 is pushed to origin/main; live
+build logs and the unfinished runtime controller were excluded from that cut.
 GeneratorV5 runs all ten checks successfully under original4023/900, result795dab0e;
 this is not compiler or runtime acceptance. Full build and public component
 tests remain required. Prior

@@ -22,7 +22,11 @@ Next actions, in dependency order:
    98 pure ownership-model checks. Two actual frontend checks pass; the third
    fails three ignored nodiscard results. The separate18-byte correction passes
    all three fresh frontend checks with independent DATA review. The full
-   build and cleanup guest execution remain outstanding.
+   native build now exits0 with coordinated DATA review. A fresh interop
+   component passes all16 deployed cases (review55a255e7); a separate public
+   Fetch component passes INIT review4b3b0f43 with the complete actual import
+   audit. Its eight-case runtime comparison and fresh real-Next component
+   remain the next gates.
    See the [bounded cleanup plan](nextjs-fetch-resource-cleanup-2026-11-07.md).
 2. Validate covered ordinary EOF, direct cancellation and future retirement through the normal
    build/component mechanisms and explicit unchanged interfaces. Then rerun
@@ -36,7 +40,7 @@ Next actions, in dependency order:
    two-primary-tag mutation contract, all failures and unchanged legacy app code.
 
 The implementation/build checkpoint is committed and pushed through
-`064ab4a2`; [progress.md](../../progress.md) tracks current work and closed evidence.
+`4ffa8659`; [progress.md](../../progress.md) tracks current work and closed evidence.
 
 The retained first fresh **Next 16.4.5 / React 19.3.1 App Router application
 passes the selected experimental Wasmtime smoke contract**:

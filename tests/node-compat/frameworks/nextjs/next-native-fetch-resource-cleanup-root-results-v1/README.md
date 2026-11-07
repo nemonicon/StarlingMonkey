@@ -16,6 +16,13 @@ only its18-byte change over the previous composition. FrontendV3 completes
 independent DATA review passes. No object, linked engine or guest success
 is inferred from this frontend result.
 
+Full native build Root9eab2f/original11018/7200 now exits0 with six successful
+owned phases. Result ece47f14 reports all1,931 inputs and ten tool trees intact;
+candidate engine476b1c1d is31,347,353 bytes and metadata22f1d456 is4,859,179 bytes.
+Coordinated independent terminal DATA review41857258 passes, joining owner54d1
+and source/compiler/linkd0cbd lanes. No ordinary engine or
+guest export ran and no component/runtime result is inferred from the build.
+
 `run-frontends.py` is a Root-owned three-TU frontend driver, initially dormant
 until its concrete input map is pinned. It derives actual compiler commands
 from the retained successful build's Ninja log, checks them against the real
