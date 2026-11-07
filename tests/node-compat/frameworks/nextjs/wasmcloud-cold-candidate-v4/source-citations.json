@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "sourceOnly": true,
+  "pinnedHostCommit": "bc5acfb8e15f7d6d199ca940354d82e590c2d5ff",
+  "references": [
+    {
+      "file": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v3/upstream/dev.rs",
+        "sha256": "a7f26577bebe2085383df0c16eca9c440d50076b0d3216f4020c0cf787baaca9",
+        "bytes": 72300
+      },
+      "lines": [
+        711,
+        724
+      ],
+      "finding": "Dev volumes copy host_path and guest_path to separate HostPathVolume/VolumeMount, read_only:false; no guest app-path lookup."
+    },
+    {
+      "file": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/upstream/crates/wash-runtime/src/engine/volumes.rs",
+        "sha256": "6c0a84a3e52a2fbfb265ca301dead3950b87208e6d5ce3f9bfb9a4b9415bf208",
+        "bytes": 31898
+      },
+      "lines": [
+        28,
+        68
+      ],
+      "finding": "Opened host directory handle is cloned into Dir, mount_path retained as a name and returned alongside an independent P2 preopen descriptor; no lookup inside /app."
+    },
+    {
+      "file": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v7/plan.json",
+        "sha256": "122e269f138281202a76e5f1e6004bbf332108d131874ae22208bb6e1f4569b2",
+        "bytes": 14507
+      },
+      "finding": "WT V7 empty underlying app cache path is an actor-owned policy, not a universal host requirement. That held Source remains unchanged."
+    }
+  ],
+  "proposal": "Cold copy retains exact425source directories plusroot426, no extra app path. Separate existing owned hostcache0700 is mounted at /app/.next/cache. This is not runtime nested routing/cache persistence/readonly-rights proof."
+}

@@ -1,0 +1,104 @@
+--- V3/deploy.mjs
++++ V4/deploy.mjs
+@@ -10,6 +10,43 @@
+ const here=dirname(fileURLToPath(import.meta.url));assert.equal(process.version,'v22.14.0');assert.equal(process.argv.length,3);
+ const read=async p=>JSON.parse(await readFile(p,'utf8'));
+ const errorData=e=>({name:e?.name??typeof e,message:e?.message??String(e),stack:e?.stack??null});
++// Pure fresh-app DATA policy, inlined into the authenticated actor.
++function relativeMember(name){
++ assert.equal(typeof name,'string');assert(name&&!name.includes('\\')&&!name.includes('\0'));
++ assert(name.split('/').every(x=>x!==''&&x!=='.'&&x!=='..'));return name;
++}
++function sourceDirectoryNames(input){
++ const names=input.directories.map(x=>relativeMember(x.path));assert.equal(new Set(names).size,names.length);
++ return ['.',...names].sort();
++}
++function ownedDirectoryNames(input,policy){
++ assert.deepEqual(policy.additionalDirectories,[]);
++ const names=sourceDirectoryNames(input);assert(names.includes('.next'));assert(!names.includes('.next/cache'));
++ assert(!input.files.some(x=>x.path==='.next/cache'||x.path.startsWith('.next/cache/')));
++ return names;
++}
++function validateFreshInput(input,build,plan){
++ const policy=plan.applicationSchema;
++ assert.equal(policy.name,'fresh-next-standalone-root-excluded-v1');assert.equal(input.schemaVersion,1);
++ assert.equal(policy.sourceDirectoriesExcludeRoot,true);assert.equal(input.root,plan.applicationSource);
++ assert.equal(input.regularFiles,input.files.length);assert.equal(input.regularFiles,policy.files);
++ assert.equal(input.bytes,input.files.reduce((sum,x)=>sum+x.bytes,0));assert.equal(input.bytes,policy.bytes);
++ assert.equal(input.directories.length,policy.directoriesExcludingRoot);assert.deepEqual(input.symlinks,[]);
++ assert.equal(new Set(input.files.map(x=>relativeMember(x.path))).size,input.files.length);
++ const dirs=sourceDirectoryNames(input);assert(!input.directories.some(x=>x.path==='.'));
++ assert(input.files.every(x=>!dirs.includes(x.path)));
++ const owned=ownedDirectoryNames(input,policy);assert.equal(owned.length,policy.ownedDirectoriesIncludingRoot);
++ assert.equal(build.schemaVersion,1);assert.equal(build.state,'NEXT_APP_BUILD_PASSED_UNREVIEWED_V1');
++ assert.equal(build.passed,true);assert.deepEqual(build.errors,[]);assert.equal(build.originalInputsPreserved,true);
++ assert.equal(build.outputRoot,plan.applicationBuildOutputRoot);assert.equal(build.sourceOnlyPreparation,false);
++ assert.deepEqual(build.applicationInventoryDescriptor,plan.applicationInputs);assert.deepEqual(build.applicationInventory,input);
++ const versions={next:'16.4.5',react:'19.3.1','react-dom':'19.3.1'};
++ assert.deepEqual(build.installedVersions,versions);assert.deepEqual(build.installedVersionsBeforeNextBuild,versions);
++ const root=plan.applicationRootIdentity;
++ assert.deepEqual(Object.keys(root).sort(),['dev','ino','mode','nlink']);
++ for(const value of Object.values(root))assert(Number.isSafeInteger(value)&&value>=0);
++ assert(root.ino>0&&root.nlink>0&&root.mode<=0o777);return true;
++}
+ async function row(path){const h=createHash('sha256');let bytes=0;for await(const b of createReadStream(path)){h.update(b);bytes+=b.length;}return{path,sha256:h.digest('hex'),bytes};}
+ async function verify(r){assert(r&&typeof r.path==='string'&&resolve(r.path)===r.path);const s=await lstat(r.path);assert(s.isFile()&&!s.isSymbolicLink());assert.equal(await realpath(r.path),r.path);assert.deepEqual(await row(r.path),r);}
+ async function walk(root){const out={files:[],dirs:['.'],links:[]};async function visit(dir){for(const name of(await readdir(dir)).sort()){const path=join(dir,name),s=await lstat(path),rel=relative(root,path);if(s.isSymbolicLink())out.links.push(rel);else if(s.isDirectory()){out.dirs.push(rel);await visit(path);}else{assert(s.isFile());out.files.push(rel);}}}await visit(root);return out;}
+@@ -39,12 +76,19 @@
+ assert.deepEqual(construction.commands.map(x=>x.label),['componentize-init','component-validate','component-wit']);
+ for(const command of construction.commands){await verify(command.terminal);const t=await read(command.terminal.path);assert(clean(t));assert.deepEqual(t.authority,construction.rootAuthority);assert.equal(command.rawExitCode,0);assert.equal(command.clean,true);assert.deepEqual(t.stdout,command.stdout);assert.deepEqual(t.stderr,command.stderr);extraRefs.push(command.terminal,t.stdout,t.stderr);}
+ for(const k of ['validateTerminal','witTerminal']){await verify(audit[k]);const t=await read(audit[k].path);assert(clean(t));extraRefs.push(audit[k],t.stdout,t.stderr);}
+-const input=await read(a.applicationInputs.path);assert.equal(input.root,a.applicationSource);assert.equal(input.regularFiles,plan.expectedApp.files);assert.equal(input.bytes,plan.expectedApp.bytes);assert.equal(input.directories.length,plan.expectedApp.directories);assert.equal(input.files.length,input.regularFiles);assert.equal(new Set(input.files.map(x=>x.path)).size,input.files.length);
+-async function sourceBookend(){assert.equal(await realpath(input.root),input.root);const tree=await walk(input.root);assert.deepEqual(tree.links,[]);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),input.directories.map(x=>x.path).sort());for(const r of input.files){const path=join(input.root,r.path),s=await lstat(path);assert(!r.path.startsWith('/')&&!r.path.split('/').includes('..'));await verify({path,sha256:r.sha256,bytes:r.bytes});for(const[k,v]of Object.entries({dev:r.dev,ino:r.ino,nlink:r.nlink}))assert.equal(s[k],v);assert.equal(s.mode&0o777,r.mode);}for(const r of input.directories){const s=await lstat(join(input.root,r.path));assert(s.isDirectory());assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);assert.equal(s.mode&0o777,r.mode);}}
++assert.deepEqual(a.applicationInputs,plan.applicationInputs);assert.equal(a.applicationSource,plan.applicationSource);
++const input=await read(a.applicationInputs.path),appBuild=await read(plan.applicationBuildResult.path);validateFreshInput(input,appBuild,plan);
++async function sourceBookend(){
++ assert.equal(await realpath(input.root),input.root);const rootStat=await lstat(input.root);assert(rootStat.isDirectory()&&!rootStat.isSymbolicLink());
++ assert.deepEqual({dev:rootStat.dev,ino:rootStat.ino,mode:rootStat.mode&0o777,nlink:rootStat.nlink},plan.applicationRootIdentity);
++ const tree=await walk(input.root);assert.equal(tree.links.length,0);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),sourceDirectoryNames(input));
++ for(const r of input.files){const path=join(input.root,r.path),s=await lstat(path);assert(s.isFile()&&!s.isSymbolicLink());await verify({path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);assert.equal(s.nlink,r.nlink);assert.equal(s.nlink,1);}
++ for(const r of input.directories){const path=join(input.root,r.path),s=await lstat(path);assert(s.isDirectory()&&!s.isSymbolicLink());assert.equal(await realpath(path),path);assert.equal(s.mode&0o777,r.mode);assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);}
++}
+ await sourceBookend();await protect();
+ process.umask(0o077);const output=resolve(plan.outputPrefix+'-'+a.runId);assert.equal(output,plan.outputPrefix+'-'+a.runId);await mkdir(output,{mode:0o700});
+ const app=join(output,'app'),cache=join(output,'cache'),project=join(output,'project');
+-const result={schemaVersion:1,state:'NEXT_WASMCLOUD_COLD_IN_PROGRESS_V1',runId:a.runId,rootAuthority:authorityRef,sourceIndex:a.sourceIndex,component:a.component,componentAudit:a.componentAudit,engine:a.engine,nativeMetadata:a.nativeMetadata,engineBuildEvidence:a.engineBuildEvidence,constructionResult:a.constructionResult,inputEntry:a.inputEntry,inputSourceIndex:a.inputSourceIndex,worldFamily:plan.worldFamily.sourceIndex,worldBefore:worldIdentityBefore,wash:a.wash,applicationInputs:a.applicationInputs,outputRoot:output,commands:[],responses:[],errors:[],server:null,originalInputsPreserved:false,readonlyAppPreserved:false,coldPolicySourceOnly:plan.coldPolicy,physicalInstanceIdentityObserved:false,cacheSequenceExecuted:false,browserExecuted:false,retainedContractAcceptance:false,fullNextAcceptance:false,adoption:false};
++const result={schemaVersion:1,state:'NEXT_WASMCLOUD_COLD_IN_PROGRESS_V1',runId:a.runId,rootAuthority:authorityRef,sourceIndex:a.sourceIndex,component:a.component,componentAudit:a.componentAudit,engine:a.engine,nativeMetadata:a.nativeMetadata,engineBuildEvidence:a.engineBuildEvidence,constructionResult:a.constructionResult,inputEntry:a.inputEntry,inputSourceIndex:a.inputSourceIndex,worldFamily:plan.worldFamily.sourceIndex,worldBefore:worldIdentityBefore,wash:a.wash,applicationInputs:a.applicationInputs,outputRoot:output,commands:[],responses:[],errors:[],server:null,originalInputsPreserved:false,readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],coldPolicySourceOnly:plan.coldPolicy,physicalInstanceIdentityObserved:false,cacheSequenceExecuted:false,browserExecuted:false,retainedContractAcceptance:false,fullNextAcceptance:false,adoption:false};
+ const save=()=>writeFile(join(output,'result.json'),JSON.stringify(result,null,2)+'\n',{mode:0o600});await save();
+ const handles=[],children=[];let lease,host,stopping=false;
+ const pause=ms=>new Promise(r=>setTimeout(r,ms));
+@@ -56,7 +100,18 @@
+  const done=new Promise(resolve=>{child.once('error',e=>{status={code:null,signal:null,error:errorData(e)};resolve(status);});child.once('exit',(code,signal)=>{status={code,signal,error:null};resolve(status);});});
+  const item={child,done,get status(){return status;},record:{label,argv:[a.wash.path,...args],pid:child.pid??null,stdout,stderr,timeout:false,forcedCleanup:false,exit:null}};children.push(item);result.commands.push(item.record);await save();return item;
+ }
+-async function readonlyBookend(){const tree=await walk(app);assert.deepEqual(tree.links,[]);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),input.directories.map(x=>x.path).sort());for(const r of input.files){const path=join(app,r.path),s=await lstat(path);await verify({path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,0o444);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}for(const r of input.directories)assert.equal((await lstat(join(app,r.path))).mode&0o777,0o555);}
++async function prepareReadonlyCopy(){
++ await cp(input.root,app,{recursive:true,force:false,errorOnExist:true,verbatimSymlinks:true,mode:fsConstants.COPYFILE_FICLONE});
++ // Independent direct-P2 preopens do not require a path in the copied app.
++ // No additional directory is created in this owned copy.
++ for(const r of input.files)await chmod(join(app,r.path),0o444);
++ for(const name of ownedDirectoryNames(input,plan.applicationSchema).sort((a,b)=>b.length-a.length))await chmod(join(app,name),0o555);
++}
++async function readonlyBookend(){
++ const tree=await walk(app);assert.deepEqual(tree.links,[]);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),ownedDirectoryNames(input,plan.applicationSchema));
++ for(const r of input.files){const path=join(app,r.path),s=await lstat(path);assert(s.isFile()&&!s.isSymbolicLink());await verify({path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,0o444);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}
++ for(const name of ownedDirectoryNames(input,plan.applicationSchema)){const path=join(app,name),s=await lstat(path);assert(s.isDirectory()&&!s.isSymbolicLink());assert.equal(await realpath(path),path);assert.equal(s.mode&0o777,0o555);}
++}
+ async function tcpReady(port){return new Promise(resolve=>{const socket=createConnection({host:'127.0.0.1',port});let settled=false;function finish(ok){if(settled)return;settled=true;socket.destroy();resolve(ok);}socket.once('connect',()=>finish(true));socket.once('error',()=>finish(false));socket.setTimeout(150,()=>finish(false));});}
+ async function capture(request,origin){
+  const record={id:request.id,sourceFixtureId:request.sourceFixtureId,method:request.method??'GET',path:request.path,complete:false,chunks:[],shellChunk:-1,readyChunk:-1};result.responses.push(record);await save();
+@@ -74,11 +129,10 @@
+ }
+ try{
+  // COPYFILE_FICLONE (not FORCE) uses Node's ordinary copy fallback. Verify every byte/inode.
+- await cp(input.root,app,{recursive:true,force:false,errorOnExist:true,verbatimSymlinks:true,mode:fsConstants.COPYFILE_FICLONE});
+- for(const r of input.files)await chmod(join(app,r.path),0o444);for(const r of [...input.directories].sort((a,b)=>b.path.length-a.path.length))await chmod(join(app,r.path),0o555);
+- await readonlyBookend();await mkdir(cache,{mode:0o700});assert.equal((await lstat(cache)).mode&0o777,0o700);assert((await lstat(join(app,'.next/cache'))).isDirectory());
++ await prepareReadonlyCopy();
++ await readonlyBookend();await mkdir(cache,{mode:0o700});assert.equal((await lstat(cache)).mode&0o777,0o700);const cacheStat=await lstat(cache);assert(cacheStat.isDirectory()&&!cacheStat.isSymbolicLink());assert.equal(await realpath(cache),cache);
+  await mkdir(join(project,'.wash'),{recursive:true,mode:0o700});await mkdir(join(output,'responses'),{mode:0o700});
+- result.applicationCopy={files:input.regularFiles,bytes:input.bytes,byteIdentical:true,independentInodes:true,filesMode:'0444',directoryMode:'0555'};result.mounts=[{host:app,guest:'/app'},{host:cache,guest:'/app/.next/cache',physicalRootMode:'0700'}];result.readonlyWasiDescriptorRightsProved=false;await save();
++ result.applicationCopy={files:input.regularFiles,bytes:input.bytes,sourceDirectoriesExcludingRoot:input.directories.length,ownedDirectoriesIncludingRoot:426,ownedAdditionalDirectories:[],byteIdentical:true,independentInodes:true,filesMode:'0444',directoryMode:'0555'};result.mounts=[{host:app,guest:'/app'},{host:cache,guest:'/app/.next/cache',physicalRootMode:'0700'}];result.readonlyWasiDescriptorRightsProved=false;await save();
+  lease=createServer();lease.on('error',()=>{});await new Promise((resolve,reject)=>{lease.once('error',reject);lease.listen({host:'127.0.0.1',port:0,exclusive:true},resolve);});const address=lease.address();assert(address&&typeof address==='object'&&address.address==='127.0.0.1');const origin='http://127.0.0.1:'+address.port;result.portLease={origin,port:address.port,heldThroughConfigInspection:true,singleAttempt:true,fallbackAllowed:false};
+  const configured=configuration(a.component.path,app,cache,origin),configPath=join(project,'.wash/config.json'),empty=join(output,'empty-user-config.json');await writeFile(configPath,JSON.stringify(configured,null,2)+'\n',{flag:'wx',mode:0o600});await writeFile(empty,'{}\n',{flag:'wx',mode:0o600});const configRefs=[await row(configPath),await row(empty)];extraRefs.push(...configRefs);result.configured=configured;result.configFiles=configRefs;await save();
+  await protect();await sourceBookend();await witBookend();

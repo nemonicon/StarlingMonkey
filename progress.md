@@ -4,6 +4,14 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-07. Overall roadmap: **in progress**.
 
+Current priority is fresh Next.js acceptance. The isolated host build passes
+with2,181 files; its Node/Wasm admission Sources and reusable regression CLI
+are reviewed. The fresh app has **not yet been served in Wasm**. Launch order is
+matched Node, Wasmtime, then the fresh wasmCloud cold contract. Browser failure
+investigation follows the first paired gate. The last preparation recorded
+280,678,400 free bytes, below the conservative1GiB Root launch floor. No launch
+or runtime result is inferred from Source/preparation checks.
+
 
 **Established passing Next baseline:24/24 HTTP,2/2 browser on55f05.**
 
@@ -272,6 +280,26 @@ shared cache was deleted. The [priority roadmap](docs/node-compat/nextjs-priorit
 now puts fresh-app Wasm acceptance first, browser reliability second and the
 fresh second-host contract third; unrelated API expansion and a new engine build
 are outside that immediate critical path.
+
+The [browser reliability protocol](docs/node-compat/nextjs-browser-reliability-plan.md)
+is now written and remains unexecuted. After first fresh-app paired acceptance,
+it predeclares three additional pairs in alternating arm order, retaining all
+outcomes without favorable replacement, error filtering or longer limits. The
+stock runner's fixed output namespace needs a genuine reviewed successor before
+that cohort; no repeat flag is invented. Three positive pairs would establish
+finite observations, not a cause, failure-rate bound or general reliability.
+The first V5 abort and later old-app CDP positives remain separate. Fresh-app
+wasmCloud admission [SourceV4](tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v4/README.md)
+is now sealed8236614e/4170 and independently reviewed, with31 inert checks,
+four grammar checks and AST passing. Its policy comes from the pinned host's
+actual direct-P2 volume path: exact425 source directories plus root426 owned,
+no added app path and a separate0700 host cache/preopen. The existing Wasmtime
+actor's declared empty-mountpoint policy stays unchanged and is not a universal
+host requirement. Root rehashed all26 payloads. Cold8/readiness60s/600s
+ownership/SIGINT gates, component1c31 and standard13-interface world stay exact.
+No cold Root grant or workload is issued here, and no nested-routing/cache
+persistence or rights proof follows from Source reasoning. The next live order
+remains fresh matched Node, Wasmtime, then the finite second-host gate.
 
 The new read-only browser observer is Source-reviewed: seven bounded CDP event
 types plus requestfailed-aware observation completion, with unchanged actions,

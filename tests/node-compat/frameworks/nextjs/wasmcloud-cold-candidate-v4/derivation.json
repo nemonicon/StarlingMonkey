@@ -1,0 +1,406 @@
+{
+  "schemaVersion": 1,
+  "sourceOnly": true,
+  "parentIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v3/index.json",
+    "sha256": "2684f16f28e73db5d8b0dad5bb61948d62860b68150fe53bfb81eebe4d5cfdfc",
+    "bytes": 4469
+  },
+  "unchangedFiles": [
+    {
+      "parent": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v3/models.mjs",
+        "sha256": "cdb18a2083d4db71ebe159f597e966e00c3ec37cbaedd691139e46622e40d1fa",
+        "bytes": 7030
+      },
+      "current": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v4/models.mjs",
+        "sha256": "cdb18a2083d4db71ebe159f597e966e00c3ec37cbaedd691139e46622e40d1fa",
+        "bytes": 7030
+      }
+    },
+    {
+      "parent": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v3/run-owned.py",
+        "sha256": "268e58d864a3f9c6397e3086922b576f76c55f2b9d60e1d584c4b13142940c2d",
+        "bytes": 4145
+      },
+      "current": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v4/run-owned.py",
+        "sha256": "268e58d864a3f9c6397e3086922b576f76c55f2b9d60e1d584c4b13142940c2d",
+        "bytes": 4145
+      }
+    },
+    {
+      "parent": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v3/cold-contract.json",
+        "sha256": "ae1b649de5d96f9902297da227eebf6cecf4a0e3bb338736b06f6ac22c6eac42",
+        "bytes": 2741
+      },
+      "current": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v4/cold-contract.json",
+        "sha256": "ae1b649de5d96f9902297da227eebf6cecf4a0e3bb338736b06f6ac22c6eac42",
+        "bytes": 2741
+      }
+    },
+    {
+      "parent": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v3/root-authority-template.json",
+        "sha256": "b3924355b47cc2c4b2534b9abc60d9a5459c18b5e417f5bf7ea34708fc6609b0",
+        "bytes": 991
+      },
+      "current": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v4/root-authority-template.json",
+        "sha256": "b3924355b47cc2c4b2534b9abc60d9a5459c18b5e417f5bf7ea34708fc6609b0",
+        "bytes": 991
+      }
+    }
+  ],
+  "policySourceContext": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v7/app-policy.mjs",
+    "sha256": "d835be43d9e048785a7cbc5bffbacced646f1ac52847079d7fc9798822f585dc",
+    "bytes": 2759
+  },
+  "policyColdDifference": {
+    "nativeOwnedAdditionalDirectories": [
+      ".next/cache"
+    ],
+    "nativeOwnedDirectoriesIncludingRoot": 427,
+    "coldOwnedAdditionalDirectories": [],
+    "coldOwnedDirectoriesIncludingRoot": 426,
+    "reason": "Independent wash direct-P2 preopens do not look up the guest mountpoint inside the app copy."
+  },
+  "policy": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v4/app-policy.mjs",
+    "sha256": "8cf12347a6ba17abec80bf8c54adc32bf1200c31c73ccc6d697011a7f73109ac",
+    "bytes": 2720
+  },
+  "exactDeployReplacements": [
+    {
+      "before": "const errorData=e=>({name:e?.name??typeof e,message:e?.message??String(e),stack:e?.stack??null});",
+      "after": "const errorData=e=>({name:e?.name??typeof e,message:e?.message??String(e),stack:e?.stack??null});\n// Pure fresh-app DATA policy, inlined into the authenticated actor.\nfunction relativeMember(name){\n assert.equal(typeof name,'string');assert(name&&!name.includes('\\\\')&&!name.includes('\\0'));\n assert(name.split('/').every(x=>x!==''&&x!=='.'&&x!=='..'));return name;\n}\nfunction sourceDirectoryNames(input){\n const names=input.directories.map(x=>relativeMember(x.path));assert.equal(new Set(names).size,names.length);\n return ['.',...names].sort();\n}\nfunction ownedDirectoryNames(input,policy){\n assert.deepEqual(policy.additionalDirectories,[]);\n const names=sourceDirectoryNames(input);assert(names.includes('.next'));assert(!names.includes('.next/cache'));\n assert(!input.files.some(x=>x.path==='.next/cache'||x.path.startsWith('.next/cache/')));\n return names;\n}\nfunction validateFreshInput(input,build,plan){\n const policy=plan.applicationSchema;\n assert.equal(policy.name,'fresh-next-standalone-root-excluded-v1');assert.equal(input.schemaVersion,1);\n assert.equal(policy.sourceDirectoriesExcludeRoot,true);assert.equal(input.root,plan.applicationSource);\n assert.equal(input.regularFiles,input.files.length);assert.equal(input.regularFiles,policy.files);\n assert.equal(input.bytes,input.files.reduce((sum,x)=>sum+x.bytes,0));assert.equal(input.bytes,policy.bytes);\n assert.equal(input.directories.length,policy.directoriesExcludingRoot);assert.deepEqual(input.symlinks,[]);\n assert.equal(new Set(input.files.map(x=>relativeMember(x.path))).size,input.files.length);\n const dirs=sourceDirectoryNames(input);assert(!input.directories.some(x=>x.path==='.'));\n assert(input.files.every(x=>!dirs.includes(x.path)));\n const owned=ownedDirectoryNames(input,policy);assert.equal(owned.length,policy.ownedDirectoriesIncludingRoot);\n assert.equal(build.schemaVersion,1);assert.equal(build.state,'NEXT_APP_BUILD_PASSED_UNREVIEWED_V1');\n assert.equal(build.passed,true);assert.deepEqual(build.errors,[]);assert.equal(build.originalInputsPreserved,true);\n assert.equal(build.outputRoot,plan.applicationBuildOutputRoot);assert.equal(build.sourceOnlyPreparation,false);\n assert.deepEqual(build.applicationInventoryDescriptor,plan.applicationInputs);assert.deepEqual(build.applicationInventory,input);\n const versions={next:'16.4.5',react:'19.3.1','react-dom':'19.3.1'};\n assert.deepEqual(build.installedVersions,versions);assert.deepEqual(build.installedVersionsBeforeNextBuild,versions);\n const root=plan.applicationRootIdentity;\n assert.deepEqual(Object.keys(root).sort(),['dev','ino','mode','nlink']);\n for(const value of Object.values(root))assert(Number.isSafeInteger(value)&&value>=0);\n assert(root.ino>0&&root.nlink>0&&root.mode<=0o777);return true;\n}"
+    },
+    {
+      "before": "const input=await read(a.applicationInputs.path);assert.equal(input.root,a.applicationSource);assert.equal(input.regularFiles,plan.expectedApp.files);assert.equal(input.bytes,plan.expectedApp.bytes);assert.equal(input.directories.length,plan.expectedApp.directories);assert.equal(input.files.length,input.regularFiles);assert.equal(new Set(input.files.map(x=>x.path)).size,input.files.length);",
+      "after": "assert.deepEqual(a.applicationInputs,plan.applicationInputs);assert.equal(a.applicationSource,plan.applicationSource);\nconst input=await read(a.applicationInputs.path),appBuild=await read(plan.applicationBuildResult.path);validateFreshInput(input,appBuild,plan);"
+    },
+    {
+      "before": "async function sourceBookend(){assert.equal(await realpath(input.root),input.root);const tree=await walk(input.root);assert.deepEqual(tree.links,[]);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),input.directories.map(x=>x.path).sort());for(const r of input.files){const path=join(input.root,r.path),s=await lstat(path);assert(!r.path.startsWith('/')&&!r.path.split('/').includes('..'));await verify({path,sha256:r.sha256,bytes:r.bytes});for(const[k,v]of Object.entries({dev:r.dev,ino:r.ino,nlink:r.nlink}))assert.equal(s[k],v);assert.equal(s.mode&0o777,r.mode);}for(const r of input.directories){const s=await lstat(join(input.root,r.path));assert(s.isDirectory());assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);assert.equal(s.mode&0o777,r.mode);}}",
+      "after": "async function sourceBookend(){\n assert.equal(await realpath(input.root),input.root);const rootStat=await lstat(input.root);assert(rootStat.isDirectory()&&!rootStat.isSymbolicLink());\n assert.deepEqual({dev:rootStat.dev,ino:rootStat.ino,mode:rootStat.mode&0o777,nlink:rootStat.nlink},plan.applicationRootIdentity);\n const tree=await walk(input.root);assert.equal(tree.links.length,0);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),sourceDirectoryNames(input));\n for(const r of input.files){const path=join(input.root,r.path),s=await lstat(path);assert(s.isFile()&&!s.isSymbolicLink());await verify({path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);assert.equal(s.nlink,r.nlink);assert.equal(s.nlink,1);}\n for(const r of input.directories){const path=join(input.root,r.path),s=await lstat(path);assert(s.isDirectory()&&!s.isSymbolicLink());assert.equal(await realpath(path),path);assert.equal(s.mode&0o777,r.mode);assert.equal(s.dev,r.dev);assert.equal(s.ino,r.ino);}\n}"
+    },
+    {
+      "before": "readonlyAppPreserved:false,coldPolicySourceOnly:",
+      "after": "readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],coldPolicySourceOnly:"
+    },
+    {
+      "before": "async function readonlyBookend(){const tree=await walk(app);assert.deepEqual(tree.links,[]);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),input.directories.map(x=>x.path).sort());for(const r of input.files){const path=join(app,r.path),s=await lstat(path);await verify({path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,0o444);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}for(const r of input.directories)assert.equal((await lstat(join(app,r.path))).mode&0o777,0o555);}",
+      "after": "async function prepareReadonlyCopy(){\n await cp(input.root,app,{recursive:true,force:false,errorOnExist:true,verbatimSymlinks:true,mode:fsConstants.COPYFILE_FICLONE});\n // Independent direct-P2 preopens do not require a path in the copied app.\n // No additional directory is created in this owned copy.\n for(const r of input.files)await chmod(join(app,r.path),0o444);\n for(const name of ownedDirectoryNames(input,plan.applicationSchema).sort((a,b)=>b.length-a.length))await chmod(join(app,name),0o555);\n}\nasync function readonlyBookend(){\n const tree=await walk(app);assert.deepEqual(tree.links,[]);assert.deepEqual(tree.files.sort(),input.files.map(x=>x.path).sort());assert.deepEqual(tree.dirs.sort(),ownedDirectoryNames(input,plan.applicationSchema));\n for(const r of input.files){const path=join(app,r.path),s=await lstat(path);assert(s.isFile()&&!s.isSymbolicLink());await verify({path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,0o444);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}\n for(const name of ownedDirectoryNames(input,plan.applicationSchema)){const path=join(app,name),s=await lstat(path);assert(s.isDirectory()&&!s.isSymbolicLink());assert.equal(await realpath(path),path);assert.equal(s.mode&0o777,0o555);}\n}"
+    },
+    {
+      "before": " await cp(input.root,app,{recursive:true,force:false,errorOnExist:true,verbatimSymlinks:true,mode:fsConstants.COPYFILE_FICLONE});\n for(const r of input.files)await chmod(join(app,r.path),0o444);for(const r of [...input.directories].sort((a,b)=>b.path.length-a.path.length))await chmod(join(app,r.path),0o555);",
+      "after": " await prepareReadonlyCopy();"
+    },
+    {
+      "before": "assert((await lstat(join(app,'.next/cache'))).isDirectory());",
+      "after": "const cacheStat=await lstat(cache);assert(cacheStat.isDirectory()&&!cacheStat.isSymbolicLink());assert.equal(await realpath(cache),cache);"
+    },
+    {
+      "before": "result.applicationCopy={files:input.regularFiles,bytes:input.bytes,byteIdentical:true,independentInodes:true,filesMode:'0444',directoryMode:'0555'};",
+      "after": "result.applicationCopy={files:input.regularFiles,bytes:input.bytes,sourceDirectoriesExcludingRoot:input.directories.length,ownedDirectoriesIncludingRoot:426,ownedAdditionalDirectories:[],byteIdentical:true,independentInodes:true,filesMode:'0444',directoryMode:'0555'};"
+    }
+  ],
+  "planDeltas": [
+    {
+      "field": "state",
+      "before": "DORMANT_NEXT_WASMCLOUD_EIGHT_COLD_SOURCE_ONLY_V3",
+      "after": "DORMANT_FRESH_APP_NEXT_WASMCLOUD_COLD_SOURCE_ONLY_V4"
+    },
+    {
+      "field": "expectedArtifacts",
+      "before": {
+        "component": {
+          "sha256": "1c3108d2fdce72a1bfa8cc64a0e6e0645acd71223b26b6dc11d037d4a95efe83",
+          "bytes": 37214251
+        },
+        "componentAudit": {
+          "sha256": "dcf0ad2949f1fbc94fdc0e21537879f5821c5c06c9abcbcafff664506a435225",
+          "bytes": 2502
+        },
+        "engine": {
+          "sha256": "4623640b79b97eb91dc8559b3766fdb430a1807fe90b6ace6c85668a97f13067",
+          "bytes": 31324051
+        },
+        "nativeMetadata": {
+          "sha256": "726d69cf60f99c53a472bde9af1d26a9c8c76aaad9cf8bb90255788ee0bb9bfb",
+          "bytes": 670384
+        },
+        "constructionResult": {
+          "sha256": "3831a5aaf5d1e605bbaf6897058b847c58016023ad3a5dfb394205aabfb0f943",
+          "bytes": 9341
+        },
+        "constructionCallerIndex": {
+          "sha256": "cc411d388fc22fa6d994a65978c14b505db3b545e9e96973a0d6e0bc658f933e",
+          "bytes": 1755
+        },
+        "inputSourceIndex": {
+          "sha256": "73b583bed57a6e988debe5abca156abcd2e4b5ed331b1b4171f8636d33bf1042",
+          "bytes": 2914
+        },
+        "inputEntry": {
+          "sha256": "1e49ddc61094f25a46056f10869e2ec409ef03d1b2a762670720666d3dc9bf4c",
+          "bytes": 40900
+        },
+        "adapter": {
+          "sha256": "d30ade5b0a146ab1f6cbb878322fa937ec19c4a2b09f7497e9f08e49fb13cfd7",
+          "bytes": 49672
+        },
+        "applicationInputs": {
+          "sha256": "871579d9adaf8ef093de4e7c1f8f26ca30127d51d21d451021648a66248ff86c",
+          "bytes": 677652
+        },
+        "wash": {
+          "sha256": "365d896eaed3894f1c551a1ed7351c2aae9dfa5548ce82041ead92e6253d1954",
+          "bytes": 101947952
+        }
+      },
+      "after": {
+        "component": {
+          "sha256": "1c3108d2fdce72a1bfa8cc64a0e6e0645acd71223b26b6dc11d037d4a95efe83",
+          "bytes": 37214251
+        },
+        "componentAudit": {
+          "sha256": "dcf0ad2949f1fbc94fdc0e21537879f5821c5c06c9abcbcafff664506a435225",
+          "bytes": 2502
+        },
+        "engine": {
+          "sha256": "4623640b79b97eb91dc8559b3766fdb430a1807fe90b6ace6c85668a97f13067",
+          "bytes": 31324051
+        },
+        "nativeMetadata": {
+          "sha256": "726d69cf60f99c53a472bde9af1d26a9c8c76aaad9cf8bb90255788ee0bb9bfb",
+          "bytes": 670384
+        },
+        "constructionResult": {
+          "sha256": "3831a5aaf5d1e605bbaf6897058b847c58016023ad3a5dfb394205aabfb0f943",
+          "bytes": 9341
+        },
+        "constructionCallerIndex": {
+          "sha256": "cc411d388fc22fa6d994a65978c14b505db3b545e9e96973a0d6e0bc658f933e",
+          "bytes": 1755
+        },
+        "inputSourceIndex": {
+          "sha256": "73b583bed57a6e988debe5abca156abcd2e4b5ed331b1b4171f8636d33bf1042",
+          "bytes": 2914
+        },
+        "inputEntry": {
+          "sha256": "1e49ddc61094f25a46056f10869e2ec409ef03d1b2a762670720666d3dc9bf4c",
+          "bytes": 40900
+        },
+        "adapter": {
+          "sha256": "d30ade5b0a146ab1f6cbb878322fa937ec19c4a2b09f7497e9f08e49fb13cfd7",
+          "bytes": 49672
+        },
+        "applicationInputs": {
+          "sha256": "b4c53ac0f8e7fab31ee172c96d81f4b08778a3cfd9e4546c91b8b111cb0f78e9",
+          "bytes": 659175
+        },
+        "wash": {
+          "sha256": "365d896eaed3894f1c551a1ed7351c2aae9dfa5548ce82041ead92e6253d1954",
+          "bytes": 101947952
+        }
+      }
+    },
+    {
+      "field": "outputPrefix",
+      "before": "/private/tmp/starling-node-compat/next-wasmcloud-cold-v3",
+      "after": "/private/tmp/starling-node-compat/next-wasmcloud-cold-v4"
+    },
+    {
+      "field": "protectedSourceReferences",
+      "before": [
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/probe-v1/run-wasmcloud.mjs",
+          "sha256": "83d8186ed7265c7c65ff042299de3a8dc7fd093dca1b48a305db285afa431cfe",
+          "bytes": 7440
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/probe-v1/results/deployment-host-wasmcloud-v1/result.json",
+          "sha256": "acc86b378afffa9163249e79fbdb6c85869882bec93f759dd4312f8a24c338c2",
+          "bytes": 5934
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/upstream/crates/wash-runtime/src/host/http.rs",
+          "sha256": "2820063f86b74bde92b7853f79c9f13c15d54593af6de79fd22d0b34de41ba01",
+          "bytes": 277716
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/upstream/crates/wash-runtime/src/engine/volumes.rs",
+          "sha256": "6c0a84a3e52a2fbfb265ca301dead3950b87208e6d5ce3f9bfb9a4b9415bf208",
+          "bytes": 31898
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v5/deploy.mjs",
+          "sha256": "1bf54dc7a59239a199229c5693f27b8c94a3fa1defe9e1d99f9c55098d5ba42f",
+          "bytes": 16555
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v5/run-owned.py",
+          "sha256": "246ebcea64c366f8c06ec4f20b2a501ddb28cda75c1679aab300ca977e58a208",
+          "bytes": 4267
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/fixture-contract.json",
+          "sha256": "d6399e901a0612f672ee176e9ded84fcc19e3f4016059e5d5f728596b0b807f2",
+          "bytes": 8158
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v1/index.json",
+          "sha256": "ca875e42ee1639f0707fcc43d77217ce08aa64e68cb9fdcf92872676ece1b4de",
+          "bytes": 3204
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v2/index.json",
+          "sha256": "5d8939f62b9c1d0aec6e3a61b78abcae08478ddcad119f0926bb7df2375a592f",
+          "bytes": 5259
+        }
+      ],
+      "after": [
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/probe-v1/run-wasmcloud.mjs",
+          "sha256": "83d8186ed7265c7c65ff042299de3a8dc7fd093dca1b48a305db285afa431cfe",
+          "bytes": 7440
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/probe-v1/results/deployment-host-wasmcloud-v1/result.json",
+          "sha256": "acc86b378afffa9163249e79fbdb6c85869882bec93f759dd4312f8a24c338c2",
+          "bytes": 5934
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/upstream/crates/wash-runtime/src/host/http.rs",
+          "sha256": "2820063f86b74bde92b7853f79c9f13c15d54593af6de79fd22d0b34de41ba01",
+          "bytes": 277716
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/upstream/crates/wash-runtime/src/engine/volumes.rs",
+          "sha256": "6c0a84a3e52a2fbfb265ca301dead3950b87208e6d5ce3f9bfb9a4b9415bf208",
+          "bytes": 31898
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v5/deploy.mjs",
+          "sha256": "1bf54dc7a59239a199229c5693f27b8c94a3fa1defe9e1d99f9c55098d5ba42f",
+          "bytes": 16555
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v5/run-owned.py",
+          "sha256": "246ebcea64c366f8c06ec4f20b2a501ddb28cda75c1679aab300ca977e58a208",
+          "bytes": 4267
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/fixture-contract.json",
+          "sha256": "d6399e901a0612f672ee176e9ded84fcc19e3f4016059e5d5f728596b0b807f2",
+          "bytes": 8158
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v1/index.json",
+          "sha256": "ca875e42ee1639f0707fcc43d77217ce08aa64e68cb9fdcf92872676ece1b4de",
+          "bytes": 3204
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v2/index.json",
+          "sha256": "5d8939f62b9c1d0aec6e3a61b78abcae08478ddcad119f0926bb7df2375a592f",
+          "bytes": 5259
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v3/index.json",
+          "sha256": "2684f16f28e73db5d8b0dad5bb61948d62860b68150fe53bfb81eebe4d5cfdfc",
+          "bytes": 4469
+        },
+        {
+          "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v3/upstream/dev.rs",
+          "sha256": "a7f26577bebe2085383df0c16eca9c440d50076b0d3216f4020c0cf787baaca9",
+          "bytes": 72300
+        },
+        {
+          "path": "/private/tmp/starling-node-compat/next-app-build-v1-first/result.json",
+          "sha256": "fe0e0bdb63db86e921811f70b237812407ed1134eda7af917a2df0420706fbc7",
+          "bytes": 709565
+        },
+        {
+          "path": "/private/tmp/starling-node-compat/next-app-build-v1-first/application-inputs.json",
+          "sha256": "b4c53ac0f8e7fab31ee172c96d81f4b08778a3cfd9e4546c91b8b111cb0f78e9",
+          "bytes": 659175
+        }
+      ]
+    },
+    {
+      "field": "expectedApp",
+      "before": {
+        "files": 2218,
+        "bytes": 48808299,
+        "directories": 455,
+        "symlinks": 0
+      },
+      "after": {
+        "files": 2181,
+        "bytes": 48714867,
+        "directories": 425,
+        "directoryCountExcludesRoot": true,
+        "symlinks": 0
+      }
+    },
+    {
+      "field": "applicationInputs",
+      "before": null,
+      "after": {
+        "path": "/private/tmp/starling-node-compat/next-app-build-v1-first/application-inputs.json",
+        "sha256": "b4c53ac0f8e7fab31ee172c96d81f4b08778a3cfd9e4546c91b8b111cb0f78e9",
+        "bytes": 659175
+      }
+    },
+    {
+      "field": "applicationSource",
+      "before": null,
+      "after": "/private/tmp/starling-node-compat/next-app-build-v1-first/application/.next/standalone"
+    },
+    {
+      "field": "applicationBuildResult",
+      "before": null,
+      "after": {
+        "path": "/private/tmp/starling-node-compat/next-app-build-v1-first/result.json",
+        "sha256": "fe0e0bdb63db86e921811f70b237812407ed1134eda7af917a2df0420706fbc7",
+        "bytes": 709565
+      }
+    },
+    {
+      "field": "applicationBuildOutputRoot",
+      "before": null,
+      "after": "/private/tmp/starling-node-compat/next-app-build-v1-first"
+    },
+    {
+      "field": "applicationRootIdentity",
+      "before": null,
+      "after": {
+        "dev": 16777234,
+        "ino": 173620604,
+        "mode": 493,
+        "nlink": 8
+      }
+    },
+    {
+      "field": "applicationSchema",
+      "before": null,
+      "after": {
+        "name": "fresh-next-standalone-root-excluded-v1",
+        "sourceDirectoriesExcludeRoot": true,
+        "files": 2181,
+        "bytes": 48714867,
+        "directoriesExcludingRoot": 425,
+        "additionalDirectories": [],
+        "ownedDirectoriesIncludingRoot": 426
+      }
+    }
+  ],
+  "actualRootAuthority": null,
+  "actualRuntime": null,
+  "actorInvoked": false
+}
