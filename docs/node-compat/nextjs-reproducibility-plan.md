@@ -45,8 +45,18 @@ cannot be made portable by replacing strings or expected hashes.
    before hashes. That historical composer expects an existing composition and
    exact installed base path; the new materializer instead applies authenticated
    finite replacements directly to the Git donor map. Its new source-only
-   composition and support descriptors still require reviewed integration with
-   the builder's path-bound late inputs; they are not compiled metadata.
+   composition and support descriptors now have reviewed integration through
+   [portable build preparation V2](../../tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-v2/README.md).
+   It explicitly selects all435 native/387 support/3 embedding files and
+   removes the historical compiled-output prerequisites. The real ten
+   generator checks passed on that fresh tree; the
+   [generator DATA review](../../tests/node-compat/frameworks/nextjs/next-native-portable-generator-root-results-v1/actual-review/README.md)
+   retains them. V2 authenticates the indexed producer plan and narrow Root
+   grant, exact original selection, Node and argv, plus all61 raw proof
+   references. The real receipt passes and25 altered inputs refuse. Root's
+   [actual V2 preparation](../../tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-root-results-v2/README.md)
+   passes with an unissued draft and no selection copy. No full build has run;
+   these records are source/generator evidence, not compiled metadata.
 
 2. **Build or obtain the coherent guest SpiderMonkey prerequisite.** The manual
    [Intl workflow](../../.github/workflows/spidermonkey-intl.yml) invokes
@@ -77,7 +87,18 @@ cannot be made portable by replacing strings or expected hashes.
    remains a native source input; the Intl CMake path explicitly selects the84
    lock through `NODE_COMPAT_INTL_LOCKFILE`.
 
-4. **Build the complete V7 engine, then the recorded UTF-16 delta.** The existing
+4. **Build the complete portable engine with the UTF-16 afterimage.** The reviewed
+   [portable V2 builder](../../tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-v2/run.py)
+   is the next full-build path. It preserves the existing real CMake/Rust
+   commands, offline policy, one-job limit and3GiB start/1GiB phase guard while
+   selecting the fresh825-file input tree and genuine fresh generator proof.
+   All external prerequisite fields must be bound before issuing its build
+   request. A new full build and its new metadata must pass the original
+   whole-app contract; neither the old engine identity nor old compile rows
+   may be projected onto it.
+
+   The historical tested chain first built V7, then compiled a UTF-16 delta. Its
+   existing
    [V4 builder](../../tests/node-compat/frameworks/nextjs/next-native-build-candidate-v4/run.py)
    accepts `python3 -I -B …/run.py --authority AUTHORITY`. Its `command_plan`
    performs direct Rust1.88 version/sysroot checks, then real
@@ -173,7 +194,8 @@ Node/npm, Python, CMake/Ninja, cbindgen, the private packaging toolchain and the
 pinned Chrome/Playwright setup also require explicit acquisition and validation.
 These macOS ARM64 paths and host executables are not a portable OS image.
 
-The next useful implementation is one reviewed bootstrap/materialization layer:
+The source-selection and generator-admission layer is now reviewed and exercised
+without a native build. The next build-portability work is the external layer:
 restore authenticated external archives and Cargo inputs; relocate finite source
 composition without changing content; create fresh tool/app inventories and
 late authorities; then execute the existing stages in this order. Keep new

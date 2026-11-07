@@ -4,6 +4,16 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-07. Overall roadmap: **in progress**.
 
+**Next.js is the immediate priority.** The next deliverable is a repeatable
+experimental Next application run, using the unchanged app and standard WASI
+world. The fresh Wasm smoke and native three-run cohort already pass. Prioritize
+the complete portable native build and regression on its new artifact, then
+request-isolation and cancellation boundaries. The matched-Node-only browser
+abort investigation remains open alongside this work; its failed all-six gate
+must not be reported as passed. Broader Node APIs, performance claims and
+production promotion follow these gates. See the updated
+[execution roadmap](docs/node-compat/nextjs-priority-roadmap.md).
+
 The **first fresh-build Next.js pair now passes on Node and real Wasm**. Each
 passes24/24 HTTP, cache generation1→2, five incremental stream chunks(shell0,
 ready2) and2/2 strict browser interactions with empty error arrays. The actual
@@ -359,6 +369,36 @@ preparations were caught in pre-launch review and preserved unused; corrected
 V2 requests9fd6e9b6 explicitly select the intended two true permissions. No
 runtime failure, retry or gate relaxation is inferred from either preparation
 issue. Original cohort remains strict5/6 with its failed p3-stock retained.
+
+While live diagnostics remain capacity-held, the portable native-build path
+advanced. The new [V1 Source admission](tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-v1/README.md)
+explicitly selects all435 native/387 support/3 embedding inputs, replacing the
+historical386 support donor dependency and removing old compiled-output
+prerequisites while retaining archive provenance. Exact CMake/Rust commands
+and3GiB/1GiB guards remain.32 portable/42 extended source-data checks pass; Root
+actual JSON-only [preparation](tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-root-results-v1/README.md)
+exits0 with selectionb209cf8f and unissued draft68df6a7a. No build was granted.
+Independent review qualifies that parser/draft path but holds the V1 generator
+consumer for explicit producer-plan/index/Root-grant semantic joins. The
+[genuine V2](tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-v2/README.md)
+now passes independent review: the actual receipt reaches all61 proof
+references and25 DATA mutations refuse. Root's actual
+[V2 preparation/admission](tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-root-results-v2/README.md)
+also exits0, retains the exact originalb209 selection path and emits unissued
+draftdc91e5e7 without copying the selection. V1 and its unissued data remain
+preserved. This closes receipt linkage, not full build execution.
+
+The separate [generator-only producer](tests/node-compat/frameworks/nextjs/next-native-portable-generator-check-v1/README.md)
+38cbd788 and Rootgrant0669f9c9 passed Source/pre-action review. Its **first actual
+ten Node --check commands all pass**, raw0/clean with empty stderr and900s
+outer0. Resultf9e63c04/970943 preserves435 native/825 physical/171 directory
+and tool bookends. Only sibling evidence directories were written. Admission
+426,127,360 bytes clears its separate64MiB small-scope start gate; total complete
+evidence plus final receipt is below8MiB, with no truncation or continuous
+limit claim. The [99-record DATA review](tests/node-compat/frameworks/nextjs/next-native-portable-generator-root-results-v1/actual-review/README.md)
+984e7313/988 passes Root readback and independent current audit. This is a
+fresh source-generation proof, not CMake/Cargo/compiler/engine/guest execution,
+a native build, ABI validation, clean-machine reproduction or promotion.
 The first V5 abort and later old-app CDP positives remain separate. Fresh-app
 wasmCloud admission [SourceV4](tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v4/README.md)
 is now sealed8236614e/4170 and independently reviewed, with31 inert checks,

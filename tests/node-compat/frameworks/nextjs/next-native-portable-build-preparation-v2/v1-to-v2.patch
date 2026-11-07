@@ -1,0 +1,182 @@
+--- v1/portable.py
++++ v2/portable.py
+@@ -203,7 +203,58 @@
+     return result
+ 
+ 
+-def validate_generators(generated, selection, node, policy):
++def generator_roles(generated, selection, node, policy, selection_ref):
++    """Join the actual producer's indexed plan/entry and narrowly scoped grant."""
++    require(selection_ref is not None, 'Exact consumer selection descriptor required')
++    index = document(generated['sourceIndex'])
++    require(index['schemaVersion'] == 1, 'Unsupported generator Source index')
++    source_root = canonical(Path(generated['sourceIndex']['path']).parent)
++    indexed = {}
++    refs = [generated['sourceIndex'], generated['rootAuthority'], generated['plan'], selection_ref]
++    for row in index['files']:
++        name = relative(row['path']).as_posix()
++        require(name not in indexed and name != 'index.json', 'Duplicate generator Source member')
++        ref = dict(path=str(source_root / name), sha256=row['sha256'], bytes=row['bytes'])
++        file_row(ref['path'], ref)
++        indexed[name] = ref
++        refs.append(ref)
++    nodes = list(source_root.rglob('*'))
++    require(not any(p.is_symlink() for p in nodes), 'Generator Source alias')
++    require({p.relative_to(source_root).as_posix() for p in nodes if p.is_file()} == {'index.json', *indexed},
++            'Generator Source membership differs')
++    require(indexed.get('plan.json') == generated['plan'] and 'run.py' in indexed,
++            'Generator plan/entry not the indexed producer members')
++    plan = document(generated['plan'])
++    require(plan['schemaVersion'] == 1 and plan['state'] == 'PORTABLE_NEXT_INSTALLED_GENERATORS_SOURCE_ONLY_V1',
++            'Wrong generator plan role')
++    require(plan['node'] == node and all(node[k] == policy['node'][k] for k in ['sha256', 'bytes']),
++            'Generator plan Node mismatch')
++    require(plan['sourceRoot'] == selection['sourceRoot'] and plan['composition'] == selection['composition']
++            and plan['materializationSummary'] == selection['sourceMaterialization']
++            and plan['roleContentSha256'] == selection['roleContentSha256']
++            and plan['expectedRoleCounts'] == selection['roleCounts'], 'Generator plan source selection mismatch')
++    require(plan['perCommandSeconds'] == 30 and plan['outerSeconds'] == 900,
++            'Generator plan action bounds differ')
++    root = document(generated['rootAuthority'])
++    require(root['schemaVersion'] == 1 and root['state'] == 'ROOT_PORTABLE_NEXT_GENERATORS_AUTHORIZED_V1',
++            'Not a generator-only Root authority')
++    require(root['sourceIndex'] == generated['sourceIndex'] and root['plan'] == generated['plan']
++            and root['portableSelection'] == selection_ref, 'Generator Root roles/selection differ')
++    require(root['generatorChecksAllowed'] is root['nodeHostSourceOnly'] is True
++            and root['unissued'] is False, 'Generator action not issued')
++    require(all(root[k] is False for k in ['nativeBuildAllowed', 'compilerAllowed', 'cmakeAllowed',
++                'cargoAllowed', 'engineAllowed', 'guestAllowed', 'networkAllowed', 'copySourceAllowed']),
++            'Generator Root authority is wider than allowed')
++    require(not any(k in root for k in ['argv', 'environment', 'outputRoot', 'monitorOutputRoot']),
++            'Generator Root override refused')
++    require(document(selection_ref) == {k: v for k, v in selection.items()
++            if k != 'protectedInputs'} | {'protectedInputs': [r for r in selection['protectedInputs'] if r != selection_ref]},
++            'Consumer selection document differs')
++    return refs
++
++
++def validate_generators(generated, selection, node, policy, selection_ref):
++    role_refs = generator_roles(generated, selection, node, policy, selection_ref)
+     require(all(node[k] == policy['node'][k] for k in ['sha256', 'bytes']), 'Wrong generator Node')
+     require(generated['schemaVersion'] == 1 and generated['state'] == 'ACTUAL_PORTABLE_NEXT_INSTALLED_GENERATORS_CHECKED_V1',
+             'Fresh generator receipt required')
+@@ -229,7 +280,7 @@
+     require(all(type(r['rawExitCode']) is int and r['rawExitCode'] == 0
+                 and r['stderrSha256'] == hashlib.sha256(b'').hexdigest() for r in commands),
+             'Generator failed or stderr not empty')
+-    refs = [generated[k] for k in ['rootAuthority', 'sourceIndex', 'plan']]
++    refs = role_refs
+     generator_plan = document(generated['plan'])
+     require(generator_plan['perCommandSeconds'] == 30 and generator_plan['outerSeconds'] == 900,
+             'Generator plan command/outer cap differs')
+--- v1/prepare.py
++++ v2/prepare.py
+@@ -44,7 +44,7 @@
+     return descriptor(path)
+ 
+ 
+-def prepare(materialization=None, output=None):
++def prepare(materialization=None, output=None, selection=None):
+     module, plan = load()
+     policy = plan['portableSourcePolicy']
+     summary = dict(schemaVersion=1, state='PORTABLE_BUILD_PREPARATION_SOURCE_ONLY_V1',
+@@ -54,15 +54,24 @@
+                    buildStartBytes=plan['disk']['startBytes'], buildStopBytes=plan['disk']['stopBytes'],
+                    outputRoot=None)
+     refs = module.authenticate_policy(policy, REPO)
+-    if materialization is None:
++    existing_selection_ref = None
++    if selection is not None:
++        module.require(materialization is None, 'Choose materialization or existing selection')
++        existing_selection_ref = descriptor(module.canonical(selection))
++        module.admit(existing_selection_ref, policy, REPO)
++        selected = module.document(existing_selection_ref)
++        ref = selected['sourceMaterialization']
++    elif materialization is None:
+         module.require(output is None, '--output requires --materialization')
+         return summary
+-    materialization = module.canonical(materialization)
+-    ref = descriptor(materialization)
+-    selected = module.inspect_layout(ref, policy, refs)
++    else:
++        materialization = module.canonical(materialization)
++        ref = descriptor(materialization)
++        selected = module.inspect_layout(ref, policy, refs)
+     summary.update(state='PORTABLE_BUILD_INPUTS_AUTHENTICATED_NOT_BUILT_V1',
+                    sourceMaterialization=ref, composition=selected['composition'],
+-                   freshPhysicalFiles=len(selected['physicalRecords']))
++                   freshPhysicalFiles=len(selected['physicalRecords']),
++                   existingPortableSelection=existing_selection_ref)
+     if output is None:
+         return summary
+     # Own Source bytes are authenticated before publishing a usable draft.
+@@ -84,8 +93,11 @@
+     module.require(not (output == REPO or REPO in output.parents or output == input_root
+                         or input_root in output.parents or output in input_root.parents),
+                    'Preparation output must be disjoint from checkout and materialized inputs')
++    if existing_selection_ref is not None:
++        previous_root = Path(existing_selection_ref['path']).parent
++        module.require(previous_root not in output.parents, 'Preserve the existing preparation namespace')
+     output.mkdir(mode=0o700)
+-    selection_ref = write_new(output / 'portable-selection.json', selected)
++    selection_ref = existing_selection_ref or write_new(output / 'portable-selection.json', selected)
+     draft = json.loads((HERE / 'root-authority.template.json').read_bytes())
+     draft.update(entry=descriptor(HERE / 'run.py'), plan=descriptor(HERE / 'plan.json'),
+                  callerIndex=descriptor(HERE / 'index.json'), composition=selected['composition'],
+@@ -125,10 +137,12 @@
+ 
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument('--materialization', type=Path)
++    group = parser.add_mutually_exclusive_group()
++    group.add_argument('--materialization', type=Path)
++    group.add_argument('--selection', type=Path, help='Authenticate and select exact existing proof-bound DATA')
+     parser.add_argument('--output', type=Path)
+     args = parser.parse_args()
+-    print(json.dumps(prepare(args.materialization, args.output), indent=2))
++    print(json.dumps(prepare(args.materialization, args.output, args.selection), indent=2))
+ 
+ 
+ if __name__ == '__main__':
+--- v1/run.py
++++ v2/run.py
+@@ -185,7 +185,7 @@
+  assert a['supportAdditions']==[r for r in module.role_copies(portable,'build-support')if r['relativePath']=='runtime/crates/staticlib-template/Cargo.intl.toml.in']
+  rows+=portable['protectedInputs']+[a['generatorNode']]
+  composition=read(a['composition']);source=Path(composition['sourceRoot']);assert source.name=='source'and source.is_absolute();assert composition['nativeSourceFiles']==len(composition['files'])==435
+- generated=read(a['installedGeneratorResult']);assert generated['sourceIndex']==a['installedGeneratorCallerIndex']and generated['rootAuthority']==a['installedGeneratorRootAuthority'];check_family(a['installedGeneratorCallerIndex']);rows+=module.validate_generators(generated,portable,a['generatorNode'],spec['portableSourcePolicy']);assert generated['passed']is True and generated['sourceFiles']==435 and generated['sourceBeforeAfterUnchanged']is True and generated['nativeOrGuestExecuted']is False
++ generated=read(a['installedGeneratorResult']);assert generated['sourceIndex']==a['installedGeneratorCallerIndex']and generated['rootAuthority']==a['installedGeneratorRootAuthority'];check_family(a['installedGeneratorCallerIndex']);rows+=module.validate_generators(generated,portable,a['generatorNode'],spec['portableSourcePolicy'],a['portableSelection']);assert generated['passed']is True and generated['sourceFiles']==435 and generated['sourceBeforeAfterUnchanged']is True and generated['nativeOrGuestExecuted']is False
+  assert len(generated['commands'])==10 and all(x['rawExitCode']==0 and x['stderrSha256']==hashlib.sha256(b'').hexdigest()for x in generated['commands'])
+  names=set()
+  for r in composition['files']:
+--- v1/test-admission.py
++++ v2/test-admission.py
+@@ -158,7 +158,8 @@
+         draft = json.loads((prepared / 'root-authority.unissued.json').read_text())
+         check(draft['state'].startswith('UNISSUED_') and draft['buildAllowed'] is None
+               and draft['installedGeneratorResult'] is None and draft['generatorNode'] is None)
+-        selected = m.admit(ref(prepared / 'portable-selection.json'), policy, relocated)
++        selection_ref = ref(prepared / 'portable-selection.json')
++        selected = m.admit(selection_ref, policy, relocated)
+         check(len(selected['files']) == 825 and len(selected['physicalRecords']) == 825)
+         check(len(m.role_copies(selected, 'build-support')) == 387
+               and len(draft['componentizeSources']) == 3 and len(draft['supportAdditions']) == 1)
+@@ -175,14 +176,14 @@
+             sourceAfter=[r['source'] for r in m.role_copies(selected, 'native-policy-source')],
+             commands=[dict(argv=a, rawExitCode=0, stderrSha256=hashlib.sha256(b'').hexdigest())
+                       for a in m.generator_argv(policy, '/old-root/source', node)])
+-        refused(lambda: m.validate_generators(generated, selected, node, policy))
++        refused(lambda: m.validate_generators(generated, selected, node, policy, selection_ref))
+         bad = copy.deepcopy(generated)
+         bad['composition']['sha256'] = '0' * 64
+-        refused(lambda: m.validate_generators(bad, selected, node, policy))
++        refused(lambda: m.validate_generators(bad, selected, node, policy, selection_ref))
+         bad = copy.deepcopy(generated)
+         bad['wholePortableBefore'][0]['mode'] = 0o777
+-        refused(lambda: m.validate_generators(bad, selected, node, policy))
+-        refused(lambda: m.validate_generators(generated, selected, dict(node, sha256='0' * 64), policy))
++        refused(lambda: m.validate_generators(bad, selected, node, policy, selection_ref))
++        refused(lambda: m.validate_generators(generated, selected, dict(node, sha256='0' * 64), policy, selection_ref))
+         bad_record = json.loads((prepared / 'portable-selection.json').read_text())
+         bad_record['physicalRecords'][0]['mode'] = 0o777
+         altered = tmp / 'altered-selection.json'

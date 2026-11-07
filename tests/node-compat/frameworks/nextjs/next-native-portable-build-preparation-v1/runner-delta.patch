@@ -1,0 +1,63 @@
+--- next-native-build-candidate-v4/run.py
++++ next-native-portable-build-preparation-v1/run.py
+@@ -123,16 +123,24 @@
+  assert a['schemaVersion']==1 and a['state']=='ROOT_EXPERIMENTAL_NEXT_INTL_NATIVE_BUILD_AUTHORITY_V1'
+  assert a['buildAllowed']is True and a['configureAllowed']is True and a['coherentPatchedIntlLibraryAndHeaders']is True
+  for key in ['engineOrGuestExecutionAllowed','freezeAllowed','networkAllowed','rustupAllowed']:assert a[key]is False
+- for key in ['entry','plan','callerIndex','composition','installedGeneratorResult','intlLockfile','offlineCargoConfig','intlCargoAudit','spidermonkeyEvidence','savedFramePatchIndex']:assert isinstance(a[key],dict),key
++ for key in ['entry','plan','callerIndex','composition','installedGeneratorResult','intlLockfile','offlineCargoConfig','intlCargoAudit','spidermonkeyEvidence','savedFramePatchIndex','portableSelection','generatorNode','installedGeneratorCallerIndex','installedGeneratorRootAuthority']:assert isinstance(a[key],dict),key
+  w=Path(a['workRoot']);assert w.is_absolute()and'..'not in w.parts and str(w).startswith('/private/tmp/starling-node-compat/next-native-intl-build-')
+  for parent in w.parents:assert not parent.is_symlink(),parent
+  return w
++
++def portable_admission(a,spec):
++ module=load_utility(dict(path=str(HERE/'portable.py'),sha256=spec['portableAdmissionModule']['sha256'],bytes=spec['portableAdmissionModule']['bytes']),'portable_next_source_admission')
++ selection=module.admit(a['portableSelection'],spec['portableSourcePolicy'],HERE.parents[4])
++ return module,selection
+ 
+ def effective_plan(a):
+  spec=read(a['plan']);assert a['plan']==descriptor(HERE/'plan.json')and spec['actionsAllowed']is False
+  p=read(spec['basePlan']);p['hostTools']=[x for x in p['hostTools']if x['name']not in ['rustup','cargo','rustc']]
+  p.update(disk=spec['disk'],timeouts=spec['timeouts'],cmakeFlags={**p['cmakeFlags'],**spec['cmakeAdditions']})
+- p['cargo']=a['cargo'];p['rustc']=a['rustc'];return p
++ p['cargo']=a['cargo'];p['rustc']=a['rustc'];module,selection=portable_admission(a,spec)
++ support=module.role_copies(selection,'build-support');p['supportCopies']=[r for r in support if r['relativePath']!='runtime/crates/staticlib-template/Cargo.intl.toml.in']
++ assert len(p['supportCopies'])==386
++ return p
+ 
+ def tree_snapshot(root):
+  """Read-only complete physical tree, including directories and safe links.
+@@ -172,8 +180,12 @@
+ def inputs(a,spec,p):
+  rows=[a['entry'],a['plan'],a['callerIndex'],spec['baseRunner'],spec['basePlan'],spec['portableBaseMap'],spec['baseBuildResult'],a['composition'],a['installedGeneratorResult'],a['intlLockfile'],a['offlineCargoConfig'],a['intlCargoAudit'],a['spidermonkeyEvidence'],a['savedFramePatchIndex'],a['cargo'],a['rustc'],a['smLibrary'],a['smSavedFrameHeader'],a['smConfigHeader'],a['smConfdefsHeader']]
+  assert Path(a['callerIndex']['path'])==HERE/'index.json';check_family(a['callerIndex']);check_family(a['savedFramePatchIndex'])
++ module,portable=portable_admission(a,spec);assert a['composition']==portable['composition']
++ assert a['componentizeSources']==module.role_copies(portable,'componentize-embedding')
++ assert a['supportAdditions']==[r for r in module.role_copies(portable,'build-support')if r['relativePath']=='runtime/crates/staticlib-template/Cargo.intl.toml.in']
++ rows+=portable['protectedInputs']+[a['generatorNode']]
+  composition=read(a['composition']);source=Path(composition['sourceRoot']);assert source.name=='source'and source.is_absolute();assert composition['nativeSourceFiles']==len(composition['files'])==435
+- generated=read(a['installedGeneratorResult']);assert generated['passed']is True and generated['sourceFiles']==435 and generated['sourceBeforeAfterUnchanged']is True and generated['nativeOrGuestExecuted']is False
++ generated=read(a['installedGeneratorResult']);assert generated['sourceIndex']==a['installedGeneratorCallerIndex']and generated['rootAuthority']==a['installedGeneratorRootAuthority'];check_family(a['installedGeneratorCallerIndex']);rows+=module.validate_generators(generated,portable,a['generatorNode'],spec['portableSourcePolicy']);assert generated['passed']is True and generated['sourceFiles']==435 and generated['sourceBeforeAfterUnchanged']is True and generated['nativeOrGuestExecuted']is False
+  assert len(generated['commands'])==10 and all(x['rawExitCode']==0 and x['stderrSha256']==hashlib.sha256(b'').hexdigest()for x in generated['commands'])
+  names=set()
+  for r in composition['files']:
+@@ -209,8 +221,8 @@
+  assert a['offlineCargoConfig']['path']=='/private/tmp/starling-node-compat/next-intl-cargo-resolution-v2/offline-cargo/config.toml'
+  config=checked(a['offlineCargoConfig']).read_text();assert 'directory = "'+trees['intl-vendor']['root']+'"'in config
+  extraction=read(spec['baseBuildResult']);assert extraction['passed']is True
+- rows += [extraction['engineCandidate'],extraction['metadata']]+extraction['sourceAfter']
+- rows += [x['target']for x in extraction['sourceCopies']if '/componentize-source/'in x['target']['path']]
++ # Old extraction JSON remains archive provenance; old compiled outputs/source
++ # locations are not requirements or evidence for these fresh portable inputs.
+  for role in ['wasi-sdk','binaryen','wasm-tools','wasmtime','weval']:
+   old=next(x for x in extraction['archives']if x['role']==role);assert old['archive']==trees[role]['archive']and old['extractedRoot']==trees[role]['root']
+  openssl=next(x for x in extraction['archives']if x['role']=='openssl')['archive'];rows.append(openssl)
+@@ -251,7 +263,7 @@
+  save(work/'root-authority.json',a);save(work/'protection-before.json',before)
+  result=dict(schemaVersion=1,state='EXPERIMENTAL_NEXT_INTL_NATIVE_BUILD_RUNNING_V1',sourceComposition=a['composition'],sourceCopies=[],phases=[],primaryError=None,postCollectionErrors=[],inputProtection=None,engineOrGuestExecuted=False,adoption=False)
+  def recheck():
+-  checked(authority_row);check_family(a['callerIndex']);check_family(a['savedFramePatchIndex'])
++  checked(authority_row);check_family(a['callerIndex']);check_family(a['savedFramePatchIndex']);check_family(a['installedGeneratorCallerIndex']);portable_admission(a,spec)
+   for r in protected:checked(r)
+   for role,t in trees.items():assert tree_snapshot(t['root'])==before[role],'reused tree changed: '+role
+  try:

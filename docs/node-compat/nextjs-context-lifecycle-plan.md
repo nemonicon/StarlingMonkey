@@ -15,6 +15,15 @@ proof. Unref across calls, tagged real HTTP, disconnect and native resource
 counts remain open. The original source-audit and proposed deeper tests below
 retain their scopes.
 
+Current integration update: the observed-I/O policy was subsequently integrated
+into component1c3108d2, which passes the fresh application pair and all three
+native cohort samples. The historical55f05 statements below describe the
+earlier checkpoint. The next application-level regression adds concurrent
+cookie/header contexts, chunked Unicode JSON, malformed JSON and subsequent
+healthy recovery through the unchanged Next routes. Isolated context/peer
+controls do not replace these application observations. See the
+[current execution order](nextjs-priority-roadmap.md).
+
 The [actual native V5 review](../../tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/hydration-v5-review/README.md)
 proves two executions of this fixed app's 24 HTTP contracts, cache invalidation,
 incremental stream and two browser interactions. It does not prove same-instance

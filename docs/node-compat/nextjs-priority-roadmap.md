@@ -5,11 +5,13 @@ application now passes the selected experimental Wasmtime smoke contract**:
 24/24 HTTP checks, cache generation 1 → 2, five incremental Suspense chunks,
 and both browser interactions, with zero recorded browser or observer errors.
 A stock Node 22.14.0 control passes the same browser worker, readiness checks,
-20-second test limits and error gates. See the
-[current milestone](nextjs-wasm-milestone-2026-11-06.md). The portable
-[native first/repeat review](../../tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/hydration-v5-review/README.md)
-and [matched Node review](../../tests/node-compat/frameworks/nextjs/next-intl-runtime-root-results-v1/hydration-stock-v1-review/README.md)
-retain the actual observations and read-only checkers.
+20-second test limits and error gates in the first fresh pair. The later fixed
+cohort passes native3/3 and stock2/3, leaving its combined all-six gate failed.
+The [fresh paired review](../../tests/node-compat/frameworks/nextjs/next-app-runtime-root-results-v1/first-pair-review/README.md)
+and [cohort review](../../tests/node-compat/frameworks/nextjs/next-browser-reliability-root-results-v1/cohort-review/README.md)
+retain these separate outcomes. Next.js execution takes priority over expanding
+unneeded Node APIs. The immediate next runtime check is concurrent request
+isolation and body recovery through the unchanged application.
 
 The accepted production checkpoint remains
 [foundations-v13](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md).
@@ -20,14 +22,15 @@ JavaScript AOT compilation nor a client-side Wasm port.
 
 ## Exact passing generation
 
-The passing component is `55f05e3d…` (37,214,436 bytes), engine `4623640b…`
+The current fresh-app component is `1c3108d2…` (37,214,251 bytes), engine `4623640b…`
 (31,324,051 bytes), and incremental metadata `726d69cf…`. The engine retains the
 coherent patched Intl/SavedFrame V7 build and its 80 native compile rows plus
 separate embedding as ancestry. One fresh UTF-16 Module translation unit and a
 new archive/relink replace the failed non-ASCII `Function` workaround; this is
 not a claim of 80 fresh frontend compilations. The
 [build review](../../tests/node-compat/frameworks/nextjs/next-native-module-utf16-delta-root-results-v1/actual-review/README.md)
-records that distinction and the input protections.
+records that distinction and the input protections. Earlier `55f05e3d…`
+first/repeat successes remain in the [original milestone](nextjs-wasm-milestone-2026-11-06.md).
 
 The raw [guest entry](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v4/guest-entry.mjs)
 loads the unmodified standalone application from `/app`. Its six bounded guest
@@ -36,6 +39,8 @@ send's ReadStream options, AbortSignal-aware pipeTo, classic request-body
 conversion, and AsyncResource construction/runInAsyncScope over native ALS
 capture. Their limits remain part of the experimental contract. The entry
 contains no `Function` compilation fallback or diagnostic app wrapper.
+The current integrated V5 component also includes the reviewed observed-I/O
+abort policy; it is the artifact selected by the fresh regression command.
 
 The final component imports exactly thirteen selected standard WASI interfaces,
 all at **0.2.10**, and exports `wasi:http/incoming-handler@0.2.10`. The successful
@@ -100,16 +105,23 @@ free bytes for stock and1,578,336,256 for native. Keep the same start guards on
 future actions; this is not measured peak demand. No SDK, old proof or shared
 binary was deleted to manufacture headroom.
 
-## Priorities after the first pass
+## Execution order
+
+Run new application checks with the existing component before changing the
+engine. Keep source-build preparation moving while the volume lacks launch
+headroom. Do not wait for a stock-only diagnostic to finish before testing a
+new native application behavior; preserve its strict failure and unresolved
+cause. Every changed engine must rerun the complete app contract.
 
 | Priority | Work | Completion gate |
 | --- | --- | --- |
 | 1 | Run the freshly built unchanged Next app in Wasm | **First actual pair passes** on nativeV7/stockV3/browserV3:24HTTP/cache1→2/five chunks/2strict-browser checks, raw0/clean/protected inputs. Genuine2,181-file inventory/new build+action IDs run on1c3108d2 without rebuilding the engine. The304-payload portable paired DATA review passes Root readback. Old2,218-file evidence and failures remain unchanged. |
-| 2 | Resolve browser failure and establish reliability | The [fixed cohort](../../tests/node-compat/frameworks/nextjs/next-browser-reliability-root-results-v1/cohort-review/README.md) retains **5/6 strict passes and an unmet all-six gate**: native3/3, matched Node2/3;144HTTP/12browser functions pass. p3-stock ERR_ABORTED/body unavailable stays failed; cleanup/source/world pass. Its580-record reader passes Root readback. [One unmodified standalone control](../../tests/node-compat/frameworks/nextjs/direct-standalone-control-root-results-v1/actual-review/README.md) also passes24+2 without the bridge; this does not identify a cause. The pinned POST audit found no explicit abort. The reviewed [extra-CDP-session-off diagnostic](../../tests/node-compat/frameworks/nextjs/extra-cdp-off-root-results-v1/README.md) is ready, but off1 stopped before any actor at the1GiB floor (recheck673,460,224 bytes); all three samples remain unexecuted. |
-| 3 | Regress the fresh app on the second host | **Fresh cold8 passes** on stock wasmCloud2.11.0/embedded Wasmtime48.0.7: result6d959823/47822, config/dev/outer0, strict three-chunk stream(shell0/ready1), source/copy/world protected. The [portable coldV4 review](../../tests/node-compat/frameworks/nextjs/wasmcloud-cold-root-results-v4/actual-review/README.md) retains175 exact files and passes Root readback. The exact426dir copied app and independent direct-P2 cache preopen work for cold8. Retained-cache/browser acceptance remains separate; original host404/SIGINT130 evidence stays retained. |
-| 4 | Close response, context and resource boundaries | The [native-stream probe](../../tests/node-compat/frameworks/nextjs/native-pipe-root-results-v1/README.md) matches36 actual Node records in a real component; isolated I/O-abort controls pass eight responses. Broader cancellation/compression, AsyncResource, native handle counts, trailers and teardown remain open. Guest facade results do not prove native private-state/resource counts. |
-| 5 | Reproduce and measure the successful generation | All825 native source inputs reconstruct from Git, and official Node/npm acquisition plus the isolated host app build pass. Native builder integration, authenticated external prerequisites and a full clean-machine run remain open. Execute the [paired measurement plan](nextjs-measurement-plan.md) for size, startup, public server RSS and route timing after fresh-app acceptance. It is unexecuted; functional success establishes no performance advantage or memory bound. |
-| 6 | Prepare production promotion | Review exact selected manifests, defaults, build inputs, INIT barriers, facade limits and host rights; run required release and compatibility suites before profile/API promotion. Keep foundations-v13 accepted until this decision is explicit. |
+| 2 | Test real Next request isolation and body recovery | Supplement the unchanged24HTTP/cache/stream/2browser gate with six checks: two distinct cookie/header contexts, chunked Unicode JSON and malformed JSON concurrently, then an empty context and successful POST recovery. Reuse the existing `/api/context` and `/api/json` routes, fresh app and1c31 component. Preserve all response bytes/errors before assertions. Source preparation is in progress; no new actual result yet. Client overlap does not prove same-Store concurrency. |
+| 3 | Rebuild the working engine from the portable source selection | All825 inputs reconstruct from Git; all ten fresh generator checks pass. [Actual generator DATA](../../tests/node-compat/frameworks/nextjs/next-native-portable-generator-root-results-v1/actual-review/README.md) passes Root readback. Reviewed V2 closes producer-plan/index/Root linkage and Root's [actual preparation](../../tests/node-compat/frameworks/nextjs/next-native-portable-build-preparation-root-results-v2/README.md) passes with the exactb209 selection and an unissued draft. Bind coherent external prerequisites, execute the3GiB-start/1GiB-phase full build, then rerun the complete application on its new component. Clean-machine reproduction remains open. |
+| 4 | Close response, context and resource boundaries demanded by Next | The [native-stream probe](../../tests/node-compat/frameworks/nextjs/native-pipe-root-results-v1/README.md) matches36 Node records; context interleaving and isolated I/O-abort controls pass their bounded contracts. Broader cancellation/compression, AsyncResource, native handle counts, trailers and teardown remain open. Guest facade results do not prove native private-state/resource counts. Fix observed application failures before adding unrelated APIs. |
+| 5 | Investigate browser reliability without erasing the failure | The [fixed cohort](../../tests/node-compat/frameworks/nextjs/next-browser-reliability-root-results-v1/cohort-review/README.md) retains **5/6 strict passes and an unmet all-six gate**: native3/3, matched Node2/3. All144HTTP/12browser functions pass; p3-stock ERR_ABORTED/body unavailable stays failed. [One direct standalone control](../../tests/node-compat/frameworks/nextjs/direct-standalone-control-root-results-v1/actual-review/README.md) passes without the bridge; no cause follows. The reviewed [extra-CDP-session-off diagnostic](../../tests/node-compat/frameworks/nextjs/extra-cdp-off-root-results-v1/README.md) remains unexecuted after its1GiB capacity refusal. It does not block the demonstrated native milestone or the next native regression. |
+| 6 | Preserve the second-host boundary | **Fresh cold8 passes** on stock wasmCloud2.11.0/embedded Wasmtime48.0.7, including strict streaming and protected inputs. The [coldV4 review](../../tests/node-compat/frameworks/nextjs/wasmcloud-cold-root-results-v4/actual-review/README.md) passes Root readback. Retained-cache/browser acceptance remains separate: this host's selected P2 path does not retain an instance between requests. Do not change the host or widen the world to force that behavior. |
+| 7 | Measure and consider production promotion | The [paired measurement plan](nextjs-measurement-plan.md) is unexecuted; no performance advantage or memory bound follows. Review exact manifests, defaults, build inputs, INIT barriers, facade limits and host rights, then run release/compatibility suites before promotion. Keep foundations-v13 accepted until that decision is explicit. |
 
 ## Per-surface depth
 
@@ -124,7 +136,7 @@ replace each surface's broader differential, lifetime and failure suite.
 | HTTP and WASI adapter | Real custom-server prepare/getRequestHandler, typed request-body EOF, native response streaming, actions and resource translation pass the selected full app contract. | General Node listen/TCP/TLS/HTTP2 behavior and exhaustive cancellation/ownership semantics are outside the pass. |
 | AsyncLocalStorage and AsyncResource | Real native store/Promise queue/task/tick/fresh/neutral boundaries; dependency controls and actual Next request/action/static paths run. The bounded AsyncResource facade calls native ALS.snapshot. | Full hooks/IDs/lifecycle, cross-request concurrency, broader AsyncResource and named ESM binding parity remain open. |
 | Startup, timers and performance | Required process/env/cwd, URL/OS, timers/immediates and performance paths are present in the linked profile and measured app. | Broad Node API coverage, phase/ref-unref edge cases, snapshot resumption and reset safety remain separate. |
-| Native web and classic streams | The app's request conversion, response piping, gzip/static delivery and five-chunk Suspense path pass. | pipeTo facade disturbed-state/queued-close/private-state limits and signal pipeThrough remain explicit; native regression work is priority 2. |
+| Native web and classic streams | The app's request conversion, response piping, gzip/static delivery and five-chunk Suspense path pass. | pipeTo facade disturbed-state/queued-close/private-state limits and signal pipeThrough remain explicit; broader native stream regression remains open. |
 | Crypto/compression | RuntimeOnly RNG, native SHA256, existing Hash/Hmac and streaming Gzip/Deflate are selected in the generation; demanded app paths execute. | This is not proof of all crypto operations, keys, compression formats or persistent-state cleanup. |
 | Unicode and Error stacks | Patched Intl/ICU generation passes 36 strict Unicode records. Real native SavedFrames unblock send/depd. | Three anonymous function-name type differences keep the separate strict stack run failed; eval-origin/receiver/native/async methods remain deferred. |
 
