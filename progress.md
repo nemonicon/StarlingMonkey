@@ -7,8 +7,9 @@ Last updated: 2026-11-07. Overall roadmap: **in progress**.
 **Next.js is the immediate priority.** The next deliverable is a repeatable
 experimental Next application run, using the unchanged app and standard WASI
 world. The fresh Wasm smoke and native three-run cohort already pass. Prioritize
-the complete portable native build and regression on its new artifact, then
-request-isolation and cancellation boundaries. The matched-Node-only browser
+the concurrent request/body/recovery regression on the current artifact, while
+preparing the complete portable native build and regression on its new artifact.
+Broader cancellation/resource boundaries follow. The matched-Node-only browser
 abort investigation remains open alongside this work; its failed all-six gate
 must not be reported as passed. Broader Node APIs, performance claims and
 production promotion follow these gates. See the updated
@@ -387,6 +388,53 @@ references and25 DATA mutations refuse. Root's actual
 also exits0, retains the exact originalb209 selection path and emits unissued
 draftdc91e5e7 without copying the selection. V1 and its unissued data remain
 preserved. This closes receipt linkage, not full build execution.
+The [unissued full-build input draft](tests/node-compat/frameworks/nextjs/next-native-portable-build-root-results-v2/README.md)
+then passes the real builder's read-only `effective_plan`, `inputs` and
+`selected_manifests`:435/387/3 inputs,22 public+2 private manifests,1,767
+protected file descriptors and10 inventory/provenance descriptors. Independent
+review confirms its inherited tool/SpiderMonkey/Rust facts match the successful
+build and its generator pins match the new result. No required field or file
+is missing. Full live tool-tree verification remains a launch-time gate;
+configure/build remain NULL and the proposed work directory is absent. This
+step does not run any tool, source copy or native build.
+The compact full-build launcher now passes32 inert checks,2 AST checks and
+independent review. Root's actual `--run` invocation refuses at the first3GiB
+capacity gate, exit1, before issuing an authority or creating work/monitor
+outputs. The unchanged unissued draft and absent paths are checked; the full
+refusal and753,332,224-byte **after-refusal** observation are retained. No native
+build or workload started. The reviewed one-command path is ready for sufficient
+headroom, with original7200s ownership and all worker guards retained.
+
+The next actual application regression is now prepared: reviewed
+[NativeV8](tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v8/README.md)
+47c821e8 adds six concurrent context/body/recovery cases through unchanged Next
+routes, then requires every original24HTTP/cache/stream/2browser assertion.
+The deploy actor, owned runner and app policy remain byte-identical to V7;
+component1c31, engine462, fresh app and13-interface world remain unchanged.
+Source21 and local fake-server62 checks pass across24 outcomes, including
+wrong-context, transport-close and partial-response-close failures. A review
+correction retains received partial bytes and the original read error; the first
+fake fixture's legal close-delimited EOF failure stays in preparation history.
+These are harness checks, not target results or guest fault injection.
+
+The [Root wrapper/request/CLI](tests/node-compat/frameworks/nextjs/next-app-request-isolation-root-results-v1/README.md)
+also pass independent review. Actual `--prepare-only` exits0 with requested9ebfa4;
+the first real launch invocation exits2 at the1GiB gate with761,180,160 bytes,
+before creating its request, monitor, output or world receipt. All seven
+declared absent paths are checked and raw outputs retained. No new real Next
+or guest request ran, and the six cases remain unexecuted. The shared helper
+is also selected by the matched pinned-Node differential path. Client overlap
+does not prove same-Store concurrency; possible instance-local cache-counter
+effects must remain failures under the unchanged cache gate.
+The reviewed [StockV6 Source](tests/node-compat/frameworks/nextjs/browser-hydration-matched-host-candidate-v6/README.md)
+bccce053 now consumes that one V8 helper, retaining normal CDP and the original
+V4 contract/300s owner with a fresh V6 namespace. Source29 wiring/15 namespace
+checks and independent Source/request/CLI reviews pass. Actual control
+`--prepare-only` exits0 with request6eb140fa, mode0600 in owned0700 parent; both
+server/monitor outputs are absent. At preparation770,953,216 bytes are free;
+launch is not attempted. The two reusable commands now prepare the exact same
+six observable application cases for future differential checks; neither arm
+has executed them against real Next yet.
 
 The separate [generator-only producer](tests/node-compat/frameworks/nextjs/next-native-portable-generator-check-v1/README.md)
 38cbd788 and Rootgrant0669f9c9 passed Source/pre-action review. Its **first actual

@@ -1,10 +1,13 @@
 # Reproducing the experimental Next generation
 
-The selected full Next smoke passes on component `55f05e3d…`, engine
-`4623640b…`, with the first and repeat Wasmtime runs and matched Node control
-retained in the [milestone report](nextjs-wasm-milestone-2026-11-06.md).
+The selected fresh-app Next smoke passes on component `1c3108d2…`, engine
+`4623640b…`, with the genuine2,181-file application and matched Node control
+retained in the [fresh paired review](../../tests/node-compat/frameworks/nextjs/next-app-runtime-root-results-v1/first-pair-review/README.md).
+The later native three-run cohort passes; its combined gate stays failed
+because one stock run aborts. Earlier55f05 first/repeat runs remain in the
+[historical milestone report](nextjs-wasm-milestone-2026-11-06.md).
 **A clean-machine build has not been demonstrated.** The existing
-[regression command](../../tests/node-compat/frameworks/nextjs/run-native-next-regression.py)
+[regression command](../../tests/node-compat/frameworks/nextjs/run-fresh-next-regression.py)
 reuses exact private artifacts; it does not bootstrap them. This plan is a
 source audit with the isolated host app build now executed; it does not claim
 bit-for-bit rebuilds or a rebuilt native engine.
@@ -92,8 +95,13 @@ cannot be made portable by replacing strings or expected hashes.
    is the next full-build path. It preserves the existing real CMake/Rust
    commands, offline policy, one-job limit and3GiB start/1GiB phase guard while
    selecting the fresh825-file input tree and genuine fresh generator proof.
-   All external prerequisite fields must be bound before issuing its build
-   request. A new full build and its new metadata must pass the original
+   The [unissued input draft](../../tests/node-compat/frameworks/nextjs/next-native-portable-build-root-results-v2/README.md)
+   now binds the genuine tool/SpiderMonkey/Rust fields and fresh generator
+   proof. The actual read-only builder input check passes1,767 file descriptors,
+   ten inventory descriptors and22 public+2 private manifests, with independent
+   field review. No required field or file is missing; full live tool-tree
+   reauthentication still belongs to launch. Build/configure permissions remain
+   NULL, with insufficient current headroom. A new full build and its new metadata must pass the original
    whole-app contract; neither the old engine identity nor old compile rows
    may be projected onto it.
 
@@ -165,10 +173,11 @@ cannot be made portable by replacing strings or expected hashes.
    records cannot be cast into evidence for this new build.
 
 7. **Construct, audit, then run.** The committed raw
-   [entry V4](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v4/index.json)
-   installs six bounded facades during INIT; the deployed loader reads the real
+   [entry V5](../../tests/node-compat/frameworks/nextjs/next-component-entry-fixes-v5/index.json)
+   retains six bounded facades during INIT and the observed-I/O abort policy;
+   the deployed loader reads the real
    app from `/app`. Its
-   [constructor V4](../../tests/node-compat/frameworks/nextjs/next-entry-fixes-construction-v4/run.py)
+   [constructor V5](../../tests/node-compat/frameworks/nextjs/next-entry-fixes-construction-v5/run.py)
    accepts `python3 -I -B …/run.py --authority AUTHORITY --sha256 AUTHORITY_SHA`.
    It configures the official tool shim's single WIT-directory preopen, uses a
    held cwd outside output/TMPDIR, calls the genuine raw-source API, saves the
@@ -176,7 +185,7 @@ cannot be made portable by replacing strings or expected hashes.
    clocks and HTTP; disable only `fetch-event`; AOT/debug remain off. Admit only
    the selected13 standard0.2.10 interfaces and incoming-handler export. No
    textual version rewrite, bundler substitute or app mount during INIT is used.
-   The final [V5 deployment runner](../../tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v5/run-owned.py)
+   The current [V7 deployment runner](../../tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v7/run-owned.py)
    binds the constructor, engine, metadata, source families and fresh app
    inventory before serving. The retained-artifact regression wrapper selects
    Wasmtime42.0.1 reuse128/idle60, a physical0444/0555 app copy, fresh nested

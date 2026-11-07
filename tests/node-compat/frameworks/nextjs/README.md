@@ -5,17 +5,24 @@ passes the selected **experimental native Wasm smoke contract**: 24/24 HTTP,
 cache generation 1 → 2, five incremental Suspense chunks, and 2/2 browser
 interactions with zero recorded page, console, request or observer errors.
 The same hydration-aware browser worker, whole 20-second limits and strict
-error gates also pass against stock Node 22.14.0. The
+error gates also pass against stock Node 22.14.0 in the first fresh pair. The
+later fixed cohort passes native3/3 and stock2/3, leaving the all-six strict
+gate failed; the stock action abort remains unresolved. The
 [current milestone report](../../../../docs/node-compat/nextjs-wasm-milestone-2026-11-06.md)
 and [priority roadmap](../../../../docs/node-compat/nextjs-priority-roadmap.md)
-record the exact scope and remaining work. Portable
+record the exact scope and remaining work. The current
+[fresh-app paired review](next-app-runtime-root-results-v1/first-pair-review/README.md)
+and [cohort review](next-browser-reliability-root-results-v1/cohort-review/README.md)
+retain those new results separately. Earlier portable
 [native first/repeat](next-intl-runtime-root-results-v1/hydration-v5-review/README.md)
 and [matched Node](next-intl-runtime-root-results-v1/hydration-stock-v1-review/README.md)
 reviews retain the actual evidence and DATA checkers.
 
-This route uses component `55f05e3d…` (37,214,436 bytes), engine `4623640b…`
-(31,324,051 bytes), the raw [entry V4](next-component-entry-fixes-v4/guest-entry.mjs)
-and its six bounded guest facades. Native UTF-16 Module compilation preserves
+The current fresh-app route uses component `1c3108d2…` (37,214,251 bytes), engine `4623640b…`
+(31,324,051 bytes), the V5 integration of the raw entry and its six bounded
+guest facades plus observed-I/O abort policy. The earlier55f05 generation and
+[entry V4](next-component-entry-fixes-v4/guest-entry.mjs) remain retained.
+Native UTF-16 Module compilation preserves
 real source and stack provenance; no Function fallback or app source rewrite is
 installed. Server JavaScript runs inside SpiderMonkey/Wasm while the browser
 runs ordinary Next client JavaScript. This is not JavaScript AOT compilation
@@ -28,11 +35,11 @@ The component emits exactly thirteen selected standard WASI **0.2.10** imports
 and the incoming-handler export. No custom host service, host modification,
 interface widening or raw socket/TLS implementation is used. wasmCloud's pinned
 P2 HTTP path creates a fresh instance per request and is not accepted for this
-retained-server/cache contract. A separate [eight-request cold control](wasmcloud-cold-candidate-v2/README.md)
-now passes on stock wasmCloud2.11.0/embedded Wasmtime48.0.7 using this same
+retained-server/cache contract. The fresh-app [eight-request cold control](wasmcloud-cold-candidate-v4/README.md)
+now passes on stock wasmCloud2.11.0/embedded Wasmtime48.0.7 using the current
 component: health×3, SSR, JSON POST, filesystem/SHA, assets and strict incremental
 streaming. Its runtime/CLI parents exit0 with inputs preserved. The [portable
-DATA review](wasmcloud-cold-root-results-v2/actual-review/README.md) retains117
+DATA review](wasmcloud-cold-root-results-v4/actual-review/README.md) retains175
 records and passes readback. The earlier
 TCP-only readiness attempt's eight host404s remain retained failures. No browser
 or retained cache assertion ran on wasmCloud. The physical 0444/0555 modes do not establish
@@ -46,12 +53,33 @@ match five unchanged app files; a tenth captured body is the actual POST RSC
 response. The previous early-click timeout and aborted action request remain
 failed observations, with no retroactive causal or pass relabeling.
 
-Use the [retained-artifact runner](run-native-next-regression.py) for this exact
-native generation, using its reviewed baseline authority and exact artifact pins.
-A fresh run ID is mandatory; the first run and a fresh repeat both pass.
+Use the [fresh-app runner](run-fresh-next-regression.py) for the current
+experimental generation and its exact reviewed private artifacts:
+
+```sh
+python3 -I -B tests/node-compat/frameworks/nextjs/run-fresh-next-regression.py --run-id FRESH
+```
+
+A fresh lowercase run ID of at most48 characters is mandatory. The command
+requires at least1GiB free at launch and preserves each result. `--prepare-only`
+writes a request without starting the runtime or browser. It reuses the pinned
+app and component; it does not build them from a clean checkout. The older
+[retained-artifact runner](run-native-next-regression.py) still selects55f05 and
+its original application generation. Do not mix their inventories.
 Portable clean-machine bootstrap and broader lifecycle/production regression
 work are separate; the historical commands
 below deliberately reproduce the older foundations-v13 bundler corpus.
+
+The next [request-isolation regression](next-app-request-isolation-root-results-v1/README.md)
+adds six overlapping context/body/recovery checks while preserving that full
+contract. Its Source/local-client tests and preparation pass, but its real
+launch stopped before any actor below1GiB free; all six application cases are
+still unexecuted. Use `run-next-request-regression.py --run-id next-check-001` once there
+is sufficient headroom. It reuses the same app/component and retains partial
+bytes and errors; it makes no same-instance concurrency claim.
+The prepared `run-next-request-control.py` command uses the same helper against
+pinned Node while retaining the original strict control gates. Neither new
+six-case arm has run against real Next yet.
 
 ## Historical foundations-v13 bundler corpus
 

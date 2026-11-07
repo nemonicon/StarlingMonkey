@@ -1,0 +1,15 @@
+# Matched Node V6 — shared six-case batch, Source only
+
+V6 derives directly from Stock V4, retaining its CDP-enabled Browser V3/e324 behavior. Stock V5's CDP-off path is not used. No app, component, engine, Node Module provider or HTTP bridge changes. All actual Root/run/review slots remain NULL and the template is unissued.
+
+The actor imports the **single held V8 supplemental.mjs** by reference. After the real app.prepare/handler readiness and before the original contract loop, it collects the exact same six cases: two distinct concurrent request contexts, chunked Unicode JSON, malformed JSON, then empty-context and JSON recovery. The helper's complete raw/body/chunk/error files and actor raw result are saved before semantic validation. A validation-false result still permits the unchanged original24 HTTP/cache/stream/two-browser suite to run; it remains part of the final failure. Unexpected collector/publication throws remain ordinary recorded failures, without a retry.
+
+The original final gate is preserved verbatim, saved as `originalContractPassed`, then conjoined with supplemental validation. This never replaces failed original conditions or counts six new cases as part of the original24 denominator. Individual supplemental failures and unavailable/partial bodies remain raw observations. Client overlap and enqueue boundaries do not establish same-Store/native resource identity or guest packet/read boundaries.
+
+`plans.json` protects the whole held V8 Source family and exact helper descriptor before/after the existing owned run. No helper implementation or supplemental tests are copied. To avoid another browser implementation copy, the actor invokes the already pinned V4 browserSource path; its whole V4 family is also protected. Browser bytes, five fresh-app pins, functional bodies, CDP/error collection,20s/500ms limits and strict error gates are unchanged.
+
+The fixed output prefix is `/private/tmp/starling-node-compat/next-browser-hydration-stock-v6`; every future grant still requires a safe unique runId. The original owner is changed only at that namespace literal. Original0af300s ownership, actual authority/source/input bookends, fresh-copy/root/mode/inode checks, owned-cache reset, localhost-only behavior and process cleanup are unchanged. No output or monitor path/argv override is added. Earlier namespaces and evidence are untouched.
+
+Source tests inverse all five actor edits to the exact V4 text, compare the one-literal owner change, and check unchanged plan fields, helper/index roles, raw-before-validation order, false-validation continuation and the final independent gate truth table. Callback markers exercise only the actual small integration span; the real helper collector, Next, HTTP/net server and browser are never called. No fake runtime/resource evidence is produced. Grammar checks execute no actor body.
+
+A separately reviewed Root grant, resource preflight and actual matched Node trial are still required. This Source does not claim new HTTP, browser, guest, concurrency or reliability results. Root owns the control request/CLI/docs and any later action.

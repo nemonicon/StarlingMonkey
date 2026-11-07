@@ -1,0 +1,30 @@
+--- wasmtime-deployment-candidate-v7/run-contracts.mjs
++++ wasmtime-deployment-candidate-v8/run-contracts.mjs
+@@ -7,6 +7,7 @@
+ import {mkdir,readFile,writeFile} from 'node:fs/promises';
+ import {dirname,join,resolve} from 'node:path';
+ import {fileURLToPath} from 'node:url';
++import {collectSupplemental,validateSupplemental} from './supplemental.mjs';
+ const here=dirname(fileURLToPath(import.meta.url)),origin=new URL(process.argv[2]),root=resolve(process.argv[3]),browserTools=process.argv[4];
+ assert.equal(process.version,'v22.14.0');assert.equal(process.argv.length,6);const runId=process.argv[5];assert(/^[a-z0-9][a-z0-9-]{0,47}$/.exec(runId)?.[0]===runId);assert.equal(origin.origin,process.argv[2]);assert.equal(origin.hostname,'127.0.0.1');assert.equal(origin.protocol,'http:');assert(browserTools);assert.equal(root,'/private/tmp/starling-node-compat/next-wasmtime-deployment-'+runId+'/client');
+ await mkdir(root,{mode:0o700});await mkdir(join(root,'responses'));
+@@ -15,6 +16,10 @@
+ const errorData=e=>({name:e?.name??'Error',message:e?.message??String(e),stack:e?.stack??null});
+ const save=()=>writeFile(join(root,'result.json'),JSON.stringify(result,null,2)+'\n');await save();
+ try {
++  result.supplemental=await collectSupplemental({origin:result.origin,output:join(root,'supplemental')});
++  await save(); // Whole six-case raw capture precedes semantic comparison.
++  result.supplementalValidation=validateSupplemental(result.supplemental);
++  await save();
+   const contract = JSON.parse(await readFile(join(here, '../fixture-contract.json')));
+   const bodies = new Map();
+   for (const item of contract.requests) {
+@@ -77,6 +82,8 @@
+ } catch(error){result.errors.push(errorData(error));}
+ finally {
+  result.passed=result.http.length===24&&result.http.every(x=>x.passed)&&result.cacheInvalidation?.passed===true&&result.streaming?.complete===true&&result.streaming?.incrementalDeliveryObserved===true&&result.browserExit?.code===0&&result.browser?.passed===true&&result.errors.length===0&&result.transportErrors.length===0;
++ result.originalContractPassed=result.passed;
++ result.passed=result.originalContractPassed&&result.supplementalValidation?.passed===true;
+  await save();
+ }
+ console.log(JSON.stringify({state:result.passed?'ACTUAL_NEXT_WASMTIME_CONTRACT_CLIENT_PASSED_V2':'ACTUAL_NEXT_WASMTIME_CONTRACT_CLIENT_FAILED_V2',http:result.http.length,passedHttp:result.http.filter(x=>x.passed).length,errors:result.errors}));process.exitCode=result.passed?0:1;
