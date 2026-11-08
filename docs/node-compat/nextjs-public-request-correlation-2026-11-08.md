@@ -128,7 +128,14 @@ The [native-boundary Source proposal](../../tests/node-compat/frameworks/nextjs/
 identifies existing internal guest registration and ordinary native `call`
 observation sites. It rules out direct stdout inside canonical `post_call`:
 the ABI's may-leave restriction forbids those imports. It contains no native
-patch or implemented diagnostic API. The next engineering decisions are a
-default-off internal guest surface, primitive/string validation, per-export
-ambiguity/clearing rules and ordinary-call I/O error behavior, followed by
-targeted native tests and a fresh same-world build/constructor if implemented.
+patch or implemented diagnostic API. A separate
+[native candidate](../../tests/node-compat/frameworks/nextjs/next-native-export-public-correlation-candidate-v1/README.md)
+now implements the default-off internal surface, primitive/string validation,
+per-export ambiguity/clearing and bounded ordinary-call I/O. Both macro modes
+pass real C++ frontend checks after an authenticated SDK directory repair;
+the original failed checks are preserved. Fresh source materialization, portable
+selection and all ten installed-generator checks complete successfully. Full
+compile/link, the 17-case direct-WASI probe, actual emitted imports and a fresh
+same-world Next.js comparison remain required. These preparation results do not
+resolve the retained strict browser failure or change its public-correlation
+conclusion.

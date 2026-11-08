@@ -1,0 +1,132 @@
+--- cleanup/launch.py
++++ diagnostic/launch-build.py
+@@ -1,4 +1,4 @@
+-"""One V3 owned native build; default checks inputs without launching tools."""
++"""One opt-in diagnostic V3 owned build. Default reads only; --run issues exactly configure/build."""
+ from pathlib import Path
+ import argparse
+ import copy
+@@ -12,10 +12,12 @@
+ sys.dont_write_bytecode = True
+ HERE = Path(__file__).absolute().parent
+ DRAFT = HERE / 'authority.unissued.json'
+-DRAFT_SHA = '261da3e74a1c5be5d1832e8c6149a129908762d4f5d61d3ea55966de1a1e2975'
+-CALLER_SHA = '9cb06e1d5d30af3c16389aa0f0ddf13b1fd40afb720c59e7f22c4283f57edc86'
+-ENTRY_SHA = 'd4e6a2aab5ef3aab17792446e1b73a6c61fd6ab053efc618a1e8842c591d8a01'
+-PLAN_SHA = '0a1ebf37bcaa07d8b202acb2503d360627303a6292355f3797bfbf6ce3d129c9'
++DRAFT_SHA = None
++PREPARATION = HERE / 'build-preparation.json'
++PREPARATION_SHA = None
++CALLER_SHA = '2c3b46dd458427922b5581fd87728bd373741af4a5f12847533832135cb9165d'
++ENTRY_SHA = '45538b3b6044fab7ace00e256b86b5ef0ff8a3351c70f6f3499a9805afd139d7'
++PLAN_SHA = '3895cf16445f04231338d66a62e8d4bc6ba2d1f4966f5fe14a930c25ab5cd260'
+ MONITOR_SHA = '86913867251bc889701859ca6a361ccf9c17288a6a3bfc7a5c8d8e5bbe5c4cbe'
+ WRAPPER_PYTHON_SHA = 'b76df9b72b06c2592c34e234c10fb51a587fa4aaf3d57fd98325ea2774f4f758'
+ BUILD_TOOL_PYTHON_SHA = '4a81cbef89c3cded9c9435c2faf747823dfed9ca9a0da82df374834a18c70dc8'
+@@ -80,6 +82,21 @@
+ 
+ 
+ def prepare():
++    # Actual draft/receipt bindings must exist before helper imports or output/action.
++    require(type(DRAFT_SHA) is str and type(PREPARATION_SHA) is str, 'Unbound actual preparation; Source-only launcher')
++    preparation_ref = row(PREPARATION)
++    require(preparation_ref['sha256'] == PREPARATION_SHA, 'Preparation receipt changed')
++    receipt = json.loads(PREPARATION.read_bytes())
++    require(receipt['state'] == 'ROOT_NATIVE_EXPORT_DIAGNOSTIC_BUILD_DRAFT_PREPARED_UNISSUED_V1'
++            and receipt['rootAuthorityIssued'] is receipt['buildOrToolInvoked'] is receipt['cargoCommandInvoked'] is False,
++            'Genuine unissued JSON-only preparation')
++    preparer_ref = receipt['preparer']
++    require(preparer_ref['path'] == str(HERE / 'prepare-build.py') and row(preparer_ref['path']) == preparer_ref,
++            'Actual Source preparer role')
++    prep_spec = importlib.util.spec_from_file_location('reviewed_native_diagnostic_root_preparation', preparer_ref['path'])
++    preparer = importlib.util.module_from_spec(prep_spec)
++    prep_spec.loader.exec_module(preparer)
++    context = preparer.context()
+     draft_ref = row(DRAFT)
+     require(draft_ref['sha256'] == DRAFT_SHA, 'Draft changed; review before repinning')
+     a = json.loads(DRAFT.read_bytes())
+@@ -105,12 +122,21 @@
+     fresh(a['workRoot'])
+     output = Path(a['workRoot'] + '-root-monitor')
+     fresh(output)
+-    return a, draft_ref, module, plan, output
+-
+-
+-def run(a, draft_ref, module, plan, output):
+-    # This action gate precedes native/tool input reads, issuance, mkdir and copy.
++    require(receipt['authority'] == draft_ref and receipt['workRoot'] == a['workRoot']
++            and receipt['portableCargoSelection'] == a['portableCargoSelection']
++            and receipt['portableSelection'] == a['portableSelection'], 'Actual preparation/draft role joins')
++    for ref in [receipt[k] for k in ('actualPreparationApi', 'actualPreparedAuthority', 'preparationConfig',
++                'actualGeneratorResult', 'actualGeneratorReview', 'frontendReview', 'materializationReview', 'sdkRepair',
++                'sourceToolAuthorityProvenance')]:
++        require(row(ref['path']) == ref, 'Actual preparation evidence changed')
++    preparer.validate_draft(a, context)
++    return a, draft_ref, module, plan, output, preparer, context, preparation_ref
++
++
++def run(a, draft_ref, module, plan, output, preparer, context, preparation_ref):
++    # Read-only preparation authenticated inputs; this action capacity gate precedes issuance/mkdir/copy.
+     capacity(free_bytes(Path(a['workRoot']).parent), plan['disk']['startBytes'])
++    preparer.protect_context(context)
+     effective = module.effective_plan(a)
+     composition, source, embedding, support, trees, openssl, protected = module.inputs(a, plan, effective)
+     module.selected_manifests(a, source)
+@@ -124,13 +150,13 @@
+     issued = issued_copy(a)
+     module.validate_authority(issued)  # Pure validation; never calls the runner.
+     launcher = row(Path(__file__).absolute())
+-    protected += [draft_ref, launcher]
++    protected += [draft_ref, launcher, preparation_ref, row(HERE / 'prepare-build.py')]
+     fresh(a['workRoot'])
+     fresh(output)
+     capacity(free_bytes(output.parent), plan['disk']['startBytes'])
+     output.mkdir(mode=0o700)
+     result = dict(schemaVersion=1, state='PORTABLE_NATIVE_BUILD_ROOT_FAILED_UNREVIEWED_V3',
+-                  draft=draft_ref, launcher=launcher, workRoot=a['workRoot'], rootOutput=str(output),
++                  draft=draft_ref, preparation=preparation_ref, launcher=launcher, workRoot=a['workRoot'], rootOutput=str(output),
+                   portableCargoSelection=a['portableCargoSelection'], wrapperPython=python,
+                   nativeBuildToolPython=build_python,
+                   monitorInvoked=False, issuedAuthority=None, terminal=None, workerResult=None,
+@@ -140,7 +166,7 @@
+         module.save(authority, issued)
+         result['issuedAuthority'] = module.descriptor(authority)
+         module.save(output / 'launch-scope.json', dict(
+-            scope='One fresh full native configure/build, unchanged offline/jobs1/3GiB-start/1GiB-floor policy; no engine/guest/freeze/network/rustup/retry.',
++            scope='One fresh opt-in diagnostic full native configure/build, unchanged offline/jobs1/3GiB-start/1GiB-floor. Exact private embedding macro evidence required; no engine/guest/freeze/network/rustup/retry.',
+             inheritedPreparationOnlyTextIsDraftProvenance=True,
+             authorityChangedKeys=['state', 'configureAllowed', 'buildAllowed'],
+             timeoutSeconds=7200, cleanup='Original0af bounded cleanup additional',
+@@ -191,12 +217,13 @@
+             module.check_family(a['callerIndex'])
+             module.portable_admission(a, plan)
+             module.recheck_cargo(a, plan, cargo_before)
++            preparer.protect_context(context)
+             if result['issuedAuthority']:
+                 require(module.read(result['issuedAuthority']) == issued, 'Issued authority changed')
+         except BaseException as error:
+             protection_errors.append(dict(type=type(error).__name__, message=str(error)))
+         result['originalInputProtection'] = dict(unchanged=not protection_errors, errors=protection_errors,
+-                                                liveToolTreeScope='Worker responsibility; no independent outer tree result inferred')
++                                                liveToolTreeScope='Worker owns all ten tree before/final guards; Root additionally repeats original baseline full-native and repaired-SDK protection, not a new whole-ten outer attestation')
+         passed = (result.get('ownedCleanRawZero') is True and result.get('workerReportedPassed') is True
+                   and not result['errors'] and not protection_errors)
+         result['completedUnreviewed'] = passed
+@@ -215,7 +242,7 @@
+     mode.add_argument('--run', action='store_true')
+     args = parser.parse_args()
+     require(__debug__ and sys.flags.isolated and sys.dont_write_bytecode, 'Run Python with -B -I without -O')
+-    a, draft_ref, module, plan, output = prepare()
++    a, draft_ref, module, plan, output, preparer, context, preparation_ref = prepare()
+     free = free_bytes(Path(a['workRoot']).parent)
+     if not args.run:
+         summary = dict(state='PORTABLE_NATIVE_BUILD_ROOT_PREPARE_ONLY_V3', draft=draft_ref,
+@@ -226,7 +253,7 @@
+         if args.check_capacity:
+             capacity(free, plan['disk']['startBytes'])
+         return 0
+-    return run(a, draft_ref, module, plan, output)
++    return run(a, draft_ref, module, plan, output, preparer, context, preparation_ref)
+ 
+ 
+ if __name__ == '__main__':

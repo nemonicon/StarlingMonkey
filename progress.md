@@ -269,8 +269,14 @@ Current next steps and outstanding work:
   admission mechanism. The generator recipe `fa8be735` binds these actual
   materialization results and passes independent Source review; its ten unchanged
   checks now finish raw0 (`08479bfe`), with all ten commands passing and the
-  runner reporting preserved source/tool inputs; independent DATA review is
-  pending. The full native build is next. The frontend retained corpus contains
+  runner reporting preserved source/tool inputs. Independent DATA review
+  `fbb5db08` verifies all ten commands and their owners, recorded source
+  preservation and finite raw streams; current source/tool payload rehashes are
+  explicitly delegated to the real admission checks. The real builder
+  preparation exits0, creating fresh Cargo selection `98c52b61` and an unissued
+  build draft `4937da3c`. Its preparer and launcher pass whole Source review;
+  only the two actual draft/receipt SHA bindings change in the launcher. The
+  full native build is next. The frontend retained corpus contains
   52 files/4,009,463 bytes; Root's first offline reader exits0, preserving raw
   frontend codes `[1,1,0,0]`, separate driver0 and unaccepted runtime status.
   A separate replay from actual staged Git blobs and permissions also exits0.
