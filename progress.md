@@ -114,15 +114,22 @@ Current next steps and outstanding work:
   preserves every sample. Comprehensive stock wasmCloud coverage with an exact
   self-origin allowance is the next execution priority; original failed gates,
   broader lifecycle/cache overlap, costs and production promotion remain open.
-- **Next implementation in progress, Source only:** the different-host reuse
+- **Next implementation ready for preparation, Source only:** the different-host reuse
   plan `8a268f33` has independent Source review. A new full-contract stock
-  wasmCloud actor and unbound Root preparation/wrapper are being prepared from
+  wasmCloud actor and Root preparation/wrapper are prepared from
   the existing cold host mechanism. They select the unchanged D990 component,
   f805 app and full client/browser checks. One canonical literal loopback origin
   must bind the exact port and normalized one-entry egress rule; no fallback
   port, host modification or new component import is proposed. Runtime grants,
-  selected origin and actual results remain unissued. Evidence retention and
-  reader review are complete; the next-host drafting and Source review continue.
+  selected origin and actual results remain unissued. Actor `f22d805c` seals
+  18 payload files/127,795 bytes after independent Source/closure review. Root
+  syntax checks for all three JS files pass0/empty output, with the external
+  grammar receipt preserving actual argv/cwd. Root/B/R review the genuine
+  preparer/wrapper and caller coupling; the sole actor-SHA binding produces
+  wrapper `95f360f1`, with exact reversal to its reviewed unbound bytes. Natural
+  client exits0/1 may publish log digests; interrupted/error/other exits retain
+  paths and delegate descendant finalization to the original monitor. No new
+  host profile has executed. Evidence retention and reader review are complete.
 - **Complete:** guarded native build, real-Next component construction, and one
   full deployed regression. HTTP/stream/browser checks pass in that sample;
   cache1→1 keeps the full suite failed. Prior browser failures remain unresolved.

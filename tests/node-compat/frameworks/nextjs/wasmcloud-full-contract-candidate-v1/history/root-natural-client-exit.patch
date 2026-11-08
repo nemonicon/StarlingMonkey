@@ -1,0 +1,11 @@
+--- first-client-scope/deploy.mjs
++++ natural-status-scope/deploy.mjs
+@@ -150,7 +150,7 @@
+  for(const child of children){
+   if(!child.status){child.record.forcedCleanup=true;child.child.kill('SIGKILL');await boundedWait(child.done,1000);}
+   child.record.exit=child.status;
+-  if(child.record.label==='full-contract-client'&&(child.record.forcedCleanup||child.status===null)){
++  if(child.record.label==='full-contract-client'&&(child.record.forcedCleanup||child.status===null||![0,1].includes(child.status.code)||child.status.signal!==null||child.status.error!==null)){
+    // Direct-child reaping does not finalize inherited browser-descendant fds.
+    child.record.rawStreamDigestsUnavailable=true;
+    child.record.rawStreamFinalization='Interrupted client: raw paths retained without final digests; descendant quiescence/finalization delegated to the unchanged original600-second monitor';

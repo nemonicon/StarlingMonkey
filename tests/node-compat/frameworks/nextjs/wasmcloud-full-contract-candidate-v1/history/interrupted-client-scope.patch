@@ -1,0 +1,19 @@
+--- first/deploy.mjs
++++ corrected/deploy.mjs
+@@ -147,7 +147,15 @@
+ finally{
+  if(lease?.listening)await new Promise(resolve=>lease.close(()=>resolve()));
+  if(host&&!host.status){stopping=true;result.server.shutdownRequested=true;result.server.sigintSent=host.child.kill('SIGINT');if(await boundedWait(host.done,plan.gracefulStopMilliseconds)===null){result.server.forcedCleanup=true;host.child.kill('SIGKILL');await boundedWait(host.done,plan.gracefulStopMilliseconds);}}
+- for(const child of children){if(!child.status){child.record.forcedCleanup=true;child.child.kill('SIGKILL');await boundedWait(child.done,1000);}child.record.exit=child.status;for(const k of ['stdout','stderr'])if(typeof child.record[k]==='string')child.record[k]=await row(child.record[k]);}
++ for(const child of children){
++  if(!child.status){child.record.forcedCleanup=true;child.child.kill('SIGKILL');await boundedWait(child.done,1000);}
++  child.record.exit=child.status;
++  if(child.record.label==='full-contract-client'&&(child.record.forcedCleanup||child.status===null)){
++   // Direct-child reaping does not finalize inherited browser-descendant fds.
++   child.record.rawStreamDigestsUnavailable=true;
++   child.record.rawStreamFinalization='Interrupted client: raw paths retained without final digests; descendant quiescence/finalization delegated to the unchanged original600-second monitor';
++  }else for(const k of ['stdout','stderr'])if(typeof child.record[k]==='string')child.record[k]=await row(child.record[k]);
++ }
+  for(const handle of handles)try{await handle.close();}catch(error){result.errors.push({stage:'raw-stream-close',...errorData(error)});}
+  try{await sourceBookend();await protect();await witBookend();result.originalInputsPreserved=true;}catch(error){result.errors.push({stage:'final-input-protection',...errorData(error)});}
+  try{await readonlyBookend();result.readonlyAppPreserved=true;}catch(error){result.errors.push({stage:'final-readonly-app',...errorData(error)});}
