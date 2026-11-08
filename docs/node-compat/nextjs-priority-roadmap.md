@@ -17,9 +17,10 @@ both pass once on Wasm and matched Node. The latter passes24HTTP/52cache/80suppl
 generation1→2 and stream5(0,2) before complete gzip/HTTP EOF with2,963 decoded
 bytes. The same app, engine, component and13 standard interfaces are retained.
 Chrome/React and Store identity are absent from these controls; the strict full
-browser failure remains failed. Next prepare a separately versioned app adding
-only compress:false, then run the unchanged full client and strict browser with
-fresh build/asset bindings on Wasm and Node. This standard configuration
+browser failure remains failed. The separately versioned [compress:false application](nextjs-compression-off-profile.md)
+now builds with the same tracing exclusion and all other34 fixture files exact.
+Next derive its reviewed build/asset bindings and run the unchanged full client
+and strict browser on Wasm and Node. This standard configuration
 counterfactual diagnoses a profile dimension; it is not an established fix or
 compression/cancellation cause.
 

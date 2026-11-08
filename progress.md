@@ -4,43 +4,42 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
-Latest diagnostic: the [captured Server Action HTTP replay](docs/node-compat/nextjs-rsc-http-response-results.md)
-passes once on Wasm29465/600 and Node29725/300, both raw0/clean. Both return
-HTTP200, complete gzip RSC and2,963 decoded bytes; encoded sizes are1,488/1,491.
-End/HTTP-complete and CRC/ISIZE pass with no abort or collection error. The exact
-391-byte request and all19 original headers are retained; replay rewrites only
-Host/Origin/Referer and removes the old public nonce. The app/engine/component
-and13 standard WASI0.2.10 imports are unchanged. This fresh-host/no-prework,
-non-browser workload does not explain or waive the original strict browser abort.
-Preparation's JSON-format assumption failure and exact preimages are preserved;
-corrected binding`bdd3e053` and fixed preparation`3a900d27` pass. Primary DATA
-review`0e74de45` and independent runtime/gzip review`e22f9f7a` pass;380 retained
-payloads total7,575,911 bytes (`b3a97510`). Root rehashes the entire raw corpus.
-The next non-browser prework control is Source-only preparation, with no slots
-or requests yet. Control preceding workload before changing native behavior.
+Current next step: the [compression-off application](docs/node-compat/nextjs-compression-off-profile.md)
+builds successfully (`9d8c6bbb`) through original owners36534/120,36554/120,
+36565/600 and36633/900. Its dynamic standalone inventory is2,196 files/48,805,615
+bytes/431 child directories, with no links/source cache. Both emitted server
+configs contain compress:false and the unchanged tracing exclusion. Only19
+fixture bytes change; the other34 files remain exact. Source index`5c280e4b`,
+whole Source/API reviews, actual syntax/AST checks and binding`126c68c7` pass.
+Primary build review`9106545f` and independent build/config gate`d4194323` pass.
+Raw index`95116830` retains92 payloads/2,795,484 bytes, rehashed by Root. Fresh
+HTML/asset selection`05c965a6` derives five client scripts and four actions scripts
+from the actual new HTML; independent asset review`a9fe908f` passes. The unchanged full-client/strict-browser Wasm/Node comparison remains
+outstanding; no new compression-off guest/browser result is claimed.
 
-The [non-browser prework control](docs/node-compat/nextjs-rsc-prework-response-results.md)
-now passes once on Wasm34292/600 and Node34423/300, both raw0/clean. Both pass
-24HTTP,52 portable cache checks,80 supplemental checks, persisted generation1→2
-and stream5(0,2), then complete the raw RSC POST with normal gzip/CRC/ISIZE and
-HTTP EOF. Encoded sizes1,486/1,492 both decode to2,963 bytes. Four actual Node
-syntax checks and whole Source/API reviews pass. Binding`b27b9b19` derives2,028
-fresh inputs; fixed preparation`2bdd462d` executes each slot once. The unchanged
-4,382-byte pre-browser request span runs on the same listener before replay;
-Chrome/React and same-Store identity are not established. Independent binding review`fa90206c` and runtime/gzip review`79d0bfa0` pass,
-including all50 raw prework files per arm. Primary review`026c026a` verifies
-both physical canonical generation2 records with no pending file and retains
-202 payloads/6,368,082 bytes (`61ce2c24`); Root rehashes the complete corpus. The next Source-only diagnostic
-adds only Next's compress:false option to a new application version, preserving
-the full strict browser client and every earlier failure.
+The [raw response after non-browser prework](docs/node-compat/nextjs-rsc-prework-response-results.md)
+passes once on Wasm34292/600 and Node34423/300, both raw0/clean. Both pass24HTTP,
+52 portable-cache checks,80 supplemental checks, persisted generation1→2 and
+stream5(0,2), then complete the raw RSC POST with normal gzip/CRC/ISIZE and HTTP
+EOF. Encoded sizes1,486/1,492 both decode to2,963 bytes. Binding`b27b9b19` derives
+2,028 fresh inputs; preparation`2bdd462d` executes each slot once. The exact
+4,382-byte original pre-browser span runs on the same listener before replay;
+Chrome/React and same-Store identity are not established. Primary review`026c026a`,
+binding review`fa90206c` and independent runtime/gzip review`79d0bfa0` pass,
+including all50 raw prework files per arm and both physical generation2 records
+with no pending file. Raw index`61ce2c24` retains202 payloads/6,368,082 bytes;
+Root verifies current and staged Git blobs. Checkpoint`1c1c7a21` is pushed.
 
-The [compression-off application build template](tests/node-compat/frameworks/nextjs/next-fs-callback-no-compress-root-results-v1/README.md)
-is Source-only: index`5c280e4b` seals43 payloads/109,241 bytes, including35 fixture
-files/66,499 bytes. Only the19-byte compress:false line changes the V2 app;
-34 files and the tracing exclusion stay exact. Actual config syntax and both
-Python AST checks pass. Whole Source/API review passes. Root binds only the Source index and builder
-(`126c68c7`), preserving an exact two-literal inverse. The build is not invoked
-yet; later app review/asset/browser/runtime authorities remain unissued.
+The earlier [fresh-host raw replay](docs/node-compat/nextjs-rsc-http-response-results.md)
+also passes once on Wasm29465/600 and Node29725/300, raw0/clean, with1,488/1,491
+gzip bytes decoding to2,963. It preserves the actual391-byte body and all19
+captured headers, rewriting Host/Origin/Referer and removing the old public
+nonce. Reviews`0e74de45` and`e22f9f7a` pass; raw index`b3a97510` retains380
+payloads/7,575,911 bytes with current/staged checks. Preparation's JSON-format
+assumption failure and exact preimages remain retained. Both raw controls use
+the unchanged app/engine/component and13 standard WASI0.2.10 imports. Neither
+explains or waives the original strict browser abort; full Next acceptance
+remains false.
 
 Latest ported-fixture comparison: explicit filesystem-backed callback state
 passes1→2 on both Wasm and Node. Both also pass24HTTP,52 portable-cache checks,
