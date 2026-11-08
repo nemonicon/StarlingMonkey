@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "state": "UNCOMPILED_NATIVE_EXPORT_PUBLIC_CORRELATION_GUEST_AFTERIMAGE_V1",
+  "baseSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-public-request-correlation-entry-v1/index.json",
+    "sha256": "f8c6d52b28aa9d4cd85e9eecbf4182028cf73175595e0e6fea7fce2e3d44dca4",
+    "bytes": 3872
+  },
+  "before": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-public-request-correlation-entry-v1/guest-entry.mjs",
+    "sha256": "a1d66a6e3427204f5fc0a8e2207836e71eea7b095926ce5b38e4e2ecef65c8d3",
+    "bytes": 47563
+  },
+  "after": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-export-public-correlation-entry-v1/guest-entry.mjs",
+    "sha256": "022fccdfb1d9f603f7cbed6136edb99d1e7767fad4a3fd5e6c808acdcb3c236e",
+    "bytes": 48063
+  },
+  "patch": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-export-public-correlation-entry-v1/guest-entry.patch",
+    "sha256": "29c6f2ead24a361572a1bc461e7a7129efbdd2963e9006e01a7243bffc21396f",
+    "bytes": 1411
+  },
+  "unchangedV2MarkerContract": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-export-public-correlation-entry-v1/marker-contract.json",
+    "sha256": "74709535564f1031b8238b1221ca212d37c7d7d805c6eaaf730ff94bf6d81f74",
+    "bytes": 14591
+  },
+  "changes": [
+    {
+      "kind": "one static named import",
+      "before": "import {bootstrap} from 'starling:node-startup';\n",
+      "after": "import {bootstrap} from 'starling:node-startup';\nimport {observe as __nativeExportObserve} from 'internal:starlingmonkey/native-export-diagnostic-v1';\n"
+    },
+    {
+      "kind": "one synchronous primitive observation at existing admitted adapter-entry",
+      "before": "      completionTrace=guestCompletionBegin('adapter',method,url,guestCorrelationRequest(request,correlationCount));\n      guestCompletionRecord(completionTrace,'adapter-enter');",
+      "after": "      completionTrace=guestCompletionBegin('adapter',method,url,guestCorrelationRequest(request,correlationCount));\n      try{\n        if(completionTrace!==undefined)__nativeExportObserve(\n          completionTrace.method==='GET'?0:1,completionTrace.path==='/actions'?0:1,\n          completionTrace.corrState==='missing'?0:completionTrace.corrState==='valid'?1:\n            completionTrace.corrState==='invalid'?2:3,\n          completionTrace.corrCount,completionTrace.corr);\n      }catch{guestCompletionFault();}\n      guestCompletionRecord(completionTrace,'adapter-enter');"
+    }
+  ],
+  "addedAwaits": 0,
+  "addedReaders": 0,
+  "addedRequestOrBodyAccesses": 0,
+  "newHolder": false,
+  "nativeObserveLexicalCallSites": 1,
+  "actualNativeSourceIndex": null,
+  "actualEngine": null,
+  "actualComponent": null,
+  "actualRuntime": null
+}

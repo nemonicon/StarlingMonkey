@@ -233,6 +233,28 @@ Current next steps and outstanding work:
   ambiguity/clearing and ordinary-call I/O policy before any new native build.
   Persistent-cache overlap/error/bounds, broader lifecycle coverage, bootstrap,
   empirical cost measurements and production promotion remain outstanding.
+- **Native export diagnostic implementation in progress:** the preceding goal
+  turn made concrete progress through the real public-correlation pair, three
+  DATA reviews, current/Git-permission offline checks, and pushed checkpoint
+  `ec3c2020`. This turn adds separate opt-in native and guest candidates using
+  the inspected builtin registration and ordinary native `call` site. Native
+  Source `6ed5a7ce` uses primitive-only observations, owned fixed bytes, saturated
+  ambiguity, bounded stdout and memory-only retirement in `post_call`. It adds
+  no host service, WIT interface or core ABI export. Guest `5d20e455` adds one
+  named internal import and one synchronous observation from the existing
+  snapshot; all body/await/cleanup paths remain unchanged. Probe `2226ae28`
+  declares 17 direct-WASI cases with no actual engine/INIT/runtime result yet.
+  Source peers pass these candidates and the unbound portable build recipes.
+  The first macro-OFF/ON frontend pair fails before reaching the candidate:
+  the SDK lacks two empty generic libc++ directories required by LLVM version
+  discovery. A full audit hashes all 10,114 SDK files (366,304,928 bytes), finds
+  no changed/extra payloads and only those missing directories, then restores
+  their authenticated paths/modes with explicit new physical identities. The
+  failed outputs remain intact. Fresh V2 frontend checks pass raw0/clean with
+  warnings-as-errors in both OFF/ON modes, using the same C++ candidate and
+  original compiler vector. This proves frontend compilation only. Full engine
+  build, native callback/INIT cases, emitted-import inspection and the next full
+  Next.js regression remain outstanding; the strict browser failure is unfixed.
 - **Complete:** guarded native build, real-Next component construction, and one
   full deployed regression. HTTP/stream/browser checks pass in that sample;
   cache1→1 keeps the full suite failed. Prior browser failures remain unresolved.

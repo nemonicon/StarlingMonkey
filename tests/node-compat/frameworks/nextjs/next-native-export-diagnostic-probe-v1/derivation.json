@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_ONLY_DIRECT_STANDARD_WASI_RESOURCE_PROBE_DERIVATION_V1",
+  "entry": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-export-diagnostic-probe-v1/guest-probe.mjs",
+    "sha256": "c06db86ab5f8be5c95f70db0446f70b87a6fef56fad03effc59d3cb918fa8021",
+    "bytes": 6434
+  },
+  "nativeSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-export-public-correlation-candidate-v1/index.json",
+    "sha256": "6ed5a7ceabb308a163707dcb95d2b7f3ab521513cceea9837ebb70b741bfca9b",
+    "bytes": 3805
+  },
+  "nativeProtocol": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-export-public-correlation-candidate-v1/protocol.json",
+    "sha256": "d183ba3666e3d27739ad06d1593f446d14baca9fd1a49d2d445c278e0de12b6d",
+    "bytes": 4393
+  },
+  "standardApiSource": {
+    "source": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-public-request-correlation-entry-v1/guest-entry.mjs",
+      "sha256": "a1d66a6e3427204f5fc0a8e2207836e71eea7b095926ce5b38e4e2ecef65c8d3",
+      "bytes": 47563
+    },
+    "witnesses": [
+      {
+        "firstLine": 452,
+        "lastLine": 465,
+        "excerpt": "// Production-shaped guest adapter. No diagnostic app, event log or host service.\n// `types` is the genuine selected wasi:http/types@0.2.10 namespace.\nconst drop=value=>{if(value)value[Symbol.dispose]();};\nfunction text(value){let out='';for(const byte of value)out+=String.fromCharCode(byte);return out;}\nfunction bytes(value){\n  const out=new Uint8Array(value.length);\n  for(let i=0;i<value.length;i++){const code=value.charCodeAt(i);if(code>255)throw new TypeError('HTTP header values must be ByteStrings');out[i]=code;}\n  return out;\n}\nfunction ownData(value,key){\n  if(value===null||(typeof value!=='object'&&typeof value!=='function'))return undefined;\n  const descriptor=Object.getOwnPropertyDescriptor(value,key);\n  return descriptor&&Object.prototype.hasOwnProperty.call(descriptor,'value')?descriptor.value:undefined;\n}"
+      },
+      {
+        "firstLine": 676,
+        "lastLine": 695,
+        "excerpt": "      request=new Request(url,{method,headers,signal:ioAbort.signal,...(body?{body,duplex:'half'}:{})});\n      completionTrace=guestCompletionBegin('adapter',method,url,guestCorrelationRequest(request,correlationCount));\n      guestCompletionRecord(completionTrace,'adapter-enter');\n      completionPhase='web-handler';\n      const response=await webHandler(request);\n      if(primarySet)throw primaryValue;\n      completionPhase='response-setup';\n      const fields=[];\n      for(const[name,value]of response.headers)if(name!=='set-cookie')fields.push([name,bytes(value)]);\n      const cookies=response.headers.getSetCookie?.()??(response.headers.get('set-cookie')?[response.headers.get('set-cookie')]:[]);\n      for(const value of cookies)fields.push(['set-cookie',bytes(value)]);\n      outgoingResponse=new OutgoingResponse(Fields.fromList(fields));outgoingResponse.setStatusCode(response.status);\n      outputBody=outgoingResponse.body();\n      const outgoing=outgoingResponse;outgoingResponse=undefined;responseTransferred=true;\n      completionPhase='response-outparam';\n      ResponseOutparam.set(outparam,{tag:'ok',val:outgoing});responseSet=true;\n      completionPhase='response-read';\n      outputStream=outputBody.write();\n      if(response.body){\n        responseReader=response.body.getReader();"
+      },
+      {
+        "firstLine": 700,
+        "lastLine": 750,
+        "excerpt": "          for(let offset=0;offset<part.value.byteLength;offset+=4096){\n            try{outputStream.blockingWriteAndFlush(part.value.subarray(offset,offset+4096));}\n            catch(error){outputFailureObserved=true;outputFailureRaw=error;outputFailureTag=streamError(error)?.tag;throw error;}\n          }\n        }\n      }\n      completionPhase='output-child-dispose';\n      const stream=outputStream;outputStream=undefined;\n      try{drop(stream);}catch(error){outputChildUncertain=true;throw error;}\n      guestCompletionRecord(completionTrace,'output-child-dispose-returned',completionPhase);\n      const finishedBody=outputBody;outputBody=undefined;outputFinished=true;\n      completionPhase='outgoing-body-finish';\n      OutgoingBody.finish(finishedBody,undefined);\n      guestCompletionRecord(completionTrace,'outgoing-body-finish-returned',completionPhase);\n    }catch(error){\n      guestCompletionRecord(completionTrace,'adapter-catch',completionPhase,\n        (responseSet?1:0)|(outputFailureObserved?2:0)|(outputFinished?4:0),error,true);\n      const observedOutput=outputFailureObserved&&outputFailureRaw===error;\n      const variant=observedOutput?streamError(error):undefined;\n      let primary=error;\n      if(observedOutput)try{primary=streamFailure(error);}catch(conversionError){primary=conversionError;}\n      if(observedOutput&&responseSet&&['closed','last-operation-failed'].includes(variant?.tag))abortObservedIo(primary);\n      if(isObservedClosedOutput({observed:outputFailureObserved,raw:outputFailureRaw,caught:error,tag:outputFailureTag,responseSet})&&!primarySet){\n        if(!responseReader)rememberFailure(new Error('Closed output has no response reader'));\n        else{\n          try{await responseReader.cancel(primary);cancelReturned=true;}catch(cancelError){rememberFailure(cancelError);}\n          try{responseReader.releaseLock();responseReader=undefined;readerReleased=true;}catch(lockError){rememberFailure(lockError);}\n          if(!primarySet)handledClosed=true;\n        }\n      }else{\n        // Preserve the exact first unknown/falsy primary through later cleanup.\n        rememberFailure(primary);\n        if(responseReader)try{await responseReader.cancel(primary);}catch(cancelError){rememberFailure(cancelError);}\n      }\n    }finally{\n      if(responseReader)try{responseReader.releaseLock();responseReader=undefined;}catch(error){rememberFailure(error);}\n      releaseInput();\n      const stream=outputStream;outputStream=undefined;\n      if(stream)try{drop(stream);}catch(error){outputChildUncertain=true;rememberFailure(error);}\n      const body=outputBody;outputBody=undefined;\n      if(body&&!outputFinished&&!outputChildUncertain)try{drop(body);}catch(error){outputBodyUncertain=true;rememberFailure(error);}\n      if(outgoingResponse&&!outputChildUncertain&&!outputBodyUncertain)try{drop(outgoingResponse);}catch(error){rememberFailure(error);}\n      if(!responseTransferred)try{drop(outparam);}catch(error){rememberFailure(error);}\n      if(!headerChildUncertain&&!inputChildUncertain&&!inputBodyUncertain)try{drop(incoming);}catch(error){rememberFailure(error);}\n      cleanupReturned=!primarySet&&!headerChildUncertain&&!inputChildUncertain&&!inputBodyUncertain&&!outputChildUncertain&&!outputBodyUncertain;\n    }\n    guestCompletionRecord(completionTrace,'adapter-post-cleanup','post-cleanup',\n      (primarySet?1:0)|(cleanupReturned?2:0),primaryValue,primarySet);\n    if(primarySet)throw primaryValue;\n    if(handledClosed&&!mayReturnHandledClosed({classified:handledClosed,cancelReturned,readerReleased,cleanupReturned,\n      requestAborted:request?.signal.aborted===true,fatalSet:primarySet}))throw new Error('Known output close cleanup incomplete');"
+      }
+    ]
+  },
+  "apiOperations": [
+    "incoming.method()",
+    "incoming.pathWithQuery()",
+    "Fields.fromList",
+    "new OutgoingResponse",
+    "response.setStatusCode",
+    "response.body",
+    "ResponseOutparam.set",
+    "body.write",
+    "stream.blockingWriteAndFlush",
+    "Symbol.dispose",
+    "OutgoingBody.finish"
+  ],
+  "scope": "These methods and child-before-parent ordering are drawn from actual held0.2.10 adapter Source. The direct fixture acquires no incoming header/body children. No JS adapter API, host service, new native API/WIT or compiler/producer execution is invented.",
+  "newCode": "A separate synchronous actual incomingHandler; case arguments are deliberate fixture primitives rather than incoming metadata observations.",
+  "exceptionLimits": "All first errors propagate after best-effort cleanup. Failed disposal/transfer creates uncertainty; no complete cleanup or record is claimed on that branch. No fault/GC/error-injection validation occurs here.",
+  "actualConstruction": null,
+  "actualExecution": null
+}
