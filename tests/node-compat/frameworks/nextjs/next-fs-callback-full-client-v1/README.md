@@ -1,0 +1,9 @@
+# Filesystem-callback full client: unbound Source
+
+run-contracts.mjs derives7439 with only two exact fresh output policies, the physical next-fs-callback-browser-v1 worker path and truthful FS_CALLBACK full-suite labels changed. client.patch is the complete literal diff. CLI remains Node script ORIGIN FRESH_CLIENT_OUTPUT BROWSER_TOOLS RUN_ID (argc6). Planned native root is /private/tmp/starling-node-compat/next-fs-callback-native-v1-fs-callback-native-first/client; Stock uses the corresponding stock names. Other physical manifest, supplemental, portable-cache and fixture-contract imports are unchanged.
+
+HTTP24, unchanged numeric generation-increase assertion, strict incremental stream, both original strict browser tests, supplemental80 and portable-cache52 conjunctions are byte-identical. Pure semantic false predicates still proceed to the browser. fullOriginalContractExecuted starts false and is derived only from actual complete publications in finally, independently of semantic success. controlOnly is false and fullNextAccepted stays false.
+
+The new callback application persists its count in a disjoint explicit standard filesystem namespace. This is a new ported application contract, not a pass of the preserved old module-global fixture or a global Next fix. The same full assertion code can test that contract without replacing the earlier failed result. No private Store, callback identity, response-cause or host transport inference is added.
+
+The new browser Source index in sourceRequirements is NULL/pending, to be bound by Root only after actual clean app V2 HTML/assets and the browser family are sealed. No fake old7c3 index is supplied. Runtime app, browser, full-client and protection bindings remain pending in next-fs-callback-runtime-v1. No Node, parser, retained helper, admission or target was executed by the author; no authority or execution permission is issued.

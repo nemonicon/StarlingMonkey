@@ -1,0 +1,50 @@
+--- cache-runtime/run.mjs
++++ atomic-runtime/run.mjs
+@@ -56,15 +56,15 @@
+  assert.equal(plan.prospectiveArtifactBindingsPending,false,'New actual INIT bindings pending');
+  assert.equal(typeof plan.expectedConstructorReviewState,'string');assert(Object.values(plan.expectedBindings).every(x=>x&&typeof x.path==='string'));
+  const authpath=resolve(process.argv[3]),ar=await row(authpath),a=await document(ar);
+- assert.equal(a.state,'ROOT_PERSISTENT_CACHE_OVERLAP_RUNTIME_AUTHORIZED_V1');assert.equal(a.schemaVersion,1);assert.equal(a.unissued,false);
+- for(const k of ['localhostServeAllowed','cacheSuiteAllowed','applicationCopyAllowed','fixtureCopyAllowed','writableTestRootAllowed'])assert.equal(a[k],true);
++ assert.equal(a.state,'ROOT_NEXT_NODE_FS_ATOMIC_RUNTIME_AUTHORIZED_V1');assert.equal(a.schemaVersion,1);assert.equal(a.unissued,false);
++ for(const k of ['localhostServeAllowed','nodeFsAtomicSuiteAllowed','applicationCopyAllowed','fixtureCopyAllowed','writableTestRootAllowed'])assert.equal(a[k],true);
+  for(const k of ['browserAllowed','guestEnvironmentAllowed','outgoingHttpWorkloadSelected','automaticRetryAllowed','nativeBuildAllowed','constructorAllowed'])assert.equal(a[k],false);
+  assert.equal(typeof a.runId,'string');const match=/^[a-z0-9][a-z0-9-]{0,47}$/.exec(a.runId);assert(match&&match[0]===a.runId);
+  assert.deepEqual(a.sourceIndex,await row(join(HERE,'index.json')));assert.deepEqual(a.plan,await row(join(HERE,'plan.json')));
+  for(const[k,v]of Object.entries(plan.expectedBindings))assert.deepEqual(a[k],v);
+  for(const[k,v]of Object.entries(plan.knownInputs))assert.deepEqual(a[k],v);
+  await family(a.sourceIndex);await family(plan.guestSourceIndex);const suiteIndex=await family(plan.suiteSourceIndex);
+- await verify(plan.guestEntry);await verify(plan.suiteEntry);assert.equal(suiteIndex.files.filter(r=>r.path==='cache-cases.cjs'&&r.sha256===plan.suiteEntry.sha256&&r.bytes===plan.suiteEntry.bytes).length,1);
++ await verify(plan.guestEntry);await verify(plan.suiteEntry);assert.equal(suiteIndex.files.filter(r=>r.path==='atomic-cases.cjs'&&r.sha256===plan.suiteEntry.sha256&&r.bytes===plan.suiteEntry.bytes).length,1);
+  assert.deepEqual(await row(process.execPath),plan.node);await verify(plan.wasmtime);await verify(a.component);
+  const review=await document(a.constructionDataReview);assert.equal(review.state,plan.expectedConstructorReviewState);assert.equal(review.verifiedPassed,true);assert.equal(review.completeReturnedImportAuditVerified,true);
+  for(const k of ['component','componentAudit','engine','nativeMetadata'])assert.deepEqual(review[k],a[k]);assert.deepEqual(review.actualResult,a.constructionResult);assert.deepEqual(review.fullBuildReview,a.fullNativeBuildReview);
+@@ -72,14 +72,14 @@
+  const audit=await document(a.componentAudit);assert.equal(audit.passed,true);assert.deepEqual(audit.component,a.component);assert.deepEqual(audit.exports,['wasi:http/incoming-handler@0.2.10']);assert(audit.emittedImports.every(x=>plan.selectedInterfaces.includes(x)));assert.equal(plan.selectedInterfaces.length,13);
+  const input=await document(plan.applicationInventory),rootIdentity=await document(plan.applicationRootIdentity);
+  assert.deepEqual(rootIdentity.inventory,plan.applicationInventory);assert.equal(input.root,plan.applicationSource);assert.equal(rootIdentity.rootIdentity.path,input.root);
+- assert.equal(input.schemaVersion,1);assert.deepEqual(input.symlinks,[]);assert.equal(input.regularFiles,input.files.length);assert.equal(input.regularFiles,2186);assert.equal(input.directories.length,427);assert.equal(input.bytes,48755844);assert.equal(input.files.reduce((n,x)=>n+x.bytes,0),input.bytes);
++ assert.equal(input.schemaVersion,1);assert.deepEqual(input.symlinks,[]);assert.equal(input.regularFiles,input.files.length);assert.equal(input.regularFiles,plan.expectedApplication.files);assert.equal(input.directories.length,plan.expectedApplication.directories);assert.equal(input.bytes,plan.expectedApplication.bytes);assert.equal(input.files.reduce((n,x)=>n+x.bytes,0),input.bytes);
+  const fileNames=input.files.map(r=>member(r.path)),dirNames=['.',...input.directories.map(r=>member(r.path))].sort();assert.equal(new Set(fileNames).size,fileNames.length);assert.equal(new Set(dirNames).size,dirNames.length);assert(fileNames.every(x=>!dirNames.includes(x)));
+  const output=plan.outputPrefix+'-'+a.runId,ownerRoot=output+'-external-root';
+  const started=JSON.parse(await readFile(join(ownerRoot,'started.json'),'utf8'));assert.deepEqual(started.authority,ar);assert.equal(started.pid,process.pid);assert.equal(started.timeoutSeconds,180);assert.deepEqual(started.argv,[plan.node.path,join(HERE,'run.mjs'),'--authority',authpath]);
+  const disk=await statfs(dirname(output));assert(Number(disk.bavail)*Number(disk.bsize)>=plan.minimumFreeBytes);await mkdir(output,{mode:0o700});
+  const app=join(output,'app'),suite=join(output,'suite'),testRoot=join(output,'cache-tests');
+  const paths={stdout:join(output,'wasmtime.stdout.log'),stderr:join(output,'wasmtime.stderr.log'),body:join(output,'http.body'),response:join(output,'response.json'),result:join(output,'result.json')};
+- const result={schemaVersion:1,state:'PERSISTENT_CACHE_OVERLAP_RUNTIME_COLLECTING_V1',rootAuthority:ar,sourceIndex:a.sourceIndex,component:a.component,constructionDataReview:a.constructionDataReview,server:null,http:null,stdoutCapture:null,errors:[],applicationCopy:null,suiteCopy:null,testInventory:null,collectionCompletedCleanly:false,suiteAccepted:false,passed:false,fullNextAccepted:false};
++ const result={schemaVersion:1,state:'NEXT_NODE_FS_ATOMIC_RUNTIME_COLLECTING_V1',rootAuthority:ar,sourceIndex:a.sourceIndex,component:a.component,constructionDataReview:a.constructionDataReview,server:null,http:null,stdoutCapture:null,errors:[],applicationCopy:null,suiteCopy:null,testInventory:null,collectionCompletedCleanly:false,suiteAccepted:false,passed:false,fullNextAccepted:false};
+  let host=null,closed=null,status=null,capture=null,captureDone=null,lease=null,stderrHandle=null,stdoutHandle=null,stopPromise=null,origin=null;
+  async function sourceApp(){
+   const tree=await walk(input.root);assert.deepEqual(tree.files.sort(),[...fileNames].sort());assert.deepEqual(tree.dirs.sort(),dirNames);
+@@ -140,9 +140,9 @@
+  // Interpretation follows original child shutdown + complete stdout finalization, never live output.
+  if(result.http?.complete&&!result.http.overflow){try{
+   const value=JSON.parse(await readFile(paths.body,'utf8'));result.parsedResponse=await save(paths.response,value);
+-  const report=value.report;result.suiteAccepted=result.collectionCompletedCleanly&&result.http.status===200&&value.marker==='NEXT_PERSISTENT_CACHE_OVERLAP_COMPONENT_V1'&&value.suiteFulfilled===true&&value.originalRejection===null&&value.passed===true&&report?.passed===true&&report.executionKind==='wasm-guest'&&report.guestExecuted===true&&report.guestExecutedRequiresExternalParentProof===true&&Array.isArray(report.unattemptedCaseIds)&&report.unattemptedCaseIds.length===0&&Array.isArray(report.cases)&&report.cases.length===plan.expectedCaseIds.length&&report.cases.every((x,i)=>x.id===plan.expectedCaseIds[i]&&x.passed===true);
++  const report=value.report;result.suiteAccepted=result.collectionCompletedCleanly&&result.http.status===200&&value.marker==='NEXT_NODE_FS_ATOMIC_COMPONENT_V1'&&value.suiteFulfilled===true&&value.originalRejection===null&&value.passed===true&&report?.passed===true&&report.executionKind==='wasm-guest'&&report.guestExecuted===true&&report.guestExecutedRequiresExternalParentProof===true&&Array.isArray(report.unattemptedCaseIds)&&report.unattemptedCaseIds.length===0&&Array.isArray(report.cases)&&report.cases.length===plan.expectedCaseIds.length&&report.assertions===11&&report.actualNextHelperUsed===true&&report.fakeDependencies===false&&report.helperImplementationModified===false&&report.cases.every((x,i)=>x.id===plan.expectedCaseIds[i]&&x.passed===true&&Array.isArray(x.assertions)&&x.assertions.length===[4,4,3][i]&&x.assertions.every(a=>a.passed===true));
+  }catch(error){result.errors.push({stage:'final-response-json',...errorData(error)});}}
+- result.passed=result.collectionCompletedCleanly&&result.suiteAccepted&&result.errors.length===0;result.state=result.passed?'PERSISTENT_CACHE_OVERLAP_RUNTIME_PASSED_UNREVIEWED_V1':'PERSISTENT_CACHE_OVERLAP_RUNTIME_FAILED_RAW_PRESERVED_V1';
++ result.passed=result.collectionCompletedCleanly&&result.suiteAccepted&&result.errors.length===0;result.state=result.passed?'NEXT_NODE_FS_ATOMIC_RUNTIME_PASSED_UNREVIEWED_V1':'NEXT_NODE_FS_ATOMIC_RUNTIME_FAILED_RAW_PRESERVED_V1';
+  await save(paths.result,result);console.log(JSON.stringify({collectionCompletedCleanly:result.collectionCompletedCleanly,suiteAccepted:result.suiteAccepted,passed:result.passed,fullNextAccepted:false}));process.exitCode=result.passed?0:1;
+ }
+ main().catch(error=>{console.error(error);process.exitCode=1;});

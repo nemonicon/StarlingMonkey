@@ -1,0 +1,9 @@
+--- v1/next.config.mjs
++++ v2/next.config.mjs
+@@ -7,5 +7,6 @@
+   outputFileTracingRoot: fileURLToPath(new URL('.', import.meta.url)),
+   experimental: { cpus: 1 },
+   outputFileTracingIncludes: { '/api/fs-crypto': ['./fixtures/message.txt'] },
++  outputFileTracingExcludes: { '/api/cache': ['./.next/cache/**'] },
+ };
+ export default config;

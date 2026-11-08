@@ -4,6 +4,42 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
+Current implementation: a separately versioned Next callback now persists its
+bounded generation record under the existing standard writable cache preopen.
+The original module-global fixture and failed result remain untouched. The
+real Node reference for Next's `nodeFs.writeFileAtomic` passes3 cases/11
+assertions (original12192/120, raw0/clean), including create-only publication,
+EEXIST no-replacement and temporary-file cleanup. The callback helper's Node
+conformance passes8 groups/9 real calls (original13933/120, raw0/clean), covering
+lazy import,1→2 publication and fail-closed pending/corrupt/limit/alias cases.
+Independent Node DATA reviews`0b5d842a` and`e8af5ecf` verify those two references;
+new component HTTP and application execution remain open.
+
+The first35-file FS-callback host build passes all4 original monitored phases,
+but is **not deployable**: Next traces8 build-cache files/74,976,273 bytes into
+standalone, violating the unchanged empty-cache admission. DATA review`f5302c27`
+verifies the2204-file artifact and83 retained records/2,576,661 bytes. No runtime
+attempt uses it. V2 preserves34/35 files and changes only an explicit
+`/api/cache` tracing exclusion for`./.next/cache/**`; no artifact is manually
+filtered. Its fresh4-phase host build passes (`5db7f8`/session79563→`fa8b7b`),
+with independent DATA review`4a6f03ce`:2,196 files/48,801,297 bytes/431 child
+directories, no source cache or callback seed, and fresh5/4 browser asset pins.
+The full runtime binding`349283e4` derives2,030 inputs with dynamic counts,
+all six external client dependencies and genuine before/final source/world
+guards. Fixed preparation`f402d56e` reserves native600→Node300 slots before
+either actor. New FS-callback app assertions are unchanged; the original global
+fixture remains a separate failed regression.
+
+The first filesystem-helper constructor stops raw1/clean before invoking Node:
+its copied working-directory metadata still named the old recipe. Failure
+review`9ea9e562` and26 raw copies preserve this pre-Node defect. A new V2 recipe
+corrects that field and checks it before authority issuance. The fresh V2
+constructor (`72937a`/session7130→`da9d04`, original17011/2400) completes raw0/
+clean using the same237c engine, complete metadata and selected13-interface
+standard WASI0.2.10 world. INIT review and actual helper HTTP checks are next;
+no helper execution is inferred from construction. No engine build, host
+modification or new host interface is selected.
+
 Latest comprehensive current-build comparison: **Node passes; Wasm fails only
 the retained legacy generation assertion**. Both pass24HTTP,52 portable-cache
 checks,80 supplemental checks, five incremental stream chunks and both strict
