@@ -35,6 +35,14 @@ requires the pinned private artifacts and reviewed construction/launch path;
 clean-machine bootstrap remains outstanding. Next work adds real-handler cache
 overlap, error and bound tests while retaining every original application gate.
 
+Those [real-handler cache checks](next-persistent-cache-overlap-root-results-v1/README.md)
+now pass eleven groups/41 assertions on Node, stock Wasmtime and stock wasmCloud.
+Independent differential reviews verify the assertion details and normalized
+cache records. The initial stock config-validator preflight failure remains
+retained. This closes only the fixed helper subset; original full-application
+acceptance remains failed. The linked records include fresh-check commands and
+clearly distinguish the tested original controller from the convenience CLI.
+
 ## Historical 2026-11-06 smoke checkpoint
 
 The following smoke results, artifact runners and then-pending request-isolation

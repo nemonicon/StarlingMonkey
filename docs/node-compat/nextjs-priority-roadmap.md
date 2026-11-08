@@ -23,8 +23,13 @@ now passes both Node and a real Wasmtime component: eleven groups/41 assertions
 against the unchanged handler, genuine Next delegate and real filesystem.
 Coordinated differential review `d474a118` verifies identical assertion details
 and both sets of23 fixture files, with generated epochs/timestamps explicitly
-normalized. The selected second host is the next execution gate. This does
-not change either original full-application outcome.
+normalized. The same suite now also passes stock wasmCloud2.11.0, with review
+`fbe6f91f` verifying the full differential, three mounts and empty environment/
+egress. The initial pre-dev configuration-validator failure remains retained;
+a separate one-predicate correction matches the pinned Rust empty-map serializer.
+This closes the fixed helper's two-host gate, without changing either original
+full-application outcome. Browser completion and lifecycle/resource/cost gates
+remain the next work; process-global continuity stays an unavailable guarantee.
 
 Earlier baseline: bounded Fetch cleanup compiles and
 passes its public tests; the D990 baseline below retains both failed gates.

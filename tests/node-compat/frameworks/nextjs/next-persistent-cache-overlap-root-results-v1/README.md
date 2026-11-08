@@ -49,8 +49,7 @@ agree exactly. Fifty-eight finite runtime/fixture records (129,191 bytes) are
 retained under `runtime-records/`, alongside the original Node records.
 
 This establishes the fixed helper subset on Node and stock Wasmtime, through
-the actual guest CJS/filesystem/crypto/Buffer profile. The same test on stock
-wasmCloud remains pending. Computation-gap overlap does not test
+the actual guest CJS/filesystem/crypto/Buffer profile. Computation-gap overlap does not test
 simultaneous filesystem syscalls, other processes, crash durability or CAS.
 Original full Next acceptance remains false, including its legacy generation
 failure and retained intermittent browser failures. No production promotion is
@@ -73,3 +72,14 @@ environment config map; no host dev command, HTTP request or cache suite runs.
 The separate v2 validator accepts exactly `{}` or `{config:{}}`, matching the
 pinned Rust serialization rule and preserving the same empty policy. Source
 review and fresh JSON preparation pass; v2 runtime remains pending.
+
+The subsequent fixed v2 stock wasmCloud2.11.0 run passes all eleven groups/41
+assertions under original owner72460/180 seconds, raw0/clean. Complete HTTP200
+delivers9,307 bytes; both config and dev stdout captures finalize completely,
+and dev stops normally. The [independent stock-host differential review](actual-wasmcloud-v2-review.json)
+verifies every assertion detail against Node/Wasmtime and all23 cache payloads
+after only generated epoch/timestamp normalization. It verifies the effective
+empty environment, deny-all egress and three exact mounts. Thirty-nine finite
+runtime/fixture records/106,157 bytes are retained under `wasmcloud-v2-records/`.
+The initial failure remains unchanged. This closes the selected host gate for
+the fixed helper subset; full Next.js and global runtime acceptance remain false.

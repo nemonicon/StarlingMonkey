@@ -4,7 +4,16 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
-Latest pushed checkpoint: `aa1afd42` on `origin/main`, containing the completed
+Current completed helper milestone: the same real-filesystem cache suite passes
+**11 groups/41 assertions on Node, Wasmtime and stock wasmCloud**. Independent
+differential reviews verify identical assertion details and23 cache files per
+arm, with only generated epochs/timestamps normalized. The original full Next.js
+contract remains failed; production remains foundations-v13. Next priorities are
+browser completion, explicit request-state limits, lifecycle/resource checks,
+clean-machine bootstrap and measured costs. Broader cache races/crash durability
+remain outside this bounded helper result.
+
+Diagnostic-pair checkpoint: `aa1afd42` on `origin/main`, containing the completed
 native-to-Node diagnostic comparison, independent DATA reviews and both portable
 raw-corpus checks. The Next.js test README now leads with this current failed
 full-acceptance result; its earlier smoke status is explicitly historical.
@@ -80,6 +89,23 @@ index`95ca9c27`/plan`6e290fc0` and controller`33fda2ee` retain all16 flags,
 three mounts, empty environment/egress and original180-second owner. JSON-only
 preparation (`b4b644`/session32019, completion`cb73e9`) issues new authority
 `e2529f90`/4,553 bytes without launching another actor.
+The fixed new v2 stock trial now completes raw0/clean under original72460/180
+(`e49196`/session22659, completion`e2765d`), after checkpoint`e25b203f` is pushed.
+HTTP200 delivers9,307 complete bytes. All11 groups/41 assertion details exactly
+match Node and Wasmtime. Config-show72474 exits0 with complete2,830-byte stdout;
+dev72479 stops normally with complete42-byte stdout. All23 cache files total
+40,541 bytes; source/copy/final guards pass. Independent v2 DATA review is
+pending. V1's pre-dev failure remains unaccepted and unchanged. This positive
+helper scope does not accept the original full Next.js contract or fix either
+its module-global generation limitation or intermittent browser completion.
+Independent stock-v2 differential DATA review`fbe6f91f` now passes, verifying
+all41 assertion details against Node and Wasmtime, all23 actual cache payloads,
+both complete stdout captures, quiescent stderr hashes, exact three mounts,
+empty effective environment and deny-all egress lists. The short config process
+is explicitly not observed between owner samples; its direct child status and
+capture are joined separately. V1 remains bound/unaccepted. The39-file v2
+runtime/fixture copy totals106,157 bytes. This closes the fixed helper's selected
+second-host gate while preserving global runtime/full Next acceptance false.
 
 Active experiment: the opt-in native export diagnostic has passed Source review,
 both C++ frontend modes, fresh 825-file materialization and all ten generator
