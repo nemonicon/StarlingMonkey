@@ -37,11 +37,32 @@ with env{} and no cache/suite/app work during INIT. Fifty-four finite INIT
 records/275,126 bytes are copied under `construction-records/`; binaries, package
 and native metadata payloads are explicitly omitted from that curation.
 
-Guest runtime remains pending. The separate new entry will run
-the same suite through the actual guest CJS/filesystem profile after deployed
-bootstrap, using the existing engine and selected standard WASI world. Node
-success does not establish guest parity. Computation-gap overlap does not test
+The first real guest runtime now passes all eleven groups/41 assertions in one
+GET, original owner69109/180 seconds/raw0/clean. HTTP200 delivers9,307 complete
+bytes; Wasmtime child69125 stops normally, stdout is completely captured
+(zero bytes), and source/owned copies remain unchanged. The
+[coordinated differential DATA review](actual-runtime-review.json) verifies
+exact assertion labels, statuses and details against Node, and independently
+hashes all23 guest plus23 Node fixture files. Their canonical records agree
+after only generated epoch-token and lastModified normalization; pending bytes
+agree exactly. Fifty-eight finite runtime/fixture records (129,191 bytes) are
+retained under `runtime-records/`, alongside the original Node records.
+
+This establishes the fixed helper subset on Node and stock Wasmtime, through
+the actual guest CJS/filesystem/crypto/Buffer profile. The same test on stock
+wasmCloud remains pending. Computation-gap overlap does not test
 simultaneous filesystem syscalls, other processes, crash durability or CAS.
 Original full Next acceptance remains false, including its legacy generation
 failure and retained intermittent browser failures. No production promotion is
 made by these helper tests.
+
+For future fresh guest checks, the [convenience CLI](run-guest-regression.README.md)
+requires an explicit run ID and preserves separate preparation/owner records.
+It is Source reviewed and its `--help` passes; its operational modes have not
+launched another target. The first accepted guest sample used the original
+controller. Both paths still require the pinned private artifacts.
+
+The stock wasmCloud actor now passes whole Source review. Its three mounts use
+the existing stock configuration mechanism, with empty guest environment and
+egress policy. JSON-only preparation issues a fresh4,550-byte authority, without
+starting the host. Its one-request runtime and differential result remain pending.

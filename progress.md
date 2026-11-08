@@ -42,6 +42,30 @@ and two controller descriptor inverses. JSON-only runtime preparation
 (`e1a9b1`/session3510, completion`5e2594`) issues authority`5c8ae0d7`/4,386 bytes
 without launching an actor. The fixed test remains one GET, original180-second
 owner, no HTTP warmup/retry/guest environment or new capabilities.
+The subsequent actual guest runtime completes raw0/clean under original
+owner69109/180 (`a75c6b`/session69211, completion`21bbbe`). Its one HTTP200
+response is9,307 bytes complete. All11 groups/41 assertions pass and match the
+Node reference exactly. Coordinated runtime differential DATA review`d474a118`
+verifies owner/capture/body/source/copy joins and all23 files/40,541 bytes per
+arm; canonical records match after only epoch-token/lastModified normalization.
+No Node or target rerun occurs during review. The finite54-file INIT record
+copy is275,126 bytes; the58-file runtime/fixture copy is129,191 bytes. Large
+binaries, app/package/native metadata payloads are explicitly omitted from
+these copies. This accepts only the fixed cache-helper subset on Wasmtime.
+Stock wasmCloud, concurrent processes/crash durability, broader lifecycle/costs,
+original legacy generation and intermittent browser failures remain open.
+Checkpoint`f59e0db8` was pushed before this guest launch. A compact reusable
+guest-run CLI and the stock wasmCloud one-request Source are being prepared;
+neither has executed a further target.
+The future fresh-ID guest CLI is now Source reviewed; Root`10238e` checks
+`--help` only (raw0/empty stderr), leaving its operational modes unexecuted.
+The separate stock wasmCloud actor passes whole Source review against the
+actual three-volume configuration APIs. Its Root controller retains the
+genuine original guards and180-second owner, adding explicit stock-host/config
+permission while denying external egress/new services/host mutation. Only
+genuine0599 INIT roles are Source-bound. JSON-only preparation
+(`21ab5b`/session40978, completion`22ed9b`) issues authority`a98fb01b`/4,550 bytes
+with no actor invocation. This is still a pending second-host execution gate.
 
 Active experiment: the opt-in native export diagnostic has passed Source review,
 both C++ frontend modes, fresh 825-file materialization and all ten generator

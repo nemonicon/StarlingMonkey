@@ -19,10 +19,12 @@ proposal until resource ownership, sibling-instance wiring and final imports
 are validated. Do not expand native compatibility merely to hide these gates.
 
 The first [real-handler cache suite](../../tests/node-compat/frameworks/nextjs/next-persistent-cache-overlap-root-results-v1/README.md)
-now passes its Node reference: eleven groups/41 assertions against the unchanged
-handler, genuine Next delegate and real filesystem. Its guest counterpart is
-the next execution gate, followed by the selected second host. This does not
-change either original full-application outcome.
+now passes both Node and a real Wasmtime component: eleven groups/41 assertions
+against the unchanged handler, genuine Next delegate and real filesystem.
+Coordinated differential review `d474a118` verifies identical assertion details
+and both sets of23 fixture files, with generated epochs/timestamps explicitly
+normalized. The selected second host is the next execution gate. This does
+not change either original full-application outcome.
 
 Earlier baseline: bounded Fetch cleanup compiles and
 passes its public tests; the D990 baseline below retains both failed gates.

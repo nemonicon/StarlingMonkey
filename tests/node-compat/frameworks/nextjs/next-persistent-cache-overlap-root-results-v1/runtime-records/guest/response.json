@@ -1,0 +1,408 @@
+{
+  "schemaVersion": 1,
+  "marker": "NEXT_PERSISTENT_CACHE_OVERLAP_COMPONENT_V1",
+  "suiteFulfilled": true,
+  "originalRejection": null,
+  "report": {
+    "executionKind": "wasm-guest",
+    "guestExecuted": true,
+    "guestExecutedRequiresExternalParentProof": true,
+    "schemaVersion": 1,
+    "state": "PERSISTENT_CACHE_REAL_FS_SUITE_PASSED_V1",
+    "passed": true,
+    "plannedCaseIds": [
+      "overlap-invalidation",
+      "duplicate-tuple",
+      "slot-collision",
+      "reset-during-computation",
+      "association-limit",
+      "busy-publication",
+      "corrupt-read-poisons",
+      "invalid-set-consumes",
+      "value-and-shape-bounds",
+      "layout-and-record-bounds",
+      "unsupported-batch-no-mutation"
+    ],
+    "cases": [
+      {
+        "id": "overlap-invalidation",
+        "passed": true,
+        "assertions": [
+          {
+            "label": "overlapping computation starts on real miss",
+            "passed": true
+          },
+          {
+            "label": "overlapping computation starts on real miss",
+            "passed": true
+          },
+          {
+            "label": "both delayed old-epoch writes skipped",
+            "passed": true
+          },
+          {
+            "label": "fresh computation recovers after overlap",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "duplicate-tuple",
+        "passed": true,
+        "assertions": [
+          {
+            "label": "overlapping same tuple cannot publish first/last winner",
+            "passed": true
+          },
+          {
+            "label": "poisoned tuple cannot overwrite later distinct computation",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "slot-collision",
+        "passed": true,
+        "assertions": [
+          {
+            "label": "documented same slot remains one bounded file",
+            "passed": true
+          },
+          {
+            "label": "collision is miss rather than wrong-key data",
+            "passed": true
+          },
+          {
+            "label": "last complete collision publication is readable",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "reset-during-computation",
+        "passed": true,
+        "assertions": [
+          {
+            "label": "post-start reset permanently disables same-instance delayed/new writes",
+            "passed": true
+          },
+          {
+            "label": "initial reset on fresh instance remains operational",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "association-limit",
+        "passed": true,
+        "assertions": [
+          {
+            "label": "64 associations still permit associated publication",
+            "passed": true
+          },
+          {
+            "label": "65th association disables all later same-instance writes without eviction/reuse",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "busy-publication",
+        "passed": true,
+        "assertions": [
+          {
+            "label": "original rejection ERR_SM_CACHE_BUSY / publish.write",
+            "passed": true
+          },
+          {
+            "label": "busy publication preserves target and pending bytes",
+            "passed": true
+          },
+          {
+            "label": "failed publication consumed tuple; no silent retry/reclamation",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "corrupt-read-poisons",
+        "passed": true,
+        "assertions": [
+          {
+            "label": "original rejection ERR_SM_CACHE_CORRUPT / read",
+            "passed": true
+          },
+          {
+            "label": "corrupt file is not removed or replaced online",
+            "passed": true
+          },
+          {
+            "label": "failed read poisons its computation association after fixture repair",
+            "passed": true
+          },
+          {
+            "label": "fresh instance reads explicitly restored original bytes",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "invalid-set-consumes",
+        "passed": true,
+        "assertions": [
+          {
+            "label": "original rejection ERR_SM_CACHE_CORRUPT / value.data",
+            "passed": true
+          },
+          {
+            "label": "validation rejection consumes tuple before corrected delayed retry",
+            "passed": true
+          },
+          {
+            "label": "new computation after refusal can publish",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "value-and-shape-bounds",
+        "passed": true,
+        "assertions": [
+          {
+            "label": "construct exact documented FETCH value byte boundary",
+            "passed": true
+          },
+          {
+            "label": "exact32768 value accepted",
+            "passed": true
+          },
+          {
+            "label": "original rejection ERR_SM_CACHE_LIMIT / value",
+            "passed": true
+          },
+          {
+            "label": "over-limit value cannot publish and cannot reuse consumed tuple",
+            "passed": true
+          },
+          {
+            "label": "original rejection ERR_SM_CACHE_PROFILE / json",
+            "passed": true
+          },
+          {
+            "label": "value getter is not invoked, including falsy throw body",
+            "passed": true
+          },
+          {
+            "label": "original rejection ERR_SM_CACHE_PROFILE / value.data",
+            "passed": true
+          },
+          {
+            "label": "original rejection ERR_SM_CACHE_LIMIT / json",
+            "passed": true
+          },
+          {
+            "label": "all shape/bounds refusals leave published value unchanged",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "layout-and-record-bounds",
+        "passed": true,
+        "assertions": [
+          {
+            "label": "original rejection ERR_SM_CACHE_IO / layout",
+            "passed": true
+          },
+          {
+            "label": "missing private parent is not created implicitly",
+            "passed": true
+          },
+          {
+            "label": "original rejection ERR_SM_CACHE_CORRUPT / layout",
+            "passed": true
+          },
+          {
+            "label": "over-cap stat refusal leaves original owned fixture file intact",
+            "passed": true
+          },
+          {
+            "label": "original rejection ERR_SM_CACHE_CORRUPT / layout",
+            "passed": true
+          },
+          {
+            "label": "fresh handler recovers after explicit fixture-only record restoration",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "unsupported-batch-no-mutation",
+        "passed": true,
+        "assertions": [
+          {
+            "label": "original rejection ERR_SM_CACHE_UNSUPPORTED / revalidateTag",
+            "passed": true
+          },
+          {
+            "label": "whole invalidation batch refuses before persistent mutation",
+            "passed": true
+          },
+          {
+            "label": "unsupported mutation does not invalidate published value",
+            "passed": true
+          }
+        ]
+      }
+    ],
+    "unattemptedCaseIds": [],
+    "assertions": 41,
+    "actualCacheFilesystemUsed": true,
+    "actualNextDelegateUsed": true,
+    "cacheImplementationModified": false,
+    "fakeDependencies": false,
+    "overlapScope": "Deterministically held application-computation promises between real get and set; no mid-sync-FS or concurrent-process execution claim.",
+    "legacyGenerationGateChanged": false,
+    "fullNextAccepted": false,
+    "applicationRoot": "/app",
+    "testRoot": "/cache-tests",
+    "handler": {
+      "path": "/app/cache-handler.cjs",
+      "sha256": "c1013ea6b84ca9bd0cab6d34090568152122f68c28bd0d8668d0cc3ccc4452c9",
+      "bytes": 17798
+    },
+    "delegate": {
+      "path": "/app/node_modules/next/dist/server/lib/incremental-cache/file-system-cache.js",
+      "sha256": "427a5a07865eb68f0335ef701636bc1e065e8809552d243333d22e5eefcaae29",
+      "bytes": 28206
+    },
+    "nodeFsHelper": {
+      "path": "/app/node_modules/next/dist/server/lib/node-fs-methods.js",
+      "sha256": "6bc8642f72edfd01f57072915271eb8fe5e959fe56c2f44005f6d9a258abb0a7",
+      "bytes": 1300
+    },
+    "inventory": {
+      "files": [
+        {
+          "path": "association-limit/.next/cache/portable-fetch-v2/entries/0.json",
+          "bytes": 473,
+          "sha256": "4260a3a091a4492f43e588475e69aa1f258e04eed9edffa15971cacade986bfa"
+        },
+        {
+          "path": "association-limit/.next/cache/portable-fetch-v2/epochs/1.json",
+          "bytes": 238,
+          "sha256": "3fa6675d0445715c3235bd3b7a734e36c9763f64ecc14f2f4a6ac8eb2d48defc"
+        },
+        {
+          "path": "busy-publication/.next/cache/portable-fetch-v2/entries/0.json",
+          "bytes": 472,
+          "sha256": "cc76baca1f4634c0b98a7219480020b848757316c5b556f95a10079a53722aab"
+        },
+        {
+          "path": "busy-publication/.next/cache/portable-fetch-v2/entries/0.pending",
+          "bytes": 19,
+          "sha256": "fd9aea8fbb7366410021b3f0c545995529428e5a52353aa8269443faf040d996"
+        },
+        {
+          "path": "busy-publication/.next/cache/portable-fetch-v2/epochs/1.json",
+          "bytes": 238,
+          "sha256": "a6fb5912cad51afd2c4cc102aa1f2120708a5fbac49caf072ecd6bc9a45876f3"
+        },
+        {
+          "path": "corrupt-read-poisons/.next/cache/portable-fetch-v2/entries/0.json",
+          "bytes": 473,
+          "sha256": "dddfb99583337ec2dda7c976b34286f1f9567bdfead2e71a269b591413db085c"
+        },
+        {
+          "path": "corrupt-read-poisons/.next/cache/portable-fetch-v2/epochs/1.json",
+          "bytes": 238,
+          "sha256": "86b666f3f98ca03d3f46bf95ccbd857ec8e70d133f600e230b364035115080f7"
+        },
+        {
+          "path": "duplicate-tuple/.next/cache/portable-fetch-v2/entries/0.json",
+          "bytes": 477,
+          "sha256": "020629307ca2830a78911e0d331f408142b50d1b59b8991afed71208fe5a9150"
+        },
+        {
+          "path": "duplicate-tuple/.next/cache/portable-fetch-v2/epochs/1.json",
+          "bytes": 238,
+          "sha256": "71c068032895ec0059801cdab2649418e07a8d1c76ec72a93909696cad3523f6"
+        },
+        {
+          "path": "invalid-set-consumes/.next/cache/portable-fetch-v2/entries/0.json",
+          "bytes": 484,
+          "sha256": "72d38b769e9d3b6c18ad21ae4b2c0c0ac2651cf35879840e0e685c852366f1d4"
+        },
+        {
+          "path": "invalid-set-consumes/.next/cache/portable-fetch-v2/epochs/1.json",
+          "bytes": 238,
+          "sha256": "42d6f2a43f576f109a4ca4b76916de4da413f0653e97f445e43e1ff012d5c8b1"
+        },
+        {
+          "path": "layout-and-record-bounds/.next/cache/portable-fetch-v2/entries/0.json",
+          "bytes": 474,
+          "sha256": "11df47c6303bd24b89f97ee43eda849dc62d74c3f7e87768089817e9d2ab9c10"
+        },
+        {
+          "path": "layout-and-record-bounds/.next/cache/portable-fetch-v2/epochs/1.json",
+          "bytes": 238,
+          "sha256": "0e7b6e930b3740eda6898cabd5f6225fba8a45ef5d12d80a27657b3dd87d7379"
+        },
+        {
+          "path": "overlap-invalidation/.next/cache/portable-fetch-v2/entries/0.json",
+          "bytes": 474,
+          "sha256": "8e0ee1cd269d0359e5ca5b2027131afd05861f0c92330f811eec0fea5fee1fd1"
+        },
+        {
+          "path": "overlap-invalidation/.next/cache/portable-fetch-v2/epochs/1.json",
+          "bytes": 238,
+          "sha256": "b5572c0029325cdeefbda3c806b8354caf590d59265c3d44c6d5e3e8f3629c17"
+        },
+        {
+          "path": "reset-during-computation/.next/cache/portable-fetch-v2/entries/0.json",
+          "bytes": 481,
+          "sha256": "286a7a1d410340231b1d254cc7d0cc11f50719c51b5fa491ea4b9be45a245f40"
+        },
+        {
+          "path": "reset-during-computation/.next/cache/portable-fetch-v2/epochs/1.json",
+          "bytes": 238,
+          "sha256": "3655a138b3b6d71a379e858fa7754b089a0f86c71517869694cb209728dba132"
+        },
+        {
+          "path": "slot-collision/.next/cache/portable-fetch-v2/entries/0.json",
+          "bytes": 470,
+          "sha256": "0f396b17732a561b3580b529b91c29059a46507863c37ebac1bb71d8398d8378"
+        },
+        {
+          "path": "slot-collision/.next/cache/portable-fetch-v2/epochs/1.json",
+          "bytes": 238,
+          "sha256": "d08008c400246c3432a7db41b603da764e02b092be2c6b174f74627dca533178"
+        },
+        {
+          "path": "unsupported-batch-no-mutation/.next/cache/portable-fetch-v2/entries/0.json",
+          "bytes": 475,
+          "sha256": "11dc620980c7d4141216ca05a8bf66b2b74d9330e7d8cf81e7c132f461289ed1"
+        },
+        {
+          "path": "unsupported-batch-no-mutation/.next/cache/portable-fetch-v2/epochs/1.json",
+          "bytes": 238,
+          "sha256": "76ab8cfbe15d7d5286e74ca5ebc2dae525dacced59099d971738270aa771f381"
+        },
+        {
+          "path": "value-and-shape-bounds/.next/cache/portable-fetch-v2/entries/0.json",
+          "bytes": 33151,
+          "sha256": "ba3b7415f2f44c439dc434d3b1f5d778635421221488e74fed1d185112ad18e3"
+        },
+        {
+          "path": "value-and-shape-bounds/.next/cache/portable-fetch-v2/epochs/1.json",
+          "bytes": 238,
+          "sha256": "1c6bcbff9998ac2d5833d834bea47b3ac8151ead45e6e1a4c97d2efc6fee229d"
+        }
+      ],
+      "directories": 81,
+      "logicalBytes": 40541,
+      "modeOrWasiRightsInferred": false
+    }
+  },
+  "passed": true
+}
