@@ -164,6 +164,27 @@ Current next steps and outstanding work:
   scheduling effects remain explicit. No new trial, native patch, private
   identity or cause is claimed. Persistent-cache overlap/error/bounds, lifecycle,
   clean-machine bootstrap, measurements and production promotion remain open.
+- **Public correlation implementation in progress:** the previous goal turn made
+  concrete progress through the full stock wasmCloud run, independent reviews,
+  portable checks and pushed checkpoint `a69c1997`. This turn implements separate
+  guest, browser and client Source versions from the reviewed correlation plan.
+  The guest V2 draft preserves body/ownership/await paths and observes bounded
+  header metadata at the existing adapter/classic boundaries. Browser/client
+  drafts preserve original gates and select a host-only manifest through real
+  CLI paths. Constructor scaffolding reuses exact generic operations and original
+  native/world guard contexts. Root is preparing unbound native/Node control
+  actors; the new Stock runner explicitly adds an authority-path argument while
+  the full-client CLI remains unchanged. Source reviews pass the guest,
+  browser/client and unbound host operations. Root's guest syntax check and
+  actual private-helper seam pass all 21 cases with zero accessor calls. Seven
+  host JS syntax checks also pass. Host metadata seam tests pass all 15 cases
+  after canonicalizing the fixture's macOS temporary-path alias; the first
+  fixture-only raw1 is retained. Source review catches and corrects exact-length
+  and newline predicates in both host metadata helpers before activation.
+  Guest `f8c6d52b` and constructor `6ef36102` seal their reviewed payloads;
+  Root's literal-only constructor pins reverse exactly to the reviewed unbound
+  files. Browser/client metadata sealing is in progress. No new guest component,
+  runtime grant or trial has executed. The same-world INIT construction is next.
 - **Complete:** guarded native build, real-Next component construction, and one
   full deployed regression. HTTP/stream/browser checks pass in that sample;
   cache1→1 keeps the full suite failed. Prior browser failures remain unresolved.
