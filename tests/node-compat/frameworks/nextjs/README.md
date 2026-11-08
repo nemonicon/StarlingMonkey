@@ -1,5 +1,47 @@
 # Next.js execution
 
+## Current checkpoint: 2026-11-08
+
+Next.js runs inside the experimental SpiderMonkey/Wasm server, but full portable
+Next.js acceptance remains **failed**. The latest fixed native-to-Node comparison
+uses engine `237c4e5a` and component `6b2084d0`. Native passes all 24 HTTP cases,
+52 persistent-cache checks, 80 supplemental checks, five streaming chunks and
+both functional and strict browser interactions in this sample. Its unchanged
+legacy generation check observes `1 → 1` and fails. Node observes `1 → 2` and
+passes the full suite. Earlier intermittent Server Action completion failures
+remain unresolved; one positive diagnostic sample establishes no fix.
+
+The [current result and limitations](../../../../docs/node-compat/nextjs-native-export-diagnostic-2026-11-08.md),
+[priority roadmap](../../../../docs/node-compat/nextjs-priority-roadmap.md) and
+[progress log](../../../../progress.md) supersede the historical status below.
+Production acceptance remains foundations-v13. There is no complete Node,
+Buffer or Next compatibility claim. The selected world still has thirteen
+standard WASI 0.2.10 interfaces and only the incoming-handler export; no custom
+host services, host modifications or socket/TLS implementation were introduced.
+
+Two portable regression evidence checks run from a checkout without the old
+temporary build trees:
+
+```sh
+python3 -I -B tests/node-compat/frameworks/nextjs/next-native-export-diagnostic-probe-root-results-v1/retained-runtime-v1/check.py
+python3 -I -B tests/node-compat/frameworks/nextjs/next-native-export-diagnostic-pair-root-results-v1/retained-raw-data-v1/check.py
+```
+
+Both pass from the working tree and from Git-mode copies. The first verifies
+the seventeen-case direct diagnostic deployment; the second verifies the full
+pair while preserving native failure and Node success. These check retained
+data, not a new target execution or a rebuild. Fresh target execution still
+requires the pinned private artifacts and reviewed construction/launch path;
+clean-machine bootstrap remains outstanding. Next work adds real-handler cache
+overlap, error and bound tests while retaining every original application gate.
+
+## Historical 2026-11-06 smoke checkpoint
+
+The following smoke results, artifact runners and then-pending request-isolation
+steps describe that earlier cutoff. Later comprehensive executions and the
+remaining failures are recorded above; these historical runners select their
+own original artifacts.
+
 The unmodified **Next.js 16.4.5 / React 19.3.1** standalone application now
 passes the selected **experimental native Wasm smoke contract**: 24/24 HTTP,
 cache generation 1 → 2, five incremental Suspense chunks, and 2/2 browser

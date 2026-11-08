@@ -4,6 +4,30 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
+Latest pushed checkpoint: `aa1afd42` on `origin/main`, containing the completed
+native-to-Node diagnostic comparison, independent DATA reviews and both portable
+raw-corpus checks. The Next.js test README now leads with this current failed
+full-acceptance result; its earlier smoke status is explicitly historical.
+Complementary whole-reader Source and copied-DATA review also passes, with no
+material holds: all 350 pair payloads, 33 analysis inputs, 54 guest records and
+six native records are verified without opening original paths or executing
+the reader/analyzer/target. Its additive receipt preserves full acceptance false.
+
+New implementation: the real-filesystem cache overlap/error/bounds suite now
+passes its first Node22.14 reference run: **11 groups/41 assertions**, original
+owner65596/raw0/clean (`9738b5`/session34763, completion`edf36f`). It uses the
+unchanged handler and real pinned Next delegate/nodeFs, with no dependency
+fakes. All2,186 app files/48,755,844 bytes/427 directories and selected Source
+inputs remain unchanged. The [reusable launcher and actual records](tests/node-compat/frameworks/nextjs/next-persistent-cache-overlap-root-results-v1/README.md)
+preserve this Node-only scope. A new guest entry and constructor are being
+prepared to run the same suite inside the actual component; guest parity and
+second-host checks remain pending. No new native build or capability is needed.
+The new guest/constructor/Root scripts and ordered Source bindings now pass
+whole Source review. JSON-only preparation completes (`6c8ee0`/session1931,
+completion`178394`) with genuine authority`54a24c40`/5,596,685 bytes; no actor has
+been launched at this cutoff. The existing complete-metadata/build guards,
+parser-only WIT preopen and original construction ceilings remain in use.
+
 Active experiment: the opt-in native export diagnostic has passed Source review,
 both C++ frontend modes, fresh 825-file materialization and all ten generator
 checks. The full native build now finishes raw0/clean under original owner28096

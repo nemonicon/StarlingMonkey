@@ -18,6 +18,12 @@ before changing the response path. A composed guest observer is only a source
 proposal until resource ownership, sibling-instance wiring and final imports
 are validated. Do not expand native compatibility merely to hide these gates.
 
+The first [real-handler cache suite](../../tests/node-compat/frameworks/nextjs/next-persistent-cache-overlap-root-results-v1/README.md)
+now passes its Node reference: eleven groups/41 assertions against the unchanged
+handler, genuine Next delegate and real filesystem. Its guest counterpart is
+the next execution gate, followed by the selected second host. This does not
+change either original full-application outcome.
+
 Earlier baseline: bounded Fetch cleanup compiles and
 passes its public tests; the D990 baseline below retains both failed gates.
 Engine476b1c1d/metadata22f1d456, componentd990ecc1 and runtime result2fb8d5fd
