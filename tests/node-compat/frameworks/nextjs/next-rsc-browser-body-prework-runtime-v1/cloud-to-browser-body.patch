@@ -1,0 +1,64 @@
+--- identity/deploy.mjs
++++ browser-body/deploy.mjs
+@@ -1,4 +1,4 @@
+-// Dormant stock wasmCloud identity-RSC prework actor; late Root authority is mandatory.
++// Dormant stock wasmCloud browser-body RSC prework actor; late Root authority is mandatory.
+ // Builtins only; neither generated guest modules nor packaging APIs are imported.
+ import assert from 'node:assert/strict';
+ import {captureRawStdout} from './capture-stdout.mjs';
+@@ -64,17 +64,17 @@
+ assert.equal(typeof plan.expectedCompositionReviewState,'string');
+ assert(plan.compositionReviewFixedValues&&Object.keys(plan.compositionReviewFixedValues).length>0);
+ assert(Array.isArray(plan.protectedInputs)&&plan.protectedInputs.length>0,'Fresh Root protection graph required');
+-assert.equal(plan.controlOnly,true);assert.equal(plan.prospectiveRscResponseBindingsPending,false,'New identity-RSC app/client DATA pending');
+-assert.equal(plan.rscResponseControl.clientSourcePending,false,'New identity-RSC client Source pending');
++assert.equal(plan.controlOnly,true);assert.equal(plan.prospectiveRscResponseBindingsPending,false,'New browser-body app/client DATA pending');
++assert.equal(plan.rscResponseControl.clientSourcePending,false,'New browser-body client Source pending');
+ assert(plan.rscResponseControl.requiredClientIndex&&plan.rscResponseControl.requiredClient);
+ assert.deepEqual(plan.clientSourceIndex,plan.rscResponseControl.requiredClientIndex);
+ assert.deepEqual(plan.clientSource,plan.rscResponseControl.requiredClient);
+ for(const key of ['outputPrefix','applicationSource','applicationInputs','applicationBuildResult','applicationBuildReview','applicationRootIdentity','applicationRootIdentityEvidence','applicationSchema','clientSource','clientSourceIndex'])assert(plan[key]!==null,'New control binding:'+key);
+ const authorityPath=resolve(process.argv[2]),authority=await read(authorityPath),authorityRef=await row(authorityPath);
+-assert.equal(authority.state,'ROOT_NEXT_RSC_IDENTITY_CLOUD_AUTHORIZED_V1');
++assert.equal(authority.state,'ROOT_NEXT_RSC_BROWSER_BODY_CLOUD_AUTHORIZED_V1');
+ assert.equal(authority.publicRequestCorrelationAllowed,true);
+ assert.equal(authority.standardHandlerObserverAllowed,true);
+-assert.equal(authority.rscResponseControlAllowed,true);assert.equal(authority.controlOnly,true);assert.equal(authority.browserAllowed,false);
++assert.equal(authority.rscResponseControlAllowed,true);assert.equal(authority.controlOnly,true);assert.equal(authority.browserAllowed,true);
+ for(const key of ['stockHostAllowed','configInspectAllowed','guestEnvironmentAllowed','outgoingHttpWorkloadSelected'])assert.equal(authority[key],true);
+ for(const key of ['hostMutationAllowed','automaticRetryAllowed','newServicesAllowed'])assert.equal(authority[key],false);
+ const selectedOrigin=new URL(authority.selfOrigin);assert.equal(authority.selfOrigin,selectedOrigin.origin);assert.equal(selectedOrigin.protocol,'http:');assert.equal(selectedOrigin.hostname,'127.0.0.1');assert.equal(selectedOrigin.username,'');assert.equal(selectedOrigin.password,'');assert(Number.isInteger(Number(selectedOrigin.port))&&Number(selectedOrigin.port)>0&&Number(selectedOrigin.port)<=65535);
+@@ -165,7 +165,7 @@
+ }
+ await sourceBookend();
+ const output=resolve(plan.outputPrefix+'-'+authority.runId);assert.equal(output,plan.outputPrefix+'-'+authority.runId);const app=join(output,'app'),cache=join(output,'cache'),project=join(output,'project');await mkdir(output,{mode:0o700});
+-const result={schemaVersion:1,state:'RSC_IDENTITY_PREWORK_CLOUD_PROFILE_IN_PROGRESS_V1',controlOnly:true,responseProbeExecuted:false,fullOriginalContractExecuted:false,fullNextAccepted:false,runId:authority.runId,outputRoot:output,inputEntry:authority.inputEntry,inputSourceIndex:authority.inputSourceIndex,component:authority.component,componentAudit:authority.componentAudit,constructionResult:authority.constructionResult,servedEnvelope:authority.envelope,servedEnvelopeCompositionReview:authority.compositionReview,standardHandlerObserverMarkersInterpreted:false,rootAuthority:authorityRef,sourceIndex:authority.sourceIndex,selectedInterfaces:plan.selectedInterfaces,emittedImports:audit.emittedImports,errors:[],server:null,client:null,originalInputsPreserved:false,readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationInputs:plan.applicationInputs,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],adoption:false,actualHost:'stock-wasmCloud-2.11.0',wash:plan.wash,commands:[],configVerifiedBeforeDev:false,readiness:null};
++const result={schemaVersion:1,state:'RSC_BROWSER_BODY_PREWORK_CLOUD_PROFILE_IN_PROGRESS_V1',controlOnly:true,responseProbeExecuted:false,fullOriginalContractExecuted:false,fullNextAccepted:false,runId:authority.runId,outputRoot:output,inputEntry:authority.inputEntry,inputSourceIndex:authority.inputSourceIndex,component:authority.component,componentAudit:authority.componentAudit,constructionResult:authority.constructionResult,servedEnvelope:authority.envelope,servedEnvelopeCompositionReview:authority.compositionReview,standardHandlerObserverMarkersInterpreted:false,rootAuthority:authorityRef,sourceIndex:authority.sourceIndex,selectedInterfaces:plan.selectedInterfaces,emittedImports:audit.emittedImports,errors:[],server:null,client:null,originalInputsPreserved:false,readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationInputs:plan.applicationInputs,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],adoption:false,actualHost:'stock-wasmCloud-2.11.0',wash:plan.wash,commands:[],configVerifiedBeforeDev:false,readiness:null};
+ const save=()=>writeFile(join(output,'result.json'),JSON.stringify(result,null,2)+'\n',{mode:0o600});await save();
+ const pause=ms=>new Promise(yes=>setTimeout(yes,ms));const children=[];let host=null,status=null,clientProcess=null,lease=null,stopping=false;
+ async function prepareReadonlyCopy(){
+@@ -251,13 +251,13 @@
+  const deadline=Date.now()+plan.listenerSeconds*1000;let ready=false;result.readiness={tcpConnect:false,workloadRegistered:false,extraHttpRequests:0,origin,polls:0,source:plan.readinessPolicy.sourceFile,completionEvents:[]};
+  while(Date.now()<deadline){assert.equal(host.status,null,'Stock host exited before registration');assert.equal(host.capture.failed,false);const {logs,sizes}=await readinessLogs(host),registered=registrationFromLogs(logs,origin);result.readiness.polls++;result.readiness.lastLogSizes=sizes;result.readiness.workloadRegistered=registered.registered;result.readiness.completionEvents=registered.events;result.readiness.matchingMessageLines=registered.messageLines;
+   if(registered.registered&&await tcpReady(address.port)){assert.equal(host.status,null);result.readiness.tcpConnect=true;ready=true;await save();break;}await save();await pause(50);}
+- assert(ready,'Exact post-registration event AND TCP listener deadline');assert.equal(host.status,null,'Stock host exited before identity response probe');
++ assert(ready,'Exact post-registration event AND TCP listener deadline');assert.equal(host.status,null,'Stock host exited before browser-body response probe');
+  result.publicRequestCorrelation=await writePublicCorrelationManifest({block:authority.publicRequestCorrelation,runId:authority.runId,origin,output});artifactRefs.push(result.publicRequestCorrelation.manifest);await artifactBookend();await save();
+  clientProcess=await launchClient([plan.clientSource.path,origin,join(output,'client'),plan.browserTools,authority.runId]);result.client=clientProcess.record;result.responseClientInvoked=true;await save();
+  const clientStatus=await Promise.race([clientProcess.done,host.capture.failure.then(failure=>{throw Error('Stock lifetime stdout capture failed: '+failure.stage);})]);
+  result.client.exit=clientStatus;result.client.result=await row(join(output,'client/result.json'));const observed=await read(result.client.result.path);assert.equal(typeof observed.responseProbeExecuted,'boolean');result.responseProbeExecuted=observed.responseProbeExecuted;await save();
+- assert.equal(observed.suite,'NEXT_RSC_IDENTITY_PREWORK_HTTP_CLIENT_V1');assert.equal(observed.controlOnly,true);assert.equal(observed.responseProbeExecuted,true);assert.equal(observed.fullOriginalContractExecuted,false);assert.equal(observed.fullNextAccepted,false);assert.deepEqual(clientStatus,{code:0,signal:null,error:null});assert.equal(observed.passed,true);assert.equal(host.status,null,'Stock host must remain live through the identity response probe');result.controlPassed=true;
+-}catch(error){result.errors.push({stage:'wasmcloud-identity-response-or-control',...errorData(error)});}
++ assert.equal(observed.suite,'NEXT_RSC_BROWSER_BODY_PREWORK_CLIENT_V1');assert.equal(observed.controlOnly,true);assert.equal(observed.responseProbeExecuted,true);assert.equal(observed.fullOriginalContractExecuted,false);assert.equal(observed.fullNextAccepted,false);assert.deepEqual(clientStatus,{code:0,signal:null,error:null});assert.equal(observed.passed,true);assert.equal(host.status,null,'Stock host must remain live through the browser-body response probe');result.controlPassed=true;
++}catch(error){result.errors.push({stage:'wasmcloud-browser-body-response-or-control',...errorData(error)});}
+ finally{
+  if(lease?.listening)try{await new Promise(yes=>lease.close(()=>yes()));}catch(error){result.errors.push({stage:'lease-close',...errorData(error)});}
+  try{await finalizeClient(clientProcess);}catch(error){result.errors.push({stage:'client-finalize',...errorData(error)});}
+@@ -270,6 +270,6 @@
+  result.cacheInventory=[];try{assert.equal((await lstat(cache)).mode&0o777,0o700);const tree=await walk(cache);assert.equal(tree.links.length,0);for(const name of tree.files){const path=join(cache,name);result.cacheInventory.push({...await row(path),relativePath:name,mode:(await lstat(path)).mode&0o777});}}catch(error){result.errors.push({stage:'cache-final-inventory',...errorData(error)});}
+  result.allDirectCliExitsZero=JSON.stringify(result.commands.map(x=>x.label))===JSON.stringify(['config-show','wash-dev','response-client'])&&result.commands.every(x=>x.timeout===false&&x.forcedCleanup===false&&x.exit?.code===0&&x.exit?.signal===null&&x.exit?.error===null);
+  result.passed=result.controlPassed===true&&result.configVerifiedBeforeDev===true&&result.errors.length===0&&result.originalInputsPreserved&&result.readonlyAppPreserved&&result.allDirectCliExitsZero&&children.length===2&&children.every(x=>x.record.stdoutCapture?.complete===true)&&result.server?.shutdownReason==='response-probe-collected'&&result.server?.shutdownRequested===true&&result.server?.sigintSent===true&&host?.status?.code===0&&host?.status?.signal===null&&host?.status?.error===null;
+- result.state=result.passed?'RSC_IDENTITY_PREWORK_CLOUD_PROFILE_PASSED_UNREVIEWED_V1':'RSC_IDENTITY_PREWORK_CLOUD_PROFILE_FAILED_RAW_PRESERVED_V1';await save();
++ result.state=result.passed?'RSC_BROWSER_BODY_PREWORK_CLOUD_PROFILE_PASSED_UNREVIEWED_V1':'RSC_BROWSER_BODY_PREWORK_CLOUD_PROFILE_FAILED_RAW_PRESERVED_V1';await save();
+ }
+ console.log(JSON.stringify({state:result.state,passed:result.passed,responseProbeExecuted:result.responseProbeExecuted,fullOriginalContractExecuted:false,fullNextAccepted:false,errors:result.errors}));process.exitCode=result.passed?0:1;

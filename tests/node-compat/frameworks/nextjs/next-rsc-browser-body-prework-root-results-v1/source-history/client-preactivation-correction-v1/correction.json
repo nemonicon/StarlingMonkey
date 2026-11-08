@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_ONLY_PREACTIVATION_CORRECTION_EXACT_INVERSE_V1",
+  "beforeMain": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-rsc-browser-body-prework-root-results-v1/source-history/client-preactivation-correction-v1/run-client.mjs.before",
+    "sha256": "9432379025c3662b2494707f97dcf2fb1b2e026540caaf2259b51373d530c24f",
+    "bytes": 29866
+  },
+  "beforeIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-rsc-browser-body-prework-root-results-v1/source-history/client-preactivation-correction-v1/index.json.before",
+    "sha256": "d23b658076249e359ba4edf04376e2f7ad3e5fffc9868e71a286b767575dda19",
+    "bytes": 1174
+  },
+  "afterMain": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-rsc-browser-body-prework-client-v1/run-client.mjs",
+    "sha256": "1b9976d216eb44dc2648136d4d2c2079d7b2308034530c8d38d2d2553c101d3f",
+    "bytes": 30137
+  },
+  "correctionPatch": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-rsc-browser-body-prework-root-results-v1/source-history/client-preactivation-correction-v1/correction.patch",
+    "sha256": "c03bc294b139aba614d8ec5a5432e3bee18d844d25e594ede3487f0f76444aea",
+    "bytes": 3962
+  },
+  "changes": [
+    "two observer callbacks stop after the first known observer failure",
+    "only actual response.arrayBuffer rejection sets rejected; later serialization error preserves fulfilled outcome/byte count and fails collection"
+  ],
+  "inverseReplacements": [
+    {
+      "after": " function noteCdp(event,payload){\n  if(!active||observerFailed)return;",
+      "before": " function noteCdp(event,payload){\n  if(!active)return;"
+    },
+    {
+      "after": "   page.on('request',request=>{if(!active||observerFailed)return;try{",
+      "before": "   page.on('request',request=>{if(!active)return;try{"
+    },
+    {
+      "after": "    let buffer;\n    try{buffer=await response.arrayBuffer();}catch(error){out.bodyOutcome='rejected';out.bodyError=describe(error);return out;}\n    out.bodyOutcome='fulfilled';out.bodyBytes=buffer.byteLength;\n    if(buffer.byteLength>bodyLimit){out.overLimit=true;return out;}\n    try{const bytes=new Uint8Array(buffer);let binary='';for(let i=0;i<bytes.length;i++)binary+=String.fromCharCode(bytes[i]);out.bodyBase64=btoa(binary);\n    }catch(error){out.bodySerializationError=describe(error);}\n",
+      "before": "    try{const buffer=await response.arrayBuffer(),bytes=new Uint8Array(buffer);out.bodyOutcome='fulfilled';out.bodyBytes=bytes.length;\n     if(bytes.length>bodyLimit){out.overLimit=true;return out;}\n     let binary='';for(let i=0;i<bytes.length;i++)binary+=String.fromCharCode(bytes[i]);out.bodyBase64=btoa(binary);\n    }catch(error){out.bodyOutcome='rejected';out.bodyError=describe(error);}\n"
+    },
+    {
+      "after": "   if(value.bodySerializationError)throw new Error('Fulfilled arrayBuffer serialization failed: '+value.bodySerializationError.message);\n   if(value.overLimit)throw new RangeError('arrayBuffer exceeded post-read4MiB retention cap; allocation was not prebounded');",
+      "before": "   if(value.overLimit)throw new RangeError('arrayBuffer exceeded post-read4MiB retention cap; allocation was not prebounded');"
+    }
+  ],
+  "inverseReconstructsBeforeMainExactly": true,
+  "SourceFunctionsOrTargetsExecuted": false
+}

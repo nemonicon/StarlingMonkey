@@ -46,3 +46,12 @@ generation2 files are canonical with no pending file. Complete cloud config/dev
 stdout is2,685/22,686 bytes. No browser, React, gzip, wire-body, same-Store or
 full-Next acceptance follows. Raw application/cache bulk, native/tool payloads
 and binaries are explicitly omitted; their existing guarded proofs remain.
+
+From the repository root, the portable retained-data check is:
+
+```sh
+python3 -I -B tests/node-compat/frameworks/nextjs/next-rsc-identity-prework-root-results-v1/check-retained.py
+```
+
+It passes without reading original /private/tmp paths, checking208 payloads and
+the retained owner/prework/body/publication records. It executes no guest or host.

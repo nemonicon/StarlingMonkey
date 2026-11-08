@@ -32,8 +32,17 @@ independent runtime gate`c02e546d` pass. Raw index`3f20c56c` retains208 payloads
 5,576,656 bytes, rehashed by Root. Both physical35-byte canonical generation2
 records have no pending file. Cloud config/dev complete stdout sizes are2,685/
 22,686 bytes, with normal shutdown. The strict browser failure remains failed.
-The next diagnostic isolates Chrome fetch body consumption from React navigation;
-its client/runtime Source is in preparation, with no new browser run yet.
+Checkpoint`bcc465b2` is pushed. The new portable retained-data checker passes
+both the working-tree corpus and a210-file copy from actual staged Git blobs,
+without private build trees. It starts no runtime. The next diagnostic isolates
+Chrome fetch body consumption from React navigation. Its corrected6-file client
+and14-file actor Source pass independent whole Source/API review`eefe5b3a`,
+with all three actual Node syntax checks passing. Both preactivation observer/
+serialization corrections have exact preimages/inverses. Fresh binding`a8e8084e`
+protects2,056 inputs; preparation`29f9fe96` issues the fixed cloud600→Node300 pair
+without invoking an actor. Independent binding DATA review`05ad2412` reconstructs
+the exact union and passes; complementary Source/API review`b401c4d4` also passes.
+No new browser run has occurred; all original failures remain failed.
 
 Latest result: the [compression-off full Next profile](docs/node-compat/nextjs-compression-off-full-results.md)
 passes once on Wasm40483/600 and Node40694/300, both raw0/clean. Both pass24HTTP,

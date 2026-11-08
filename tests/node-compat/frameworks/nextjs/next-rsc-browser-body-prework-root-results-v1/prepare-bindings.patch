@@ -1,0 +1,107 @@
+--- identity-unbound-prepare-bindings
++++ browser-body-unbound-prepare-bindings
+@@ -1,4 +1,4 @@
+-"""Bind the captured identity-response prework pair; no actor or host launch."""
++"""Bind the captured Chrome body-response prework pair; no actor or host launch."""
+ import copy
+ import hashlib
+ import importlib.util
+@@ -8,8 +8,8 @@
+ 
+ HERE = Path(__file__).resolve().parent
+ BASE = HERE.parent
+-ACTOR = BASE / 'next-rsc-identity-prework-runtime-v1'
+-CLIENT = BASE / 'next-rsc-identity-prework-client-v1'
++ACTOR = BASE / 'next-rsc-browser-body-prework-runtime-v1'
++CLIENT = BASE / 'next-rsc-browser-body-prework-client-v1'
+ ACTOR_INDEX = None
+ CLIENT_INDEX = None
+ CONTROLLER_UNBOUND = None
+@@ -22,6 +22,11 @@
+ FAILED_CLOUD_REVIEW = dict(path=str(BASE / 'next-fs-callback-no-compress-wasmcloud-root-results-v1/actual-runtime-review.json'),
+     sha256='81a9c56b5c22c284149f971ae1e6ca9cdd4d8b72d8f22e4a5b107f4aa9d3041a', bytes=81083)
+ 
++HOST_REQUIREMENTS = [{'path': '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', 'sha256': '2a2d660daf7f2a6e405fc6b885c996eca0ac71dd9f52d326e06d4d602ce9352c', 'bytes': 367696}, {'path': '/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/node_modules/playwright-core/index.js', 'sha256': 'a58fb2cec4293e7dcf73c58a179898a4f3986666451a19da4e731fa3af63265b', 'bytes': 697}, {'path': '/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/node_modules/playwright-core/index.mjs', 'sha256': '3d36e2132d3c8b62397d23f0bb4177336aaee503203ae2a2c90fbeb5bf3317dd', 'bytes': 1063}, {'path': '/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/node_modules/playwright-core/package.json', 'sha256': '8aa1c9863fa8dea324e674254158cdc79440f4124ef2d84d38053013541cb7d6', 'bytes': 876}, {'path': '/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/package-lock.json', 'sha256': 'f8dd9d403df7dc61de13badeefa22da1e639f5eb8117537a39fa864f9a37ba8f', 'bytes': 714}, {'path': '/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools/package.json', 'sha256': '7b241bd7c3c2a45f0484ccd799fd5f6fa6ce517d70278a7a92f26b7b2e882661', 'bytes': 164}]
++BROWSER_TOOLS = '/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools'
++IDENTITY_REVIEW = dict(path=str(BASE / 'next-rsc-identity-prework-root-results-v1/actualreview.json'),
++    sha256='04f53121c8c75ae60c9dee51122bbfb2657d3abc73a9a3c5f95d00bc0c993c5d', bytes=124407)
++
+ 
+ def main():
+     assert __debug__ and sys.flags.isolated and sys.dont_write_bytecode
+@@ -30,7 +35,7 @@
+     raw = path.read_bytes()
+     assert (hashlib.sha256(raw).hexdigest(), len(raw)) == (
+         '4bafbb2fd675bcee84746aea3988ae6eb597d64570d19cd3c8819aa158d2c5e4', 19784)
+-    spec = importlib.util.spec_from_file_location('genuine_rsc_identity_binding_admission', path)
++    spec = importlib.util.spec_from_file_location('genuine_rsc_browser_body_binding_admission', path)
+     prep = importlib.util.module_from_spec(spec)
+     spec.loader.exec_module(prep)
+     state = prep.context()
+@@ -46,6 +51,8 @@
+     assert failed['fullNextAccepted'] is False
+     assert Path(ACTOR_INDEX['path']) == ACTOR / 'index.json'
+     assert Path(CLIENT_INDEX['path']) == CLIENT / 'index.json'
++    identity_review = prep.document(IDENTITY_REVIEW)
++    assert identity_review['verifiedDataReviewPassed'] is True and identity_review['fullNextAccepted'] is False
+     app = prep.document(APP_REVIEW)
+     assert app['state'] == 'COORDINATED_FS_CALLBACK_NO_COMPRESS_APP_BUILD_DATA_REVIEW_PASSED_V1'
+     assert app['buildVersion'] == 1
+@@ -123,6 +130,7 @@
+             requestBody=capture['body'], headerEvidence=capture['headerEvidence'])
+ 
+     client_plan = bind_plan(CLIENT, 'plan.json', 'client', bind_client)
++    assert client_plan['hostRequirements'] == HOST_REQUIREMENTS and client_plan['browserTools'] == BROWSER_TOOLS
+     assert set(client_plan['preworkSourceRequirements']) == {'donorFullClient', 'portableCacheCollector', 'supplemental', 'fixtureContract'}
+     for ref in client_plan['preworkSourceRequirements'].values():
+         prep.checked(ref)
+@@ -137,9 +145,9 @@
+             applicationBuildReview=APP_REVIEW, applicationRootIdentityEvidence=app['applicationRootIdentityEvidence'],
+             applicationBuildSource=app['sourceIndex'], clientSource=prep.row(CLIENT / 'run-client.mjs'),
+             clientSourceIndex=client_ref, prospectiveRscResponseBindingsPending=False,
+-            bindingState='READY_RSC_RESPONSE_CONTROL', browserTools='reserved-unused',
+-            outputPrefix='/private/tmp/starling-node-compat/next-rsc-identity-prework-' + arm + '-v1',
+-            runId='rsc-identity-' + arm + '-first')
++            bindingState='READY_RSC_RESPONSE_CONTROL', browserTools=BROWSER_TOOLS,
++            outputPrefix='/private/tmp/starling-node-compat/next-rsc-browser-body-prework-' + arm + '-v1',
++            runId='rsc-browser-body-' + arm + '-first')
+         p['rscResponseControl'].update(clientSourcePending=False, requiredClientIndex=client_ref,
+             requiredClient=prep.row(CLIENT / 'run-client.mjs'))
+         p['namespacePolicy']['actualOutputPrefixAndRunIdPending'] = False
+@@ -198,6 +206,8 @@
+             ASSET_SELECTION, FAILED_CLOUD_REVIEW]:
+         add(ref)
+     for ref in capture['source'].values():
++        add(ref)
++    for ref in HOST_REQUIREMENTS + [IDENTITY_REVIEW]:
+         add(ref)
+     for p in plans.values():
+         descriptors(p)
+@@ -221,10 +231,10 @@
+             p['protectedInputs'] = protected
+         bind_plan(ACTOR, name, arm, publish)
+     actor_ref = reseal(ACTOR)
+-    binding = dict(schemaVersion=1, state='ROOT_RSC_IDENTITY_PREWORK_ACTUAL_BINDINGS_V1',
++    binding = dict(schemaVersion=1, state='ROOT_RSC_BROWSER_BODY_PREWORK_ACTUAL_BINDINGS_V1',
+         actorIndex=actor_ref, clientIndex=client_ref, cloudPlan=prep.row(ACTOR / 'plan.json'),
+         stockPlan=prep.row(ACTOR / 'stock-plan.json'), applicationBuildReview=APP_REVIEW,
+-        requestCapture=CAPTURE, assetSelection=ASSET_SELECTION, originalFailedCloudReview=FAILED_CLOUD_REVIEW, protectedInputs=protected,
++        requestCapture=CAPTURE, assetSelection=ASSET_SELECTION, originalFailedCloudReview=FAILED_CLOUD_REVIEW, precedingIdentityReview=IDENTITY_REVIEW, protectedInputs=protected,
+         innerConstructionReview=prep.row(BASE / 'next-native-export-diagnostic-next-root-results-v1/actual-construction-review.json'),
+         compositionReview=prep.row(BASE / 'next-standard-handler-observer-root-results-v1/actual-next-v3-composition-review.json'))
+     binding_ref = prep.save(HERE / 'runtime-bindings.json', binding)
+@@ -244,12 +254,12 @@
+         prep.family(ref)
+     after = prep.admit(original)
+     assert before == after
+-    receipt = dict(schemaVersion=1, state='ROOT_RSC_IDENTITY_PREWORK_METADATA_BOUND_NOT_RUN_V1',
++    receipt = dict(schemaVersion=1, state='ROOT_RSC_BROWSER_BODY_PREWORK_METADATA_BOUND_NOT_RUN_V1',
+         bindings=binding_ref, generator=prep.row(Path(__file__).resolve()), controller=prep.row(controller),
+         planInverses=changes, controllerOneLiteralInverseVerified=True,
+         protectedInputCount=len(protected), originalGuardBefore=before, originalGuardAfter=after,
+         genuineBuildReferences=len(state['buildRefs']), genuineSourceReferences=len(state['sourceRefs']),
+-        oldProtectedArrayCopied=False, browserSelected=False, requestSent=False, fullNextAccepted=False)
++        oldProtectedArrayCopied=False, browserSelected=True, browserInvoked=False, requestSent=False, fullNextAccepted=False)
+     print(json.dumps(prep.save(HERE / 'source-bindings.json', receipt)))
+ 
+ 

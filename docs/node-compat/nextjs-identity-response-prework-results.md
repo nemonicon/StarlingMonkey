@@ -80,3 +80,13 @@ the same captured body and preceding workload, without React navigation. Its
 browser-managed headers must be observed and recorded; forbidden headers cannot
 be silently presented as an exact replay. Keep the original strict browser
 worker and every full-suite assertion unchanged.
+
+The retained sample can be checked without the private build trees:
+
+```sh
+python3 -I -B tests/node-compat/frameworks/nextjs/next-rsc-identity-prework-root-results-v1/check-retained.py
+```
+
+This passes with208 exact payloads and recomputes both retained owner, prework,
+body and publication outcomes. It checks saved evidence; it starts no runtime
+and does not replace fresh host or browser tests.
