@@ -12,8 +12,8 @@ PREPARER = dict(path=str(BASE / 'next-native-export-diagnostic-next-root-results
     sha256='4bafbb2fd675bcee84746aea3988ae6eb597d64570d19cd3c8819aa158d2c5e4', bytes=19784)
 INNER_AUTHORITY = dict(path=str(BASE / 'next-native-export-diagnostic-next-root-results-v1/diagnostic-next-construction-authority.json'),
     sha256='23313b9b1858e22df729b379c10750cd92ba00ce4aa9bee179fc21142fdfea66', bytes=5597386)
-SOURCE_INDEX = None
-BUILDER = None
+SOURCE_INDEX = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-fs-callback-no-compress-app-build-v1/index.json', 'sha256': '5c280e4ba8f6a9eb8b27e9af41e293f22e082f1b3f17b44114019de5efec1422', 'bytes': 6994}
+BUILDER = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-fs-callback-no-compress-app-build-v1/build.py', 'sha256': '33116d753710000806ff698c1da4bb0a7d02006b185c89c918ef8e154f6c117a', 'bytes': 16714}
 INTEROP = dict(path=str(BASE / 'next-module-fileurl-interop-probe-root-results-v1/actual-runtime-review.json'),
     sha256='030fad8bec22f753d0436d0089d47d38014bae73cfdee911bd5d9baf4da3a226', bytes=7649)
 NODE = dict(path='/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node',

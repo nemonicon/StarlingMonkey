@@ -38,8 +38,9 @@ The [compression-off application build template](tests/node-compat/frameworks/ne
 is Source-only: index`5c280e4b` seals43 payloads/109,241 bytes, including35 fixture
 files/66,499 bytes. Only the19-byte compress:false line changes the V2 app;
 34 files and the tracing exclusion stay exact. Actual config syntax and both
-Python AST checks pass. Whole Source/API review is in progress; build pins,
-actual build and later asset/browser/runtime authorities are unissued.
+Python AST checks pass. Whole Source/API review passes. Root binds only the Source index and builder
+(`126c68c7`), preserving an exact two-literal inverse. The build is not invoked
+yet; later app review/asset/browser/runtime authorities remain unissued.
 
 Latest ported-fixture comparison: explicit filesystem-backed callback state
 passes1→2 on both Wasm and Node. Both also pass24HTTP,52 portable-cache checks,
