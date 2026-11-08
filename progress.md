@@ -24,12 +24,18 @@ the prepared Node control passes. No explicit negative net error in the selected
 NetLog request contexts identifies EOF or a cause. The current component now
 passes stock wasmCloud cold8, raw0/clean/protected, with coordinated DATA
 review0ed0e4c2. It cannot waive full-suite failures.
+The matched identity-encoding browser pair now also completes: explicit POST
+negotiation/absent response Content-Encoding pass on both arms, while native
+retains the same cache and strict browser failures and prepared Node passes.
+Coordinated DATA review8151dc47 passes that outcome review; the next discriminator is deployed guest
+response-completion markers rather than another compression workaround.
 
 Current next steps and outstanding work:
 
-- **Next.js critical path:** run a matched browser identity-encoding diagnostic
-  with the original strict assertions, then use that observation to choose a
-  response-path change or a narrower guest completion trace. Separately resolve
+- **Next.js critical path:** observe deployed guest completion at the existing
+  public response/adapter boundaries with bounded diagnostic markers. The
+  matched identity-encoding pair preserves the native failures, so simply
+  requesting identity is insufficient. Separately resolve
   the legacy counter contract against per-request guest state; durable-cache
   success does not waive that failure. Expand the second-host action/browser
   contract only with an explicit self-origin egress policy. The
@@ -79,8 +85,9 @@ Current next steps and outstanding work:
   pushed as Source in9060b4ef; its new INIT and deployed public profile now pass.
   Current action-wire control results also pass. The new NetLog pair completes
   with native raw1/stock raw0; coordinated DATA reviewf3d7a9ab preserves the two
-  failed gates. Closed DATA, offline readers and documentation form the next
-  commit checkpoint. Current wasmCloud SourceV5 is sealed01a939fa after whole
+  failed gates. Closed DATA, offline readers, current wasmCloud results and
+  documentation are committed and pushed to origin/main in1756de82.
+  Current wasmCloud SourceV5 is sealed01a939fa after whole
   Source and closure review. After a separately preserved Python-alias preparation
   failure, corrected Root admission succeeds and the actual cold8 exits0 with
   all eight requests passing. Coordinated result review0ed0e4c2 passes that scope.
@@ -319,7 +326,27 @@ Next is a matched browser `Accept-Encoding: identity` diagnostic, preserving
 all strict gates and explicitly verifying request negotiation/absent response
 Content-Encoding. It changes outer response coding only; pinned Next strips
 that header before internal self-fetch. Source preparation is underway, with
-no new actor/grant/result yet. Neither outcome alone would establish a cause.
+no actor/grant/result at that preparation cutoff. Sealed Sourcece4f5538,
+native880a19a8 and stockc20a85c3 subsequently pass whole Source/closure review.
+Preparationf50436 issues protocol314b4566/nativeb4e62057/stock81eca687.
+Root439c49/original65026/600 terminates raw1/clean/protected; Root7957e5
+verifies that boundary before StockRoot9bba39/original65237/300 terminates0.
+Native resulte0deb8d2 and Node result0e560a52 both pass explicit NetLog identity
+send-header/absent Content-Encoding negotiation. Native still has legacy1→1
+and all three strict POST7 ERR_ABORTED errors; Node passes every declared gate.
+All52/80/24/stream5/functional2 groups pass in both samples. Coordinated DATA
+review8151dc47 binds independent browser/NetLog/owner review27751124.
+Its90-file/5,625,171-byte raw corpus is closed (manifeste9dba92c); portable
+checker1a4f1ae6 passes a Git-style copy and Rootf7d17f current copy without
+original-path/JS/actor/network execution. Context-wide negotiation changes assets and
+timing too; no unique cause or inner-fetch/append/EOF proof follows. See the
+[identity diagnostic](tests/node-compat/frameworks/nextjs/next-browser-identity-root-results-v1/README.md).
+The next Source-only diagnostic is bounded deployed guest completion markers at
+existing adapter/public-response boundaries. It adds no reader/fetch wrapper,
+new host capability or INIT I/O; native Source remains unchanged. Correlation
+between separate request objects must stay explicit/qualified, and no error
+listener may mask an otherwise unhandled EventEmitter error. No trace component
+or runtime result exists yet.
 Commit4ffa8659 is pushed to origin/main; live
 build logs and the unfinished runtime controller were excluded from that cut.
 GeneratorV5 runs all ten checks successfully under original4023/900, result795dab0e;

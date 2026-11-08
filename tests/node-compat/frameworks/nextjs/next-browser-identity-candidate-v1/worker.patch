@@ -1,0 +1,51 @@
+--- held-netlog/browser-check.mjs
++++ identity/browser-check.mjs
+@@ -1,6 +1,7 @@
+ // Real browser checks for the owned stock-Node Next fixture. No action at import
+ // is promised: this is a standalone worker, launched only by the experiment.
+ import assert from 'node:assert/strict';
++import {identityNegotiationGate} from './identity-gate.mjs';
+ import {createHash} from 'node:crypto';
+ import {createReadStream} from 'node:fs';
+ import {mkdir,readFile,writeFile,realpath,open,lstat} from 'node:fs/promises';
+@@ -117,7 +118,8 @@
+ function trace(test,phase,event,data={}){if(result.trace.length>=4000){if(!result.errors.some(x=>x.stage==='trace-limit'))result.errors.push({stage:'trace-limit',message:'4000 trace records exceeded'});return;}result.trace.push({sequence:++sequence,ns:(process.hrtime.bigint()-traceStart).toString(),test,phase,event,...data});}
+ const save=()=>writeFile(join(output,'result.json'),JSON.stringify(result,null,2)+'\n',{mode:0o600});
+ const errorData=e=>({name:typeof e?.name==='string'?e.name:'Error',message:typeof e?.message==='string'?e.message:String(e),stack:typeof e?.stack==='string'?e.stack:null});
+-let browser;
++let browser,identityNetlog;
++result.identityNegotiation=null;
+ await save();
+ try{
+   const fromTools=createRequire(join(tools,'package.json'));
+@@ -148,7 +150,7 @@
+     const requestData=request=>({requestId:requestId(request),url:request.url(),method:request.method(),resourceType:request.resourceType(),isNavigationRequest:request.isNavigationRequest(),redirectedFrom:request.redirectedFrom()?requestId(request.redirectedFrom()):null});
+     mark('context-setup');
+     const pending=(async()=>{
+-      context=await browser.newContext({viewport:{width:1280,height:800},acceptDownloads:false});
++      context=await browser.newContext({viewport:{width:1280,height:800},acceptDownloads:false,extraHTTPHeaders:{'Accept-Encoding':'identity'}});
+       context.setDefaultTimeout(limit);context.setDefaultNavigationTimeout(limit);
+       page=await context.newPage();
+       page.on('request',request=>{const data=requestData(request);observer.noteRequest(request,data);trace(id,phase,'request',data);});
+@@ -274,7 +276,7 @@
+       const after=await handle.stat(),pathAfter=await lstat(netlogPath);
+       for(const key of ['dev','ino','size','mode','nlink','mtimeMs','ctimeMs'])assert.equal(after[key],guarded[key],'NetLog changed while reading');
+       assert(pathAfter.dev===after.dev&&pathAfter.ino===after.ino&&pathAfter.size===after.size&&pathAfter.nlink===1&&!pathAfter.isSymbolicLink(),'NetLog path changed');
+-      result.netlog.completeJson=true;result.netlog.eventCount=parsed.events.length;
++      result.netlog.completeJson=true;result.netlog.eventCount=parsed.events.length;identityNetlog=parsed;
+       result.netlog.file={path:netlogPath,sha256:createHash('sha256').update(bytes).digest('hex'),bytes:bytes.length};
+     }catch(error){const data={stage:'netlog-retention',...errorData(error)};result.netlog.errors.push(data);result.errors.push(data);}
+     finally{if(handle)try{await handle.close();}catch(error){const data={stage:'netlog-close',...errorData(error)};result.netlog.errors.push(data);result.errors.push(data);}}
+@@ -291,7 +293,11 @@
+   if(!result.assetCapturePassed)result.errors.push({stage:'client-asset-capture',message:'All five exact decoded script bodies required'});
+   result.functionalPassed=result.tests.length===2&&result.tests.every(t=>t.passed);
+   result.browserErrorFree=result.pageerrors.length===0&&result.consoleerrors.length===0&&result.failedrequests.length===0;
+-  result.passed=result.functionalPassed&&result.browserErrorFree&&result.errors.length===0&&result.browserClosed;
++  try{
++    result.identityNegotiation=identityNegotiationGate({origin:origin.origin,actionPosts:result.actionPosts,responseHeaders:result.responseHeaders,netlog:identityNetlog});
++    if(!result.identityNegotiation.passed)result.errors.push({stage:'outer-identity-negotiation',failures:result.identityNegotiation.failures});
++  }catch(error){result.errors.push({stage:'outer-identity-negotiation',...errorData(error)});}
++  result.passed=result.functionalPassed&&result.browserErrorFree&&result.errors.length===0&&result.browserClosed&&result.identityNegotiation?.passed===true;
+   result.finished=new Date().toISOString();await save();
+ }
+ process.stdout.write(JSON.stringify({output,passed:result.passed,functionalPassed:result.functionalPassed,browserErrorFree:result.browserErrorFree,tests:result.tests.map(t=>({id:t.id,passed:t.passed,timedOut:t.timedOut})),errors:result.errors})+'\n');

@@ -91,10 +91,20 @@ records fresh P2 Store creation, read/write mount descriptor rights and the
 explicit deny-all HTTP egress policy. Broader self-HTTP/action tests need a
 separately selected exact-origin policy and retain the original acceptance gates.
 
-Next is a matched browser `Accept-Encoding: identity` diagnostic, keeping every
-strict interaction and acceptance gate. It must verify the actual POST request
-header and absent response Content-Encoding before claiming an identity-coded
-sample. Pinned Next filters this header from its internal forwarded request,
-so this tests outer response negotiation, not the inner native-fetch encoding.
-Source is being prepared; no such browser sample exists yet. A difference would
-show an association in that sample, not establish a unique compression cause.
+The matched browser `Accept-Encoding: identity` diagnostic now completes with
+every original strict gate. Native resulte0deb8d2 still fails legacy1→1 and
+three strict POST7 ERR_ABORTED checks; prepared Node result0e560a52 passes.
+Both verify explicit NetLog send headers and absent response Content-Encoding.
+Original owners65026/600 and65237/300 terminate cleanly with raw1/raw0;
+coordinated DATA review8151dc47 binds independent browser/owner review27751124. See the
+[identity results](../../tests/node-compat/frameworks/nextjs/next-browser-identity-root-results-v1/README.md).
+
+Simply requesting identity was insufficient in this sample. The context-wide
+setting also changes navigation and assets; changed transfer sizes/timing limit
+a causal interpretation. Pinned Next filters this header from its internal
+forwarded request, so this does not prove inner native-fetch encoding or append
+selection. Next is a Source-only bounded deployed guest completion diagnostic
+using existing public response events and adapter EOF/disposal/finish returns.
+It needs no additional body reader, fetch wrapper, native change or INIT I/O.
+Separate request objects and lane-local diagnostic tokens must not be treated
+as private identities or unique causal joins. No such trace component has run.

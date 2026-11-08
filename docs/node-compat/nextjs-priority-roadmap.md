@@ -54,9 +54,15 @@ Next actions, in dependency order:
    native still fails both gates; the prepared Node control passes. Its selected
    request contexts contain no explicit negative net error, which establishes
    neither transport EOF nor cause. Reviewf3d7a9ab preserves the failed result.
-   A matched browser identity-encoding diagnostic is now being prepared, keeping
-   every strict gate and checking actual request/response negotiation. This
-   changes outer response coding only, without a causal claim. Declared React19.3.1
+   The matched identity-encoding pair now also completes: both verify actual
+   NetLog identity send headers and absent response Content-Encoding, but native
+   retains the same failed gates and prepared Node passes. Coordinated DATA
+   review8151dc47 verifies those outcomes. Simply requesting identity does not resolve this sample.
+   Next is a bounded deployed guest completion trace at existing public response
+   and adapter EOF/disposal/finish boundaries; no extra body reader or fetch
+   wrapper, native patch or INIT I/O is proposed. Distinct request objects cannot
+   be joined by coincident counters/method/path, and an error observer must not
+   mask unhandled errors. Declared React19.3.1
    and the captured Next-vendored browser canary are recorded separately.
 4. **Parallel compatibility priority:** distinguish module-local generation
    from durable cache invalidation, then inspect guest export quiescence and
@@ -78,7 +84,7 @@ Next actions, in dependency order:
    two-primary-tag mutation contract, all failures and unchanged legacy app code.
 
 The implementation/build checkpoint is committed and pushed through
-`9060b4ef`; [progress.md](../../progress.md) tracks current work and closed evidence.
+`1756de82`; [progress.md](../../progress.md) tracks current work and closed evidence.
 
 The retained first fresh **Next 16.4.5 / React 19.3.1 App Router application
 passes the selected experimental Wasmtime smoke contract**:

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "parentSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-browser-netlog-candidate-v1/index.json",
+    "sha256": "c7be23d9dbdd8a956ccb7507d640aadbd7da3a05d46c76bb5b6ac2e75d8f46d5",
+    "bytes": 2029
+  },
+  "workerReplacements": [
+    {
+      "before": "import assert from 'node:assert/strict';",
+      "after": "import assert from 'node:assert/strict';\nimport {identityNegotiationGate} from './identity-gate.mjs';"
+    },
+    {
+      "before": "let browser;",
+      "after": "let browser,identityNetlog;\nresult.identityNegotiation=null;"
+    },
+    {
+      "before": "context=await browser.newContext({viewport:{width:1280,height:800},acceptDownloads:false});",
+      "after": "context=await browser.newContext({viewport:{width:1280,height:800},acceptDownloads:false,extraHTTPHeaders:{'Accept-Encoding':'identity'}});"
+    },
+    {
+      "before": "result.netlog.completeJson=true;result.netlog.eventCount=parsed.events.length;",
+      "after": "result.netlog.completeJson=true;result.netlog.eventCount=parsed.events.length;identityNetlog=parsed;"
+    },
+    {
+      "before": "  result.passed=result.functionalPassed&&result.browserErrorFree&&result.errors.length===0&&result.browserClosed;",
+      "after": "  try{\n    result.identityNegotiation=identityNegotiationGate({origin:origin.origin,actionPosts:result.actionPosts,responseHeaders:result.responseHeaders,netlog:identityNetlog});\n    if(!result.identityNegotiation.passed)result.errors.push({stage:'outer-identity-negotiation',failures:result.identityNegotiation.failures});\n  }catch(error){result.errors.push({stage:'outer-identity-negotiation',...errorData(error)});}\n  result.passed=result.functionalPassed&&result.browserErrorFree&&result.errors.length===0&&result.browserClosed&&result.identityNegotiation?.passed===true;"
+    }
+  ],
+  "unchangedAnalyser": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-browser-netlog-candidate-v1/analyze.py",
+    "sha256": "2e5770301e724441e7768824ba5a50a6f0ae920a65619f2c4ce1359d6559a8cd",
+    "bytes": 8029
+  },
+  "newPureGate": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-browser-identity-candidate-v1/identity-gate.mjs",
+    "sha256": "004a2acabaed67f51a4e02c6dca0a55312735bf6191ff64ec0038e6f33f842c2",
+    "bytes": 7067
+  },
+  "noNodeOrTargetExecuted": true,
+  "sourceOnly": true,
+  "actualAuthority": null
+}

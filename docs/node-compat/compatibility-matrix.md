@@ -11,6 +11,9 @@ pass normal-input Fetch/gzip/wire subsets without waiving either failure.
 A later Chrome NetLog full-suite pair preserves both native failures while the
 prepared Node control passes (reviewf3d7a9ab). The absence of an explicit negative
 net error in the selected NetLog contexts establishes neither EOF nor a cause.
+A matched identity-encoding pair verifies explicit POST send headers/absent
+Content-Encoding on both arms and preserves the same native failures, while
+prepared Node passes (review8151dc47); no unique compression cause follows.
 Declared React19.3.1 and the actual Next-vendored browser canary runtime are
 distinguished in the [client audit](nextjs-server-action-next-steps.md).
 The machine-readable production dispositions remain unchanged.
