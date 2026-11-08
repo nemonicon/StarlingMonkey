@@ -1,7 +1,7 @@
 # Next compression-off diagnostic profile
 
-Updated 2026-11-08. The new application builds successfully. It has not yet run
-the full browser contract. This is a standard Next configuration experiment,
+Updated 2026-11-08. The new application builds successfully and now passes the
+[full browser contract once on Wasm and Node](nextjs-compression-off-full-results.md). This is a standard Next configuration experiment,
 not a native zlib fix or a replacement for the failed compression-enabled run.
 
 The [fixture config](../../tests/node-compat/frameworks/nextjs/next-fs-callback-no-compress-app-build-v1/fixture/next.config.mjs)
@@ -16,7 +16,8 @@ successfully; Root receipt`9d8c6bbb` reports buildPassed:true and runtimeExecute
 The standalone inventory records2,196 files/48,805,615 bytes/431 child directories,
 no symlinks or source cache. Both emitted required-server-files configs contain
 compress:false and the preserved tracing exclusion. These are build/config
-observations; effective HTTP headers still require a live test.
+observations. The subsequent full browser run observes no Content-Encoding
+header on either Server Action response.
 
 The pinned guest and Node startup paths consume the emitted Next configuration.
 Next's router installs dynamic compression only when compress is not false.
@@ -25,12 +26,12 @@ standard WASI0.2.10 interfaces can be reused. No new guest service, engine
 construction or host modification is proposed.
 
 The build review, root identity and HTML/script asset pins are verified.
-Next bind fresh full-client/browser/runtime namespaces. Run the unchanged
-24HTTP/cache52/supplemental80/generation/stream and both strict browser tests
-once per declared Wasm and Node slot. Preserve all original predicates and raw
-failures. A passing sample would narrow the reproduction to a profile dimension;
-it would not establish reliability or a compression, bridge, backpressure,
-timing or cancellation cause. Full Next acceptance remains false.
+Fresh namespaces and bindings run the unchanged24HTTP/cache52/supplemental80/
+generation/stream and both strict browser tests once on each declared host; both
+pass. Future runs need new declared output namespaces and current input bindings.
+Keep all original predicates and raw failures. This sample narrows the tested
+application profile; it does not establish reliability or a compression, bridge,
+backpressure, timing or cancellation cause. Full Next acceptance remains false.
 
 Build evidence is in the [Root packet](../../tests/node-compat/frameworks/nextjs/next-fs-callback-no-compress-root-results-v1/README.md).
 The [raw-after-prework result](nextjs-rsc-prework-response-results.md) explains

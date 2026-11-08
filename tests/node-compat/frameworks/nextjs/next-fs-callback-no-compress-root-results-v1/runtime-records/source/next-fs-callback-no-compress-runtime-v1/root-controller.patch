@@ -1,0 +1,132 @@
+--- donor/run-controls.unbound.py
++++ newRoot/run-controls.py
+@@ -1,4 +1,4 @@
+-"""Prepare the fixed current-app full-contract profiles; run one original owner at a time."""
++"""Prepare the fixed compression-off full-contract profiles; run one original owner at a time."""
+ import argparse
+ import hashlib
+ import importlib.util
+@@ -24,9 +24,10 @@
+ 
+ 
+ # Required existing reviewed DATA/Source, not issued runtime bindings.
+-REQUIRED_APP_REVIEW = None
++REQUIRED_APP_REVIEW = dict(path=str(BASE / 'next-fs-callback-no-compress-root-results-v1/actual-build-review.json'),
++    sha256='9106545f606ee30b2a3a05940d97233ce3b2e867e6abcdc5c5ec84efa09ad679', bytes=22847)
+ REQUIRED_BROWSER_INDEX = None
+-REQUIRED_WORKER = dict(path=str(BASE / 'next-fs-callback-browser-v1/browser-check.mjs'),
++REQUIRED_WORKER = dict(path=str(BASE / 'next-fs-callback-no-compress-browser-v1/browser-check.mjs'),
+     sha256='01caabc8dae9f684d7e7c9f70b413223811fd06fba3be546ce733c153d37072b', bytes=32170)
+ 
+ 
+@@ -40,23 +41,33 @@
+     prep = importlib.util.module_from_spec(spec)
+     spec.loader.exec_module(prep)
+     binding = prep.document(BINDINGS)
+-    assert binding['state'] == 'ROOT_FS_CALLBACK_ACTUAL_RUNTIME_BINDINGS_V1'
++    assert binding['state'] == 'ROOT_FS_NO_COMPRESS_ACTUAL_RUNTIME_BINDINGS_V1'
+     assert binding['compositionReview'] == COMPOSITION_REVIEW and binding['innerConstructionReview'] == INNER_REVIEW
+     assert binding['applicationBuildReview'] == REQUIRED_APP_REVIEW and binding['browserIndex'] == REQUIRED_BROWSER_INDEX
+     actor_index = prep.family(binding['actorIndex'])
+     browser_index = prep.family(binding['browserIndex'])
+     client_index = prep.family(binding['clientIndex'])
+     client_root = Path(binding['clientIndex']['path']).parent
+-    assert client_root == BASE / 'next-fs-callback-full-client-v1'
++    assert client_root == BASE / 'next-fs-callback-no-compress-full-client-v1'
++    client_plan_ref = next(dict(r, path=str(client_root / r['path'])) for r in client_index['files'] if r['path'] == 'plan.json')
++    client_plan = prep.document(client_plan_ref)
++    requirements = client_plan['sourceRequirements']
++    assert set(requirements) == {'manifestReader', 'supplemental', 'portableCacheCollector', 'fixtureContract', 'browserSourceIndex', 'browserWorker'}
++    assert requirements['browserSourceIndex'] == binding['browserIndex'] and requirements['browserWorker'] == REQUIRED_WORKER
++    protected = {r['path']: r for r in binding['protectedInputs']}
++    assert len(protected) == len(binding['protectedInputs'])
++    for r in requirements.values():
++        prep.checked(r)
++        assert protected[r['path']] == r, 'Every full-client consumer must be in the fresh protected graph'
+     actor_root = Path(binding['actorIndex']['path']).parent
+     browser_root = Path(binding['browserIndex']['path']).parent
+-    assert actor_root == BASE / 'next-fs-callback-runtime-v1'
+-    assert browser_root == BASE / 'next-fs-callback-browser-v1'
++    assert actor_root == BASE / 'next-fs-callback-no-compress-runtime-v1'
++    assert browser_root == BASE / 'next-fs-callback-no-compress-browser-v1'
+     for role, name in [('nativePlan', 'plan.json'), ('stockPlan', 'stock-plan.json')]:
+         assert binding[role]['path'] == str(actor_root / name)
+         assert any(dict(r, path=str(actor_root / r['path'])) == binding[role] for r in actor_index['files'])
+     app = prep.document(binding['applicationBuildReview'])
+-    assert app['state'] == 'COORDINATED_FS_CALLBACK_APP_BUILD_DATA_REVIEW_PASSED_V1' and app['verifiedPassed'] is True
++    assert app['state'] == 'COORDINATED_FS_CALLBACK_NO_COMPRESS_APP_BUILD_DATA_REVIEW_PASSED_V1' and app['verifiedPassed'] is True
+     inner = prep.document(INNER_REVIEW)
+     assert inner['verifiedPassed'] is True and inner['rootAuthority'] == INNER_AUTHORITY
+     composition = prep.document(COMPOSITION_REVIEW)
+@@ -82,7 +93,7 @@
+         assert plan['node'] == plans['native']['node'] and plan['monitor'] == plans['native']['monitor']
+         prefix = Path(plan['outputPrefix'])
+         assert prefix.parent == Path('/private/tmp/starling-node-compat') and prefix.resolve() == prefix
+-        assert plan['runId'] == ('fs-callback-native-first' if arm == 'native' else 'fs-callback-stock-first')
++        assert plan['runId'] == ('fs-no-compress-native-first' if arm == 'native' else 'fs-no-compress-stock-first')
+     assert plans['native']['applicationSource'] == app['applicationRoot']
+     assert plans['stock']['standaloneSource'] == app['applicationRoot']
+     self_ref = prep.row(Path(__file__).resolve())
+@@ -113,7 +124,7 @@
+         publicRequestCorrelation=PUBLIC, compilerAllowed=False, nativeBuildAllowed=False,
+         automaticRetry=False, replacementTrials=False, fullNextAccepted=False)
+     if arm == 'native':
+-        return dict(common, state='ROOT_NEXT_FS_CALLBACK_NATIVE_FULL_AUTHORIZED_V1',
++        return dict(common, state='ROOT_NEXT_FS_NO_COMPRESS_NATIVE_AUTHORIZED_V1',
+             plan=binding['nativePlan'], component=inner['component'], componentAudit=inner['componentAudit'],
+             constructionResult=inner['actualResult'], constructionCallerIndex=inner['callerSourceIndex'],
+             inputSourceIndex=inner['inputSourceIndex'], inputEntry=inner['inputEntry'],
+@@ -121,7 +132,7 @@
+             localhostServeAllowed=True, actualNextGuestAllowed=True, browserAllowed=True,
+             standardHandlerObserverAllowed=True, componentConstructionAllowed=False,
+             externalDeploymentAllowed=False, adoptionAllowed=False)
+-    return dict(common, state='ROOT_NEXT_FS_CALLBACK_HOST_FULL_AUTHORIZED_V1',
++    return dict(common, state='ROOT_NEXT_FS_NO_COMPRESS_HOST_AUTHORIZED_V1',
+         plans=binding['stockPlan'], rootAuthorityPath=str(HERE / 'stock-authority.json'),
+         localhostServerAllowed=True, browserAllowed=True, guestAllowed=False, engineAllowed=False,
+         externalApplicationDeploymentAllowed=False)
+@@ -150,7 +161,7 @@
+                 outputRoot=str(output), ownerOutputRoot=str(output) + '-external-root', ownerSeconds=600 if arm == 'native' else 300))
+         prep.admit(original)
+         protect()
+-        prep.save(prepared_path, dict(schemaVersion=1, state='ROOT_FIXED_FS_CALLBACK_PAIR_PREPARED_NOT_RUN_V1',
++        prep.save(prepared_path, dict(schemaVersion=1, state='ROOT_FIXED_FS_NO_COMPRESS_PAIR_PREPARED_NOT_RUN_V1',
+             controller=self_ref, bindings=BINDINGS, trials=rows, order=['native', 'stock'], publicRequestCorrelation=PUBLIC,
+             constructorGuardBefore=before, actorsInvoked=False, automaticRetry=False, replacementTrials=False,
+             oldRedirectFailuresWaived=False, fullOriginalContractExecuted=False, fullNextAccepted=False))
+@@ -160,7 +171,7 @@
+     prepared_ref = prep.row(prepared_path)
+     prepared = prep.document(prepared_ref)
+     assert prepared['controller'] == self_ref and prepared['bindings'] == BINDINGS
+-    assert prepared['state'] == 'ROOT_FIXED_FS_CALLBACK_PAIR_PREPARED_NOT_RUN_V1'
++    assert prepared['state'] == 'ROOT_FIXED_FS_NO_COMPRESS_PAIR_PREPARED_NOT_RUN_V1'
+     assert prepared['order'] == ['native', 'stock'] and [x['arm'] for x in prepared['trials']] == ['native', 'stock']
+     for item in prepared['trials']:
+         expected_output = plans[item['arm']]['outputPrefix'] + '-' + plans[item['arm']]['runId']
+@@ -207,7 +218,7 @@
+             client_ref = observed['client']['result']
+             assert client_ref['path'] == str(native_output / 'client/result.json')
+             client = prep.document(client_ref)
+-            assert client['suite'] == 'NEXT_FS_CALLBACK_FULL_CONTRACT_CLIENT_V1'
++            assert client['suite'] == 'NEXT_FS_NO_COMPRESS_FULL_CONTRACT_CLIENT_V1'
+             assert client['controlOnly'] is False and client['fullOriginalContractExecuted'] is True
+             assert observed['fullOriginalContractExecuted'] is True and client['fullNextAccepted'] is False
+             assert type(client['passed']) is bool
+@@ -230,7 +241,7 @@
+         except BaseException as error:
+             try:
+                 prep.save(HERE / 'stock-unattempted.json', dict(schemaVersion=1,
+-                    state='FS_CALLBACK_FULL_STOCK_SLOT_UNATTEMPTED_NATIVE_COLLECTION_UNCERTAIN_V1',
++                    state='FS_NO_COMPRESS_FULL_STOCK_SLOT_UNATTEMPTED_NATIVE_COLLECTION_UNCERTAIN_V1',
+                     error=dict(name=type(error).__name__, message=str(error)[:2048]), bindings=BINDINGS,
+                     automaticRetry=False, replacementTrials=False, fullNextAccepted=False))
+             except BaseException:
+@@ -268,7 +279,7 @@
+                 secondary.append(dict(name=type(error).__name__, message=str(error)[:2048]))
+         clean = terminal is not None and not terminal['timeout'] and not terminal['forcedCleanup'] and terminal['parentOwnedGroupGone'] and terminal['allObservedOwnedGroupsGone'] and all(not terminal[k] for k in ('errors', 'signals', 'interruptedSignals', 'remainingObservedPids'))
+         try:
+-            row = dict(schemaVersion=1, state='ROOT_FS_CALLBACK_FULL_ORIGINAL_OWNER_COMPLETED_UNREVIEWED_V1', arm=arm,
++            row = dict(schemaVersion=1, state='ROOT_FS_NO_COMPRESS_FULL_ORIGINAL_OWNER_COMPLETED_UNREVIEWED_V1', arm=arm,
+                 rawExitCode=None if terminal is None else terminal['rawExitCode'], originalOwner=None if terminal is None else terminal['pid'],
+                 cleanOwner=clean, finalInputsPreserved=preserved, error=None if primary is None else dict(name=type(primary).__name__, message=str(primary)[:2048]),
+                 secondaryErrors=secondary, authority=ar, controller=self_ref, bindings=BINDINGS,

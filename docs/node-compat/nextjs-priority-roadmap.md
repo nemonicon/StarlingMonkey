@@ -1,6 +1,16 @@
 # Next.js execution priority
 
-Updated result: the separately versioned
+Current result: the [compression-off full profile](nextjs-compression-off-full-results.md)
+passes once on Wasm and matched Node, including24HTTP/52cache/80supplemental,
+generation1→2, incremental streaming and both unchanged strict browser tests.
+Actual POST7 body/finished/sizes fulfill; the Content-Encoding header is absent.
+The original compressed failure remains failed. This is one bounded application
+profile, not reliability, broad Node support or production acceptance.
+Next run the same full profile on stock wasmCloud2.11 with fresh actual bindings
+and complete lifetime logs; then finish the separate lifecycle/resource/reuse,
+clean-machine, cost and release gates. See the [next-step source audit](../../tests/node-compat/frameworks/nextjs/next-fs-callback-no-compress-root-results-v1/next-steps.md).
+
+Earlier result: the separately versioned
 [persisted-callback fixture](nextjs-persisted-callback-results.md) passes1→2 on
 both Wasm and Node, with both physical state records verified. Both also pass
 24HTTP/52 cache/80 supplemental/incremental streaming/functional browser checks.
@@ -19,8 +29,8 @@ bytes. The same app, engine, component and13 standard interfaces are retained.
 Chrome/React and Store identity are absent from these controls; the strict full
 browser failure remains failed. The separately versioned [compress:false application](nextjs-compression-off-profile.md)
 now builds with the same tracing exclusion and all other34 fixture files exact.
-Next derive its reviewed build/asset bindings and run the unchanged full client
-and strict browser on Wasm and Node. This standard configuration
+Its subsequent reviewed full-client/strict-browser comparison now passes once
+on Wasm and Node, as recorded above. This standard configuration
 counterfactual diagnoses a profile dimension; it is not an established fix or
 compression/cancellation cause.
 

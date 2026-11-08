@@ -39,3 +39,15 @@ files, six host-tool rows, actual HTML/scripts and standalone server/config.
 Binding`37db0289` derives2,041 fresh protected inputs. Preparation`340af5c4`
 reserves one original600-second Wasm slot followed by one300-second Node slot.
 No actor has run yet; all Source/API reviews and actual syntax checks pass.
+
+Actual full pair: Wasm40483/600 and Node40694/300 both exit0 cleanly and pass the
+unchanged24HTTP/52cache/80supplemental/generation/stream/strict-browser suite.
+Stream count is3(0,1) in both, under the original incremental predicate. POST7
+body/finished/sizes fulfill, with2,963 decoded bytes and no Content-Encoding
+header. See the [full result report](../../../../../docs/node-compat/nextjs-compression-off-full-results.md)
+and [next steps](next-steps.md). The original compressed failure remains failed.
+
+[Primary full-contract review](actual-runtime-review.json) (`e19aaa2d`) and
+[independent gate recomputation](independent-full-gate-review.json) (`d6ab47a6`)
+pass within their stated scopes. The [runtime raw corpus](runtime-records/index.json)
+retains257 payloads/9,536,752 bytes, including both physical generation2 records.

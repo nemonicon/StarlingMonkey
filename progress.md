@@ -4,25 +4,33 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
-Current next step: the [compression-off application](docs/node-compat/nextjs-compression-off-profile.md)
-builds successfully (`9d8c6bbb`) through original owners36534/120,36554/120,
-36565/600 and36633/900. Its dynamic standalone inventory is2,196 files/48,805,615
-bytes/431 child directories, with no links/source cache. Both emitted server
-configs contain compress:false and the unchanged tracing exclusion. Only19
-fixture bytes change; the other34 files remain exact. Source index`5c280e4b`,
-whole Source/API reviews, actual syntax/AST checks and binding`126c68c7` pass.
-Primary build review`9106545f` and independent build/config gate`d4194323` pass.
-Raw index`95116830` retains92 payloads/2,795,484 bytes, rehashed by Root. Fresh
-HTML/asset selection`05c965a6` derives five client scripts and four actions scripts
-from the actual new HTML; independent asset review`a9fe908f` passes. The unchanged full-client/strict-browser Wasm/Node comparison remains
-outstanding; no new compression-off guest/browser result is claimed. New
-browser/full-client/runtime Source forks are sealed (22 payloads/181,014 bytes),
-with worker01ca byte-identical and all original semantic conjunctions unchanged.
-Actual Node syntax checks pass for the modified full client and both actors;
-Root controller/binder AST checks and all final Source/API reviews pass.
-Runtime binding`37db0289` derives2,041 fresh inputs, including every client,
-WIT, host-tool and selected HTML/script/config consumer. Fixed preparation
-`340af5c4` reserves one Wasm600→Node300 pair; no actor has run in this profile.
+Latest result: the [compression-off full Next profile](docs/node-compat/nextjs-compression-off-full-results.md)
+passes once on Wasm40483/600 and Node40694/300, both raw0/clean. Both pass24HTTP,
+52 portable-cache checks,80 supplemental checks, persisted generation1→2,
+incremental stream3(shell0,ready1), and both original strict browser tests.
+Page/console/failed-request/capture errors are zero; POST7 body/finished/sizes
+fulfill with2,963 decoded bytes and no observed Content-Encoding header.
+Playwright reports response body sizes3,001/2,976; no raw-wire equality is claimed.
+The browser worker01ca and every original full semantic predicate remain exact.
+Binding`37db0289` protects2,041 fresh inputs and preparation`340af5c4` executes
+each declared slot once. Independent binding review`e68db3bd` and full-gate recomputation`d6ab47a6`
+pass. Primary review`e19aaa2d` verifies both full contracts and both physical
+35-byte canonical generation2 records with no pending file. Raw index`55487d02`
+retains257 payloads/9,536,752 bytes, rehashed by Root; native stdout is complete
+at28,755 bytes/104 chunks with normal host shutdown.
+This one configuration-profile sample does not resolve the original compressed
+failure or establish reliability/general Node support/production promotion.
+
+The [compression-off application](docs/node-compat/nextjs-compression-off-profile.md)
+builds through original owners36534/120,36554/120,36565/600 and36633/900, with
+2,196 files/48,805,615 bytes/431 child directories and no links/source cache.
+Both emitted configs contain compress:false. Only19 fixture bytes change;
+34 files and the tracing exclusion remain exact. Source5c280e4b, build review
+9106545f, independent gate d4194323 and fresh5/4asset selection05c965a6 with
+independent join a9fe908f pass. The92-payload build corpus totals2,795,484 bytes.
+Next: prepare the [stock wasmCloud full profile](tests/node-compat/frameworks/nextjs/next-fs-callback-no-compress-root-results-v1/next-steps.md)
+with current app/component bindings and complete lifetime capture. Lifecycle,
+resource/reuse, clean-machine, empirical cost and release/promotion gates remain.
 
 The [raw response after non-browser prework](docs/node-compat/nextjs-rsc-prework-response-results.md)
 passes once on Wasm34292/600 and Node34423/300, both raw0/clean. Both pass24HTTP,

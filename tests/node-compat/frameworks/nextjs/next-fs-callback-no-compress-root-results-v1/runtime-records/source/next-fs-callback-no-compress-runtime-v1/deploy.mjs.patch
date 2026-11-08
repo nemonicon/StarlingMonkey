@@ -1,0 +1,46 @@
+--- donor/deploy.mjs
++++ new/deploy.mjs
+@@ -70,7 +70,7 @@
+ assert.deepEqual(plan.clientSource,plan.fsCallbackFullControl.requiredFullClient);
+ for(const key of ['outputPrefix','applicationSource','applicationInputs','applicationBuildResult','applicationBuildReview','applicationRootIdentity','applicationRootIdentityEvidence','applicationSchema','clientSource','clientSourceIndex','browserSource','browserSourceIndex'])assert(plan[key]!==null,'New control binding:'+key);
+ const authorityPath=resolve(process.argv[2]),authority=await read(authorityPath);
+-assert.equal(authority.state,'ROOT_NEXT_FS_CALLBACK_NATIVE_FULL_AUTHORIZED_V1');
++assert.equal(authority.state,'ROOT_NEXT_FS_NO_COMPRESS_NATIVE_AUTHORIZED_V1');
+ assert.equal(authority.publicRequestCorrelationAllowed,true);
+ assert.equal(authority.standardHandlerObserverAllowed,true);
+ assert.equal(authority.fsCallbackFullSuiteAllowed,true);assert.equal(authority.controlOnly,false);
+@@ -143,7 +143,7 @@
+ const input=await read(plan.applicationInputs.path),appBuild=await read(plan.applicationBuildResult.path);
+ await verify(plan.applicationBuildReview);await verify(plan.applicationRootIdentityEvidence);
+ const newAppReview=await read(plan.applicationBuildReview.path);
+-assert.equal(newAppReview.state,'COORDINATED_FS_CALLBACK_APP_BUILD_DATA_REVIEW_PASSED_V1');assert.equal(newAppReview.verifiedPassed,true);
++assert.equal(newAppReview.state,'COORDINATED_FS_CALLBACK_NO_COMPRESS_APP_BUILD_DATA_REVIEW_PASSED_V1');assert.equal(newAppReview.verifiedPassed,true);
+ assert.deepEqual(newAppReview.actualResult,plan.applicationBuildResult);assert.deepEqual(newAppReview.applicationInputs,plan.applicationInputs);
+ assert.deepEqual(newAppReview.applicationRootIdentityEvidence,plan.applicationRootIdentityEvidence);assert.equal(newAppReview.applicationRoot,plan.applicationSource);
+ artifactRefs.push(plan.applicationBuildReview,plan.applicationRootIdentityEvidence);
+@@ -157,7 +157,7 @@
+ }
+ await sourceBookend();
+ const output=resolve(plan.outputPrefix+'-'+authority.runId);assert.equal(output,plan.outputPrefix+'-'+authority.runId);const app=join(output,'app'),cache=join(output,'cache');await mkdir(output,{mode:0o700});
+-const result={schemaVersion:1,state:'FS_CALLBACK_FULL_NATIVE_PROFILE_IN_PROGRESS_V1',controlOnly:false,fullOriginalContractExecuted:false,fullNextAccepted:false,runId:authority.runId,outputRoot:output,inputEntry:authority.inputEntry,inputSourceIndex:authority.inputSourceIndex,component:authority.component,componentAudit:authority.componentAudit,constructionResult:authority.constructionResult,servedEnvelope:authority.envelope,servedEnvelopeCompositionReview:authority.compositionReview,standardHandlerObserverMarkersInterpreted:false,rootAuthority:await row(authorityPath),sourceIndex:authority.sourceIndex,selectedInterfaces:plan.selectedInterfaces,emittedImports:audit.emittedImports,errors:[],server:null,client:null,originalInputsPreserved:false,readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationInputs:plan.applicationInputs,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],adoption:false};
++const result={schemaVersion:1,state:'FS_NO_COMPRESS_FULL_NATIVE_PROFILE_IN_PROGRESS_V1',controlOnly:false,fullOriginalContractExecuted:false,fullNextAccepted:false,runId:authority.runId,outputRoot:output,inputEntry:authority.inputEntry,inputSourceIndex:authority.inputSourceIndex,component:authority.component,componentAudit:authority.componentAudit,constructionResult:authority.constructionResult,servedEnvelope:authority.envelope,servedEnvelopeCompositionReview:authority.compositionReview,standardHandlerObserverMarkersInterpreted:false,rootAuthority:await row(authorityPath),sourceIndex:authority.sourceIndex,selectedInterfaces:plan.selectedInterfaces,emittedImports:audit.emittedImports,errors:[],server:null,client:null,originalInputsPreserved:false,readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationInputs:plan.applicationInputs,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],adoption:false};
+ const save=()=>writeFile(join(output,'result.json'),JSON.stringify(result,null,2)+'\n',{mode:0o600});await save();
+ const pause=ms=>new Promise(r=>setTimeout(r,ms));
+ async function boundedWait(promise,ms){let timer;try{await Promise.race([promise,new Promise(resolve=>{timer=setTimeout(resolve,ms);})]);}finally{clearTimeout(timer);}}
+@@ -202,7 +202,7 @@
+  assert(ready,'Wasmtime did not report exact listener within60s');result.server.readyOrigin=origin;await save();
+  result.publicRequestCorrelation=await writePublicCorrelationManifest({block:authority.publicRequestCorrelation,runId:authority.runId,origin,output});
+  artifactRefs.push(result.publicRequestCorrelation.manifest);await artifactBookend();await save();
+- const client=await launch(plan.node.path,[plan.clientSource.path,origin,join(output,'client'),plan.browserTools,authority.runId],'client');clientProcess=client;result.client={command:client.command,pid:client.child.pid??null,stdout:client.stdout,stderr:client.stderr};await save();const status=await Promise.race([client.done,hostCapture.failure.then(failure=>{throw Error('Wasmtime raw stdout capture failed: '+failure.stage);})]);result.client.exit=status;result.client.result=await row(join(output,'client/result.json'));const observed=await read(result.client.result.path);assert.equal(typeof observed.fullOriginalContractExecuted,'boolean');result.fullOriginalContractExecuted=observed.fullOriginalContractExecuted;assert.equal(observed.suite,'NEXT_FS_CALLBACK_FULL_CONTRACT_CLIENT_V1');assert.equal(observed.controlOnly,false);assert.equal(observed.fullOriginalContractExecuted,true);assert.equal(observed.fullNextAccepted,false);assert.deepEqual(status,{code:0,signal:null,error:null});assert.equal(observed.passed,true);assert.equal(hostExit,null,'Server must remain live through full contracts');result.controlPassed=true;
++ const client=await launch(plan.node.path,[plan.clientSource.path,origin,join(output,'client'),plan.browserTools,authority.runId],'client');clientProcess=client;result.client={command:client.command,pid:client.child.pid??null,stdout:client.stdout,stderr:client.stderr};await save();const status=await Promise.race([client.done,hostCapture.failure.then(failure=>{throw Error('Wasmtime raw stdout capture failed: '+failure.stage);})]);result.client.exit=status;result.client.result=await row(join(output,'client/result.json'));const observed=await read(result.client.result.path);assert.equal(typeof observed.fullOriginalContractExecuted,'boolean');result.fullOriginalContractExecuted=observed.fullOriginalContractExecuted;assert.equal(observed.suite,'NEXT_FS_NO_COMPRESS_FULL_CONTRACT_CLIENT_V1');assert.equal(observed.controlOnly,false);assert.equal(observed.fullOriginalContractExecuted,true);assert.equal(observed.fullNextAccepted,false);assert.deepEqual(status,{code:0,signal:null,error:null});assert.equal(observed.passed,true);assert.equal(hostExit,null,'Server must remain live through full contracts');result.controlPassed=true;
+ }catch(error){result.errors.push({stage:'deployment-or-control',...errorData(error)});}
+ finally{
+  if(lease)await new Promise(resolve=>lease.close(()=>resolve()));
+@@ -248,6 +248,6 @@
+  try{await readonlyBookend();result.readonlyAppPreserved=true;}catch(error){result.errors.push({stage:'readonly-app-final',...errorData(error)});}
+  result.cacheInventory=[];try{const tree=await walk(cache);assert.equal(tree.links.length,0);for(const name of tree.files){const path=join(cache,name);result.cacheInventory.push({...await row(path),relativePath:name,mode:(await lstat(path)).mode&0o777});}}catch(error){result.errors.push({stage:'cache-final-inventory',...errorData(error)});}
+  result.passed=hostCaptureOutcome?.complete===true&&result.controlPassed===true&&result.errors.length===0&&result.originalInputsPreserved&&result.readonlyAppPreserved&&result.server?.shutdownRequested===true&&result.server?.sigintSent===true&&result.server?.forcedCleanup===false&&hostExit?.code===0&&hostExit?.signal===null&&hostExit?.error===null;
+- result.state=result.passed?'FS_CALLBACK_FULL_NATIVE_PROFILE_PASSED_UNREVIEWED_V1':'FS_CALLBACK_FULL_NATIVE_PROFILE_FAILED_RAW_PRESERVED_V1';await save();
++ result.state=result.passed?'FS_NO_COMPRESS_FULL_NATIVE_PROFILE_PASSED_UNREVIEWED_V1':'FS_NO_COMPRESS_FULL_NATIVE_PROFILE_FAILED_RAW_PRESERVED_V1';await save();
+ }
+ console.log(JSON.stringify({state:result.state,passed:result.passed,errors:result.errors}));process.exitCode=result.passed?0:1;
