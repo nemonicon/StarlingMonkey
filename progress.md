@@ -15,10 +15,14 @@ review`b473d4c9` pass for this build-only scope. Probe component`d04c4289`
 (37,156,919 bytes) now constructs/validates at raw0, with coordinated INIT
 review`163eb782`: 131 observed imports across the same thirteen standard
 WASI0.2.10 interfaces, incoming-handler-only export, full returned graph and
-complete marker-free INIT capture. Its seventeen deployed cases are next;
-the fixture's return-value flag and active observation behavior remain
-unobserved. The new Next.js constructor authority is prepared, with no new
-Next.js result or fix established. Source/build preparation
+complete marker-free INIT capture. All seventeen deployed cases now finish
+raw0/clean (`f085c120`), with complete capture and final protection. Independent
+semantic review confirms sixteen records and all seventeen response contracts;
+coordinated review`91e961ab` binds owner/capture review`77fbda3f`. The new real-Next
+component also constructs at raw0 as`6b2084d0` (37,282,148 bytes), with the same
+thirteen standard interfaces; coordinated INIT review`5c284564` binds
+owner/world review`8890980b`. The full deployed comparison remains pending.
+No Next.js fix is established. Source/build preparation
 checkpoint `2cd7de93` is pushed to `origin/main`.
 
 Next.js executes in a real Wasm component. The fixed ten-trial comparison passes
@@ -319,6 +323,45 @@ Current next steps and outstanding work:
   contains 115 copies/6,123,766 bytes; Root's first offline check`fc2462` exits0,
   preserving ten generator outcomes and recorded 825-file evidence while
   excluding current Source/tool payload replay and runtime/build acceptance.
+- **Seventeen runtime cases collected and passed; review pending:** Root
+  `387858`/session46077 finishes`56cea8` raw0 under original53995/1,800 seconds.
+  Driver result`f085c120` reports all seventeen cases passed, no unattempted
+  suffix, complete stdout and final native/Source/world protection. Independent
+  semantic intake checks all sixteen native frames: two single-valid, twelve
+  unavailable and two ambiguous. Every response reports the snapshot return
+  flag true, undefined observation returns and untouched conversion hooks.
+  `/none` has zero native records in complete capture under its declared100ms
+  bound; this does not prove native export completion. The concatenation case
+  reports nonlinear-string; no representation or forced-GC claim follows.
+  The 512-KiB allocation case retains the expected copied fixture bytes.
+  Next constructor `fe446b`/session53324 separately finishes`1ab962` raw0 under
+  original54388/2,400 seconds, producing component`6b2084d0` and audit`089139f8`.
+  It validates the same thirteen WASI0.2.10 interfaces/incoming-only export;
+  independent construction review and the full Next.js pair remain open.
+- **Diagnostic runtime and new Next INIT reviews complete:** coordinated
+  runtime review`91e961ab` accepts all seventeen declared probe cases and joins
+  owner/capture review`77fbda3f`: eighteen clean original owners, seventeen
+  distinct owned Wasmtime children and seventeen complete captures. Raw stdout
+  is 3,760 bytes, direct stderr680 bytes and HTTP bodies6,424 bytes. This remains
+  a diagnostic subset, with no full Next acceptance. New Next INIT review
+  `5c284564` joins owner/world review`8890980b`, verifies all four clean owners,
+  eight marker-free INIT streams, complete 52-field metadata, 131 observed
+  imports/13 interfaces and 1,678 freshly derived Source evidence descriptors.
+  The four public values for one fixed native→Node pair are declared in
+  `public-correlation-declaration.json` (`c0e32a24`) before either arm. Each
+  unchanged actor derives its actual origin after its port0 listener is ready.
+  Fresh Source/protection assembly and the full pair are next; no earlier
+  failure or production gate is waived.
+- **Full pair prepared, no arm launched yet:** Source-only binder`6ef473` /
+  session21318 exits0 (`a664ef`) and creates native actor index`39cd3c7c` from
+  the actual new component/constructor/build evidence. It derives 1,650 current
+  Source/target descriptors, 1,771 protected inputs and actual metadata/build/
+  Source lengths52/35/1678; no predecessor array is retargeted. Root's
+  `ec72c4`/session63690 preparation exits0 (`a6d38c`) and validates both fixed
+  arms before writing either runtime grant. Native run`native-export-237c-first`
+  and Node run`native-export-stock-22-first` retain the original600/300-second
+  owners under the1,200-second pair owner, every original gate and complete
+  native stdout capture. The next action is the single declared comparison.
 - **Complete:** guarded native build, real-Next component construction, and one
   full deployed regression. HTTP/stream/browser checks pass in that sample;
   cache1→1 keeps the full suite failed. Prior browser failures remain unresolved.

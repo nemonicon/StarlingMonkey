@@ -1,0 +1,199 @@
+--- held-bea8/analyze.py
++++ native-public-correlation-analysis-v1/analyze.py
+@@ -1,4 +1,4 @@
+-"""Bounded, read-only public-correlation DATA analysis; explicit CLI files only."""
++"""Bounded native-success-site/public-correlation DATA analysis; explicit CLI files only."""
+ import argparse
+ from collections import Counter
+ import hashlib
+@@ -16,17 +16,20 @@
+ PINNED = {
+     'proposal': ('fbc52612cc86a451f4ef00399c748d5086a6fda35d9b317c2ba3a1cd3b333ea5', 12781),
+     'contract': ('74709535564f1031b8238b1221ca212d37c7d7d805c6eaaf730ff94bf6d81f74', 14591),
+-    'guest-index': ('f8c6d52b28aa9d4cd85e9eecbf4182028cf73175595e0e6fea7fce2e3d44dca4', 3872),
+-    'guest-entry': ('a1d66a6e3427204f5fc0a8e2207836e71eea7b095926ce5b38e4e2ecef65c8d3', 47563),
++    'guest-index': ('5d20e455b39a082c8b9a6cfbe7884fe0ec21f12acb35209e739e3de7c9482cd7', 4267),
++    'guest-entry': ('022fccdfb1d9f603f7cbed6136edb99d1e7767fad4a3fd5e6c808acdcb3c236e', 48063),
+     'browser-index': ('a2e8ca5532dfb5d57177ee0e7ea5ab6cdd039e7ac092fa5359d5fdd5ad436bd8', 3224),
+     'browser-source': ('800f1feeffd75c8f07a83e4ba10c7aaa9470ab0bb45e15973ac0736ab7f38247', 30573),
+     'client-index': ('9a4b59588a1fe68e06c361b74bbc2ed0ac68147a6612a951f0dadb030246636a', 3531),
+     'client-source': ('4edc72d9e66468084d922e9ca0609d6db2dbdfbadf132342665d0fd9c459dd9e', 8516),
+-    'native-index': ('67f4eaf6eda2b2aec51e344e5ba810e6ff3c90fa3e114647b121182a03502342', 1842),
+     'stock-index': ('eb286ac0f4427d9786d772bea9d72c9ddfae49a36bef0d67e157bcf5aa0bba21', 1386),
+-    'constructor-review': ('1dff846899ed3ba0671c875db0d2fe8e9f6afd6733038713881bfb6107774de1', 33138),
++    'constructor-review': ('5c284564e0ddefba507c5429acd98c42393d5c0f2764105a4046f0665f51e16a', 22550),
++    'native-source-index': ('6ed5a7ceabb308a163707dcb95d2b7f3ab521513cceea9837ebb70b741bfca9b', 3805),
++    'native-protocol': ('d183ba3666e3d27739ad06d1593f446d14baca9fd1a49d2d445c278e0de12b6d', 4393),
++    'native-bridge-contract': ('2799de0fff7252fca603d03f135cdcadd10ffd3d0fe0501854c2cb701d55adc0', 3912),
++    'probe-review': ('91e961ab3887b696fefb7262afa3bb8df12c045fa663dd5b0f1ea009cbbfca52', 78495),
+ }
+-DATA = ['pair-plan', 'pair-result', 'native-authority', 'native-result', 'native-client',
++DATA = ['native-index', 'pair-plan', 'pair-result', 'native-authority', 'native-result', 'native-client',
+         'native-terminal', 'native-browser', 'native-netlog', 'native-manifest',
+         'native-retained-manifest', 'native-stdout', 'stock-authority', 'stock-result',
+         'stock-terminal', 'stock-browser', 'stock-netlog', 'stock-manifest',
+@@ -281,6 +284,96 @@
+                 ambiguousInvalidOrDuplicatePostEnterObservations=ambiguous)
+ 
+ 
++
++NATIVE_MARKER = 'NEXT_NATIVE_EXPORT_PUBLIC_CORRELATION_V1'
++
++
++def native_markers(data, protocol):
++    """Native stdout DATA only; never count merged records as component-instance identities."""
++    records, truncated, malformed, foreign = [], [], [], []
++    lines = data.splitlines(keepends=True)
++    need(len(lines) <= 65536, 'Finite shared stdout lines')
++    offset = 0
++    for number, line in enumerate(lines, 1):
++        start = offset
++        offset += len(line)
++        if b'NEXT_NATIVE_' not in line:
++            continue
++        try:
++            need(line.endswith(b'\n') and len(line) <= 512 and
++                 all(32 <= x <= 126 for x in line[:-1]), 'Native ASCII/LF/512-byte bound')
++            v = parse(line)
++            need(type(v) is dict, 'Native record object')
++            if v.get('marker') != NATIVE_MARKER:
++                foreign.append(dict(line=number, offset=start, marker=v.get('marker')))
++                continue
++            need(type(v.get('version')) is int and v['version'] == 1, 'Native version')
++            witness = dict(line=number, offset=start, bytes=len(line), record=v)
++            if v.get('event') == protocol['limits']['truncationEvent']:
++                need(set(v) == {'marker', 'version', 'event'}, 'Short native truncation schema')
++                truncated.append(witness)
++                continue
++            need(set(v) == set(protocol['record']['fields']) and
++                 v['event'] == 'native-success-return-site', 'Native Source event/schema')
++            need(v['status'] in protocol['record']['statuses'] and type(v['observations']) is int and
++                 v['observations'] in [1, 2] and v['method'] in protocol['record']['method'] and
++                 v['path'] in protocol['record']['path'] and v['reason'] in protocol['record']['reasons'],
++                 'Native fixed enums/counts')
++            route = (v['method'], v['path'])
++            admitted = route in {('GET', '/actions'), ('POST', '/actions'), ('GET', '/action-result')}
++            if v['status'] == 'single-valid':
++                need(v['observations'] == 1 and admitted and v['reason'] == '-' and
++                     type(v['corrCount']) is int and v['corrCount'] == 1 and type(v['corr']) is str and
++                     re.fullmatch('[0-9a-f]{64}', v['corr']), 'Native copied valid primitive snapshot')
++            else:
++                need(v['corrCount'] is v['corr'] is None, 'Unavailable native snapshot cleared')
++                if v['status'] == 'ambiguous':
++                    need(v['observations'] == 2 and route == ('-', '-') and
++                         v['reason'] == 'multiple-observations', 'Source multiple-attempt clearing')
++                else:
++                    need(v['observations'] == 1 and v['reason'] not in ['-', 'multiple-observations'],
++                         'Single unavailable observation')
++                    if v['reason'] == 'missing':
++                        need(admitted, 'Missing is certified only at admitted native route')
++            records.append(witness)
++        except (ValueError, TypeError, KeyError, AttributeError) as error:
++            malformed.append(dict(line=number, offset=start,
++                                  reason=type(error).__name__ + ': ' + str(error)[:160]))
++    return dict(records=records, truncationFrames=truncated, malformed=malformed, foreign=foreign,
++                eventCounts=dict(Counter(x['record']['event'] for x in records)),
++                diagnosticLossObserved=bool(truncated or malformed or foreign),
++                componentInstancesOrWindowsNotIdentified=True, missingRecordsRemainUnobserved=True,
++                completeObservationProved=False)
++
++
++def native_site_join(public_joined, diagnostic_loss, frames, nonce):
++    """Pure public-value decision over schema-validated native ordinary-site observations."""
++    matching, unknown, missing, other, nonpost = [], [], [], [], []
++    for x in frames:
++        r = x['record']
++        route = (r['method'], r['path'])
++        admitted = route in {('GET', '/actions'), ('POST', '/actions'), ('GET', '/action-result')}
++        # A cleared/partial route may conceal the POST. Never infer its route from another record.
++        if r['status'] == 'ambiguous' or not admitted:
++            unknown.append(x)
++        elif route != ('POST', '/actions'):
++            nonpost.append(x)
++        elif r['status'] == 'single-valid':
++            (matching if r['corr'] == nonce else other).append(x)
++        elif r['status'] == 'unavailable' and r['reason'] == 'missing' and r['observations'] == 1 and r['corr'] is r['corrCount'] is None:
++            # d183 + selected primitive callback certifies strict missing/count0/null despite output count=null.
++            missing.append(x)
++        else:
++            unknown.append(x)
++    return dict(joined=public_joined is True and diagnostic_loss is False and
++                len(matching) == 1 and not unknown,
++                matchingValidPostSiteCount=len(matching), matchingValidPostSiteObservations=matching,
++                ambiguousOrUnknownPostOrRouteClearedObservations=unknown,
++                certifiedMissingPostObservations=missing, otherValidNoncePostObservations=other,
++                knownOtherRouteObservations=nonpost, publicValueGroupingOnly=True,
++                crossRecordNumericOrTemporalJoinUsed=False, physicalWindowIdentityProved=False)
++
++
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     for name in [*PINNED, *DATA]:
+@@ -291,6 +384,14 @@
+     for index, name, role in [('guest-index', 'guest-entry.mjs', 'guest-entry'), ('guest-index', 'marker-contract.json', 'contract'),
+                                ('browser-index', 'browser-check.mjs', 'browser-source'), ('client-index', 'run-contracts.mjs', 'client-source')]:
+         member(obj[index], name, refs[role])
++    member(obj['guest-index'], 'native-module-contract.json', refs['native-bridge-contract'])
++    member(obj['native-source-index'], 'protocol.json', refs['native-protocol'])
++    need(obj['guest-index']['nativeDiagnosticSourceContext'] == refs['native-source-index'] and
++         obj['native-protocol']['record']['marker'] == NATIVE_MARKER and
++         obj['native-protocol']['record']['version'] == 1 and
++         obj['native-protocol']['record']['event'] == 'native-success-return-site' and
++         obj['native-bridge-contract']['module'] == obj['native-protocol']['module'] and
++         obj['native-bridge-contract']['imports']['named'] == ['observe'], 'Selected native/guest Source ABI')
+     need(obj['contract']['marker'] == MARKER and obj['contract']['version'] == 2 and
+          obj['contract']['reviewedProposal'] == refs['proposal'], 'Held proposal/record contract')
+     plan, pair = obj['pair-plan'], obj['pair-result']
+@@ -301,13 +402,23 @@
+          pair['automaticRetry'] is pair['replacementTrials'] is False, 'One fixed pair')
+     review = obj['constructor-review']
+     need(review['verifiedPassed'] is review['completeReturnedImportAuditVerified'] is True and
+-         review['state'] == 'COORDINATED_PUBLIC_REQUEST_CORRELATION_COMPONENT_INIT_DATA_REVIEW_PASSED_V1', 'Actual INIT prerequisite')
++         review['state'] == 'COORDINATED_NATIVE_EXPORT_DIAGNOSTIC_NEXT_COMPONENT_INIT_DATA_REVIEW_PASSED_V1', 'Actual INIT prerequisite')
++    probe = obj['probe-review']
++    need(probe['state'] == 'COORDINATED_NATIVE_EXPORT_DIAGNOSTIC_DIRECT_PROBE_RUNTIME_DATA_REVIEW_PASSED_V1' and
++         probe['verifiedPassed'] is probe['directProbeRuntimeAccepted'] is True and
++         probe['engine'] == review['engine'] and probe['nativeMetadata'] == review['nativeMetadata'] and
++         probe['fullBuildReview'] == review['fullBuildReview'] and probe['fullNextAccepted'] is False,
++         'Genuine direct17 prerequisite only; no projected Next records')
+     native = obj['native-result']; cap = native['server']['stdoutCapture']
+     need(cap['state'] == 'RAW_STDOUT_CAPTURE_FINALIZED_COMPLETE_V1' and cap['limitBytes'] == 8 * MIB and
+          all(cap[k] is True for k in ['complete', 'pipeEof', 'fileClosed', 'fileBoundVerified', 'finalized']) and
+          all(cap[k] is False for k in ['overflow', 'partialWritePossible', 'unretainedBytesUnknown']) and cap['errors'] == [] and
+          cap['fileBytes'] == cap['completeWriteBytes'] == cap['lastReservedWriteCeiling'] == len(raw['native-stdout']), 'Complete raw stdout required BEFORE marker parsing')
+     match(native['server']['stdout'], refs['native-stdout'], 'final native stdout')
++    stdout_stamp = initial['native-stdout']
++    need(all(cap['finalIdentity'][k] == v for k, v in
++             zip(['dev', 'ino', 'mode', 'nlink', 'size'], stdout_stamp[:5])) and
++         cap['rejectedWholeChunkBytes'] is None, 'Actual finalized stdout physical identity')
+     need(native['server']['exit'] == {'code': 0, 'signal': None, 'error': None} and
+          native['client']['exit'] in [{'code': x, 'signal': None, 'error': None} for x in (0, 1)], 'Natural completed native processes')
+     match(native['client']['result'], refs['native-client'], 'native client')
+@@ -367,6 +478,7 @@
+             clientCounterNonceHasNoPostJoinClaim=True)
+     need(len(all_nonces) == len(set(all_nonces)) == 4, 'No nonce reuse across this fixed pair')
+     marker = markers(raw['native-stdout'])
++    native_marker = native_markers(raw['native-stdout'], obj['native-protocol'])
+     expected = arm_reports['native']['serverActionNonce']
+     frames = marker['records']; selected = [x for x in frames if x['record'].get('corr') == expected and x['record'].get('corrState') == 'valid']
+     post = [x for x in selected if x['record']['method'] == 'POST' and x['record']['path'] == '/actions']
+@@ -384,10 +496,16 @@
+         uninstrumentedOrOtherNoncePostDoesNotCountAsThisNonceReplay=True)
+     decision = public_join(arm_reports['native']['browserPublicPostMetadataObserved'], marker['diagnosticLossObserved'], frames, expected)
+     marker['selectedServerAction']['cardinalityDecision'] = decision
++    native_decision = native_site_join(decision['joined'], native_marker['diagnosticLossObserved'],
++                                       native_marker['records'], expected)
++    native_marker['selectedServerAction'] = native_decision
+     need(all(stamp(paths[k]) == v for k, v in initial.items()), 'Final all-input read bookends')
+-    report = dict(schemaVersion=1, state='PUBLIC_REQUEST_CORRELATION_DATA_ANALYSIS_V1', dataParseSucceeded=True,
+-        inputs=refs, arms=arm_reports, nativeMarkers=marker, observedPublicPostMetadataJoin=decision['joined'],
+-        joinScope='Exact public nonce and cardinality at browser POST, same-local NetLog send headers, adapter-enter and classic-enter only.',
++    report = dict(schemaVersion=1, state='NATIVE_SUCCESS_RETURN_SITE_PUBLIC_CORRELATION_DATA_ANALYSIS_V1', dataParseSucceeded=True,
++        inputs=refs, arms=arm_reports, guestV2Markers=marker, nativeSuccessSiteMarkers=native_marker,
++        observedPublicPostMetadataJoin=decision['joined'],
++        observedNativeSuccessReturnSitePublicPostMetadataJoin=native_decision['joined'],
++        joinScope='Exact public value/cardinality at browser POST, document-local NetLog send headers, V2 adapter/classic POST enters and native-success-return-site only. No token/order/time/physical join.',
++        nativeSiteScope='Record emitted after native fulfilled+lowering checks, before original C return; no C-return, post_call/post-return, host/TCP completion or causal proof.',
+         undetectableSpoofingOrReplayExcluded=False, missingObservationsAreUnobserved=True,
+         loggerSilenceDoesNotProveLosslessObservation=True, forwardedGetIsNotPost=True,
+         privateStoreOrResourceIdentityProved=False, crossLaneNumericIdentityProved=False,
