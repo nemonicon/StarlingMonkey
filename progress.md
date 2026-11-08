@@ -30,6 +30,21 @@ and pinned dependency versions are retained. The new strict-browser Source
 preserves the original observer/lifecycle bytes; generated script pins and app
 bindings remain pending the actual build. No new engine/component build is
 required or claimed. The old full-pair failures remain unchanged.
+The actual host build now passes (`ff098e`/session37098, completion`aa136e`)
+under original4 owners89901/120,89912/120,89922/600,90029/900, with Source/
+tool/native/world guards preserved. Result`4313cdd7`/715,210 bytes derives
+2,196 standalone files/48,800,573 bytes/431 directories, genuine new BUILD_ID
+and two action IDs. Root derives five eligible scripts from six generated
+external script elements, excluding the real noModule polyfill. Build DATA
+review`ee491e55` verifies all2,196 payloads, manifests and original phase
+owners. New browser/runtime Source passes review and all four Node syntax
+checks. Fresh bindings`d69c6809` contain1,926 current host descriptors and
+separately typed five browser URLs with their real physical asset files. The
+first intake mistook a URL for a filesystem path and failed before authority;
+that refusal is retained, the reader corrected, and original native/world
+guards still pass. JSON-only pair preparation`97459c81` now completes with
+both fixed authorities; no new browser/guest control has executed yet.
+
 
 Outstanding critical work:
 
