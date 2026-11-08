@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "sourceOnly": true,
+  "pinnedHostCommit": "bc5acfb8e15f7d6d199ca940354d82e590c2d5ff",
+  "localReferences": [
+    {
+      "file": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v4/models.mjs",
+        "sha256": "cdb18a2083d4db71ebe159f597e966e00c3ec37cbaedd691139e46622e40d1fa",
+        "bytes": 7030
+      },
+      "lines": [
+        18,
+        33
+      ],
+      "symbol": "configuration/validateEffective",
+      "finding": "Exact stock CLI configuration, two preopens, three guest environment variables and empty egress/plugin/service policy."
+    },
+    {
+      "file": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v3/upstream/dev.rs",
+        "sha256": "a7f26577bebe2085383df0c16eca9c440d50076b0d3216f4020c0cf787baaca9",
+        "bytes": 72300
+      },
+      "lines": [
+        450,
+        482
+      ],
+      "symbol": "DevCommand::run",
+      "finding": "Build, await workload running, then exact listening completion marker; no HTTP warmup."
+    },
+    {
+      "file": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmcloud-cold-candidate-v3/upstream/dev.rs",
+        "sha256": "a7f26577bebe2085383df0c16eca9c440d50076b0d3216f4020c0cf787baaca9",
+        "bytes": 72300
+      },
+      "lines": [
+        700,
+        751
+      ],
+      "symbol": "build_workload",
+      "finding": "Host paths and guest mount names independent; read_only:false; manifest environment and egress lists copied into LocalResources."
+    },
+    {
+      "file": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/upstream/crates/wash-runtime/src/engine/volumes.rs",
+        "sha256": "6c0a84a3e52a2fbfb265ca301dead3950b87208e6d5ce3f9bfb9a4b9415bf208",
+        "bytes": 31898
+      },
+      "lines": [
+        28,
+        82
+      ],
+      "symbol": "ResolvedVolumeMount::from_opened/ActiveCtx::volume_directories",
+      "finding": "Dev mounts expose READ|WRITE WASI descriptors; physical app chmod is narrower OS policy, not readonly descriptor proof."
+    },
+    {
+      "file": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/upstream/crates/wash-runtime/src/host/http.rs",
+        "sha256": "2820063f86b74bde92b7853f79c9f13c15d54593af6de79fd22d0b34de41ba01",
+        "bytes": 277716
+      },
+      "lines": [
+        3660,
+        3855
+      ],
+      "symbol": "invoke_component_handler/handle_component_request",
+      "finding": "P2 new_store_as then fresh ProxyPre instantiate; detached task owns Store and may outlive response head. P3 pool branch is separate."
+    },
+    {
+      "file": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/upstream/crates/wash-runtime/src/host/http.rs",
+        "sha256": "2820063f86b74bde92b7853f79c9f13c15d54593af6de79fd22d0b34de41ba01",
+        "bytes": 277716
+      },
+      "lines": [
+        2765,
+        2801
+      ],
+      "symbol": "outgoing_request",
+      "finding": "Allowed-host check precedes local shortcut/network routing; denied requests do not become allowed because target is local."
+    },
+    {
+      "file": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/upstream/crates/wash-runtime/src/host/http.rs",
+        "sha256": "2820063f86b74bde92b7853f79c9f13c15d54593af6de79fd22d0b34de41ba01",
+        "bytes": 277716
+      },
+      "lines": [
+        3939,
+        3960
+      ],
+      "symbol": "check_allowed_hosts",
+      "finding": "Empty allowedHosts is deny-all outgoingHTTP, including loopback; cold8 does not need app-internal action fetch."
+    },
+    {
+      "file": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/upstream/crates/wash-runtime/src/engine/mod.rs",
+        "sha256": "b26fcaa846be48da7895fe504bc333f76d0c483f8e8566663111b58395bd0180",
+        "bytes": 103586
+      },
+      "lines": [
+        68,
+        151
+      ],
+      "symbol": "WASI_LINKER_VERSIONS/add_wasi_to_linker",
+      "finding": "Host registers0.2.12/P3 compatible bindings; selected guest still emits13 interfaces at0.2.10, not P3."
+    },
+    {
+      "file": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/upstream/crates/wash-runtime/src/engine/workload.rs",
+        "sha256": "61a3fa0695a0a0ea8d2141d670770d5812526c642b0614ec7854b186cd5b8053",
+        "bytes": 332575
+      },
+      "lines": [
+        2009,
+        2046
+      ],
+      "symbol": "new_store_as",
+      "finding": "Builds new Store from workload context templates for the P2 handler."
+    }
+  ],
+  "githubConnectorPrimarySourceRead": [
+    {
+      "url": "https://github.com/wasmCloud/wasmCloud/blob/bc5acfb8e15f7d6d199ca940354d82e590c2d5ff/Cargo.toml",
+      "gitBlobSha1": "4c49a114c1461e9f61fe374ec9e326c91f7816b7",
+      "utf8Bytes": 9237,
+      "lines": [
+        {
+          "line": 16,
+          "text": "version = \"2.11.0\""
+        },
+        {
+          "line": 134,
+          "text": "wasmtime = { version = \"48.0.7\", default-features = false }"
+        },
+        {
+          "line": 135,
+          "text": "wasmtime-wasi = { version = \"48.0.7\", default-features = false }"
+        },
+        {
+          "line": 136,
+          "text": "wasmtime-wasi-io = { version = \"48.0.7\", default-features = false }"
+        },
+        {
+          "line": 137,
+          "text": "wasmtime-wasi-http = { version = \"48.0.7\", default-features = false }"
+        },
+        {
+          "line": 138,
+          "text": "wasmtime-wasi-tls = { version = \"48.0.7\", default-features = false }"
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wasmCloud/wasmCloud/blob/bc5acfb8e15f7d6d199ca940354d82e590c2d5ff/crates/wash-runtime/src/engine/linked_call.rs",
+      "gitBlobSha1": "8ea06b5b5cd45f6b81a3e2cb611022bda9ba2d44",
+      "utf8Bytes": 56379,
+      "lines": [
+        {
+          "line": 283,
+          "text": "pub(crate) fn apply_environment("
+        },
+        {
+          "line": 291,
+          "text": "    builder.envs(&pairs);"
+        },
+        {
+          "line": 302,
+          "text": "    apply_environment(&mut wasi_ctx_builder, &template.local_resources.environment);"
+        },
+        {
+          "line": 303,
+          "text": "    wasi_ctx_builder.inherit_stdout().inherit_stderr();"
+        },
+        {
+          "line": 340,
+          "text": "    ctx.volume_mounts = all_volume_mounts.to_vec();"
+        },
+        {
+          "line": 346,
+          "text": "pub(crate) async fn new_store_from_templates("
+        }
+      ]
+    }
+  ],
+  "currentWashAvailability": {
+    "path": "/private/tmp/starling-node-compat/wasmcloud/bin/wash-2.11.0-aarch64-apple-darwin",
+    "expected": {
+      "sha256": "365d896eaed3894f1c551a1ed7351c2aae9dfa5548ce82041ead92e6253d1954",
+      "bytes": 101947952
+    },
+    "statOnly": true,
+    "regular": true,
+    "canonical": true,
+    "mode": "0755",
+    "nlink": 1,
+    "bytes": 101947952,
+    "currentPayloadHashVerified": false,
+    "executed": false
+  },
+  "wasmtimeVersionScope": "Pinned workspace dependency version48.0.7; Cargo metadata Source verification is not a new installed-binary build attestation."
+}

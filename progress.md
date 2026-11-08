@@ -2,7 +2,7 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
-Last updated: 2026-11-07. Overall roadmap: **in progress**.
+Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
 Latest result: native Fetch cleanup compiles and links, a fresh interoperability
 component passes INIT construction review, and all16 deployed module cases pass
@@ -16,9 +16,24 @@ failure is retained; a separate correction preserves every operational byte.
 The corrected full Next.js run now completes: all HTTP, supplemental,
 persistent-cache, streaming and functional browser checks pass. Legacy
 generation1→1 and strict Server Action `ERR_ABORTED` remain failed.
+Two subsequent normal-input controls pass: the current captured action response
+fully drains with valid HTTP/gzip integrity on both Wasm and prepared Node, and
+the2-MiB gzip composition probe observes16 backpressure/drain cycles with valid
+EOF/CRC. A subsequent Chrome NetLog pair preserves both native failures while
+the prepared Node control passes. No explicit negative net error in the selected
+NetLog request contexts identifies EOF or a cause. The current component now
+passes stock wasmCloud cold8, raw0/clean/protected, with coordinated DATA
+review0ed0e4c2. It cannot waive full-suite failures.
 
 Current next steps and outstanding work:
 
+- **Next.js critical path:** run a matched browser identity-encoding diagnostic
+  with the original strict assertions, then use that observation to choose a
+  response-path change or a narrower guest completion trace. Separately resolve
+  the legacy counter contract against per-request guest state; durable-cache
+  success does not waive that failure. Expand the second-host action/browser
+  contract only with an explicit self-origin egress policy. The
+  [priority roadmap](docs/node-compat/nextjs-priority-roadmap.md) tracks this order.
 - **Complete:** guarded native build, real-Next component construction, and one
   full deployed regression. HTTP/stream/browser checks pass in that sample;
   cache1→1 keeps the full suite failed. Prior browser failures remain unresolved.
@@ -41,7 +56,7 @@ Current next steps and outstanding work:
   137 retained originals, including two screenshots; Root independently compared
   every archived member with the current original. The omitted application and
   tool payloads are not reproduced by this archive.
-- **Next:** bounded native Web fetch resource ownership cleanup. Source audit
+- **Completed build/public subset; wider lifecycle open:** bounded native Web fetch resource ownership cleanup. Source audit
   identifies missing disposal paths. Six-file afterimages and pure ownership
   models are sealed after independent review. The actual frontend checks now
   pass two translation units and fail the third on three ignored nodiscard
@@ -61,7 +76,14 @@ Current next steps and outstanding work:
   performance/size evaluation and any production promotion. Foundations-v13 remains
   the accepted checkpoint. Reviewed build, lifecycle and failed Next snapshots
   through1b06d3c2 are committed and pushed. The next gzip-composition probe is
-  uncompiled Source work in progress.
+  pushed as Source in9060b4ef; its new INIT and deployed public profile now pass.
+  Current action-wire control results also pass. The new NetLog pair completes
+  with native raw1/stock raw0; coordinated DATA reviewf3d7a9ab preserves the two
+  failed gates. Closed DATA, offline readers and documentation form the next
+  commit checkpoint. Current wasmCloud SourceV5 is sealed01a939fa after whole
+  Source and closure review. After a separately preserved Python-alias preparation
+  failure, corrected Root admission succeeds and the actual cold8 exits0 with
+  all eight requests passing. Coordinated result review0ed0e4c2 passes that scope.
 
 The corrected2251/afb build is accepted as build DATA only. A separately sealed
 [interop constructorV2](tests/node-compat/frameworks/nextjs/next-module-fileurl-interop-probe-construction-v2/README.md)
@@ -219,6 +241,85 @@ remain outstanding; README's no-index statement describes its preseal draft.
 A separate current-cohort action-wire control is also being prepared to isolate
 HTTP/gzip EOF without browser navigation. No extra native patch or runtime
 acceptance follows from either preparation.
+The gzip probe subsequently constructs successfully: selector875ce909,
+Root676066/original49983/2400 raw0/clean, all three inner commands0,
+result98ca3f7c/component1b4feb75/37,260,529 bytes. INIT DATA reviewab6a0c61
+audits its actual131 imports/134 identities, unchanged standard13 world and
+complete current31/39/17 roles. No Node-reference codec or deployed gzip case
+has run; the new runtime controller/grants are still being prepared. Current
+action-wire Source is also sealed (common596792c5, native2e33f8de,
+prepared-Node2c95a071), preserving original prefixes/CRC/framing gates and the
+captured391-byte POST. Concrete grants and both actual transport runs remain
+outstanding. These Source/preparation results do not change the failed full
+Next baseline.
+Those controls have now executed once. Native wire Root9da74a/original52331/600
+and prepared Node Root04097a/original52580/300 both exit0/clean/protected, after
+explicit native-clean/protected sequencing. Native transportee6c24ad and Node
+transport8b4b2161 retain complete HTTP messages/single gzip/CRC/ISIZE and2,963
+decoded bytes each; bytes/CRCs differ and Flight is opaque. DATA review52fa402d
+binds independent owner/wireb6d0e86a. The33-file/671,933-byte raw corpus is
+retained (manifest9f5c3b56); its standalone Python check passes67cb66.
+Gzip runtime Root0c9d20/original53251/600 also exits0/clean/protected with both
+180-second phase owners0. Resultc98f5472 and validation24c188d8 show exact53-byte
+and2-MiB plaintext/CRC/EOF against independent Node; actual large guest compressed
+bytes2,097,810 versus Node2,097,815. Public response write(false)/drain/pause/resume
+are each16, input-write(false)32. Coordinated DATA review86220bbe binds owner/
+world/public-log11c365a3. A39-file/6,350,276-byte raw corpus (manifest11d9a1b9)
+and offline Python checker pass7d6a43 without Node/guest/network invocation;
+only a clearly derived temporary descriptor-path view is made for the held
+DATA verifier. No retained originals change. Both controls preserve the failed
+full Next/capture baseline and establish no native resource count or cause.
+See [current completion controls](docs/node-compat/nextjs-completion-controls-2026-11-08.md).
+The next diagnostic uses one shared strict browser worker with only standard
+Chrome NetLog startup capture, a16-MiB circular target/20-MiB final read cap,
+default capture mode and unchanged interactions/assertions/deadlines. Its Source
+is under ordered sealing at that preparation cutoff. The subsequently sealed
+sharedc7be23d9, nativee697c715 and stockdb0b4eb3 then execute in one fresh pair.
+Root64c124/original57224/600 terminates raw1/clean; Root8ab627/original57521/300
+terminates raw0/clean. Native result91880401 preserves legacy1→1 and the three
+strict POST7 abort failures; prepared Node result723cc5c6 passes all declared
+gates. Both pass5/52 persistent-cache,6/80 supplemental,24 HTTP,5 stream and2
+functional browser checks. Coordinated DATA reviewf3d7a9ab binds independent
+browser/NetLog reviewa3707d8c and current native/world/app-copy evidence.
+The3,331-event native and3,413-event Node NetLogs each have one exact-origin
+POST/actions candidate and no explicit negative net error in the selected
+request/one-hop context. Empty end-record parameters prove neither EOF nor
+cause; public browser/CDP abort remains failed. An initial native DATA analysis
+used the wrong origin; both it and the explicit corrected-origin report are
+preserved, with no target rerun. See the
+[NetLog result record](tests/node-compat/frameworks/nextjs/next-browser-netlog-root-results-v1/README.md).
+Its92-file/5,601,728-byte raw corpus is retained (manifest056dabc2). The original
+copy-mode checker passes Rootb124d3. A separate portable reader4d595df6 preserves
+that checker/manifest while treating historical permissions as DATA, because Git
+does not preserve them; temporary0644/0755 checkout checks pass and Root4b5360
+also passes the current-copy reader. No actor runs and no original absolute path
+is read.
+The next executable portability check is current D990/f805 stock wasmCloud
+cold8. SourceV5 index01a939fa seals13 unchanged payloads/85,462 bytes after C's
+whole Source and closure reviews. Root full-native/world admission is being
+implemented separately at that cutoff. The first JSON preparationfaa419 fails
+before guard loading/authority/actor because Homebrew reports an executable
+alias. Original RootV5 sources and1032-byte traceback are preserved. A separate
+RootV6 resolves that path before the same binary pin check; its sole+10B wrapper
+change passes narrow Source review. Preparation91b952/f1de29 issues actual
+authorityc4075e8b with1784 protected descriptors and31/39/18+825pairs.
+Rootfeb2db/original61905/600 then exits0/clean/protected, result efac2d2a:
+eight status200 responses pass, including three streamed chunks with shell0
+and ready1. Config inspection and normal SIGINT shutdown both exit0. Coordinated
+DATA review0ed0e4c2 binds independent owner/config/response review6dbf5c9a.
+The45-file/749,774-byte raw corpus is closed (manifestd0fd9e03), including all
+eight bodies/chunk records. Portable checker e22e91ae passes a Git-style copy
+and Rooteef354 current copy without original-path/actor/network operations.
+Its physical app modes do not imply readonly WASI
+descriptor rights; explicit empty allowedHosts denies outgoing HTTP; pinned
+P2 hosting creates a new Store per request. These source limits and future
+exact-origin egress selection are recorded in the
+[host audit](docs/node-compat/nextjs-wasmcloud-mount-egress-source-note.md).
+Next is a matched browser `Accept-Encoding: identity` diagnostic, preserving
+all strict gates and explicitly verifying request negotiation/absent response
+Content-Encoding. It changes outer response coding only; pinned Next strips
+that header before internal self-fetch. Source preparation is underway, with
+no new actor/grant/result yet. Neither outcome alone would establish a cause.
 Commit4ffa8659 is pushed to origin/main; live
 build logs and the unfinished runtime controller were excluded from that cut.
 GeneratorV5 runs all ten checks successfully under original4023/900, result795dab0e;

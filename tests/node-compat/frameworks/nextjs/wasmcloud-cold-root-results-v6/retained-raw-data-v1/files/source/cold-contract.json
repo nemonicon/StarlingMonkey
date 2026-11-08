@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "state": "NEXT_WASMCLOUD_EIGHT_COLD_REQUESTS_CONTRACT_V1",
+  "requests": [
+    {
+      "id": "cold-health-1",
+      "path": "/api/health",
+      "method": "GET",
+      "status": 200,
+      "json": {
+        "marker": "NEXT_HEALTH_OK",
+        "ok": true
+      },
+      "sourceFixtureId": "health"
+    },
+    {
+      "id": "cold-health-2",
+      "path": "/api/health",
+      "method": "GET",
+      "status": 200,
+      "json": {
+        "marker": "NEXT_HEALTH_OK",
+        "ok": true
+      },
+      "sourceFixtureId": "health"
+    },
+    {
+      "id": "cold-health-3",
+      "path": "/api/health",
+      "method": "GET",
+      "status": 200,
+      "json": {
+        "marker": "NEXT_HEALTH_OK",
+        "ok": true
+      },
+      "sourceFixtureId": "health"
+    },
+    {
+      "id": "home",
+      "path": "/",
+      "method": "GET",
+      "status": 200,
+      "includes": [
+        "NEXT_HOME_STATIC",
+        "NEXT_ROOT_LAYOUT",
+        "Starling Next Runtime Fixture"
+      ],
+      "sourceFixtureId": "home"
+    },
+    {
+      "id": "json-post",
+      "path": "/api/json",
+      "method": "POST",
+      "status": 200,
+      "body": "{\"value\":\"posted\"}",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "json": {
+        "marker": "NEXT_JSON_POST",
+        "value": "posted"
+      },
+      "sourceFixtureId": "json-post"
+    },
+    {
+      "id": "fs-crypto-probe",
+      "path": "/api/fs-crypto",
+      "method": "GET",
+      "status": 200,
+      "json": {
+        "marker": "NEXT_FS_CRYPTO",
+        "text": "nextjs-runtime-fixture\n",
+        "sha256": "6bb4bb9103d951dce4f9ff0ebaeee7e91d610226c5661630d59824f0d958b928"
+      },
+      "scope": "Node baseline expected success; Wasm unsupported bindings must be retained as breakage",
+      "sourceFixtureId": "fs-crypto-probe"
+    },
+    {
+      "id": "public-asset",
+      "path": "/fixture.txt",
+      "method": "GET",
+      "status": 200,
+      "includes": [
+        "NEXT_PUBLIC_ASSET"
+      ],
+      "sourceFixtureId": "public-asset"
+    },
+    {
+      "id": "suspense-complete",
+      "path": "/stream",
+      "method": "GET",
+      "status": 200,
+      "includes": [
+        "NEXT_STREAM_SHELL",
+        "NEXT_STREAM_READY"
+      ],
+      "sourceFixtureId": "suspense-complete",
+      "stream": true
+    }
+  ],
+  "sourceFixtureContract": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/fixture-contract.json",
+    "sha256": "d6399e901a0612f672ee176e9ded84fcc19e3f4016059e5d5f728596b0b807f2",
+    "bytes": 8158
+  },
+  "strictStreaming": "readyChunk>shellChunk>=0",
+  "cacheSequenceIncluded": false,
+  "browserIncluded": false,
+  "retainedStateClaimed": false,
+  "fullNextAcceptance": false
+}

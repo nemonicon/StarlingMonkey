@@ -1,0 +1,9 @@
+# Current cleanup native action-wire owner Source
+
+This is an unexecuted fork of held `5fe9ab27…`. Its owner, application policy and unissued Root template are byte-identical; deployment code changes only the shared wire-client Source path. Plan data selects actual D990 component/9256 INIT review, accepted 476b core/22f full metadata, unchanged f805/1631 prebuilt application and the current captured POST. No app, guest, engine, HTTP assertion or host-capability changes are included.
+
+The fixed `/private/tmp/starling-node-compat/next-action-wire-native-v1` prefix remains required by the unchanged owner. Root must choose a fresh safe runId. The standard13 world, separate read-only application/writable cache preopens, owned server/shutdown/copy protection, 600-second original owner and 1 GiB start guard remain unchanged. One shared client makes one transport-only POST, with the original strict framing/gzip CRC/ISIZE/EOF gates and no browser.
+
+The copied unissued template explicitly requires the genuine external whole-world/full-native Root guard. Root must use the original guard APIs before/final and the genuine current constructor authority's complete fixed metadata/evidence: 435 native +387 support +3 embedding Source records, 80 native compile rows plus one separate embedding command. Old metadata/scalar projection, guard rebinding and substitute APIs are excluded. This Source does not build or construct anything and does not reproduce those proofs by relabeling old records.
+
+The new common Source index is NULL/pending until ordered sealing; all action/results remain NULL. Existing old Source/protected evidence stays an unchanged prefix, with current refs appended. Current failed browser/cache results remain failed; this transport diagnostic cannot accept them or establish a cause. B authored the bindings; C authored the donor and peers this fork. No Node, parser, guard, producer, engine or guest ran during preparation.

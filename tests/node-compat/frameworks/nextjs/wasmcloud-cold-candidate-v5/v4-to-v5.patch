@@ -1,0 +1,22 @@
+--- v4/models.mjs
++++ v5/models.mjs
+@@ -59,7 +59,7 @@
+  assert.equal(ctor.state,'ROOT_NEXT_NATIVE_COMPONENT_CONSTRUCTION_V2');assert.equal(ctor.entryMode,'real-next');assert.deepEqual(ctor.callerIndex,a.constructionCallerIndex);
+  assert.deepEqual(ctor.engine,a.engine);assert.deepEqual(ctor.nativeMetadata,a.nativeMetadata);assert.deepEqual(ctor.engineBuildEvidence,a.engineBuildEvidence);
+  assert.deepEqual(ctor.metadataExpectedFixedValues,a.metadataExpectedFixedValues);
+- assert.equal(native.schemaVersion,1);assert.equal(native.metadataKind,'EXPERIMENTAL_NEXT_INTL_INCREMENTAL_NATIVE_BUILD_ACTUAL_V1');assert.deepEqual(native.engine,a.engine);
++ assert.equal(native.schemaVersion,1);assert.equal(native.metadataKind,'EXPERIMENTAL_NEXT_INTL_NATIVE_BUILD_ACTUAL_V1');assert.deepEqual(native.engine,a.engine);
+  assert(a.metadataExpectedFixedValues&&Object.hasOwn(a.metadataExpectedFixedValues,'metadataKind')&&Object.hasOwn(a.metadataExpectedFixedValues,'engine'));
+  for(const[k,v]of Object.entries(a.metadataExpectedFixedValues))assert.deepEqual(native[k],v,k);
+  assert.equal(audit.schemaVersion,1);assert.equal(audit.state,'NEXT_NATIVE_COMPONENT_DATA_AUDIT_PASSED_V1');assert.equal(audit.passed,true);assert.equal(audit.entryMode,'real-next');
+--- v4/deploy.mjs
++++ v5/deploy.mjs
+@@ -132,7 +132,7 @@
+  await prepareReadonlyCopy();
+  await readonlyBookend();await mkdir(cache,{mode:0o700});assert.equal((await lstat(cache)).mode&0o777,0o700);const cacheStat=await lstat(cache);assert(cacheStat.isDirectory()&&!cacheStat.isSymbolicLink());assert.equal(await realpath(cache),cache);
+  await mkdir(join(project,'.wash'),{recursive:true,mode:0o700});await mkdir(join(output,'responses'),{mode:0o700});
+- result.applicationCopy={files:input.regularFiles,bytes:input.bytes,sourceDirectoriesExcludingRoot:input.directories.length,ownedDirectoriesIncludingRoot:426,ownedAdditionalDirectories:[],byteIdentical:true,independentInodes:true,filesMode:'0444',directoryMode:'0555'};result.mounts=[{host:app,guest:'/app'},{host:cache,guest:'/app/.next/cache',physicalRootMode:'0700'}];result.readonlyWasiDescriptorRightsProved=false;await save();
++ result.applicationCopy={files:input.regularFiles,bytes:input.bytes,sourceDirectoriesExcludingRoot:input.directories.length,ownedDirectoriesIncludingRoot:plan.applicationSchema.ownedDirectoriesIncludingRoot,ownedAdditionalDirectories:[],byteIdentical:true,independentInodes:true,filesMode:'0444',directoryMode:'0555'};result.mounts=[{host:app,guest:'/app'},{host:cache,guest:'/app/.next/cache',physicalRootMode:'0700'}];result.readonlyWasiDescriptorRightsProved=false;await save();
+  lease=createServer();lease.on('error',()=>{});await new Promise((resolve,reject)=>{lease.once('error',reject);lease.listen({host:'127.0.0.1',port:0,exclusive:true},resolve);});const address=lease.address();assert(address&&typeof address==='object'&&address.address==='127.0.0.1');const origin='http://127.0.0.1:'+address.port;result.portLease={origin,port:address.port,heldThroughConfigInspection:true,singleAttempt:true,fallbackAllowed:false};
+  const configured=configuration(a.component.path,app,cache,origin),configPath=join(project,'.wash/config.json'),empty=join(output,'empty-user-config.json');await writeFile(configPath,JSON.stringify(configured,null,2)+'\n',{flag:'wx',mode:0o600});await writeFile(empty,'{}\n',{flag:'wx',mode:0o600});const configRefs=[await row(configPath),await row(empty)];extraRefs.push(...configRefs);result.configured=configured;result.configFiles=configRefs;await save();
+  await protect();await sourceBookend();await witBookend();

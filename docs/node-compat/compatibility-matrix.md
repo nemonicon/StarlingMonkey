@@ -2,6 +2,20 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
+The latest experimental D990/476b generation **fails full Next acceptance**:
+24 HTTP,80 supplemental,52 persistent-cache checks, incremental streaming and
+both functional browser interactions pass, while legacy generation1→1 and
+strict action-response capture fail. Independent DATA reviewc3a8b95b preserves
+that outcome. Subsequent [completion controls](nextjs-completion-controls-2026-11-08.md)
+pass normal-input Fetch/gzip/wire subsets without waiving either failure.
+A later Chrome NetLog full-suite pair preserves both native failures while the
+prepared Node control passes (reviewf3d7a9ab). The absence of an explicit negative
+net error in the selected NetLog contexts establishes neither EOF nor a cause.
+Declared React19.3.1 and the actual Next-vendored browser canary runtime are
+distinguished in the [client audit](nextjs-server-action-next-steps.md).
+The machine-readable production dispositions remain unchanged.
+
+The following earlier smoke results retain their original artifact/cohort scope.
 The [Next priority roadmap](nextjs-priority-roadmap.md) now records a passing
 experimental full-application smoke milestone. The unmodified **Next 16.4.5 /
 React 19.3.1** application passes **24/24 HTTP, cache generation 1 → 2, five
@@ -42,23 +56,30 @@ and no complete Next/Node or production support is inferred.
 | Additional experimental boundary | Strategy/capability | Status and deviation | Evidence / remaining validation |
 | --- | --- | --- | --- |
 | Request context and Unicode body recovery | Existing native/facade HTTP/streams/ALS; same thirteen WASI0.2.10 interfaces | Six measured end-to-end cases pass; client overlap does not identify a JS heap, Store or native owner | Both original arms80checks; fresh full-build V9 also80checks. Same-instance scheduling/lifetime still unproved |
-| Process/global state across HTTP instances | Guest JS state plus stock host deployment model | Per-instance state is distinct from a shared Node server process. P2 reuse/idle settings do not provide request affinity or one heap | Pinned Wasmtime source and observed cache failure; actual per-request instance selection remains untraced |
-| Default Next cache/tag coherence | Native filesystem with Next's existing JS FileSystemCache | Partial: files can be shared while invalidation epochs remain in a module-local Map. A lexical callback counter is also instance-local | Native1→1 gate remains failed; filesystem CacheHandler integration is a proposal, not implemented support or a fix for global counters |
+| Process/global state across HTTP instances | Guest JS state plus stock host deployment model | Per-instance state is distinct from a shared Node process. P2 reuse/idle settings do not guarantee affinity; pinned wasmCloud cold P2 Source creates a Store/instance per request | [Host Source limits](nextjs-wasmcloud-mount-egress-source-note.md); actual private instance identities/quiescence are not inferred. Cross-request global/cache continuity is not a portable guarantee |
+| Next cache/tag coherence | Native filesystem plus bounded audited CacheHandler and genuine Next FileSystemCache delegate | Partial experimental support: persistent five-request nonce/tag scenario passes52 checks; lexical callback counters remain instance-local | Current C101 handler and16-case CJS/fileURL bridge are implemented/tested. Legacy1→1 stays failed; nonce success does not independently establish that legacy key's invalidation or global continuity |
 | Strict browser response capture | Unchanged functional/error/body contracts with declared instrumentation | Both interactions work, but default extra-CDP captures retain ERR_ABORTED/missing body. Node extra-CDP-off completes3/3 strict passes; one separately declared native off-session control still fails action capture/cache | Preserve all failures; this session change is not sufficient for the native sample. Independently review controls and investigate response completion; no unique cause or reliability claim |
 
 These rows are experimental deployment findings. They do not change the pinned
 Node inventory, accepted production export manifests or initial machine-readable
 API dispositions.
 
+| Additional current public subset | Strategy/capability | Status | Validation and limit |
+| --- | --- | --- | --- |
+| Fetch read EOF, readers and selected cancellation | Existing native six-file cleanup; selected standard WASI HTTP/I/O | Eight public groups/eleven requests per Node and guest arm pass | Review705270ee; no private handle counts, complete abort/clone/append or metadata ownership proof |
+| Streaming gzip/classic/bridge/WASI composition | Existing native zlib kernel plus audited JS stream/HTTP semantics |53-byte and2-MiB exact decode/CRC/EOF pass;16 public response backpressure/drain cycles observed | Review86220bbe; generated-body path, not all Next/native-append branches or complete zlib parity |
+| Current Server Action transport without navigation | Same D990/f805 app and captured391-byte POST; standard HTTP/gzip | Both Wasm and prepared Node produce complete HTTP messages and valid single gzip members | Review52fa402d; Flight remains opaque, decoded bytes differ, strict browser failure unresolved |
+| Stock wasmCloud dev filesystem policy | Standard filesystem preopens; current dev config grants read/write modes | Physical0444/0555 app copies constrain ordinary unprivileged writes, without readonly descriptor rights | [Pinned Source audit](nextjs-wasmcloud-mount-egress-source-note.md); dev config exposes no readonly-volume knob; current D990 cold8 passes, coordinated DATA review0ed0e4c2 |
+| Stock wasmCloud cold outgoing HTTP | Selected standard outgoing-handler with explicit empty allowedHosts | Deny-all policy; cold8 does not test Next's internal self-HTTP | A future exact-port self-origin URL policy is expressible but unexecuted; omission would broaden to allow-all |
+
 The later811459ea affinity diagnostic records four different JS-global state
 epochs at the four cache/revalidation admissions. Cache1→1 still fails; its
 strict browser sample passes with logging/entropy perturbation disclosed.
 Neither native Store identity nor unique cache cause follows. See the
-[diagnostic findings](nextjs-cache-affinity-diagnostic-plan.md). The proposed
-optional Next CacheHandler also requires genuine CJS/fileURL dynamic-import
-validation and a checked referrer failure boundary; no current support claim
-for that path or shared-cache implementation is made. The
-[source-based proposal](nextjs-portable-cache-proposal.md) retains these gates.
+[diagnostic findings](nextjs-cache-affinity-diagnostic-plan.md). The earlier
+[source-based proposal](nextjs-portable-cache-proposal.md) retains its original
+gates; subsequent current CJS/fileURL and bounded shared-cache results are
+recorded in the [actual cache checks](nextjs-portable-cache-2026-11-07.md).
 
 | Experimental API/language gate | Strategy and capability | Current status and deviation | Validation |
 | --- | --- | --- | --- |

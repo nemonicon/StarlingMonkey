@@ -1,0 +1,70 @@
+--- /Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-portable-cache-native-candidate-v1/browser-check.mjs
++++ /Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-browser-netlog-candidate-v1/browser-check.mjs
+@@ -3,7 +3,7 @@
+ import assert from 'node:assert/strict';
+ import {createHash} from 'node:crypto';
+ import {createReadStream} from 'node:fs';
+-import {mkdir,readFile,writeFile,realpath} from 'node:fs/promises';
++import {mkdir,readFile,writeFile,realpath,open,lstat} from 'node:fs/promises';
+ import {createRequire} from 'node:module';
+ import {join,resolve,relative,isAbsolute} from 'node:path';
+ import {pathToFileURL} from 'node:url';
+@@ -17,6 +17,7 @@
+ const tools=resolve(options['--tools']),output=resolve(options['--output']);
+ const chrome='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',limit=20000;
+ await mkdir(output,{mode:0o700}); // Exclusive fresh output; never overwrite a prior run.
++const netlogPath=join(output,'netlog.json'),netlogReadLimit=20*1024*1024;
+ async function descriptor(path){const h=createHash('sha256');let bytes=0;for await(const b of createReadStream(path)){h.update(b);bytes+=b.length;}return{path,sha256:h.digest('hex'),bytes};}
+ const result={schemaVersion:1,suite:'nextjs-hydration-browser-diagnostic-v2',origin:origin.origin,playwrightVersion:null,browserVersion:null,
+   executable:null,tests:[],pageerrors:[],consoleerrors:[],failedrequests:[],actionPosts:[],errors:[],
+@@ -24,6 +25,7 @@
+   cdpEvents:[],cdpCorrelations:[],cdpScope:{events:['Network.requestWillBeSent','Network.responseReceived','Network.dataReceived','Network.loadingFinished','Network.loadingFailed','Page.navigatedWithinDocument','Page.frameNavigated'],payloads:'Complete semantic protocol JSON; not original wire bytes',protocolClock:'CDP timestamps/monotonic seconds and wallTime retain original values; no conversion to Node hrtime',arrivalClock:'Node process.hrtime relative nanoseconds shared with Playwright trace',idCorrelation:'CDP IDs and per-test Playwright WeakMap IDs are distinct; URL/method matches are candidates only'},
+   assetBodies:[],bodyCaptures:[],responseHeaders:[],trace:[],traceClock:'Node process.hrtime.bigint relative nanoseconds',responseFinishedObservations:[],
+   beforeCloseNetworkCompletionWait:false,responseCaptureDrainBeforeCloseLimitMs:500,responseFinishedDrainAfterCloseLimitMs:2000};
++result.netlog={requestedSizeMegabytes:16,finalReadLimitBytes:netlogReadLimit,captureMode:'default Strip private information; no capture-mode flag',normalBrowserCloseRequired:true,completeJson:false,fsynced:false,file:null,circularCaptureConfigured:true,historyCompleteProved:false,evictionStatus:'not determined from this format',errors:[]};
+ // Exact unchanged app's five client chunks. response.body gives decoded entity
+ // bytes; request.sizes reports encoded transfer size, not wire bytes/digest.
+ const assetPins=[{"path":"/_next/static/chunks/webpack-44d8aec3c26a0cdc.js","sha256":"d0a82fed8b37553509fe37aa7c8dfa791ba125f47b8a45899e0fd6a03936a339","bytes":3253},{"path":"/_next/static/chunks/4bd1b696-c7408084347438ae.js","sha256":"7d5ccf185a6f85ab38ce400a7f10aa0a3496eb4e9aee1e500a85e01c4222fcec","bytes":203721},{"path":"/_next/static/chunks/794-ceeb732a1a81bc27.js","sha256":"55e42a1727ceefd5974b3ba5d35ce152d56f1a46f73f038d82b7fe8c1fe7f8fc","bytes":241744},{"path":"/_next/static/chunks/main-app-3c5fdbb8b7eab329.js","sha256":"73b4610d4d390a6906eba5a2c3555671c08deae1a5c0f8eb30917a52a535b6c1","bytes":513},{"path":"/_next/static/chunks/app/client/page-b0c3fc49684db039.js","sha256":"a60609e1626ebb5728ce2a599b9bea3f28d2d779ff1ca0896cc9c97837f35587","bytes":511}];
+@@ -128,7 +130,7 @@
+   result.executableHashScope='Selected Chrome executable only; not an entire application-bundle hash';await save();
+   const module=await import(pathToFileURL(entry).href),chromium=module.chromium??module.default?.chromium;
+   assert(chromium,'Actual Playwright Chromium API');
+-  browser=await chromium.launch({executablePath:chrome,headless:true,timeout:limit});result.browserVersion=browser.version();assert.equal(result.browserVersion,'156.0.8078.81','Matched controls require the retained Chrome version');await save();
++  browser=await chromium.launch({executablePath:chrome,headless:true,timeout:limit,args:['--log-net-log='+netlogPath,'--net-log-max-size-mb=16']});result.browserVersion=browser.version();assert.equal(result.browserVersion,'156.0.8078.81','Matched controls require the retained Chrome version');await save();
+   async function test(id,body){
+     const record={id,passed:false,timedOut:false,screenshot:null,error:null};const started=Date.now();
+     let context,page,timer,phase='context-setup';const finishes=new Set(),ids=new WeakMap();let nextRequest=0;
+@@ -250,6 +252,33 @@
+ }catch(error){result.errors.push({stage:'browser-setup-or-suite',...errorData(error)});}
+ finally{
+   if(browser)try{await browser.close();result.browserClosed=!browser.isConnected();}catch(error){result.errors.push({stage:'browser-close',...errorData(error)});}
++  // NetLog is finalized only after the unchanged normal browser close. The
++  // requested circular16MiB cap can omit earlier events; complete JSON is not
++  // proof of a complete event history. Never truncate, repair or regenerate it.
++  if(result.browserClosed){
++    let handle;
++    try{
++      const before=await lstat(netlogPath);
++      assert(before.isFile()&&!before.isSymbolicLink()&&before.nlink===1,'Regular unique NetLog required');
++      assert(before.size>0&&before.size<=netlogReadLimit,'NetLog exceeds20MiB final-file bound');
++      assert.equal(await realpath(netlogPath),netlogPath,'Canonical NetLog path');
++      handle=await open(netlogPath,'r+');
++      const opened=await handle.stat();assert(opened.dev===before.dev&&opened.ino===before.ino&&opened.size===before.size,'NetLog identity changed');
++      await handle.chmod(0o600);await handle.sync();result.netlog.fsynced=true;
++      const guarded=await handle.stat();
++      assert(guarded.size>0&&guarded.size<=netlogReadLimit,'NetLog exceeds20MiB immediately before read');
++      const bytes=await handle.readFile();
++      assert.equal(bytes.length,guarded.size);
++      const parsed=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));
++      assert(parsed&&typeof parsed==='object'&&!Array.isArray(parsed)&&parsed.constants&&typeof parsed.constants==='object'&&!Array.isArray(parsed.constants)&&Array.isArray(parsed.events),'Complete NetLog constants/events JSON required');
++      const after=await handle.stat(),pathAfter=await lstat(netlogPath);
++      for(const key of ['dev','ino','size','mode','nlink','mtimeMs','ctimeMs'])assert.equal(after[key],guarded[key],'NetLog changed while reading');
++      assert(pathAfter.dev===after.dev&&pathAfter.ino===after.ino&&pathAfter.size===after.size&&pathAfter.nlink===1&&!pathAfter.isSymbolicLink(),'NetLog path changed');
++      result.netlog.completeJson=true;result.netlog.eventCount=parsed.events.length;
++      result.netlog.file={path:netlogPath,sha256:createHash('sha256').update(bytes).digest('hex'),bytes:bytes.length};
++    }catch(error){const data={stage:'netlog-retention',...errorData(error)};result.netlog.errors.push(data);result.errors.push(data);}
++    finally{if(handle)try{await handle.close();}catch(error){const data={stage:'netlog-close',...errorData(error)};result.netlog.errors.push(data);result.errors.push(data);}}
++  }else{const data={stage:'netlog-retention',message:'Normal browser close not observed; no finalized NetLog claim'};result.netlog.errors.push(data);result.errors.push(data);}
+   // URL/method matching supplies candidates only. Never merge protocol IDs,
+   // redirects, clocks or arrival order into a causal request identity claim.
+   for(const event of result.cdpEvents.filter(x=>x.event==='Network.requestWillBeSent')){

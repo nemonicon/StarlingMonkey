@@ -1,0 +1,9 @@
+# Current prepared Node action-wire control Source
+
+This unexecuted fork of held `b1c14894…` keeps its owner/template, original `/private/tmp/starling-node-compat/next-action-wire-stock-v1` prefix and 300-second/1 GiB policy. Root supplies a fresh safe runId. The unchanged HTTP bridge and request/response/shutdown/owned-copy bookends remain; no browser or extra warmup/request is added.
+
+The actor changes only its shared-client Source path, two provider-path literals and the exact owned-cache-parent preparation block carried from held StockV2. The provider is the same physical `df257054…`/`0ef75df5…` implementation, with the existing `createHostModuleRequire(filename, observations)` API. It uses public Node22 `vm.compileFunction` with `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER`. Its custom synchronous CommonJS cache remains separate from Node's main-context ESM import cache. This is an explicit prepared host reference **outside the guest profile**, not an unmodified bare standalone server or a guest/Node-parity claim.
+
+The unchanged f805 source app has no `.next/cache` parent. After resetting only the fresh owned copy, the carried StockV2 block exclusively creates that parent at0700 and checks its identity/mode before Next preparation. The original source app is untouched. This is a preparation prerequisite, not a claim that the single `/actions` POST exercises portable FETCH caching.
+
+Plan data uses the same current f805/1631 app and common captured 391-byte form as the native arm. Common capture/model/framing/single-gzip CRC/ISIZE/EOF assertions remain unchanged. New common index binding and all actual action/results remain pending/NULL until ordered closure and Root grants. Prior failed StockV1/native gates remain failed. B authored this binding; C authored the donor/provider and peers it. No Node, JavaScript parser, compiler, server, HTTP or guest was invoked here.

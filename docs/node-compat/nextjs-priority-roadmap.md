@@ -1,6 +1,6 @@
 # Next.js execution priority
 
-Updated 2026-11-07. The current critical path is the remaining request-state
+Updated 2026-11-08. The current critical path is the remaining request-state
 and Server Action response-completion gaps. Bounded Fetch cleanup compiles and
 passes its public tests; the fresh full Next.js run still fails both gates.
 Engine476b1c1d/metadata22f1d456, componentd990ecc1 and runtime result2fb8d5fd
@@ -47,9 +47,17 @@ Next actions, in dependency order:
    test before changing native code. Keep the strict browser assertions.
    The [client audit](nextjs-server-action-next-steps.md) and
    [response-path audit](nextjs-response-completion-next-steps.md) now identify
-   those boundaries; a normal-input gzip/backpressure probe is the next proposed
-   test. Declared React19.3.1 and the captured Next-vendored browser canary are
-   recorded separately.
+   those boundaries. The normal-input gzip/backpressure probe and current-cohort
+   no-navigation action-wire pair now pass, with
+   [retained integrity/completion DATA](nextjs-completion-controls-2026-11-08.md).
+   A standard Chrome NetLog pair now completes with unchanged strict assertions:
+   native still fails both gates; the prepared Node control passes. Its selected
+   request contexts contain no explicit negative net error, which establishes
+   neither transport EOF nor cause. Reviewf3d7a9ab preserves the failed result.
+   A matched browser identity-encoding diagnostic is now being prepared, keeping
+   every strict gate and checking actual request/response negotiation. This
+   changes outer response coding only, without a causal claim. Declared React19.3.1
+   and the captured Next-vendored browser canary are recorded separately.
 4. **Parallel compatibility priority:** distinguish module-local generation
    from durable cache invalidation, then inspect guest export quiescence and
    scheduling. Persistent nonce success never waives the original counter
@@ -58,12 +66,19 @@ Next actions, in dependency order:
    and [worker dispatch](https://raw.githubusercontent.com/bytecodealliance/wasmtime/v42.0.1/crates/wasi-http/src/handler.rs)
    describe reuse and availability, not an observed Store identity in this run.
    Preserve per-instance/process limitations explicitly.
-5. Check wasmCloud, lifecycle/resource limits and measured costs after the
-   relevant application gates. Preserve the read-only route delegate, bounded
+5. **Observed bounded portability pass:** current D990/f805 on stock wasmCloud
+   exits0/clean/protected with all eight coldV5 requests passing; coordinated DATA
+   review0ed0e4c2 passes that scope. This tests current target-host instantiation independently
+   of full Next acceptance. Its pinned
+   [mount/egress and request-state limits](nextjs-wasmcloud-mount-egress-source-note.md)
+   remain explicit: physical app modes are not readonly descriptor rights;
+   empty allowedHosts denies outgoing HTTP; P2 request Stores do not promise
+   process-global continuity. Broader host/browser/self-HTTP coverage and measured
+   lifecycle/resource costs remain later gates. Preserve the read-only route delegate, bounded
    two-primary-tag mutation contract, all failures and unchanged legacy app code.
 
 The implementation/build checkpoint is committed and pushed through
-`172f5690`; [progress.md](../../progress.md) tracks current work and closed evidence.
+`9060b4ef`; [progress.md](../../progress.md) tracks current work and closed evidence.
 
 The retained first fresh **Next 16.4.5 / React 19.3.1 App Router application
 passes the selected experimental Wasmtime smoke contract**:
