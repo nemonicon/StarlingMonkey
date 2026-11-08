@@ -56,8 +56,9 @@ it is not a demonstrated fix. No native or host change is selected.
 
 Current next steps and outstanding work:
 
-- **Next.js critical path:** implement the reviewed exploratory comparison
-  using two small entry-only await variants, then investigate
+- **Next.js critical path:** finish the Root controller for the reviewed fixed
+  ten-run comparison, then execute its predeclared trials. Both new entry-only
+  await variants now compile and pass INIT review. Investigate
   completion stability against the retained failed samples without retry-based
   acceptance. The response-site trace cannot establish export or transport
   completion. Separately resolve
@@ -508,9 +509,67 @@ as55551d4b after Root/C whole-family and final mechanical review: seven payloads
 Each has exactly one six-byte `await ` insertion and otherwise reproduces its
 parent byte-for-byte; D retains the parent response logger/schema. The historical
 f2fb whole-entry/no-await wording is explicitly not adopted for D. Real world
-fields and current build/cleanup/interop prerequisites remain; actual new
-constructor/component/count/runtime fields are NULL. Neither new variant is
-compiled and no trial in that comparison schedule has run.
+fields and current build/cleanup/interop prerequisites remain. At that Source
+seal the new constructor/component/count/runtime fields were NULL; actual
+construction updates follow below. No trial in that comparison schedule has run.
+The complete Promise trace/raw/checker checkpoint is committed and pushed in
+5cc6e5ef; the working tree was clean at that cut. Subsequent work is now Source
+implementation of the fixed comparison: two sole-real-next callers (Bplan8ce4c7cd,
+Dplan234d4f3d) reuse the three generic executables and exact31/39/18 build
+algorithm, with extra shared-family variant selection checks. Whole Source and
+final closure reviews now pass: Bcallerbbbfcf69/Dcaller2b0e4f0d; Root9fb093
+reverses each three-pin binding to the reviewed Source. Four runtime actor
+scaffolds pass whole Source review and preserve the same six operational files.
+A/C indices9736914f/98cfe869 seal their unchanged thirteen payloads. Following
+genuine new INIT reviews, bound B/D actors now seal3a00ff3a/cd38d1dc with13
+payloads/138,845 and139,209 bytes. Whole and final Source closure pass; six
+operational files remain unchanged and all prospective trial grants are NULL.
+Root Source plan5613cd96 (initial
+cut1b7759ff, with only the proposal-status reference clarified) declares all ten unique
+output/owner namespaces, eight native trials and two unchanged Stock controls,
+with no replacements and all original gates required. No comparison action has
+started; old A/D990 and C/c6ae components are reused without reconstruction.
+B preparationb51cfc issues authorityf5ec0282; Root0599ba/session4525 runs
+original86727/2400 and finishes0/clean/protected (60f407). Resulteb166eff records
+component59a88505/37,239,252 bytes and auditf50d4939. D preparation870bb4 issues
+authority72f16a56. A Root command typo412821 fails in the shell127 before the
+interpreter/target starts; the separately recorded correction810cc7/session24188
+runs original87057/2400 and finishes0/clean/protected (12a6ee). Resultad33478f
+records componentdda80e61/37,253,073 bytes and auditc1f547e9. Each has all three
+inner commands0. Root9a3bf3/902af4 reads actual results; current WIT audits retain
+the same13 standard interfaces/incoming-handler-only export. No comparison
+request has run and artifact size alone establishes no performance advantage.
+Owner/world reviews9260319f/164cad43 pass with actual2/1/1/6 and2/1/1/29 owned
+observations; all eight INIT streams per case lack markers. Joint primary
+typed-return/import/package reviews b35640a9/94cbfa54 now pass. Each audits the
+whole actual component,131 returned tuples/134 typed graph IDs/debugundefined,
+standard13 surface and31/39/18 joins. The unchanged package4889files/21links/
+424directories is hashed once jointly after both results; existing engine/Node
+binary integrity is explicitly delegated to accepted build and actual guards.
+Rootcb3f3a reads both scopes/provenance; D's shell-path error remains qualified
+as a pre-target command error, not a failed or repeated INIT trial.
+B/D INIT corpora now close63/598,982 bytes and88/640,973 bytes, with manifests
+a680f3e8/6c52ece7 and readers0e491672/211c3401. Original monitors, typed-return
+records, options, WIT and finite Source/review witnesses are retained; full binary,
+metadata, package/SDK/app/native payloads remain omitted. Root92510a/93b639 reads
+both readers and scope; independent offline runs f5cb64/ce7350 pass without
+original paths or target execution, alongside R's current/Git-style checks.
+The common Root ten-trial policy/preparer/controller now passes whole Source
+review and ten pure policy tests. Review caught and corrected an aggregate
+reporting edge: originalAllPassed requires raw0, the original observation's
+acceptance and the producer's predicate; clean raw1 remains a recorded failure
+that can continue the fixed schedule. Bound policyd2418e3c/39,927 bytes differs
+only in six genuine descriptor bindings from reviewed675de2e6; Root9435b7
+independently reverses them exactly. Original guards remain in their own contexts,
+native argv remainslen2, Stock argvlen3, and no review fields are defaulted.
+Root61cb76/session5760 preparation finishes0 (ce8432), validating all ten fresh
+contexts before writing any authority. Cohort authority6643729c/14,011 bytes
+binds the ten authorities, fixed order and whole driver Source; Rootb0f5fd reads
+the concrete manifest. No comparison trial has started. Driver completion and
+original test acceptance remain separate, with no retries/replacements/promotion.
+Git's whitespace check notes an extra final blank line in the authenticated
+Root policy. Its reviewed bytes are retained because all ten prepared authorities
+pin that exact Source; other current Source whitespace checks pass.
 Commit4ffa8659 is pushed to origin/main; live
 build logs and the unfinished runtime controller were excluded from that cut.
 GeneratorV5 runs all ten checks successfully under original4023/900, result795dab0e;

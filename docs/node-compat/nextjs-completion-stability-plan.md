@@ -1,7 +1,7 @@
 # Completion comparison after the Promise diagnostic
 
-Status: engineering proposal; neither new B/D variant is compiled and no trial
-in the schedule below has executed. A and C have separate historical results.
+Status: recorded engineering proposal. Current B/D construction and trial status
+is tracked in [progress.md](../../progress.md). A and C have separate historical results.
 The current cd60 sample passes strict browser completion while the earlier c6ae
 sample fails it. Both retain legacy generation1→1. That difference does not
 identify a cause: cd60 changes await scheduling, holder allocation and logging.
