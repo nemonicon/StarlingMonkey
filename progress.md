@@ -18,8 +18,13 @@ Root rehashes the155-file raw corpus. The boundary audit`b5e4f87a` observes
 SPA historyApi update/same loader before canceled:true, not a recorded MPA/new
 document; cancellation initiator and HTTP EOF remain unproved. Fresh captured
 request`a45dea80` retains this build's391-byte action and all19 ordered headers
-with exact manifest provenance. Next is an identity-response raw-after-prework
-comparison on cloud and Node, preserving the original strict failure and gates.
+with exact manifest provenance. The [identity raw-after-prework Source](tests/node-compat/frameworks/nextjs/next-rsc-identity-prework-root-results-v1/README.md)
+is prepared: client5/51,321 bytes and runtime14/157,761 bytes; actual Node syntax,
+Root AST and whole Source/API reviews pass. A README-only precision correction
+is preserved with its exact preimage; operational code stays fixed. Binding
+`84aaacc3` derives2,047 fresh inputs and preparation`57b16d89` reserves the fixed
+cloud600→Node300 pair. No actor has run in this profile; the original strict
+failure and every existing gate remain.
 
 Latest result: the [compression-off full Next profile](docs/node-compat/nextjs-compression-off-full-results.md)
 passes once on Wasm40483/600 and Node40694/300, both raw0/clean. Both pass24HTTP,

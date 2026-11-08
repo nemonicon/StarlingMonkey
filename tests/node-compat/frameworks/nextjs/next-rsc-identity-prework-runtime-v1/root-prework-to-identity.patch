@@ -1,0 +1,388 @@
+--- donor/root-prework-to-identity
++++ identity/root-prework-to-identity
+@@ -1,4 +1,4 @@
+-"""Prepare the fixed prework plus direct RSC response probes; run one original owner at a time."""
++"""Prepare the fixed cloud then bridged-Node identity-RSC prework response probes; run one original owner at a time."""
+ import argparse
+ import hashlib
+ import importlib.util
+@@ -6,6 +6,7 @@
+ import os
+ from pathlib import Path
+ import shutil
++import socket
+ import sys
+ 
+ HERE = Path(__file__).resolve().parent
+@@ -24,8 +25,17 @@
+ 
+ 
+ # Required existing reviewed DATA/Source, not issued runtime bindings.
+-REQUIRED_APP_REVIEW = dict(path=str(BASE / 'next-fs-callback-root-results-v2/actual-build-review.json'),
+-    sha256='4a6f03cefbed841af163f62f2ef4cc226a025d84379c7cb7f2a33a541e0b147c', bytes=18599)
++REQUIRED_APP_REVIEW = dict(path=str(BASE / 'next-fs-callback-no-compress-root-results-v1/actual-build-review.json'),
++    sha256='9106545f606ee30b2a3a05940d97233ce3b2e867e6abcdc5c5ec84efa09ad679', bytes=22847)
++
++
++def canonical_origin(value):
++    assert type(value) is str and value.startswith('http://127.0.0.1:')
++    port = value.removeprefix('http://127.0.0.1:')
++    assert port.isascii() and port.isdecimal() and port == str(int(port))
++    assert 1 <= int(port) <= 65535 and int(port) != 80
++    assert value == 'http://127.0.0.1:' + str(int(port))
++    return value
+ 
+ 
+ def context():
+@@ -38,15 +48,20 @@
+     prep = importlib.util.module_from_spec(spec)
+     spec.loader.exec_module(prep)
+     binding = prep.document(BINDINGS)
+-    assert binding['state'] == 'ROOT_RSC_PREWORK_ACTUAL_RUNTIME_BINDINGS_V1'
++    assert binding['state'] == 'ROOT_RSC_IDENTITY_PREWORK_ACTUAL_BINDINGS_V1'
+     assert binding['compositionReview'] == COMPOSITION_REVIEW and binding['innerConstructionReview'] == INNER_REVIEW
+     assert binding['applicationBuildReview'] == REQUIRED_APP_REVIEW
+     actor_index = prep.family(binding['actorIndex'])
+     client_index = prep.family(binding['clientIndex'])
+     client_root = Path(binding['clientIndex']['path']).parent
+-    assert client_root == BASE / 'next-rsc-prework-client-v1'
++    assert client_root == BASE / 'next-rsc-identity-prework-client-v1'
+     client_plan_ref = next(dict(r, path=str(client_root / r['path'])) for r in client_index['files'] if r['path'] == 'plan.json')
+     client_plan = prep.document(client_plan_ref)
++    assert client_plan['suite'] == 'NEXT_RSC_IDENTITY_PREWORK_HTTP_CLIENT_V1'
++    assert client_plan['nodeArgc'] == 6 and client_plan['controlOnly'] is True
++    assert client_plan['fullOriginalContractExecuted'] is False and client_plan['browserExecuted'] is False
++    assert client_plan['requiredApplicationReview'] == REQUIRED_APP_REVIEW
++    assert client_plan['responsePolicy']['rawBodyFilename'] == 'body.raw.bin'
+     assert client_plan['encodedBodyLimit'] == 4 * 1024 * 1024 and client_plan['decodedBodyLimit'] == 16 * 1024 * 1024
+     assert client_plan['httpTimeoutMs'] == 20000 and client_plan['cleanupTimeoutMs'] == 2000
+     prework_requirements = client_plan['preworkSourceRequirements']
+@@ -56,19 +71,22 @@
+     assert any(dict(r, path=str(client_root / r['path'])) == prework_module for r in client_index['files'])
+     requirements = client_plan['sourceRequirements']
+     assert set(requirements) == {'requestCapture', 'requestBody', 'headerEvidence'}
+-    assert client_plan['requestCapture'] == requirements['requestCapture']
++    assert client_plan['requestCapture'] == binding['requestCapture'] == requirements['requestCapture']
+     protected = {ref['path']: ref for ref in binding['protectedInputs']}
+     assert len(protected) == len(binding['protectedInputs'])
+     for ref in [*requirements.values(), *prework_requirements.values()]:
+         prep.checked(ref)
+         assert protected[ref['path']] == ref, 'Every external client consumer is protected before/final'
+     actor_root = Path(binding['actorIndex']['path']).parent
+-    assert actor_root == BASE / 'next-rsc-prework-runtime-v1'
+-    for role, name in [('nativePlan', 'plan.json'), ('stockPlan', 'stock-plan.json')]:
++    assert actor_root == BASE / 'next-rsc-identity-prework-runtime-v1'
++    for role, name in [('cloudPlan', 'plan.json'), ('stockPlan', 'stock-plan.json')]:
+         assert binding[role]['path'] == str(actor_root / name)
+         assert any(dict(r, path=str(actor_root / r['path'])) == binding[role] for r in actor_index['files'])
+     app = prep.document(binding['applicationBuildReview'])
+-    assert app['state'] == 'COORDINATED_FS_CALLBACK_APP_BUILD_DATA_REVIEW_PASSED_V1' and app['verifiedPassed'] is True
++    assert app['state'] == 'COORDINATED_FS_CALLBACK_NO_COMPRESS_APP_BUILD_DATA_REVIEW_PASSED_V1' and app['verifiedPassed'] is True
++    assert app['verifiedDataReviewPassed'] is True and app['buildVersion'] == 1
++    for key in ('sourceCacheAbsent', 'runtimeCacheMountPolicyCompatible', 'configuredCompressFalseVerified', 'effectiveStandaloneConfigCompressFalseVerified'):
++        assert app[key] is True
+     inner = prep.document(INNER_REVIEW)
+     assert inner['verifiedPassed'] is True and inner['rootAuthority'] == INNER_AUTHORITY
+     composition = prep.document(COMPOSITION_REVIEW)
+@@ -76,7 +94,7 @@
+     assert composition['innerComponent'] == inner['component'] and composition['innerConstructionAuthority'] == INNER_AUTHORITY
+     assert len(composition['selectedImports']) == 13 and all(x.endswith('@0.2.10') for x in composition['selectedImports'])
+     assert composition['selectedExports'] == ['wasi:http/incoming-handler@0.2.10']
+-    plans = {arm: prep.document(binding[arm + 'Plan']) for arm in ('native', 'stock')}
++    plans = {arm: prep.document(binding[arm + 'Plan']) for arm in ('cloud', 'stock')}
+     for arm, plan in plans.items():
+         assert plan['controlOnly'] is True and plan['prospectiveRscResponseBindingsPending'] is False
+         assert plan['rscResponseControl']['clientSourcePending'] is False
+@@ -88,11 +106,20 @@
+         assert plan['clientSourceIndex'] == binding['clientIndex']
+         assert plan['clientSource']['path'] == str(client_root / 'run-client.mjs')
+         assert any(dict(r, path=str(client_root / r['path'])) == plan['clientSource'] for r in client_index['files'])
+-        assert plan['node'] == plans['native']['node'] and plan['monitor'] == plans['native']['monitor']
++        assert plan['node'] == plans['cloud']['node'] and plan['monitor'] == plans['cloud']['monitor']
+         prefix = Path(plan['outputPrefix'])
+         assert prefix.parent == Path('/private/tmp/starling-node-compat') and prefix.resolve() == prefix
+-        assert plan['runId'] == ('rsc-prework-native-first' if arm == 'native' else 'rsc-prework-stock-first')
+-    assert plans['native']['applicationSource'] == app['applicationRoot']
++        assert plan['runId'] == ('rsc-identity-cloud-first' if arm == 'cloud' else 'rsc-identity-stock-first')
++        assert str(prefix) == '/private/tmp/starling-node-compat/next-rsc-identity-prework-' + arm + '-v1'
++        assert plan['runId'] == plan['namespacePolicy']['plannedRunId']
++        assert str(prefix) == plan['namespacePolicy']['plannedOutputPrefix']
++        assert plan['browserTools'] == 'reserved-unused'
++    assert plans['cloud']['applicationSchema']['additionalDirectories'] == []
++    assert plans['cloud']['applicationSchema']['ownedDirectoriesIncludingRoot'] == plans['cloud']['applicationSchema']['directoriesExcludingRoot'] + 1
++    assert plans['cloud']['selfOrigin'] is None and plans['cloud']['outerSeconds'] == 600
++    assert plans['stock']['outerSeconds'] == 300
++    assert client_plan['allowedOutputPolicies'] == [dict(runId=plans[arm]['runId'], output=plans[arm]['outputPrefix'] + '-' + plans[arm]['runId'] + '/client') for arm in ('cloud', 'stock')]
++    assert plans['cloud']['applicationSource'] == app['applicationRoot']
+     assert plans['stock']['standaloneSource'] == app['applicationRoot']
+     self_ref = prep.row(Path(__file__).resolve())
+ 
+@@ -115,21 +142,24 @@
+     return prep, binding, plans, inner, composition, self_ref, protect, authority, before
+ 
+ 
+-def make_authority(arm, binding, plans, inner, composition):
++def make_authority(arm, binding, plans, inner, composition, origin=None):
+     common = dict(schemaVersion=1, arm=arm, runId=plans[arm]['runId'], sourceIndex=binding['actorIndex'],
+         controlOnly=True, rscResponseControlAllowed=True, publicRequestCorrelationAllowed=True,
+         publicRequestCorrelation=PUBLIC, compilerAllowed=False, nativeBuildAllowed=False,
+         automaticRetry=False, replacementTrials=False, fullNextAccepted=False)
+-    if arm == 'native':
+-        return dict(common, state='ROOT_NEXT_RSC_PREWORK_NATIVE_AUTHORIZED_V1',
+-            plan=binding['nativePlan'], component=inner['component'], componentAudit=inner['componentAudit'],
++    if arm == 'cloud':
++        return dict(common, state='ROOT_NEXT_RSC_IDENTITY_CLOUD_AUTHORIZED_V1',
++            plan=binding['cloudPlan'], component=inner['component'], componentAudit=inner['componentAudit'],
+             constructionResult=inner['actualResult'], constructionCallerIndex=inner['callerSourceIndex'],
+             inputSourceIndex=inner['inputSourceIndex'], inputEntry=inner['inputEntry'],
+             envelope=composition['envelope'], compositionReview=COMPOSITION_REVIEW,
+             localhostServeAllowed=True, actualNextGuestAllowed=True, browserAllowed=False,
++            selfOrigin=canonical_origin(origin), stockHostAllowed=True, configInspectAllowed=True,
++            guestEnvironmentAllowed=True, outgoingHttpWorkloadSelected=True,
++            hostMutationAllowed=False, automaticRetryAllowed=False, newServicesAllowed=False,
+             standardHandlerObserverAllowed=True, componentConstructionAllowed=False,
+             externalDeploymentAllowed=False, adoptionAllowed=False)
+-    return dict(common, state='ROOT_NEXT_RSC_PREWORK_HOST_AUTHORIZED_V1',
++    return dict(common, state='ROOT_NEXT_RSC_IDENTITY_HOST_AUTHORIZED_V1',
+         plans=binding['stockPlan'], rootAuthorityPath=str(HERE / 'stock-authority.json'),
+         localhostServerAllowed=True, browserAllowed=False, guestAllowed=False, engineAllowed=False,
+         externalApplicationDeploymentAllowed=False)
+@@ -139,7 +169,7 @@
+     parser = argparse.ArgumentParser(description=__doc__)
+     modes = parser.add_mutually_exclusive_group(required=True)
+     modes.add_argument('--prepare', action='store_true')
+-    modes.add_argument('--run', choices=['native', 'stock'])
++    modes.add_argument('--run', choices=['cloud', 'stock'])
+     args = parser.parse_args()
+     prep, binding, plans, inner, composition, self_ref, protect, original, before = context()
+     assert shutil.disk_usage('/private/tmp').free >= 1024**3
+@@ -147,19 +177,27 @@
+     if args.prepare:
+         assert not prepared_path.exists() and not prepared_path.is_symlink()
+         slots = []
+-        for arm in ('native', 'stock'):
++        for arm in ('cloud', 'stock'):
+             path = HERE / (arm + '-authority.json')
+             output = Path(plans[arm]['outputPrefix'] + '-' + plans[arm]['runId'])
+             assert all(not x.exists() and not x.is_symlink() for x in (path, output, Path(str(output) + '-external-root'), HERE / (arm + '-owner-result.json')))
+             slots.append((arm, path, output))
++        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as selected:
++            selected.bind(('127.0.0.1', 0))
++            host, port = selected.getsockname()
++            assert host == '127.0.0.1'
++            cloud_origin = canonical_origin('http://127.0.0.1:' + str(port))
++        # Closed selection socket is not a reservation/handoff; cloud must lease it once.
+         rows = []
+         for arm, path, output in slots:
+-            rows.append(dict(arm=arm, authority=prep.save(path, make_authority(arm, binding, plans, inner, composition)),
+-                outputRoot=str(output), ownerOutputRoot=str(output) + '-external-root', ownerSeconds=600 if arm == 'native' else 300))
+-        prep.admit(original)
++            rows.append(dict(arm=arm, authority=prep.save(path, make_authority(arm, binding, plans, inner, composition, cloud_origin)),
++                outputRoot=str(output), ownerOutputRoot=str(output) + '-external-root', ownerSeconds=600 if arm == 'cloud' else 300))
++        assert prep.admit(original) == before
+         protect()
+-        prep.save(prepared_path, dict(schemaVersion=1, state='ROOT_FIXED_RSC_PREWORK_PAIR_PREPARED_NOT_RUN_V1',
+-            controller=self_ref, bindings=BINDINGS, trials=rows, order=['native', 'stock'], publicRequestCorrelation=PUBLIC,
++        prep.save(prepared_path, dict(schemaVersion=1, state='ROOT_FIXED_RSC_IDENTITY_PREWORK_PAIR_PREPARED_NOT_RUN_V1',
++            controller=self_ref, bindings=BINDINGS, trials=rows, order=['cloud', 'stock'], publicRequestCorrelation=PUBLIC,
++            cloudSelfOrigin=cloud_origin, portSelectionSocketClosedBeforeAuthorityPublication=True,
++            portReservationOrHandoffGuaranteed=False, actorMustLeaseExactOriginOnce=True, fallbackAllowed=False,
+             constructorGuardBefore=before, actorsInvoked=False, automaticRetry=False, replacementTrials=False,
+             oldRedirectFailuresWaived=False, fullOriginalContractExecuted=False, fullNextAccepted=False))
+         print(json.dumps(dict(prepared=prep.row(prepared_path), actorsInvoked=False)))
+@@ -168,43 +206,76 @@
+     prepared_ref = prep.row(prepared_path)
+     prepared = prep.document(prepared_ref)
+     assert prepared['controller'] == self_ref and prepared['bindings'] == BINDINGS
+-    assert prepared['state'] == 'ROOT_FIXED_RSC_PREWORK_PAIR_PREPARED_NOT_RUN_V1'
+-    assert prepared['order'] == ['native', 'stock'] and [x['arm'] for x in prepared['trials']] == ['native', 'stock']
++    assert prepared['state'] == 'ROOT_FIXED_RSC_IDENTITY_PREWORK_PAIR_PREPARED_NOT_RUN_V1'
++    assert prepared['portReservationOrHandoffGuaranteed'] is False and prepared['fallbackAllowed'] is False
++    assert prepared['order'] == ['cloud', 'stock'] and [x['arm'] for x in prepared['trials']] == ['cloud', 'stock']
+     for item in prepared['trials']:
+         expected_output = plans[item['arm']]['outputPrefix'] + '-' + plans[item['arm']]['runId']
+         assert item['outputRoot'] == expected_output and item['ownerOutputRoot'] == expected_output + '-external-root'
+-        assert item['ownerSeconds'] == (600 if item['arm'] == 'native' else 300)
++        assert item['ownerSeconds'] == (600 if item['arm'] == 'cloud' else 300)
+     trial = next(x for x in prepared['trials'] if x['arm'] == arm)
+     ar = trial['authority']
+-    assert prep.document(ar) == make_authority(arm, binding, plans, inner, composition)
++    cloud_origin = prepared['cloudSelfOrigin']
++    assert prep.document(ar) == make_authority(arm, binding, plans, inner, composition, cloud_origin)
+     if arm == 'stock':
+         try:
+-            previous = prep.document(prep.row(HERE / 'native-owner-result.json'))
+-            native_trial = next(x for x in prepared['trials'] if x['arm'] == 'native')
++            previous = prep.document(prep.row(HERE / 'cloud-owner-result.json'))
++            cloud_trial = next(x for x in prepared['trials'] if x['arm'] == 'cloud')
+             assert previous['controller'] == self_ref and previous['bindings'] == BINDINGS
+-            assert previous['authority'] == native_trial['authority']
+-            assert prep.document(previous['authority']) == make_authority('native', binding, plans, inner, composition)
++            assert previous['authority'] == cloud_trial['authority']
++            assert prep.document(previous['authority']) == make_authority('cloud', binding, plans, inner, composition, cloud_origin)
+             assert previous['cleanOwner'] and previous['finalInputsPreserved'] and previous['error'] is None
+             assert type(previous['rawExitCode']) is int and previous['rawExitCode'] in (0, 1) and previous['secondaryErrors'] == []
+             assert previous['constructorGuardBefore'] == previous['constructorGuardAfter'] == before
+-            assert previous['terminal']['path'] == str(Path(native_trial['ownerOutputRoot']) / 'terminal.json')
+-            native_terminal = prep.document(previous['terminal'])
+-            assert native_terminal['authority'] == native_trial['authority']
+-            assert native_terminal['pid'] == previous['originalOwner'] and native_terminal['rawExitCode'] == previous['rawExitCode']
+-            assert not native_terminal['timeout'] and not native_terminal['forcedCleanup']
+-            assert native_terminal['parentOwnedGroupGone'] and native_terminal['allObservedOwnedGroupsGone']
+-            assert all(not native_terminal[k] for k in ('errors', 'signals', 'interruptedSignals', 'remainingObservedPids'))
+-            native_output = Path(plans['native']['outputPrefix'] + '-' + plans['native']['runId'])
+-            observed = prep.document(prep.row(native_output / 'result.json'))
+-            assert observed['rootAuthority'] == native_trial['authority'] and observed['sourceIndex'] == binding['actorIndex']
++            assert previous['terminal']['path'] == str(Path(cloud_trial['ownerOutputRoot']) / 'terminal.json')
++            cloud_terminal = prep.document(previous['terminal'])
++            assert cloud_terminal['authority'] == cloud_trial['authority']
++            assert cloud_terminal['pid'] == previous['originalOwner'] and cloud_terminal['rawExitCode'] == previous['rawExitCode']
++            assert not cloud_terminal['timeout'] and not cloud_terminal['forcedCleanup']
++            assert cloud_terminal['parentOwnedGroupGone'] and cloud_terminal['allObservedOwnedGroupsGone']
++            assert all(not cloud_terminal[k] for k in ('errors', 'signals', 'interruptedSignals', 'remainingObservedPids'))
++            cloud_output = Path(plans['cloud']['outputPrefix'] + '-' + plans['cloud']['runId'])
++            observed = prep.document(prep.row(cloud_output / 'result.json'))
++            assert observed['rootAuthority'] == cloud_trial['authority'] and observed['sourceIndex'] == binding['actorIndex']
+             assert observed['servedEnvelope'] == composition['envelope']
+             assert observed['originalInputsPreserved'] and observed['readonlyAppPreserved']
+             assert observed['server']['stdoutCapture']['complete'] is True and observed['server']['shutdownRequested'] is True and observed['server']['sigintSent'] is True
+             assert not observed['server']['forcedCleanup'] and observed['server']['exit'] == dict(code=0, signal=None, error=None)
+             assert type(observed['client']['exit']['code']) is int and observed['client']['exit']['code'] in (0, 1) and observed['client']['exit']['signal'] is None and observed['client']['exit']['error'] is None
++            assert observed['configVerifiedBeforeDev'] is True
++            assert observed['readiness']['workloadRegistered'] is True and observed['readiness']['tcpConnect'] is True
++            assert observed['readiness']['extraHttpRequests'] == 0
++            assert observed['portLease']['origin'] == cloud_origin and observed['portLease']['fallbackAllowed'] is False
++            assert [r['label'] for r in observed['commands']] == ['config-show', 'wash-dev', 'response-client']
++            assert observed['commands'][1] == observed['server']
++            for command in observed['commands'][:2]:
++                assert command['exit'] == dict(code=0, signal=None, error=None)
++                assert command['timeout'] is False and command['forcedCleanup'] is False
++                cc = command['stdoutCapture']
++                assert cc['limitBytes'] == 8388608 and cc['errors'] == []
++                assert all(cc[k] is True for k in ('pipeEof', 'fileClosed', 'fileBoundVerified', 'finalized', 'complete'))
++                assert all(cc[k] is False for k in ('overflow', 'partialWritePossible', 'unretainedBytesUnknown'))
++                assert command['stdout']['path'] == cc['path'] == str(cloud_output / (command['label'] + '.stdout.log'))
++                assert command['stdout']['bytes'] == cc['fileBytes'] == cc['completeWriteBytes'] == cc['lastReservedWriteCeiling']
++                prep.checked(command['stdout'])
++                assert command['stderrPath'] == str(cloud_output / (command['label'] + '.stderr.log'))
++                assert command['stderrFinalDigestDeferredToOriginalOwnerTerminal'] is True
++                # Original600 terminal above proves descendant quiescence before this read.
++                prep.row(Path(command['stderrPath']))
++            show = prep.document(observed['commands'][0]['stdout'])
++            assert show['success'] is True and show['data'] == observed['effectiveConfiguration']
++            wanted, effective = observed['configured'], observed['effectiveConfiguration']
++            assert wanted['build'] == effective['build'] and wanted['version'] == effective['version'] == '2.11.0'
++            for key in ('address', 'command', 'component_path', 'service', 'volumes'):
++                assert wanted['dev'][key] == effective['dev'][key]
++            assert wanted['dev']['component_path'] == composition['envelope']['path']
++            assert wanted['dev']['volumes'] == [dict(host_path=str(cloud_output / 'app'), guest_path='/app'), dict(host_path=str(cloud_output / 'cache'), guest_path='/app/.next/cache')]
++            assert effective['workload']['allowedHosts'] == wanted['workload']['allowedHosts'] == [cloud_origin + '/']
++            assert effective['workload']['allowedIpNameLookups'] == effective['workload']['allowedHostLoopbackPorts'] == []
++            assert effective['workload']['environment']['config'] == dict(STARLING_NEXT_ORIGIN=cloud_origin, NODE_ENV='production', NEXT_TELEMETRY_DISABLED='1')
+             capture = observed['server']['stdoutCapture']
+             stdout = observed['server']['stdout']
+-            assert stdout['path'] == capture['path'] == str(native_output / 'wasmtime.stdout.log')
++            assert stdout['path'] == capture['path'] == str(cloud_output / 'wash-dev.stdout.log')
+             assert type(stdout['bytes']) is int and 0 <= stdout['bytes'] <= 8388608
+             assert capture['limitBytes'] == 8388608 and capture['errors'] == []
+             assert all(capture[k] for k in ('pipeEof', 'fileClosed', 'fileBoundVerified', 'finalized', 'complete'))
+@@ -213,9 +284,9 @@
+             prep.checked(stdout)
+             # Publication/collection gates only: strict semantic false remains a valid collected slot.
+             client_ref = observed['client']['result']
+-            assert client_ref['path'] == str(native_output / 'client/result.json')
++            assert client_ref['path'] == str(cloud_output / 'client/result.json')
+             client = prep.document(client_ref)
+-            assert client['suite'] == 'NEXT_RSC_PREWORK_HTTP_RESPONSE_CLIENT_V1'
++            assert client['suite'] == 'NEXT_RSC_IDENTITY_PREWORK_HTTP_CLIENT_V1'
+             assert client['controlOnly'] is True and client['fullOriginalContractExecuted'] is False
+             assert observed['fullOriginalContractExecuted'] is False and client['fullNextAccepted'] is False
+             assert client['responseProbeExecuted'] is True and observed['responseProbeExecuted'] is True
+@@ -225,7 +296,7 @@
+             assert preceding['executed'] is True and preceding['collectionComplete'] is True
+             assert type(preceding['passed']) is bool
+             prework_ref = preceding['result']
+-            assert prework_ref['path'] == str(native_output / 'client/prework-result.json')
++            assert prework_ref['path'] == str(cloud_output / 'client/prework-result.json')
+             assert type(prework_ref['bytes']) is int and 0 < prework_ref['bytes'] <= 16 * 1024 * 1024
+             prework_publication = preceding['publication']
+             assert all(prework_publication[k] is True for k in ('complete', 'fsynced', 'closed'))
+@@ -248,7 +319,7 @@
+             assert sum(r['bytes'] for r in raw_files) <= 32 * 1024 * 1024
+             raw_by_path = {r['path']: r for r in raw_files}
+             assert len(raw_by_path) == len(raw_files)
+-            client_output = native_output / 'client'
++            client_output = cloud_output / 'client'
+             for r in raw_files:
+                 rel = Path(r['path']).relative_to(client_output)
+                 assert rel.as_posix() in ('stream-chunks.json', 'prework-progress.json') or rel.parts[0] in ('responses', 'portable-cache', 'supplemental')
+@@ -302,7 +373,7 @@
+             for key in ('received', 'endObserved', 'complete', 'abortedObserved', 'closeObserved'):
+                 assert type(response[key]) is bool
+             raw_capture, raw_publication, raw_ref = response['rawCapture'], response['encodedBodyPublication'], response['encodedBody']
+-            assert raw_ref['path'] == str(native_output / 'client/body.raw.gz')
++            assert raw_ref['path'] == str(cloud_output / 'client/body.raw.bin')
+             assert type(raw_ref['bytes']) is int and 0 <= raw_ref['bytes'] <= 4 * 1024 * 1024
+             assert raw_capture['overflow'] is False and raw_capture['unretainedBytesUnknown'] is False
+             assert raw_capture['allObservedBytesCaptured'] is True
+@@ -312,7 +383,7 @@
+             assert raw_publication['fileBytes'] == raw_ref['bytes'] and raw_publication['sha256'] == raw_ref['sha256']
+             assert raw_publication['errors'] == []
+             prep.checked(raw_ref)
+-            assert client['publicationFile'] == str(native_output / 'client/publication.json')
++            assert client['publicationFile'] == str(cloud_output / 'client/publication.json')
+             publication_ref = prep.row(Path(client['publicationFile']))
+             assert 0 < publication_ref['bytes'] <= 65536
+             publication = prep.document(publication_ref)
+@@ -326,14 +397,14 @@
+             assert publication['decodedBody'] == response['decodedBody']
+             if response['decodedBody'] is not None:
+                 decoded_ref = response['decodedBody']
+-                assert decoded_ref['path'] == str(native_output / 'client/body.decoded.bin')
++                assert decoded_ref['path'] == str(cloud_output / 'client/body.decoded.bin')
+                 assert type(decoded_ref['bytes']) is int and 0 <= decoded_ref['bytes'] <= 16 * 1024 * 1024
+                 prep.checked(decoded_ref)
+             assert publication['encodedBodyPublication'] == raw_publication
+             assert publication['responseProbeExecuted'] is True and publication['responseCollectionComplete'] is client['responseCollectionComplete']
+             # The summary is emitted only after the receipt fsync/close; it is an external ordered publication witness.
+             summary_ref = observed['client']['stdout']
+-            assert summary_ref['path'] == str(native_output / 'client.stdout.log')
++            assert summary_ref['path'] == str(cloud_output / 'response-client.stdout.log')
+             assert 0 < summary_ref['bytes'] <= 65536
+             summary_bytes = prep.checked(summary_ref).read_bytes()
+             prep.checked(summary_ref)
+@@ -350,7 +421,7 @@
+         except BaseException as error:
+             try:
+                 prep.save(HERE / 'stock-unattempted.json', dict(schemaVersion=1,
+-                    state='RSC_PREWORK_STOCK_SLOT_UNATTEMPTED_NATIVE_COLLECTION_UNCERTAIN_V1',
++                    state='RSC_IDENTITY_STOCK_SLOT_UNATTEMPTED_CLOUD_COLLECTION_UNCERTAIN_V1',
+                     error=dict(name=type(error).__name__, message=str(error)[:2048]), bindings=BINDINGS,
+                     automaticRetry=False, replacementTrials=False, fullNextAccepted=False))
+             except BaseException:
+@@ -362,7 +433,7 @@
+     plan = plans[arm]
+     node = plan['node']
+     actor = Path(binding['actorIndex']['path']).parent
+-    argv = ([node['path'], str(actor / 'deploy.mjs'), ar['path']] if arm == 'native' else
++    argv = ([node['path'], str(actor / 'deploy.mjs'), ar['path']] if arm == 'cloud' else
+         [node['path'], str(actor / 'run-stock.mjs'), trial['outputRoot'], plan['standaloneSource'], plan['browserTools'], plan['runId'], ar['path']])
+     monitor = prep.original(plan['monitor'], 'genuine_rsc_response_original_owner')
+     env = {k: os.environ[k] for k in ('HOME', 'USER', 'LOGNAME') if k in os.environ}
+@@ -377,6 +448,7 @@
+     finally:
+         try:
+             after = prep.admit(original)
++            assert after == before
+             protect()
+             prep.checked(ar)
+             prep.checked(prepared_ref)
+@@ -388,7 +460,7 @@
+                 secondary.append(dict(name=type(error).__name__, message=str(error)[:2048]))
+         clean = terminal is not None and not terminal['timeout'] and not terminal['forcedCleanup'] and terminal['parentOwnedGroupGone'] and terminal['allObservedOwnedGroupsGone'] and all(not terminal[k] for k in ('errors', 'signals', 'interruptedSignals', 'remainingObservedPids'))
+         try:
+-            row = dict(schemaVersion=1, state='ROOT_RSC_PREWORK_ORIGINAL_OWNER_COMPLETED_UNREVIEWED_V1', arm=arm,
++            row = dict(schemaVersion=1, state='ROOT_RSC_IDENTITY_PREWORK_ORIGINAL_OWNER_COMPLETED_UNREVIEWED_V1', arm=arm,
+                 rawExitCode=None if terminal is None else terminal['rawExitCode'], originalOwner=None if terminal is None else terminal['pid'],
+                 cleanOwner=clean, finalInputsPreserved=preserved, error=None if primary is None else dict(name=type(primary).__name__, message=str(primary)[:2048]),
+                 secondaryErrors=secondary, authority=ar, controller=self_ref, bindings=BINDINGS,
