@@ -1,0 +1,34 @@
+--- next-persistent-cache-overlap-component-v1/guest-entry.mjs
++++ next-node-fs-atomic-component-v1/guest-entry.mjs
+@@ -719,24 +719,24 @@
+     if(request.method!=='GET'||url.pathname!=='/cache-suite'||url.search!=='')
+       return new Response('one predeclared GET /cache-suite required',{status:404});
+     if(++admittedCalls!==1)return new Response('cache suite already called',{status:409});
+-    const suite=require('/cache-test-source/cache-cases.cjs');
+-    if(!suite||typeof suite.runCacheSuite!=='function')throw new TypeError('Actual cache suite export required');
+-    if(typeof suite.describeThrown!=='function')throw new TypeError('Actual cache suite rejection descriptor required');
++    const suite=require('/cache-test-source/atomic-cases.cjs');
++    if(!suite||typeof suite.runNodeFsAtomicSuite!=='function')throw new TypeError('Actual nodeFs atomic suite export required');
++    if(typeof suite.describeThrown!=='function')throw new TypeError('Actual nodeFs atomic suite rejection descriptor required');
+     const report={executionKind:'wasm-guest',guestExecuted:true,guestExecutedRequiresExternalParentProof:true};
+     let suiteFulfilled=false,primarySet=false,primaryValue;
+     try{
+-      const returned=await suite.runCacheSuite({applicationRoot:'/app',testRoot:'/cache-tests',report});
+-      if(returned!==report)throw new TypeError('Cache suite must return its caller-owned report');
++      const returned=await suite.runNodeFsAtomicSuite({applicationRoot:'/app',testRoot:'/cache-tests',report});
++      if(returned!==report)throw new TypeError('NodeFs atomic suite must return its caller-owned report');
+       suiteFulfilled=true;
+     }catch(error){primarySet=true;primaryValue=error;}
+     try{
+       const originalRejection=primarySet?suite.describeThrown(primaryValue):null;
+       const passed=suiteFulfilled&&report.passed===true;
+-      const result={schemaVersion:1,marker:'NEXT_PERSISTENT_CACHE_OVERLAP_COMPONENT_V1',
++      const result={schemaVersion:1,marker:'NEXT_NODE_FS_ATOMIC_COMPONENT_V1',
+         suiteFulfilled,originalRejection,report,passed};
+       const json=JSON.stringify(result);
+       if(typeof json!=='string'||__nextBuffer.byteLength(json,'utf8')>131072)
+-        throw new RangeError('Cache suite JSON exceeds the fixed128KiB response bound');
++        throw new RangeError('NodeFs atomic suite JSON exceeds the fixed128KiB response bound');
+       return new Response(json,{status:passed?200:500,
+         headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
+     }catch(error){if(primarySet)throw primaryValue;throw error;}

@@ -4,6 +4,18 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
+Latest ported-fixture comparison: explicit filesystem-backed callback state
+passes1→2 on both Wasm and Node. Both also pass24HTTP,52 portable-cache checks,
+80 supplemental checks and five incremental stream chunks. Node19876/300 is
+raw0/clean and passes the full suite. Wasm19501/600 is raw1/clean solely on the
+retained strict browser POST7`net::ERR_ABORTED` failure; both functional browser
+interactions pass. Both complete the full client with preserved inputs. The
+physical callback records both contain canonical generation2 with no pending
+file, independently verified by primary DATA review`c6846dbb`. Its528 retained
+payloads total10,941,748 bytes; complete native stdout is28,788 bytes/108 chunks
+with normal host shutdown and unchanged13 standard WASI0.2.10 imports. This is a new application
+contract, not repaired module-global persistence; every older failure remains.
+
 Current implementation: a separately versioned Next callback now persists its
 bounded generation record under the existing standard writable cache preopen.
 The original module-global fixture and failed result remain untouched. The
@@ -13,7 +25,11 @@ EEXIST no-replacement and temporary-file cleanup. The callback helper's Node
 conformance passes8 groups/9 real calls (original13933/120, raw0/clean), covering
 lazy import,1→2 publication and fail-closed pending/corrupt/limit/alias cases.
 Independent Node DATA reviews`0b5d842a` and`e8af5ecf` verify those two references;
-new component HTTP and application execution remain open.
+the same helper also passes actual component HTTP, independently reviewed as
+`2dba6246`:3 cases/11 assertions, HTTP200/2,385 bytes, complete capture and
+original18925/180 raw0/clean. Its165 retained payloads total1,463,419 bytes.
+Raw Node/guest rejection details are preserved; type/code match, while messages
+and adapter operation/module fields differ. No whole-error-object parity claim.
 
 The first35-file FS-callback host build passes all4 original monitored phases,
 but is **not deployable**: Next traces8 build-cache files/74,976,273 bytes into
@@ -36,11 +52,24 @@ review`9ea9e562` and26 raw copies preserve this pre-Node defect. A new V2 recipe
 corrects that field and checks it before authority issuance. The fresh V2
 constructor (`72937a`/session7130→`da9d04`, original17011/2400) completes raw0/
 clean using the same237c engine, complete metadata and selected13-interface
-standard WASI0.2.10 world. INIT review and actual helper HTTP checks are next;
-no helper execution is inferred from construction. No engine build, host
+standard WASI0.2.10 world. INIT DATA review`f395dbe4` verifies the37,252,678-byte
+component and complete returned graph with131 observed imports. Actual helper
+HTTP then passes separately, as described above. No engine build, host
 modification or new host interface is selected.
 
-Latest comprehensive current-build comparison: **Node passes; Wasm fails only
+Checkpoint`d5eb3adb` pushes these Sources and retained counterexamples. The fixed
+new-app full pair runs once per arm afterward: native`3c8456`/session49338→
+`c39980`, Node`340d2a`/session60640→`36ab31`. The persisted-state gate passes;
+the unresolved strict browser failure is again the Next.js critical path.
+The staged Git blob check verifies all911 payloads/28,941,994 bytes across six
+finite packets, preserving both failed preparations and runtime outcomes.
+The [response-completion audit](tests/node-compat/frameworks/nextjs/next-fs-callback-root-results-v2/next-browser-steps.md)
+locates real compression/Flight/body-EOF owners without a justified code fix.
+Next is a conditional non-browser HTTP replay of the retained391-byte action
+POST with captured-header restoration, checking actual gzip completion and EOF.
+It is a new diagnostic workload; original strict browser failures remain intact.
+
+Earlier comprehensive current-build comparison: **Node passes; Wasm fails only
 the retained legacy generation assertion**. Both pass24HTTP,52 portable-cache
 checks,80 supplemental checks, five incremental stream chunks and both strict
 browser tests. Wasm records1→1; Node records1→2. Native7204/600 finishes raw1/clean,

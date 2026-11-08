@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "state": "NEXT_APP_BUILD_PLAN_ONLY_V1",
+  "buildExecuted": false,
+  "buildPathActuallyTested": false,
+  "fixtureRoot": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/portable-cache-app-fixture-v1",
+  "outputRoot": null,
+  "expectedNodeVersion": "v22.14.0",
+  "actualVersionProbesRequired": true,
+  "explicitToolsRequiredBeforeBuild": true,
+  "toolInputs": null,
+  "commands": [
+    {
+      "id": "node-version",
+      "argv": [
+        "{NODE_22_14_0}",
+        "--version"
+      ],
+      "cwd": "{FRESH_OUTPUT}",
+      "seconds": 120
+    },
+    {
+      "id": "npm-version",
+      "argv": [
+        "{NODE_22_14_0}",
+        "{NPM_CLI_JS}",
+        "--version"
+      ],
+      "cwd": "{FRESH_OUTPUT}",
+      "seconds": 120
+    },
+    {
+      "id": "npm-ci",
+      "argv": [
+        "{NODE_22_14_0}",
+        "{NPM_CLI_JS}",
+        "ci",
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund"
+      ],
+      "cwd": "{FRESH_OUTPUT}/application",
+      "seconds": 600
+    },
+    {
+      "id": "next-build",
+      "argv": [
+        "{NODE_22_14_0}",
+        "{FRESH_OUTPUT}/application/node_modules/next/dist/bin/next",
+        "build",
+        "--webpack"
+      ],
+      "cwd": "{FRESH_OUTPUT}/application",
+      "seconds": 900
+    }
+  ],
+  "environment": {
+    "HOME": "/Users/dan",
+    "USER": "dan",
+    "LOGNAME": "dan",
+    "PATH": "{NODE_DIRECTORY}:/usr/bin:/bin",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "NEXT_TELEMETRY_DISABLED": "1",
+    "CI": "1",
+    "NODE_ENV": "production",
+    "NPM_CONFIG_CACHE": "{FRESH_OUTPUT}/npm-cache",
+    "TMPDIR": "{FRESH_OUTPUT}/tmp",
+    "NPM_CONFIG_USERCONFIG": "{FRESH_OUTPUT}/empty-user.npmrc",
+    "NPM_CONFIG_GLOBALCONFIG": "{FRESH_OUTPUT}/empty-global.npmrc"
+  },
+  "packaging": [
+    "real .next/standalone/server.js",
+    "copy .next/static",
+    "copy public",
+    "verify traced fixtures/message.txt",
+    "fresh dynamic inventory/BUILD_ID/action manifest"
+  ]
+}

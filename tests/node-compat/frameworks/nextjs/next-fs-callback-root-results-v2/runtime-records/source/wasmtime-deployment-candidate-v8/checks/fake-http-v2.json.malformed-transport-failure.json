@@ -1,0 +1,413 @@
+{
+  "fakeServerOnly": true,
+  "raw": {
+    "schemaVersion": 1,
+    "suite": "NEXT_CONCURRENT_CONTEXT_BODY_RECOVERY_V1",
+    "origin": "http://127.0.0.1:56185",
+    "output": "/private/tmp/next-v8-fake-http-Cmhvyi/malformed-transport-failure",
+    "clock": "One client process.hrtime.bigint relative nanoseconds; ordering only",
+    "clientOverlapOnly": true,
+    "sameStoreOrNativeResourceIdentityClaimed": false,
+    "guestReadOrPacketChunkBoundariesClaimed": false,
+    "perRequestTimeoutMs": 20000,
+    "observations": [
+      {
+        "id": "context-alpha",
+        "phase": "concurrent",
+        "request": {
+          "method": "GET",
+          "path": "/api/context",
+          "headers": {
+            "cookie": "fixture_token=parallel-alpha",
+            "x-fixture-probe": "probe-alpha"
+          }
+        },
+        "startedNs": "36667",
+        "headersNs": "1932333",
+        "terminalNs": "2551583",
+        "status": 200,
+        "responseHeaders": {
+          "connection": "close",
+          "content-length": "74",
+          "content-type": "application/json",
+          "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+          "set-cookie": "fixture_reply=set; Path=/; HttpOnly; SameSite=lax",
+          "x-fixture-response": "context-ok"
+        },
+        "body": {
+          "path": "/private/tmp/next-v8-fake-http-Cmhvyi/malformed-transport-failure/context-alpha.body",
+          "sha256": "32062f2be9c7ab5c887b9c3e0cbf1b7dd89bcd44aa42f6019ca479e6ed1ffc99",
+          "bytes": 74
+        },
+        "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1hbHBoYSIsImhlYWRlciI6InByb2JlLWFscGhhIn0=",
+        "responseChunks": [
+          {
+            "bytes": 74,
+            "sha256": "32062f2be9c7ab5c887b9c3e0cbf1b7dd89bcd44aa42f6019ca479e6ed1ffc99",
+            "base64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1hbHBoYSIsImhlYWRlciI6InByb2JlLWFscGhhIn0=",
+            "arrivedNs": "1963000"
+          }
+        ],
+        "bodyEofObserved": true,
+        "error": null,
+        "readerReleaseError": null,
+        "publicationError": null,
+        "signalAborted": false
+      },
+      {
+        "id": "malformed-json",
+        "phase": "concurrent",
+        "request": {
+          "method": "POST",
+          "path": "/api/json",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "body": {
+            "bytes": 15,
+            "sha256": "3d5628e6b626e4c4e876501f916ea032cb1d8732dc079c72011b9abffbb25cc6",
+            "base64": "e2JhZC1jb25jdXJyZW50"
+          }
+        },
+        "startedNs": "482292",
+        "headersNs": null,
+        "terminalNs": "2984458",
+        "status": null,
+        "responseHeaders": null,
+        "body": null,
+        "bodyBase64": null,
+        "responseChunks": [],
+        "bodyEofObserved": false,
+        "error": {
+          "thrownType": "object",
+          "name": "TypeError",
+          "message": "fetch failed",
+          "code": null,
+          "stack": "TypeError: fetch failed\n    at node:internal/deps/undici/undici:13502:13\n    at async capture (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v8/supplemental.mjs:58:22)\n    at async Promise.all (index 2)\n    at async collectSupplemental (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v8/supplemental.mjs:84:7)\n    at async file:///Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v8/test-supplemental.mjs:46:17"
+        },
+        "readerReleaseError": null,
+        "publicationError": null,
+        "signalAborted": false
+      },
+      {
+        "id": "context-beta",
+        "phase": "concurrent",
+        "request": {
+          "method": "GET",
+          "path": "/api/context",
+          "headers": {
+            "cookie": "fixture_token=parallel-beta",
+            "x-fixture-probe": "probe-beta"
+          }
+        },
+        "startedNs": "231042",
+        "headersNs": "2272958",
+        "terminalNs": "3024917",
+        "status": 200,
+        "responseHeaders": {
+          "connection": "close",
+          "content-length": "72",
+          "content-type": "application/json",
+          "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+          "set-cookie": "fixture_reply=set; Path=/; HttpOnly; SameSite=lax",
+          "x-fixture-response": "context-ok"
+        },
+        "body": {
+          "path": "/private/tmp/next-v8-fake-http-Cmhvyi/malformed-transport-failure/context-beta.body",
+          "sha256": "ac832c2da2c6eb64e8550fd664acf12a0acd62c253b0a75a8c48db21d02a92d1",
+          "bytes": 72
+        },
+        "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1iZXRhIiwiaGVhZGVyIjoicHJvYmUtYmV0YSJ9",
+        "responseChunks": [
+          {
+            "bytes": 72,
+            "sha256": "ac832c2da2c6eb64e8550fd664acf12a0acd62c253b0a75a8c48db21d02a92d1",
+            "base64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1iZXRhIiwiaGVhZGVyIjoicHJvYmUtYmV0YSJ9",
+            "arrivedNs": "2294792"
+          }
+        ],
+        "bodyEofObserved": true,
+        "error": null,
+        "readerReleaseError": null,
+        "publicationError": null,
+        "signalAborted": false
+      },
+      {
+        "id": "chunked-unicode-json",
+        "phase": "concurrent",
+        "request": {
+          "method": "POST",
+          "path": "/api/json",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "body": {
+            "kind": "controlled-two-chunk-ReadableStream",
+            "bytes": 37,
+            "sha256": "b688add07b3e56bfa2311645c8d239333c71a4bbdf12d56ee9da5f0328d4b3b0",
+            "base64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4oKsLfCfmIAtY2Fmw6kifQ=="
+          }
+        },
+        "startedNs": "317458",
+        "headersNs": "3588292",
+        "terminalNs": "3782125",
+        "status": 200,
+        "responseHeaders": {
+          "connection": "close",
+          "content-type": "application/json",
+          "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "path": "/private/tmp/next-v8-fake-http-Cmhvyi/malformed-transport-failure/chunked-unicode-json.body",
+          "sha256": "0e86dacfdaa318e56eb57fc9cec6140e661da92235419301844a3b1d1e5eddc6",
+          "bytes": 63
+        },
+        "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoiY29uY3VycmVudC3igqwt8J+YgC1jYWbDqSJ9",
+        "responseChunks": [
+          {
+            "bytes": 63,
+            "sha256": "0e86dacfdaa318e56eb57fc9cec6140e661da92235419301844a3b1d1e5eddc6",
+            "base64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoiY29uY3VycmVudC3igqwt8J+YgC1jYWbDqSJ9",
+            "arrivedNs": "3615875"
+          }
+        ],
+        "bodyEofObserved": true,
+        "error": null,
+        "readerReleaseError": null,
+        "publicationError": null,
+        "signalAborted": false
+      },
+      {
+        "id": "empty-context-recovery",
+        "phase": "recovery",
+        "request": {
+          "method": "GET",
+          "path": "/api/context",
+          "headers": {}
+        },
+        "startedNs": "3950250",
+        "headersNs": "5073542",
+        "terminalNs": "5495083",
+        "status": 200,
+        "responseHeaders": {
+          "connection": "close",
+          "content-length": "53",
+          "content-type": "application/json",
+          "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+          "set-cookie": "fixture_reply=set; Path=/; HttpOnly; SameSite=lax",
+          "x-fixture-response": "context-ok"
+        },
+        "body": {
+          "path": "/private/tmp/next-v8-fake-http-Cmhvyi/malformed-transport-failure/empty-context-recovery.body",
+          "sha256": "cc1090d59c1d01dbde09808230ca598dcc5c05b6d4d3da4905a8a768404cfc41",
+          "bytes": 53
+        },
+        "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOm51bGwsImhlYWRlciI6bnVsbH0=",
+        "responseChunks": [
+          {
+            "bytes": 53,
+            "sha256": "cc1090d59c1d01dbde09808230ca598dcc5c05b6d4d3da4905a8a768404cfc41",
+            "base64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOm51bGwsImhlYWRlciI6bnVsbH0=",
+            "arrivedNs": "5102542"
+          }
+        ],
+        "bodyEofObserved": true,
+        "error": null,
+        "readerReleaseError": null,
+        "publicationError": null,
+        "signalAborted": false
+      },
+      {
+        "id": "json-recovery",
+        "phase": "recovery",
+        "request": {
+          "method": "POST",
+          "path": "/api/json",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "body": {
+            "bytes": 29,
+            "sha256": "4d95fedcdd9601b1929da35c379e921d7842b8a4e1e8310ea54a8c18ecd1b2e9",
+            "base64": "eyJ2YWx1ZSI6InJlY292ZXJlZC3nlYwt4pyFIn0="
+          }
+        },
+        "startedNs": "4156292",
+        "headersNs": "5377250",
+        "terminalNs": "5574000",
+        "status": 200,
+        "responseHeaders": {
+          "connection": "close",
+          "content-length": "55",
+          "content-type": "application/json",
+          "date": "Sat, 07 Nov 2026 04:49:26 GMT"
+        },
+        "body": {
+          "path": "/private/tmp/next-v8-fake-http-Cmhvyi/malformed-transport-failure/json-recovery.body",
+          "sha256": "ed2630529bcfda8bd7cf6600c27ef402baf93dc4728d4d2787f8c296d7fa857b",
+          "bytes": 55
+        },
+        "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoicmVjb3ZlcmVkLeeVjC3inIUifQ==",
+        "responseChunks": [
+          {
+            "bytes": 55,
+            "sha256": "ed2630529bcfda8bd7cf6600c27ef402baf93dc4728d4d2787f8c296d7fa857b",
+            "base64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoicmVjb3ZlcmVkLeeVjC3inIUifQ==",
+            "arrivedNs": "5399500"
+          }
+        ],
+        "bodyEofObserved": true,
+        "error": null,
+        "readerReleaseError": null,
+        "publicationError": null,
+        "signalAborted": false
+      }
+    ],
+    "completionOrder": [
+      "context-alpha",
+      "malformed-json",
+      "context-beta",
+      "chunked-unicode-json",
+      "empty-context-recovery",
+      "json-recovery"
+    ],
+    "uploadEvents": [
+      {
+        "event": "head-enqueued",
+        "ns": "32792"
+      },
+      {
+        "event": "tail-release-requested",
+        "ns": "3256042"
+      },
+      {
+        "event": "tail-release-observed",
+        "ns": "3259542"
+      },
+      {
+        "event": "tail-enqueued",
+        "ns": "3265042"
+      }
+    ],
+    "phaseOneTerminalNs": "3947792",
+    "chunkedRequest": {
+      "body": {
+        "bytes": 37,
+        "sha256": "b688add07b3e56bfa2311645c8d239333c71a4bbdf12d56ee9da5f0328d4b3b0",
+        "base64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4oKsLfCfmIAtY2Fmw6kifQ=="
+      },
+      "chunks": [
+        {
+          "bytes": 22,
+          "sha256": "9586b5d91d9b4f5378041c7e72b51c5b3054625aa884be94e4ce949a54156eb9",
+          "base64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4g=="
+        },
+        {
+          "bytes": 15,
+          "sha256": "cabb7bbc47326be137a48422771b2fd75dcbc6a9756f02b8acbda1c2376744ca",
+          "base64": "gqwt8J+YgC1jYWbDqSJ9"
+        }
+      ],
+      "splitInsideUtf8Sequence": true,
+      "clientEnqueueBoundariesOnly": true
+    },
+    "completedNs": "5702833"
+  },
+  "received": [
+    {
+      "method": "GET",
+      "path": "/api/context",
+      "headers": {
+        "host": "127.0.0.1:56185",
+        "connection": "keep-alive",
+        "cookie": "fixture_token=parallel-alpha",
+        "x-fixture-probe": "probe-alpha",
+        "accept": "*/*",
+        "accept-language": "*",
+        "sec-fetch-mode": "cors",
+        "user-agent": "node",
+        "accept-encoding": "gzip, deflate"
+      },
+      "bodyBase64": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/context",
+      "headers": {
+        "host": "127.0.0.1:56185",
+        "connection": "keep-alive",
+        "cookie": "fixture_token=parallel-beta",
+        "x-fixture-probe": "probe-beta",
+        "accept": "*/*",
+        "accept-language": "*",
+        "sec-fetch-mode": "cors",
+        "user-agent": "node",
+        "accept-encoding": "gzip, deflate"
+      },
+      "bodyBase64": ""
+    },
+    {
+      "method": "POST",
+      "path": "/api/json",
+      "headers": {
+        "host": "127.0.0.1:56185",
+        "connection": "keep-alive",
+        "content-type": "application/json",
+        "accept": "*/*",
+        "accept-language": "*",
+        "sec-fetch-mode": "cors",
+        "user-agent": "node",
+        "accept-encoding": "gzip, deflate",
+        "content-length": "15"
+      },
+      "bodyBase64": "e2JhZC1jb25jdXJyZW50"
+    },
+    {
+      "method": "POST",
+      "path": "/api/json",
+      "headers": {
+        "host": "127.0.0.1:56185",
+        "connection": "keep-alive",
+        "content-type": "application/json",
+        "accept": "*/*",
+        "accept-language": "*",
+        "sec-fetch-mode": "cors",
+        "user-agent": "node",
+        "accept-encoding": "gzip, deflate",
+        "transfer-encoding": "chunked"
+      },
+      "bodyBase64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4oKsLfCfmIAtY2Fmw6kifQ=="
+    },
+    {
+      "method": "GET",
+      "path": "/api/context",
+      "headers": {
+        "host": "127.0.0.1:56185",
+        "connection": "keep-alive",
+        "accept": "*/*",
+        "accept-language": "*",
+        "sec-fetch-mode": "cors",
+        "user-agent": "node",
+        "accept-encoding": "gzip, deflate"
+      },
+      "bodyBase64": ""
+    },
+    {
+      "method": "POST",
+      "path": "/api/json",
+      "headers": {
+        "host": "127.0.0.1:56185",
+        "connection": "keep-alive",
+        "content-type": "application/json",
+        "accept": "*/*",
+        "accept-language": "*",
+        "sec-fetch-mode": "cors",
+        "user-agent": "node",
+        "accept-encoding": "gzip, deflate",
+        "content-length": "29"
+      },
+      "bodyBase64": "eyJ2YWx1ZSI6InJlY292ZXJlZC3nlYwt4pyFIn0="
+    }
+  ]
+}

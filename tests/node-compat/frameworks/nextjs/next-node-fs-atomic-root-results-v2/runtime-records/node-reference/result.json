@@ -1,0 +1,110 @@
+{
+  "executionKind": "node-reference",
+  "guestExecuted": false,
+  "applicationGateWaived": false,
+  "schemaVersion": 1,
+  "state": "NEXT_NODE_FS_ATOMIC_SUITE_PASSED_V1",
+  "passed": true,
+  "plannedCaseIds": [
+    "create-new",
+    "existing-no-replacement",
+    "missing-parent-error"
+  ],
+  "cases": [
+    {
+      "id": "create-new",
+      "passed": true,
+      "assertions": [
+        {
+          "label": "New destination publication returns true",
+          "passed": true
+        },
+        {
+          "label": "New destination contains exact original bytes",
+          "passed": true
+        },
+        {
+          "label": "Successful publication removes its temporary file",
+          "passed": true
+        },
+        {
+          "label": "Published destination is one ordinary remaining link",
+          "passed": true
+        }
+      ],
+      "returned": true
+    },
+    {
+      "id": "existing-no-replacement",
+      "passed": true,
+      "assertions": [
+        {
+          "label": "Existing destination returns false for EEXIST",
+          "passed": true
+        },
+        {
+          "label": "Existing destination bytes are not replaced",
+          "passed": true
+        },
+        {
+          "label": "EEXIST publication removes its temporary file",
+          "passed": true
+        },
+        {
+          "label": "EEXIST leaves the original destination as one remaining link",
+          "passed": true
+        }
+      ],
+      "returned": false
+    },
+    {
+      "id": "missing-parent-error",
+      "passed": true,
+      "assertions": [
+        {
+          "label": "Missing parent preserves the original ENOENT rejection",
+          "passed": true
+        },
+        {
+          "label": "Rejected missing-parent call adds no owned entry",
+          "passed": true
+        },
+        {
+          "label": "Rejected call leaves the existing destination unchanged",
+          "passed": true
+        }
+      ],
+      "originalRejection": {
+        "type": "object",
+        "message": "ENOENT: no such file or directory, open '/private/tmp/starling-node-compat/next-node-fs-atomic-node-v1-node-first/data/absent/value.txt.2d598867-42b4-4b2c-b0bc-ed44a13a8dcd.tmp'",
+        "code": "ENOENT"
+      }
+    }
+  ],
+  "unattemptedCaseIds": [],
+  "assertions": 11,
+  "actualNextHelperUsed": true,
+  "fakeDependencies": false,
+  "helperImplementationModified": false,
+  "legacyGenerationGateChanged": false,
+  "fullNextAccepted": false,
+  "scope": "Sequential publish-if-absent helper calls in one owned directory. No atomic increment/replacement, CAS, concurrent process, fsync, crash or route-cache persistence proof.",
+  "applicationRoot": "/private/tmp/starling-node-compat/next-nonredirect-action-app-build-v2-first/application/.next/standalone",
+  "testRoot": "/private/tmp/starling-node-compat/next-node-fs-atomic-node-v1-node-first/data",
+  "nodeFsHelper": {
+    "path": "/private/tmp/starling-node-compat/next-nonredirect-action-app-build-v2-first/application/.next/standalone/node_modules/next/dist/server/lib/node-fs-methods.js",
+    "sha256": "6bc8642f72edfd01f57072915271eb8fe5e959fe56c2f44005f6d9a258abb0a7",
+    "bytes": 1300
+  },
+  "inventory": {
+    "files": [
+      {
+        "path": "published.txt",
+        "bytes": 30,
+        "sha256": "9c17b6e9e7f0e96022055a8f1c80b8a48a1d04e293cb98ca3fefc5f22b052f82"
+      }
+    ],
+    "logicalBytes": 30,
+    "modesOrInodeIdentityOrWasiRightsInferred": false
+  }
+}

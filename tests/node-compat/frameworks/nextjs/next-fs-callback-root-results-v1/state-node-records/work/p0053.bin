@@ -1,0 +1,617 @@
+{
+  "passed": true,
+  "schemaVersion": 1,
+  "suite": "NEXT_FS_CALLBACK_STATE_CONFORMANCE_V1",
+  "executionKind": "node-only",
+  "guestExecuted": false,
+  "fullNextAccepted": false,
+  "helperSource": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-fs-callback-app-build-v1/fixture/app/api/cache/callback-generation.cjs",
+    "sha256": "48186fd2099c7a3c361971784c8578473b487b95a41921ddf036e0d1b0fa63b1",
+    "bytes": 5490
+  },
+  "helperImported": true,
+  "helperCalls": 9,
+  "cases": [
+    {
+      "id": "lazy-import",
+      "passed": true,
+      "cacheParentAbsentBeforeAndAfter": true,
+      "before": [],
+      "after": []
+    },
+    {
+      "id": "sequential",
+      "passed": true,
+      "returned": [
+        1,
+        2
+      ],
+      "canonicalRecords": [
+        "{\"schemaVersion\":1,\"generation\":1}\n",
+        "{\"schemaVersion\":1,\"generation\":2}\n"
+      ],
+      "afterFirst": [
+        {
+          "path": ".next",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1",
+          "mode": 493,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1/generation.json",
+          "mode": 420,
+          "nlink": 1,
+          "kind": "file",
+          "bytes": 35,
+          "sha256": "2bb21b9ed7af50d5c9bd131837526c1109a7cced5380a99e2db50e28d3a4e7c1",
+          "base64": "eyJzY2hlbWFWZXJzaW9uIjoxLCJnZW5lcmF0aW9uIjoxfQo="
+        }
+      ],
+      "afterSecond": [
+        {
+          "path": ".next",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1",
+          "mode": 493,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1/generation.json",
+          "mode": 420,
+          "nlink": 1,
+          "kind": "file",
+          "bytes": 35,
+          "sha256": "a1fb3924a495526cfb4c6bedf2bc3e510627964768a53ee34920070f02d273fa",
+          "base64": "eyJzY2hlbWFWZXJzaW9uIjoxLCJnZW5lcmF0aW9uIjoyfQo="
+        }
+      ]
+    },
+    {
+      "id": "pending-busy",
+      "passed": true,
+      "expectedCode": "ERR_SM_CALLBACK_BUSY",
+      "originalRejection": {
+        "type": "object",
+        "name": "Error",
+        "code": "ERR_SM_CALLBACK_BUSY",
+        "message": "Pending publication exists; no retry or online reclamation"
+      },
+      "before": [
+        {
+          "path": ".next",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1",
+          "mode": 448,
+          "nlink": 4,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1/generation.json",
+          "mode": 420,
+          "nlink": 1,
+          "kind": "file",
+          "bytes": 35,
+          "sha256": "d84ba13718cfc04909e77c0bb1a20d2ba83860e32781fce92605e4c9846c742a",
+          "base64": "eyJzY2hlbWFWZXJzaW9uIjoxLCJnZW5lcmF0aW9uIjo3fQo="
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1/generation.pending",
+          "mode": 420,
+          "nlink": 1,
+          "kind": "file",
+          "bytes": 19,
+          "sha256": "4f44eeade0c9b13bcae15f0d54fca4d76eeeb41d24625c59c59ff775dbbe116b",
+          "base64": "aW5jb21wbGV0ZS1wZW5kaW5nCg=="
+        }
+      ],
+      "after": [
+        {
+          "path": ".next",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1",
+          "mode": 448,
+          "nlink": 4,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1/generation.json",
+          "mode": 420,
+          "nlink": 1,
+          "kind": "file",
+          "bytes": 35,
+          "sha256": "d84ba13718cfc04909e77c0bb1a20d2ba83860e32781fce92605e4c9846c742a",
+          "base64": "eyJzY2hlbWFWZXJzaW9uIjoxLCJnZW5lcmF0aW9uIjo3fQo="
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1/generation.pending",
+          "mode": 420,
+          "nlink": 1,
+          "kind": "file",
+          "bytes": 19,
+          "sha256": "4f44eeade0c9b13bcae15f0d54fca4d76eeeb41d24625c59c59ff775dbbe116b",
+          "base64": "aW5jb21wbGV0ZS1wZW5kaW5nCg=="
+        }
+      ]
+    },
+    {
+      "id": "corrupt-record",
+      "passed": true,
+      "expectedCode": "ERR_SM_CALLBACK_CORRUPT",
+      "originalRejection": {
+        "type": "object",
+        "name": "Error",
+        "code": "ERR_SM_CALLBACK_CORRUPT",
+        "message": "Expected canonical versioned integer record"
+      },
+      "before": [
+        {
+          "path": ".next",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1/generation.json",
+          "mode": 420,
+          "nlink": 1,
+          "kind": "file",
+          "bytes": 35,
+          "sha256": "484a8f7309d4017919142b7869f11f592ea65b89428979be0318b5cd4acd48d0",
+          "base64": "eyJzY2hlbWFWZXJzaW9uIjoxLCJnZW5lcmF0aW9uIjowfQo="
+        }
+      ],
+      "after": [
+        {
+          "path": ".next",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1/generation.json",
+          "mode": 420,
+          "nlink": 1,
+          "kind": "file",
+          "bytes": 35,
+          "sha256": "484a8f7309d4017919142b7869f11f592ea65b89428979be0318b5cd4acd48d0",
+          "base64": "eyJzY2hlbWFWZXJzaW9uIjoxLCJnZW5lcmF0aW9uIjowfQo="
+        }
+      ]
+    },
+    {
+      "id": "generation-limits",
+      "passed": true,
+      "subcases": [
+        {
+          "label": "above-limit",
+          "expectedCode": "ERR_SM_CALLBACK_LIMIT",
+          "originalRejection": {
+            "type": "object",
+            "name": "Error",
+            "code": "ERR_SM_CALLBACK_LIMIT",
+            "message": "Generation is outside the selected bound"
+          },
+          "before": [
+            {
+              "path": ".next",
+              "mode": 448,
+              "nlink": 3,
+              "kind": "directory"
+            },
+            {
+              "path": ".next/cache",
+              "mode": 448,
+              "nlink": 3,
+              "kind": "directory"
+            },
+            {
+              "path": ".next/cache/app-callback-generation-v1",
+              "mode": 448,
+              "nlink": 3,
+              "kind": "directory"
+            },
+            {
+              "path": ".next/cache/app-callback-generation-v1/generation.json",
+              "mode": 420,
+              "nlink": 1,
+              "kind": "file",
+              "bytes": 41,
+              "sha256": "c16be0e329ac74f8a09a83c17b1d2e5deb31cca21420606f36f2800a7641e1e7",
+              "base64": "eyJzY2hlbWFWZXJzaW9uIjoxLCJnZW5lcmF0aW9uIjoxMDAwMDAxfQo="
+            }
+          ],
+          "after": [
+            {
+              "path": ".next",
+              "mode": 448,
+              "nlink": 3,
+              "kind": "directory"
+            },
+            {
+              "path": ".next/cache",
+              "mode": 448,
+              "nlink": 3,
+              "kind": "directory"
+            },
+            {
+              "path": ".next/cache/app-callback-generation-v1",
+              "mode": 448,
+              "nlink": 3,
+              "kind": "directory"
+            },
+            {
+              "path": ".next/cache/app-callback-generation-v1/generation.json",
+              "mode": 420,
+              "nlink": 1,
+              "kind": "file",
+              "bytes": 41,
+              "sha256": "c16be0e329ac74f8a09a83c17b1d2e5deb31cca21420606f36f2800a7641e1e7",
+              "base64": "eyJzY2hlbWFWZXJzaW9uIjoxLCJnZW5lcmF0aW9uIjoxMDAwMDAxfQo="
+            }
+          ]
+        },
+        {
+          "label": "at-limit",
+          "expectedCode": "ERR_SM_CALLBACK_LIMIT",
+          "originalRejection": {
+            "type": "object",
+            "name": "Error",
+            "code": "ERR_SM_CALLBACK_LIMIT",
+            "message": "Generation limit reached; never wrap or reset"
+          },
+          "before": [
+            {
+              "path": ".next",
+              "mode": 448,
+              "nlink": 3,
+              "kind": "directory"
+            },
+            {
+              "path": ".next/cache",
+              "mode": 448,
+              "nlink": 3,
+              "kind": "directory"
+            },
+            {
+              "path": ".next/cache/app-callback-generation-v1",
+              "mode": 448,
+              "nlink": 3,
+              "kind": "directory"
+            },
+            {
+              "path": ".next/cache/app-callback-generation-v1/generation.json",
+              "mode": 420,
+              "nlink": 1,
+              "kind": "file",
+              "bytes": 41,
+              "sha256": "a08227c75079fba7e3ccf13cb073b066cae829f649cc0ca73bed6e81edee0c5f",
+              "base64": "eyJzY2hlbWFWZXJzaW9uIjoxLCJnZW5lcmF0aW9uIjoxMDAwMDAwfQo="
+            }
+          ],
+          "after": [
+            {
+              "path": ".next",
+              "mode": 448,
+              "nlink": 3,
+              "kind": "directory"
+            },
+            {
+              "path": ".next/cache",
+              "mode": 448,
+              "nlink": 3,
+              "kind": "directory"
+            },
+            {
+              "path": ".next/cache/app-callback-generation-v1",
+              "mode": 448,
+              "nlink": 3,
+              "kind": "directory"
+            },
+            {
+              "path": ".next/cache/app-callback-generation-v1/generation.json",
+              "mode": 420,
+              "nlink": 1,
+              "kind": "file",
+              "bytes": 41,
+              "sha256": "a08227c75079fba7e3ccf13cb073b066cae829f649cc0ca73bed6e81edee0c5f",
+              "base64": "eyJzY2hlbWFWZXJzaW9uIjoxLCJnZW5lcmF0aW9uIjoxMDAwMDAwfQo="
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unexpected-member",
+      "passed": true,
+      "expectedCode": "ERR_SM_CALLBACK_CORRUPT",
+      "originalRejection": {
+        "type": "object",
+        "name": "Error",
+        "code": "ERR_SM_CALLBACK_CORRUPT",
+        "message": "Unexpected namespace member"
+      },
+      "before": [
+        {
+          "path": ".next",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1/unselected.txt",
+          "mode": 420,
+          "nlink": 1,
+          "kind": "file",
+          "bytes": 21,
+          "sha256": "74c0c233140b6d34713bccac61901a726c1cbfa0dbd89878d91d63a61cebfc31",
+          "base64": "a2VlcC10aGlzLWJ5dGUtZXhhY3QK"
+        }
+      ],
+      "after": [
+        {
+          "path": ".next",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1/unselected.txt",
+          "mode": 420,
+          "nlink": 1,
+          "kind": "file",
+          "bytes": 21,
+          "sha256": "74c0c233140b6d34713bccac61901a726c1cbfa0dbd89878d91d63a61cebfc31",
+          "base64": "a2VlcC10aGlzLWJ5dGUtZXhhY3QK"
+        }
+      ]
+    },
+    {
+      "id": "oversized-record",
+      "passed": true,
+      "expectedCode": "ERR_SM_CALLBACK_CORRUPT",
+      "originalRejection": {
+        "type": "object",
+        "name": "Error",
+        "code": "ERR_SM_CALLBACK_CORRUPT",
+        "message": "Unexpected record type, alias or size"
+      },
+      "before": [
+        {
+          "path": ".next",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1/generation.json",
+          "mode": 420,
+          "nlink": 1,
+          "kind": "file",
+          "bytes": 129,
+          "sha256": "0ec9eb33e74510bcdd1f2ea55206e82f21649c5c2becbf2b433eb475b34c01bd",
+          "base64": "eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4"
+        }
+      ],
+      "after": [
+        {
+          "path": ".next",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1/generation.json",
+          "mode": 420,
+          "nlink": 1,
+          "kind": "file",
+          "bytes": 129,
+          "sha256": "0ec9eb33e74510bcdd1f2ea55206e82f21649c5c2becbf2b433eb475b34c01bd",
+          "base64": "eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4"
+        }
+      ]
+    },
+    {
+      "id": "hardlink-alias",
+      "passed": true,
+      "expectedCode": "ERR_SM_CALLBACK_CORRUPT",
+      "originalRejection": {
+        "type": "object",
+        "name": "Error",
+        "code": "ERR_SM_CALLBACK_CORRUPT",
+        "message": "Unexpected record type, alias or size"
+      },
+      "before": [
+        {
+          "path": ".next",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1/generation.json",
+          "mode": 420,
+          "nlink": 2,
+          "kind": "file",
+          "bytes": 35,
+          "sha256": "fdf1326bd8d7f102e051875b10a770a6ab93564fe7a0dd8f66ba5df64fdb47cf",
+          "base64": "eyJzY2hlbWFWZXJzaW9uIjoxLCJnZW5lcmF0aW9uIjo5fQo="
+        },
+        {
+          "path": "reference.json",
+          "mode": 420,
+          "nlink": 2,
+          "kind": "file",
+          "bytes": 35,
+          "sha256": "fdf1326bd8d7f102e051875b10a770a6ab93564fe7a0dd8f66ba5df64fdb47cf",
+          "base64": "eyJzY2hlbWFWZXJzaW9uIjoxLCJnZW5lcmF0aW9uIjo5fQo="
+        }
+      ],
+      "after": [
+        {
+          "path": ".next",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1",
+          "mode": 448,
+          "nlink": 3,
+          "kind": "directory"
+        },
+        {
+          "path": ".next/cache/app-callback-generation-v1/generation.json",
+          "mode": 420,
+          "nlink": 2,
+          "kind": "file",
+          "bytes": 35,
+          "sha256": "fdf1326bd8d7f102e051875b10a770a6ab93564fe7a0dd8f66ba5df64fdb47cf",
+          "base64": "eyJzY2hlbWFWZXJzaW9uIjoxLCJnZW5lcmF0aW9uIjo5fQo="
+        },
+        {
+          "path": "reference.json",
+          "mode": 420,
+          "nlink": 2,
+          "kind": "file",
+          "bytes": 35,
+          "sha256": "fdf1326bd8d7f102e051875b10a770a6ab93564fe7a0dd8f66ba5df64fdb47cf",
+          "base64": "eyJzY2hlbWFWZXJzaW9uIjoxLCJnZW5lcmF0aW9uIjo5fQo="
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,22 @@
 # Next.js execution priority
 
+Updated result: the separately versioned
+[persisted-callback fixture](nextjs-persisted-callback-results.md) passes1→2 on
+both Wasm and Node, with both physical state records verified. Both also pass
+24HTTP/52 cache/80 supplemental/incremental streaming/functional browser checks.
+Wasm19501/600 remains failed solely on strict POST7`net::ERR_ABORTED`, while
+Node19876/300 passes the full suite. Primary DATA review`c6846dbb` retains528
+payloads/10,941,748 bytes. The original global-counter fixture remains failed;
+this result demonstrates explicit persisted application data only. The actual
+Next filesystem-helper component separately passes3 cases/11 assertions.
+The critical path is now strict response completion and the related lifecycle
+investigation, with no weaker browser gate or earlier failure waiver.
+The [Source-backed next probe](../../tests/node-compat/frameworks/nextjs/next-fs-callback-root-results-v2/next-browser-steps.md)
+uses the actual retained multipart action body with captured-header restoration
+and a non-browser HTTP consumer to test gzip/EOF completion. It must stop during
+preparation if exact required header provenance is missing. No implementation
+fix, harmless-cancellation conclusion or full Next acceptance follows yet.
+
 Updated 2026-11-08. The latest comprehensive current-build comparison finishes
 with **Node passed and Wasm failed solely on legacy generation1→1**. Both pass
 24HTTP,52 portable-cache checks,80 supplemental checks, five incremental chunks
