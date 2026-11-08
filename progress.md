@@ -27,6 +27,21 @@ whole Source review. JSON-only preparation completes (`6c8ee0`/session1931,
 completion`178394`) with genuine authority`54a24c40`/5,596,685 bytes; no actor has
 been launched at this cutoff. The existing complete-metadata/build guards,
 parser-only WIT preopen and original construction ceilings remain in use.
+The subsequent actual INIT now completes raw0/clean under original owner66965
+(`d78d54`/session28985, completion`489618`). Component`66a3ed9e` is37,239,204
+bytes. Coordinated INIT DATA review`0599a450` verifies the complete return
+graph,131 observed tuples on the same13 standard WASI0.2.10 interfaces,
+incoming-handler-only export, all4 clean owners/8 streams and no deployed
+suite/app work. The one-GET guest runtime actor is being prepared; its actual
+suite result remains unobserved. Node cache and constructor preparation
+checkpoint`20e110d4` is pushed to`origin/main`.
+The one-GET guest actor and Root controller now pass whole Source review;
+actual INIT roles are bound through genuine review`0599a450`, with actor index
+`7073c030` and plan`16cad8e9`. Root verifies the exact metadata-only changes
+and two controller descriptor inverses. JSON-only runtime preparation
+(`e1a9b1`/session3510, completion`5e2594`) issues authority`5c8ae0d7`/4,386 bytes
+without launching an actor. The fixed test remains one GET, original180-second
+owner, no HTTP warmup/retry/guest environment or new capabilities.
 
 Active experiment: the opt-in native export diagnostic has passed Source review,
 both C++ frontend modes, fresh 825-file materialization and all ten generator

@@ -28,7 +28,16 @@ also accepts an explicit application root and fresh test path. The initial
 Source-only comments in that frozen fixture describe its publication cutoff;
 the actual Node result is recorded here.
 
-Guest construction and runtime remain pending. A separate new entry will run
+Guest component construction now completes raw0/clean as `66a3ed9e`
+(37,239,204 bytes). The [coordinated INIT DATA review](actual-construction-review.json)
+verifies all four owners/eight streams, complete typed return graph, 131 observed
+import tuples across the selected thirteen standard WASI0.2.10 interfaces and
+incoming-handler-only export. Only the official WIT parser preopen is present,
+with env{} and no cache/suite/app work during INIT. Fifty-four finite INIT
+records/275,126 bytes are copied under `construction-records/`; binaries, package
+and native metadata payloads are explicitly omitted from that curation.
+
+Guest runtime remains pending. The separate new entry will run
 the same suite through the actual guest CJS/filesystem profile after deployed
 bootstrap, using the existing engine and selected standard WASI world. Node
 success does not establish guest parity. Computation-gap overlap does not test
