@@ -15,7 +15,14 @@ Primary build review`9106545f` and independent build/config gate`d4194323` pass.
 Raw index`95116830` retains92 payloads/2,795,484 bytes, rehashed by Root. Fresh
 HTML/asset selection`05c965a6` derives five client scripts and four actions scripts
 from the actual new HTML; independent asset review`a9fe908f` passes. The unchanged full-client/strict-browser Wasm/Node comparison remains
-outstanding; no new compression-off guest/browser result is claimed.
+outstanding; no new compression-off guest/browser result is claimed. New
+browser/full-client/runtime Source forks are sealed (22 payloads/181,014 bytes),
+with worker01ca byte-identical and all original semantic conjunctions unchanged.
+Actual Node syntax checks pass for the modified full client and both actors;
+Root controller/binder AST checks and all final Source/API reviews pass.
+Runtime binding`37db0289` derives2,041 fresh inputs, including every client,
+WIT, host-tool and selected HTML/script/config consumer. Fixed preparation
+`340af5c4` reserves one Wasm600→Node300 pair; no actor has run in this profile.
 
 The [raw response after non-browser prework](docs/node-compat/nextjs-rsc-prework-response-results.md)
 passes once on Wasm34292/600 and Node34423/300, both raw0/clean. Both pass24HTTP,

@@ -1,0 +1,46 @@
+--- donor/run-stock.mjs
++++ new/run-stock.mjs
+@@ -30,7 +30,7 @@
+ assert.equal(process.argv.length,7,'Versioned host-only authority argument; six original positions preserved');
+ const authorityPath=resolve(process.argv[6]);
+ const authority=JSON.parse(await readFile(authorityPath,'utf8'));
+-assert.equal(authority.state,'ROOT_NEXT_FS_CALLBACK_HOST_FULL_AUTHORIZED_V1');
++assert.equal(authority.state,'ROOT_NEXT_FS_NO_COMPRESS_HOST_AUTHORIZED_V1');
+ assert.equal(authority.controlOnly,false);assert.equal(authority.fsCallbackFullSuiteAllowed,true);
+ assert.equal(authority.localhostServerAllowed,true);assert.equal(authority.browserAllowed,true);
+ for(const key of ['compilerAllowed','nativeBuildAllowed','guestAllowed','engineAllowed','externalApplicationDeploymentAllowed'])assert.equal(authority[key],false);
+@@ -73,7 +73,7 @@
+ assert.deepEqual(await descriptor(plan.applicationBuildReview.path),plan.applicationBuildReview);
+ assert.deepEqual(await descriptor(plan.applicationRootIdentityEvidence.path),plan.applicationRootIdentityEvidence);
+ const newAppReview=JSON.parse(await readFile(plan.applicationBuildReview.path));
+-assert.equal(newAppReview.state,'COORDINATED_FS_CALLBACK_APP_BUILD_DATA_REVIEW_PASSED_V1');assert.equal(newAppReview.verifiedPassed,true);
++assert.equal(newAppReview.state,'COORDINATED_FS_CALLBACK_NO_COMPRESS_APP_BUILD_DATA_REVIEW_PASSED_V1');assert.equal(newAppReview.verifiedPassed,true);
+ assert.deepEqual(newAppReview.actualResult,plan.applicationBuildResult);assert.deepEqual(newAppReview.applicationInputs,plan.applicationInputs);
+ assert.deepEqual(newAppReview.applicationRootIdentityEvidence,plan.applicationRootIdentityEvidence);assert.equal(newAppReview.applicationRoot,source);
+ 
+@@ -93,7 +93,7 @@
+   for(const r of input.files){const path=join(application,r.path),s=await lstat(path);assert.deepEqual(await descriptor(path),{path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}
+   for(const r of input.directories)assert.equal((await lstat(join(application,r.path))).mode&0o777,r.mode);
+ }
+-const result = {schemaVersion: 1, suite: 'NEXT_FS_CALLBACK_FULL_MATCHED_NODE_PROFILE_V1', controlOnly:false, fullOriginalContractExecuted:false, fullNextAccepted:false,
++const result = {schemaVersion: 1, suite: 'NEXT_FS_NO_COMPRESS_FULL_MATCHED_NODE_PROFILE_V1', controlOnly:false, fullOriginalContractExecuted:false, fullNextAccepted:false,
+   node: process.version, guestExecuted: false, applicationModified: false,
+   standaloneSource: source, sourceServer: await descriptor(join(source, 'server.js')),
+   bridge: await descriptor(join(here, '../http-bridge-candidate-v1/bridge.mjs')), harness: await descriptor(fileURLToPath(import.meta.url)),
+@@ -197,7 +197,7 @@
+   result.controlClientResult=await descriptor(join(clientOutput,'result.json'));
+   result.control=JSON.parse(await readFile(result.controlClientResult.path));
+   assert.equal(typeof result.control.fullOriginalContractExecuted,'boolean');result.fullOriginalContractExecuted=result.control.fullOriginalContractExecuted;
+-  assert.equal(result.control.suite,'NEXT_FS_CALLBACK_FULL_CONTRACT_CLIENT_V1');
++  assert.equal(result.control.suite,'NEXT_FS_NO_COMPRESS_FULL_CONTRACT_CLIENT_V1');
+   assert.equal(result.control.controlOnly,false);assert.equal(result.control.fullOriginalContractExecuted,true);assert.equal(result.control.fullNextAccepted,false);
+ } catch (error) {
+   result.errors.push({type:error===null?'null':typeof error,name:error?.name??null,message:error?.message??String(error),stack:error?.stack??null});
+@@ -213,6 +213,6 @@
+     &&result.errors.length===0&&result.transportErrors.length===0;
+   await save();
+ }
+-console.log(JSON.stringify({state:result.passed?'NEXT_FS_CALLBACK_FULL_MATCHED_NODE_PROFILE_PASSED':'NEXT_FS_CALLBACK_FULL_MATCHED_NODE_PROFILE_FAILED',
++console.log(JSON.stringify({state:result.passed?'NEXT_FS_NO_COMPRESS_FULL_MATCHED_NODE_PROFILE_PASSED':'NEXT_FS_NO_COMPRESS_FULL_MATCHED_NODE_PROFILE_FAILED',
+   controlOnly:false,fullOriginalContractExecuted:result.fullOriginalContractExecuted,passed:result.passed,errors:result.errors,transportErrors:result.transportErrors,guestExecuted:false,fullNextAccepted:false}));
+ process.exitCode=result.passed?0:1;

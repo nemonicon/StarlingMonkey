@@ -29,3 +29,13 @@ verifiedDataGatePassed flag is checked without modifying either held report.
 [Fresh asset selection](asset-selection.json) and [independent join](independent-asset-selection-review.json)
 verify five modern client scripts and four actions scripts from this build.
 No runtime authority is issued by those DATA records.
+
+The full browser/client/runtime Source forks are now frozen and indexed, with
+worker01ca and all semantic predicates unchanged. Actual modified-JavaScript
+syntax checks and both Root AST checks pass. prepare-runtime-bindings.py starts
+with four NULL Source/controller descriptors and refuses helper reads/mutation
+unbound. It derives a fresh union including six client consumers, eight WIT
+files, six host-tool rows, actual HTML/scripts and standalone server/config.
+Binding`37db0289` derives2,041 fresh protected inputs. Preparation`340af5c4`
+reserves one original600-second Wasm slot followed by one300-second Node slot.
+No actor has run yet; all Source/API reviews and actual syntax checks pass.
