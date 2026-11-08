@@ -183,8 +183,24 @@ Current next steps and outstanding work:
   and newline predicates in both host metadata helpers before activation.
   Guest `f8c6d52b` and constructor `6ef36102` seal their reviewed payloads;
   Root's literal-only constructor pins reverse exactly to the reviewed unbound
-  files. Browser/client metadata sealing is in progress. No new guest component,
-  runtime grant or trial has executed. The same-world INIT construction is next.
+  files. Browser `a2e8ca55` and client `9a4b5958` are now sealed. Checkpoint
+  `526b4da3` is committed and pushed. The actual same-world constructor ran once:
+  raw0, no timeout/signals/forced cleanup, all observed owned groups gone. New
+  component `df8d7420` is 37,266,121 bytes. Independent INIT checks observe the
+  complete returned graph (131 functions, an observation rather than a target),
+  the same 13 standard WASI imports, and incoming-handler-only export. The four
+  original owners and current world/Source inputs pass complementary review;
+  no deployed correlation markers appeared during INIT. Primary `1dff8468` and
+  owner/world `b0549965` reviews are held. The offline INIT checker passes all
+  80 retained files (649,898 bytes), reads no original paths, and explicitly
+  excludes omitted binaries/package/app validation. Runtime actor bindings are
+  held at native `67f4eaf6` and Node `eb286ac0`; fresh protection includes all
+  1,650 native source/target descriptors. The first DATA binder stopped before
+  writing on an incorrectly named bridge index; its source/failure are retained
+  and the corrected binder passed. The pair driver passed Source reviews and
+  six existing pure publication-policy tests. Both fixed native→Node authorities
+  are prepared, with four public header values declared before either trial.
+  No application trial for this diagnostic has executed yet.
 - **Complete:** guarded native build, real-Next component construction, and one
   full deployed regression. HTTP/stream/browser checks pass in that sample;
   cache1→1 keeps the full suite failed. Prior browser failures remain unresolved.

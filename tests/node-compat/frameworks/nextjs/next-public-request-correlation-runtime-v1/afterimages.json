@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "nativeDeployDonor": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-completion-a-runtime-candidate-v1/deploy.mjs",
+  "replacements": [
+    {
+      "before": "import {captureRawStdout} from './capture-stdout.mjs';",
+      "after": "import {captureRawStdout} from './capture-stdout.mjs';\nimport {validatePublicCorrelation,writePublicCorrelationManifest} from './public-correlation.mjs';"
+    },
+    {
+      "before": "const authorityPath=resolve(process.argv[2]),authority=await read(authorityPath),plan=await read(join(here,'plan.json'));",
+      "after": "const plan=await read(join(here,'plan.json'));\nassert.equal(plan.bindingState,'READY_CURRENT_CORRELATED_COMPONENT_AND_CLIENT','Unbound Source: no authority input, output or actor');\nfor(const key of ['clientSource','browserSource','clientSourceIndex','browserSourceIndex','acceptedConstructionReview','expectedComponent'])assert(plan[key]!==null,'Missing reviewed binding:'+key);\nconst authorityPath=resolve(process.argv[2]),authority=await read(authorityPath);"
+    },
+    {
+      "before": "assert.equal(authority.state,'ROOT_NEXT_WASMTIME_DEPLOYMENT_AUTHORIZED_V2');",
+      "after": "assert.equal(authority.state,'ROOT_NEXT_PUBLIC_REQUEST_CORRELATION_AUTHORIZED_V1');\nassert.equal(authority.publicRequestCorrelationAllowed,true);\nvalidatePublicCorrelation(authority.publicRequestCorrelation);"
+    },
+    {
+      "before": "async function protect(){await family(authority.sourceIndex);await family(authority.constructionCallerIndex);await entrySelection();for(const ref of plan.sourceFamilies)await family(ref);for(const r of plan.protectedInputs)await verify(r);}",
+      "after": "async function protect(){await family(authority.sourceIndex);await family(authority.constructionCallerIndex);await entrySelection();for(const ref of plan.sourceFamilies)await family(ref);await family(plan.clientSourceIndex);await family(plan.browserSourceIndex);for(const r of [...plan.protectedInputs,plan.clientSource,plan.browserSource])await verify(r);}"
+    },
+    {
+      "before": " const client=await launch(plan.node.path,[join(here,'run-contracts.mjs'),origin,join(output,'client'),plan.browserTools,authority.runId],'client');",
+      "after": " result.publicRequestCorrelation=await writePublicCorrelationManifest({block:authority.publicRequestCorrelation,runId:authority.runId,origin,output});\n artifactRefs.push(result.publicRequestCorrelation.manifest);await artifactBookend();await save();\n const client=await launch(plan.node.path,[plan.clientSource.path,origin,join(output,'client'),plan.browserTools,authority.runId],'client');"
+    },
+    {
+      "before": "if(result.client.shutdownRequested===true){",
+      "after": "if(result.client.shutdownRequested===true||clientProcess.status===null||![0,1].includes(clientProcess.status.code)||clientProcess.status.signal!==null||clientProcess.status.error!==null){"
+    }
+  ],
+  "expectedUnbound": true,
+  "actualActions": null
+}

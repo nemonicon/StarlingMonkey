@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "donor": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-browser-netlog-stock-candidate-v1/run-stock.mjs",
+  "replacements": [
+    {
+      "before": "import {createHostModuleRequire} from './module-host-provider.mjs';",
+      "after": "import {createHostModuleRequire} from '../next-browser-netlog-stock-candidate-v1/module-host-provider.mjs';\nimport {validatePublicCorrelation,writePublicCorrelationManifest} from '../next-public-request-correlation-runtime-v1/public-correlation.mjs';"
+    },
+    {
+      "before": "const plan = JSON.parse(await readFile(join(here, 'plans.json')));",
+      "after": "const plan = JSON.parse(await readFile(join(here, 'plans.json')));\nassert.equal(plan.bindingState,'READY_CURRENT_CORRELATION_BROWSER','Unbound Source: no authority, output, app or browser');\nassert.equal(process.argv.length,7,'Versioned host-only authority argument; six original positions preserved');\nconst authorityPath=resolve(process.argv[6]);\nconst authority=JSON.parse(await readFile(authorityPath,'utf8'));\nassert.equal(authority.state,'ROOT_NEXT_PUBLIC_CORRELATION_HOST_AUTHORIZED_V1');\nassert.equal(authority.publicRequestCorrelationAllowed,true);assert.equal(authority.runId,runId);validatePublicCorrelation(authority.publicRequestCorrelation);"
+    },
+    {
+      "before": "assert.equal(process.argv.length,6);assert(browserTools,'Both browser checks mandatory');",
+      "after": "assert.equal(process.argv.length,7);assert(browserTools,'Both browser checks mandatory');"
+    },
+    {
+      "before": "  result.hostModuleProvider = await descriptor(join(here, './module-host-provider.mjs'));",
+      "after": "  result.hostModuleProvider = await descriptor(join(here, '../next-browser-netlog-stock-candidate-v1/module-host-provider.mjs'));"
+    },
+    {
+      "before": "const save = () => { if (result.moduleObservations?.snapshot)",
+      "after": "const rootAuthorityDescriptor=await descriptor(authorityPath);assert.deepEqual(authority.plans,await descriptor(join(here,'plans.json')));\nresult.rootAuthority=rootAuthorityDescriptor;result.publicRequestCorrelation=null;\nconst save = () => { if (result.moduleObservations?.snapshot)"
+    },
+    {
+      "before": "    const args = [join(here, '../next-browser-netlog-candidate-v1/browser-check.mjs'), '--origin', result.origin,\n      '--tools', browserTools, '--output', join(root, 'browser')];",
+      "after": "    result.publicRequestCorrelation=await writePublicCorrelationManifest({block:authority.publicRequestCorrelation,runId,origin:result.origin,output:root});\n    await save();\n    const args = [plan.arms.stock.browserSource.path, '--origin', result.origin,\n      '--tools', browserTools, '--output', join(root, 'browser'),'--correlation-manifest',result.publicRequestCorrelation.manifest.path];"
+    },
+    {
+      "before": "} finally {\n  if (server)",
+      "after": "} finally {\n  try{assert.deepEqual(await descriptor(authorityPath),rootAuthorityDescriptor);if(result.publicRequestCorrelation)assert.deepEqual(await descriptor(result.publicRequestCorrelation.manifest.path),result.publicRequestCorrelation.manifest);}catch(error){result.errors.push({stage:'correlation-input-protection',name:error.name,message:error.message,stack:error.stack});}\n  if (server)"
+    }
+  ],
+  "rawConjunctionUnchanged": true,
+  "actualAuthority": null,
+  "actualResult": null
+}
