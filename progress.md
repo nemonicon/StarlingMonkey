@@ -43,7 +43,29 @@ separately typed five browser URLs with their real physical asset files. The
 first intake mistook a URL for a filesystem path and failed before authority;
 that refusal is retained, the reader corrected, and original native/world
 guards still pass. JSON-only pair preparation`97459c81` now completes with
-both fixed authorities; no new browser/guest control has executed yet.
+both fixed authorities. The declared v1 control pair now completes once per arm:
+native93323/600 and Node93597/300, both raw1/clean with protected inputs. Both
+render the returned value and pass five script hashes plus the unique POST200
+body/hash/sizes/response.finished checks, with no failed requests or observer
+errors. Both remain failed solely on the same Chrome console error: the new
+fixture's HTML pattern`[a-z0-9-]+` is invalid in UnicodeSets (`v`) mode. This is
+not waived. The [HTML Standard](https://html.spec.whatwg.org/multipage/input.html#the-pattern-attribute)
+requires that compilation mode. A new separate fixture version will correct
+only that pattern while retaining this failed pair and unchanged strict checks.
+V1 runtime DATA review`9c474a61` verifies both failed controls and their
+positive89-byte POST captures. The63-file raw packet is3,150,631 bytes.
+The corrected v2 fixture preserves33/34 files and changes only the HTML pattern
+to`(?:[a-z0-9]|-)+`;264 host-Node UnicodeSets cases pass. Its real fresh build
+(`bcbaf2`/session85573, completion`1a2663`) now passes all4 original owners,
+with result`26bce5aa`,2,196 files/48,800,578 bytes and new generated action IDs.
+Five script hashes are derived from its real HTML. Build DATA review`80c59d47`
+verifies the complete new payload and corrected pattern. The byte-identical
+browser/runtime code is separately sealed with fresh v2 app and asset bindings;
+Root verifies whole controller-preimage/namespace and binding inverses. V2
+runtime preparation is in progress; no v1 outcome is overwritten or waived.
+
+
+
 
 
 Outstanding critical work:

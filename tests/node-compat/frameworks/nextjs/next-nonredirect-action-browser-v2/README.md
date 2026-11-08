@@ -1,0 +1,13 @@
+# Nonredirect browser Source v2: form-pattern correction only
+
+New Source only. Root alone binds genuine new /action-value generated/prerendered HTML, browser-eligible external script pins and the new standalone inventory after actual build review. All asset bindings startNULL and fail before output/browser use. No old five chunks, fixture/action ID or app counts are retargeted.
+
+The physical client CLI remains `node run-browser.mjs ORIGIN FRESH_OUTPUT BROWSER_TOOLS RUN_ID` (argc6). Root supplies the same public two-test manifest at `dirname(FRESH_OUTPUT)/public-request-correlation.json`. The browser worker accepts the same four flag pairs as800f. One fresh context uses the existing server-action nonce slot; schema/reader are byte-identical c495. The new client result explicitly says controlOnly/fullOriginalContractExecuted:false and cannot stand in for24/52/80/legacy/fullNext. It is reusable against independently owned Node or Wasm origins.
+
+The real /action-value useActionState form sends fixture-nonredirect-value to its actual exported server action and waits for exactly that rendered result on the same URL. No waitForURL, router redirect, manual fetch wrapper, cancellation, retry or new drain is introduced. Network observer/handlers, whole20s timeout,500ms preclose and2000ms postclose drains are retained verbatim. The single-test count and dynamic script list are deliberate new-fixture scope; existing redirect fixtures/results remain unchanged and failed.
+
+Strict success additionally requires exactly one POST200 with decoded body SHA/bytes, fulfilled request.sizes and response.finished, and each declared new script body/request exactly once with actual inventory hashes. Every requestfailed/pageerror/consoleerror/observer error remains fatal. Response.body is decoded data and sizes are encoded counts; no wire digest or private identity follows. Native/guest/outer route classifiers do not admit /action-value, so no public metadata join is claimed.
+
+No Source/helper/function/JS parser/Node/browser/host/guest/guard or build executed during authoring. C selected and forked the prior observer/client Source and authored related DATA reviews; R authors the new fixture, Root owns builds and eventual runs.
+
+V2 copies all three executable/helper files byte-for-byte from v1; their V1 result schemas are unchanged. Plan metadata is reset from genuine03ece2 unbound Source, so all app/HTML/asset/fixture/review/runtime descriptors remain NULL. Root must derive new v2 asset pins from the actually built corrected form. The v1 overall console-error failures remain failed; neither network observer nor strict acceptance predicate is changed or waived. No browser, Node, parser, helper or target was executed by this Source copy.
