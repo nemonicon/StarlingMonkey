@@ -1,0 +1,289 @@
+{
+  "cases": 17,
+  "passed": true,
+  "results": [
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [],
+        "joined": true,
+        "matchingPostEnterCounts": {
+          "adapter": 1,
+          "classic": 1
+        }
+      },
+      "case": "single-valid-per-lane",
+      "expectedJoin": true
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [],
+        "joined": true,
+        "matchingPostEnterCounts": {
+          "adapter": 1,
+          "classic": 1
+        }
+      },
+      "case": "prior-missing-count0-both",
+      "expectedJoin": true
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [],
+        "joined": true,
+        "matchingPostEnterCounts": {
+          "adapter": 1,
+          "classic": 1
+        }
+      },
+      "case": "valid-other-public-nonce",
+      "expectedJoin": true
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [
+          {
+            "line": 1,
+            "record": {
+              "corr": null,
+              "corrCount": 1,
+              "corrState": "invalid",
+              "event": "adapter-enter",
+              "lane": "adapter",
+              "method": "POST",
+              "path": "/actions"
+            }
+          }
+        ],
+        "joined": false,
+        "matchingPostEnterCounts": {
+          "adapter": 1,
+          "classic": 1
+        }
+      },
+      "case": "invalid-null-adapter",
+      "expectedJoin": false
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [
+          {
+            "line": 1,
+            "record": {
+              "corr": null,
+              "corrCount": 0,
+              "corrState": "invalid",
+              "event": "classic-enter",
+              "lane": "classic",
+              "method": "POST",
+              "path": "/actions"
+            }
+          }
+        ],
+        "joined": false,
+        "matchingPostEnterCounts": {
+          "adapter": 1,
+          "classic": 1
+        }
+      },
+      "case": "invalid-shape-count0",
+      "expectedJoin": false
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [
+          {
+            "line": 1,
+            "record": {
+              "corr": null,
+              "corrCount": 2,
+              "corrState": "duplicate",
+              "event": "classic-enter",
+              "lane": "classic",
+              "method": "POST",
+              "path": "/actions"
+            }
+          }
+        ],
+        "joined": false,
+        "matchingPostEnterCounts": {
+          "adapter": 1,
+          "classic": 1
+        }
+      },
+      "case": "duplicate-null-classic",
+      "expectedJoin": false
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [
+          {
+            "line": 1,
+            "record": {
+              "corr": null,
+              "corrCount": 1,
+              "corrState": "invalid",
+              "event": "adapter-enter",
+              "lane": "adapter",
+              "method": "POST",
+              "path": "/actions"
+            }
+          }
+        ],
+        "joined": false,
+        "matchingPostEnterCounts": {
+          "adapter": 1,
+          "classic": 1
+        }
+      },
+      "case": "coalesced-value-classified-invalid",
+      "expectedJoin": false
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [
+          {
+            "line": 1,
+            "record": {
+              "corr": null,
+              "corrCount": 2,
+              "corrState": "duplicate",
+              "event": "adapter-enter",
+              "lane": "adapter",
+              "method": "POST",
+              "path": "/actions"
+            }
+          },
+          {
+            "line": 1,
+            "record": {
+              "corr": null,
+              "corrCount": 1,
+              "corrState": "invalid",
+              "event": "classic-enter",
+              "lane": "classic",
+              "method": "POST",
+              "path": "/actions"
+            }
+          }
+        ],
+        "joined": false,
+        "matchingPostEnterCounts": {
+          "adapter": 1,
+          "classic": 1
+        }
+      },
+      "case": "both-ambiguous",
+      "expectedJoin": false
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [],
+        "joined": false,
+        "matchingPostEnterCounts": {
+          "adapter": 2,
+          "classic": 1
+        }
+      },
+      "case": "replayed-valid-adapter",
+      "expectedJoin": false
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [],
+        "joined": false,
+        "matchingPostEnterCounts": {
+          "adapter": 1,
+          "classic": 2
+        }
+      },
+      "case": "replayed-valid-classic",
+      "expectedJoin": false
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [],
+        "joined": true,
+        "matchingPostEnterCounts": {
+          "adapter": 1,
+          "classic": 1
+        }
+      },
+      "case": "forwarded-get-additional",
+      "expectedJoin": true
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [],
+        "joined": false,
+        "matchingPostEnterCounts": {
+          "adapter": 0,
+          "classic": 0
+        }
+      },
+      "case": "get-cannot-substitute-post",
+      "expectedJoin": false
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [],
+        "joined": false,
+        "matchingPostEnterCounts": {
+          "adapter": 1,
+          "classic": 1
+        }
+      },
+      "case": "wrong-browser-evidence",
+      "expectedJoin": false
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [],
+        "joined": false,
+        "matchingPostEnterCounts": {
+          "adapter": 1,
+          "classic": 1
+        }
+      },
+      "case": "logger-malformed-or-truncation-loss",
+      "expectedJoin": false
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [],
+        "joined": false,
+        "matchingPostEnterCounts": {
+          "adapter": 1,
+          "classic": 0
+        }
+      },
+      "case": "missing-classic",
+      "expectedJoin": false
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [],
+        "joined": false,
+        "matchingPostEnterCounts": {
+          "adapter": 0,
+          "classic": 0
+        }
+      },
+      "case": "wrong-valid-nonce-only",
+      "expectedJoin": false
+    },
+    {
+      "actual": {
+        "ambiguousInvalidOrDuplicatePostEnterObservations": [],
+        "joined": false,
+        "matchingPostEnterCounts": {
+          "adapter": 0,
+          "classic": 0
+        }
+      },
+      "case": "empty-records",
+      "expectedJoin": false
+    }
+  ],
+  "scope": "Actual pure decision function only; hand-authored already-classified frame fixtures. No marker parser, NetLog parser, logger, guest, target or actual analyzer main execution.",
+  "sourceSha256": "bea8ebd58b1ca8f8539273f7caade5873b4a66312507d223f7ca4fe648f6f965"
+}

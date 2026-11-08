@@ -25,7 +25,23 @@ field to bind the actual browser POST to guest trace sites, alongside explicit
 persistent-cache overlap/error coverage. The ten-trial portable DATA checks pass;
 the new host's raw retention and current/Git-mode checks also pass. The
 [public-correlation plan](../../tests/node-compat/frameworks/nextjs/nextjs-public-request-correlation-plan-v1/plan.json)
-has Source review only; its future implementation and runtime bindings remain null.
+is now implemented in a separate guest/browser/client version. Component
+`df8d7420` passes same-world INIT review; its 80-file offline evidence check
+passes. The declared native→Node pair executes once with all original gates:
+native passes HTTP24/cache52/supplemental80/legacy1→2/stream/function checks but
+fails strict POST7 browser completion; Node passes the full suite. Native raw1
+and Node raw0 remain separate outcomes. Owner/browser review `75095ddc` and
+public-correlation review `96e7d886` are held. The actual POST metadata match is
+observed across Playwright, a unique local NetLog send and both guest lanes. Its
+nine guest sites still do not establish native export or host/transport
+completion. Primary review `ad0944cb` verifies the full pair and preserves native
+false/Node true/full Next false. The 318-file raw corpus passes current and
+Git-permission offline checks. The next [native-boundary proposal](../../tests/node-compat/frameworks/nextjs/next-native-export-public-correlation-plan-v1/README.md)
+identifies an internal guest registration path and ordinary `call` success site;
+direct stdout in `post_call` is rejected by the canonical ABI. No native patch
+is implemented. Primitive snapshot validation, ambiguity/clearing and legal
+ordinary-call I/O behavior are the next bounded engineering decisions.
+See the [current correlation checkpoint](nextjs-public-request-correlation-2026-11-08.md).
 The first prefix-mismatched harness attempt remains a separate pre-HTTP failure.
 The following earlier2251/4e results remain as a separate baseline.
 The optional persistent cache profile works on that corrected native loader.
@@ -100,6 +116,14 @@ Next actions, in dependency order:
    and explicit context close. No longer shutdown wait, native patch, default
    entry change or additional repetition campaign is selected from these samples.
    The cd60 observer remains separate, with additional holder/fulfillment logging.
+   The current correlated component and fixed pair now execute without a new
+   native build or interface. The unique public POST observation review and
+   finite raw DATA checks now pass. The next bounded design targets ordinary
+   native-call observability under the documented ABI restrictions. A successful
+   public metadata match does not establish the native
+   embedding `call`/`post_call` boundary, host task completion, transport EOF or a
+   cancellation cause. The inspected consumer and export audits remain the
+   Source map for that decision. No production promotion is selected.
 4. **Parallel compatibility priority:** distinguish module-local generation
    from durable cache invalidation, then inspect guest export quiescence and
    scheduling. Persistent nonce success never waives the original counter

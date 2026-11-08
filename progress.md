@@ -200,7 +200,39 @@ Current next steps and outstanding work:
   and the corrected binder passed. The pair driver passed Source reviews and
   six existing pure publication-policy tests. Both fixed native→Node authorities
   are prepared, with four public header values declared before either trial.
-  No application trial for this diagnostic has executed yet.
+  Checkpoint `9954a664` is committed and pushed. The declared pair then ran once
+  under the original 1200-second monitor, completing cleanly in 23.34 seconds.
+  Root observes native raw1/full-suite false and Node raw0/full-suite true.
+  Native cache1→2, 52 persistent-cache checks, 80 supplemental checks and five
+  streaming chunks (shell0/ready2) pass. Its strict browser result remains false:
+  POST7 `/actions` reports `ERR_ABORTED`, with three retained observer errors and
+  unavailable body/sizes; both visible interactions succeed. Node passes the
+  strict browser checks too. Native stdout is completely finalized at 17,508
+  bytes within the 8 MiB limit. All original failures remain failures; driver0
+  records a clean experiment, not test acceptance. Owner/browser review
+  `75095ddc` and correlation review `96e7d886` are held. Root's bounded analyzer
+  `558dc24d` observes a unique public POST metadata match across Playwright,
+  NetLog and adapter/classic entries. All 54 marker witnesses match raw stdout;
+  the matching POST has nine named sites, including EOF1,488 bytes/seven reads.
+  Invalid/duplicate competing header observations now block a match, with 17
+  actual pure decision cases passing. A mistaken Root argv-hash preflight stops
+  before analyzer execution and is retained; the corrected actual analyzer runs
+  once. No private identity, native-export/host/TCP completion, gzip integrity or
+  cause follows from this match. Primary review `ad0944cb` independently verifies
+  both arms' 48 HTTP cases/104 persistent-cache checks/160 supplemental checks,
+  the current 825 native roles, 1,761 protected inputs and three app trees, with
+  four binary payloads explicitly delegated rather than replayed. Its runtime
+  state remains unaccepted. Finite raw-pair retention now holds 318 files
+  (5,969,078 bytes); Root's first checker replay and an independent copy with
+  actual staged Git permissions both pass. Neither reads original paths nor
+  executes helpers/analyzers/targets; omitted payloads stay explicitly excluded.
+  The native-boundary Source audit identifies an internal guest registration
+  path and an ordinary `call` success site, while proving that direct WASI stdout
+  inside canonical `post_call` is forbidden. Its separate proposal has no native
+  patch or implemented API. Next are bounded internal-snapshot validation,
+  ambiguity/clearing and ordinary-call I/O policy before any new native build.
+  Persistent-cache overlap/error/bounds, broader lifecycle coverage, bootstrap,
+  empirical cost measurements and production promotion remain outstanding.
 - **Complete:** guarded native build, real-Next component construction, and one
   full deployed regression. HTTP/stream/browser checks pass in that sample;
   cache1→1 keeps the full suite failed. Prior browser failures remain unresolved.
