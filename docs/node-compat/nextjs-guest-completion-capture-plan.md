@@ -57,5 +57,14 @@ Keep the original deployment prefix,600-second owner, default f19d NetLog browse
 standard13 WASI0.2.10 imports and every52/80/24/legacy/stream/strict-browser gate.
 The identity header is not part of this next intervention. Capture failure and
 application failure remain separate recorded outcomes; neither grants a waiver.
-Controller/binder Source is being authored. Its review and an actual deployed
-run remain outstanding.
+The parent capture helper passes nine finite Node22 file/stream tests, with
+independent DATA review `b68296a6`. These cover the hard cap, whole-chunk refusal,
+pending EOF, partial writes and sync/close/abort failures. They execute no Wasm,
+Wasmtime or network; interrupted-client orchestration remains Source-reviewed
+only. The complete controller/binder then passes whole Source review. Its first
+actual run captures13,296 stdout bytes completely, while the original application
+gates remain failed (review `d0085b5c`). The
+[trace results](../../tests/node-compat/frameworks/nextjs/next-guest-completion-runtime-root-results-v1/README.md)
+retain54 qualified marker records and a portable raw corpus. The
+[export/Promise Source audit](nextjs-export-promise-completion-audit.md) maps the
+remaining settlement/event-loop/host-task boundaries without finding a defect.

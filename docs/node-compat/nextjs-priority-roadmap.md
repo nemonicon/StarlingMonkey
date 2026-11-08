@@ -58,11 +58,15 @@ Next actions, in dependency order:
    NetLog identity send headers and absent response Content-Encoding, but native
    retains the same failed gates and prepared Node passes. Coordinated DATA
    review8151dc47 verifies those outcomes. Simply requesting identity does not resolve this sample.
-   Next is a bounded deployed guest completion trace at existing public response
-   and adapter EOF/disposal/finish boundaries; no extra body reader or fetch
-   wrapper, native patch or INIT I/O is proposed. Distinct request objects cannot
-   be joined by coincident counters/method/path, and an error observer must not
-   mask unhandled errors. Declared React19.3.1
+   The bounded deployed guest completion trace now captures13,296 bytes completely
+   and54 qualified records while preserving both failed gates (reviewd0085b5c).
+   Positive EOF/disposal/finish/cleanup/return sites do not establish export or
+   transport completion, and colliding counters cannot identify physical requests.
+   The [export/Promise audit](nextjs-export-promise-completion-audit.md) finds no
+   defect in the inspected settlement/event-loop path. Next is a separate entry
+   observation of the exact handler.handle Promise adoption, preserving values
+   and errors while explicitly changing await scheduling. No native patch is
+   justified yet. Declared React19.3.1
    and the captured Next-vendored browser canary are recorded separately.
 4. **Parallel compatibility priority:** distinguish module-local generation
    from durable cache invalidation, then inspect guest export quiescence and
@@ -84,7 +88,7 @@ Next actions, in dependency order:
    two-primary-tag mutation contract, all failures and unchanged legacy app code.
 
 The implementation/build checkpoint is committed and pushed through
-`96304c24`; [progress.md](../../progress.md) tracks current work and closed evidence.
+`7f8ec2b3`; [progress.md](../../progress.md) tracks current work and closed evidence.
 
 The retained first fresh **Next 16.4.5 / React 19.3.1 App Router application
 passes the selected experimental Wasmtime smoke contract**:

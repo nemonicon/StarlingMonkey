@@ -379,8 +379,35 @@ typed-return/owner/options/WIT/marker-absence evidence without original paths,
 JavaScript, Node, guards or Wasm execution. Omitted package/binary/native payloads
 are not reproduced by replay.
 The [capture plan](docs/node-compat/nextjs-guest-completion-capture-plan.md)
-records actual files/symbols and the proposed boundary; controller Source is now
-being authored against the accepted new constructor roles. No deployment has run.
+records actual files/symbols and the proposed boundary. Root's finite Node22
+capture-helper tests d7b91a now pass all nine cases, including exact8MiB,
+whole-chunk refusal, live-pipe EOF, partial writes and sync/close/abort failures.
+Independent DATA reviewb68296a6 verifies real file bytes and retained report8887349d;
+orchestration failure handling remains Source-only. No Wasm/Wasmtime/network
+was invoked by those tests. The full runtime13-payload Source and fresh Root
+binder pass whole Source and mechanical closure (indexbf552c58/c828 wrapper).
+Preparation647582/ad6beb issues authorityff6dbe1b/1,787 protected refs; Root99a366
+and original74838/600 then terminate1/clean/protected (a1f83c). Native full
+result62cff4ff retains the same two failed gates: legacy1→1 and three strict
+POST7 ERR_ABORTED errors;52/80/24/stream5/functional2 pass. Wasmtime74870 exits0
+on normal SIGINT; stdoutba199ca0 is completely captured13,296 bytes/52 parent
+chunks under the8-MiB bound, with EOF/write/sync/close/bookends and no capture
+error/overflow. Coordinated DATA reviewd0085b5c binds B2a05a418/Rc2f37726.
+The54 marker records positively observe six each adapter terminal sites and
+classic enter/finish/close; none reports catch/logger-error/truncation. Resets
+and token collisions prevent private/cross-lane/outer-inner identity joins;
+these are recorded Source-site observations, not Promise/export/host completion
+or a cause. The60-file/3,266,120-byte raw corpus closes(manifestf3fc1168), with
+portable reader170ea6fb passing B's current/Git-style checks and Root2a3e64.
+The reader does not reinterpret markers or reproduce omitted app/tool/native
+payloads. See [actual trace results](tests/node-compat/frameworks/nextjs/next-guest-completion-runtime-root-results-v1/README.md).
+The [export/Promise audit](docs/node-compat/nextjs-export-promise-completion-audit.md)
+finds no Source defect: compiled embedding requires a fulfilled lowered Promise
+after the event loop, with later post_call/host-task boundaries unobserved.
+Next Source-only entry work observes the exact handler.handle Promise adoption
+with one explicit diagnostic await, preserving value/rejection while declaring
+scheduling perturbation. No such new component/runtime exists yet. Source and
+INIT results through7f8ec2b3 are pushed.
 Commit4ffa8659 is pushed to origin/main; live
 build logs and the unfinished runtime controller were excluded from that cut.
 GeneratorV5 runs all ten checks successfully under original4023/900, result795dab0e;

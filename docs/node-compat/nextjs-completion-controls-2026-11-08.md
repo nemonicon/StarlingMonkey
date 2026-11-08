@@ -103,8 +103,17 @@ Simply requesting identity was insufficient in this sample. The context-wide
 setting also changes navigation and assets; changed transfer sizes/timing limit
 a causal interpretation. Pinned Next filters this header from its internal
 forwarded request, so this does not prove inner native-fetch encoding or append
-selection. Next is a Source-only bounded deployed guest completion diagnostic
-using existing public response events and adapter EOF/disposal/finish returns.
-It needs no additional body reader, fetch wrapper, native change or INIT I/O.
-Separate request objects and lane-local diagnostic tokens must not be treated
-as private identities or unique causal joins. No such trace component has run.
+selection. The separate c6ae diagnostic now runs with bounded, complete13,296-byte
+stdout capture and54 valid marker records. Reviewd0085b5c preserves the same
+legacy/strict failures while observing six each adapter terminal sites and
+classic enter/finish/close. The
+[retained trace](../../tests/node-compat/frameworks/nextjs/next-guest-completion-runtime-root-results-v1/README.md)
+keeps capture success separate from application failure. Separate request
+objects and colliding lane-local tokens establish no physical identities or
+unique causal joins. No Promise/export/host completion follows from these sites.
+
+The [export/Promise Source audit](nextjs-export-promise-completion-audit.md)
+finds no verified defect. A new entry-only observation at handler.handle Promise
+adoption is being prepared. It adds an explicit diagnostic await, preserves
+fulfillment/rejection and declares scheduling perturbation; it is not a fix for
+a missing await. No new component or runtime result exists for that proposal.

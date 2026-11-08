@@ -14,6 +14,11 @@ net error in the selected NetLog contexts establishes neither EOF nor a cause.
 A matched identity-encoding pair verifies explicit POST send headers/absent
 Content-Encoding on both arms and preserves the same native failures, while
 prepared Node passes (review8151dc47); no unique compression cause follows.
+The separate c6ae diagnostic also retains both native failures while capturing
+54 positive public completion-site records (reviewd0085b5c). Counter collisions
+and later export/task boundaries prevent a physical request or completion-cause
+inference; the [Source audit](nextjs-export-promise-completion-audit.md) found no
+verified defect. These observations change no accepted API disposition.
 Declared React19.3.1 and the actual Next-vendored browser canary runtime are
 distinguished in the [client audit](nextjs-server-action-next-steps.md).
 The machine-readable production dispositions remain unchanged.
