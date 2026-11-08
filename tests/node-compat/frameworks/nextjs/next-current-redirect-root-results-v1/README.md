@@ -27,7 +27,11 @@ are verified. Uncertain capture or cleanup stops the second slot.
 Source peers verified label/client-suite-only operational changes and byte-exact
 transport/capture/copy/lifecycle preservation. Root's two actual Node syntax
 checks pass. Binding and runtime evidence are distinct; primary DATA review
-documents the actual outcomes. Raw packets omit app trees and external binaries.
+documents the actual outcomes. [The paired DATA review](actual-runtime-review.json)
+verifies both strict passes, native3802/600 and Node4007/300 raw0/clean. The
+[167-file raw packet](runtime-records/index.json) retains9,038,560 bytes; app
+trees, cache contents and external binaries are omitted. Original full-profile
+failures and arbitrary cross-request JS-global continuity remain unresolved.
 
 See [the result report](../../../../../docs/node-compat/nextjs-current-redirect-control.md)
 and [progress](../../../../../progress.md) for the current result and remaining

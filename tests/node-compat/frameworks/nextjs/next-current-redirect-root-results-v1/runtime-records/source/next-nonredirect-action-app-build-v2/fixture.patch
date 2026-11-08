@@ -1,0 +1,11 @@
+--- v1/fixture/app/action-value/form.jsx
++++ v2/fixture/app/action-value/form.jsx
+@@ -6,7 +6,7 @@
+ export default function ActionValueForm() {
+   const [value, submit, pending] = useActionState(returnActionValue, '');
+   return <form action={submit} data-testid="action-value-form">
+-    <label>Value <input name="value" required maxLength={64} pattern="[a-z0-9-]+" /></label>
++    <label>Value <input name="value" required maxLength={64} pattern="(?:[a-z0-9]|-)+" /></label>
+     <button type="submit" data-testid="action-value-submit" disabled={pending}>Submit value</button>
+     <p data-testid="action-value-result">{value}</p>
+   </form>;

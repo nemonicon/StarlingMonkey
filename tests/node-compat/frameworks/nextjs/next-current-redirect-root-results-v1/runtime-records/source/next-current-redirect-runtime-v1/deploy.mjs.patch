@@ -1,0 +1,53 @@
+--- next-nonredirect-action-runtime-v2/deploy.mjs
++++ next-current-redirect-runtime-v1/deploy.mjs
+@@ -56,20 +56,20 @@
+  assert(root.ino>0&&root.nlink>0&&root.mode<=0o777);return true;
+ }
+ const plan=await read(join(here,'plan.json'));
+-assert.equal(plan.bindingState,'READY_CURRENT_CORRELATED_COMPONENT_AND_CLIENT','Unbound Source: no authority input, output or actor');
++assert.equal(plan.bindingState,'READY_CURRENT_REDIRECT_BROWSER_CONTROL','Unbound Source: no authority input, output or actor');
+ for(const key of ['clientSource','browserSource','clientSourceIndex','browserSourceIndex','acceptedConstructionReview','expectedComponent'])assert(plan[key]!==null,'Missing reviewed binding:'+key);
+ assert.equal(plan.prospectiveEnvelopeBindingsPending,false,'Unbound composed-envelope Source');
+ assert(plan.expectedEnvelopeBindings.envelope&&plan.expectedEnvelopeBindings.compositionReview);
+ assert.equal(typeof plan.expectedCompositionReviewState,'string');
+ assert(plan.compositionReviewFixedValues&&Object.keys(plan.compositionReviewFixedValues).length>0);
+ assert(Array.isArray(plan.protectedInputs)&&plan.protectedInputs.length>0,'Fresh Root protection graph required');
+-assert.equal(plan.controlOnly,true);assert.equal(plan.prospectiveNonredirectAppBindingsPending,false,'New app/client DATA pending');
++assert.equal(plan.controlOnly,true);assert.equal(plan.prospectiveCurrentRedirectAppBindingsPending,false,'New app/client DATA pending');
+ for(const key of ['outputPrefix','applicationSource','applicationInputs','applicationBuildResult','applicationBuildReview','applicationRootIdentity','applicationRootIdentityEvidence','applicationSchema','clientSource','clientSourceIndex','browserSource','browserSourceIndex'])assert(plan[key]!==null,'New control binding:'+key);
+ const authorityPath=resolve(process.argv[2]),authority=await read(authorityPath);
+-assert.equal(authority.state,'ROOT_NEXT_NONREDIRECT_ACTION_NATIVE_CONTROL_AUTHORIZED_V1');
++assert.equal(authority.state,'ROOT_NEXT_CURRENT_REDIRECT_NATIVE_CONTROL_AUTHORIZED_V1');
+ assert.equal(authority.publicRequestCorrelationAllowed,true);
+ assert.equal(authority.standardHandlerObserverAllowed,true);
+-assert.equal(authority.nonredirectActionControlAllowed,true);assert.equal(authority.controlOnly,true);
++assert.equal(authority.currentRedirectControlAllowed,true);assert.equal(authority.controlOnly,true);
+ validatePublicCorrelation(authority.publicRequestCorrelation);
+ assert.deepEqual(authority.sourceIndex,await row(join(here,'index.json')));assert.deepEqual(authority.plan,await row(join(here,'plan.json')));
+ for(const key of ['localhostServeAllowed','actualNextGuestAllowed','browserAllowed'])assert.equal(authority[key],true);
+@@ -153,7 +153,7 @@
+ }
+ await sourceBookend();
+ const output=resolve(plan.outputPrefix+'-'+authority.runId);assert.equal(output,plan.outputPrefix+'-'+authority.runId);const app=join(output,'app'),cache=join(output,'cache');await mkdir(output,{mode:0o700});
+-const result={schemaVersion:1,state:'NONREDIRECT_ACTION_NATIVE_CONTROL_IN_PROGRESS_V1',controlOnly:true,fullOriginalContractExecuted:false,fullNextAccepted:false,runId:authority.runId,outputRoot:output,inputEntry:authority.inputEntry,inputSourceIndex:authority.inputSourceIndex,component:authority.component,componentAudit:authority.componentAudit,constructionResult:authority.constructionResult,servedEnvelope:authority.envelope,servedEnvelopeCompositionReview:authority.compositionReview,standardHandlerObserverMarkersInterpreted:false,rootAuthority:await row(authorityPath),sourceIndex:authority.sourceIndex,selectedInterfaces:plan.selectedInterfaces,emittedImports:audit.emittedImports,errors:[],server:null,client:null,originalInputsPreserved:false,readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationInputs:plan.applicationInputs,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],adoption:false};
++const result={schemaVersion:1,state:'CURRENT_REDIRECT_NATIVE_CONTROL_IN_PROGRESS_V1',controlOnly:true,fullOriginalContractExecuted:false,fullNextAccepted:false,runId:authority.runId,outputRoot:output,inputEntry:authority.inputEntry,inputSourceIndex:authority.inputSourceIndex,component:authority.component,componentAudit:authority.componentAudit,constructionResult:authority.constructionResult,servedEnvelope:authority.envelope,servedEnvelopeCompositionReview:authority.compositionReview,standardHandlerObserverMarkersInterpreted:false,rootAuthority:await row(authorityPath),sourceIndex:authority.sourceIndex,selectedInterfaces:plan.selectedInterfaces,emittedImports:audit.emittedImports,errors:[],server:null,client:null,originalInputsPreserved:false,readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationInputs:plan.applicationInputs,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],adoption:false};
+ const save=()=>writeFile(join(output,'result.json'),JSON.stringify(result,null,2)+'\n',{mode:0o600});await save();
+ const pause=ms=>new Promise(r=>setTimeout(r,ms));
+ async function boundedWait(promise,ms){let timer;try{await Promise.race([promise,new Promise(resolve=>{timer=setTimeout(resolve,ms);})]);}finally{clearTimeout(timer);}}
+@@ -198,7 +198,7 @@
+  assert(ready,'Wasmtime did not report exact listener within60s');result.server.readyOrigin=origin;await save();
+  result.publicRequestCorrelation=await writePublicCorrelationManifest({block:authority.publicRequestCorrelation,runId:authority.runId,origin,output});
+  artifactRefs.push(result.publicRequestCorrelation.manifest);await artifactBookend();await save();
+- const client=await launch(plan.node.path,[plan.clientSource.path,origin,join(output,'client'),plan.browserTools,authority.runId],'client');clientProcess=client;result.client={command:client.command,pid:client.child.pid??null,stdout:client.stdout,stderr:client.stderr};await save();const status=await Promise.race([client.done,hostCapture.failure.then(failure=>{throw Error('Wasmtime raw stdout capture failed: '+failure.stage);})]);result.client.exit=status;result.client.result=await row(join(output,'client/result.json'));const observed=await read(result.client.result.path);assert.equal(observed.suite,'NEXT_NONREDIRECT_ACTION_BROWSER_CONTROL_CLIENT_V1');assert.equal(observed.controlOnly,true);assert.equal(observed.fullOriginalContractExecuted,false);assert.deepEqual(status,{code:0,signal:null,error:null});assert.equal(observed.passed,true);assert.equal(hostExit,null,'Server must remain live through full contracts');result.controlPassed=true;
++ const client=await launch(plan.node.path,[plan.clientSource.path,origin,join(output,'client'),plan.browserTools,authority.runId],'client');clientProcess=client;result.client={command:client.command,pid:client.child.pid??null,stdout:client.stdout,stderr:client.stderr};await save();const status=await Promise.race([client.done,hostCapture.failure.then(failure=>{throw Error('Wasmtime raw stdout capture failed: '+failure.stage);})]);result.client.exit=status;result.client.result=await row(join(output,'client/result.json'));const observed=await read(result.client.result.path);assert.equal(observed.suite,'NEXT_PRISTINE_REDIRECT_BROWSER_CONTROL_CLIENT_V1');assert.equal(observed.controlOnly,true);assert.equal(observed.fullOriginalContractExecuted,false);assert.deepEqual(status,{code:0,signal:null,error:null});assert.equal(observed.passed,true);assert.equal(hostExit,null,'Server must remain live through browser control');result.controlPassed=true;
+ }catch(error){result.errors.push({stage:'deployment-or-control',...errorData(error)});}
+ finally{
+  if(lease)await new Promise(resolve=>lease.close(()=>resolve()));
+@@ -244,6 +244,6 @@
+  try{await readonlyBookend();result.readonlyAppPreserved=true;}catch(error){result.errors.push({stage:'readonly-app-final',...errorData(error)});}
+  result.cacheInventory=[];try{const tree=await walk(cache);assert.equal(tree.links.length,0);for(const name of tree.files){const path=join(cache,name);result.cacheInventory.push({...await row(path),relativePath:name,mode:(await lstat(path)).mode&0o777});}}catch(error){result.errors.push({stage:'cache-final-inventory',...errorData(error)});}
+  result.passed=hostCaptureOutcome?.complete===true&&result.controlPassed===true&&result.errors.length===0&&result.originalInputsPreserved&&result.readonlyAppPreserved&&result.server?.shutdownRequested===true&&result.server?.sigintSent===true&&result.server?.forcedCleanup===false&&hostExit?.code===0&&hostExit?.signal===null&&hostExit?.error===null;
+- result.state=result.passed?'NONREDIRECT_ACTION_NATIVE_CONTROL_PASSED_UNREVIEWED_V1':'NONREDIRECT_ACTION_NATIVE_CONTROL_FAILED_RAW_PRESERVED_V1';await save();
++ result.state=result.passed?'CURRENT_REDIRECT_NATIVE_CONTROL_PASSED_UNREVIEWED_V1':'CURRENT_REDIRECT_NATIVE_CONTROL_FAILED_RAW_PRESERVED_V1';await save();
+ }
+ console.log(JSON.stringify({state:result.state,passed:result.passed,errors:result.errors}));process.exitCode=result.passed?0:1;

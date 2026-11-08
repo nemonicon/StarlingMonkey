@@ -4,6 +4,15 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
+Current-build redirect comparison: **all three browser-only profiles pass**:
+pristine Node891/600, real Wasm3802/600 and bridge Node4007/300, each raw0/clean.
+The fixed matched pair ran once per arm after pushed checkpoint`18771094`,
+with exact current app80c/browser7c3 and protected inputs. Both strict original
+browser tests pass on both matched arms. Primary pair DATA review`1a689477`
+verifies both passes and167 retained payloads/9,038,560 bytes. Next restore the comprehensive HTTP/cache/supplemental/stream workload
+using this exact build and browser; keep the legacy generation and every original
+predicate. No earlier failure is waived and no cancellation cause is established.
+
 Latest redirect control: **pristine standalone Node passes both current strict
 browser tests**, including the redirecting Server Action. Original owner891/600
 finishes raw0/clean with protected inputs; the requested standalone server
@@ -121,13 +130,20 @@ preserve exact plan/controller inverses and freshly verify2,016 protected inputs
 genuine35 build/1,678 source references and the whole constructor/world guards.
 Preparation`3664207d` fixes both authorities and fresh slots before any actor:
 Wasm original600-second owner, then bridge Node original300-second owner.
-No new engine/component/observer build or application warmup runs.
+No new engine/component/observer build or application warmup runs. The actual
+fixed pair then finishes once per arm, native3802/600 (`0159c0`/session13562→
+`1b5843`) and bridge Node4007/300 (`2b4104`/session86288→`f6fba9`), both raw0/clean
+with protected inputs and strict browser passes. Pair DATA review`1a689477`
+verifies both strict passes and167 retained payloads/9,038,560 bytes, including
+normal host shutdown and complete13,459-byte native stdout. Source preparation for the comprehensive current-build comparison
+is underway; no new engine/component or host changes are planned.
 
 
 Outstanding critical work:
 
-- Compare the bridge Node and Wasm profiles against the completed pristine Node
-  control using the exact current app and strict browser-only workload. The [Source-backed
+- Run the comprehensive HTTP/cache/supplemental/stream comparison using the exact
+  current app and strict browser worker now passing in all three browser-only
+  profiles. The [Source-backed
   next-step audit](tests/node-compat/frameworks/nextjs/next-nonredirect-action-root-results-v2/next-steps.md)
   locates the existing bare-Node launcher and its earlier strict pass, while
   preserving the current app/worker/asset gap. The bounded

@@ -21,10 +21,14 @@ The current pristine standalone Node control now passes both strict browser
 tests, including redirect POST completion (owner891/600, raw0/clean). It uses
 the corrected current app, current public-header/NetLog worker and genuine
 script pins. [Primary DATA/raw retention](nextjs-current-redirect-control.md)
-verifies123 payloads/5,245,828 bytes. Next run the bridge Node
-and Wasm profiles with that exact app and browser-only workload: the earlier
-failed full pair used a different build and preceding HTTP/cache workload, so
-the pristine pass alone cannot isolate the bridge. Keep every original redirect
+verifies123 payloads/5,245,828 bytes. The bridge Node and Wasm controls now also
+pass both strict tests, original4007/300 and3802/600 raw0/clean. Primary
+DATA review`1a689477` verifies167 retained payloads/9,038,560 bytes.
+All three use that exact app and browser-only
+workload. Next restore the comprehensive HTTP/cache/supplemental/stream workload
+against this current build and worker. The earlier failed full pair used a
+different build and preceding workload, so these positive controls cannot
+identify its cause. Keep every original redirect
 failure and assertion. The standard
 return observer witnesses a later site, with seven unknown POST competitors
 still blocking the conservative outer public join. No private identity,

@@ -7,8 +7,8 @@ the full Next.js profile.
 | Profile | Current-build browser result | Execution |
 | --- | --- | --- |
 | Generated standalone server, ordinary Node HTTP | Both strict tests pass | Original owner891/600, raw0/clean |
-| Node with the shared HTTP bridge and module provider | Pending | New fixed control slot |
-| Existing real Wasm component and standard WASI observer envelope | Pending | New fixed control slot |
+| Node with the shared HTTP bridge and module provider | Both strict tests pass | Original owner4007/300, raw0/clean |
+| Existing real Wasm component and standard WASI observer envelope | Both strict tests pass | Original owner3802/600, raw0/clean |
 
 All three select the same corrected Next16.4.5/React19.3.1 standalone build:
 2,196 files/48,800,578 bytes, build review`80c59d47`. The physical browser/client
@@ -39,10 +39,23 @@ in the primary review.
 The earlier failed full pair used the older2,186-file build and ran24HTTP,
 52 cache checks and80 supplemental checks before the browser. A pristine pass
 against this new build therefore cannot identify the earlier failure's cause.
-The next fixed pair keeps the current app and browser-only workload while
-selecting the existing bridge Node and Wasm profiles. Its Source changes only
+The fixed pair keeps the current app and browser-only workload while
+selecting the existing bridge Node and Wasm profiles. Both finish raw0/clean
+with protected inputs and successful browser clients. The
+[paired DATA review](../../tests/node-compat/frameworks/nextjs/next-current-redirect-root-results-v1/actual-runtime-review.json)
+(`1a689477`) verifies both strict passes and the
+[167-file raw packet](../../tests/node-compat/frameworks/nextjs/next-current-redirect-root-results-v1/runtime-records/index.json)
+(9,038,560 bytes). Native stdout is complete at13,459 bytes/48 chunks; the host
+shuts down normally at0. Both redirect responses have complete2,963-byte decoded
+bodies and fulfilled sizes/finished before context closure. Their decoded hashes
+and gzip lengths differ across native, bridge and pristine Node; no byte-for-byte
+RSC parity or wire hash is claimed. Its Source changes only
 control identities, required client suite and current binding declarations;
 transport, backpressure, copying, capture and guest code remain unchanged.
+The next comprehensive pair will use this exact current build and strict worker,
+restore the original HTTP/cache/supplemental/stream workload, and retain the
+legacy generation and every other original predicate. This is a new workload
+comparison; previous failed runs are not retried or overwritten.
 
 The [bridge cancellation audit](nextjs-bridge-cancellation-audit.md) records an
 untested close/drain seam and proposes a focused regression. Neither this Source
