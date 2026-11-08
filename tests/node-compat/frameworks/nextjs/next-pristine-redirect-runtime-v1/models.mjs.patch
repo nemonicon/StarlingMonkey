@@ -1,0 +1,19 @@
+--- direct-standalone-control-candidate-v2/models.mjs
++++ next-pristine-redirect-runtime-v1/models.mjs
+@@ -1,7 +1,7 @@
+ // Pure finite Source/DATA functions. No process, network or filesystem calls.
+ import assert from 'node:assert/strict';
+ export function outputFor(prefix,id){
+- assert.equal(prefix,'/private/tmp/starling-node-compat/next-direct-standalone-control');
++ assert.equal(prefix,'/private/tmp/starling-node-compat/next-pristine-redirect-runtime-v1');
+  assert(typeof id==='string'&&/^[a-z0-9][a-z0-9-]{0,47}$/.exec(id)?.[0]===id,'Safe explicit runId required');
+  return prefix+'-'+id;
+ }
+@@ -41,6 +41,6 @@
+   server.exit?.code===130&&server.exit.signal===null&&server.exit.error===null;
+ }
+ export function accepted(result){
+- return result.contractsPassed===true&&result.errors.length===0&&result.originalInputsPreserved===true&&
++ return result.browserControlPassed===true&&result.errors.length===0&&result.originalInputsPreserved===true&&
+   result.copyInitiallyVerified===true&&result.ownedFinalInventoryRecorded===true&&serverStopAccepted(result.server);
+ }

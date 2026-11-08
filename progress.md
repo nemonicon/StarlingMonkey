@@ -88,6 +88,20 @@ positive evidence.
 
 
 
+Current critical-path work: the pristine standalone redirect control is being
+prepared with the current v2 app and original800f two-test observer. Current
+client/actions HTML selects5/4 scripts; physical hashes and inventories are
+independently verified. The new browser preserves the original functional,
+network-observer, deadline/drain and final strict predicates; only its genuine
+current asset bindings and control labels differ. No app/engine/component
+rebuild is needed. Both launcher and browser Source pass whole review. The
+first dependency intake refused a documentary asset URL before authority;
+explicit executable/app/browser dependencies replace that recursive intake and
+the refusal is retained. Genuine original source/world admission passes before/
+final; all four Node syntax checks pass. JSON-only preparation`51e87986` now
+issues one pristine600-second control authority, with no actor launched yet.
+
+
 Outstanding critical work:
 
 - Run the existing pristine standalone Node control on the current app and
