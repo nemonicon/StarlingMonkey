@@ -28,9 +28,14 @@ Both emitted configs contain compress:false. Only19 fixture bytes change;
 34 files and the tracing exclusion remain exact. Source5c280e4b, build review
 9106545f, independent gate d4194323 and fresh5/4asset selection05c965a6 with
 independent join a9fe908f pass. The92-payload build corpus totals2,795,484 bytes.
-Next: prepare the [stock wasmCloud full profile](tests/node-compat/frameworks/nextjs/next-fs-callback-no-compress-root-results-v1/next-steps.md)
-with current app/component bindings and complete lifetime capture. Lifecycle,
-resource/reuse, clean-machine, empirical cost and release/promotion gates remain.
+Next: the [stock wasmCloud full profile](tests/node-compat/frameworks/nextjs/next-fs-callback-no-compress-wasmcloud-root-results-v1/README.md)
+is prepared but not run. Actual wash2.11.0 version/hash preflight, all Source/API
+reviews and three Node syntax checks pass. Binding`a069e157` derives2,049 fresh
+inputs; preparation`c4c1e09c` issues one literal self-origin and one original600
+owner, with no reservation/handoff guarantee or fallback. The new cloud profile
+preserves original gates, current52-field admission, two mounts/three guest
+environment values and complete lifetime stdout. No host instance has launched. Lifecycle, resource/reuse, clean-machine,
+empirical cost and release/promotion gates remain outstanding.
 
 The [raw response after non-browser prework](docs/node-compat/nextjs-rsc-prework-response-results.md)
 passes once on Wasm34292/600 and Node34423/300, both raw0/clean. Both pass24HTTP,

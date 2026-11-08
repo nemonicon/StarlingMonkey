@@ -1,0 +1,11 @@
+# Compression-off stock wasmCloud full-client Source
+
+This four-file Source fork derives from `../next-fs-callback-no-compress-full-client-v1/run-contracts.mjs` (8a788a1983d337aea857e509b8f5f304d8cd1e86623f2a00def5dc2bebeeb23b, 9657 bytes). `client.patch` changes only the single exact cloud output policy/run ID and suite/result labels; reversing those substitutions restores the donor exactly.
+
+CLI remains `node run-contracts.mjs ORIGIN FRESH_CLIENT_OUTPUT BROWSER_TOOLS RUN_ID` (argc 6). The sole run ID is `fs-no-compress-wasmcloud-first`; output must be `/private/tmp/starling-node-compat/next-fs-callback-no-compress-wasmcloud-v1-fs-no-compress-wasmcloud-first/client`. Suite: `NEXT_FS_NO_COMPRESS_WASMCLOUD_FULL_CONTRACT_CLIENT_V1`.
+
+Every original 24-HTTP, generation-increase, 52 portable-cache, 80 supplemental, strict-stream and two strict-browser assertion and final conjunction is unchanged. `fullOriginalContractExecuted` still starts false and derives from actual collected publications in `finally`; semantic failure does not skip later browser collection, while a collection exception preserves partial output. `controlOnly` stays false and `fullNextAccepted` stays false.
+
+The physical browser path is unchanged: `../next-fs-callback-no-compress-browser-v1/browser-check.mjs` (01caabc8). Its genuine bound Source index 83071f52 and all six consumer descriptors are recorded in the plan. The existing compression-off application review is prerequisite DATA only. This fork selects no new application inventory/pins or old protected-input array. The future cloud actor must publish the matching public-correlation manifest before invoking this client.
+
+Actual host, authority, runtime, output and full-profile review remain NULL. No Source index or authority is issued. A later stock-host result would cover this explicit compression-off, persisted-data application profile only. P2 request continuity, arbitrary JS globals, browser reliability, broader Node support and production acceptance are not inferred; compressed and original-global failures remain unchanged. Only Source text/JSON/hash comparisons were performed, without retained functions, Node, JS parsing, helpers, CLIs, HTTP or targets.
