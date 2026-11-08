@@ -6,7 +6,12 @@ exact preimages and inverses. Source seals`442fd32d` permit only metadata bindin
 actual binding`a8e8084e` derives2,056 fresh protected inputs. Preparation`29f9fe96`
 issues the fixed cloud600→Node300 slots with no actor invoked. Independent bound
 DATA review`05ad2412` passes the exact input union and metadata inverses;
-complementary Source/API review`b401c4d4` also passes. No browser or host has run here.
+complementary Source/API review`b401c4d4` also passes. Both actual slots now finish
+raw0/clean: cloud59256/600 and Node59943/300, prework24/52/80/gen1→2/stream3(0,1),
+then genuine Chrome fetch/arrayBuffer2,963 bytes and CDP loadingFinished.
+Primary DATA review`bc79b811` and independent runtime gate`03955d93` pass.
+Raw index`44f69415` retains239 payloads/6,882,196 bytes. See the
+[result report](../../../../../docs/node-compat/nextjs-browser-body-prework-results.md).
 
 The preceding [identity HTTP pair](../next-rsc-identity-prework-root-results-v1/README.md)
 passes on stock wasmCloud and matched Node. This successor uses the same app,
@@ -21,8 +26,11 @@ same-origin /actions document establishes the security origin without a server
 GET; the test harness removes its route before the actual POST. Service workers
 are blocked. The captured391-byte body and five script-settable headers are
 selected; thirteen browser-managed headers are observed rather than forged.
-Routing/cache history, the synthetic document, missing React/assets/user gesture
-and header differences prevent a single-variable or exact-wire-replay claim.
+Routing/cache history, the synthetic document and missing React/assets prevent
+a single-variable or exact-wire-replay claim. Actual CDP hasUserGesture:true on
+both POSTs; Playwright evaluation sets that flag despite no explicit form/click.
+All13 browser-managed values match after canonical Host/Origin/Referer mapping;
+header casing/order and wire identity are not asserted.
 
 ArrayBuffer bytes are browser-exposed entity data. The4MiB acceptance limit is
 checked after allocation. Fetch/body settlement, independent CDP loadingFinished
@@ -52,4 +60,25 @@ explain cancellation or change production foundations-v13.
 [complementary peer](source-api-peer-review.json), [binding review](independent-binding-review.json)
 and [syntax checkpoint](syntax-checkpoint.json) record their distinct scopes.
 [Actual binding](source-bindings.json) and [preparation](control-preparation.json)
-are metadata/preparation results; they are not browser/runtime results.
+are metadata/preparation results. Separate original-owner receipts and the
+[Root terminal DATA check](root-terminal-data-check.json) record actual runs.
+
+[Primary DATA review](actualreview.json), [independent runtime gate](independent-runtime-gate-review.json)
+and [raw index](raw-records/index.json) preserve request/body/terminal/publication
+and ownership evidence separately. Both physical35-byte generation2 records
+are canonical with no pending file. Config/dev complete stdout is2,717/22,686
+bytes. App/cache/native/tool binary bulk and the whole browser bundle are omitted.
+
+Portable saved-sample check, from the repository root:
+
+```sh
+python3 -I -B tests/node-compat/frameworks/nextjs/next-rsc-browser-body-prework-root-results-v1/check-retained.py
+```
+
+This passes on copied evidence in the working tree and an isolated241-file
+copy from actual staged Git blobs, without private build trees or new runtime
+execution. The [checker peer](independent-retained-checker-review.json) verifies
+its Source/three-pin inverse; [Root's Git-mode result](retained-check-git-mode-result.json)
+records the actual saved-sample run. The [next Source audit](next-boundary-source-audit.md) proposes a
+bounded CDP resource-stream observer in the unchanged strict workload; no such
+runner has been authored or launched.

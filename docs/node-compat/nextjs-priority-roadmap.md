@@ -11,10 +11,18 @@ prework gates and the captured391-byte POST reach HTTP200/no coding/complete EOF
 with2,963 retained body bytes per arm. This ordinary HTTP consumer does not
 execute Chrome or React navigation and cannot waive the strict failure.
 
-Next isolate Chrome's fetch body read from React navigation using a separately
-versioned direct `fetch`→`arrayBuffer` control. Preserve the captured body,
-record browser-managed header differences and use the same prework, current
-application and matched Node reference. Keep strict worker01ca and all original
+The separately versioned [Chrome fetch→arrayBuffer control](nextjs-browser-body-prework-results.md)
+now also passes on wasmCloud59256/600 and Node59943/300: both complete prework,
+consume2,963 browser entity bytes and independently observe loadingFinished.
+All13 browser-managed values match after canonical origin mapping; actual
+hasUserGesture:true corrects the prospective no-gesture assumption. The
+synthetic document excludes React/router/hydration/form execution, so this
+does not reproduce or waive the original strict browser failure.
+
+Next inspect the original React/router path using a bounded passive browser
+response-body observer, subject to the pinned protocol's actual API and its
+observer effects. Distinguish network-body bytes/terminal from React root
+settlement and reader completion. Keep strict worker01ca and all original
 assertions unchanged. After the response boundary, prioritize lifecycle and
 resource retirement/reuse, clean-machine reproduction, empirical cost and
 production promotion in that order.

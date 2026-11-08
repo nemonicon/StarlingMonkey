@@ -4,6 +4,28 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
+Latest bounded diagnostic: the [direct Chrome body control](docs/node-compat/nextjs-browser-body-prework-results.md)
+passes once on stock wasmCloud59256/600 and Node59943/300, both raw0/clean.
+Both pass24HTTP/52cache/80supplemental, generation1→2, stream3(0,1), then genuine
+fetch/arrayBuffer2,963 bytes with independent CDP loadingFinished and no coding.
+Page/console/failed-request errors are zero; browser/host/owner cleanup passes.
+The intended391-byte POST and five script headers are verified; all13 browser-
+managed values match after canonical origin mapping. Exactly one synthetic GET
+and one real POST are observed. Actual hasUserGesture:true corrects the
+prospective no-gesture assumption; no form/click is performed. React/router
+are absent, so the original comprehensive strict failure remains failed.
+Source checkpoint`2cc06c56` is pushed; Root terminal check`753fb61d` passes.
+Primary DATA review`bc79b811` and independent runtime gate`03955d93` pass.
+Raw index`44f69415` retains239 payloads/6,882,196 bytes; both physical35-byte
+generation2 files are canonical with no pending file. Cloud config/dev complete
+stdout is2,717/22,686 bytes. The portable copied-evidence checker passes the
+current corpus and an isolated241-file copy from actual staged Git blobs.
+Source/binding peer`c424ab34` verifies the exact three-pin inverse. Root rehashes
+all239 payloads and compares every staged byte; no private build trees are copied.
+Full Next remains failed. The [next-boundary Source audit](tests/node-compat/frameworks/nextjs/next-rsc-browser-body-prework-root-results-v1/next-boundary-source-audit.md)
+(`c897ce46`) recommends bounded CDP resource streaming alongside unchanged
+strict assertions; no new observer runner is implemented or launched.
+
 Latest second-host result: the [compression-off stock wasmCloud trial](docs/node-compat/nextjs-compression-off-wasmcloud-results.md)
 finishes original47197/600 raw1/clean. It passes24HTTP/52portable/80supplemental,
 generation1→2, stream3(0,1), functionalUI2 and assets, but overall strict browser
@@ -42,7 +64,9 @@ serialization corrections have exact preimages/inverses. Fresh binding`a8e8084e`
 protects2,056 inputs; preparation`29f9fe96` issues the fixed cloud600→Node300 pair
 without invoking an actor. Independent binding DATA review`05ad2412` reconstructs
 the exact union and passes; complementary Source/API review`b401c4d4` also passes.
-No new browser run has occurred; all original failures remain failed.
+Both actual browser controls now pass as recorded above; all original failures
+remain failed. The next bounded Source audit examines passive response-body
+observation within the original React/router path, with no new runner yet.
 
 Latest result: the [compression-off full Next profile](docs/node-compat/nextjs-compression-off-full-results.md)
 passes once on Wasm40483/600 and Node40694/300, both raw0/clean. Both pass24HTTP,
@@ -6906,6 +6930,16 @@ The following records preparation checkpoints and completed build attempts; the 
 The [consumer355 producer](tests/node-compat/foundation-stream-consumers/native-integration-candidate-v1/README.md) is sealed at index `ab88215a…8e25`:53 files,3,357 preparation references,767 native-tool rows,50 pure checks and three syntax checks. All three planned variants keep zlib ON; the disabled variant disables only consumers. The source framework distinguishes configured, frozen and original preparation roots, and is not a component-packaging closure. The [independent producer review](tests/node-compat/foundation-stream-consumers/independent-native-integration-source-review-v1/README.md), index `6e24de20…f6c5bc`, holds C355-M1: the configured parent codec helper can execute before the current767 tool hashes are checked. Staging, native builds, installation and runtime validation remain unexecuted; the v1 packet remains held. The [v2 producer correction](tests/node-compat/foundation-stream-consumers/native-integration-candidate-v2/README.md), index `9edf31c1…3a378`, authenticates current tool dependencies at the start of the frozen reader. Its59 files/3,420 inputs,50 source checks,19 ordering/scratch checks and three syntax checks pass. The native355 payload is unchanged. [Independent v2 source review](tests/node-compat/foundation-stream-consumers/independent-native-integration-v2-source-review-v1/README.md), index `28300826…827811`, passes. Root [source review](tests/node-compat/foundation-stream-consumers/native-integration-v2-root-source-review.json) authorizes staging only. [Actual publication](tests/node-compat/foundation-stream-consumers/native-integration-v2-root-stage-results.json), Root session7465/PID11018, exits0 in6.090 operational seconds and publishes1,173 files at `/tmp/starling-node-compat/consumers-source-v2`, on genuine detached54b HEAD with no Git alternates. Root independently verifies its59 staged indexed files; [Full actual-stage review](tests/node-compat/foundation-stream-consumers/independent-native-integration-v2-stage-review-v1/README.md), index `371b7880…1b64d`, passes:1,173 overlay files plus508 genuine baseline files,3,420 original-context inputs and only three genuine documentation symlinks outside the consumed overlay. The [normal-OFF build review](tests/node-compat/foundation-stream-consumers/native-integration-v2-normal-off-build-root-review.json) authorizes one fresh Release build. That build ran under Root session4055/PID14781 with consumers/zlib ON, entropy OFF, one job and2GiB/800MiB disk guards. The [normal build/freeze/read-only verification](tests/node-compat/foundation-stream-consumers/native-integration-v2-normal-off-root-results.json) now finishes raw0 for all three commands:108 build steps,10,002,283-byte engine `661ef794…f0c79`, metadata `860e9521…62f92`, freeze `fadc83ce…26096`,1,164 frozen copies and1,162 original-reference entries. Its [independent native review](tests/node-compat/foundation-stream-consumers/independent-native-consumers-v2-normal-off-review-v1/README.md), index `b80489f4…124d6c`, passes:1,164 frozen files,1,162 pre-GC original entries,62/4/6 native command groups plus the separate embedding command, selected native codec/header/install order and complete locked dependency provenance. A separate [GC build review](tests/node-compat/foundation-stream-consumers/native-integration-v2-gc-off-build-root-review.json) follows the reviewer’s complete pre-GC original checkpoint; [GC build/freeze/read-only verification](tests/node-compat/foundation-stream-consumers/native-integration-v2-gc-off-root-results.json), Root sessions60577/57664/26486, also finishes raw0:17 incremental steps,engine `b378dea3…910e7` (10,003,832 bytes),metadata `675131c9…87672`,freeze `0268e073…1101e` and1,164 frozen files. [Independent GC native review](tests/node-compat/foundation-stream-consumers/independent-native-consumers-v2-gc-off-review-v1/README.md), index `010fbd51…a9db91`, passes the actual GC files/commands and rechecks all normal frozen copies; no guest-GC/root-isolation claim follows. The [consumer-OFF control](tests/node-compat/foundation-stream-consumers/native-integration-v2-disabled-off-build-root-review.json) ran under Root99558/PID39882 on its separate s0 project, with zlib ON and the same62/private6 layout; its [build/freeze/read-only verification](tests/node-compat/foundation-stream-consumers/native-integration-v2-disabled-off-root-results.json), Root99558/3263/24291, now finishes raw0:108 steps,engine `81ffa152…e5110` (9,995,242 bytes),metadata `8e05a705…f76ac`,freeze `9d6fd222…4a4e1` and1,164 frozen files. Independent control review is underway. All three native artifacts were exported into a separate unreviewed candidate document at exporter raw0; no admission or runtime proof was issued. Only the two expected shared normal CMake/compile-database originals may reconfigure; their retained snapshots and all frozen normal files remain strict. No component or guest has run. [Cache preparation attempt2](tests/node-compat/foundation-stream-consumers/native-integration-v2-cache-preseed-attempt2-root-results.json) separately copies four hash-verified download/tool cache files into the fresh build directory, with independent inodes. The initial helper failed before copying files because local Python lacks hashlib.file_digest; its [failed receipt](tests/node-compat/foundation-stream-consumers/native-integration-v2-cache-preseed-root-results.json) and empty-directory observation are retained. The corrected streaming-hash retry passes. No checked-out source, engine, metadata or codec evidence was copied.
 
 ## Outstanding work, in dependency order
+
+Immediate execution priority remains Next.js response completion: implement and
+validate the Source-audited CDP resource-stream observer in one separately
+versioned strict workload, retaining every original assertion and failed sample.
+Use the observed body/terminal boundary to choose any later React root/reader
+instrumentation. Direct HTTP and Chrome arrayBuffer controls are complete within
+their bounded scopes; the original full wasmCloud browser contract remains
+failed. Lifecycle/resource/reuse, clean-machine reproduction, empirical cost and
+production promotion follow that boundary investigation. The broader release
+dependencies below remain open.
 
 1. Preserve bounded foundations-v13, its v12 parent, historical failures and
    counterexamples. Corrected classic source promotion, declared archive scope,

@@ -1,0 +1,57 @@
+--- identity/run-stock.mjs
++++ browser-body/run-stock.mjs
+@@ -1,5 +1,5 @@
+-// Direct RSC response probe through the unchanged matched Node message bridge.
+-// The legacy resource argv slot does not select a browser or add a public request nonce.
++// Browser-body RSC response probe through the unchanged matched Node message bridge.
++// Browser-tools argv selects the real Chrome client; documentary manifest adds no request nonce.
+ // This is host Node evidence, never a claim of guest execution.
+ import assert from 'node:assert/strict';
+ import {createHash} from 'node:crypto';
+@@ -31,9 +31,9 @@
+ assert.equal(process.argv.length,7,'Versioned host-only authority argument; six original positions preserved');
+ const authorityPath=resolve(process.argv[6]);
+ const authority=JSON.parse(await readFile(authorityPath,'utf8'));
+-assert.equal(authority.state,'ROOT_NEXT_RSC_IDENTITY_HOST_AUTHORIZED_V1');
++assert.equal(authority.state,'ROOT_NEXT_RSC_BROWSER_BODY_HOST_AUTHORIZED_V1');
+ assert.equal(authority.controlOnly,true);assert.equal(authority.rscResponseControlAllowed,true);
+-assert.equal(authority.localhostServerAllowed,true);assert.equal(authority.browserAllowed,false);
++assert.equal(authority.localhostServerAllowed,true);assert.equal(authority.browserAllowed,true);
+ for(const key of ['compilerAllowed','nativeBuildAllowed','guestAllowed','engineAllowed','externalApplicationDeploymentAllowed'])assert.equal(authority[key],false);
+ assert.equal(authority.publicRequestCorrelationAllowed,true);assert.equal(authority.runId,runId);validatePublicCorrelation(authority.publicRequestCorrelation);
+ function deriveOutput(prefix,id){
+@@ -42,7 +42,7 @@
+   return prefix+'-'+id;
+ }
+ assert.equal(process.version, 'v22.14.0');
+-assert.equal(process.argv.length,7);assert(browserTools,'Reserved client resources argument mandatory');
++assert.equal(process.argv.length,7);assert(browserTools,'Browser tools argument mandatory');
+ assert.equal(process.argv[2],root,'Output argument must be canonical');assert.equal(root,deriveOutput(plan.outputPrefix,runId));
+ assert(source.endsWith('/application/.next/standalone'));
+ await mkdir(root, {mode: 0o700});
+@@ -95,7 +95,7 @@
+   for(const r of input.files){const path=join(application,r.path),s=await lstat(path);assert.deepEqual(await descriptor(path),{path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}
+   for(const r of input.directories)assert.equal((await lstat(join(application,r.path))).mode&0o777,r.mode);
+ }
+-const result = {schemaVersion: 1, suite: 'NEXT_RSC_IDENTITY_PREWORK_MATCHED_NODE_PROFILE_V1', controlOnly:true, responseProbeExecuted:false, fullOriginalContractExecuted:false, fullNextAccepted:false,
++const result = {schemaVersion: 1, suite: 'NEXT_RSC_BROWSER_BODY_PREWORK_MATCHED_NODE_PROFILE_V1', controlOnly:true, responseProbeExecuted:false, fullOriginalContractExecuted:false, fullNextAccepted:false,
+   node: process.version, guestExecuted: false, applicationModified: false,
+   standaloneSource: source, sourceServer: await descriptor(join(source, 'server.js')),
+   bridge: await descriptor(join(here, '../http-bridge-candidate-v1/bridge.mjs')), harness: await descriptor(fileURLToPath(import.meta.url)),
+@@ -199,7 +199,7 @@
+   result.controlClientResult=await descriptor(join(clientOutput,'result.json'));
+   result.control=JSON.parse(await readFile(result.controlClientResult.path));
+   assert.equal(typeof result.control.responseProbeExecuted,'boolean');result.responseProbeExecuted=result.control.responseProbeExecuted;
+-  assert.equal(result.control.suite,'NEXT_RSC_IDENTITY_PREWORK_HTTP_CLIENT_V1');
++  assert.equal(result.control.suite,'NEXT_RSC_BROWSER_BODY_PREWORK_CLIENT_V1');
+   assert.equal(result.control.controlOnly,true);assert.equal(result.control.responseProbeExecuted,true);assert.equal(result.control.fullOriginalContractExecuted,false);assert.equal(result.control.fullNextAccepted,false);
+ } catch (error) {
+   result.errors.push({type:error===null?'null':typeof error,name:error?.name??null,message:error?.message??String(error),stack:error?.stack??null});
+@@ -215,6 +215,6 @@
+     &&result.errors.length===0&&result.transportErrors.length===0;
+   await save();
+ }
+-console.log(JSON.stringify({state:result.passed?'NEXT_RSC_IDENTITY_PREWORK_MATCHED_NODE_PROFILE_PASSED':'NEXT_RSC_IDENTITY_PREWORK_MATCHED_NODE_PROFILE_FAILED',
++console.log(JSON.stringify({state:result.passed?'NEXT_RSC_BROWSER_BODY_PREWORK_MATCHED_NODE_PROFILE_PASSED':'NEXT_RSC_BROWSER_BODY_PREWORK_MATCHED_NODE_PROFILE_FAILED',
+   controlOnly:true,responseProbeExecuted:result.responseProbeExecuted,fullOriginalContractExecuted:false,passed:result.passed,errors:result.errors,transportErrors:result.transportErrors,guestExecuted:false,fullNextAccepted:false}));
+ process.exitCode=result.passed?0:1;

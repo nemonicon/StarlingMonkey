@@ -11,6 +11,9 @@ HTTP24/cache52/supplemental80/generation/stream/functional UI, but fails strict
 Server Action completion with `ERR_ABORTED`, despite absent Content-Encoding.
 The [raw identity control after prework](nextjs-identity-response-prework-results.md)
 completes on wasmCloud and Node; it does not waive the browser failure.
+The subsequent [direct Chrome body control](nextjs-browser-body-prework-results.md)
+also passes both hosts: arrayBuffer consumption and CDP loadingFinished are
+independently observed after prework. React/router execution is absent there.
 
 The [priority roadmap](nextjs-priority-roadmap.md) leads with that response
 lifetime boundary, then lifecycle/resource/reuse, clean-machine reproduction,

@@ -14,6 +14,10 @@ non-browser workload. That control does not execute Chrome/React or explain the
 browser cancellation. See the
 [current full trial](../../../../docs/node-compat/nextjs-compression-off-wasmcloud-results.md)
 and [raw control](../../../../docs/node-compat/nextjs-identity-response-prework-results.md).
+The subsequent [direct Chrome control](../../../../docs/node-compat/nextjs-browser-body-prework-results.md)
+also passes both hosts, consuming2,963 bytes with separate CDP loadingFinished
+after prework. It uses a synthetic same-origin page without React/router/form
+execution; the original strict browser failure remains failed.
 The original module-global generation fixture remains a separate failed contract.
 
 The [current result and limitations](../../../../docs/node-compat/nextjs-native-export-diagnostic-2026-11-08.md),

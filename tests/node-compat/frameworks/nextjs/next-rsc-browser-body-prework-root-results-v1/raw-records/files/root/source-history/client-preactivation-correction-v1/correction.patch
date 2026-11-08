@@ -1,0 +1,43 @@
+--- run-client.mjs.before
++++ run-client.mjs
+@@ -129,7 +129,7 @@
+   if(rows.length&&requestExtra.has(id)&&(result.browserFetch.response===null||responseExtra.has(id)))resolveObserved();
+  }
+  function noteCdp(event,payload){
+-  if(!active)return;
++  if(!active||observerFailed)return;
+   try{
+    const text=JSON.stringify(payload),bytes=Buffer.byteLength(text);
+    if(result.cdpEvents.length>=policy.cdpMaxEvents||bytes>policy.cdpMaxEventBytes||cdpBytes+bytes>policy.cdpMaxPayloadBytes)throw new RangeError('CDP semantic capture bound exceeded');
+@@ -151,7 +151,7 @@
+    result.browser.version=browser.version();assert.equal(result.browser.version,'156.0.8078.81');
+    context=await browser.newContext({viewport:{width:1280,height:800},acceptDownloads:false,serviceWorkers:'block'});
+    context.setDefaultTimeout(policy.httpTimeoutMs);context.setDefaultNavigationTimeout(policy.httpTimeoutMs);page=await context.newPage();
+-   page.on('request',request=>{if(!active)return;try{
++   page.on('request',request=>{if(!active||observerFailed)return;try{
+     const url=request.url(),method=request.method(),navigation=request.isNavigationRequest(),type=request.resourceType();
+     const role=url===result.syntheticDocument.url&&method==='GET'&&navigation&&type==='document'?'synthetic-document':url===result.request.url&&method==='POST'?'selected-post':'unexpected';
+     const row={url,method,resourceType:type,isNavigationRequest:navigation,role};
+@@ -187,15 +187,18 @@
+     try{response=await window.fetch(url,{method:'POST',headers:headers.map(({name,value})=>[name,value]),body:bytes,redirect:'manual'});out.fetchOutcome='fulfilled';
+      out.response={url:response.url,status:response.status,statusText:response.statusText,type:response.type,redirected:response.redirected,headers:Array.from(response.headers,([name,value])=>({name,value}))};
+     }catch(error){out.fetchOutcome='rejected';out.fetchError=describe(error);return out;}
+-    try{const buffer=await response.arrayBuffer(),bytes=new Uint8Array(buffer);out.bodyOutcome='fulfilled';out.bodyBytes=bytes.length;
+-     if(bytes.length>bodyLimit){out.overLimit=true;return out;}
+-     let binary='';for(let i=0;i<bytes.length;i++)binary+=String.fromCharCode(bytes[i]);out.bodyBase64=btoa(binary);
+-    }catch(error){out.bodyOutcome='rejected';out.bodyError=describe(error);}
++    let buffer;
++    try{buffer=await response.arrayBuffer();}catch(error){out.bodyOutcome='rejected';out.bodyError=describe(error);return out;}
++    out.bodyOutcome='fulfilled';out.bodyBytes=buffer.byteLength;
++    if(buffer.byteLength>bodyLimit){out.overLimit=true;return out;}
++    try{const bytes=new Uint8Array(buffer);let binary='';for(let i=0;i<bytes.length;i++)binary+=String.fromCharCode(bytes[i]);out.bodyBase64=btoa(binary);
++    }catch(error){out.bodySerializationError=describe(error);}
+     return out;
+    },{url:result.request.url,bodyBase64:body.toString('base64'),headers:scriptHeaders,bodyLimit:policy.bodyLimitBytes});
+    if(!active)return;
+    assert(['fulfilled','rejected'].includes(value.fetchOutcome));result.browserFetch.settled=true;result.browserFetch.outcome=value.fetchOutcome;result.browserFetch.response=value.response;result.browserFetch.error=value.fetchError;
+    assert(['fulfilled','rejected','unattempted'].includes(value.bodyOutcome));result.bodyRead.attempted=value.bodyOutcome!=='unattempted';result.bodyRead.outcome=value.bodyOutcome;result.bodyRead.bytes=value.bodyBytes;result.bodyRead.error=value.bodyError;
++   if(value.bodySerializationError)throw new Error('Fulfilled arrayBuffer serialization failed: '+value.bodySerializationError.message);
+    if(value.overLimit)throw new RangeError('arrayBuffer exceeded post-read4MiB retention cap; allocation was not prebounded');
+    if(value.bodyOutcome==='fulfilled'){
+     assert(typeof value.bodyBase64==='string');decodedBody=Buffer.from(value.bodyBase64,'base64');assert.equal(decodedBody.toString('base64'),value.bodyBase64);
