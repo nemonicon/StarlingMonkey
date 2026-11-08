@@ -1,0 +1,96 @@
+--- ../next-rsc-prework-client-v1/run-client.mjs
++++ run-client.mjs
+@@ -3,7 +3,6 @@
+ import {runPrework} from './prework.mjs';
+ import http from 'node:http';
+ import {createHash} from 'node:crypto';
+-import {gunzipSync} from 'node:zlib';
+ import {writeFileSync} from 'node:fs';
+ import {readFile,open,mkdir,lstat,realpath} from 'node:fs/promises';
+ import {dirname,join,resolve} from 'node:path';
+@@ -39,11 +38,6 @@
+  assert.equal(url.origin,text);assert.equal(url.protocol,'http:');assert.equal(url.hostname,'127.0.0.1');
+  assert(url.port&&Number(url.port)!==80&&url.username===''&&url.password==='');return url;
+ }
+-function crc32(bytes){
+- let crc=0xffffffff;
+- for(const byte of bytes){crc^=byte;for(let bit=0;bit<8;bit++)crc=(crc>>>1)^((crc&1)?0xedb88320:0);}
+- return (crc^0xffffffff)>>>0;
+-}
+ 
+ async function main(){
+  assert.equal(process.version,'v22.14.0');assert.equal(process.argv.length,6,'CLIENT ORIGIN FRESH_OUTPUT RESERVED RUN_ID');
+@@ -53,10 +47,10 @@
+  const policy=JSON.parse(await readFile(join(here,'plan.json'),'utf8'));
+  assert(policy.requestCapture!==null,'Source request DATA is unbound; no output or HTTP');
+  assert.equal(policy.requestCaptureBindingPending,false);
+- assert.equal(policy.suite,'NEXT_RSC_PREWORK_HTTP_RESPONSE_CLIENT_V1');
++ assert.equal(policy.suite,'NEXT_RSC_IDENTITY_PREWORK_HTTP_CLIENT_V1');
+  assert.equal(policy.encodedBodyLimit,4194304);assert.equal(policy.decodedBodyLimit,16777216);
+  assert.equal(policy.httpTimeoutMs,20000);assert.equal(policy.cleanupTimeoutMs,2000);
+- const expectedRoot=runId==='rsc-prework-native-first'?'/private/tmp/starling-node-compat/next-rsc-prework-native-v1-'+runId+'/client':runId==='rsc-prework-stock-first'?'/private/tmp/starling-node-compat/next-rsc-prework-stock-v1-'+runId+'/client':null;
++ const expectedRoot=runId==='rsc-identity-cloud-first'?'/private/tmp/starling-node-compat/next-rsc-identity-prework-cloud-v1-'+runId+'/client':runId==='rsc-identity-stock-first'?'/private/tmp/starling-node-compat/next-rsc-identity-prework-stock-v1-'+runId+'/client':null;
+  assert.equal(output,expectedRoot);assert.equal(output,process.argv[3]);
+  assert.equal(await realpath(dirname(output)),dirname(output));
+  assert.deepEqual(Object.keys(policy.sourceRequirements).sort(),['headerEvidence','requestBody','requestCapture']);
+@@ -115,7 +109,7 @@
+   request:{attempted:false,created:false,method:capture.method,path:capture.path,url:origin.origin+capture.path,headers,headerChanges:changes,
+    body:capture.body,bodyReserialized:false,finishObserved:false,closeObserved:false,errors:[]},
+   response:{received:false,statusCode:null,statusMessage:null,httpVersion:null,headers:null,rawHeaders:[],trailers:null,rawTrailers:[],
+-   complete:false,endObserved:false,abortedObserved:false,closeObserved:false,errors:[],information:[],encodedBody:null,encodedBodyPublication:null,decodedBody:null,decodedBodyPublication:null,gzip:null,
++   complete:false,endObserved:false,abortedObserved:false,closeObserved:false,errors:[],information:[],encodedBody:null,encodedBodyPublication:null,decodedBody:null,decodedBodyPublication:null,identity:null,
+    rawCapture:{observedBytes:0,retainedBytes:0,overflow:false,unretainedBytesUnknown:false,allObservedBytesCaptured:false,
+     scope:'All IncomingMessage data events, after transfer framing and before content decoding; not unseen wire bytes or HTTP completion'}},
+   connection:{socketAssigned:false,socketCloseObserved:false,socketCloseHadError:null,errors:[],cleanupRequested:false,cleanupRequestedAfterResponseEnd:false,cleanupCompleted:false},
+@@ -185,7 +179,7 @@
+  const raw=result.response.rawCapture,encoded=Buffer.concat(chunks,raw.retainedBytes);
+  raw.allObservedBytesCaptured=!raw.overflow&&!raw.unretainedBytesUnknown&&encoded.length===raw.observedBytes;
+  try{
+-  const encodedPublication=await publish(join(output,'body.raw.gz'),encoded);
++  const encodedPublication=await publish(join(output,'body.raw.bin'),encoded);
+   result.response.encodedBody=encodedPublication.ref;result.response.encodedBodyPublication=encodedPublication.evidence;
+   result.response.encodedBodyPublication.complete=raw.allObservedBytesCaptured;
+  }catch(error){
+@@ -198,26 +192,28 @@
+  const check=(name,passed,detail=null)=>{if(!passed)result.validationErrors.push({name,detail});return passed;};
+  check('preceding-workload-passed',result.precedingWorkload.passed);
+  check('HTTP200',result.response.statusCode===200);check('HTTP-response-complete',result.responseCollectionComplete);
+- check('Content-Encoding-gzip',result.response.headers?.['content-encoding']==='gzip');
++ const headersObserved=result.response.received&&result.response.headers!==null;
++ const codingPresent=headersObserved&&Object.hasOwn(result.response.headers,'content-encoding');
++ const identityEligible=headersObserved&&!codingPresent;
++ check('Content-Encoding-absent',identityEligible);
++ result.response.identity={operation:'identity-copy',responseHeadersObserved:headersObserved,contentEncodingHeaderPresent:codingPresent,
++  observedContentEncoding:codingPresent?result.response.headers['content-encoding']:null,copyAttempted:identityEligible,copyPublished:false,
++  copiedBytes:null,copiedBytesEqualRetainedRaw:null,contentDecodingPerformed:false,
++  completeHttpBody:result.responseCollectionComplete,
++  scope:result.responseCollectionComplete?'Complete observed HTTP entity body after transfer framing; identity copy, not wire framing'
++   :'Observed entity-body prefix after transfer framing; HTTP completion is not established'};
+  check('RSC-content-type',typeof result.response.headers?.['content-type']==='string'&&result.response.headers['content-type'].startsWith('text/x-component'));
+  check('action-redirect',result.response.headers?.['x-action-redirect']==='/action-result?value=browser-action;push');
+- try{
+-  const decoded=gunzipSync(encoded,{maxOutputLength:policy.decodedBodyLimit});
+-  assert(decoded.length<=policy.decodedBodyLimit);
++ if(identityEligible)try{
++  const decoded=Buffer.from(encoded);assert(decoded.length<=policy.decodedBodyLimit);
+   const decodedPublication=await publish(join(output,'body.decoded.bin'),decoded);
+   result.response.decodedBody=decodedPublication.ref;result.response.decodedBodyPublication=decodedPublication.evidence;
+-  const trailer=encoded.length>=8?{crc32:encoded.readUInt32LE(encoded.length-8),isize:encoded.readUInt32LE(encoded.length-4)}:null;
+-  const actual={crc32:crc32(decoded),isize:decoded.length>>>0};
+-  result.response.gzip={decoder:'host Node22 node:zlib.gunzipSync normal validation',decoderSucceeded:true,
+-   trailer,decoded:actual,crc32Matches:trailer!==null&&trailer.crc32===actual.crc32,isizeMatches:trailer!==null&&trailer.isize===actual.isize,
+-   memberCountVerified:false,scope:'Last8byte trailer compared to aggregate decoded bytes; no single-member proof or wire-byte claim'};
+-  check('gzip-last-trailer-CRC32',result.response.gzip.crc32Matches);check('gzip-last-trailer-ISIZE',result.response.gzip.isizeMatches);
++  result.response.identity.copyPublished=true;result.response.identity.copiedBytes=decoded.length;
++  result.response.identity.copiedBytesEqualRetainedRaw=decoded.equals(encoded);
++  check('identity-copy-equals-retained-raw',result.response.identity.copiedBytesEqualRetainedRaw);
+   const text=decoded.toString('utf8');for(const marker of ['NEXT_ACTION_RESULT','browser-action'])check('RSC-marker:'+marker,text.includes(marker));
+  }catch(error){
+-  if(result.response.decodedBody===null&&error?.code?.startsWith('Z_'))result.response.gzip={decoderSucceeded:false,error:errorData(error),memberCountVerified:false};
+-  else if(result.response.decodedBody===null&&error?.code==='ERR_BUFFER_TOO_LARGE')result.response.gzip={decoderSucceeded:false,error:errorData(error),memberCountVerified:false};
+-  else collection('decoded-body-publication-or-validation',error);
+-  result.validationErrors.push({name:'gzip-decode-or-publication',...errorData(error)});
++  collection('identity-body-publication',error);
+  }
+  // Input read bookends are collection evidence, never inferred from HTTP200.
+  for(const [key,limit] of [['requestCapture',65536],['requestBody',65536],['headerEvidence',1048576]])

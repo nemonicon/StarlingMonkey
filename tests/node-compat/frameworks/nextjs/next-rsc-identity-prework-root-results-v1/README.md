@@ -2,10 +2,15 @@
 
 All Source/API and actual syntax checks pass. Binding`84aaacc3` derives2,047
 fresh protected inputs; preparation`57b16d89` reserves cloud600→Node300 slots.
-The cloud literal origin is issued; no actor/request has run yet. The same
-reviewed compression-off app, engine237c, inner6b20 and served envelopee4c7 are
-selected through future genuine Root bindings. The existing cloud full-suite
-abort remains a failed regression.
+The fixed pair has now run: cloud53303/600 and Node53776/300 both finish raw0
+with clean original owners. Both pass24HTTP/52portable/80supplemental,
+generation1→2, stream3(0,1), then HTTP200/no Content-Encoding and complete EOF
+with2,963 entity bytes. Each identity copy equals its own raw body; cross-host
+hashes differ. Primary DATA review`04f53121` and independent runtime gate`c02e546d` pass.
+Raw index`3f20c56c` retains208 payloads/5,576,656 bytes, rehashed by Root.
+The same reviewed compression-off app, engine237c, inner6b20 and served
+envelopee4c7 remain selected. The existing cloud full-suite abort remains a
+failed regression. See the [result report](../../../../../docs/node-compat/nextjs-identity-response-prework-results.md).
 
 The identity client preserves the full pre-browser request span, then sends the
 current captured391-byte POST with all captured headers except the removed
@@ -33,3 +38,11 @@ All three binder Source/controller slots and raw request DATA slots are initiall
 NULL. The fresh union includes current3capture+4prework consumers/localhelper,
 actual app/config/manifest provenance, original35/1678 native roles and selected
 WIT; no old protected array or browser tool admission is reused.
+
+[Primary DATA review](actualreview.json), [independent runtime gate](independent-runtime-gate-review.json)
+and [raw index](raw-records/index.json) keep actual prework, identity-body
+publication, HTTP EOF and original-owner cleanup separate. Both physical35-byte
+generation2 files are canonical with no pending file. Complete cloud config/dev
+stdout is2,685/22,686 bytes. No browser, React, gzip, wire-body, same-Store or
+full-Next acceptance follows. Raw application/cache bulk, native/tool payloads
+and binaries are explicitly omitted; their existing guarded proofs remain.

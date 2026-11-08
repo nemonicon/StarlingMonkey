@@ -2,16 +2,22 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
-**Next.js now passes the selected full application contract in Wasm.** Two
-fresh stock Wasmtime42.0.1 runs and a matched Node22.14 control pass24/24 HTTP
-checks, cache invalidation, incremental Suspense and both hydrated browser
-interactions with zero captured errors. The [milestone report](nextjs-wasm-milestone-2026-11-06.md)
-records the exact experimental engine/component, thirteen standard WASI0.2.10
-imports, explicit host reuse settings and repeat command. Server JavaScript
-executes in SpiderMonkey/Wasm; the browser runs ordinary Next client JavaScript.
-The [priority roadmap](nextjs-priority-roadmap.md) now leads with reproducibility,
-deeper stream/context/lifetime checks and production promotion. Full Node/Buffer
-compatibility, performance gains and wasmCloud retained P2 execution remain open.
+**Next.js executes in Wasm; full portable acceptance remains failed.** The
+[compression-off full profile](nextjs-compression-off-full-results.md) passes
+once on stock Wasmtime and matched Node, including persisted generation1→2 and
+strict browser completion. The subsequent
+[stock wasmCloud full trial](nextjs-compression-off-wasmcloud-results.md) passes
+HTTP24/cache52/supplemental80/generation/stream/functional UI, but fails strict
+Server Action completion with `ERR_ABORTED`, despite absent Content-Encoding.
+The [raw identity control after prework](nextjs-identity-response-prework-results.md)
+completes on wasmCloud and Node; it does not waive the browser failure.
+
+The [priority roadmap](nextjs-priority-roadmap.md) leads with that response
+lifetime boundary, then lifecycle/resource/reuse, clean-machine reproduction,
+measured cost and production promotion. Server JavaScript executes in
+SpiderMonkey/Wasm with thirteen selected standard WASI0.2.10 interfaces;
+the browser runs ordinary Next client JavaScript. Full Node/Buffer compatibility
+and performance gains remain unverified.
 
 ## Earlier experimental checkpoints
 

@@ -3,13 +3,18 @@
 ## Current checkpoint: 2026-11-08
 
 Next.js runs inside the experimental SpiderMonkey/Wasm server, but full portable
-Next.js acceptance remains **failed**. The latest fixed native-to-Node comparison
-uses engine `237c4e5a` and component `6b2084d0`. Native passes all 24 HTTP cases,
-52 persistent-cache checks, 80 supplemental checks, five streaming chunks and
-both functional and strict browser interactions in this sample. Its unchanged
-legacy generation check observes `1 → 1` and fails. Node observes `1 → 2` and
-passes the full suite. Earlier intermittent Server Action completion failures
-remain unresolved; one positive diagnostic sample establishes no fix.
+Next.js acceptance remains **failed**. The current compression-off application
+uses engine `237c4e5a` and component `6b2084d0`. Its full Wasmtime/Node comparison
+passes once, including persisted generation1→2 and the unchanged strict browser
+tests. The subsequent stock wasmCloud full trial passes24 HTTP cases,52 cache
+checks,80 supplemental checks, generation, streaming, functional UI and assets,
+but fails strict POST7 completion with `ERR_ABORTED` and no Content-Encoding.
+Both wasmCloud and Node now complete a raw identity response after the same
+non-browser workload. That control does not execute Chrome/React or explain the
+browser cancellation. See the
+[current full trial](../../../../docs/node-compat/nextjs-compression-off-wasmcloud-results.md)
+and [raw control](../../../../docs/node-compat/nextjs-identity-response-prework-results.md).
+The original module-global generation fixture remains a separate failed contract.
 
 The [current result and limitations](../../../../docs/node-compat/nextjs-native-export-diagnostic-2026-11-08.md),
 [priority roadmap](../../../../docs/node-compat/nextjs-priority-roadmap.md) and
@@ -32,8 +37,8 @@ the seventeen-case direct diagnostic deployment; the second verifies the full
 pair while preserving native failure and Node success. These check retained
 data, not a new target execution or a rebuild. Fresh target execution still
 requires the pinned private artifacts and reviewed construction/launch path;
-clean-machine bootstrap remains outstanding. Next work adds real-handler cache
-overlap, error and bound tests while retaining every original application gate.
+clean-machine bootstrap remains outstanding. Next work isolates browser body
+consumption from React navigation while retaining every original application gate.
 
 Those [real-handler cache checks](next-persistent-cache-overlap-root-results-v1/README.md)
 now pass eleven groups/41 assertions on Node, stock Wasmtime and stock wasmCloud.

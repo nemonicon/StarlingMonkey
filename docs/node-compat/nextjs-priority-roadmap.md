@@ -4,10 +4,20 @@ Current second-host result: the [stock wasmCloud compression-off full trial](nex
 passes24HTTP/52cache/80supplemental/generation/stream/function/asset checks but
 fails strict POST7 completion with ERR_ABORTED, despite absent Content-Encoding.
 Its clean owner and complete captures retain this failed outcome. Compression
-is not required for this observed failure; its cause remains unresolved. Next
-use the actual current action request in an identity-response raw-after-prework
-cloud/Node control, then follow the observed response-lifetime boundary without
-weakening01ca. Lifecycle/resource/reuse, reproduction, cost and promotion remain.
+is not required for this observed failure; its cause remains unresolved.
+The [identity-response raw-after-prework pair](nextjs-identity-response-prework-results.md)
+now passes on cloud53303/600 and Node53776/300: both24/52/80/generation/stream
+prework gates and the captured391-byte POST reach HTTP200/no coding/complete EOF,
+with2,963 retained body bytes per arm. This ordinary HTTP consumer does not
+execute Chrome or React navigation and cannot waive the strict failure.
+
+Next isolate Chrome's fetch body read from React navigation using a separately
+versioned direct `fetch`→`arrayBuffer` control. Preserve the captured body,
+record browser-managed header differences and use the same prework, current
+application and matched Node reference. Keep strict worker01ca and all original
+assertions unchanged. After the response boundary, prioritize lifecycle and
+resource retirement/reuse, clean-machine reproduction, empirical cost and
+production promotion in that order.
 
 Earlier passing sample: the [compression-off full profile](nextjs-compression-off-full-results.md)
 passes once on Wasm and matched Node, including24HTTP/52cache/80supplemental,

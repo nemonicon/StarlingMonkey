@@ -19,12 +19,21 @@ SPA historyApi update/same loader before canceled:true, not a recorded MPA/new
 document; cancellation initiator and HTTP EOF remain unproved. Fresh captured
 request`a45dea80` retains this build's391-byte action and all19 ordered headers
 with exact manifest provenance. The [identity raw-after-prework Source](tests/node-compat/frameworks/nextjs/next-rsc-identity-prework-root-results-v1/README.md)
-is prepared: client5/51,321 bytes and runtime14/157,761 bytes; actual Node syntax,
-Root AST and whole Source/API reviews pass. A README-only precision correction
-is preserved with its exact preimage; operational code stays fixed. Binding
-`84aaacc3` derives2,047 fresh inputs and preparation`57b16d89` reserves the fixed
-cloud600→Node300 pair. No actor has run in this profile; the original strict
-failure and every existing gate remain.
+now [completes both actual controls](docs/node-compat/nextjs-identity-response-prework-results.md):
+cloud53303/600 and Node53776/300 finish raw0/clean. Both pass24HTTP/52portable/
+80supplemental, generation1→2 and stream3(0,1), followed by HTTP200/no
+Content-Encoding, complete/end/known socket cleanup and2,963 retained entity
+bytes. Each identity copy matches its own raw file; cross-host hashes differ.
+Captured Accept-Encoding stays unchanged; no gzip operation or wire-byte claim
+is made. Binding`84aaacc3` derives2,047 fresh inputs and preparation`57b16d89`
+executes the fixed cloud600→Node300 pair once. Independent binding review
+`e83bc3c4`, Root terminal DATA check`2886ad91`, primary review`04f53121` and
+independent runtime gate`c02e546d` pass. Raw index`3f20c56c` retains208 payloads/
+5,576,656 bytes, rehashed by Root. Both physical35-byte canonical generation2
+records have no pending file. Cloud config/dev complete stdout sizes are2,685/
+22,686 bytes, with normal shutdown. The strict browser failure remains failed.
+The next diagnostic isolates Chrome fetch body consumption from React navigation;
+its client/runtime Source is in preparation, with no new browser run yet.
 
 Latest result: the [compression-off full Next profile](docs/node-compat/nextjs-compression-off-full-results.md)
 passes once on Wasm40483/600 and Node40694/300, both raw0/clean. Both pass24HTTP,
