@@ -1,0 +1,68 @@
+--- next-current-redirect-runtime-v1/run-stock.mjs
++++ next-current-full-runtime-v1/run-stock.mjs
+@@ -1,4 +1,4 @@
+-// Current redirect browser control through the unchanged matched Node message bridge.
++// Current full-contract profile through the unchanged matched Node message bridge.
+ // This is host Node evidence, never a claim of guest execution.
+ import assert from 'node:assert/strict';
+ import {createHash} from 'node:crypto';
+@@ -19,15 +19,19 @@
+ const source = resolve(process.argv[3]);
+ const browserTools = process.argv[4],runId=process.argv[5];
+ const plan = JSON.parse(await readFile(join(here, 'stock-plan.json')));
+-assert.equal(plan.bindingState,'READY_CURRENT_REDIRECT_BROWSER_CONTROL','Unbound Source: no authority, output, app or browser');
+-assert.equal(plan.controlOnly,true);assert.equal(plan.prospectiveCurrentRedirectAppBindingsPending,false);
++assert.equal(plan.bindingState,'READY_CURRENT_FULL_CONTRACT_CONTROL','Unbound Source: no authority, output, app or browser');
++assert.equal(plan.controlOnly,false);assert.equal(plan.prospectiveCurrentFullAppBindingsPending,false);
++assert.equal(plan.currentFullControl.fullClientSourcePending,false,'New full client Source pending');
++assert(plan.currentFullControl.requiredFullClientIndex&&plan.currentFullControl.requiredFullClient);
++assert.deepEqual(plan.clientSourceIndex,plan.currentFullControl.requiredFullClientIndex);
++assert.deepEqual(plan.clientSource,plan.currentFullControl.requiredFullClient);
+ for(const key of ['applicationInputs','applicationBuildResult','applicationBuildReview','applicationRootIdentity','applicationRootIdentityEvidence','expectedApplication','standaloneSource','clientSource','clientSourceIndex'])assert(plan[key]!==null,'Missing new control binding:'+key);
+ assert(Array.isArray(plan.protectedInputs)&&plan.protectedInputs.length>0,'Fresh Node Source graph required');
+ assert.equal(process.argv.length,7,'Versioned host-only authority argument; six original positions preserved');
+ const authorityPath=resolve(process.argv[6]);
+ const authority=JSON.parse(await readFile(authorityPath,'utf8'));
+-assert.equal(authority.state,'ROOT_NEXT_CURRENT_REDIRECT_HOST_CONTROL_AUTHORIZED_V1');
+-assert.equal(authority.controlOnly,true);assert.equal(authority.currentRedirectControlAllowed,true);
++assert.equal(authority.state,'ROOT_NEXT_CURRENT_FULL_HOST_CONTROL_AUTHORIZED_V1');
++assert.equal(authority.controlOnly,false);assert.equal(authority.currentFullSuiteAllowed,true);
+ assert.equal(authority.localhostServerAllowed,true);assert.equal(authority.browserAllowed,true);
+ for(const key of ['compilerAllowed','nativeBuildAllowed','guestAllowed','engineAllowed','externalApplicationDeploymentAllowed'])assert.equal(authority[key],false);
+ assert.equal(authority.publicRequestCorrelationAllowed,true);assert.equal(authority.runId,runId);validatePublicCorrelation(authority.publicRequestCorrelation);
+@@ -89,7 +93,7 @@
+   for(const r of input.files){const path=join(application,r.path),s=await lstat(path);assert.deepEqual(await descriptor(path),{path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}
+   for(const r of input.directories)assert.equal((await lstat(join(application,r.path))).mode&0o777,r.mode);
+ }
+-const result = {schemaVersion: 1, suite: 'NEXT_CURRENT_REDIRECT_MATCHED_NODE_CONTROL_V1', controlOnly:true, fullOriginalContractExecuted:false, fullNextAccepted:false,
++const result = {schemaVersion: 1, suite: 'NEXT_CURRENT_FULL_MATCHED_NODE_PROFILE_V1', controlOnly:false, fullOriginalContractExecuted:false, fullNextAccepted:false,
+   node: process.version, guestExecuted: false, applicationModified: false,
+   standaloneSource: source, sourceServer: await descriptor(join(source, 'server.js')),
+   bridge: await descriptor(join(here, '../http-bridge-candidate-v1/bridge.mjs')), harness: await descriptor(fileURLToPath(import.meta.url)),
+@@ -192,8 +196,9 @@
+   const [code,signal]=await once(child,'exit');result.controlClientExit={code,signal};
+   result.controlClientResult=await descriptor(join(clientOutput,'result.json'));
+   result.control=JSON.parse(await readFile(result.controlClientResult.path));
+-  assert.equal(result.control.suite,'NEXT_PRISTINE_REDIRECT_BROWSER_CONTROL_CLIENT_V1');
+-  assert.equal(result.control.controlOnly,true);assert.equal(result.control.fullOriginalContractExecuted,false);
++  assert.equal(typeof result.control.fullOriginalContractExecuted,'boolean');result.fullOriginalContractExecuted=result.control.fullOriginalContractExecuted;
++  assert.equal(result.control.suite,'NEXT_CURRENT_FULL_CONTRACT_CLIENT_V1');
++  assert.equal(result.control.controlOnly,false);assert.equal(result.control.fullOriginalContractExecuted,true);assert.equal(result.control.fullNextAccepted,false);
+ } catch (error) {
+   result.errors.push({type:error===null?'null':typeof error,name:error?.name??null,message:error?.message??String(error),stack:error?.stack??null});
+ } finally {
+@@ -203,11 +208,11 @@
+   try{await dependencyBookend();result.originalDependencyInputsPreserved=true;}catch(error){result.originalDependencyInputsPreserved=false;result.errors.push({stage:'dependency-final-protection',name:error?.name??null,message:error?.message??String(error)});}
+   try{await sourceBookend();result.originalApplicationInputsPreserved=true;}catch(error){result.originalApplicationInputsPreserved=false;result.errors.push({stage:'original-app-final-protection',name:error.name,message:error.message,stack:error.stack});}
+   result.passed=result.prepared===true&&result.controlClientExit?.code===0&&result.controlClientExit?.signal===null
+-    &&result.control?.passed===true&&result.control?.controlOnly===true&&result.control?.fullOriginalContractExecuted===false
++    &&result.control?.passed===true&&result.control?.controlOnly===false&&result.control?.fullOriginalContractExecuted===true
+     &&result.originalApplicationInputsPreserved===true&&result.originalDependencyInputsPreserved===true
+     &&result.errors.length===0&&result.transportErrors.length===0;
+   await save();
+ }
+-console.log(JSON.stringify({state:result.passed?'NEXT_CURRENT_REDIRECT_MATCHED_NODE_CONTROL_PASSED':'NEXT_CURRENT_REDIRECT_MATCHED_NODE_CONTROL_FAILED',
+-  controlOnly:true,fullOriginalContractExecuted:false,passed:result.passed,errors:result.errors,transportErrors:result.transportErrors,guestExecuted:false,fullNextAccepted:false}));
++console.log(JSON.stringify({state:result.passed?'NEXT_CURRENT_FULL_MATCHED_NODE_PROFILE_PASSED':'NEXT_CURRENT_FULL_MATCHED_NODE_PROFILE_FAILED',
++  controlOnly:false,fullOriginalContractExecuted:result.fullOriginalContractExecuted,passed:result.passed,errors:result.errors,transportErrors:result.transportErrors,guestExecuted:false,fullNextAccepted:false}));
+ process.exitCode=result.passed?0:1;

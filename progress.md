@@ -13,6 +13,27 @@ verifies both passes and167 retained payloads/9,038,560 bytes. Next restore the 
 using this exact build and browser; keep the legacy generation and every original
 predicate. No earlier failure is waived and no cancellation cause is established.
 
+The comprehensive current-build successor is now prepared: full client and
+actors preserve all original gates and order while selecting the physical7c3
+browser. Source review and three actual Node syntax checks pass. Root bindings
+`80ad6105` preserve whole metadata/controller inverses and freshly verify2,025
+descriptors with genuine35 build/1,678 source references. Before/final original
+constructor/world guards pass. Preparation`35f5ad50` fixes native600→Node300
+authorities and fresh slots, with no actor launched at preparation. Execution
+scope is derived from published stages, separately from semantic pass. No new
+engine, component, observer, app build or host changes are introduced.
+The first preparation is held: independent binding review caught the bare HTTP
+fixture contract missing from its2,024-input union. All13 original metadata
+payloads/1,809,307 bytes are retained; zero actors/trials had run. Exact unbound
+Source was restored, and corrected binderV2 explicitly checks all six external
+client requirements before deriving the fresh union. Original code/assertions
+are unchanged. This qualifies the earlier binder Source PASS and records a
+preparation defect, not a runtime failure or retry.
+Independent corrected-binding DATA review`ac08a62d` passes all2,025 current
+descriptors, exact Source inverses, separate client/browser family joins and the
+complete13-file held archive. Git blob verification preserves that archive's
+1,809,307 bytes exactly. The fixed comprehensive pair is ready for execution.
+
 Latest redirect control: **pristine standalone Node passes both current strict
 browser tests**, including the redirecting Server Action. Original owner891/600
 finishes raw0/clean with protected inputs; the requested standalone server

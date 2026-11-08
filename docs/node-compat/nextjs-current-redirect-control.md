@@ -56,6 +56,16 @@ The next comprehensive pair will use this exact current build and strict worker,
 restore the original HTTP/cache/supplemental/stream workload, and retain the
 legacy generation and every other original predicate. This is a new workload
 comparison; previous failed runs are not retried or overwritten.
+The [comprehensive successor](../../tests/node-compat/frameworks/nextjs/next-current-full-root-results-v1/README.md)
+is prepared with both fixed authorities (`35f5ad50`), fresh2,025-descriptor input
+closure and genuine before/final constructor/world guards. Source review and
+three Node syntax checks pass. Its full client has a distinct real source family
+from the unchanged browser worker. Execution scope starts false and is derived
+from published collection, separately from the unchanged success predicate.
+The first preparation's external fixture-contract omission was caught before
+execution and retained with all13 metadata payloads. Corrected binding explicitly
+checks all six client dependencies. No test/actor code or assertion changed,
+and zero trials ran under that held preparation.
 
 The [bridge cancellation audit](nextjs-bridge-cancellation-audit.md) records an
 untested close/drain seam and proposes a focused regression. Neither this Source
