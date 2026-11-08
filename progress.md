@@ -4,6 +4,18 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
+Active experiment: the opt-in native export diagnostic has passed Source review,
+both C++ frontend modes, fresh 825-file materialization and all ten generator
+checks. The full native build now finishes raw0/clean under original owner28096
+with its 7,200-second ceiling (`37f8d3`/session59432, completion`572b44`). Engine
+`237c4e5a` is 31,350,211 bytes; metadata`500e76ac` records the diagnostic ON
+definition only in the separate embedding compile, with none in the 80 native
+compile rows. Coordinated build DATA review`7e5311ad` and Source/link
+review`b473d4c9` pass for this build-only scope. Probe and Next.js
+construction recipes are prepared; neither a new engine runtime result nor a
+Next.js fix is established. Source/build preparation
+checkpoint `2cd7de93` is pushed to `origin/main`.
+
 Next.js executes in a real Wasm component. The fixed ten-trial comparison passes
 both Node controls and one of eight guest full-suite samples. All ten pass HTTP,
 persistent cache, streaming and functional UI checks; seven guest generation
@@ -276,7 +288,14 @@ Current next steps and outstanding work:
   preparation exits0, creating fresh Cargo selection `98c52b61` and an unissued
   build draft `4937da3c`. Its preparer and launcher pass whole Source review;
   only the two actual draft/receipt SHA bindings change in the launcher. The
-  full native build is next. The frontend retained corpus contains
+  full native build now finishes raw0/clean, producing engine`237c4e5a` and
+  metadata`500e76ac`. Coordinated review`7e5311ad` binds Source/link
+  review`b473d4c9`: all six phases and seven owners pass, with 1,950 protected
+  descriptors and exact private embedding ON evidence. The 825 Source pairs,
+  80+1 compile commands and Rust/link inputs are checked; the current complete
+  ten-tree payload sweep is delegated to the actual worker/Root guards.
+  No engine execution, component or runtime acceptance follows from this build.
+  The frontend retained corpus contains
   52 files/4,009,463 bytes; Root's first offline reader exits0, preserving raw
   frontend codes `[1,1,0,0]`, separate driver0 and unaccepted runtime status.
   A separate replay from actual staged Git blobs and permissions also exits0.

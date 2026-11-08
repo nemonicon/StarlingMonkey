@@ -1,0 +1,285 @@
+"""Unbound Root Source: fresh diagnostic-probe INIT authority, never a target launcher."""
+import argparse
+import copy
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import stat
+import sys
+
+HERE = Path(__file__).resolve().parent
+BASE = HERE.parent
+PLANNED_CALLER = BASE / 'next-native-export-diagnostic-probe-construction-v2'
+# Genuine future reviewed DATA and separately sealed bound caller only.
+CALLER_INDEX = None
+CALLER_PLAN = None
+BUILD_REVIEW = None
+BUILD_SOURCE_REVIEW = None
+ENGINE = None
+NATIVE_METADATA = None
+FULL_GUARD = dict(path=str(BASE / 'next-full-build-runtime-root-results-v1/run-full-native-requests.py'),
+    sha256='47c9cab9461a63aa12b38e6f4e8cae3cc714270c370a313fab571f53991cdfe0', bytes=14500)
+WORLD_GUARD = dict(path=str(BASE / 'peer-disconnect-root-results-v3/launch-peer-v3-construction.py'),
+    sha256='b7a15f315cde9f87d511eaf2cb0c315853bf343965e825b78abddfb68be82921', bytes=4683)
+RUN_ID = 'diagnostic-probe-native-export-first'
+
+
+def require(v, message):
+    if not v:
+        raise ValueError(message)
+
+
+def bound():
+    require(all(type(r) is dict and set(r) == {'path', 'sha256', 'bytes'} for r in
+        (CALLER_INDEX, CALLER_PLAN, BUILD_REVIEW, BUILD_SOURCE_REVIEW, ENGINE, NATIVE_METADATA)),
+        'Future reviewed diagnostic build/bound-v2 Source pending; no reads, imports or outputs')
+    require(CALLER_INDEX['path'] == str(PLANNED_CALLER / 'index.json') and
+            CALLER_PLAN['path'] == str(PLANNED_CALLER / 'plan.json'), 'Bound v2 caller only')
+
+
+def stamp(p):
+    s = p.lstat()
+    return (s.st_dev, s.st_ino, s.st_mode, s.st_nlink, s.st_size, s.st_mtime_ns, s.st_ctime_ns)
+
+
+def row(value):
+    p = Path(value)
+    require(p.is_absolute() and '..' not in p.parts and p.resolve() == p and
+            not any(q.is_symlink() for q in (p, *p.parents)), 'Canonical independent input')
+    s = stamp(p)
+    require(stat.S_ISREG(s[2]) and s[3] == 1, 'Regular nlink1 input')
+    h = hashlib.sha256()
+    with p.open('rb') as f:
+        for block in iter(lambda: f.read(1024**2), b''):
+            h.update(block)
+    require(stamp(p) == s, 'Input read changed')
+    return dict(path=str(p), sha256=h.hexdigest(), bytes=s[4])
+
+
+def checked(ref):
+    require(type(ref) is dict and set(ref) == {'path', 'sha256', 'bytes'} and
+            type(ref['bytes']) is int and ref['bytes'] >= 0 and row(ref['path']) == ref,
+            'Exact descriptor')
+    return Path(ref['path'])
+
+
+def document(ref):
+    require(type(ref) is dict and type(ref['bytes']) is int and 0 <= ref['bytes'] <= 16 * 1024**2,
+            'Finite JSON bound')
+    p = checked(ref)
+    value = json.loads(p.read_bytes())
+    checked(ref)
+    return value
+
+
+def family(ref):
+    index = document(ref)
+    root = Path(ref['path']).parent
+    names, dirs = {'index.json'}, set()
+    for r in index['files']:
+        q = Path(r['path'])
+        require(not q.is_absolute() and '..' not in q.parts and q.as_posix() == r['path'] and
+                r['path'] not in names, 'Safe unique indexed member')
+        names.add(r['path'])
+        dirs.update(d.as_posix() for d in q.parents if d != Path('.'))
+        checked(dict(r, path=str(root / q)))
+    nodes = list(root.rglob('*'))
+    require(all(not p.is_symlink() and (p.is_file() or p.is_dir()) for p in nodes) and
+            {p.relative_to(root).as_posix() for p in nodes if p.is_file()} == names and
+            {p.relative_to(root).as_posix() for p in nodes if p.is_dir()} == dirs, 'Closed Source family')
+    return index
+
+
+def original(ref, name):
+    p = checked(ref)
+    spec = importlib.util.spec_from_file_location(name, p)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    checked(ref)
+    return module
+
+
+def unique(refs):
+    out = {}
+    for r in refs:
+        checked(r)
+        if r['path'] in out:
+            require(out[r['path']] == r, 'Conflicting evidence descriptor')
+        out[r['path']] = r
+    return list(out.values())
+
+
+def context():
+    bound()  # First operation: no helper import, DATA output or action while unbound.
+    require(__debug__ and sys.flags.isolated and sys.dont_write_bytecode, 'Use Python -I -B, no -O')
+    family(CALLER_INDEX)
+    p = document(CALLER_PLAN)
+    require(p['prospectiveDiagnosticBuildBindingsPending'] is False and
+            p['prospectiveInputSourceBindingPending'] is False and
+            p['expectedEngineForRootAuthority'] == ENGINE and
+            p['expectedNativeMetadataForRootAuthority'] == NATIVE_METADATA and
+            p['requiredCoordinatedFullBuildReviewForRootAuthority'] == BUILD_REVIEW and
+            p['requiredFullBuildSourceReview'] == BUILD_SOURCE_REVIEW, 'Actual bound-v2 policy')
+    require(p['expectedNativeMetadataFixedValuesForRootAuthority'] == dict(schemaVersion=1,
+        policy='complete-actual-native-metadata-object', nativeMetadata=NATIVE_METADATA),
+        'Versioned complete-object policy, not a fabricated Source frame')
+    require(set(p['entries']) == {'real-next'} and p['expectedReturnedImportFunctionCount'] is None and
+            p['completeReturnedImportAuditRequired'] is True, 'Sole selector/no count target')
+    fixture_index = family(p['inputSourceIndex'])
+    fixture_root = Path(p['inputSourceIndex']['path']).parent
+    fixture = document(row(fixture_root / 'plan.json'))
+    require(fixture['entry'] == p['entries']['real-next'] and
+            fixture['worldSourceIndex'] == p['worldSourceIndex'] and fixture['witDirectory'] == p['witDirectory'],
+            'Actual probe fixture/selector/world')
+    require(any(dict(r, path=str(fixture_root / r['path'])) == fixture['entry']
+                for r in fixture_index['files']), 'Indexed selected entry')
+    family(p['worldSourceIndex'])
+    for k in ('requiredDiagnosticNativeSourceIndex', 'requiredDiagnosticBuilderSourceIndex', 'requiredCleanupSourceIndex'):
+        family(p[k])
+    for k in ('requiredDiagnosticNativeProtocol', 'requiredDiagnosticEmbeddingAfterimage',
+              'requiredCleanupAfterimageForRootAuthority', 'requiredInheritedModuleLoaderAfterimageForRootAuthority'):
+        checked(p[k])
+    review, source_review, md = document(BUILD_REVIEW), document(BUILD_SOURCE_REVIEW), document(NATIVE_METADATA)
+    require(review['state'] == 'INDEPENDENT_PORTABLE_NEXT_INTL_NATIVE_BUILD_DATA_REVIEW_PASSED_V1' and
+            review['verifiedPassed'] is True and source_review['verifiedPassed'] is True and
+            review['engine'] == ENGINE and review['metadata'] == NATIVE_METADATA and md['engine'] == ENGINE,
+            'Genuine original full-build review wire; no aliases')
+    result_ref, observation_ref = review['actualResult'], review['actualRootObservation']
+    result, observation = document(result_ref), document(observation_ref)
+    require(result['engineCandidate'] == ENGINE and result['metadata'] == NATIVE_METADATA and
+            observation['workerResult'] == result_ref and
+            observation['issuedAuthority'] == review['issuedAuthority'], 'Actual result/outer roles')
+    source_root = Path(md['compiledSourceRoot'])
+    work = source_root.parent
+    require(result_ref['path'] == str(work / 'result.json') and
+            result['sourceComposition'] == md['sourceComposition'], 'Actual fresh build namespace/composition')
+    evidence = md['nativeExportDiagnosticCompileEvidence']
+    require(result['nativeExportDiagnosticCompileEvidence'] == evidence == dict(
+        option='NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1', requested='ON',
+        observed=dict(type='BOOL', value='ON'), embeddingDefinition='-DNODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1=1',
+        embeddingDefinitionOccurrences=1, separateEmbeddingCommands=1, nativeCompileRows=80,
+        nativeRowsWithDiagnosticDefinition=0, compiledSourceAfterimagesAuthenticated=True), 'Exact actual opt-in proof')
+    require(p['requiredDiagnosticBuildOption']['actualProof'] == NATIVE_METADATA, 'Compile-proof actual metadata pin')
+    require(md['requestedCMake']['NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1'] == 'ON' and
+            md['observedCMake']['NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1'] == dict(type='BOOL', value='ON'),
+            'Actual configure opt-in')
+    # Fresh pairs come from the new result, never a rewritten predecessor array.
+    copies = result['sourceCopies']
+    require(len(copies) == len({x['target']['path'] for x in copies}) == 825, 'Fresh whole-source pairs')
+    pairs = []
+    for c in copies:
+        require(all(c['source'][k] == c['target'][k] for k in ('sha256', 'bytes')) and
+                c['singleLink'] is c['distinctInode'] is True, 'Copied pair equality')
+        pairs += [c['source'], c['target']]
+    for relative, wanted in [('builtins/web/fetch/request-response.cpp', p['requiredCleanupAfterimageForRootAuthority']),
+                             ('runtime/script_loader.cpp', p['requiredInheritedModuleLoaderAfterimageForRootAuthority'])]:
+        selected = [r for r in md['nativePolicyInputManifest'] if r['path'] == relative]
+        compiled = [r for r in md['compiledAfterInputs'] if r['path'] == str(source_root / relative)]
+        require(len(selected) == len(compiled) == 1 and all(
+            selected[0][k] == compiled[0][k] == wanted[k] for k in ('sha256', 'bytes')), 'Inherited compiled Source')
+        checked(compiled[0])
+    embedding = row(work / 'componentize-source/embedding/embedding.cpp')
+    require(all(embedding[k] == p['requiredDiagnosticEmbeddingAfterimage'][k] for k in ('sha256', 'bytes')),
+            'Actual new embedding afterimage')
+    full_roles = dict(engine=ENGINE, nativeMetadata=NATIVE_METADATA, fullNativeBuildResult=result_ref,
+        fullNativeBuildObservation=observation_ref, fullNativeBuildReview=BUILD_REVIEW,
+        fullNativeBuildSourceIndex=review['callerSourceIndex'],
+        fullBuildGeneratedNullSource=row(work / 'build/starling-raw.wasm/null.cpp'))
+    full = original(FULL_GUARD, 'genuine_original_diagnostic_probe_full_guard')
+    world = original(WORLD_GUARD, 'genuine_original_diagnostic_probe_world_guard')
+    full.protect_full_build(full_roles, md)
+    build_refs = [result_ref, observation_ref, BUILD_REVIEW, BUILD_SOURCE_REVIEW, review['issuedAuthority'],
+                  observation['terminal'], md['rootAuthority'], md['recipe'], md['compileDatabase'],
+                  md['wholeNinjaCommands'], row(work / 'protection-before.json')]
+    for phase in result['phases']:
+        build_refs += [phase['outerTerminal'], phase['workerResult']]
+        terminal = document(phase['outerTerminal'])
+        build_refs += [terminal['stdout'], terminal['stderr']]
+    wit = [row(q) for q in sorted(Path(p['witDirectory']).rglob('*.wit'))]
+    require(len(wit) == 8, 'Whole standard WIT cohort')
+    source_refs = [CALLER_INDEX, CALLER_PLAN, p['inputSourceIndex'], p['worldSourceIndex'], FULL_GUARD, WORLD_GUARD,
+                  row(Path(__file__).resolve()), row(HERE / 'launch-construction.py')] + wit + pairs
+    source_refs += [p[k] for k in ('requiredDiagnosticNativeSourceIndex', 'requiredDiagnosticNativeProtocol',
+        'requiredDiagnosticEmbeddingAfterimage', 'requiredDiagnosticBuilderSourceIndex', 'requiredCleanupSourceIndex',
+        'requiredCleanupAfterimageForRootAuthority', 'requiredInheritedModuleLoaderAfterimageForRootAuthority',
+        'requiredInteropRuntimeReviewForRootAuthority', 'baselineFullBuildReviewForAncestry',
+        'baselineFullBuildSourceReviewForAncestry')]
+    state = dict(plan=p, metadata=md, full=full, world=world, fullRoles=full_roles,
+                 buildRefs=unique(build_refs), sourceRefs=unique(source_refs))
+    protect(state)
+    return state
+
+
+def protect(s):
+    bound()
+    for r in s['buildRefs'] + s['sourceRefs'] + [ENGINE, NATIVE_METADATA]:
+        checked(r)
+    family(CALLER_INDEX)
+    family(s['plan']['inputSourceIndex'])
+    require(document(NATIVE_METADATA) == s['metadata'], 'Complete metadata changed')
+    s['full'].protect_full_build(s['fullRoles'], s['metadata'])
+
+
+def authority(s):
+    p = s['plan']
+    # Existing constructor schema, fresh literal; no predecessor evidence arrays.
+    a = dict(schemaVersion=1, state='ROOT_NEXT_NATIVE_COMPONENT_CONSTRUCTION_V2', callerIndex=CALLER_INDEX,
+        entryMode='real-next', runId=RUN_ID, outputRoot=p['outputPrefix'] + '-real-next-' + RUN_ID,
+        engine=ENGINE, nativeMetadata=NATIVE_METADATA, engineBuildEvidence=s['buildRefs'], newSourceEvidence=s['sourceRefs'],
+        metadataExpectedFixedValues=copy.deepcopy(s['metadata']), nativeBuildReviewedForConstruction=True,
+        componentizeInitAllowed=True, ordinaryExportsAllowed=False, httpServingAllowed=False, networkAllowed=False,
+        nativeBuildAllowed=False, packageMutationAllowed=False, globalPinMutationAllowed=False, debugAllowed=False,
+        applicationMountAtInitAllowed=False, deployedResnapshotAllowed=False, worldSourceIndex=p['worldSourceIndex'],
+        nativeProfileLabel='Fresh independently reviewed opt-in diagnostic engine, actual whole metadata and825pairs; no predecessor frame projection.',
+        completion='Direct probe INIT only; static inactive observe literal is not a deployed case/public request join.',
+        rootReview='Root independently admits actual new build/ON proof/current Source and world. Actual return graph/count remain unobserved until future construction; no runtime/fullNext/private identity/completion claim.')
+    s['world'].world_guard(a)
+    return a
+
+
+def admit(a):
+    s = context()
+    require(a == authority(s), 'Exact fresh constructor authority')
+    protect(s)
+    return s['world'].world_guard(a)
+
+
+def save(path, value):
+    with path.open('x') as f:
+        os.fchmod(f.fileno(), 0o600)
+        f.write(json.dumps(value, indent=2) + '\n')
+        f.flush()
+        os.fsync(f.fileno())
+    return row(path)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--write', action='store_true', help='Root JSON authority preparation only; no constructor launch')
+    args = parser.parse_args()
+    s = context()
+    a = authority(s)
+    for p in (Path(a['outputRoot']), Path(a['outputRoot'] + '-external-root')):
+        require(p.is_absolute() and p.resolve() == p and not p.exists() and not p.is_symlink(), 'Fresh output')
+    if not args.write:
+        print(json.dumps(dict(sourceOnly=True, rootAuthorityIssued=False, targetInvoked=False,
+                              actualBuildReview=BUILD_REVIEW, proposedOutput=a['outputRoot']))); return 0
+    target, receipt = HERE / 'diagnostic-probe-construction-authority.json', HERE / 'construction-preparation.json'
+    require(not target.exists() and not target.is_symlink() and not receipt.exists() and not receipt.is_symlink(),
+            'Exclusive fresh preparation records')
+    protect(s)
+    ar = save(target, a)
+    save(receipt, dict(state='ROOT_DIAGNOSTIC_PROBE_INIT_AUTHORITY_PREPARED_NOT_LAUNCHED_V1', authority=ar,
+        preparer=row(Path(__file__).resolve()), caller=CALLER_INDEX, plan=CALLER_PLAN, engine=ENGINE,
+        nativeMetadata=NATIVE_METADATA, actualBuildReview=BUILD_REVIEW, actualBuildSourceReview=BUILD_SOURCE_REVIEW,
+        metadataFixedValuesPolicy='Complete actual object, no31-field projection', actorInvoked=False,
+        fullBuildGuard=FULL_GUARD, worldGuard=WORLD_GUARD))
+    protect(s)
+    print(json.dumps(dict(authority=ar, actorInvoked=False)), flush=True)
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

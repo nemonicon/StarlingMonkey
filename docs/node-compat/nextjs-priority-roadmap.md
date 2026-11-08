@@ -44,9 +44,13 @@ now implements primitive snapshot validation, ambiguity/clearing and bounded
 ordinary-call I/O. Macro-OFF/ON C++ frontend checks pass after restoring two
 authenticated empty SDK directories; the original failed checks are retained.
 The fresh 825-file source set and its genuine portable selection are verified.
-Next are the ten installed-generator checks, full native build, 17-case direct
-WASI probe, emitted-import audit and full Next.js regression. Frontend success
-does not establish runtime correctness or resolve the browser failure.
+All ten installed-generator checks and the full native build finish raw0. The
+new engine `237c4e5a` is 31,350,211 bytes; actual metadata records one private
+embedding definition and none in the 80 native compile rows. Native Source/link
+DATA review `b473d4c9` and coordinated build review `7e5311ad` pass. Next are the
+17-case direct WASI probe, emitted-import audit and full Next.js regression.
+Build success does not establish runtime correctness or resolve the browser
+failure.
 See the [current correlation checkpoint](nextjs-public-request-correlation-2026-11-08.md).
 The first prefix-mismatched harness attempt remains a separate pre-HTTP failure.
 The following earlier2251/4e results remain as a separate baseline.

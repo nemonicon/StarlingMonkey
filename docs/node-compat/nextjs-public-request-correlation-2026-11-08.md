@@ -135,7 +135,10 @@ per-export ambiguity/clearing and bounded ordinary-call I/O. Both macro modes
 pass real C++ frontend checks after an authenticated SDK directory repair;
 the original failed checks are preserved. Fresh source materialization, portable
 selection and all ten installed-generator checks complete successfully. Full
-compile/link, the 17-case direct-WASI probe, actual emitted imports and a fresh
-same-world Next.js comparison remain required. These preparation results do not
+compile/link now also finishes raw0 as engine`237c4e5a`, with diagnostic ON proof
+and native Source/link DATA review`b473d4c9`; coordinated review`7e5311ad` passes
+for the build-only scope.
+The 17-case direct-WASI probe, actual emitted imports and a fresh
+same-world Next.js comparison remain required. These build results do not
 resolve the retained strict browser failure or change its public-correlation
 conclusion.
