@@ -1,5 +1,11 @@
 # Portable Next cache proposal
 
+Current status: this document preserves the initial model-only proposal. Its
+separate HandlerV2 successor now runs in the real component and passes the five
+persistent-cache requests/52 checks. See the [actual application results](nextjs-portable-cache-2026-11-07.md).
+Those results do not promote the earlier forty fake-filesystem checks or satisfy
+the original module-local generation counter. The original contract remains failed.
+
 Status: **engineering proposal with a model-tested Source prototype; no deployed cache handler accepted**. The original
 cache-generation gate remains failed. The deployed affinity diagnostic observed
 four different JS-global state epochs for its three cache reads and invalidation

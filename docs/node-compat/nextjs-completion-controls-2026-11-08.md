@@ -113,7 +113,20 @@ objects and colliding lane-local tokens establish no physical identities or
 unique causal joins. No Promise/export/host completion follows from these sites.
 
 The [export/Promise Source audit](nextjs-export-promise-completion-audit.md)
-finds no verified defect. A new entry-only observation at handler.handle Promise
-adoption is being prepared. It adds an explicit diagnostic await, preserves
-fulfillment/rejection and declares scheduling perturbation; it is not a fix for
-a missing await. No new component or runtime result exists for that proposal.
+finds no verified defect. The separate entry-only observation at handler.handle
+Promise adoption now constructs as cd60c673 and passes INIT review0013502c,
+with the same13 standard interfaces and no INIT marker output. It adds an
+explicit diagnostic await, preserves fulfillment/rejection and declares
+scheduling perturbation; the preceding async return already adopted the Promise.
+
+Its first full regression ends1/clean/protected, result2ae87cb0:52 persistent
+cache checks,80 supplemental checks,24 HTTP cases and five stream chunks pass.
+Both strict browser tests also pass in this sample; POST7 body (2,963 decoded
+bytes), finished and sizes fulfill with no browser errors/failed requests.
+Legacy generation1→1 still fails the original overall contract. Complete bounded
+stdout retains14,762 bytes/62 parent chunks before marker interpretation.
+Coordinated runtime DATA review4d47759f binds owner/browser reviewffc43a9b and
+marker reviewc64c02ca. Its60 markers include six child-call fulfillment sites,
+without establishing enclosing export/native/host completion. One instrumented positive
+sample establishes no reliability, missing-await defect or fix and does not
+waive earlier failures.

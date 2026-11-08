@@ -1,0 +1,13 @@
+Uncompiled B/D return-await Source variants in ONE family. Each ESM member changes exactly one verified line in its own parent neutral async callback:
+
+`return handler.handle(incoming,outparam);` becomes `return await handler.handle(incoming,outparam);`.
+
+B is the exact73b/1e49 V5 descendant (guest-entry-b.mjs). D is the exact8043/bf44 response-completion descendant (guest-entry-d.mjs). The insertion is six bytes in each file; every other byte, including readers, native invocation arguments, disposal/catch/finally/final guards and facade prefix, remains identical. No cd60 holder, child-fulfillment logger/catch, new body reader, native/C++/WIT/host change, header, clock, entropy or identifier is introduced.
+
+The original async return already adopts the handler Promise. An explicit return-await can change reaction/adoption scheduling; it is not a missing-await fix and implies no guaranteed extra microtask count. No behavior, improvement, reliability, cause or private-state result is claimed from Source.
+
+D retains the old NEXT_GUEST_RESPONSE_COMPLETION_V1 logger/code/record schema verbatim, including per-component256-record/512B ASCII bounds and all ambiguity/no-host-completion qualifications. The pinned f2fb marker contract is historical record-schema and Source ancestry evidence only. Its original no-added-await/whole-entry reconstruction/orchestration wording does not describe D after this insertion; this plan and derivation define the current whole entry. Source comments retained in the exact parents also keep their historical cutoff. B has no response diagnostic logger. Neither variant contains the separate cd60 child-Promise observer.
+
+The shared plan exposes genuine8025 worldSourceIndex/witDirectory/next-http, eight WIT files, selected13@0.2.10 and only incoming-handler. Current476b/22f/full4185,cleanup445e/compiled1fe40ee/accepted55a requirements remain. The existing generic constructor can later select either indexed B or D as its sole real-next member through a separate caller; there is no new entryMode/API or simultaneous two-entry construction. Actual engine/metadata/authority/constructor/component/import count/runtime are NULL. All actual returned tuples and evidence must be derived anew.
+
+Existing A/D990 and C/c6ae artifacts and all prior failure records are unchanged. Future B/D construction/deployment is separate; no actor, helper, guard, Node, JavaScript grammar/runtime, ABI export, native build or network action was invoked here. R uses Python text/JSON/AST checks only. R authored this family and the response-logger parent/related cleanup Source; whole-family C/Root Source review is pending, and no index is published.

@@ -2,7 +2,7 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
-The latest experimental D990/476b generation **fails full Next acceptance**:
+The experimental D990/476b baseline **fails full Next acceptance**:
 24 HTTP,80 supplemental,52 persistent-cache checks, incremental streaming and
 both functional browser interactions pass, while legacy generation1→1 and
 strict action-response capture fail. Independent DATA reviewc3a8b95b preserves
@@ -19,6 +19,16 @@ The separate c6ae diagnostic also retains both native failures while capturing
 and later export/task boundaries prevent a physical request or completion-cause
 inference; the [Source audit](nextjs-export-promise-completion-audit.md) found no
 verified defect. These observations change no accepted API disposition.
+The subsequent cd60 child-handler Promise diagnostic passes strict browser
+completion in its first sample: POST body/finished/sizes all fulfill, with no
+browser errors. The overall run2ae87cb0 still fails legacy generation1→1.
+Coordinated DATA review4d47759f verifies that outcome. The added await/logging can perturb
+scheduling; neither reliability nor a cause or fix is established. Earlier
+failures and the production dispositions remain unchanged.
+The [request-state contract](nextjs-request-state-contract.md) records that the
+portable profile does not guarantee one shared module instance across HTTP
+requests. Explicit cache persistence and arbitrary lexical state are distinct;
+the original generation test remains failed.
 Declared React19.3.1 and the actual Next-vendored browser canary runtime are
 distinguished in the [client audit](nextjs-server-action-next-steps.md).
 The machine-readable production dispositions remain unchanged.

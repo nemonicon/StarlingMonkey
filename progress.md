@@ -5,9 +5,11 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
 Next.js executes in a real Wasm component. Current HTTP, persistent cache,
-streaming and functional UI checks pass; the full suite remains failed at the
-legacy generation counter and strict Server Action response completion. Work
-now focuses on those failures before API expansion or production promotion.
+streaming and functional UI checks pass. The new Promise diagnostic also passes
+strict Server Action response completion in one sample; earlier failures remain
+unresolved. The full suite still fails at the legacy generation counter. Work
+now focuses on request-state portability and completion stability before API
+expansion or production promotion.
 
 Latest result: native Fetch cleanup compiles and links, a fresh interoperability
 component passes INIT construction review, and all16 deployed module cases pass
@@ -40,21 +42,36 @@ sites, without proving export-Promise or host/TCP completion. The source audit
 finds no verified settlement defect. A separate child-handler Promise observer
 now constructs and validates as componentcd60c673 (37,260,823 bytes). Its
 coordinated INIT review0013502c observes131 imports on the same13 interfaces,
-with clean ownership and no INIT markers. Deployment remains pending. Its
+with clean ownership and no INIT markers. Its first full deployed run now
+finishes1/clean/protected:52 persistent-cache checks,80 supplemental checks,
+24 HTTP cases, five stream chunks and both strict browser tests pass. POST7's
+body (2,963 decoded bytes), finished signal and sizes all fulfill, with no browser
+errors or failed requests. Legacy generation1→1 keeps the overall suite failed.
+Complete stdout capture retains14,762 bytes; coordinated runtime DATA review
+4d47759f verifies these outcomes and retains failed overall acceptance.
+One instrumented positive sample is not a demonstrated fix or
+reliability result. Its
 added await observes existing Promise adoption and can perturb scheduling;
 it is not a demonstrated fix. No native or host change is selected.
 
 Current next steps and outstanding work:
 
-- **Next.js critical path:** run the newly reviewed child-handler Promise
-  observer through the unchanged full suite
-  with bounded stdout capture. The response-site trace is complete but cannot
-  establish Promise or transport completion. The matched identity-encoding pair
-  also preserves the native failures. Separately resolve
+- **Next.js critical path:** implement the reviewed exploratory comparison
+  using two small entry-only await variants, then investigate
+  completion stability against the retained failed samples without retry-based
+  acceptance. The response-site trace cannot establish export or transport
+  completion. Separately resolve
   the legacy counter contract against per-request guest state; durable-cache
   success does not waive that failure. Expand the second-host action/browser
   contract only with an explicit self-origin egress policy. The
   [priority roadmap](docs/node-compat/nextjs-priority-roadmap.md) tracks this order.
+  The [request-state contract](docs/node-compat/nextjs-request-state-contract.md)
+  distinguishes module-local state from persistent cache behavior; it makes no
+  claim about a private Store or the exact observed failure cause. The separate
+  [completion comparison proposal](docs/node-compat/nextjs-completion-stability-plan.md)
+  isolates await and response logging through fixed arms; it has not executed.
+  Independent Source review passes both documents; the request-state note's
+  preliminary review-status sentence is updated to the held4d47759f result.
 - **Complete:** guarded native build, real-Next component construction, and one
   full deployed regression. HTTP/stream/browser checks pass in that sample;
   cache1→1 keeps the full suite failed. Prior browser failures remain unresolved.
@@ -443,6 +460,57 @@ streams contain no new marker. C freshly hashes the whole component, typed graph
 current package and metadata; existing engine/Node payloads delegate to the
 accepted build and actual constructor guards. Deployed child-Promise markers
 remain unobserved. Source-only runtime binding is the next step.
+The new INIT retained corpus closes69 payloads/619,676 bytes (manifest55e97332).
+B's current/Git-style checks and Root40d8f7 pass the offline readerd592d8cc;
+it verifies retained owner/options/WIT/INIT joins without original paths or
+execution and does not reproduce omitted binary/package/native payloads.
+The reviewed entry and construction checkpoint is committed and pushed in
+a03974fb. The subsequent runtime Source, raw archives and offline checks are
+included with this tracker.
+Runtime Source1b728657 now seals13 payloads/126,000 bytes after whole Source and
+actual-binding closure review; all six operational files remain byte-identical.
+Roota573e6 reverses the sole wrapper binding to exact reviewed Source. Preparation
+0dd8a9/session27304 terminates0 (11bfc9), issuing authority1113140e with1,787
+fresh protected descriptors,825 source/target pairs and31/39/18 roles. Original
+native/world guards pass and admission observes48,769,073,152 free bytes.
+Root838c00/session64237 runs original81527/600 and terminates1/clean/protected
+(47ed83). Result2ae87cb0 retains client1294c107: portable52/supplemental80/HTTP24/
+stream5 and both strict browser tests pass, while legacy1→1 fails. Root270208,
+2d0c7d and2e88d3 read those actual gates; POST7 body/finished/sizes fulfill with
+2,963 decoded bytes, and browser errors/failed requests are empty. Rootecb24a
+reads final capture metadata before marker interpretation: stdout6fea20d1 is
+completely retained14,762 bytes/62 parent chunks with EOF/write/close/bookends,
+no overflow and no errors. Host81556 exits0 by normal SIGINT; client81572 exits1
+naturally. Coordinated DATA review4d47759f now passes for these observed outcomes,
+binding Bffc43a9b and Rc64c02ca. It verifies1787 current protected roles,825pairs,
+31/39/18,35 closed families, both2,186-file app inventories and12 cache files;
+6,733 finite current hashes and five explicit binary stat/delegation roles remain
+qualified. The retained pure-Python analyzer f7fdd2f1 runs once after Source
+review and complete capture, yielding eb5cc366:60 strict markers/5 ordinary lines,
+six positive child fulfillment sites, no catch/rejection/logger-error/truncation.
+Root0e0f5a independently counts these raw sites. Sequence/token collisions remain
+descriptive, and the Source-local holder is not a physical/cross-lane identity.
+Rootfbb3c8/3e31d9 reads review scope/joins/limitations. No enclosing export,
+native loop/post_call, host task, TCP completion, cause or fix is proved. Added
+await/logging can perturb scheduling; all earlier failed samples remain unchanged.
+The runtime retained corpus now closes60 payloads/3,361,206 bytes (manifest6016cc6e),
+including all14 browser files,21 outer records, complete stdout, the three reviews,
+analyzer Source and full analysis. B's current/Git-style checks and Root5474a9
+pass reader4fe15fe6; Rootec3966 reads its whole Source and portable six-input
+analyzer command. The reader verifies retained owners/capture/strict positive
+browser data and legacy failure without original paths or marker-code execution.
+Historical modes/identities and omitted binary/app/package/native payloads remain
+documentary. The marker analyzer can be explicitly replayed on the retained six
+copied inputs. Two minimal await-only entry variants are now being authored for
+the separately reviewed fixed comparison. Their shared Source family now seals
+as55551d4b after Root/C whole-family and final mechanical review: seven payloads/
+113,541 bytes, plan72ce4d40, B30b4644e/40,906 bytes and Dcffdccd0/45,374 bytes.
+Each has exactly one six-byte `await ` insertion and otherwise reproduces its
+parent byte-for-byte; D retains the parent response logger/schema. The historical
+f2fb whole-entry/no-await wording is explicitly not adopted for D. Real world
+fields and current build/cleanup/interop prerequisites remain; actual new
+constructor/component/count/runtime fields are NULL. Neither new variant is
+compiled and no trial in that comparison schedule has run.
 Commit4ffa8659 is pushed to origin/main; live
 build logs and the unfinished runtime controller were excluded from that cut.
 GeneratorV5 runs all ten checks successfully under original4023/900, result795dab0e;

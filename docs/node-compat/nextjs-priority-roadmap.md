@@ -2,11 +2,15 @@
 
 Updated 2026-11-08. The current critical path is the remaining request-state
 and Server Action response-completion gaps. Bounded Fetch cleanup compiles and
-passes its public tests; the fresh full Next.js run still fails both gates.
+passes its public tests; the D990 baseline below retains both failed gates.
 Engine476b1c1d/metadata22f1d456, componentd990ecc1 and runtime result2fb8d5fd
 pass all five persistent-cache requests/52 checks,24 HTTP cases,80 supplemental
-checks, five stream chunks and both functional browser interactions. Legacy
-generation stays1→1 and strict POST7 capture retains three ERR_ABORTED errors.
+checks, five stream chunks and both functional browser interactions. That baseline
+retains legacy generation1→1 and three strict POST7 ERR_ABORTED errors. The new
+Promise diagnostic's first trial now passes strict browser completion, including
+the POST body/finished/sizes, while legacy1→1 still fails the overall suite.
+Coordinated DATA review4d47759f verifies these outcomes; a single instrumented pass proves no fix or
+reliability and does not waive earlier failures.
 The first prefix-mismatched harness attempt remains a separate pre-HTTP failure.
 The following earlier2251/4e results remain as a separate baseline.
 The optional persistent cache profile works on that corrected native loader.
@@ -41,10 +45,9 @@ Next actions, in dependency order:
    Node and guest arm pass. The corrected full application suite then executes
    and preserves the two failures above; coordinated DATA reviewc3a8b95b
    verifies that failed trial. Durable raw records belong to these separate runs.
-3. **Next implementation priority:** inspect the pinned Next/React Server Action
-   consumer and guest outgoing-stream/compression/finish boundaries. Use the
-   retained POST7 trace to choose a concrete completion invariant and targeted
-   test before changing native code. Keep the strict browser assertions.
+3. **Completion stability priority:** use the inspected Next/React consumer and
+   guest response boundaries to select a discriminating comparison before any
+   native change. Keep every strict browser assertion and retained failure.
    The [client audit](nextjs-server-action-next-steps.md) and
    [response-path audit](nextjs-response-completion-next-steps.md) now identify
    those boundaries. The normal-input gzip/backpressure probe and current-cohort
@@ -66,10 +69,18 @@ Next actions, in dependency order:
    defect in the inspected settlement/event-loop path. A separate entry now
    constructs as componentcd60c673/37,260,823 bytes to observe the exact
    handler.handle Promise adoption, preserving values and errors while explicitly
-   changing await scheduling. Its same13-interface INIT review and full deployed
-   regression are being completed. No native patch is
+   changing await scheduling. Its same13-interface coordinated INIT review0013502c
+   passes. The first full regression now ends1/clean/protected:52/80/24/stream5
+   pass, and both strict browser tests pass with POST7 body/finished/sizes fulfilled
+   and no browser errors. Legacy1→1 remains failed. Review4d47759f verifies that
+   outcome; the60-file raw corpus and offline reader now pass Root readback.
+   Await/logging can perturb scheduling. No native patch is
    justified yet. Declared React19.3.1
    and the captured Next-vendored browser canary are recorded separately.
+   The next [comparison proposal](nextjs-completion-stability-plan.md) separates
+   the extra await from the response logger, with a fixed exploratory schedule
+   and every outcome retained. It has not executed; cd60 is a separate diagnostic
+   with additional holder/fulfillment logging, not a clean factor arm.
 4. **Parallel compatibility priority:** distinguish module-local generation
    from durable cache invalidation, then inspect guest export quiescence and
    scheduling. Persistent nonce success never waives the original counter
@@ -77,7 +88,9 @@ Next actions, in dependency order:
    Wasmtime's [serve options](https://raw.githubusercontent.com/bytecodealliance/wasmtime/v42.0.1/src/commands/serve.rs)
    and [worker dispatch](https://raw.githubusercontent.com/bytecodealliance/wasmtime/v42.0.1/crates/wasi-http/src/handler.rs)
    describe reuse and availability, not an observed Store identity in this run.
-   Preserve per-instance/process limitations explicitly.
+   The [request-state contract](nextjs-request-state-contract.md) makes module-global
+   continuity an unavailable portable guarantee while preserving the original
+   failed gate. Explicit persistence does not preserve arbitrary lexical state.
 5. **Observed bounded portability pass:** current D990/f805 on stock wasmCloud
    exits0/clean/protected with all eight coldV5 requests passing; coordinated DATA
    review0ed0e4c2 passes that scope. This tests current target-host instantiation independently
@@ -89,8 +102,9 @@ Next actions, in dependency order:
    lifecycle/resource costs remain later gates. Preserve the read-only route delegate, bounded
    two-primary-tag mutation contract, all failures and unchanged legacy app code.
 
-The implementation/build checkpoint is committed and pushed through
-`3988e1e9`; [progress.md](../../progress.md) tracks current work and closed evidence.
+The entry/INIT checkpoint was pushed in `a03974fb`. This checkpoint adds the
+completed runtime DATA, offline checks and Source-only comparison variants;
+[progress.md](../../progress.md) tracks current work and closed evidence.
 
 Historical baseline: the first fresh **Next 16.4.5 / React 19.3.1 App Router
 application passed its selected experimental Wasmtime smoke contract**:
@@ -316,6 +330,7 @@ See the [pinned lifetime analysis](../../tests/node-compat/host-capabilities/was
 
 The historical smoke milestone passed on its selected Wasmtime configuration
 and matched Node control. The current broader application contract remains
-failed at legacy generation and strict Server Action response capture.
+failed at legacy generation. Strict Server Action capture passes in the new
+diagnostic sample, with earlier failures and completion stability still unresolved.
 Reproducibility, deeper lifecycle coverage, production promotion and performance
 work remain open.

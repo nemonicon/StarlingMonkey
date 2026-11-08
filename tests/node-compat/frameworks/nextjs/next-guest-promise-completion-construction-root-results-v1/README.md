@@ -30,3 +30,21 @@ await fix. A child-fulfillment record cannot establish completion of the outer
 neutral callback, generated export, native event loop/post_call, host task or TCP
 response. Raw component-local counters cannot identify physical requests across
 instances or lanes. Both earlier application failures remain open.
+
+## Offline retained check
+
+The69-payload/619,676-byte corpus `retained-raw-data-v1` (manifest55e97332)
+retains the four original monitor directories, actual return records, WIT,
+options and finite Source/review witnesses. Root launcher stdout/stderr files
+were absent; none is invented. From the repository root:
+
+```sh
+python3 tests/node-compat/frameworks/nextjs/next-guest-promise-completion-construction-root-results-v1/retained-raw-data-v1/check.py
+```
+
+B's current and Git-style checks and Root40d8f7 pass. This verifies retained
+bytes and recorded owner/INIT/WIT joins without original paths, JavaScript,
+helpers, Node or Wasm. Historical identities/modes are documentary. Omitted
+component, engine, full metadata, package, app and native payloads are not
+revalidated by replay; the complete typed-graph audit remains the separate
+coordinated review.

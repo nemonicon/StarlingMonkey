@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "state": "UNCOMPILED_CHILD_HANDLER_PROMISE_COMPLETION_TWO_CORE_DRAFT_V1",
+  "parentSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-guest-response-completion-diagnostic-entry-v1/index.json",
+    "sha256": "8043008f10db41b3c1be3c2881288ceffffdc3033ac94232af5d95e19c6e6719",
+    "bytes": 1509
+  },
+  "parentEntry": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-guest-response-completion-diagnostic-entry-v1/guest-entry.mjs",
+    "sha256": "bf44a61ccc02627bebeeff396439c6180933909c33bc860b59ac7a5ffe9162aa",
+    "bytes": 45368
+  },
+  "parentMarkerContract": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-guest-response-completion-diagnostic-entry-v1/marker-contract.json",
+    "sha256": "f2fbb92f3262d0fb340759ab22fbefededcfbeaf94f93562e033d559a2694b2e",
+    "bytes": 14520
+  },
+  "marker": "NEXT_GUEST_PROMISE_COMPLETION_V1",
+  "routeAdmissions": [
+    {
+      "method": "GET",
+      "pathname": "/actions"
+    },
+    {
+      "method": "POST",
+      "pathname": "/actions"
+    },
+    {
+      "method": "GET",
+      "pathname": "/action-result"
+    }
+  ],
+  "limits": {
+    "recordsPerComponentInstanceIncludingErrorOrTruncation": 256,
+    "normalRecordsBeforeReservedTruncation": 255,
+    "bytesPerRecordIncludingNewline": 512,
+    "ASCIIOnly": true,
+    "counterOverflow": "Diagnostic stops and best-effort logger-error; application flow continues",
+    "globalMergedStdoutBound": "Not established by per-component cap; future owned capture needs its separate file bound."
+  },
+  "loggerFailure": "Every helper catches ordinary JS exceptions, attempts one bounded logger-error if space/stdout permit, stops further records. A failed stdout may prevent that error record too; absence cannot pass. Uncatchable engine/host traps are not promised catchable.",
+  "init": {
+    "onlyDeclarationsAndUndefinedLexicalState": true,
+    "noIOOrHelperCallAtInit": true,
+    "stateFirstAllocated": "Selected deployed request after actual Request creation, or its synchronous selected Node handler observation",
+    "entropy": false,
+    "clocks": false
+  },
+  "lanes": {
+    "adapter": {
+      "token": "Separate component-local counter held in handleResources local completionTrace across existing awaits; never current-global",
+      "events": [
+        "adapter-enter",
+        "adapter-read-eof",
+        "output-child-dispose-returned",
+        "outgoing-body-finish-returned",
+        "adapter-catch",
+        "adapter-post-cleanup",
+        "adapter-normal-return-site",
+        "child-handler-promise-fulfilled",
+        "child-handler-promise-rejected"
+      ],
+      "bytes": "readBytes/readChunks count chunks returned by existing reader; not successfully written/peer-received bytes. EOF only when existing part.done branch is taken; a no-body response has no fabricated EOF.",
+      "catchFlags": {
+        "1": "responseSet",
+        "2": "outputFailureObserved",
+        "4": "outputFinished variable; set before original finish call, not proof it returned"
+      },
+      "caught": "typeof or null only; no exception object/name/message serialization or primary-error changes",
+      "postCleanupFlags": {
+        "1": "primarySet; caughtType is typeof/null of primaryValue only when primarySet",
+        "2": "cleanupReturned as computed by original finally"
+      },
+      "normalReturnSiteFlags": {
+        "1": "handledClosed path",
+        "2": "outputFinished variable; not finish-call-return proof",
+        "4": "responseSet"
+      },
+      "normalReturnSite": "Immediately after original primary/fatal guards, with no new return/await. Can be reached on original accepted handled-closed path, not only normal finished-body path; no public Promise-settled or host-quiescence claim.",
+      "childHandlerPromise": {
+        "phase": "handler-await",
+        "flags": 0,
+        "fulfilled": "Emitted after the explicit await of this internal handler.handle call fulfills. Its fulfillment value is returned unchanged and is never serialized.",
+        "rejected": "The original caught reason is rethrown unchanged, including undefined/null/false/0/emptystring. Only typeof/null is logged. The catch covers invocation failure or await rejection and does not by itself prove that a Promise object had been returned. No disposal is performed by this catch.",
+        "sourceLocalAssociation": "A plain holder is allocated per neutral invocation inside its existing preparation/pre-entry catch. handle receives it as a third INTERNAL JavaScript argument, captures it in its runFreshRequest callback closure, and handleResources assigns the actual adapter trace after Request/trace creation. This shares the actual trace object reference, not a correlation of IncomingMessage and Request by equality/order.",
+        "nativeApi": "runFreshRequest retains its original callback/receiver/incoming/outparam arguments. No extra native/WIT parameter, slot, AsyncLocalStorage API or ABI export.",
+        "missingTrace": "No child marker is fabricated if trace assignment was not reached, the route was unselected, or the logger stopped. Absence remains unobserved.",
+        "doesNotObserve": [
+          "completion of the whole neutral callback Promise",
+          "completion of generated export-lowering Promise",
+          "native call/event-loop/post_call completion",
+          "host call_handle task completion",
+          "TCP EOF or browser completion",
+          "native append selection or private resource/Store identity"
+        ]
+      }
+    },
+    "classic": {
+      "token": "Independent component-local counter at synchronous genuine requestHandler wrapper, never assumed equal to adapter token",
+      "events": [
+        "classic-enter",
+        "response-finish",
+        "response-close"
+      ],
+      "handler": "Return requestHandler(req,res) directly, no await. Only public once finish/close observers; no error listener or new HTTP handler/endpoint."
+    }
+  },
+  "correlation": {
+    "sequenceScope": "Component-local emission-attempt sequence only; counters reset from snapshot and can collide/interleave across component instances in one stdout",
+    "tokensGloballyUnique": false,
+    "adapterClassicJoinProved": false,
+    "physicalHandleOrRealmIdentityProved": false,
+    "rule": "Never concatenate equal numeric tokens across instances/lanes or infer identity from method/path/order. Missing/truncated/logger-error/colliding/interleaved-ambiguous traces remain unobserved. Only an unambiguous adapter lane trace can support its own readEOF\u2192dispose-return\u2192finish-return order; no unique outer\u2194inner causal join.",
+    "actualReferenceScope": "Child-handler sites use holder.trace, the same Source-local object reference as the adapter invocation. This is explicit internal JavaScript reference flow, not an inferred numeric join. Raw logs still contain only colliding component-local numbers and cannot authenticate cross-instance physical handles or classic-lane joins."
+  },
+  "interpretation": [
+    "Explicit adapter-catch is evidence of a guest-observed exception at the recorded existing phase. Keep native primary/falsy-error/cancel/disposal semantics unchanged.",
+    "A finish-return marker proves that the imported public OutgoingBody.finish call returned at that site, not a private finish-call count, hostTCP EOF, browser completion or resource retirement.",
+    "Finish-return precedes original finally and final guards. Post-cleanup only proves that original finally reached its end and records primarySet/cleanupReturned; original releaseInput or another uncaught cleanup exception can bypass this marker. Missing is unobserved. Normal-return-site records fallthrough after both unchanged guards, not Promise settlement, export-return observation or host quiescence.",
+    "A complete unambiguous adapter trace plus browser abort locates a public completion disagreement; it does not prove browser-only cause or exclude host transport behavior.",
+    "Public classic finish/close is lane-local. GET/action-result can be an independently handled route and is not identified as a particular POST self-fetch by equality/path/order.",
+    "No normal marker, missing lane or lost log is not proof that native append, fetch EOF or private cleanup failed.",
+    "A child-handler-promise-fulfilled record follows the ONE explicit await of internal handler.handle; it does not observe the enclosing neutral callback or generated/native export settling.",
+    "The new rejection catch logs then rethrows the exact reason; it does not enter the preparation-disposal catch or perform resource disposal. Existing logger ordinary-exception handling remains.",
+    "All inherited and new records use NEXT_GUEST_PROMISE_COMPLETION_V1, avoiding confusion with held response-only generation logs."
+  ],
+  "preserved": {
+    "sixFacadePrefix": true,
+    "existingGenuineHandlerReturnsAndPromises": false,
+    "noNewAwaitOrReaderOrTeeOrFetchWrapper": false,
+    "noErrorListener": true,
+    "noNewRequestHeadersEnvironmentOrTimers": true,
+    "nativeSourceAndWorldUnchanged": true,
+    "engine476bMetadata22fFullReview4185RequirementsPendingInFuturePlan": true,
+    "metadataFixed31Build39Source18": "Future genuine constructor mechanism; no concrete authority here",
+    "actualImportFunctionCount": null,
+    "standardInterfaces": 13,
+    "wasiVersion": "0.2.10",
+    "exactlyOneAdditionalCodeAwait": true,
+    "noNewBodyReaderTeeFetchWrapper": true,
+    "fulfilledValuesAndRejectionReasonsPreserved": true,
+    "promiseObjectIdentityOrReactionScheduleUnchanged": false,
+    "allOriginalAdapterCatchFinallyAndGuardsUntouched": true,
+    "newOptionalHolderOnlyInternalJavaScript": true
+  },
+  "futureHostCaptureRequirement": "Standard Wasmtime42 --no-logging-prefix explicitly selected, or a separately reviewed authenticated prefix-aware parser; default prefix is logging metadata, not Store identity.",
+  "actualEngine": null,
+  "actualNativeMetadata": null,
+  "actualConstructor": null,
+  "actualComponent": null,
+  "actualRuntime": null,
+  "fullNextAcceptance": false,
+  "uniqueCauseProved": false,
+  "entryReplacements": [
+    {
+      "before": "if(state.records<256)guestCompletionWrite(state,{marker:'NEXT_GUEST_RESPONSE_COMPLETION_V1',version:1,",
+      "after": "if(state.records<256)guestCompletionWrite(state,{marker:'NEXT_GUEST_PROMISE_COMPLETION_V1',version:1,"
+    },
+    {
+      "before": "      guestCompletionWrite(state,{marker:'NEXT_GUEST_RESPONSE_COMPLETION_V1',version:1,",
+      "after": "      guestCompletionWrite(state,{marker:'NEXT_GUEST_PROMISE_COMPLETION_V1',version:1,"
+    },
+    {
+      "before": "    guestCompletionWrite(state,{marker:'NEXT_GUEST_RESPONSE_COMPLETION_V1',version:1,",
+      "after": "    guestCompletionWrite(state,{marker:'NEXT_GUEST_PROMISE_COMPLETION_V1',version:1,"
+    },
+    {
+      "before": "  async function handleResources(incoming,outparam){",
+      "after": "  async function handleResources(incoming,outparam,completionHolder){"
+    },
+    {
+      "before": "      completionTrace=guestCompletionBegin('adapter',method,url);\n      guestCompletionRecord(completionTrace,'adapter-enter');",
+      "after": "      completionTrace=guestCompletionBegin('adapter',method,url);\n      if(completionHolder!==undefined)completionHolder.trace=completionTrace;\n      guestCompletionRecord(completionTrace,'adapter-enter');"
+    },
+    {
+      "before": "  return{handle(incoming,outparam){\n    let entered=false;\n    try{return runFreshRequest((...args)=>{entered=true;return handleResources(...args);},undefined,incoming,outparam);",
+      "after": "  return{handle(incoming,outparam,completionHolder){\n    let entered=false;\n    try{return runFreshRequest((...args)=>{entered=true;return handleResources(...args,completionHolder);},undefined,incoming,outparam);"
+    },
+    {
+      "before": "// Pure orchestration, inlined unchanged into each raw guest entry.",
+      "after": "// Neutral orchestration with one explicit child-handler Promise await; no extra resource disposal."
+    },
+    {
+      "before": "          let handler;\n          try {\n            // Both promise allocation",
+      "after": "          let handler,completionHolder;\n          try {\n            // Per-invocation allocation stays inside the original pre-entry disposal catch.\n            completionHolder={trace:undefined};\n            // Both promise allocation"
+    },
+    {
+      "before": "          return handler.handle(incoming,outparam);",
+      "after": "          try {\n            const value=await handler.handle(incoming,outparam,completionHolder);\n            guestCompletionRecord(completionHolder.trace,'child-handler-promise-fulfilled','handler-await');\n            return value;\n          } catch(error) {\n            guestCompletionRecord(completionHolder.trace,'child-handler-promise-rejected','handler-await',0,error,true);\n            throw error;\n          }"
+    }
+  ],
+  "perturbation": "ONE explicit code await is added at the prior return handler.handle boundary for every neutral invocation. It changes Promise reaction/adoption scheduling; child site emissions remain conditional on the selected adapter trace. Per-invocation object allocation and new stdout calls also perturb timing. No fix/reliability, fulfilled whole export, native return or host completion claim.",
+  "readinessOwnership": "Holder allocation remains inside the original readiness/pre-entry catch, before handler ownership. The new await and rejection log are in a separate later try/catch, with no duplicate pre-entry disposal after ownership. Existing handle pre-entry cleanup, adapter catch/finally and final guards are untouched.",
+  "priorActualRuntimeReview": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-guest-completion-runtime-root-results-v1/actual-runtime-review.json",
+    "sha256": "d0085b5cdfb2365d28ccf05b3b8bd24b88ed81397e0225b739796f5a898e477f",
+    "bytes": 70364
+  },
+  "scope": "First two Source cores only; no metadata family/index/constructor/Root binder or execution grant. Held d008 trial and all earlier failed gates remain immutable. This new entry is uncompiled/unconstructed/unexecuted."
+}
