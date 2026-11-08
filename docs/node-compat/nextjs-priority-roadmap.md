@@ -84,7 +84,7 @@ Next actions, in dependency order:
    two-primary-tag mutation contract, all failures and unchanged legacy app code.
 
 The implementation/build checkpoint is committed and pushed through
-`1756de82`; [progress.md](../../progress.md) tracks current work and closed evidence.
+`96304c24`; [progress.md](../../progress.md) tracks current work and closed evidence.
 
 The retained first fresh **Next 16.4.5 / React 19.3.1 App Router application
 passes the selected experimental Wasmtime smoke contract**:

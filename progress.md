@@ -29,6 +29,9 @@ negotiation/absent response Content-Encoding pass on both arms, while native
 retains the same cache and strict browser failures and prepared Node passes.
 Coordinated DATA review8151dc47 passes that outcome review; the next discriminator is deployed guest
 response-completion markers rather than another compression workaround.
+A fresh marker component now passes INIT construction/data reviewee7511ac with
+the same13 standard imports and no INIT marker output. Bounded deployed capture
+is still being implemented; no completion trace has run.
 
 Current next steps and outstanding work:
 
@@ -338,7 +341,8 @@ All52/80/24/stream5/functional2 groups pass in both samples. Coordinated DATA
 review8151dc47 binds independent browser/NetLog/owner review27751124.
 Its90-file/5,625,171-byte raw corpus is closed (manifeste9dba92c); portable
 checker1a4f1ae6 passes a Git-style copy and Rootf7d17f current copy without
-original-path/JS/actor/network execution. Context-wide negotiation changes assets and
+original-path/JS/actor/network execution. This checkpoint is committed and pushed
+to origin/main in96304c24. Context-wide negotiation changes assets and
 timing too; no unique cause or inner-fetch/append/EOF proof follows. See the
 [identity diagnostic](tests/node-compat/frameworks/nextjs/next-browser-identity-root-results-v1/README.md).
 The next Source-only diagnostic is bounded deployed guest completion markers at
@@ -347,6 +351,36 @@ new host capability or INIT I/O; native Source remains unchanged. Correlation
 between separate request objects must stay explicit/qualified, and no error
 listener may mask an otherwise unhandled EventEmitter error. No trace component
 or runtime result exists yet.
+The first guest entry/marker-contract cores now pass Root/C Source review
+(bf44a61c/f2fbb92f). Twelve explicit edits reconstruct the exact1e49 parent;
+the helper has no INIT I/O and adds no await/body reader/error listener/native
+change. GET/POST/actions and GET/action-result are the selected existing routes.
+Markers distinguish read EOF, disposal/finish return, post-finally cleanup and
+the original normal-return site. These are local observations, not Promise,
+transport or resource completion. Metadata/constructor templates are being
+prepared; no trace component or runtime has executed.
+That preparation now has held entry Source8043008f and constructor Source5ffcf4d1
+after whole Source and ordered binding/closure review. Rootfb2dc1 independently
+verifies only the three typed Root pins changed. Preparationd130a8 issues
+authority6de134d3 with current31/39/18 roles; Rootde31fc/original69034/2400 then
+terminates0/clean (749568), all three inner commands0. Result3c5fa94b records
+componentc6ae13b9/37,253,260 bytes and audit01607fe7. INIT stdout is one858-byte
+capture record with no logger markers and empty stderr. Independent typed/package
+review observes131 actual import tuples/134 graph IDs and the same13 standard
+interfaces; coordinated INIT DATA review `ee7511ac` binds owner/world review `ed6c19e0`
+and passes the declared INIT scope. No deployed trace
+or runtime acceptance follows. The separate parent stdout-capture audit finds
+the old direct-FD/readiness-size check is not a lifetime bound: the next runtime
+controller needs a bounded prewrite pipe, explicit incomplete-prefix failure on
+overflow, pipe-EOF/write/sync/close settlement and complete-line readiness checks.
+The new INIT corpus closes97 files/639,455 bytes (manifest018f814a); its portable
+checker2f8f3694 passes Git-style modes and Root0e1eed current copy, preserving
+typed-return/owner/options/WIT/marker-absence evidence without original paths,
+JavaScript, Node, guards or Wasm execution. Omitted package/binary/native payloads
+are not reproduced by replay.
+The [capture plan](docs/node-compat/nextjs-guest-completion-capture-plan.md)
+records actual files/symbols and the proposed boundary; controller Source is now
+being authored against the accepted new constructor roles. No deployment has run.
 Commit4ffa8659 is pushed to origin/main; live
 build logs and the unfinished runtime controller were excluded from that cut.
 GeneratorV5 runs all ten checks successfully under original4023/900, result795dab0e;
