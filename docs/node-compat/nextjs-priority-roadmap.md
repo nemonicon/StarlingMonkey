@@ -1,7 +1,33 @@
 # Next.js execution priority
 
-Updated 2026-11-08. The latest fixed observer-v3 application comparison
-finishes once per arm with **both full suites failed**. Wasm and Node22 pass
+Updated 2026-11-08. The latest comprehensive current-build comparison finishes
+with **Node passed and Wasm failed solely on legacy generation1→1**. Both pass
+24HTTP,52 portable-cache checks,80 supplemental checks, five incremental chunks
+and two strict browser tests. Original7204/600 is raw1/clean; Node7523/300 is
+raw0/clean with generation1→2. Inputs are preserved and full collection completes.
+Independent JSON crosscheck`7f416299` recomputes every final term. Primary
+DATA review`303ca42f` verifies632 retained payloads/13,614,165 bytes and complete
+native capture, with the same13 standard WASI0.2.10 imports. No original assertion is waived and
+full Next acceptance remains false. Next audit the real Next persistence
+integration separately from arbitrary module-global lifetime, and retain the
+unresolved earlier abort samples.
+
+The [Source-backed next-step audit](../../tests/node-compat/frameworks/nextjs/next-current-full-root-results-v1/next-steps.md)
+locates the legacy callback's module-local `++misses`. A fresh recomputation
+can return1, so the legacy value alone does not establish a failed invalidation
+path. The separate real Next/selected-handler nonce profile already distinguishes
+hits and invalidation through52 checks. Next add a separately versioned,
+bounded FS-backed callback-generation scenario using the existing declared
+route/tag and standard cache preopen. Keep the old app and assertion intact;
+review the handler allowlist before choosing keys. Start sequentially, with
+explicit corrupt/over-limit/publication failures and a later cold-host boundary.
+Concurrent increments, CAS, arbitrary closures and durability remain unclaimed.
+If the real `nodeFs.writeFileAtomic` helper is selected, first exercise its
+create-new/EEXIST/no-replacement/temp-cleanup paths in a real component.
+Same-instance ALS interleaving and resource retirement remain separate gates.
+
+The earlier fixed observer-v3 application comparison
+finished once per arm with **both full suites failed**. Wasm and Node22 pass
 24HTTP,52 portable-cache checks,80 supplemental checks, five streaming chunks
 and two functional browser interactions. Both fail strict POST7 capture with
 `net::ERR_ABORTED`; Wasm additionally retains legacy generation1→1, while Node

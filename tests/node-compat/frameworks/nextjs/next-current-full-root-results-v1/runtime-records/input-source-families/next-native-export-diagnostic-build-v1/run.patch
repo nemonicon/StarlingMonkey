@@ -1,0 +1,38 @@
+--- Builder8/run.py
++++ diagnostic/run.py
+@@ -124,8 +124,8 @@
+  assert a['buildAllowed']is True and a['configureAllowed']is True and a['coherentPatchedIntlLibraryAndHeaders']is True
+  for key in ['engineOrGuestExecutionAllowed','freezeAllowed','networkAllowed','rustupAllowed']:assert a[key]is False
+  for key in ['entry','plan','callerIndex','composition','installedGeneratorResult','intlLockfile','offlineCargoConfig','intlCargoAudit','spidermonkeyEvidence','savedFramePatchIndex','portableSelection','portableCargoSelection','wrapperPython','generatorNode','installedGeneratorCallerIndex','installedGeneratorRootAuthority']:assert isinstance(a[key],dict),key
+- spec=read(a['plan']);assert a['wrapperPython']==spec['wrapperPython'] and descriptor(Path(sys.executable).resolve())==spec['wrapperPython'],'pinned wrapperPython3.11 required'
+- w=Path(a['workRoot']);assert w.is_absolute()and'..'not in w.parts and str(w).startswith('/private/tmp/starling-node-compat/next-native-intl-build-')
++ spec=read(a['plan']);assert spec['prospectiveSourceBindingsPending']is False,'unbound diagnostic build Source';assert a['wrapperPython']==spec['wrapperPython'] and descriptor(Path(sys.executable).resolve())==spec['wrapperPython'],'pinned wrapperPython3.11 required'
++ w=Path(a['workRoot']);assert w.is_absolute()and'..'not in w.parts and str(w).startswith('/private/tmp/starling-node-compat/next-native-export-diagnostic-build-v1-')
+  for parent in w.parents:assert not parent.is_symlink(),parent
+  return w
+ 
+@@ -153,6 +153,7 @@
+ 
+ def effective_plan(a):
+  spec=read(a['plan']);assert a['plan']==descriptor(HERE/'plan.json')and spec['actionsAllowed']is False
++ assert spec['prospectiveSourceBindingsPending']is False and spec['cmakeAdditions']['NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1']=='ON'
+  p=read(spec['basePlan']);p['hostTools']=[x for x in p['hostTools']if x['name']not in ['rustup','cargo','rustc']]
+  p.update(disk=spec['disk'],timeouts=spec['timeouts'],cmakeFlags={**p['cmakeFlags'],**spec['cmakeAdditions']})
+  p['cargo']=a['cargo'];p['rustc']=a['rustc'];p['wrapperPython']=spec['wrapperPython'];assert a['wrapperPython']==spec['wrapperPython'] and descriptor(Path(sys.executable).resolve())==spec['wrapperPython'];module,selection=portable_admission(a,spec)
+@@ -326,9 +327,16 @@
+     assert artifact.read_bytes()[:8]==b'\x00asm\x01\x00\x00\x00';assert len(compile_rows)==80 and len({r['file']for r in compile_rows})==80
+     ninja_text=checked(result['wholeNinjaCommands']).read_text();embedding_rows=[line for line in ninja_text.splitlines()if ' -c '+str(work/'componentize-source/embedding/embedding.cpp')in line];assert len(embedding_rows)==1
+     assert all(observed.get(k,{}).get('value')==v for k,v in flags.items())
++    diagnostic_macro='NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1'
++    diagnostic_definition='-D'+diagnostic_macro+'=1'
++    assert flags[diagnostic_macro]=='ON' and observed[diagnostic_macro]==dict(type='BOOL',value='ON')
++    embedding_argv=shlex.split(embedding_rows[0]);assert [token for token in embedding_argv if diagnostic_macro in token]==[diagnostic_definition]
++    assert not any(diagnostic_macro in token for row in compile_rows for token in (row['arguments']if 'arguments'in row else shlex.split(row['command'])))
++    result['nativeExportDiagnosticCompileEvidence']=dict(option=diagnostic_macro,requested='ON',observed=observed[diagnostic_macro],embeddingDefinition=diagnostic_definition,embeddingDefinitionOccurrences=1,separateEmbeddingCommands=len(embedding_rows),nativeCompileRows=len(compile_rows),nativeRowsWithDiagnosticDefinition=0,compiledSourceAfterimagesAuthenticated=True)
+     assert observed['Rust_TOOLCHAIN_IS_RUSTUP_MANAGED']['value']not in ['TRUE','ON','1']if 'Rust_TOOLCHAIN_IS_RUSTUP_MANAGED'in observed else True
+     assert read(descriptor(work/'configured-inputs.json'))==result['sourceAfter'];validate_configured(work,a,spec)
+    metadata=dict(schemaVersion=1,metadataKind='EXPERIMENTAL_NEXT_INTL_NATIVE_BUILD_ACTUAL_V1',sourceComposition=a['composition'],sourceRoot=str(source),compiledSourceRoot=str(work/'native-source'),compiledAfterInputs=result['sourceAfter'],compilerTools=p['hostTools'],actualRustTools=dict(cargo=a['cargo'],rustc=a['rustc']),nativePolicyInputCount=len(composition['files']),nativePolicyInputManifest=composition['files'],buildSupportInputCount=len(support),buildSupportInputManifest=support,embeddingInputCount=len(embedding),embeddingInputManifest=embedding,selectedModuleManifests=selection,requestedCMake=flags if 'flags'in locals()else None,observedCMake=observed,compileDatabase=result['compileDatabase'],actualCompileRows=compile_rows,wholeNinjaCommands=result.get('wholeNinjaCommands'),actualSeparateEmbeddingCompileRows=embedding_rows if 'embedding_rows'in locals()else None,actualLibrary=a['smLibrary'],actualSavedFrameHeader=a['smSavedFrameHeader'],actualConfigHeader=a['smConfigHeader'],actualConfdefs=a['smConfdefsHeader'],patchedSpiderMonkeyEvidence=a['spidermonkeyEvidence'],savedFramePatchIndex=a['savedFramePatchIndex'],actualAggregateLock=a['intlLockfile'],actualRustConfiguration=result.get('configuredRust'),offlineCargoConfig=a['offlineCargoConfig'],validatedCargoAudit=a['intlCargoAudit'],portableCargoSelection=a['portableCargoSelection'],portableCargoAdmission=cargo_before,wrapperPython=a['wrapperPython'],buildToolPython=next(r['executable']for r in p['hostTools']if r['name']=='python3'),portableBuildAdmissionVersion=3,logicalCargoAuditDescriptorFromVerifiedCapsule=True,validatedCargoProofCapsule=spec['portableCargoPolicy']['metadataArchive'],validatedCargoProofIndex=spec['portableCargoPolicy']['metadataArchiveIndex'],toolTreeInputs=trees,initialTreeProtection=descriptor(work/'protection-before.json'),originalExtractionWholeTreeAttestationClaimed=False,linkAndRustInputs=result['linkInputs'],engine=result.get('engineCandidate'),phases=result['phases'],recipe=a['entry'],rootAuthority=descriptor(work/'root-authority.json'),old83MetadataProjected=False,engineExecuted=False,guestExecuted=False,adoption=False)
++   metadata['nativeExportDiagnosticCompileEvidence']=result.get('nativeExportDiagnosticCompileEvidence')
+    save(work/'metadata.json',metadata);result['metadata']=descriptor(work/'metadata.json')
+   except BaseException as error:result['postCollectionErrors'].append(dict(type=type(error).__name__,message=str(error),stack=traceback.format_exc()))
+   errors=[]

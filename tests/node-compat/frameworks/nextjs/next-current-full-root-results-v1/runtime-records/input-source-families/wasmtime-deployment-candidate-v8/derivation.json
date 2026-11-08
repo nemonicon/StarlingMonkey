@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "sourceOnly": true,
+  "parentIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v7/index.json",
+    "sha256": "bd7856486ae75aeb3c44b12670cc54dc22c958f285faf96e3b6ba55f3917caf2",
+    "bytes": 3720
+  },
+  "unchangedActors": {
+    "deploy.mjs": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v8/deploy.mjs",
+      "sha256": "8b5433452ad4ac0d37fc85d19146c1cbd8b177f2d047725d03e08abde9a17843",
+      "bytes": 20905
+    },
+    "run-owned.py": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v8/run-owned.py",
+      "sha256": "246ebcea64c366f8c06ec4f20b2a501ddb28cda75c1679aab300ca977e58a208",
+      "bytes": 4267
+    },
+    "app-policy.mjs": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v8/app-policy.mjs",
+      "sha256": "d835be43d9e048785a7cbc5bffbacced646f1ac52847079d7fc9798822f585dc",
+      "bytes": 2759
+    }
+  },
+  "clientInsertions": [
+    {
+      "before": "import {fileURLToPath} from 'node:url';\n",
+      "after": "import {fileURLToPath} from 'node:url';\nimport {collectSupplemental,validateSupplemental} from './supplemental.mjs';\n"
+    },
+    {
+      "before": "try {\n  const contract =",
+      "after": "try {\n  result.supplemental=await collectSupplemental({origin:result.origin,output:join(root,'supplemental')});\n  await save(); // Whole six-case raw capture precedes semantic comparison.\n  result.supplementalValidation=validateSupplemental(result.supplemental);\n  await save();\n  const contract ="
+    },
+    {
+      "before": " result.passed=result.http.length===24&&result.http.every(x=>x.passed)&&result.cacheInvalidation?.passed===true&&result.streaming?.complete===true&&result.streaming?.incrementalDeliveryObserved===true&&result.browserExit?.code===0&&result.browser?.passed===true&&result.errors.length===0&&result.transportErrors.length===0;\n",
+      "after": " result.passed=result.http.length===24&&result.http.every(x=>x.passed)&&result.cacheInvalidation?.passed===true&&result.streaming?.complete===true&&result.streaming?.incrementalDeliveryObserved===true&&result.browserExit?.code===0&&result.browser?.passed===true&&result.errors.length===0&&result.transportErrors.length===0;\n result.originalContractPassed=result.passed;\n result.passed=result.originalContractPassed&&result.supplementalValidation?.passed===true;\n"
+    }
+  ],
+  "originalAssertionsTextUnchanged": true,
+  "componentOrAppOrEngineChanged": false,
+  "actualRootAuthority": null,
+  "actualRuntime": null
+}

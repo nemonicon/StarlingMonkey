@@ -4,6 +4,21 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
+Latest comprehensive current-build comparison: **Node passes; Wasm fails only
+the retained legacy generation assertion**. Both pass24HTTP,52 portable-cache
+checks,80 supplemental checks, five incremental stream chunks and both strict
+browser tests. Wasm records1→1; Node records1→2. Native7204/600 finishes raw1/clean,
+Node7523/300 raw0/clean, with protected inputs and complete collection on both.
+No test is waived. Independent six-file JSON gate crosscheck`7f416299` confirms
+the unchanged conjunctions and this sole false term. Primary DATA review`303ca42f`
+verifies both complete collections and632 retained payloads/13,614,165 bytes.
+Native stdout is complete at28,746 bytes/111 chunks; the13 standard WASI0.2.10
+imports remain unchanged. This is a positive current browser sample; previous
+browser aborts remain unresolved, and full Next acceptance remains false.
+The staged Git blob check verifies all632 raw payloads/13,614,165 bytes against
+their original SHA-256 descriptors, preserving the failed native result and
+passed Node result for future comparisons.
+
 Current-build redirect comparison: **all three browser-only profiles pass**:
 pristine Node891/600, real Wasm3802/600 and bridge Node4007/300, each raw0/clean.
 The fixed matched pair ran once per arm after pushed checkpoint`18771094`,
@@ -32,7 +47,14 @@ preparation defect, not a runtime failure or retry.
 Independent corrected-binding DATA review`ac08a62d` passes all2,025 current
 descriptors, exact Source inverses, separate client/browser family joins and the
 complete13-file held archive. Git blob verification preserves that archive's
-1,809,307 bytes exactly. The fixed comprehensive pair is ready for execution.
+1,809,307 bytes exactly. After pushed checkpoint`02b98ac7`, the fixed pair runs
+once per arm: native7204/600 (`fba975`/session94291→`48ae9c`) raw1/clean, then
+Node7523/300 (`9d608d`/session89262→`f120b9`) raw0/clean. Both execute the whole
+original client; only native legacy generation fails. Primary DATA review
+`303ca42f` verifies both complete collections, the retained native semantic
+assertion and632 raw payloads/13,614,165 bytes. Runtime/full Next acceptance stays
+false. The held first preparation and its corrected dependency closure are
+retained alongside the actual results.
 
 Latest redirect control: **pristine standalone Node passes both current strict
 browser tests**, including the redirecting Server Action. Original owner891/600
@@ -48,7 +70,7 @@ exact app and browser-only worker before selecting a runtime fix. The volume
 now has approximately42GiB free; launch/build capacity is no longer the current
 blocker. Original full failures and production acceptance remain unchanged.
 
-Latest completed control: the corrected **non-redirecting real Server Action
+Earlier completed control: the corrected **non-redirecting real Server Action
 passes on both Wasm and matched Node22**, raw0/clean, under unchanged strict
 observer/deadline/error predicates. Both render the returned value, capture all
 five pinned scripts and identical complete89-byte POST200 bodies with fulfilled
@@ -56,7 +78,7 @@ sizes/response.finished and no browser errors. Runtime DATA review`484af70a`
 verifies this bounded result. The original full redirect/counter gates below
 remain failed. See [control results](docs/node-compat/nextjs-nonredirect-action-control.md).
 
-Latest application result: the fixed **observer-v3 Wasm → Node22 comparison
+Earlier full application result: the fixed **observer-v3 Wasm → Node22 comparison
 completes with both full suites failed**, without retries. Both pass24HTTP,
 52 portable-cache checks,80 supplemental checks, five incremental chunks and
 two functional browser interactions. Both fail strict POST7 capture with
@@ -162,9 +184,16 @@ is underway; no new engine/component or host changes are planned.
 
 Outstanding critical work:
 
-- Run the comprehensive HTTP/cache/supplemental/stream comparison using the exact
-  current app and strict browser worker now passing in all three browser-only
-  profiles. The [Source-backed
+- Define and test the Next persistence integration separately from arbitrary
+  cross-request JavaScript-global continuity. The comprehensive current build
+  passes every gate except that retained native legacy assertion. Keep original
+  failures and current positive samples distinct. The [current Source audit](tests/node-compat/frameworks/nextjs/next-current-full-root-results-v1/next-steps.md)
+  identifies the callback's module-local `++misses` and the separate passing
+  nonce/invalidation profile. Next is a separately versioned bounded FS-backed
+  callback-state gate using the declared route/tag and explicit standard cache
+  preopen; no global continuity, concurrent increment, CAS or durability claim.
+  Real `nodeFs.writeFileAtomic` branches need a small component test if selected.
+  The [Source-backed
   next-step audit](tests/node-compat/frameworks/nextjs/next-nonredirect-action-root-results-v2/next-steps.md)
   locates the existing bare-Node launcher and its earlier strict pass, while
   preserving the current app/worker/asset gap. The bounded

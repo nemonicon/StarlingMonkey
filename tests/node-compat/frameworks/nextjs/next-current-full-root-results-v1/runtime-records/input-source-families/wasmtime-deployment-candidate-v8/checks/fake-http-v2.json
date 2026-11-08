@@ -1,0 +1,1744 @@
+{
+  "fakeServerOnly": true,
+  "realNextOrGuestExecuted": false,
+  "results": [
+    {
+      "mode": "positive",
+      "raw": {
+        "schemaVersion": 1,
+        "suite": "NEXT_CONCURRENT_CONTEXT_BODY_RECOVERY_V1",
+        "origin": "http://127.0.0.1:56170",
+        "output": "/private/tmp/next-v8-fake-http-Cmhvyi/positive",
+        "clock": "One client process.hrtime.bigint relative nanoseconds; ordering only",
+        "clientOverlapOnly": true,
+        "sameStoreOrNativeResourceIdentityClaimed": false,
+        "guestReadOrPacketChunkBoundariesClaimed": false,
+        "perRequestTimeoutMs": 20000,
+        "observations": [
+          {
+            "id": "context-alpha",
+            "phase": "concurrent",
+            "request": {
+              "method": "GET",
+              "path": "/api/context",
+              "headers": {
+                "cookie": "fixture_token=parallel-alpha",
+                "x-fixture-probe": "probe-alpha"
+              }
+            },
+            "startedNs": "1463250",
+            "headersNs": "27237333",
+            "terminalNs": "29882875",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "74",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "set-cookie": "fixture_reply=set; Path=/; HttpOnly; SameSite=lax",
+              "x-fixture-response": "context-ok"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/positive/context-alpha.body",
+              "sha256": "32062f2be9c7ab5c887b9c3e0cbf1b7dd89bcd44aa42f6019ca479e6ed1ffc99",
+              "bytes": 74
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1hbHBoYSIsImhlYWRlciI6InByb2JlLWFscGhhIn0=",
+            "responseChunks": [
+              {
+                "bytes": 74,
+                "sha256": "32062f2be9c7ab5c887b9c3e0cbf1b7dd89bcd44aa42f6019ca479e6ed1ffc99",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1hbHBoYSIsImhlYWRlciI6InByb2JlLWFscGhhIn0=",
+                "arrivedNs": "27389542"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "context-beta",
+            "phase": "concurrent",
+            "request": {
+              "method": "GET",
+              "path": "/api/context",
+              "headers": {
+                "cookie": "fixture_token=parallel-beta",
+                "x-fixture-probe": "probe-beta"
+              }
+            },
+            "startedNs": "5112500",
+            "headersNs": "29101708",
+            "terminalNs": "30591208",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "72",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "set-cookie": "fixture_reply=set; Path=/; HttpOnly; SameSite=lax",
+              "x-fixture-response": "context-ok"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/positive/context-beta.body",
+              "sha256": "ac832c2da2c6eb64e8550fd664acf12a0acd62c253b0a75a8c48db21d02a92d1",
+              "bytes": 72
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1iZXRhIiwiaGVhZGVyIjoicHJvYmUtYmV0YSJ9",
+            "responseChunks": [
+              {
+                "bytes": 72,
+                "sha256": "ac832c2da2c6eb64e8550fd664acf12a0acd62c253b0a75a8c48db21d02a92d1",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1iZXRhIiwiaGVhZGVyIjoicHJvYmUtYmV0YSJ9",
+                "arrivedNs": "29190958"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "malformed-json",
+            "phase": "concurrent",
+            "request": {
+              "method": "POST",
+              "path": "/api/json",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "bytes": 15,
+                "sha256": "3d5628e6b626e4c4e876501f916ea032cb1d8732dc079c72011b9abffbb25cc6",
+                "base64": "e2JhZC1jb25jdXJyZW50"
+              }
+            },
+            "startedNs": "6144292",
+            "headersNs": "30358417",
+            "terminalNs": "30677208",
+            "status": 400,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "32",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/positive/malformed-json.body",
+              "sha256": "f9d061f41ec283a146a78bb542a7c27468308123de4350b84ecd6177cc225f19",
+              "bytes": 32
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0pTT05fQkFEX0lOUFVUIn0=",
+            "responseChunks": [
+              {
+                "bytes": 32,
+                "sha256": "f9d061f41ec283a146a78bb542a7c27468308123de4350b84ecd6177cc225f19",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0pTT05fQkFEX0lOUFVUIn0=",
+                "arrivedNs": "30408792"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "chunked-unicode-json",
+            "phase": "concurrent",
+            "request": {
+              "method": "POST",
+              "path": "/api/json",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "kind": "controlled-two-chunk-ReadableStream",
+                "bytes": 37,
+                "sha256": "b688add07b3e56bfa2311645c8d239333c71a4bbdf12d56ee9da5f0328d4b3b0",
+                "base64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4oKsLfCfmIAtY2Fmw6kifQ=="
+              }
+            },
+            "startedNs": "5534417",
+            "headersNs": "31893125",
+            "terminalNs": "32206667",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "transfer-encoding": "chunked"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/positive/chunked-unicode-json.body",
+              "sha256": "0e86dacfdaa318e56eb57fc9cec6140e661da92235419301844a3b1d1e5eddc6",
+              "bytes": 63
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoiY29uY3VycmVudC3igqwt8J+YgC1jYWbDqSJ9",
+            "responseChunks": [
+              {
+                "bytes": 63,
+                "sha256": "0e86dacfdaa318e56eb57fc9cec6140e661da92235419301844a3b1d1e5eddc6",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoiY29uY3VycmVudC3igqwt8J+YgC1jYWbDqSJ9",
+                "arrivedNs": "32012125"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "empty-context-recovery",
+            "phase": "recovery",
+            "request": {
+              "method": "GET",
+              "path": "/api/context",
+              "headers": {}
+            },
+            "startedNs": "32456667",
+            "headersNs": "34757958",
+            "terminalNs": "35639958",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "53",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "set-cookie": "fixture_reply=set; Path=/; HttpOnly; SameSite=lax",
+              "x-fixture-response": "context-ok"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/positive/empty-context-recovery.body",
+              "sha256": "cc1090d59c1d01dbde09808230ca598dcc5c05b6d4d3da4905a8a768404cfc41",
+              "bytes": 53
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOm51bGwsImhlYWRlciI6bnVsbH0=",
+            "responseChunks": [
+              {
+                "bytes": 53,
+                "sha256": "cc1090d59c1d01dbde09808230ca598dcc5c05b6d4d3da4905a8a768404cfc41",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOm51bGwsImhlYWRlciI6bnVsbH0=",
+                "arrivedNs": "34804708"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "json-recovery",
+            "phase": "recovery",
+            "request": {
+              "method": "POST",
+              "path": "/api/json",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "bytes": 29,
+                "sha256": "4d95fedcdd9601b1929da35c379e921d7842b8a4e1e8310ea54a8c18ecd1b2e9",
+                "base64": "eyJ2YWx1ZSI6InJlY292ZXJlZC3nlYwt4pyFIn0="
+              }
+            },
+            "startedNs": "32893167",
+            "headersNs": "35382375",
+            "terminalNs": "35740167",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "55",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/positive/json-recovery.body",
+              "sha256": "ed2630529bcfda8bd7cf6600c27ef402baf93dc4728d4d2787f8c296d7fa857b",
+              "bytes": 55
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoicmVjb3ZlcmVkLeeVjC3inIUifQ==",
+            "responseChunks": [
+              {
+                "bytes": 55,
+                "sha256": "ed2630529bcfda8bd7cf6600c27ef402baf93dc4728d4d2787f8c296d7fa857b",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoicmVjb3ZlcmVkLeeVjC3inIUifQ==",
+                "arrivedNs": "35410458"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          }
+        ],
+        "completionOrder": [
+          "context-alpha",
+          "context-beta",
+          "malformed-json",
+          "chunked-unicode-json",
+          "empty-context-recovery",
+          "json-recovery"
+        ],
+        "uploadEvents": [
+          {
+            "event": "head-enqueued",
+            "ns": "1364542"
+          },
+          {
+            "event": "tail-release-requested",
+            "ns": "30824583"
+          },
+          {
+            "event": "tail-release-observed",
+            "ns": "30846917"
+          },
+          {
+            "event": "tail-enqueued",
+            "ns": "30857125"
+          }
+        ],
+        "phaseOneTerminalNs": "32451917",
+        "chunkedRequest": {
+          "body": {
+            "bytes": 37,
+            "sha256": "b688add07b3e56bfa2311645c8d239333c71a4bbdf12d56ee9da5f0328d4b3b0",
+            "base64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4oKsLfCfmIAtY2Fmw6kifQ=="
+          },
+          "chunks": [
+            {
+              "bytes": 22,
+              "sha256": "9586b5d91d9b4f5378041c7e72b51c5b3054625aa884be94e4ce949a54156eb9",
+              "base64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4g=="
+            },
+            {
+              "bytes": 15,
+              "sha256": "cabb7bbc47326be137a48422771b2fd75dcbc6a9756f02b8acbda1c2376744ca",
+              "base64": "gqwt8J+YgC1jYWbDqSJ9"
+            }
+          ],
+          "splitInsideUtf8Sequence": true,
+          "clientEnqueueBoundariesOnly": true
+        },
+        "completedNs": "35861875"
+      },
+      "validation": {
+        "schemaVersion": 1,
+        "passed": true,
+        "checks": 80,
+        "failures": [],
+        "clientOverlapOnly": true,
+        "sameStoreOrNativeResourceIdentityClaimed": false
+      },
+      "received": [
+        {
+          "method": "GET",
+          "path": "/api/context",
+          "headers": {
+            "host": "127.0.0.1:56170",
+            "connection": "keep-alive",
+            "cookie": "fixture_token=parallel-alpha",
+            "x-fixture-probe": "probe-alpha",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate"
+          },
+          "bodyBase64": ""
+        },
+        {
+          "method": "GET",
+          "path": "/api/context",
+          "headers": {
+            "host": "127.0.0.1:56170",
+            "connection": "keep-alive",
+            "cookie": "fixture_token=parallel-beta",
+            "x-fixture-probe": "probe-beta",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate"
+          },
+          "bodyBase64": ""
+        },
+        {
+          "method": "POST",
+          "path": "/api/json",
+          "headers": {
+            "host": "127.0.0.1:56170",
+            "connection": "keep-alive",
+            "content-type": "application/json",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate",
+            "content-length": "15"
+          },
+          "bodyBase64": "e2JhZC1jb25jdXJyZW50"
+        },
+        {
+          "method": "POST",
+          "path": "/api/json",
+          "headers": {
+            "host": "127.0.0.1:56170",
+            "connection": "keep-alive",
+            "content-type": "application/json",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate",
+            "transfer-encoding": "chunked"
+          },
+          "bodyBase64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4oKsLfCfmIAtY2Fmw6kifQ=="
+        },
+        {
+          "method": "GET",
+          "path": "/api/context",
+          "headers": {
+            "host": "127.0.0.1:56170",
+            "connection": "keep-alive",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate"
+          },
+          "bodyBase64": ""
+        },
+        {
+          "method": "POST",
+          "path": "/api/json",
+          "headers": {
+            "host": "127.0.0.1:56170",
+            "connection": "keep-alive",
+            "content-type": "application/json",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate",
+            "content-length": "29"
+          },
+          "bodyBase64": "eyJ2YWx1ZSI6InJlY292ZXJlZC3nlYwt4pyFIn0="
+        }
+      ],
+      "fakeServerOnly": true,
+      "realNextOrGuestExecuted": false
+    },
+    {
+      "mode": "crossed-context",
+      "raw": {
+        "schemaVersion": 1,
+        "suite": "NEXT_CONCURRENT_CONTEXT_BODY_RECOVERY_V1",
+        "origin": "http://127.0.0.1:56177",
+        "output": "/private/tmp/next-v8-fake-http-Cmhvyi/crossed-context",
+        "clock": "One client process.hrtime.bigint relative nanoseconds; ordering only",
+        "clientOverlapOnly": true,
+        "sameStoreOrNativeResourceIdentityClaimed": false,
+        "guestReadOrPacketChunkBoundariesClaimed": false,
+        "perRequestTimeoutMs": 20000,
+        "observations": [
+          {
+            "id": "context-alpha",
+            "phase": "concurrent",
+            "request": {
+              "method": "GET",
+              "path": "/api/context",
+              "headers": {
+                "cookie": "fixture_token=parallel-alpha",
+                "x-fixture-probe": "probe-alpha"
+              }
+            },
+            "startedNs": "118792",
+            "headersNs": "3838750",
+            "terminalNs": "5464292",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "73",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "set-cookie": "fixture_reply=set; Path=/; HttpOnly; SameSite=lax",
+              "x-fixture-response": "context-ok"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/crossed-context/context-alpha.body",
+              "sha256": "cb45aff2faf1739086e5d7897e6cc78847d473221565f7abc1189a6518f2babc",
+              "bytes": 73
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1iZXRhIiwiaGVhZGVyIjoicHJvYmUtYWxwaGEifQ==",
+            "responseChunks": [
+              {
+                "bytes": 73,
+                "sha256": "cb45aff2faf1739086e5d7897e6cc78847d473221565f7abc1189a6518f2babc",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1iZXRhIiwiaGVhZGVyIjoicHJvYmUtYWxwaGEifQ==",
+                "arrivedNs": "3881125"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "context-beta",
+            "phase": "concurrent",
+            "request": {
+              "method": "GET",
+              "path": "/api/context",
+              "headers": {
+                "cookie": "fixture_token=parallel-beta",
+                "x-fixture-probe": "probe-beta"
+              }
+            },
+            "startedNs": "629875",
+            "headersNs": "4541709",
+            "terminalNs": "6494167",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "72",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "set-cookie": "fixture_reply=set; Path=/; HttpOnly; SameSite=lax",
+              "x-fixture-response": "context-ok"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/crossed-context/context-beta.body",
+              "sha256": "ac832c2da2c6eb64e8550fd664acf12a0acd62c253b0a75a8c48db21d02a92d1",
+              "bytes": 72
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1iZXRhIiwiaGVhZGVyIjoicHJvYmUtYmV0YSJ9",
+            "responseChunks": [
+              {
+                "bytes": 72,
+                "sha256": "ac832c2da2c6eb64e8550fd664acf12a0acd62c253b0a75a8c48db21d02a92d1",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1iZXRhIiwiaGVhZGVyIjoicHJvYmUtYmV0YSJ9",
+                "arrivedNs": "4567209"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "malformed-json",
+            "phase": "concurrent",
+            "request": {
+              "method": "POST",
+              "path": "/api/json",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "bytes": 15,
+                "sha256": "3d5628e6b626e4c4e876501f916ea032cb1d8732dc079c72011b9abffbb25cc6",
+                "base64": "e2JhZC1jb25jdXJyZW50"
+              }
+            },
+            "startedNs": "1564292",
+            "headersNs": "6153000",
+            "terminalNs": "6591667",
+            "status": 400,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "32",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/crossed-context/malformed-json.body",
+              "sha256": "f9d061f41ec283a146a78bb542a7c27468308123de4350b84ecd6177cc225f19",
+              "bytes": 32
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0pTT05fQkFEX0lOUFVUIn0=",
+            "responseChunks": [
+              {
+                "bytes": 32,
+                "sha256": "f9d061f41ec283a146a78bb542a7c27468308123de4350b84ecd6177cc225f19",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0pTT05fQkFEX0lOUFVUIn0=",
+                "arrivedNs": "6188417"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "chunked-unicode-json",
+            "phase": "concurrent",
+            "request": {
+              "method": "POST",
+              "path": "/api/json",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "kind": "controlled-two-chunk-ReadableStream",
+                "bytes": 37,
+                "sha256": "b688add07b3e56bfa2311645c8d239333c71a4bbdf12d56ee9da5f0328d4b3b0",
+                "base64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4oKsLfCfmIAtY2Fmw6kifQ=="
+              }
+            },
+            "startedNs": "863667",
+            "headersNs": "7554292",
+            "terminalNs": "7823959",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "transfer-encoding": "chunked"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/crossed-context/chunked-unicode-json.body",
+              "sha256": "0e86dacfdaa318e56eb57fc9cec6140e661da92235419301844a3b1d1e5eddc6",
+              "bytes": 63
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoiY29uY3VycmVudC3igqwt8J+YgC1jYWbDqSJ9",
+            "responseChunks": [
+              {
+                "bytes": 63,
+                "sha256": "0e86dacfdaa318e56eb57fc9cec6140e661da92235419301844a3b1d1e5eddc6",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoiY29uY3VycmVudC3igqwt8J+YgC1jYWbDqSJ9",
+                "arrivedNs": "7631292"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "empty-context-recovery",
+            "phase": "recovery",
+            "request": {
+              "method": "GET",
+              "path": "/api/context",
+              "headers": {}
+            },
+            "startedNs": "7999459",
+            "headersNs": "9401584",
+            "terminalNs": "10005709",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "53",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "set-cookie": "fixture_reply=set; Path=/; HttpOnly; SameSite=lax",
+              "x-fixture-response": "context-ok"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/crossed-context/empty-context-recovery.body",
+              "sha256": "cc1090d59c1d01dbde09808230ca598dcc5c05b6d4d3da4905a8a768404cfc41",
+              "bytes": 53
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOm51bGwsImhlYWRlciI6bnVsbH0=",
+            "responseChunks": [
+              {
+                "bytes": 53,
+                "sha256": "cc1090d59c1d01dbde09808230ca598dcc5c05b6d4d3da4905a8a768404cfc41",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOm51bGwsImhlYWRlciI6bnVsbH0=",
+                "arrivedNs": "9430417"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "json-recovery",
+            "phase": "recovery",
+            "request": {
+              "method": "POST",
+              "path": "/api/json",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "bytes": 29,
+                "sha256": "4d95fedcdd9601b1929da35c379e921d7842b8a4e1e8310ea54a8c18ecd1b2e9",
+                "base64": "eyJ2YWx1ZSI6InJlY292ZXJlZC3nlYwt4pyFIn0="
+              }
+            },
+            "startedNs": "8234084",
+            "headersNs": "9857084",
+            "terminalNs": "10124500",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "55",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/crossed-context/json-recovery.body",
+              "sha256": "ed2630529bcfda8bd7cf6600c27ef402baf93dc4728d4d2787f8c296d7fa857b",
+              "bytes": 55
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoicmVjb3ZlcmVkLeeVjC3inIUifQ==",
+            "responseChunks": [
+              {
+                "bytes": 55,
+                "sha256": "ed2630529bcfda8bd7cf6600c27ef402baf93dc4728d4d2787f8c296d7fa857b",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoicmVjb3ZlcmVkLeeVjC3inIUifQ==",
+                "arrivedNs": "9880084"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          }
+        ],
+        "completionOrder": [
+          "context-alpha",
+          "context-beta",
+          "malformed-json",
+          "chunked-unicode-json",
+          "empty-context-recovery",
+          "json-recovery"
+        ],
+        "uploadEvents": [
+          {
+            "event": "head-enqueued",
+            "ns": "112959"
+          },
+          {
+            "event": "tail-release-requested",
+            "ns": "6816125"
+          },
+          {
+            "event": "tail-release-observed",
+            "ns": "6819167"
+          },
+          {
+            "event": "tail-enqueued",
+            "ns": "6826417"
+          }
+        ],
+        "phaseOneTerminalNs": "7973334",
+        "chunkedRequest": {
+          "body": {
+            "bytes": 37,
+            "sha256": "b688add07b3e56bfa2311645c8d239333c71a4bbdf12d56ee9da5f0328d4b3b0",
+            "base64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4oKsLfCfmIAtY2Fmw6kifQ=="
+          },
+          "chunks": [
+            {
+              "bytes": 22,
+              "sha256": "9586b5d91d9b4f5378041c7e72b51c5b3054625aa884be94e4ce949a54156eb9",
+              "base64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4g=="
+            },
+            {
+              "bytes": 15,
+              "sha256": "cabb7bbc47326be137a48422771b2fd75dcbc6a9756f02b8acbda1c2376744ca",
+              "base64": "gqwt8J+YgC1jYWbDqSJ9"
+            }
+          ],
+          "splitInsideUtf8Sequence": true,
+          "clientEnqueueBoundariesOnly": true
+        },
+        "completedNs": "10271417"
+      },
+      "validation": {
+        "schemaVersion": 1,
+        "passed": false,
+        "checks": 80,
+        "failures": [
+          "context-alpha:exact JSON"
+        ],
+        "clientOverlapOnly": true,
+        "sameStoreOrNativeResourceIdentityClaimed": false
+      },
+      "received": [
+        {
+          "method": "GET",
+          "path": "/api/context",
+          "headers": {
+            "host": "127.0.0.1:56177",
+            "connection": "keep-alive",
+            "cookie": "fixture_token=parallel-alpha",
+            "x-fixture-probe": "probe-alpha",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate"
+          },
+          "bodyBase64": ""
+        },
+        {
+          "method": "GET",
+          "path": "/api/context",
+          "headers": {
+            "host": "127.0.0.1:56177",
+            "connection": "keep-alive",
+            "cookie": "fixture_token=parallel-beta",
+            "x-fixture-probe": "probe-beta",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate"
+          },
+          "bodyBase64": ""
+        },
+        {
+          "method": "POST",
+          "path": "/api/json",
+          "headers": {
+            "host": "127.0.0.1:56177",
+            "connection": "keep-alive",
+            "content-type": "application/json",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate",
+            "content-length": "15"
+          },
+          "bodyBase64": "e2JhZC1jb25jdXJyZW50"
+        },
+        {
+          "method": "POST",
+          "path": "/api/json",
+          "headers": {
+            "host": "127.0.0.1:56177",
+            "connection": "keep-alive",
+            "content-type": "application/json",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate",
+            "transfer-encoding": "chunked"
+          },
+          "bodyBase64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4oKsLfCfmIAtY2Fmw6kifQ=="
+        },
+        {
+          "method": "GET",
+          "path": "/api/context",
+          "headers": {
+            "host": "127.0.0.1:56177",
+            "connection": "keep-alive",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate"
+          },
+          "bodyBase64": ""
+        },
+        {
+          "method": "POST",
+          "path": "/api/json",
+          "headers": {
+            "host": "127.0.0.1:56177",
+            "connection": "keep-alive",
+            "content-type": "application/json",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate",
+            "content-length": "29"
+          },
+          "bodyBase64": "eyJ2YWx1ZSI6InJlY292ZXJlZC3nlYwt4pyFIn0="
+        }
+      ],
+      "fakeServerOnly": true,
+      "realNextOrGuestExecuted": false
+    },
+    {
+      "mode": "malformed-transport-failure",
+      "raw": {
+        "schemaVersion": 1,
+        "suite": "NEXT_CONCURRENT_CONTEXT_BODY_RECOVERY_V1",
+        "origin": "http://127.0.0.1:56185",
+        "output": "/private/tmp/next-v8-fake-http-Cmhvyi/malformed-transport-failure",
+        "clock": "One client process.hrtime.bigint relative nanoseconds; ordering only",
+        "clientOverlapOnly": true,
+        "sameStoreOrNativeResourceIdentityClaimed": false,
+        "guestReadOrPacketChunkBoundariesClaimed": false,
+        "perRequestTimeoutMs": 20000,
+        "observations": [
+          {
+            "id": "context-alpha",
+            "phase": "concurrent",
+            "request": {
+              "method": "GET",
+              "path": "/api/context",
+              "headers": {
+                "cookie": "fixture_token=parallel-alpha",
+                "x-fixture-probe": "probe-alpha"
+              }
+            },
+            "startedNs": "36667",
+            "headersNs": "1932333",
+            "terminalNs": "2551583",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "74",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "set-cookie": "fixture_reply=set; Path=/; HttpOnly; SameSite=lax",
+              "x-fixture-response": "context-ok"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/malformed-transport-failure/context-alpha.body",
+              "sha256": "32062f2be9c7ab5c887b9c3e0cbf1b7dd89bcd44aa42f6019ca479e6ed1ffc99",
+              "bytes": 74
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1hbHBoYSIsImhlYWRlciI6InByb2JlLWFscGhhIn0=",
+            "responseChunks": [
+              {
+                "bytes": 74,
+                "sha256": "32062f2be9c7ab5c887b9c3e0cbf1b7dd89bcd44aa42f6019ca479e6ed1ffc99",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1hbHBoYSIsImhlYWRlciI6InByb2JlLWFscGhhIn0=",
+                "arrivedNs": "1963000"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "malformed-json",
+            "phase": "concurrent",
+            "request": {
+              "method": "POST",
+              "path": "/api/json",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "bytes": 15,
+                "sha256": "3d5628e6b626e4c4e876501f916ea032cb1d8732dc079c72011b9abffbb25cc6",
+                "base64": "e2JhZC1jb25jdXJyZW50"
+              }
+            },
+            "startedNs": "482292",
+            "headersNs": null,
+            "terminalNs": "2984458",
+            "status": null,
+            "responseHeaders": null,
+            "body": null,
+            "bodyBase64": null,
+            "responseChunks": [],
+            "bodyEofObserved": false,
+            "error": {
+              "thrownType": "object",
+              "name": "TypeError",
+              "message": "fetch failed",
+              "code": null,
+              "stack": "TypeError: fetch failed\n    at node:internal/deps/undici/undici:13502:13\n    at async capture (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v8/supplemental.mjs:58:22)\n    at async Promise.all (index 2)\n    at async collectSupplemental (file:///Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v8/supplemental.mjs:84:7)\n    at async file:///Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/wasmtime-deployment-candidate-v8/test-supplemental.mjs:46:17"
+            },
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "context-beta",
+            "phase": "concurrent",
+            "request": {
+              "method": "GET",
+              "path": "/api/context",
+              "headers": {
+                "cookie": "fixture_token=parallel-beta",
+                "x-fixture-probe": "probe-beta"
+              }
+            },
+            "startedNs": "231042",
+            "headersNs": "2272958",
+            "terminalNs": "3024917",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "72",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "set-cookie": "fixture_reply=set; Path=/; HttpOnly; SameSite=lax",
+              "x-fixture-response": "context-ok"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/malformed-transport-failure/context-beta.body",
+              "sha256": "ac832c2da2c6eb64e8550fd664acf12a0acd62c253b0a75a8c48db21d02a92d1",
+              "bytes": 72
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1iZXRhIiwiaGVhZGVyIjoicHJvYmUtYmV0YSJ9",
+            "responseChunks": [
+              {
+                "bytes": 72,
+                "sha256": "ac832c2da2c6eb64e8550fd664acf12a0acd62c253b0a75a8c48db21d02a92d1",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1iZXRhIiwiaGVhZGVyIjoicHJvYmUtYmV0YSJ9",
+                "arrivedNs": "2294792"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "chunked-unicode-json",
+            "phase": "concurrent",
+            "request": {
+              "method": "POST",
+              "path": "/api/json",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "kind": "controlled-two-chunk-ReadableStream",
+                "bytes": 37,
+                "sha256": "b688add07b3e56bfa2311645c8d239333c71a4bbdf12d56ee9da5f0328d4b3b0",
+                "base64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4oKsLfCfmIAtY2Fmw6kifQ=="
+              }
+            },
+            "startedNs": "317458",
+            "headersNs": "3588292",
+            "terminalNs": "3782125",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "transfer-encoding": "chunked"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/malformed-transport-failure/chunked-unicode-json.body",
+              "sha256": "0e86dacfdaa318e56eb57fc9cec6140e661da92235419301844a3b1d1e5eddc6",
+              "bytes": 63
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoiY29uY3VycmVudC3igqwt8J+YgC1jYWbDqSJ9",
+            "responseChunks": [
+              {
+                "bytes": 63,
+                "sha256": "0e86dacfdaa318e56eb57fc9cec6140e661da92235419301844a3b1d1e5eddc6",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoiY29uY3VycmVudC3igqwt8J+YgC1jYWbDqSJ9",
+                "arrivedNs": "3615875"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "empty-context-recovery",
+            "phase": "recovery",
+            "request": {
+              "method": "GET",
+              "path": "/api/context",
+              "headers": {}
+            },
+            "startedNs": "3950250",
+            "headersNs": "5073542",
+            "terminalNs": "5495083",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "53",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "set-cookie": "fixture_reply=set; Path=/; HttpOnly; SameSite=lax",
+              "x-fixture-response": "context-ok"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/malformed-transport-failure/empty-context-recovery.body",
+              "sha256": "cc1090d59c1d01dbde09808230ca598dcc5c05b6d4d3da4905a8a768404cfc41",
+              "bytes": 53
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOm51bGwsImhlYWRlciI6bnVsbH0=",
+            "responseChunks": [
+              {
+                "bytes": 53,
+                "sha256": "cc1090d59c1d01dbde09808230ca598dcc5c05b6d4d3da4905a8a768404cfc41",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOm51bGwsImhlYWRlciI6bnVsbH0=",
+                "arrivedNs": "5102542"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "json-recovery",
+            "phase": "recovery",
+            "request": {
+              "method": "POST",
+              "path": "/api/json",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "bytes": 29,
+                "sha256": "4d95fedcdd9601b1929da35c379e921d7842b8a4e1e8310ea54a8c18ecd1b2e9",
+                "base64": "eyJ2YWx1ZSI6InJlY292ZXJlZC3nlYwt4pyFIn0="
+              }
+            },
+            "startedNs": "4156292",
+            "headersNs": "5377250",
+            "terminalNs": "5574000",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "55",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/malformed-transport-failure/json-recovery.body",
+              "sha256": "ed2630529bcfda8bd7cf6600c27ef402baf93dc4728d4d2787f8c296d7fa857b",
+              "bytes": 55
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoicmVjb3ZlcmVkLeeVjC3inIUifQ==",
+            "responseChunks": [
+              {
+                "bytes": 55,
+                "sha256": "ed2630529bcfda8bd7cf6600c27ef402baf93dc4728d4d2787f8c296d7fa857b",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoicmVjb3ZlcmVkLeeVjC3inIUifQ==",
+                "arrivedNs": "5399500"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          }
+        ],
+        "completionOrder": [
+          "context-alpha",
+          "malformed-json",
+          "context-beta",
+          "chunked-unicode-json",
+          "empty-context-recovery",
+          "json-recovery"
+        ],
+        "uploadEvents": [
+          {
+            "event": "head-enqueued",
+            "ns": "32792"
+          },
+          {
+            "event": "tail-release-requested",
+            "ns": "3256042"
+          },
+          {
+            "event": "tail-release-observed",
+            "ns": "3259542"
+          },
+          {
+            "event": "tail-enqueued",
+            "ns": "3265042"
+          }
+        ],
+        "phaseOneTerminalNs": "3947792",
+        "chunkedRequest": {
+          "body": {
+            "bytes": 37,
+            "sha256": "b688add07b3e56bfa2311645c8d239333c71a4bbdf12d56ee9da5f0328d4b3b0",
+            "base64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4oKsLfCfmIAtY2Fmw6kifQ=="
+          },
+          "chunks": [
+            {
+              "bytes": 22,
+              "sha256": "9586b5d91d9b4f5378041c7e72b51c5b3054625aa884be94e4ce949a54156eb9",
+              "base64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4g=="
+            },
+            {
+              "bytes": 15,
+              "sha256": "cabb7bbc47326be137a48422771b2fd75dcbc6a9756f02b8acbda1c2376744ca",
+              "base64": "gqwt8J+YgC1jYWbDqSJ9"
+            }
+          ],
+          "splitInsideUtf8Sequence": true,
+          "clientEnqueueBoundariesOnly": true
+        },
+        "completedNs": "5702833"
+      },
+      "validation": {
+        "schemaVersion": 1,
+        "passed": false,
+        "checks": 45,
+        "failures": [
+          "malformed-json:complete/error-free capture",
+          "malformed-json:status",
+          "malformed-json:body path",
+          "schema/validation error: The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received null"
+        ],
+        "clientOverlapOnly": true,
+        "sameStoreOrNativeResourceIdentityClaimed": false
+      },
+      "received": [
+        {
+          "method": "GET",
+          "path": "/api/context",
+          "headers": {
+            "host": "127.0.0.1:56185",
+            "connection": "keep-alive",
+            "cookie": "fixture_token=parallel-alpha",
+            "x-fixture-probe": "probe-alpha",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate"
+          },
+          "bodyBase64": ""
+        },
+        {
+          "method": "GET",
+          "path": "/api/context",
+          "headers": {
+            "host": "127.0.0.1:56185",
+            "connection": "keep-alive",
+            "cookie": "fixture_token=parallel-beta",
+            "x-fixture-probe": "probe-beta",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate"
+          },
+          "bodyBase64": ""
+        },
+        {
+          "method": "POST",
+          "path": "/api/json",
+          "headers": {
+            "host": "127.0.0.1:56185",
+            "connection": "keep-alive",
+            "content-type": "application/json",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate",
+            "content-length": "15"
+          },
+          "bodyBase64": "e2JhZC1jb25jdXJyZW50"
+        },
+        {
+          "method": "POST",
+          "path": "/api/json",
+          "headers": {
+            "host": "127.0.0.1:56185",
+            "connection": "keep-alive",
+            "content-type": "application/json",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate",
+            "transfer-encoding": "chunked"
+          },
+          "bodyBase64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4oKsLfCfmIAtY2Fmw6kifQ=="
+        },
+        {
+          "method": "GET",
+          "path": "/api/context",
+          "headers": {
+            "host": "127.0.0.1:56185",
+            "connection": "keep-alive",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate"
+          },
+          "bodyBase64": ""
+        },
+        {
+          "method": "POST",
+          "path": "/api/json",
+          "headers": {
+            "host": "127.0.0.1:56185",
+            "connection": "keep-alive",
+            "content-type": "application/json",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate",
+            "content-length": "29"
+          },
+          "bodyBase64": "eyJ2YWx1ZSI6InJlY292ZXJlZC3nlYwt4pyFIn0="
+        }
+      ],
+      "fakeServerOnly": true,
+      "realNextOrGuestExecuted": false
+    },
+    {
+      "mode": "partial-response-close",
+      "raw": {
+        "schemaVersion": 1,
+        "suite": "NEXT_CONCURRENT_CONTEXT_BODY_RECOVERY_V1",
+        "origin": "http://127.0.0.1:56192",
+        "output": "/private/tmp/next-v8-fake-http-Cmhvyi/partial-response-close",
+        "clock": "One client process.hrtime.bigint relative nanoseconds; ordering only",
+        "clientOverlapOnly": true,
+        "sameStoreOrNativeResourceIdentityClaimed": false,
+        "guestReadOrPacketChunkBoundariesClaimed": false,
+        "perRequestTimeoutMs": 20000,
+        "observations": [
+          {
+            "id": "context-alpha",
+            "phase": "concurrent",
+            "request": {
+              "method": "GET",
+              "path": "/api/context",
+              "headers": {
+                "cookie": "fixture_token=parallel-alpha",
+                "x-fixture-probe": "probe-alpha"
+              }
+            },
+            "startedNs": "33458",
+            "headersNs": "1653333",
+            "terminalNs": "2309292",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "74",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "set-cookie": "fixture_reply=set; Path=/; HttpOnly; SameSite=lax",
+              "x-fixture-response": "context-ok"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/partial-response-close/context-alpha.body",
+              "sha256": "32062f2be9c7ab5c887b9c3e0cbf1b7dd89bcd44aa42f6019ca479e6ed1ffc99",
+              "bytes": 74
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1hbHBoYSIsImhlYWRlciI6InByb2JlLWFscGhhIn0=",
+            "responseChunks": [
+              {
+                "bytes": 74,
+                "sha256": "32062f2be9c7ab5c887b9c3e0cbf1b7dd89bcd44aa42f6019ca479e6ed1ffc99",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1hbHBoYSIsImhlYWRlciI6InByb2JlLWFscGhhIn0=",
+                "arrivedNs": "1677833"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "context-beta",
+            "phase": "concurrent",
+            "request": {
+              "method": "GET",
+              "path": "/api/context",
+              "headers": {
+                "cookie": "fixture_token=parallel-beta",
+                "x-fixture-probe": "probe-beta"
+              }
+            },
+            "startedNs": "171000",
+            "headersNs": "1961750",
+            "terminalNs": "2500375",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "72",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "set-cookie": "fixture_reply=set; Path=/; HttpOnly; SameSite=lax",
+              "x-fixture-response": "context-ok"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/partial-response-close/context-beta.body",
+              "sha256": "ac832c2da2c6eb64e8550fd664acf12a0acd62c253b0a75a8c48db21d02a92d1",
+              "bytes": 72
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1iZXRhIiwiaGVhZGVyIjoicHJvYmUtYmV0YSJ9",
+            "responseChunks": [
+              {
+                "bytes": 72,
+                "sha256": "ac832c2da2c6eb64e8550fd664acf12a0acd62c253b0a75a8c48db21d02a92d1",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOiJwYXJhbGxlbC1iZXRhIiwiaGVhZGVyIjoicHJvYmUtYmV0YSJ9",
+                "arrivedNs": "1983167"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "malformed-json",
+            "phase": "concurrent",
+            "request": {
+              "method": "POST",
+              "path": "/api/json",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "bytes": 15,
+                "sha256": "3d5628e6b626e4c4e876501f916ea032cb1d8732dc079c72011b9abffbb25cc6",
+                "base64": "e2JhZC1jb25jdXJyZW50"
+              }
+            },
+            "startedNs": "350292",
+            "headersNs": "2420583",
+            "terminalNs": "29259167",
+            "status": 400,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "128",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/partial-response-close/malformed-json.body",
+              "sha256": "bcabab7125ff1ee532a104f26b8b130b57db6cd9fb0109f8069a2b03ee10a58b",
+              "bytes": 25
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0pTT05fQkFEXw==",
+            "responseChunks": [
+              {
+                "bytes": 25,
+                "sha256": "bcabab7125ff1ee532a104f26b8b130b57db6cd9fb0109f8069a2b03ee10a58b",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0pTT05fQkFEXw==",
+                "arrivedNs": "2442042"
+              }
+            ],
+            "bodyEofObserved": false,
+            "error": {
+              "thrownType": "object",
+              "name": "TypeError",
+              "message": "terminated",
+              "code": null,
+              "stack": "TypeError: terminated\n    at Fetch.onAborted (node:internal/deps/undici/undici:11124:53)\n    at Fetch.emit (node:events:518:28)\n    at Fetch.terminate (node:internal/deps/undici/undici:10282:14)\n    at Object.onError (node:internal/deps/undici/undici:11245:38)\n    at Request.onError (node:internal/deps/undici/undici:2094:31)\n    at Object.errorRequest (node:internal/deps/undici/undici:1591:17)\n    at Socket.<anonymous> (node:internal/deps/undici/undici:6319:16)\n    at Socket.emit (node:events:530:35)\n    at TCP.<anonymous> (node:net:351:12)"
+            },
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "chunked-unicode-json",
+            "phase": "concurrent",
+            "request": {
+              "method": "POST",
+              "path": "/api/json",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "kind": "controlled-two-chunk-ReadableStream",
+                "bytes": 37,
+                "sha256": "b688add07b3e56bfa2311645c8d239333c71a4bbdf12d56ee9da5f0328d4b3b0",
+                "base64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4oKsLfCfmIAtY2Fmw6kifQ=="
+              }
+            },
+            "startedNs": "256583",
+            "headersNs": "29920500",
+            "terminalNs": "30117125",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "transfer-encoding": "chunked"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/partial-response-close/chunked-unicode-json.body",
+              "sha256": "0e86dacfdaa318e56eb57fc9cec6140e661da92235419301844a3b1d1e5eddc6",
+              "bytes": 63
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoiY29uY3VycmVudC3igqwt8J+YgC1jYWbDqSJ9",
+            "responseChunks": [
+              {
+                "bytes": 63,
+                "sha256": "0e86dacfdaa318e56eb57fc9cec6140e661da92235419301844a3b1d1e5eddc6",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoiY29uY3VycmVudC3igqwt8J+YgC1jYWbDqSJ9",
+                "arrivedNs": "29952375"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "empty-context-recovery",
+            "phase": "recovery",
+            "request": {
+              "method": "GET",
+              "path": "/api/context",
+              "headers": {}
+            },
+            "startedNs": "30270917",
+            "headersNs": "31160167",
+            "terminalNs": "31540500",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "53",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT",
+              "set-cookie": "fixture_reply=set; Path=/; HttpOnly; SameSite=lax",
+              "x-fixture-response": "context-ok"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/partial-response-close/empty-context-recovery.body",
+              "sha256": "cc1090d59c1d01dbde09808230ca598dcc5c05b6d4d3da4905a8a768404cfc41",
+              "bytes": 53
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOm51bGwsImhlYWRlciI6bnVsbH0=",
+            "responseChunks": [
+              {
+                "bytes": 53,
+                "sha256": "cc1090d59c1d01dbde09808230ca598dcc5c05b6d4d3da4905a8a768404cfc41",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0NPTlRFWFQiLCJjb29raWUiOm51bGwsImhlYWRlciI6bnVsbH0=",
+                "arrivedNs": "31183292"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          },
+          {
+            "id": "json-recovery",
+            "phase": "recovery",
+            "request": {
+              "method": "POST",
+              "path": "/api/json",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "bytes": 29,
+                "sha256": "4d95fedcdd9601b1929da35c379e921d7842b8a4e1e8310ea54a8c18ecd1b2e9",
+                "base64": "eyJ2YWx1ZSI6InJlY292ZXJlZC3nlYwt4pyFIn0="
+              }
+            },
+            "startedNs": "30430583",
+            "headersNs": "31447583",
+            "terminalNs": "31599708",
+            "status": 200,
+            "responseHeaders": {
+              "connection": "close",
+              "content-length": "55",
+              "content-type": "application/json",
+              "date": "Sat, 07 Nov 2026 04:49:26 GMT"
+            },
+            "body": {
+              "path": "/private/tmp/next-v8-fake-http-Cmhvyi/partial-response-close/json-recovery.body",
+              "sha256": "ed2630529bcfda8bd7cf6600c27ef402baf93dc4728d4d2787f8c296d7fa857b",
+              "bytes": 55
+            },
+            "bodyBase64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoicmVjb3ZlcmVkLeeVjC3inIUifQ==",
+            "responseChunks": [
+              {
+                "bytes": 55,
+                "sha256": "ed2630529bcfda8bd7cf6600c27ef402baf93dc4728d4d2787f8c296d7fa857b",
+                "base64": "eyJtYXJrZXIiOiJORVhUX0pTT05fUE9TVCIsInZhbHVlIjoicmVjb3ZlcmVkLeeVjC3inIUifQ==",
+                "arrivedNs": "31467708"
+              }
+            ],
+            "bodyEofObserved": true,
+            "error": null,
+            "readerReleaseError": null,
+            "publicationError": null,
+            "signalAborted": false
+          }
+        ],
+        "completionOrder": [
+          "context-alpha",
+          "context-beta",
+          "malformed-json",
+          "chunked-unicode-json",
+          "empty-context-recovery",
+          "json-recovery"
+        ],
+        "uploadEvents": [
+          {
+            "event": "head-enqueued",
+            "ns": "31375"
+          },
+          {
+            "event": "tail-release-requested",
+            "ns": "29465042"
+          },
+          {
+            "event": "tail-release-observed",
+            "ns": "29470167"
+          },
+          {
+            "event": "tail-enqueued",
+            "ns": "29482000"
+          }
+        ],
+        "phaseOneTerminalNs": "30268042",
+        "chunkedRequest": {
+          "body": {
+            "bytes": 37,
+            "sha256": "b688add07b3e56bfa2311645c8d239333c71a4bbdf12d56ee9da5f0328d4b3b0",
+            "base64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4oKsLfCfmIAtY2Fmw6kifQ=="
+          },
+          "chunks": [
+            {
+              "bytes": 22,
+              "sha256": "9586b5d91d9b4f5378041c7e72b51c5b3054625aa884be94e4ce949a54156eb9",
+              "base64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4g=="
+            },
+            {
+              "bytes": 15,
+              "sha256": "cabb7bbc47326be137a48422771b2fd75dcbc6a9756f02b8acbda1c2376744ca",
+              "base64": "gqwt8J+YgC1jYWbDqSJ9"
+            }
+          ],
+          "splitInsideUtf8Sequence": true,
+          "clientEnqueueBoundariesOnly": true
+        },
+        "completedNs": "31724208"
+      },
+      "validation": {
+        "schemaVersion": 1,
+        "passed": false,
+        "checks": 48,
+        "failures": [
+          "malformed-json:complete/error-free capture",
+          "schema/validation error: Unterminated string in JSON at position 25 (line 1 column 26)"
+        ],
+        "clientOverlapOnly": true,
+        "sameStoreOrNativeResourceIdentityClaimed": false
+      },
+      "received": [
+        {
+          "method": "GET",
+          "path": "/api/context",
+          "headers": {
+            "host": "127.0.0.1:56192",
+            "connection": "keep-alive",
+            "cookie": "fixture_token=parallel-alpha",
+            "x-fixture-probe": "probe-alpha",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate"
+          },
+          "bodyBase64": ""
+        },
+        {
+          "method": "GET",
+          "path": "/api/context",
+          "headers": {
+            "host": "127.0.0.1:56192",
+            "connection": "keep-alive",
+            "cookie": "fixture_token=parallel-beta",
+            "x-fixture-probe": "probe-beta",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate"
+          },
+          "bodyBase64": ""
+        },
+        {
+          "method": "POST",
+          "path": "/api/json",
+          "headers": {
+            "host": "127.0.0.1:56192",
+            "connection": "keep-alive",
+            "content-type": "application/json",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate",
+            "content-length": "15"
+          },
+          "bodyBase64": "e2JhZC1jb25jdXJyZW50"
+        },
+        {
+          "method": "POST",
+          "path": "/api/json",
+          "headers": {
+            "host": "127.0.0.1:56192",
+            "connection": "keep-alive",
+            "content-type": "application/json",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate",
+            "transfer-encoding": "chunked"
+          },
+          "bodyBase64": "eyJ2YWx1ZSI6ImNvbmN1cnJlbnQt4oKsLfCfmIAtY2Fmw6kifQ=="
+        },
+        {
+          "method": "GET",
+          "path": "/api/context",
+          "headers": {
+            "host": "127.0.0.1:56192",
+            "connection": "keep-alive",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate"
+          },
+          "bodyBase64": ""
+        },
+        {
+          "method": "POST",
+          "path": "/api/json",
+          "headers": {
+            "host": "127.0.0.1:56192",
+            "connection": "keep-alive",
+            "content-type": "application/json",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate",
+            "content-length": "29"
+          },
+          "bodyBase64": "eyJ2YWx1ZSI6InJlY292ZXJlZC3nlYwt4pyFIn0="
+        }
+      ],
+      "fakeServerOnly": true,
+      "realNextOrGuestExecuted": false
+    }
+  ]
+}

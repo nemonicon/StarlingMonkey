@@ -1,0 +1,24 @@
+--- parent/guest-entry.mjs
++++ candidate/guest-entry.mjs
+@@ -1,6 +1,7 @@
+ // Experimental raw ESM entry. INIT installs the bounded guest profile facades.
+ // No bootstrap, FS, clocks, entropy or Promise workload, bundler or app rewrite.
+ import {bootstrap} from 'starling:node-startup';
++import {observe as __nativeExportObserve} from 'internal:starlingmonkey/native-export-diagnostic-v1';
+ import {createServerHandler,runFreshRequest,runNeutralServer} from 'starling:node-http';
+ import {Buffer as __nextBuffer} from 'node:buffer';
+ import {addAbortListener as __nextAbortListener} from 'node:events';
+@@ -675,6 +676,13 @@
+       }
+       request=new Request(url,{method,headers,signal:ioAbort.signal,...(body?{body,duplex:'half'}:{})});
+       completionTrace=guestCompletionBegin('adapter',method,url,guestCorrelationRequest(request,correlationCount));
++      try{
++        if(completionTrace!==undefined)__nativeExportObserve(
++          completionTrace.method==='GET'?0:1,completionTrace.path==='/actions'?0:1,
++          completionTrace.corrState==='missing'?0:completionTrace.corrState==='valid'?1:
++            completionTrace.corrState==='invalid'?2:3,
++          completionTrace.corrCount,completionTrace.corr);
++      }catch{guestCompletionFault();}
+       guestCompletionRecord(completionTrace,'adapter-enter');
+       completionPhase='web-handler';
+       const response=await webHandler(request);

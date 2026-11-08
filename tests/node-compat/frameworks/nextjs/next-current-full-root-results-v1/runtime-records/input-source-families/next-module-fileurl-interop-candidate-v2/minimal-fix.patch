@@ -1,0 +1,12 @@
+--- sealed25c/runtime/script_loader.cpp
++++ uncompiled-rooted-concat/runtime/script_loader.cpp
+@@ -321,7 +321,8 @@
+   static constexpr char prefix[] = "\0cjs-file-url:";
+   JS::RootedString tag(cx, JS_NewStringCopyN(cx, prefix, sizeof(prefix) - 1));
+   if (!tag) return nullptr;
+-  JS::RootedString key_string(cx, JS_ConcatStrings(cx, tag, canonical_url.toString()));
++  JS::RootedString canonical_url_string(cx, canonical_url.toString());
++  JS::RootedString key_string(cx, JS_ConcatStrings(cx, tag, canonical_url_string));
+   if (!key_string) return nullptr;
+   JS::RootedValue key(cx, JS::StringValue(key_string)), cached(cx);
+   if (!JS::MapGet(cx, moduleRegistry, key, &cached)) return nullptr;

@@ -67,6 +67,43 @@ execution and retained with all13 metadata payloads. Corrected binding explicitl
 checks all six client dependencies. No test/actor code or assertion changed,
 and zero trials ran under that held preparation.
 
+The comprehensive pair now completes once per arm, with unchanged gates:
+
+| Gate | Wasm | Bridge Node22 |
+| --- | --- | --- |
+| HTTP | 24/24 pass | 24/24 pass |
+| Portable cache | 52 checks pass | 52 checks pass |
+| Supplemental | 80 checks pass | 80 checks pass |
+| Incremental stream | Five chunks; pass | Five chunks; pass |
+| Strict browser | Both tests pass | Both tests pass |
+| Legacy generation | 1→1; fail | 1→2; pass |
+| Original/full client | Fail | Pass |
+
+Original native7204/600 exits1 cleanly; Node7523/300 exits0 cleanly. Both publish
+`fullOriginalContractExecuted:true`. The native actor retains its assertion for
+the semantic client exit1 while collection itself completes. The
+[independent JSON crosscheck](../../tests/node-compat/frameworks/nextjs/next-current-full-root-results-v1/independent-gate-crosscheck.json)
+recomputes the original and final conjunctions and verifies the sole false
+native term. The [primary DATA review](../../tests/node-compat/frameworks/nextjs/next-current-full-root-results-v1/actual-runtime-review.json)
+(`303ca42f`) verifies all detailed HTTP/cache/supplemental/stream/browser data,
+both original owners and complete28,746-byte/111-chunk native stdout. The
+[raw packet](../../tests/node-compat/frameworks/nextjs/next-current-full-root-results-v1/runtime-records/index.json)
+retains632 payloads/13,614,165 bytes, including19 indexed input Source families,
+all six explicit client dependencies, owner/client/body records and the held
+preparation. App/cache trees and external binaries are omitted. The emitted
+imports remain13 standard WASI0.2.10 interfaces. This new positive
+browser sample does not explain or repair the earlier aborts. Arbitrary
+cross-request JS globals, general lifecycle guarantees and full Next acceptance
+remain outside the verified result.
+
+The [next-step Source audit](../../tests/node-compat/frameworks/nextjs/next-current-full-root-results-v1/next-steps.md)
+distinguishes the module-local counter from actual persisted cache operations.
+A fresh callback can still return1; the nonce-based cache profile already tests
+hits and invalidation separately. Next validate a separately versioned bounded
+FS-backed callback state contract under the existing standard cache preopen,
+keeping the legacy fixture and assertion intact. No arbitrary closure/object
+persistence, concurrent increment, CAS or crash durability is implied.
+
 The [bridge cancellation audit](nextjs-bridge-cancellation-audit.md) records an
 untested close/drain seam and proposes a focused regression. Neither this Source
 finding nor a single positive run proves causation, reliability, host TCP

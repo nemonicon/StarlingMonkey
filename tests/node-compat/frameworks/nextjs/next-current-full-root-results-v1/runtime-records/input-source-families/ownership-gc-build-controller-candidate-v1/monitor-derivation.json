@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-stream-consumers/http-host-controller-candidate-v2/controller.py",
+    "sha256": "7f557af375cd683810a11dbfcd1bd290712cc99d50b2664886d90cb888adace4",
+    "bytes": 15094
+  },
+  "afterimage": "monitor.py",
+  "edits": [
+    {
+      "before": "assert 0 < timeout_seconds <= 2400 and 0 < parent_grace_seconds <= 45",
+      "after": "assert 0 < timeout_seconds <= 7200 and 0 < parent_grace_seconds <= 45",
+      "count": 1
+    }
+  ],
+  "forwardAndReverseExact": true,
+  "scope": "Only monitor API deadline ceiling. Original HTTP main still invokes2400 and is never called by the build caller."
+}

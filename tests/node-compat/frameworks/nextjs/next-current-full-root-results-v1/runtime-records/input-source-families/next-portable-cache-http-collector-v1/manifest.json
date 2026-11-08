@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "state": "PORTABLE_NEXT_CACHE_HTTP_COLLECTOR_SOURCE_FAKE_CHECKED_DRAFT_V1",
+  "entry": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-portable-cache-http-collector-v1/collector.mjs",
+    "sha256": "f0f1054d83f9f3bab7d277cd81df24bcae850da89cbc94cdf6ae4259adfb8434",
+    "bytes": 9936
+  },
+  "test": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-portable-cache-http-collector-v1/test-collector.mjs",
+    "sha256": "2d480367ab0dfcb2e22beecf171506e2ae509cb479aa5e5fb2f9cfef0b232dfd",
+    "bytes": 10268
+  },
+  "checks": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-portable-cache-http-collector-v1/source-checks-final.json",
+    "sha256": "8753860c64a8d70b5b9107367e7a8fb6b7a8ce40101c30c809af4d8aae3db1f3",
+    "bytes": 3465
+  },
+  "designPlanIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-portable-cache-app-plan-v1/index.json",
+    "sha256": "ee8be276bcb3b23c7bbc703d65ea679836e3db8ae6825c90e59fdb18658073ec",
+    "bytes": 1125
+  },
+  "fixtureRouteSource": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/portable-cache-app-fixture-v1/app/api/portable-cache/route.js",
+    "sha256": "a9da2859b50e7a973cccb0f027b3515e023bb92cbd732b16d2311b52dcecf7b8",
+    "bytes": 666
+  },
+  "exports": {
+    "collectPortableCache": "async ({origin,output,fetchImpl?,store?}) -> capture; default host fetch and exclusive raw-file store; test injections explicitly labelled",
+    "validatePortableCache": "(capture) -> {schemaVersion,passed,checks,failures,cases,subsetOnly,originalContractAcceptanceUnchanged,actualNextExecutionVerified:false}"
+  },
+  "protocol": {
+    "origin": "canonical http://127.0.0.1:PORT only; explicit port1..65535",
+    "path": "/api/portable-cache",
+    "cases": [
+      {
+        "id": "portable-first",
+        "method": "GET"
+      },
+      {
+        "id": "portable-repeat",
+        "method": "GET"
+      },
+      {
+        "id": "portable-revalidate",
+        "method": "POST"
+      },
+      {
+        "id": "portable-after",
+        "method": "GET"
+      },
+      {
+        "id": "portable-after-repeat",
+        "method": "GET"
+      }
+    ],
+    "requestSeconds": 20,
+    "deliveredBodyCap": 65536,
+    "requestWindow": "One window spans fetch/body reads and bounded cleanup; no separate grace or retries.",
+    "bodyBytes": "Fetch-delivered bytes only; not compressed wire bytes or socket EOF.",
+    "redirect": "manual",
+    "nonce": "exact lowercase hex64; marker NEXT_PORTABLE_CACHE_VALUE",
+    "postAcknowledgement": {
+      "marker": "NEXT_PORTABLE_CACHE_REVALIDATED",
+      "tag": "portable-fetch-v1"
+    },
+    "relationships": [
+      "first==repeat",
+      "after!=first",
+      "after==afterRepeat"
+    ]
+  },
+  "storage": {
+    "freshCanonicalOutputRequired": true,
+    "caseBody": "<id>.body; retained prefix persisted even on read error/overflow",
+    "caseRecord": "<id>.json; headers/status/counts/body descriptor/base64/transportError/cleanupErrors",
+    "finalRawCapture": "observations.json; after all5 raw records, before caller validation",
+    "mode": "directory0700, exclusive files0600",
+    "storageFailure": "During collection, rethrows the original value; capture attachment is best effort on attachable values only. Init failure has zero collected records/no attachment. Incomplete capture is never accepted."
+  },
+  "strictSemantics": "HTTP200, complete/within cap/error-null/cleanup-empty, fetch-exposed JSON media type, canonical base64/hash/length, complete UTF8/exact JSON keys and nonce relationships.",
+  "existingContract": "Original24HTTP/legacy cachegeneration/stream/strict2browser and six supplemental cases remain separate required gates; this helper does not evaluate or accept them.",
+  "actualOperationalInputs": null,
+  "actualHttpOrNextOrGuestResults": null,
+  "productionAcceptance": false
+}
