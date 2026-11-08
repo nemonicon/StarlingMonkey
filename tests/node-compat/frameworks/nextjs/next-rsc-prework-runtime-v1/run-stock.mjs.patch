@@ -1,0 +1,37 @@
+--- donor/run-stock.mjs
++++ new/run-stock.mjs
+@@ -31,7 +31,7 @@
+ assert.equal(process.argv.length,7,'Versioned host-only authority argument; six original positions preserved');
+ const authorityPath=resolve(process.argv[6]);
+ const authority=JSON.parse(await readFile(authorityPath,'utf8'));
+-assert.equal(authority.state,'ROOT_NEXT_RSC_RESPONSE_HOST_AUTHORIZED_V1');
++assert.equal(authority.state,'ROOT_NEXT_RSC_PREWORK_HOST_AUTHORIZED_V1');
+ assert.equal(authority.controlOnly,true);assert.equal(authority.rscResponseControlAllowed,true);
+ assert.equal(authority.localhostServerAllowed,true);assert.equal(authority.browserAllowed,false);
+ for(const key of ['compilerAllowed','nativeBuildAllowed','guestAllowed','engineAllowed','externalApplicationDeploymentAllowed'])assert.equal(authority[key],false);
+@@ -94,7 +94,7 @@
+   for(const r of input.files){const path=join(application,r.path),s=await lstat(path);assert.deepEqual(await descriptor(path),{path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}
+   for(const r of input.directories)assert.equal((await lstat(join(application,r.path))).mode&0o777,r.mode);
+ }
+-const result = {schemaVersion: 1, suite: 'NEXT_RSC_RESPONSE_MATCHED_NODE_PROFILE_V1', controlOnly:true, responseProbeExecuted:false, fullOriginalContractExecuted:false, fullNextAccepted:false,
++const result = {schemaVersion: 1, suite: 'NEXT_RSC_PREWORK_MATCHED_NODE_PROFILE_V1', controlOnly:true, responseProbeExecuted:false, fullOriginalContractExecuted:false, fullNextAccepted:false,
+   node: process.version, guestExecuted: false, applicationModified: false,
+   standaloneSource: source, sourceServer: await descriptor(join(source, 'server.js')),
+   bridge: await descriptor(join(here, '../http-bridge-candidate-v1/bridge.mjs')), harness: await descriptor(fileURLToPath(import.meta.url)),
+@@ -198,7 +198,7 @@
+   result.controlClientResult=await descriptor(join(clientOutput,'result.json'));
+   result.control=JSON.parse(await readFile(result.controlClientResult.path));
+   assert.equal(typeof result.control.responseProbeExecuted,'boolean');result.responseProbeExecuted=result.control.responseProbeExecuted;
+-  assert.equal(result.control.suite,'NEXT_RSC_HTTP_RESPONSE_CLIENT_V1');
++  assert.equal(result.control.suite,'NEXT_RSC_PREWORK_HTTP_RESPONSE_CLIENT_V1');
+   assert.equal(result.control.controlOnly,true);assert.equal(result.control.responseProbeExecuted,true);assert.equal(result.control.fullOriginalContractExecuted,false);assert.equal(result.control.fullNextAccepted,false);
+ } catch (error) {
+   result.errors.push({type:error===null?'null':typeof error,name:error?.name??null,message:error?.message??String(error),stack:error?.stack??null});
+@@ -214,6 +214,6 @@
+     &&result.errors.length===0&&result.transportErrors.length===0;
+   await save();
+ }
+-console.log(JSON.stringify({state:result.passed?'NEXT_RSC_RESPONSE_MATCHED_NODE_PROFILE_PASSED':'NEXT_RSC_RESPONSE_MATCHED_NODE_PROFILE_FAILED',
++console.log(JSON.stringify({state:result.passed?'NEXT_RSC_PREWORK_MATCHED_NODE_PROFILE_PASSED':'NEXT_RSC_PREWORK_MATCHED_NODE_PROFILE_FAILED',
+   controlOnly:true,responseProbeExecuted:result.responseProbeExecuted,fullOriginalContractExecuted:false,passed:result.passed,errors:result.errors,transportErrors:result.transportErrors,guestExecuted:false,fullNextAccepted:false}));
+ process.exitCode=result.passed?0:1;

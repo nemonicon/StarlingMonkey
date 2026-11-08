@@ -19,6 +19,14 @@ payloads total7,575,911 bytes (`b3a97510`). Root rehashes the entire raw corpus.
 The next non-browser prework control is Source-only preparation, with no slots
 or requests yet. Control preceding workload before changing native behavior.
 
+The [non-browser prework control](tests/node-compat/frameworks/nextjs/next-rsc-prework-root-results-v1/README.md)
+is now prepared (`2bdd462d`) with fixed Wasm600→Node300 slots. Four actual
+Node syntax checks and whole Source/API reviews pass. Binding`b27b9b19` derives
+2,028 fresh inputs, including the three capture inputs, four external prework
+consumers and indexed local helper. It preserves the exact original4,382-byte
+pre-browser request span; the original full/browser clients remain unchanged.
+No request has been sent in this new profile yet.
+
 Latest ported-fixture comparison: explicit filesystem-backed callback state
 passes1→2 on both Wasm and Node. Both also pass24HTTP,52 portable-cache checks,
 80 supplemental checks and five incremental stream chunks. Node19876/300 is
