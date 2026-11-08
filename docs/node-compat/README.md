@@ -14,6 +14,9 @@ completes on wasmCloud and Node; it does not waive the browser failure.
 The subsequent [direct Chrome body control](nextjs-browser-body-prework-results.md)
 also passes both hosts: arrayBuffer consumption and CDP loadingFinished are
 independently observed after prework. React/router execution is absent there.
+The [strict-workload resource observer](nextjs-resource-stream-results.md) now
+retains2,963 browser bytes even in the reproduced wasmCloud cancellation.
+That failed terminal remains incomplete; matched Node completes and passes.
 
 The [priority roadmap](nextjs-priority-roadmap.md) leads with that response
 lifetime boundary, then lifecycle/resource/reuse, clean-machine reproduction,

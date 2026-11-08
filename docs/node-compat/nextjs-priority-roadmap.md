@@ -19,11 +19,20 @@ hasUserGesture:true corrects the prospective no-gesture assumption. The
 synthetic document excludes React/router/hydration/form execution, so this
 does not reproduce or waive the original strict browser failure.
 
-Next inspect the original React/router path using a bounded passive browser
-response-body observer, subject to the pinned protocol's actual API and its
-observer effects. Distinguish network-body bytes/terminal from React root
-settlement and reader completion. Keep strict worker01ca and all original
-assertions unchanged. After the response boundary, prioritize lifecycle and
+The [bounded resource-stream observer](nextjs-resource-stream-results.md) now
+actually runs the strict workload: cloud67923/600 fails with the same abort;
+Node68512/300 passes. Both retain2,963 binary bytes, with loadingFailed versus
+loadingFinished kept separate. The public guest POST stage chain is witnessed,
+but seven unknown outer POSTs still block the broader join. This is evidence
+about a failure, not a fix or complete cloud response.
+
+Next audit and correct the outer observer's bounded metadata classification in
+a separately versioned observer, preserving the old V3 join=false result.
+Resolve that measurement limit before selecting an engine change or intrusive
+React reader/root hooks. Keep strict worker01ca and all original assertions
+unchanged. The separately found native finish-error propagation defect needs
+its own standard-WASI regression; it is not established as this abort's cause.
+After the response boundary, prioritize lifecycle and
 resource retirement/reuse, clean-machine reproduction, empirical cost and
 production promotion in that order.
 

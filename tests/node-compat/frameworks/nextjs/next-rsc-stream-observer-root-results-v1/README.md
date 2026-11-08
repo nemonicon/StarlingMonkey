@@ -7,7 +7,12 @@ plan outerSeconds field; exact failure/preimages are retained and prior Source
 passes explicitly qualified. The one-span controller correction leaves Root's
 fixed600/300 schedule intact; peer`cc5290a5` passes. Second preparation`94e0cd22`
 finishes raw0 with no actor invoked. Independent binding/correction DATA review
-`721a82a4` passes before launch. No browser or WASI host has run in this profile.
+`721a82a4` passes before launch. The actual comparison now completes: cloud67923/600
+raw1/clean versus Node68512/300 raw0/clean. Both pass24/52/80/gen1→2/stream3(0,1),
+UI and assets. The strict/full gate remains cloudfalse/Nodetrue. Both collect
+2,963 streamed resource bytes, but cloud loadingFailed/canceled keeps resource
+completeness false; Node loadingFinished makes it true. See the
+[result report](../../../../../docs/node-compat/nextjs-resource-stream-results.md).
 
 This separate observer derivative preserves worker01ca's two functional tests,
 strict acceptance predicate,20-second limits and original screenshot/drain/close
@@ -80,3 +85,30 @@ The [binding/correction DATA review](independent-binding-correction-review.json)
 reconstructs2,060 inputs and verifies plan/source/correction inverses without
 calling a helper or reading a target output. It preserves the first preparation
 failure and the earlier peer miss.
+
+[Primary DATA review](actual-runtime-review.json),
+[independent runtime gate](independent-runtime-gate-review.json) and
+[raw index](raw-records/index.json) retain331 payloads/10,242,832 bytes. Root
+[rehashes the corpus](root-raw-corpus-check.json); no complete cloud response,
+React EOF, causal or private-identity claim is made. The
+[compiled-path Source audit](native-response-lifetime-source-audit.md) and
+[public-stage DATA follow-on](public-completion-stage-data-review.md) are separate:
+named guest sites can be witnessed while the outer join remains blocked.
+
+Portable saved-failure check from the repository root:
+
+```sh
+python3 -I -B tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-root-results-v1/check-retained.py
+```
+
+It passes the current331-payload corpus and an isolated333-file copy from
+actual staged Git blobs. It preserves cloudfalse/NodeTrue, incomplete/complete
+resource outcomes and fullNextAccepted:false. It starts no targets or original
+path reads. [Git-mode execution](retained-check-git-mode-result.json) and
+[optimized-mode refusal](retained-check-optimized-refusal.json) remain separate
+from C/B Source-only checker review and the actual fresh target trials.
+
+The [outer-observer Source audit](outer-observer-metadata-source-audit.md)
+proposes V4 target/other/absent path classification with independent header
+state. V3 discards that information, and its old global join remains false.
+No V4 code or target action exists in this packet.

@@ -18,6 +18,9 @@ The subsequent [direct Chrome control](../../../../docs/node-compat/nextjs-brows
 also passes both hosts, consuming2,963 bytes with separate CDP loadingFinished
 after prework. It uses a synthetic same-origin page without React/router/form
 execution; the original strict browser failure remains failed.
+The [resource-stream derivative](../../../../docs/node-compat/nextjs-resource-stream-results.md)
+now reproduces that failure while retaining2,963 browser-resource bytes. Node
+passes with a successful terminal; cloud's canceled terminal remains incomplete.
 The original module-global generation fixture remains a separate failed contract.
 
 The [current result and limitations](../../../../docs/node-compat/nextjs-native-export-diagnostic-2026-11-08.md),
@@ -41,8 +44,8 @@ the seventeen-case direct diagnostic deployment; the second verifies the full
 pair while preserving native failure and Node success. These check retained
 data, not a new target execution or a rebuild. Fresh target execution still
 requires the pinned private artifacts and reviewed construction/launch path;
-clean-machine bootstrap remains outstanding. Next work isolates browser body
-consumption from React navigation while retaining every original application gate.
+clean-machine bootstrap remains outstanding. Next work closes the outer public
+metadata classification gap while retaining every original application gate.
 
 Those [real-handler cache checks](next-persistent-cache-overlap-root-results-v1/README.md)
 now pass eleven groups/41 assertions on Node, stock Wasmtime and stock wasmCloud.

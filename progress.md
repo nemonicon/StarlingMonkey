@@ -4,6 +4,42 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
+Latest full-workload diagnostic: the [CDP resource-stream comparison](docs/node-compat/nextjs-resource-stream-results.md)
+finishes cloud67923/600 raw1/clean and Node68512/300 raw0/clean. Both pass24HTTP,
+52 portable checks,80 supplemental checks, generation1→2, stream3(0,1), UI2 and
+assets. The original strict browser gate remains cloudfalse/Nodetrue with3/0
+capture errors and1/0 failed requests. The pinned Chrome command actually works:
+both empty-prefix+one-binary-piece captures retain2,963 bytes, with different
+hashes. Cloud loadingFailed/canceled:true keeps completeResourceBody:false;
+Node loadingFinished proves that observer's completeResourceBody:true.
+CollectionComplete is true for both; no cloud EOF/React/host/cause claim follows.
+Primary review`7c181b42`, independent runtime gate`73c73690` and Root rehash pass.
+Raw index`304e67db` retains331 payloads/10,242,832 bytes. All original failures,
+preparation failure/correction and prior Source-peer qualifications remain.
+Source checkpoint`959454bc` is pushed. The saved-failure checker passes the
+current corpus and an isolated333-file copy from actual staged Git blobs, while
+requiring cloudfalse/NodeTrue and retaining resource-incomplete/complete. Root
+compares every staged payload byte; optimized Python is explicitly refused.
+Checker Source/binding peers`e6c76bb7`/`409899a0`, named-stage DATA peer`1a0853ba`
+and outer proposal peer`ebdd744b` pass in their stated scopes. No runtime fix or
+production promotion has occurred.
+
+The [compiled-path audit](tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-root-results-v1/native-response-lifetime-source-audit.md)
+(`d0a35f2f`, peer`2a7c7aeb`) finds the active direct-standard-WASI response pump
+separate from native HttpOutgoingBody.close's ignored finish result. That
+separate native error-propagation defect is not established as this abort's
+cause. The [public-stage DATA review](tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-root-results-v1/public-completion-stage-data-review.md)
+(`768f390a`) witnesses the named valid guest POST stage chain through EOF/child
+release/finish return/cleanup, but seven unknown outer POSTs block the broader
+join. Token1 and sequences repeat and do not establish physical identity.
+The [outer metadata audit](tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-root-results-v1/outer-observer-metadata-source-audit.md)
+(`8e2ecc32`) finds deliberate V3 correlation clearing for unadmitted paths, not
+proof of a getter failure. A bounded V4 wire is proposed to distinguish target/
+other/absent path and independent header state with the same standard calls;
+its Source peer`ebdd744b` passes, but it is not implemented or run, and old V3
+globaljoin:false is unchanged. This is
+the next gate before further intrusive instrumentation or an engine change.
+
 Current work: the [full-workload CDP observer](tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-root-results-v1/README.md)
 now has independent Source/API reviews`7f6e9841`/`f26f5512`, six actual Node
 syntax checks and17 actual synthetic groups passing. Earlier12 positive groups
@@ -16,7 +52,8 @@ correction preserves the actual failure and qualifies both prior Source passes;
 peer`cc5290a5` verifies cloud600 validation and unchanged fixed600/300 schedule.
 Second preparation`94e0cd22` finishes raw0 with no actor invoked. Independent
 binding/correction DATA review`721a82a4` reconstructs the exact union and passes
-before the fixed cloud→Node pair. No new browser/host run has occurred. Original strict failures remain failed.
+before the fixed cloud→Node pair. That actual pair now completes as recorded
+above; original strict failures remain failed.
 
 Latest bounded diagnostic: the [direct Chrome body control](docs/node-compat/nextjs-browser-body-prework-results.md)
 passes once on stock wasmCloud59256/600 and Node59943/300, both raw0/clean.
@@ -6945,11 +6982,13 @@ The [consumer355 producer](tests/node-compat/foundation-stream-consumers/native-
 
 ## Outstanding work, in dependency order
 
-Immediate execution priority remains Next.js response completion: implement and
-validate the Source-audited CDP resource-stream observer in one separately
-versioned strict workload, retaining every original assertion and failed sample.
-Use the observed body/terminal boundary to choose any later React root/reader
-instrumentation. Direct HTTP and Chrome arrayBuffer controls are complete within
+Immediate execution priority remains Next.js response completion. The CDP
+resource-stream comparison and qualified guest-stage DATA audits are complete
+within their scopes; cloud's strict failure remains. Next implement/test the
+Source-proposed V4 outer metadata classification in a separately versioned
+observer, preserving the old V3 globaljoin:false result, strict assertions and
+all failed samples. Use that evidence to choose any later React root/reader
+instrumentation or justified native fix. Direct HTTP and Chrome arrayBuffer controls are complete within
 their bounded scopes; the original full wasmCloud browser contract remains
 failed. Lifecycle/resource/reuse, clean-machine reproduction, empirical cost and
 production promotion follow that boundary investigation. The broader release
