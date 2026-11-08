@@ -1,0 +1,320 @@
+--- before/README.md
++++ after/README.md
+@@ -10,8 +10,8 @@
+ 
+ Top-level `resourceStreamObservation` contains `observations`, additive `errors`, `finalized`, `collectionComplete`, `commandSuccess`, `completeResourceBody` and `accepted`. A record contains the typed command/reply, CDP-only candidates/events/terminals, count-only rows, piece hashes/lengths, bounds, handoff status, final request admission and body/artifact/publication fields. `collectionComplete` requires a settled attempted command, one known terminal, final request admission, normal browser close and durable publication without uncertain collection errors. A recorded command rejection may be fully collected and INCONCLUSIVE: commandSuccess/completeResourceBody/accepted remain false. Unresolved commands, overflow, lost payload, bad framing/metadata, timeout, failed IO or source checks cannot satisfy collectionComplete.
+ 
+-`completeResourceBody` additionally requires a successful handoff, consistent retained payloads, positive actual data and one loadingFinished. loadingFailed can retain an observed prefix but never yields a complete body. `resource-stream-observed.bin` contains the buffered prefix followed by observed suffix pieces; its assembly/contiguousFromStart/complete fields explicitly distinguish a qualified prefix, incomplete pieces and a complete resource. `resource-stream-request.bin` retains the admitted fresh form bytes. Both files use exclusive creation, fsync, close and byte/hash readback before the final browser result is saved. Earlier inherited progress saves remain progress records. Normal browser closure precedes final observer publication. No extra network wait is added to the original lifecycle.
++`completeResourceBody` additionally requires a successful handoff, consistent retained payloads (including a legitimate zero-byte resource) and one loadingFinished. loadingFailed can retain an observed prefix but never yields a complete body. `resource-stream-observed.bin` contains the buffered prefix followed by observed suffix pieces; its assembly/contiguousFromStart/complete fields explicitly distinguish a qualified prefix, incomplete pieces and a complete resource. `resource-stream-request.bin` retains the admitted fresh form bytes. Both files use exclusive creation, fsync, close and byte/hash readback before the final browser result is saved. Earlier inherited progress saves remain progress records. Normal browser closure precedes final observer publication. No extra network wait is added to the original lifecycle.
+ 
+ The original strict `passed` remains separate. Root's new full-client/runtime protocol must evaluate the additive collection fields explicitly for comparison continuation and must retain all strict failures. Complete CDP resource bytes do not establish React root settlement, `reader.read().done`, stream cancellation initiator, MPA navigation, HTTP wire framing, TCP/host completion, private Store identity or cause. The observer adds browser/DevTools buffering, IPC, allocation and file IO, so a changed outcome alone is not a reliability, timing or GC explanation.
+ 
+-`resource-stream-fixtures.mjs` is inert until Root explicitly calls `runResourceStreamFixtures()`. Its twelve synthetic cases cover pre-reply suffix handoff, empty prefix/zero counter, missing payload, malformed base64, overflow stopping, failed terminal with retained prefix, known unsupported command, unresolved reply, same-ID redirect/reuse, payload-length contradiction, duplicate terminal and fresh multipart boundaries. These are bookkeeping fixtures, not browser or protocol implementation evidence. No fixture, helper, JavaScript parser, Node, CLI, browser, host or target was executed by the author. Root owns all syntax checks, index sealing, actual bindings, fixture execution and real runs.
++`resource-stream-fixtures.mjs` is inert until Root explicitly awaits `runResourceStreamFixtures()`. Its seventeen synthetic groups cover pre-reply suffix handoff, empty prefix/zero counter, missing payload, malformed base64, overflow stopping, failed terminal with retained prefix, known unsupported command, unresolved reply, same-ID redirect/reuse, payload-length contradiction, duplicate terminal, fresh multipart boundaries, all post-terminal data contradictions, zero-byte resource completeness, the full4MiB canonical base64 boundary, action type rejection and first/falsy publication error preservation with a secondary close failure. These are bookkeeping fixtures, not browser or protocol implementation evidence. Root executed the earlier twelve-group cut before this correction; that Source cut is preserved in Root/source-history. The five new regression groups and corrected Source remain unexecuted by the author. No fixture, helper, JavaScript parser, Node, CLI, browser, host or target was executed by the author. Root owns all syntax checks, index sealing, actual bindings, fixture execution and real runs.
+--- before/browser-check.mjs
++++ after/browser-check.mjs
+@@ -8,7 +8,7 @@
+ import {join,resolve,relative,isAbsolute} from 'node:path';
+ import {pathToFileURL,fileURLToPath} from 'node:url';
+ import {readPublicCorrelationManifest,publicCorrelationHeader} from './manifest.mjs';
+-import {createResourceStream,multipartEvidence,decodeBase64} from './resource-stream.mjs';
++import {createResourceStream,multipartEvidence,decodeBase64,withPublicationCleanup} from './resource-stream.mjs';
+ 
+ assert.equal(process.version,'v22.14.0');
+ const args=process.argv.slice(2),options={};
+@@ -155,12 +155,13 @@
+  requestIdScope:'one CDP session only; Playwright URL/body matches require explicit final evidence',strictPredicateUnchanged:true,
+  actualActionManifest:policy.actualActionManifest,requiredActionId:policy.requiredActionId,actualFormBoundaryAndLengthNotPinned:true,ReactReaderDoneObserved:false,cancellationCauseClaimed:false};
+ async function publishStream(path,bytes){
+- let handle;const evidence={complete:false,fsynced:false,closed:false,fileBytes:0,sha256:null,errors:[]};
+- try{handle=await open(path,'wx',0o600);await handle.writeFile(bytes);await handle.sync();evidence.fsynced=true;await handle.close();handle=null;evidence.closed=true;
++ let handle;const secondary=[];const evidence={complete:false,fsynced:false,closed:false,fileBytes:0,sha256:null,errors:[]};
++ try{return await withPublicationCleanup(async()=>{handle=await open(path,'wx',0o600);await handle.writeFile(bytes);await handle.sync();evidence.fsynced=true;await handle.close();handle=null;evidence.closed=true;
+   const a=await lstat(path);assert(a.isFile()&&!a.isSymbolicLink()&&a.nlink===1&&a.size===bytes.length);assert.equal(await realpath(path),path);const reread=await readFile(path),b=await lstat(path);
+   for(const k of ['dev','ino','size','mode','nlink','mtimeMs','ctimeMs'])assert.equal(a[k],b[k]);assert(reread.equals(bytes));evidence.fileBytes=bytes.length;evidence.sha256=createHash('sha256').update(bytes).digest('hex');evidence.complete=true;
+   return{ref:{path,sha256:evidence.sha256,bytes:bytes.length},evidence};
+- }finally{if(handle)await handle.close();}
++ },async()=>{if(handle)await handle.close();},secondary);}
++ finally{for(const error of secondary)result.resourceStreamObservation.errors.push({stage:'stream-publication-secondary-close',...errorData(error)});}
+ }
+ let browser;
+ await save();
+--- before/derivation.json
++++ after/derivation.json
+@@ -28,13 +28,13 @@
+   },
+   "workerPatch": {
+     "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-browser-v1/worker.patch",
+-    "sha256": "6dafe1e65846ea59f4e8bb8ae44b91d1bf46e7888f24c3dc7d590718c32755a4",
+-    "bytes": 12565
++    "sha256": "b52d09f0d0039ad26a409d86de0c40712016f559a968bccf9aec2c38630144ad",
++    "bytes": 12821
+   },
+   "planPatch": {
+     "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-browser-v1/plan.patch",
+-    "sha256": "8447bd6ab1b97df5b90fb20dfb532214d46c7b216a1dc5af7c4c685c408d7b3c",
+-    "bytes": 1249
++    "sha256": "196fefa34c013a2a76a7c4c8f35d520a2000e48484772206589926ce63f4933a",
++    "bytes": 2199
+   },
+   "removedOperationalDonorLines": [
+     "      for(const event of result.cdpScope.events)cdp.on(event,payload=>observer.cdp(event,payload,{test:id,phase}));\n"
+@@ -47,12 +47,31 @@
+     "original final strict conjunction"
+   ],
+   "newHelperFunctionsExecuted": false,
+-  "inertSyntheticFixtureGroups": 12,
++  "inertSyntheticFixtureGroups": 17,
+   "fixtureExecutionResult": null,
+   "actualAuthority": null,
+   "actualRuntime": null,
+   "oldStrictFailuresWaived": false,
+   "fullNextAccepted": false,
+   "ChromiumExaminedSource": "https://chromium.googlesource.com/chromium/src/+/494419358caf690316f160a1f27d9e771a14c033/third_party/blink/renderer/core/inspector/inspector_network_agent.cc",
+-  "ChromiumCommitProvesSelectedBinaryImplementation": false
++  "ChromiumCommitProvesSelectedBinaryImplementation": false,
++  "preactivationCorrection": {
++    "exactTenFilePreimageManifest": {
++      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-root-results-v1/source-history/observer-preactivation-correction-v1/preimages.json",
++      "sha256": "c24273d4415de9617f8b156fdd5c4ca255cfbddd1a8c0ebd862a882ad6d3e95c",
++      "bytes": 1644
++    },
++    "preimageDirectory": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-root-results-v1/source-history/observer-preactivation-correction-v1",
++    "changes": [
++      "explicit action string type",
++      "reject every post-terminal data event",
++      "zero-byte resource completeness separate from RSC semantics",
++      "bounded nonrecursive canonical base64",
++      "first raw publication failure including falsy preserved and secondary close failure recorded",
++      "plan commandTrigger literal matches worker",
++      "inherited whole-worker byteidentity claims qualified"
++    ],
++    "SourceFunctionsExecutedByR": false,
++    "priorRootTwelveGroupRunIsHistoricalPreimageOnly": true
++  }
+ }
+--- before/plan.json
++++ after/plan.json
+@@ -16,12 +16,14 @@
+       "server-action"
+     ],
+     "functionalBodiesByteIdenticalTo800f": true,
+-    "testContextObserverAndLifecycleByteIdenticalTo800f": true,
++    "testContextObserverAndLifecycleByteIdenticalTo800f": false,
+     "wholeTestMilliseconds": 20000,
+     "precloseCaptureDrainMilliseconds": 500,
+     "postcloseResponseDrainMilliseconds": 2000,
+     "newNavigationOrDrainPolicy": false,
+-    "retry": false
++    "retry": false,
++    "originalLifecycleNetworkObserverAndFunctionalSpansPreserved": true,
++    "contextCDPDispatchExtendedAdditively": true
+   },
+   "strictness": {
+     "original800fFinalPredicateUnchanged": true,
+@@ -70,9 +72,11 @@
+       "sha256": "60a5d0257394fb4a743668a7cf2855f60bfed742d803013523d72a05d2a3a999",
+       "bytes": 3057
+     },
+-    "allThreeCodeFilesByteIdentical": true,
++    "allThreeCodeFilesByteIdentical": false,
+     "codeExecutedByAuthor": false,
+-    "newIndexOrAuthorityIssued": false
++    "newIndexOrAuthorityIssued": false,
++    "onlyRunnerAndManifestByteIdentical": true,
++    "newWorkerIsAdditiveCDPObserverDerivative": true
+   },
+   "requiredActionId": null,
+   "actualActionManifest": null,
+@@ -88,7 +92,7 @@
+     "currentMultipartBoundaryMustEqualCapture": false,
+     "ChromeImplementationCommitIsNotBinaryProvenance": "494419358caf690316f160a1f27d9e771a14c033",
+     "version": 1,
+-    "commandTrigger": "first qualified requestWillBeSent",
++    "commandTrigger": "first-qualified-requestWillBeSent",
+     "metadataEventLimit": 1024,
+     "currentRequestBodyParsedAgainstManifestActionSemantics": true
+   }
+--- before/plan.patch
++++ after/plan.patch
+@@ -8,10 +8,34 @@
+    "actualAssetBindingsPending": true,
+    "applicationInputs": null,
+    "assetSelectionHtml": null,
+-@@ -73,5 +73,23 @@
+-     "allThreeCodeFilesByteIdentical": true,
++@@ -16,12 +16,14 @@
++       "server-action"
++     ],
++     "functionalBodiesByteIdenticalTo800f": true,
++-    "testContextObserverAndLifecycleByteIdenticalTo800f": true,
+++    "testContextObserverAndLifecycleByteIdenticalTo800f": false,
++     "wholeTestMilliseconds": 20000,
++     "precloseCaptureDrainMilliseconds": 500,
++     "postcloseResponseDrainMilliseconds": 2000,
++     "newNavigationOrDrainPolicy": false,
++-    "retry": false
+++    "retry": false,
+++    "originalLifecycleNetworkObserverAndFunctionalSpansPreserved": true,
+++    "contextCDPDispatchExtendedAdditively": true
++   },
++   "strictness": {
++     "original800fFinalPredicateUnchanged": true,
++@@ -70,8 +72,28 @@
++       "sha256": "60a5d0257394fb4a743668a7cf2855f60bfed742d803013523d72a05d2a3a999",
++       "bytes": 3057
++     },
++-    "allThreeCodeFilesByteIdentical": true,
+++    "allThreeCodeFilesByteIdentical": false,
+      "codeExecutedByAuthor": false,
+-     "newIndexOrAuthorityIssued": false
++-    "newIndexOrAuthorityIssued": false
+++    "newIndexOrAuthorityIssued": false,
+++    "onlyRunnerAndManifestByteIdentical": true,
+++    "newWorkerIsAdditiveCDPObserverDerivative": true
+ +  },
+ +  "requiredActionId": null,
+ +  "actualActionManifest": null,
+@@ -27,7 +51,7 @@
+ +    "currentMultipartBoundaryMustEqualCapture": false,
+ +    "ChromeImplementationCommitIsNotBinaryProvenance": "494419358caf690316f160a1f27d9e771a14c033",
+ +    "version": 1,
+-+    "commandTrigger": "first qualified requestWillBeSent",
+++    "commandTrigger": "first-qualified-requestWillBeSent",
+ +    "metadataEventLimit": 1024,
+ +    "currentRequestBodyParsedAgainstManifestActionSemantics": true
+    }
+--- before/resource-stream-fixtures.mjs
++++ after/resource-stream-fixtures.mjs
+@@ -1,7 +1,7 @@
+ // Inert synthetic cases. Root may explicitly call this export after Source review.
+ import assert from 'node:assert/strict';
+-import {createResourceStream,multipartEvidence} from './resource-stream.mjs';
+-export function runResourceStreamFixtures(){
++import {createResourceStream,multipartEvidence,withPublicationCleanup} from './resource-stream.mjs';
++export async function runResourceStreamFixtures(){
+  const url='http://127.0.0.1:12345/actions',headerName='x-next-public-request-correlation',nonce='a'.repeat(64),admission={passed:true},done={requestId:'one'};
+  const make=options=>createResourceStream({url,headerName,nonce,now:()=>'0',...options});
+  const start=m=>{const command=m.note('Network.requestWillBeSent',{requestId:'one',request:{url,method:'POST',headers:{[headerName]:nonce}}});assert.deepEqual(command,{method:'Network.streamResourceContent',params:{requestId:'one'}});};
+@@ -55,5 +55,28 @@
+   const a=multipartEvidence(build('fresh-A'),'multipart/form-data; boundary=fresh-A',action),b=multipartEvidence(build('fresh-B'),'multipart/form-data; boundary=fresh-B',action);
+   assert(a.valid&&b.valid&&a.sha256!==b.sha256);assert.deepEqual(a.parts,b.parts);assert(!multipartEvidence(build('fresh-A','wrong'),'multipart/form-data; boundary=fresh-A',action).valid);checks.push('fresh-multipart-semantics-not-old-bytes');
+  }
++ {
++  for(const length of [0,1]){const m=make();start(m);m.fulfilled({bufferedData:''});m.note('Network.loadingFinished',done);data(m,length?'x':'');
++   const r=m.finish(admission);assert(!r.record.collectionComplete&&!r.record.completeResourceBody&&r.record.errors.some(x=>x.code==='data-after-terminal'));}
++  checks.push('all-data-after-terminal-rejected');
++ }
++ {
++  const m=make();start(m);m.fulfilled({bufferedData:''});const r=finish(m);assert(r.record.completeResourceBody&&r.body.length===0);checks.push('empty-resource-completeness-not-RSC-semantics');
++ }
++ {
++  const buffer=Buffer.alloc(4194304,97),m=make();start(m);m.note('Network.dataReceived',{requestId:'one',dataLength:buffer.length,encodedDataLength:0});m.fulfilled({bufferedData:buffer.toString('base64')});
++  const r=finish(m);assert(r.record.completeResourceBody&&r.body.equals(buffer));checks.push('full-four-MiB-canonical-base64');
++ }
++ {
++  for(const action of [undefined,null,42,{},['1'.repeat(42)]])assert.throws(()=>multipartEvidence(Buffer.alloc(0),'multipart/form-data; boundary=x',action),TypeError);
++  checks.push('action-type-no-coercion');
++ }
++ {
++  for(const primary of [undefined,null,false,0,'']){const secondary=[],closeError=new Error('synthetic cleanup failure');let caught=false;
++   try{await withPublicationCleanup(async()=>{throw primary;},async()=>{throw closeError;},secondary);}catch(error){caught=true;assert.strictEqual(error,primary);}
++   assert(caught);assert.deepEqual(secondary,[closeError]);}
++  const closeError=new Error('only cleanup failed');let caught=false;try{await withPublicationCleanup(async()=>1,async()=>{throw closeError;},[]);}catch(error){caught=true;assert.strictEqual(error,closeError);}assert(caught);
++  checks.push('publication-primary-including-falsy-and-secondary-close');
++ }
+  return{state:'SYNTHETIC_RESOURCE_STREAM_FIXTURES_PASSED_V1',passed:true,checks,actualCDPOrBrowserExecuted:false};
+ }
+--- before/resource-stream.mjs
++++ after/resource-stream.mjs
+@@ -2,11 +2,18 @@
+ import {createHash} from 'node:crypto';
+ const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+ export function decodeBase64(value){
+- if(typeof value!=='string'||value.length%4!==0||!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(value))throw new TypeError('Noncanonical base64');
+- const bytes=Buffer.from(value,'base64');if(bytes.toString('base64')!==value)throw new TypeError('Noncanonical base64');return bytes;
++ if(typeof value!=='string'||value.length%4!==0||value.length>5592408)throw new TypeError('Bounded canonical base64 required');
++ for(let i=0;i<value.length;i++){const c=value.charCodeAt(i);if(!((c>=65&&c<=90)||(c>=97&&c<=122)||(c>=48&&c<=57)||c===43||c===47||c===61))throw new TypeError('Noncanonical base64 character');}
++ const bytes=Buffer.from(value,'base64');if(bytes.length>4194304||bytes.toString('base64')!==value)throw new TypeError('Noncanonical or oversized base64');return bytes;
++}
++export async function withPublicationCleanup(operation,cleanup,secondaryErrors){
++ let failed=false,primary,value;
++ try{value=await operation();}catch(error){failed=true;primary=error;}
++ try{await cleanup();}catch(error){if(failed)secondaryErrors.push(error);else throw error;}
++ if(failed)throw primary;return value;
+ }
+ export function multipartEvidence(bytes,contentType,actionId){
+- if(!Buffer.isBuffer(bytes)||bytes.length>65536||/^[a-f0-9]{42}$/.exec(actionId)?.[0]!==actionId)throw new TypeError('Bounded current action evidence required');
++ if(!Buffer.isBuffer(bytes)||bytes.length>65536||typeof actionId!=='string'||/^[a-f0-9]{42}$/.exec(actionId)?.[0]!==actionId)throw new TypeError('Bounded current action evidence required');
+  const match=/^multipart\/form-data; boundary=([A-Za-z0-9-]{1,70})$/.exec(contentType);if(!match||match[0]!==contentType)throw new TypeError('Exact multipart content type required');
+  const text=bytes.toString('utf8');if(!Buffer.from(text,'utf8').equals(bytes))throw new TypeError('Actual form evidence is not UTF8');
+  const boundary=match[1],chunks=text.split('--'+boundary);if(chunks.shift()!==''||chunks.pop()!=='--\r\n')throw new TypeError('Multipart boundary framing');
+@@ -46,6 +53,7 @@
+   }
+   const id=record.candidates[0]?.requestId;if(!id||payload.requestId!==id)return null;
+   if(event==='Network.dataReceived'){
++   if(record.terminals.length){fail('data-after-terminal','Data notification after selected terminal, including a zero-data notification');return null;}
+    const row=meta('data',{requestId:id,dataLength:payload.dataLength,encodedDataLength:payload.encodedDataLength,dataPresent:Object.hasOwn(payload,'data'),beforeCommandReply:!replySeen});if(!row)return null;
+    if(!Number.isSafeInteger(payload.dataLength)||payload.dataLength<0){fail('invalid-data-length','Invalid CDP length');return null;}
+    if(Object.hasOwn(payload,'data')){
+@@ -76,7 +84,7 @@
+   record.commandSuccess=record.handoffSuccessful&&record.reply?.outcome==='fulfilled';
+   record.collectionComplete=!!record.command&&replySeen&&record.terminals.length===1&&admission?.passed===true&&!record.errors.some(x=>x.collectionUncertain);
+   record.payloadsComplete=record.handoffSuccessful&&!record.errors.some(x=>x.collectionUncertain);
+-  record.completeBody=record.payloadsComplete&&total>0&&record.terminals[0]?.event==='Network.loadingFinished'&&admission?.passed===true;
++  record.completeBody=record.payloadsComplete&&record.terminals[0]?.event==='Network.loadingFinished'&&admission?.passed===true;
+   record.completeResourceBody=record.completeBody;
+   const body=Buffer.concat(prefix===null?suffix:[prefix,...suffix]);
+   record.body={bytes:body.length,sha256:digest(body),assembly:prefix===null?'observed-stream-pieces-only':'buffered-prefix-then-observed-stream-pieces',contiguousFromStart:record.payloadsComplete,complete:record.completeBody};
+--- before/worker.patch
++++ after/worker.patch
+@@ -4,7 +4,7 @@
+  import {join,resolve,relative,isAbsolute} from 'node:path';
+  import {pathToFileURL,fileURLToPath} from 'node:url';
+  import {readPublicCorrelationManifest,publicCorrelationHeader} from './manifest.mjs';
+-+import {createResourceStream,multipartEvidence,decodeBase64} from './resource-stream.mjs';
+++import {createResourceStream,multipartEvidence,decodeBase64,withPublicationCleanup} from './resource-stream.mjs';
+  
+  assert.equal(process.version,'v22.14.0');
+  const args=process.argv.slice(2),options={};
+@@ -32,7 +32,7 @@
+  assert.equal(new Set(policy.assetPins.map(x=>x.path)).size,policy.assetPins.length);
+  assert.equal(new Set(policy.actionsAssetPins.map(x=>x.path)).size,policy.actionsAssetPins.length);
+  for(const pin of [...policy.assetPins,...policy.actionsAssetPins]){
+-@@ -137,6 +150,18 @@
++@@ -137,6 +150,19 @@
+  function trace(test,phase,event,data={}){if(result.trace.length>=4000){if(!result.errors.some(x=>x.stage==='trace-limit'))result.errors.push({stage:'trace-limit',message:'4000 trace records exceeded'});return;}result.trace.push({sequence:++sequence,ns:(process.hrtime.bigint()-traceStart).toString(),test,phase,event,...data});}
+  const save=()=>writeFile(join(output,'result.json'),JSON.stringify(result,null,2)+'\n',{mode:0o600});
+  const errorData=e=>({name:typeof e?.name==='string'?e.name:'Error',message:typeof e?.message==='string'?e.message:String(e),stack:typeof e?.stack==='string'?e.stack:null});
+@@ -41,17 +41,18 @@
+ + requestIdScope:'one CDP session only; Playwright URL/body matches require explicit final evidence',strictPredicateUnchanged:true,
+ + actualActionManifest:policy.actualActionManifest,requiredActionId:policy.requiredActionId,actualFormBoundaryAndLengthNotPinned:true,ReactReaderDoneObserved:false,cancellationCauseClaimed:false};
+ +async function publishStream(path,bytes){
+-+ let handle;const evidence={complete:false,fsynced:false,closed:false,fileBytes:0,sha256:null,errors:[]};
+-+ try{handle=await open(path,'wx',0o600);await handle.writeFile(bytes);await handle.sync();evidence.fsynced=true;await handle.close();handle=null;evidence.closed=true;
+++ let handle;const secondary=[];const evidence={complete:false,fsynced:false,closed:false,fileBytes:0,sha256:null,errors:[]};
+++ try{return await withPublicationCleanup(async()=>{handle=await open(path,'wx',0o600);await handle.writeFile(bytes);await handle.sync();evidence.fsynced=true;await handle.close();handle=null;evidence.closed=true;
+ +  const a=await lstat(path);assert(a.isFile()&&!a.isSymbolicLink()&&a.nlink===1&&a.size===bytes.length);assert.equal(await realpath(path),path);const reread=await readFile(path),b=await lstat(path);
+ +  for(const k of ['dev','ino','size','mode','nlink','mtimeMs','ctimeMs'])assert.equal(a[k],b[k]);assert(reread.equals(bytes));evidence.fileBytes=bytes.length;evidence.sha256=createHash('sha256').update(bytes).digest('hex');evidence.complete=true;
+ +  return{ref:{path,sha256:evidence.sha256,bytes:bytes.length},evidence};
+-+ }finally{if(handle)await handle.close();}
+++ },async()=>{if(handle)await handle.close();},secondary);}
+++ finally{for(const error of secondary)result.resourceStreamObservation.errors.push({stage:'stream-publication-secondary-close',...errorData(error)});}
+ +}
+  let browser;
+  await save();
+  try{
+-@@ -215,7 +240,13 @@
++@@ -215,7 +241,13 @@
+        if(id==='server-action')page.on('request',request=>{if(request.method()==='POST'){const bytes=request.postDataBuffer();result.actionPosts.push({url:request.url(),headers:request.headers(),bodyBase64:bytes?.toString('base64')??null,bytes:bytes?.length??null});}});
+        mark('cdp-observer-setup');
+        const cdp=await context.newCDPSession(page);
+@@ -66,7 +67,7 @@
+        cdp.on('close',()=>trace(id,phase,'cdp-session-close'));
+        await cdp.send('Network.enable');await cdp.send('Page.enable');
+        record.cdpEnabledBeforeFirstAppRequest=true;trace(id,phase,'cdp-enabled',{domains:['Network','Page'],interception:false});
+-@@ -314,6 +345,36 @@
++@@ -314,6 +346,36 @@
+      result.cdpCorrelations.push({test:event.test,cdpRequestId:p.requestId,cdpSequence:event.sequence,cdpTimestamp:p.timestamp,cdpArrivalNs:event.arrivalNs,
+        url:p.request?.url??null,method:p.request?.method??null,playwrightCandidates:candidates.map(x=>({requestId:x.requestId,arrivalNs:x.ns})),identityProved:false,policy:'URL/method candidates only; independent ID and clock namespaces'});
+    }

@@ -1,0 +1,105 @@
+--- ../next-fs-callback-no-compress-browser-v1/browser-check.mjs
++++ browser-check.mjs
+@@ -8,6 +8,7 @@
+ import {join,resolve,relative,isAbsolute} from 'node:path';
+ import {pathToFileURL,fileURLToPath} from 'node:url';
+ import {readPublicCorrelationManifest,publicCorrelationHeader} from './manifest.mjs';
++import {createResourceStream,multipartEvidence,decodeBase64} from './resource-stream.mjs';
+ 
+ assert.equal(process.version,'v22.14.0');
+ const args=process.argv.slice(2),options={};
+@@ -21,11 +22,23 @@
+ const planPath=fileURLToPath(new URL('./plan.json',import.meta.url));
+ const policy=JSON.parse(await readFile(planPath,'utf8'));
+ assert.equal(policy.actualAssetBindingsPending,false,'Pristine redirect actual asset bindings pending; no output/browser');
++assert.equal(typeof policy.requiredActionId,'string','Current action manifest binding pending');assert(/^[a-f0-9]{42}$/.exec(policy.requiredActionId)?.[0]===policy.requiredActionId);
++assert.equal(policy.resourceStreamObservationPolicy.version,1);assert.equal(policy.resourceStreamObservationPolicy.commandTrigger,'first-qualified-requestWillBeSent');
++for(const [key,value]of Object.entries({bodyLimitBytes:4194304,chunkLimit:65536,metadataEventLimit:1024,metadataBytes:262144}))assert.equal(policy.resourceStreamObservationPolicy[key],value);
++async function evidence(ref,cap){
++ assert(ref&&typeof ref.path==='string'&&Number.isSafeInteger(ref.bytes)&&ref.bytes>=0&&ref.bytes<=cap);assert.equal(resolve(ref.path),ref.path);assert.equal(await realpath(ref.path),ref.path);
++ const a=await lstat(ref.path);assert(a.isFile()&&!a.isSymbolicLink()&&a.nlink===1&&a.size===ref.bytes);const bytes=await readFile(ref.path),b=await lstat(ref.path);
++ for(const k of ['dev','ino','size','mode','nlink','mtimeMs','ctimeMs'])assert.equal(a[k],b[k]);assert.equal(bytes.length,ref.bytes);assert.equal(createHash('sha256').update(bytes).digest('hex'),ref.sha256);return bytes;
++}
++const actionManifest=JSON.parse(await evidence(policy.actualActionManifest,1048576));
++const actionCandidates=Object.entries(actionManifest.node??{}).filter(([,x])=>x.filename==='app/actions/actions.js'&&x.exportedName==='submitFixture'&&Object.hasOwn(x.workers??{},'app/actions/page'));
++assert.equal(actionCandidates.length,1);assert.equal(actionCandidates[0][0],policy.requiredActionId);
+ assert(policy.applicationInputs&&policy.assetSelectionHtml&&policy.actionsAssetSelectionHtml&&Array.isArray(policy.assetPins)&&policy.assetPins.length>0&&policy.assetPins.length<=64&&Array.isArray(policy.actionsAssetPins)&&policy.actionsAssetPins.length>0);
+ for(const ref of [policy.applicationInputs,policy.assetSelectionHtml,policy.actionsAssetSelectionHtml]){
+  assert.equal(resolve(ref.path),ref.path);assert.equal(await realpath(ref.path),ref.path);assert.deepEqual(await descriptor(ref.path),ref);
+ }
+ const inventory=JSON.parse(await readFile(policy.applicationInputs.path,'utf8'));
++const actionManifestMember=inventory.files.find(x=>x.path==='.next/server/server-reference-manifest.json');assert(actionManifestMember);assert.equal(policy.actualActionManifest.path,join(inventory.root,actionManifestMember.path));assert.equal(actionManifestMember.sha256,policy.actualActionManifest.sha256);assert.equal(actionManifestMember.bytes,policy.actualActionManifest.bytes);
+ assert.equal(new Set(policy.assetPins.map(x=>x.path)).size,policy.assetPins.length);
+ assert.equal(new Set(policy.actionsAssetPins.map(x=>x.path)).size,policy.actionsAssetPins.length);
+ for(const pin of [...policy.assetPins,...policy.actionsAssetPins]){
+@@ -137,6 +150,18 @@
+ function trace(test,phase,event,data={}){if(result.trace.length>=4000){if(!result.errors.some(x=>x.stage==='trace-limit'))result.errors.push({stage:'trace-limit',message:'4000 trace records exceeded'});return;}result.trace.push({sequence:++sequence,ns:(process.hrtime.bigint()-traceStart).toString(),test,phase,event,...data});}
+ const save=()=>writeFile(join(output,'result.json'),JSON.stringify(result,null,2)+'\n',{mode:0o600});
+ const errorData=e=>({name:typeof e?.name==='string'?e.name:'Error',message:typeof e?.message==='string'?e.message:String(e),stack:typeof e?.stack==='string'?e.stack:null});
++const streamModels=[];
++result.resourceStreamObservation={schemaVersion:1,state:'CDP_RESOURCE_STREAM_WORKER_IN_PROGRESS_V1',observations:[],errors:[],finalized:false,accepted:false,
++ requestIdScope:'one CDP session only; Playwright URL/body matches require explicit final evidence',strictPredicateUnchanged:true,
++ actualActionManifest:policy.actualActionManifest,requiredActionId:policy.requiredActionId,actualFormBoundaryAndLengthNotPinned:true,ReactReaderDoneObserved:false,cancellationCauseClaimed:false};
++async function publishStream(path,bytes){
++ let handle;const evidence={complete:false,fsynced:false,closed:false,fileBytes:0,sha256:null,errors:[]};
++ try{handle=await open(path,'wx',0o600);await handle.writeFile(bytes);await handle.sync();evidence.fsynced=true;await handle.close();handle=null;evidence.closed=true;
++  const a=await lstat(path);assert(a.isFile()&&!a.isSymbolicLink()&&a.nlink===1&&a.size===bytes.length);assert.equal(await realpath(path),path);const reread=await readFile(path),b=await lstat(path);
++  for(const k of ['dev','ino','size','mode','nlink','mtimeMs','ctimeMs'])assert.equal(a[k],b[k]);assert(reread.equals(bytes));evidence.fileBytes=bytes.length;evidence.sha256=createHash('sha256').update(bytes).digest('hex');evidence.complete=true;
++  return{ref:{path,sha256:evidence.sha256,bytes:bytes.length},evidence};
++ }finally{if(handle)await handle.close();}
++}
+ let browser;
+ await save();
+ try{
+@@ -215,7 +240,13 @@
+       if(id==='server-action')page.on('request',request=>{if(request.method()==='POST'){const bytes=request.postDataBuffer();result.actionPosts.push({url:request.url(),headers:request.headers(),bodyBase64:bytes?.toString('base64')??null,bytes:bytes?.length??null});}});
+       mark('cdp-observer-setup');
+       const cdp=await context.newCDPSession(page);
+-      for(const event of result.cdpScope.events)cdp.on(event,payload=>observer.cdp(event,payload,{test:id,phase}));
++      const stream=id==='server-action'?createResourceStream({url:new URL('/actions',origin).href,headerName:publicCorrelationHeader,nonce:correlation.manifest.nonceByTest[id],now:()=>(process.hrtime.bigint()-traceStart).toString(),bodyLimit:policy.resourceStreamObservationPolicy.bodyLimitBytes,chunkLimit:policy.resourceStreamObservationPolicy.chunkLimit,eventLimit:policy.resourceStreamObservationPolicy.metadataEventLimit,metadataLimit:policy.resourceStreamObservationPolicy.metadataBytes}):null;
++      if(stream){streamModels.push(stream);result.resourceStreamObservation.observations.push(stream.record);}
++      for(const event of [...result.cdpScope.events,'Network.requestWillBeSentExtraInfo','Network.responseReceivedExtraInfo'])cdp.on(event,payload=>{
++       observer.cdp(event,payload,{test:id,phase});
++       if(stream)try{const command=stream.note(event,payload);if(command){const pending=cdp.send(command.method,command.params);void pending.then(value=>stream.fulfilled(value),error=>stream.rejected(error)).catch(error=>result.resourceStreamObservation.errors.push({stage:'command-reply-accounting',...errorData(error)}));}}
++       catch(error){result.resourceStreamObservation.errors.push({stage:'stream-event-accounting',...errorData(error)});}
++      });
+       cdp.on('close',()=>trace(id,phase,'cdp-session-close'));
+       await cdp.send('Network.enable');await cdp.send('Page.enable');
+       record.cdpEnabledBeforeFirstAppRequest=true;trace(id,phase,'cdp-enabled',{domains:['Network','Page'],interception:false});
+@@ -314,6 +345,36 @@
+     result.cdpCorrelations.push({test:event.test,cdpRequestId:p.requestId,cdpSequence:event.sequence,cdpTimestamp:p.timestamp,cdpArrivalNs:event.arrivalNs,
+       url:p.request?.url??null,method:p.request?.method??null,playwrightCandidates:candidates.map(x=>({requestId:x.requestId,arrivalNs:x.ns})),identityProved:false,policy:'URL/method candidates only; independent ID and clock namespaces'});
+   }
++  // Additive observation only: no new network wait, page hook, body reader or strict-predicate exception.
++  for(const stream of streamModels){
++   let admission={passed:false,errors:[],actualRequestBody:null,multipart:null,CDPBodyMatchedPlaywright:false};
++   try{
++    const actionTest=result.tests.find(x=>x.id==='server-action');assert(actionTest&&actionTest.timedOut===false&&actionTest.cdpObserver.stopped===false);
++    const candidates=result.actionPosts.filter(x=>x.url===new URL('/actions',origin).href);assert.equal(candidates.length,1);
++    const actual=candidates[0],body=decodeBase64(actual.bodyBase64),headers=new Map(Object.entries(actual.headers).map(([k,v])=>[k.toLowerCase(),v]));
++    const multipart=multipartEvidence(body,headers.get('content-type'),policy.requiredActionId);assert.equal(multipart.valid,true);
++    const selected=stream.record.candidates;assert.equal(selected.length,1);const requestId=selected[0].requestId;
++    const requests=result.cdpEvents.filter(x=>x.test==='server-action'&&x.event==='Network.requestWillBeSent'&&x.payload.requestId===requestId);assert.equal(requests.length,1);
++    const request=requests[0].payload.request;assert.equal(request.method,'POST');assert.equal(request.url,actual.url);assert.equal(typeof request.postData,'string');assert(Buffer.from(request.postData,'utf8').equals(body));
++    const extras=result.cdpEvents.filter(x=>x.test==='server-action'&&x.event==='Network.requestWillBeSentExtraInfo'&&x.payload.requestId===requestId);assert.equal(extras.length,1);
++    const observed=new Map(Object.entries(extras[0].payload.headers).map(([k,v])=>[k.toLowerCase(),v]));
++    assert.equal(observed.get(publicCorrelationHeader),result.publicRequestCorrelation.manifest.nonceByTest['server-action']);assert.equal(observed.get('next-action'),policy.requiredActionId);
++    assert.equal(observed.get('content-type'),headers.get('content-type'));assert.equal(observed.get('origin'),origin.origin);assert.equal(observed.get('referer'),actual.url);
++    const publication=await publishStream(join(output,'resource-stream-request.bin'),body);
++    admission={passed:true,errors:[],actualRequestBody:publication.ref,actualRequestBodyPublication:publication.evidence,multipart,CDPBodyMatchedPlaywright:true,
++     cdpRequestId:requestId,requestEventSequence:requests[0].sequence,requestExtraInfoSequence:extras[0].sequence,publicContextVerified:true,currentActionId:policy.requiredActionId,
++     capturedBodyHashEqualityRequired:false,physicalOrCrossProtocolRequestIdentityClaimed:false};
++   }catch(error){admission.errors.push(errorData(error));}
++   try{const final=stream.finish(admission);const publication=await publishStream(join(output,'resource-stream-observed.bin'),final.body);final.record.artifact=publication.ref;final.record.publication=publication.evidence;}
++   catch(error){result.resourceStreamObservation.errors.push({stage:'stream-finalization-publication',...errorData(error)});}
++  }
++  try{await evidence(policy.actualActionManifest,1048576);}catch(error){result.resourceStreamObservation.errors.push({stage:'stream-action-manifest-final',...errorData(error)});}
++  result.resourceStreamObservation.finalized=true;
++  result.resourceStreamObservation.commandSuccess=streamModels.length===1&&streamModels[0].record.commandSuccess===true;
++  result.resourceStreamObservation.completeResourceBody=streamModels.length===1&&streamModels[0].record.completeResourceBody===true;
++  result.resourceStreamObservation.collectionComplete=result.browserClosed===true&&streamModels.length===1&&streamModels[0].record.collectionComplete===true&&streamModels[0].record.publication?.complete===true&&result.resourceStreamObservation.errors.length===0;
++  result.resourceStreamObservation.accepted=result.resourceStreamObservation.collectionComplete&&result.resourceStreamObservation.completeResourceBody;
++  result.resourceStreamObservation.state=result.resourceStreamObservation.accepted?'CDP_RESOURCE_STREAM_WORKER_COMPLETE_UNREVIEWED_V1':'CDP_RESOURCE_STREAM_WORKER_INCONCLUSIVE_OR_FAILED_V1';
+   const counterAssets=result.assetBodies.filter(x=>x.test==='client-counter');
+   result.assetCapturePassed=counterAssets.length===assetPins.length&&assetPins.every(p=>counterAssets.filter(a=>new URL(a.url).pathname===p.path&&a.sourceMatch===true).length===1);
+   if(!result.assetCapturePassed)result.errors.push({stage:'client-asset-capture',message:'All declared current client decoded script bodies required'});

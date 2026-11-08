@@ -1,0 +1,486 @@
+--- body-unbound-controller
++++ stream-observer-unbound-controller
+@@ -1,4 +1,4 @@
+-"""Prepare the fixed cloud then bridged-Node Chrome-body-RSC prework response probes; run one original owner at a time."""
++"""Prepare the fixed cloud then bridged-Node full workload and CDP resource observations; run one original owner at a time."""
+ import argparse
+ import hashlib
+ import importlib.util
+@@ -38,100 +38,95 @@
+     return value
+ 
+ 
++ASSET_SELECTION = dict(path=str(BASE / 'next-fs-callback-no-compress-root-results-v1/asset-selection.json'), sha256='05c965a6b536af21c5947ccace5d9c1cc12b129c86a5b2df42e1bb95dd2c5b4c', bytes=7350)
++
++
+ def context():
+     assert __debug__ and sys.flags.isolated and sys.dont_write_bytecode and type(BINDINGS) is dict, 'Unbound Source refuses helper import/action'
+     path = Path(PREPARER['path'])
+     raw = path.read_bytes()
+     assert path.resolve() == path and not path.is_symlink() and path.stat().st_nlink == 1
+     assert (hashlib.sha256(raw).hexdigest(), len(raw)) == (PREPARER['sha256'], PREPARER['bytes'])
+-    spec = importlib.util.spec_from_file_location('genuine_rsc_response_control_admission', path)
++    spec = importlib.util.spec_from_file_location('genuine_stream_observer_full_admission', path)
+     prep = importlib.util.module_from_spec(spec)
+     spec.loader.exec_module(prep)
+     binding = prep.document(BINDINGS)
+-    assert binding['state'] == 'ROOT_RSC_BROWSER_BODY_PREWORK_ACTUAL_BINDINGS_V1'
++    assert binding['state'] == 'ROOT_RSC_STREAM_OBSERVER_ACTUAL_BINDINGS_V1'
+     assert binding['compositionReview'] == COMPOSITION_REVIEW and binding['innerConstructionReview'] == INNER_REVIEW
+-    assert binding['applicationBuildReview'] == REQUIRED_APP_REVIEW
+-    actor_index = prep.family(binding['actorIndex'])
+-    client_index = prep.family(binding['clientIndex'])
+-    client_root = Path(binding['clientIndex']['path']).parent
+-    assert client_root == BASE / 'next-rsc-browser-body-prework-client-v1'
+-    client_plan_ref = next(dict(r, path=str(client_root / r['path'])) for r in client_index['files'] if r['path'] == 'plan.json')
+-    client_plan = prep.document(client_plan_ref)
+-    assert client_plan['suite'] == 'NEXT_RSC_BROWSER_BODY_PREWORK_CLIENT_V1'
+-    assert client_plan['nodeArgc'] == 6 and client_plan['controlOnly'] is True
+-    assert client_plan['fullOriginalContractExecuted'] is False
+-    assert client_plan['requiredApplicationReview'] == REQUIRED_APP_REVIEW
+-    assert client_plan['bodyLimitBytes'] == 4 * 1024 * 1024
+-    assert client_plan['resultLimitBytes'] == 16 * 1024 * 1024
+-    assert client_plan['browserTools'] == '/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools'
+-    assert len(client_plan['hostRequirements']) == 6
+-    for ref in client_plan['hostRequirements']:
++    assert binding['applicationBuildReview'] == REQUIRED_APP_REVIEW and binding['assetSelection'] == ASSET_SELECTION
++    actor_root, client_root, browser_root = (BASE / name for name in ('next-rsc-stream-observer-runtime-v1', 'next-rsc-stream-observer-full-client-v1', 'next-rsc-stream-observer-browser-v1'))
++    indices = {}
++    for role, folder in (('actorIndex', actor_root), ('clientIndex', client_root), ('browserIndex', browser_root)):
++        assert binding[role]['path'] == str(folder / 'index.json')
++        indices[role] = prep.family(binding[role])
++    def member(role, filename):
++        folder = Path(binding[role]['path']).parent
++        return next(dict(row, path=str(folder / row['path'])) for row in indices[role]['files'] if row['path'] == filename)
++    client_plan = prep.document(member('clientIndex', 'plan.json'))
++    browser_plan = prep.document(member('browserIndex', 'plan.json'))
++    worker = member('browserIndex', 'browser-check.mjs')
++    assert client_plan['suite'] == 'NEXT_RSC_STREAM_OBSERVER_FULL_CONTRACT_CLIENT_V1'
++    assert client_plan['controlOnly'] is False and client_plan['actualBrowserSourceBindingPending'] is False
++    requirements = client_plan['sourceRequirements']
++    assert set(requirements) == {'manifestReader', 'supplemental', 'portableCacheCollector', 'fixtureContract', 'browserSourceIndex', 'browserWorker'}
++    assert requirements['browserSourceIndex'] == binding['browserIndex'] and requirements['browserWorker'] == worker
++    protected = {row['path']: row for row in binding['protectedInputs']}
++    assert len(protected) == len(binding['protectedInputs']) and protected
++    for ref in requirements.values():
+         prep.checked(ref)
+-    assert client_plan['httpTimeoutMs'] == 20000 and client_plan['cleanupTimeoutMs'] == 2000
+-    prework_requirements = client_plan['preworkSourceRequirements']
+-    assert set(prework_requirements) == {'donorFullClient', 'portableCacheCollector', 'supplemental', 'fixtureContract'}
+-    prework_module = client_plan['preworkModule']
+-    assert prework_module['path'] == str(client_root / 'prework.mjs')
+-    assert any(dict(r, path=str(client_root / r['path'])) == prework_module for r in client_index['files'])
+-    requirements = client_plan['sourceRequirements']
+-    assert set(requirements) == {'requestCapture', 'requestBody', 'headerEvidence'}
+-    assert client_plan['requestCapture'] == binding['requestCapture'] == requirements['requestCapture']
+-    protected = {ref['path']: ref for ref in binding['protectedInputs']}
+-    assert len(protected) == len(binding['protectedInputs'])
+-    for ref in [*requirements.values(), *prework_requirements.values()]:
+-        prep.checked(ref)
+-        assert protected[ref['path']] == ref, 'Every external client consumer is protected before/final'
+-    actor_root = Path(binding['actorIndex']['path']).parent
+-    assert actor_root == BASE / 'next-rsc-browser-body-prework-runtime-v1'
+-    for role, name in [('cloudPlan', 'plan.json'), ('stockPlan', 'stock-plan.json')]:
+-        assert binding[role]['path'] == str(actor_root / name)
+-        assert any(dict(r, path=str(actor_root / r['path'])) == binding[role] for r in actor_index['files'])
+-    app = prep.document(binding['applicationBuildReview'])
+-    assert app['state'] == 'COORDINATED_FS_CALLBACK_NO_COMPRESS_APP_BUILD_DATA_REVIEW_PASSED_V1' and app['verifiedPassed'] is True
+-    assert app['verifiedDataReviewPassed'] is True and app['buildVersion'] == 1
+-    for key in ('sourceCacheAbsent', 'runtimeCacheMountPolicyCompatible', 'configuredCompressFalseVerified', 'effectiveStandaloneConfigCompressFalseVerified'):
++        assert protected[ref['path']] == ref
++    app, assets = prep.document(REQUIRED_APP_REVIEW), prep.document(ASSET_SELECTION)
++    assert app['state'] == 'COORDINATED_FS_CALLBACK_NO_COMPRESS_APP_BUILD_DATA_REVIEW_PASSED_V1' and app['buildVersion'] == 1
++    for key in ('verifiedPassed', 'verifiedDataReviewPassed', 'sourceCacheAbsent', 'runtimeCacheMountPolicyCompatible', 'configuredCompressFalseVerified', 'effectiveStandaloneConfigCompressFalseVerified'):
+         assert app[key] is True
+-    inner = prep.document(INNER_REVIEW)
+-    assert inner['verifiedPassed'] is True and inner['rootAuthority'] == INNER_AUTHORITY
+-    composition = prep.document(COMPOSITION_REVIEW)
++    assert assets['verifiedPassed'] is True and assets['applicationBuildReview'] == REQUIRED_APP_REVIEW
++    assert assets['applicationInputs'] == app['applicationInputs'] and assets['applicationRoot'] == app['applicationRoot']
++    assert browser_plan['actualAssetBindingsPending'] is False
++    for key, value in (('applicationInputs', app['applicationInputs']), ('actualApplicationBuildReview', REQUIRED_APP_REVIEW), ('actualAssetSelectionReview', ASSET_SELECTION), ('assetSelectionHtml', assets['clientHtml']), ('actionsAssetSelectionHtml', assets['actionsHtml']), ('assetPins', assets['assetPins']), ('actionsAssetPins', assets['actionsAssetPins']), ('actualActionManifest', binding['actualActionManifest']), ('requiredActionId', binding['requiredActionId'])):
++        assert browser_plan[key] == value
++    policy = browser_plan['resourceStreamObservationPolicy']
++    assert policy['version'] == 1 and policy['commandTrigger'] == 'first-qualified-requestWillBeSent'
++    assert [policy[k] for k in ('bodyLimitBytes', 'chunkLimit', 'metadataEventLimit', 'metadataBytes')] == [4194304, 65536, 1024, 262144]
++    assert protected[binding['actualActionManifest']['path']] == binding['actualActionManifest']
++    manifest = prep.document(binding['actualActionManifest'])
++    action = manifest['node'][binding['requiredActionId']]
++    assert action['exportedName'] == 'submitFixture' and action['filename'] == 'app/actions/actions.js'
++    assert set(action['workers']) == {'app/actions/page'}
++    inner, composition = prep.document(INNER_REVIEW), prep.document(COMPOSITION_REVIEW)
++    assert inner['verifiedPassed'] is True and inner['rootAuthority'] == INNER_AUTHORITY and inner['completeReturnedImportAuditVerified'] is True
+     assert composition['verifiedPassed'] is True and composition['verifiedDataReviewPassed'] is True
+     assert composition['innerComponent'] == inner['component'] and composition['innerConstructionAuthority'] == INNER_AUTHORITY
+     assert len(composition['selectedImports']) == 13 and all(x.endswith('@0.2.10') for x in composition['selectedImports'])
+     assert composition['selectedExports'] == ['wasi:http/incoming-handler@0.2.10']
+     plans = {arm: prep.document(binding[arm + 'Plan']) for arm in ('cloud', 'stock')}
+     for arm, plan in plans.items():
+-        assert plan['controlOnly'] is True and plan['prospectiveRscResponseBindingsPending'] is False
+-        assert plan['rscResponseControl']['clientSourcePending'] is False
+-        assert plan['rscResponseControl']['requiredClientIndex'] == binding['clientIndex']
+-        assert plan['rscResponseControl']['requiredClient'] == plan['clientSource']
+-        assert plan['applicationBuildReview'] == binding['applicationBuildReview']
+-        assert plan['applicationBuildResult'] == app['actualResult'] and plan['applicationInputs'] == app['applicationInputs']
+-        assert plan['applicationRootIdentityEvidence'] == app['applicationRootIdentityEvidence']
+-        assert plan['clientSourceIndex'] == binding['clientIndex']
+-        assert plan['clientSource']['path'] == str(client_root / 'run-client.mjs')
+-        assert any(dict(r, path=str(client_root / r['path'])) == plan['clientSource'] for r in client_index['files'])
++        assert binding[arm + 'Plan'] == member('actorIndex', 'plan.json' if arm == 'cloud' else 'stock-plan.json')
++        assert plan['bindingState'] == 'READY_FULL_CLIENT_FULL_CONTRACT' and plan['controlOnly'] is False
++        assert plan['prospectiveFullClientBindingsPending'] is False and plan['fullClientFullContract']['clientSourcePending'] is False
++        assert plan['expectedClientSuite'] == client_plan['suite'] == plan['fullClientFullContract']['expectedClientSuite']
++        assert plan['fullClientFullContract']['requiredClientIndex'] == binding['clientIndex']
++        assert plan['fullClientFullContract']['requiredClient'] == plan['clientSource'] == member('clientIndex', 'run-contracts.mjs')
++        assert plan['clientSourceIndex'] == binding['clientIndex'] and plan['browserSourceIndex'] == binding['browserIndex'] and plan['browserSource'] == worker
++        assert plan['applicationBuildReview'] == REQUIRED_APP_REVIEW and plan['applicationBuildResult'] == app['actualResult']
++        assert plan['applicationInputs'] == app['applicationInputs'] and plan['applicationRootIdentityEvidence'] == app['applicationRootIdentityEvidence']
+         assert plan['node'] == plans['cloud']['node'] and plan['monitor'] == plans['cloud']['monitor']
+-        prefix = Path(plan['outputPrefix'])
+-        assert prefix.parent == Path('/private/tmp/starling-node-compat') and prefix.resolve() == prefix
+-        assert plan['runId'] == ('rsc-browser-body-cloud-first' if arm == 'cloud' else 'rsc-browser-body-stock-first')
+-        assert str(prefix) == '/private/tmp/starling-node-compat/next-rsc-browser-body-prework-' + arm + '-v1'
+-        assert plan['runId'] == plan['namespacePolicy']['plannedRunId']
+-        assert str(prefix) == plan['namespacePolicy']['plannedOutputPrefix']
+-        assert plan['browserTools'] == client_plan['browserTools']
++        assert plan['outputPrefix'] == '/private/tmp/starling-node-compat/next-rsc-stream-observer-' + arm + '-v1'
++        assert plan['runId'] == 'rsc-stream-observer-' + arm + '-first'
++        assert plan['namespacePolicy']['plannedOutputPrefix'] == plan['outputPrefix'] and plan['namespacePolicy']['plannedRunId'] == plan['runId']
++        assert plan['outerSeconds'] == (600 if arm == 'cloud' else 300)
++        assert plan['browserTools'] == '/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools'
++    assert client_plan['allowedOutputPolicies'] == [dict(runId=plans[arm]['runId'], output=plans[arm]['outputPrefix'] + '-' + plans[arm]['runId'] + '/client') for arm in ('cloud', 'stock')]
+     assert plans['cloud']['applicationSchema']['additionalDirectories'] == []
+     assert plans['cloud']['applicationSchema']['ownedDirectoriesIncludingRoot'] == plans['cloud']['applicationSchema']['directoriesExcludingRoot'] + 1
+-    assert plans['cloud']['selfOrigin'] is None and plans['cloud']['outerSeconds'] == 600
+-    assert plans['stock']['outerSeconds'] == 300
+-    assert client_plan['allowedOutputPolicies'] == [dict(runId=plans[arm]['runId'], output=plans[arm]['outputPrefix'] + '-' + plans[arm]['runId'] + '/client') for arm in ('cloud', 'stock')]
+-    assert plans['cloud']['applicationSource'] == app['applicationRoot']
++    assert plans['cloud']['selfOrigin'] is None and plans['cloud']['applicationSource'] == app['applicationRoot']
+     assert plans['stock']['standaloneSource'] == app['applicationRoot']
++    assert sorted(plans['cloud']['selectedInterfaces']) == sorted(composition['selectedImports'])
+     self_ref = prep.row(Path(__file__).resolve())
+-
+     def protect():
+-        for ref in [PREPARER, INNER_AUTHORITY, INNER_REVIEW, COMPOSITION_REVIEW, BINDINGS, self_ref]:
++        for ref in (PREPARER, INNER_AUTHORITY, INNER_REVIEW, COMPOSITION_REVIEW, REQUIRED_APP_REVIEW, ASSET_SELECTION, BINDINGS, self_ref):
+             prep.checked(ref)
+-        prep.family(binding['actorIndex'])
+-        prep.family(binding['clientIndex'])
++        for role in ('actorIndex', 'clientIndex', 'browserIndex'):
++            prep.family(binding[role])
+         for ref in binding['protectedInputs']:
+             prep.checked(ref)
+         for plan in plans.values():
+@@ -139,7 +134,6 @@
+                 prep.family(ref)
+             for ref in plan['protectedInputs']:
+                 prep.checked(ref)
+-
+     protect()
+     authority = prep.document(INNER_AUTHORITY)
+     before = prep.admit(authority)
+@@ -148,11 +142,11 @@
+ 
+ def make_authority(arm, binding, plans, inner, composition, origin=None):
+     common = dict(schemaVersion=1, arm=arm, runId=plans[arm]['runId'], sourceIndex=binding['actorIndex'],
+-        controlOnly=True, rscResponseControlAllowed=True, publicRequestCorrelationAllowed=True,
++        controlOnly=False, fullClientFullContractAllowed=True, rscStreamObserverAllowed=True, publicRequestCorrelationAllowed=True,
+         publicRequestCorrelation=PUBLIC, compilerAllowed=False, nativeBuildAllowed=False,
+         automaticRetry=False, replacementTrials=False, fullNextAccepted=False)
+     if arm == 'cloud':
+-        return dict(common, state='ROOT_NEXT_RSC_BROWSER_BODY_CLOUD_AUTHORIZED_V1',
++        return dict(common, state='ROOT_NEXT_RSC_STREAM_OBSERVER_CLOUD_AUTHORIZED_V1',
+             plan=binding['cloudPlan'], component=inner['component'], componentAudit=inner['componentAudit'],
+             constructionResult=inner['actualResult'], constructionCallerIndex=inner['callerSourceIndex'],
+             inputSourceIndex=inner['inputSourceIndex'], inputEntry=inner['inputEntry'],
+@@ -163,7 +157,7 @@
+             hostMutationAllowed=False, automaticRetryAllowed=False, newServicesAllowed=False,
+             standardHandlerObserverAllowed=True, componentConstructionAllowed=False,
+             externalDeploymentAllowed=False, adoptionAllowed=False)
+-    return dict(common, state='ROOT_NEXT_RSC_BROWSER_BODY_HOST_AUTHORIZED_V1',
++    return dict(common, state='ROOT_NEXT_RSC_STREAM_OBSERVER_HOST_AUTHORIZED_V1',
+         plans=binding['stockPlan'], rootAuthorityPath=str(HERE / 'stock-authority.json'),
+         localhostServerAllowed=True, browserAllowed=True, guestAllowed=False, engineAllowed=False,
+         externalApplicationDeploymentAllowed=False)
+@@ -198,7 +192,7 @@
+                 outputRoot=str(output), ownerOutputRoot=str(output) + '-external-root', ownerSeconds=600 if arm == 'cloud' else 300))
+         assert prep.admit(original) == before
+         protect()
+-        prep.save(prepared_path, dict(schemaVersion=1, state='ROOT_FIXED_RSC_BROWSER_BODY_PREWORK_PAIR_PREPARED_NOT_RUN_V1',
++        prep.save(prepared_path, dict(schemaVersion=1, state='ROOT_FIXED_RSC_STREAM_OBSERVER_PREWORK_PAIR_PREPARED_NOT_RUN_V1',
+             controller=self_ref, bindings=BINDINGS, trials=rows, order=['cloud', 'stock'], publicRequestCorrelation=PUBLIC,
+             cloudSelfOrigin=cloud_origin, portSelectionSocketClosedBeforeAuthorityPublication=True,
+             portReservationOrHandoffGuaranteed=False, actorMustLeaseExactOriginOnce=True, fallbackAllowed=False,
+@@ -210,7 +204,7 @@
+     prepared_ref = prep.row(prepared_path)
+     prepared = prep.document(prepared_ref)
+     assert prepared['controller'] == self_ref and prepared['bindings'] == BINDINGS
+-    assert prepared['state'] == 'ROOT_FIXED_RSC_BROWSER_BODY_PREWORK_PAIR_PREPARED_NOT_RUN_V1'
++    assert prepared['state'] == 'ROOT_FIXED_RSC_STREAM_OBSERVER_PREWORK_PAIR_PREPARED_NOT_RUN_V1'
+     assert prepared['portReservationOrHandoffGuaranteed'] is False and prepared['fallbackAllowed'] is False
+     assert prepared['order'] == ['cloud', 'stock'] and [x['arm'] for x in prepared['trials']] == ['cloud', 'stock']
+     for item in prepared['trials']:
+@@ -250,7 +244,7 @@
+             assert observed['readiness']['workloadRegistered'] is True and observed['readiness']['tcpConnect'] is True
+             assert observed['readiness']['extraHttpRequests'] == 0
+             assert observed['portLease']['origin'] == cloud_origin and observed['portLease']['fallbackAllowed'] is False
+-            assert [r['label'] for r in observed['commands']] == ['config-show', 'wash-dev', 'response-client']
++            assert [r['label'] for r in observed['commands']] == ['config-show', 'wash-dev', 'full-contract-client']
+             assert observed['commands'][1] == observed['server']
+             for command in observed['commands'][:2]:
+                 assert command['exit'] == dict(code=0, signal=None, error=None)
+@@ -286,148 +280,98 @@
+             assert all(not capture[k] for k in ('overflow', 'partialWritePossible', 'unretainedBytesUnknown'))
+             assert stdout['bytes'] == capture['fileBytes'] == capture['completeWriteBytes'] == capture['lastReservedWriteCeiling']
+             prep.checked(stdout)
+-            # Publication/collection gates only: strict semantic false remains a valid collected slot.
++            # Original semantics and added observation are independent. A collected strict failure remains failed.
+             client_ref = observed['client']['result']
+             assert client_ref['path'] == str(cloud_output / 'client/result.json')
+-            assert type(client_ref['bytes']) is int and 0 < client_ref['bytes'] <= 16 * 1024 * 1024
+             client = prep.document(client_ref)
+-            assert client['suite'] == 'NEXT_RSC_BROWSER_BODY_PREWORK_CLIENT_V1'
+-            assert client['controlOnly'] is True and client['fullOriginalContractExecuted'] is False
+-            assert observed['fullOriginalContractExecuted'] is False and client['fullNextAccepted'] is False
+-            assert client['responseProbeExecuted'] is True and observed['responseProbeExecuted'] is True
+-            assert type(client['passed']) is bool
+-            # Non-browser prework is a collected prerequisite, never an original full/browser acceptance claim.
+-            preceding = client['precedingWorkload']
+-            assert preceding['executed'] is True and preceding['collectionComplete'] is True
+-            assert type(preceding['passed']) is bool
+-            prework_ref = preceding['result']
+-            assert prework_ref['path'] == str(cloud_output / 'client/prework-result.json')
+-            assert type(prework_ref['bytes']) is int and 0 < prework_ref['bytes'] <= 16 * 1024 * 1024
+-            prework_publication = preceding['publication']
+-            assert all(prework_publication[k] is True for k in ('complete', 'fsynced', 'closed'))
+-            assert prework_publication['fileBytes'] == prework_ref['bytes']
+-            assert prework_publication['sha256'] == prework_ref['sha256'] and prework_publication['errors'] == []
+-            prework = prep.document(prework_ref)
+-            assert prework['suite'] == 'NEXT_RSC_PREBROWSER_WORKLOAD_V1'
+-            assert prework['executed'] is True and prework['collectionComplete'] is True
+-            assert prework['passed'] is preceding['passed']
+-            assert prework['fullOriginalContractExecuted'] is False and prework['browserExecuted'] is False
+-            assert prework['errors'] == []
+-            assert prework['transportErrors'] == []
+-            assert prework['publicManifestUsed'] is False and prework['fullNextAccepted'] is False
+-            frame = prework['collectionFrame']
+-            assert [frame[k] for k in ('httpRecords', 'portableRecords', 'supplementalRecords')] == [24, 5, 6]
+-            assert all(frame[k] is True for k in ('allHttpBodiesPublished', 'allPortableCollected', 'allSupplementalCollected', 'streamCapturePublished'))
+-            raw_files = prework['rawFiles']
+-            assert type(raw_files) is list and 0 < len(raw_files) <= 128
+-            assert all(type(r['bytes']) is int and 0 <= r['bytes'] <= 8 * 1024 * 1024 for r in raw_files)
+-            assert sum(r['bytes'] for r in raw_files) <= 32 * 1024 * 1024
+-            raw_by_path = {r['path']: r for r in raw_files}
+-            assert len(raw_by_path) == len(raw_files)
+-            client_output = cloud_output / 'client'
+-            for r in raw_files:
+-                rel = Path(r['path']).relative_to(client_output)
+-                assert rel.as_posix() in ('stream-chunks.json', 'prework-progress.json') or rel.parts[0] in ('responses', 'portable-cache', 'supplemental')
+-                prep.checked(r)
+-            http = prework['http']
+-            prework_client_plan = prep.document(prep.row(Path(binding['clientIndex']['path']).with_name('plan.json')))
+-            contract = prep.document(prework_client_plan['preworkSourceRequirements']['fixtureContract'])
+-            assert [r['id'] for r in http] == [r['id'] for r in contract['requests']] + ['server-action-submit']
+-            for r in http:
+-                body = raw_by_path[str(client_output / 'responses' / (r['id'] + '.txt'))]
+-                assert body['bytes'] == r['bodyBytes'] and body['sha256'] == r['bodySha256']
+-            portable = prework['portableCache']['records']
++            assert client['suite'] == 'NEXT_RSC_STREAM_OBSERVER_FULL_CONTRACT_CLIENT_V1'
++            assert client['controlOnly'] is False and client['fullOriginalContractExecuted'] is True
++            assert observed['fullOriginalContractExecuted'] is True and client['fullNextAccepted'] is False
++            assert type(client['passed']) is bool and client['errors'] == [] and client['transportErrors'] == []
++            assert type(client['browserExit']['code']) is int and client['browserExit']['code'] in (0, 1) and client['browserExit']['signal'] is None
++            contract_ref = prep.document(prep.row(Path(binding['clientIndex']['path']).with_name('plan.json')))['sourceRequirements']['fixtureContract']
++            contract = prep.document(contract_ref)
++            assert [r['id'] for r in client['http']] == [r['id'] for r in contract['requests']] + ['server-action-submit']
++            for row in client['http']:
++                ref = prep.row(cloud_output / 'client/responses' / (row['id'] + '.txt'))
++                assert ref['bytes'] == row['bodyBytes'] and ref['sha256'] == row['bodySha256']
++            portable = client['portableCache']['records']
+             assert len(portable) == 5
+-            portable_validation = prework['portableCacheValidation']
+-            assert type(portable_validation['checks']) is int and portable_validation['checks'] >= 0
+-            assert frame['portableChecks'] == portable_validation['checks']
+-            for r in portable:
+-                assert r['complete'] is True and r['overflow'] is False
+-                assert r['transportError'] is None and r['cleanupErrors'] == []
+-                assert r['receivedBytes'] == r['retainedBytes'] == r['body']['bytes'] <= 65536
+-                assert raw_by_path[r['body']['path']] == r['body']
+-            supplemental = prework['supplemental']['observations']
++            for row in portable:
++                assert row['complete'] and not row['overflow'] and row['transportError'] is None and row['cleanupErrors'] == []
++                assert row['receivedBytes'] == row['retainedBytes'] == row['body']['bytes'] <= 65536
++                prep.checked(row['body'])
++            supplemental = client['supplemental']['observations']
+             assert len(supplemental) == 6
+-            supplemental_validation = prework['supplementalValidation']
+-            assert type(supplemental_validation['checks']) is int and supplemental_validation['checks'] >= 0
+-            assert frame['supplementalChecks'] == supplemental_validation['checks']
+-            for r in supplemental:
+-                assert r['bodyEofObserved'] is True and r['signalAborted'] is False
+-                assert r['error'] is r['readerReleaseError'] is r['publicationError'] is None
+-                assert r['body']['bytes'] <= 1024 * 1024
+-                assert raw_by_path[r['body']['path']] == r['body']
+-            chunks = prep.document(raw_by_path[str(client_output / 'stream-chunks.json')])
+-            assert type(chunks) is list and len(chunks) >= 1
+-            assert type(frame['streamChunks']) is int and type(prework['streaming']['chunks']) is int
+-            assert len(chunks) == frame['streamChunks'] == prework['streaming']['chunks']
+-            if prework['passed']:
+-                assert portable_validation['checks'] == 52 and supplemental_validation['checks'] == 80
+-                assert portable_validation['passed'] is True and supplemental_validation['passed'] is True
+-                assert all(r['passed'] is True for r in http)
+-                assert prework['cacheInvalidation']['passed'] is True
+-                assert prework['streaming']['complete'] is True and prework['streaming']['incrementalDeliveryObserved'] is True
+-            # A known failed browser read remains failed; collection is a separate gate.
+-            assert client['collectionComplete'] is True and client['browserClosed'] is True
+-            assert client['collectionErrors'] == [] and client['requestFidelityVerified'] is True
+-            fetch, body, network = client['browserFetch'], client['bodyRead'], client['networkTerminal']
+-            assert fetch['attempted'] is True and fetch['settled'] is True
+-            assert fetch['outcome'] in ('fulfilled', 'rejected')
+-            assert body['outcome'] in ('fulfilled', 'rejected', 'unattempted')
+-            assert body['postReadLimitBytes'] == 4 * 1024 * 1024 and body['allocationPrebounded'] is False
+-            assert network['kind'] in ('loadingFinished', 'loadingFailed')
+-            assert type(network['requestId']) is str and network['requestId']
+-            assert type(network['payload']) is dict and network['payload']['requestId'] == network['requestId']
+-            body_ref, body_publication = client['browserBody'], client['browserBodyPublication']
+-            if body['outcome'] == 'fulfilled':
+-                assert body['attempted'] is True and fetch['outcome'] == 'fulfilled'
+-                assert body_ref['path'] == str(cloud_output / 'client/browser-body.bin')
+-                assert type(body_ref['bytes']) is int and 0 <= body_ref['bytes'] <= 4 * 1024 * 1024
+-                assert body['bytes'] == body_ref['bytes']
+-                assert all(body_publication[k] is True for k in ('complete', 'fsynced', 'closed'))
+-                assert body_publication['fileBytes'] == body_ref['bytes'] and body_publication['sha256'] == body_ref['sha256']
+-                assert body_publication['errors'] == []
+-                prep.checked(body_ref)
+-            else:
+-                assert body_ref is None and body_publication is None and body['bytes'] is None
+-            if client['passed']:
+-                assert preceding['passed'] is True and client['requestFidelityVerified'] is True
+-                assert fetch['outcome'] == body['outcome'] == 'fulfilled' and network['kind'] == 'loadingFinished'
+-                assert fetch['response']['status'] == 200 and fetch['response']['redirected'] is False
+-                assert all(h['name'].lower() != 'content-encoding' for h in fetch['response']['headers'])
+-            assert client['publicationFile'] == str(cloud_output / 'client/publication.json')
+-            publication_ref = prep.row(Path(client['publicationFile']))
+-            assert 0 < publication_ref['bytes'] <= 65536
+-            publication = prep.document(publication_ref)
+-            assert publication['schemaVersion'] == 1 and publication['state'] == 'RSC_HTTP_RESPONSE_CLIENT_PUBLICATION_COMPLETE_V1'
+-            assert publication['complete'] is True and publication['errors'] == []
+-            result_publication = publication['resultPublication']
+-            assert all(result_publication[key] is True for key in ('complete', 'fsynced', 'closed'))
+-            assert type(result_publication['fileBytes']) is int and result_publication['fileBytes'] == client_ref['bytes']
+-            assert result_publication['sha256'] == client_ref['sha256'] and result_publication['errors'] == []
+-            assert publication['result'] == client_ref and publication['browserBody'] == body_ref
+-            assert publication['browserBodyPublication'] == body_publication
+-            assert publication['responseProbeExecuted'] is True and publication['collectionComplete'] is True
+-            assert publication['browserClosed'] is True
+-            # The summary is emitted only after the receipt fsync/close; it is an external ordered publication witness.
+-            summary_ref = observed['client']['stdout']
+-            assert summary_ref['path'] == str(cloud_output / 'response-client.stdout.log')
+-            assert 0 < summary_ref['bytes'] <= 65536
+-            summary_bytes = prep.checked(summary_ref).read_bytes()
+-            prep.checked(summary_ref)
+-            lines = summary_bytes.decode('utf8').splitlines()
+-            assert len(lines) == 1
+-            summary = json.loads(lines[0])
+-            assert summary['state'] == 'RSC_HTTP_RESPONSE_CLIENT_TERMINAL_PUBLISHED_V1'
+-            assert summary['suite'] == client['suite'] and summary['result'] == client_ref and summary['publication'] == publication_ref
+-            assert summary['passed'] is client['passed'] and summary['responseProbeExecuted'] is True
+-            assert summary['collectionComplete'] is True and summary['browserClosed'] is True
+-            assert type(summary['collectionErrors']) is int and summary['collectionErrors'] == 0
++            for row in supplemental:
++                assert row['bodyEofObserved'] and not row['signalAborted']
++                assert row['error'] is row['readerReleaseError'] is row['publicationError'] is None
++                prep.checked(row['body'])
++            chunks = prep.document(prep.row(cloud_output / 'client/stream-chunks.json'))
++            assert type(chunks) is list and len(chunks) == client['streaming']['chunks'] and len(chunks) >= 1
++            browser_ref = prep.row(cloud_output / 'client/browser/result.json')
++            browser = prep.document(browser_ref)
++            assert client['browser'] == browser and browser['browserClosed'] is True and type(browser['passed']) is bool
++            assert [r['id'] for r in browser['tests']] == ['client-counter', 'server-action']
++            assert all(r['timedOut'] is False and r['cdpObserver']['stopped'] is False for r in browser['tests'])
++            netlog = browser['netlog']
++            assert netlog['completeJson'] is True and netlog['fsynced'] is True and netlog['errors'] == []
++            netlog_ref = netlog['file']
++            assert netlog_ref['path'] == str(cloud_output / 'client/browser/netlog.json')
++            assert type(netlog_ref['bytes']) is int and 0 < netlog_ref['bytes'] <= 20 * 1024 * 1024
++            prep.checked(netlog_ref)
++            netlog_data = json.loads(Path(netlog_ref['path']).read_bytes())
++            prep.checked(netlog_ref)
++            assert type(netlog_data) is dict and type(netlog_data['constants']) is dict and type(netlog_data['events']) is list
++            assert netlog['eventCount'] == len(netlog_data['events'])
++            stream = browser['resourceStreamObservation']
++            assert stream['finalized'] is True and stream['collectionComplete'] is True and stream['errors'] == []
++            assert len(stream['observations']) == 1
++            record = stream['observations'][0]
++            assert record['collectionComplete'] is True and record['admission']['passed'] is True
++            assert record['admission']['errors'] == []
++            assert record['admission']['currentActionId'] == binding['requiredActionId']
++            assert record['admission']['CDPBodyMatchedPlaywright'] is True and record['admission']['publicContextVerified'] is True
++            request_body = record['admission']['actualRequestBody']
++            request_publication = record['admission']['actualRequestBodyPublication']
++            assert request_body['path'] == str(cloud_output / 'client/browser/resource-stream-request.bin')
++            assert type(request_body['bytes']) is int and 0 < request_body['bytes'] <= 65536
++            assert all(request_publication[k] is True for k in ('complete', 'fsynced', 'closed'))
++            assert request_publication['fileBytes'] == request_body['bytes'] and request_publication['sha256'] == request_body['sha256']
++            assert request_publication['errors'] == []
++            prep.checked(request_body)
++            assert record['admission']['multipart']['valid'] is True
++            assert record['admission']['multipart']['bytes'] == request_body['bytes'] and record['admission']['multipart']['sha256'] == request_body['sha256']
++            assert len(record['candidates']) == len(record['terminals']) == 1
++            request_id = record['candidates'][0]['requestId']
++            assert record['admission']['cdpRequestId'] == request_id
++            assert record['command']['method'] == 'Network.streamResourceContent' and record['command']['params'] == dict(requestId=request_id)
++            assert record['command']['trigger'] == 'first-qualified-requestWillBeSent'
++            assert record['reply']['outcome'] in ('fulfilled', 'rejected')
++            assert record['terminals'][0]['event'] in ('Network.loadingFinished', 'Network.loadingFailed')
++            assert record['terminals'][0]['payload']['requestId'] == request_id
++            assert all(not row['collectionUncertain'] for row in record['errors'])
++            assert type(stream['commandSuccess']) is bool and stream['commandSuccess'] is record['commandSuccess']
++            assert type(stream['completeResourceBody']) is bool and stream['completeResourceBody'] is record['completeResourceBody']
++            assert stream['accepted'] is (stream['collectionComplete'] and stream['completeResourceBody'])
++            artifact, publication = record['artifact'], record['publication']
++            assert artifact['path'] == str(cloud_output / 'client/browser/resource-stream-observed.bin')
++            assert type(artifact['bytes']) is int and 0 <= artifact['bytes'] <= 4194304
++            assert record['body']['bytes'] == artifact['bytes'] and record['body']['sha256'] == artifact['sha256']
++            assert all(publication[k] is True for k in ('complete', 'fsynced', 'closed')) and publication['errors'] == []
++            assert publication['fileBytes'] == artifact['bytes'] and publication['sha256'] == artifact['sha256']
++            prep.checked(artifact)
++            if stream['completeResourceBody']:
++                assert stream['commandSuccess'] and record['payloadsComplete'] and record['handoffSuccessful']
++                assert record['prefixCountConsistency'] is True and record['terminals'][0]['event'] == 'Network.loadingFinished'
++            # No original strict/browser/network error is waived by resource bytes or a new positive flag.
++
+ 
+ 
+         except BaseException as error:
+             try:
+                 prep.save(HERE / 'stock-unattempted.json', dict(schemaVersion=1,
+-                    state='RSC_BROWSER_BODY_STOCK_SLOT_UNATTEMPTED_CLOUD_COLLECTION_UNCERTAIN_V1',
++                    state='RSC_STREAM_OBSERVER_STOCK_SLOT_UNATTEMPTED_CLOUD_COLLECTION_UNCERTAIN_V1',
+                     error=dict(name=type(error).__name__, message=str(error)[:2048]), bindings=BINDINGS,
+                     automaticRetry=False, replacementTrials=False, fullNextAccepted=False))
+             except BaseException:
+@@ -441,7 +385,7 @@
+     actor = Path(binding['actorIndex']['path']).parent
+     argv = ([node['path'], str(actor / 'deploy.mjs'), ar['path']] if arm == 'cloud' else
+         [node['path'], str(actor / 'run-stock.mjs'), trial['outputRoot'], plan['standaloneSource'], plan['browserTools'], plan['runId'], ar['path']])
+-    monitor = prep.original(plan['monitor'], 'genuine_rsc_response_original_owner')
++    monitor = prep.original(plan['monitor'], 'genuine_stream_observer_original_owner')
+     env = {k: os.environ[k] for k in ('HOME', 'USER', 'LOGNAME') if k in os.environ}
+     env.update(PATH=str(Path(node['path']).parent) + ':/usr/bin:/bin', NODE_ENV='production', NEXT_TELEMETRY_DISABLED='1', CI='1')
+     logs.mkdir(mode=0o700)
+@@ -466,12 +410,12 @@
+                 secondary.append(dict(name=type(error).__name__, message=str(error)[:2048]))
+         clean = terminal is not None and not terminal['timeout'] and not terminal['forcedCleanup'] and terminal['parentOwnedGroupGone'] and terminal['allObservedOwnedGroupsGone'] and all(not terminal[k] for k in ('errors', 'signals', 'interruptedSignals', 'remainingObservedPids'))
+         try:
+-            row = dict(schemaVersion=1, state='ROOT_RSC_BROWSER_BODY_PREWORK_ORIGINAL_OWNER_COMPLETED_UNREVIEWED_V1', arm=arm,
++            row = dict(schemaVersion=1, state='ROOT_RSC_STREAM_OBSERVER_PREWORK_ORIGINAL_OWNER_COMPLETED_UNREVIEWED_V1', arm=arm,
+                 rawExitCode=None if terminal is None else terminal['rawExitCode'], originalOwner=None if terminal is None else terminal['pid'],
+                 cleanOwner=clean, finalInputsPreserved=preserved, error=None if primary is None else dict(name=type(primary).__name__, message=str(primary)[:2048]),
+                 secondaryErrors=secondary, authority=ar, controller=self_ref, bindings=BINDINGS,
+                 terminal=prep.row(logs / 'terminal.json') if (logs / 'terminal.json').is_file() else None,
+-                constructorGuardBefore=before, constructorGuardAfter=after, responseProbeExecutionClaimedByOwnerReceipt=False, fullOriginalContractExecutionClaimedByOwnerReceipt=False, fullNextAccepted=False)
++                constructorGuardBefore=before, constructorGuardAfter=after, observerExecutionClaimedByOwnerReceipt=False, fullOriginalContractExecutionClaimedByOwnerReceipt=False, fullNextAccepted=False)
+             rr = prep.save(receipt, row)
+             print(json.dumps(dict(receipt=rr, rawExitCode=row['rawExitCode'], cleanOwner=clean)))
+         except BaseException:

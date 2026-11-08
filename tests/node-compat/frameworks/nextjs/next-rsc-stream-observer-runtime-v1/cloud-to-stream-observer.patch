@@ -1,0 +1,61 @@
+--- full-parent/deploy.mjs
++++ stream-observer/deploy.mjs
+@@ -57,24 +57,24 @@
+  assert(root.ino>0&&root.nlink>0&&root.mode<=0o777);return true;
+ }
+ const plan=await read(join(here,'plan.json'));
+-assert.equal(plan.bindingState,'READY_FS_CALLBACK_FULL_CONTRACT','Unbound Source: no authority input, output or actor');
++assert.equal(plan.bindingState,'READY_FULL_CLIENT_FULL_CONTRACT','Unbound Source: no authority input, output or actor');
+ for(const key of ['clientSource','browserSource','clientSourceIndex','browserSourceIndex','acceptedConstructionReview','expectedComponent'])assert(plan[key]!==null,'Missing reviewed binding:'+key);
+ assert.equal(plan.prospectiveEnvelopeBindingsPending,false,'Unbound composed-envelope Source');
+ assert(plan.expectedEnvelopeBindings.envelope&&plan.expectedEnvelopeBindings.compositionReview);
+ assert.equal(typeof plan.expectedCompositionReviewState,'string');
+ assert(plan.compositionReviewFixedValues&&Object.keys(plan.compositionReviewFixedValues).length>0);
+ assert(Array.isArray(plan.protectedInputs)&&plan.protectedInputs.length>0,'Fresh Root protection graph required');
+-assert.equal(plan.controlOnly,false);assert.equal(plan.prospectiveFsCallbackAppBindingsPending,false,'New app/client DATA pending');
+-assert.equal(plan.fsCallbackFullControl.fullClientSourcePending,false,'New full client Source pending');
+-assert(plan.fsCallbackFullControl.requiredFullClientIndex&&plan.fsCallbackFullControl.requiredFullClient);
+-assert.deepEqual(plan.clientSourceIndex,plan.fsCallbackFullControl.requiredFullClientIndex);
+-assert.deepEqual(plan.clientSource,plan.fsCallbackFullControl.requiredFullClient);
++assert.equal(plan.controlOnly,false);assert.equal(plan.prospectiveFullClientBindingsPending,false,'New app/client DATA pending');
++assert.equal(plan.fullClientFullContract.clientSourcePending,false,'New full client Source pending');
++assert(plan.fullClientFullContract.requiredClientIndex&&plan.fullClientFullContract.requiredClient);
++assert.deepEqual(plan.clientSourceIndex,plan.fullClientFullContract.requiredClientIndex);
++assert.deepEqual(plan.clientSource,plan.fullClientFullContract.requiredClient);
+ for(const key of ['outputPrefix','applicationSource','applicationInputs','applicationBuildResult','applicationBuildReview','applicationRootIdentity','applicationRootIdentityEvidence','applicationSchema','clientSource','clientSourceIndex','browserSource','browserSourceIndex'])assert(plan[key]!==null,'New control binding:'+key);
+ const authorityPath=resolve(process.argv[2]),authority=await read(authorityPath),authorityRef=await row(authorityPath);
+-assert.equal(authority.state,'ROOT_NEXT_FS_NO_COMPRESS_WASMCLOUD_AUTHORIZED_V1');
++assert.equal(authority.state,'ROOT_NEXT_RSC_STREAM_OBSERVER_CLOUD_AUTHORIZED_V1');
+ assert.equal(authority.publicRequestCorrelationAllowed,true);
+ assert.equal(authority.standardHandlerObserverAllowed,true);
+-assert.equal(authority.fsCallbackFullSuiteAllowed,true);assert.equal(authority.controlOnly,false);
++assert.equal(authority.fullClientFullContractAllowed,true);assert.equal(authority.rscStreamObserverAllowed,true);assert.equal(authority.controlOnly,false);
+ for(const key of ['stockHostAllowed','configInspectAllowed','guestEnvironmentAllowed','outgoingHttpWorkloadSelected'])assert.equal(authority[key],true);
+ for(const key of ['hostMutationAllowed','automaticRetryAllowed','newServicesAllowed'])assert.equal(authority[key],false);
+ const selectedOrigin=new URL(authority.selfOrigin);assert.equal(authority.selfOrigin,selectedOrigin.origin);assert.equal(selectedOrigin.protocol,'http:');assert.equal(selectedOrigin.hostname,'127.0.0.1');assert.equal(selectedOrigin.username,'');assert.equal(selectedOrigin.password,'');assert(Number.isInteger(Number(selectedOrigin.port))&&Number(selectedOrigin.port)>0&&Number(selectedOrigin.port)<=65535);
+@@ -165,7 +165,7 @@
+ }
+ await sourceBookend();
+ const output=resolve(plan.outputPrefix+'-'+authority.runId);assert.equal(output,plan.outputPrefix+'-'+authority.runId);const app=join(output,'app'),cache=join(output,'cache'),project=join(output,'project');await mkdir(output,{mode:0o700});
+-const result={schemaVersion:1,state:'FS_NO_COMPRESS_WASMCLOUD_FULL_PROFILE_IN_PROGRESS_V1',controlOnly:false,fullOriginalContractExecuted:false,fullNextAccepted:false,runId:authority.runId,outputRoot:output,inputEntry:authority.inputEntry,inputSourceIndex:authority.inputSourceIndex,component:authority.component,componentAudit:authority.componentAudit,constructionResult:authority.constructionResult,servedEnvelope:authority.envelope,servedEnvelopeCompositionReview:authority.compositionReview,standardHandlerObserverMarkersInterpreted:false,rootAuthority:authorityRef,sourceIndex:authority.sourceIndex,selectedInterfaces:plan.selectedInterfaces,emittedImports:audit.emittedImports,errors:[],server:null,client:null,originalInputsPreserved:false,readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationInputs:plan.applicationInputs,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],adoption:false,actualHost:'stock-wasmCloud-2.11.0',wash:plan.wash,commands:[],configVerifiedBeforeDev:false,readiness:null};
++const result={schemaVersion:1,state:'RSC_STREAM_OBSERVER_FULL_CLOUD_PROFILE_IN_PROGRESS_V1',controlOnly:false,fullOriginalContractExecuted:false,fullNextAccepted:false,runId:authority.runId,outputRoot:output,inputEntry:authority.inputEntry,inputSourceIndex:authority.inputSourceIndex,component:authority.component,componentAudit:authority.componentAudit,constructionResult:authority.constructionResult,servedEnvelope:authority.envelope,servedEnvelopeCompositionReview:authority.compositionReview,standardHandlerObserverMarkersInterpreted:false,rootAuthority:authorityRef,sourceIndex:authority.sourceIndex,selectedInterfaces:plan.selectedInterfaces,emittedImports:audit.emittedImports,errors:[],server:null,client:null,originalInputsPreserved:false,readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationInputs:plan.applicationInputs,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],adoption:false,actualHost:'stock-wasmCloud-2.11.0',wash:plan.wash,commands:[],configVerifiedBeforeDev:false,readiness:null};
+ const save=()=>writeFile(join(output,'result.json'),JSON.stringify(result,null,2)+'\n',{mode:0o600});await save();
+ const pause=ms=>new Promise(yes=>setTimeout(yes,ms));const children=[];let host=null,status=null,clientProcess=null,lease=null,stopping=false;
+ async function prepareReadonlyCopy(){
+@@ -256,7 +256,7 @@
+  clientProcess=await launchClient([plan.clientSource.path,origin,join(output,'client'),plan.browserTools,authority.runId]);result.client=clientProcess.record;result.fullContractClientInvoked=true;await save();
+  const clientStatus=await Promise.race([clientProcess.done,host.capture.failure.then(failure=>{throw Error('Stock lifetime stdout capture failed: '+failure.stage);})]);
+  result.client.exit=clientStatus;result.client.result=await row(join(output,'client/result.json'));const observed=await read(result.client.result.path);assert.equal(typeof observed.fullOriginalContractExecuted,'boolean');result.fullOriginalContractExecuted=observed.fullOriginalContractExecuted;await save();
+- assert.equal(observed.suite,'NEXT_FS_NO_COMPRESS_WASMCLOUD_FULL_CONTRACT_CLIENT_V1');assert.equal(observed.controlOnly,false);assert.equal(observed.fullOriginalContractExecuted,true);assert.equal(observed.fullNextAccepted,false);assert.deepEqual(clientStatus,{code:0,signal:null,error:null});assert.equal(observed.passed,true);assert.equal(host.status,null,'Stock host must remain live through full contracts');result.controlPassed=true;
++ assert.equal(observed.suite,'NEXT_RSC_STREAM_OBSERVER_FULL_CONTRACT_CLIENT_V1');assert.equal(observed.controlOnly,false);assert.equal(observed.fullOriginalContractExecuted,true);assert.equal(observed.fullNextAccepted,false);assert.deepEqual(clientStatus,{code:0,signal:null,error:null});assert.equal(observed.passed,true);assert.equal(host.status,null,'Stock host must remain live through full contracts');result.controlPassed=true;
+ }catch(error){result.errors.push({stage:'wasmcloud-full-deployment-or-control',...errorData(error)});}
+ finally{
+  if(lease?.listening)try{await new Promise(yes=>lease.close(()=>yes()));}catch(error){result.errors.push({stage:'lease-close',...errorData(error)});}
+@@ -270,6 +270,6 @@
+  result.cacheInventory=[];try{assert.equal((await lstat(cache)).mode&0o777,0o700);const tree=await walk(cache);assert.equal(tree.links.length,0);for(const name of tree.files){const path=join(cache,name);result.cacheInventory.push({...await row(path),relativePath:name,mode:(await lstat(path)).mode&0o777});}}catch(error){result.errors.push({stage:'cache-final-inventory',...errorData(error)});}
+  result.allDirectCliExitsZero=JSON.stringify(result.commands.map(x=>x.label))===JSON.stringify(['config-show','wash-dev','full-contract-client'])&&result.commands.every(x=>x.timeout===false&&x.forcedCleanup===false&&x.exit?.code===0&&x.exit?.signal===null&&x.exit?.error===null);
+  result.passed=result.controlPassed===true&&result.configVerifiedBeforeDev===true&&result.errors.length===0&&result.originalInputsPreserved&&result.readonlyAppPreserved&&result.allDirectCliExitsZero&&children.length===2&&children.every(x=>x.record.stdoutCapture?.complete===true)&&result.server?.shutdownReason==='full-contracts-collected'&&result.server?.shutdownRequested===true&&result.server?.sigintSent===true&&host?.status?.code===0&&host?.status?.signal===null&&host?.status?.error===null;
+- result.state=result.passed?'FS_NO_COMPRESS_WASMCLOUD_FULL_PROFILE_PASSED_UNREVIEWED_V1':'FS_NO_COMPRESS_WASMCLOUD_FULL_PROFILE_FAILED_RAW_PRESERVED_V1';await save();
++ result.state=result.passed?'RSC_STREAM_OBSERVER_FULL_CLOUD_PROFILE_PASSED_UNREVIEWED_V1':'RSC_STREAM_OBSERVER_FULL_CLOUD_PROFILE_FAILED_RAW_PRESERVED_V1';await save();
+ }
+ console.log(JSON.stringify({state:result.state,passed:result.passed,fullOriginalContractExecuted:result.fullOriginalContractExecuted,fullNextAccepted:false,errors:result.errors}));process.exitCode=result.passed?0:1;

@@ -4,6 +4,20 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
+Current work: the [full-workload CDP observer](tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-root-results-v1/README.md)
+now has independent Source/API reviews`7f6e9841`/`f26f5512`, six actual Node
+syntax checks and17 actual synthetic groups passing. Earlier12 positive groups
+missed post-terminal/empty-body/4MiB decoder counterexamples; those failures,
+exact preimages and corrected tests are retained. Original01ca strict/UI/
+deadline/drain predicates remain unchanged; the new observer is separate.
+Fresh binding`af350c5e` derives2,060 inputs. First preparation fails before
+socket/authority/target with missing stock-plan outerSeconds. Root's one-span
+correction preserves the actual failure and qualifies both prior Source passes;
+peer`cc5290a5` verifies cloud600 validation and unchanged fixed600/300 schedule.
+Second preparation`94e0cd22` finishes raw0 with no actor invoked. Independent
+binding/correction DATA review`721a82a4` reconstructs the exact union and passes
+before the fixed cloud→Node pair. No new browser/host run has occurred. Original strict failures remain failed.
+
 Latest bounded diagnostic: the [direct Chrome body control](docs/node-compat/nextjs-browser-body-prework-results.md)
 passes once on stock wasmCloud59256/600 and Node59943/300, both raw0/clean.
 Both pass24HTTP/52cache/80supplemental, generation1→2, stream3(0,1), then genuine
