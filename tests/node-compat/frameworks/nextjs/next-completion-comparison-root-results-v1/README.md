@@ -1,4 +1,20 @@
-This is an unbound Source proposal for the fixed ten-trial completion comparison. It has not prepared an authority or invoked a guard, constructor, Node, Wasmtime, browser, HTTP client, or target. Root's original plan remains byte-identical (`5613cd96`, 8,922 bytes). Its original null fields remain historical Source fields. The separate `policy.py` bindings are all null and refuse before guard loading, output creation, or action. Genuine actor indices and the two new B/D construction reviews must be bound in a later reviewed Source change.
+Current status: the six late references are bound in policy `d2418e3c`; all ten
+authorities were validated before the first action. The once-only fixed cohort
+has completed under its original owner with clean process groups and complete
+native captures. Both Node controls and B/block1 pass the original suite;
+the other seven guest samples fail it. `driverCompleted:true` records collection,
+while `originalAllPassed:false` preserves application failure. Independent DATA
+review and portable retention are complete, with current/Git-mode offline checks
+passing. See [progress.md](../../../../../progress.md)
+and the [result report](../../../../../docs/node-compat/nextjs-completion-comparison-2026-11-08.md).
+Do not rerun the consumed namespaces. Reusable checks operate on retained DATA.
+Run `python3 -I -B retained-raw-data-v1/check.py` from this directory for the
+bounded copied-DATA check; binaries/app trees and full 52/80 semantics are omitted.
+
+The following paragraphs preserve the historical unbound Source proposal and
+its preparation cutoff; their null/unexecuted statements describe that cutoff.
+
+This was an unbound Source proposal for the fixed ten-trial completion comparison. It had not prepared an authority or invoked a guard, constructor, Node, Wasmtime, browser, HTTP client, or target. Root's original plan remains byte-identical (`5613cd96`, 8,922 bytes). Its original null fields remain historical Source fields. The separate `policy.py` bindings were all null and refused before guard loading, output creation, or action. Genuine actor indices and the two new B/D construction reviews were bound in a later reviewed Source change.
 
 The order is Stock, A, B, C, D, then Stock, D, C, B, A. Each declared runId, authority filename, output directory, and owner directory is fixed in the plan. There are no retries, replacement trials, extra cases, or adaptive choices. A and C reuse their existing components; B and D select their own actual construction reviews and the shared fixture's `entries[variant]` and `variants[variant].entry`. No old artifact is rebuilt to change a review schema.
 

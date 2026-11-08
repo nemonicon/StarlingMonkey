@@ -33,6 +33,14 @@ Declared React19.3.1 and the actual Next-vendored browser canary runtime are
 distinguished in the [client audit](nextjs-server-action-next-steps.md).
 The machine-readable production dispositions remain unchanged.
 
+The later [fixed ten-trial comparison](nextjs-completion-comparison-2026-11-08.md)
+passes both Node controls and one of eight guest full-suite samples. Seven guest
+generation gates and three strict browser gates remain failed. All ten pass
+24 HTTP, 52 persistent-cache, 80 supplemental and five-chunk streaming checks.
+Coordinated DATA review `3929a4af` verifies collection and outcomes; two exploratory
+samples per arm establish no fix or reliability. Production API statuses and
+the selected 13 standard WASI imports are unchanged.
+
 The following earlier smoke results retain their original artifact/cohort scope.
 The [Next priority roadmap](nextjs-priority-roadmap.md) now records a passing
 experimental full-application smoke milestone. The unmodified **Next 16.4.5 /

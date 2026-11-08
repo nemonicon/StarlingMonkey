@@ -11,6 +11,15 @@ Promise diagnostic's first trial now passes strict browser completion, including
 the POST body/finished/sizes, while legacy1→1 still fails the overall suite.
 Coordinated DATA review4d47759f verifies these outcomes; a single instrumented pass proves no fix or
 reliability and does not waive earlier failures.
+The later [fixed ten-trial comparison](nextjs-completion-comparison-2026-11-08.md)
+now completes with independent DATA review `3929a4af`: both Node controls and
+one of eight guest samples pass the original suite. Seven guest generation
+gates and three strict browser gates remain failed; all ten pass HTTP, persistent
+cache, supplemental, incremental stream and functional browser checks. The
+comparison establishes no await/logging fix. The next execution priority is the
+full stock wasmCloud contract with exact self-origin egress, followed by explicit
+persistent-cache overlap/error coverage. Portable DATA retention, current replay
+and a separate Git-mode replay now pass.
 The first prefix-mismatched harness attempt remains a separate pre-HTTP failure.
 The following earlier2251/4e results remain as a separate baseline.
 The optional persistent cache profile works on that corrected native loader.
@@ -77,10 +86,14 @@ Next actions, in dependency order:
    Await/logging can perturb scheduling. No native patch is
    justified yet. Declared React19.3.1
    and the captured Next-vendored browser canary are recorded separately.
-   The next [comparison proposal](nextjs-completion-stability-plan.md) separates
-   the extra await from the response logger, with a fixed exploratory schedule
-   and every outcome retained. It has not executed; cd60 is a separate diagnostic
-   with additional holder/fulfillment logging, not a clean factor arm.
+   The [comparison proposal](nextjs-completion-stability-plan.md) has now run its
+   complete fixed schedule, separating await from response logging and retaining
+   every outcome. A/B strict browser checks pass twice each, C fails twice and
+   D passes once/fails once. Only B/block1 passes the guest original full suite;
+   B/block2 retains generation1→1. All failed POST terminals precede capture drain
+   and explicit context close. No longer shutdown wait, native patch, default
+   entry change or additional repetition campaign is selected from these samples.
+   The cd60 observer remains separate, with additional holder/fulfillment logging.
 4. **Parallel compatibility priority:** distinguish module-local generation
    from durable cache invalidation, then inspect guest export quiescence and
    scheduling. Persistent nonce success never waives the original counter
@@ -91,19 +104,28 @@ Next actions, in dependency order:
    The [request-state contract](nextjs-request-state-contract.md) makes module-global
    continuity an unavailable portable guarantee while preserving the original
    failed gate. Explicit persistence does not preserve arbitrary lexical state.
-5. **Observed bounded portability pass:** current D990/f805 on stock wasmCloud
+5. **Next execution priority:** extend current D990/f805
+   on stock wasmCloud to the unchanged full HTTP/cache/stream/browser contract.
+   Use a fresh literal Root-selected loopback origin, exact effective
+   `allowedHosts` rule for only that origin, explicit browser permission and the
+   original assertions. Reuse the existing cold host launcher and full client;
+   do not add a host service or widen the component world. Source review and
+   fresh authority remain required before that separately bounded action.
+   The existing **bounded portability run** on current D990/f805 stock wasmCloud
    exits0/clean/protected with all eight coldV5 requests passing; coordinated DATA
    review0ed0e4c2 passes that scope. This tests current target-host instantiation independently
    of full Next acceptance. Its pinned
    [mount/egress and request-state limits](nextjs-wasmcloud-mount-egress-source-note.md)
    remain explicit: physical app modes are not readonly descriptor rights;
-   empty allowedHosts denies outgoing HTTP; P2 request Stores do not promise
-   process-global continuity. Broader host/browser/self-HTTP coverage and measured
+   the old empty allowedHosts denies outgoing HTTP; P2 request Stores do not
+   promise process-global continuity. Full browser/self-HTTP execution is not
+   yet verified there. Persistent-cache overlap/error bounds and measured
    lifecycle/resource costs remain later gates. Preserve the read-only route delegate, bounded
    two-primary-tag mutation contract, all failures and unchanged legacy app code.
 
-The entry/INIT checkpoint was pushed in `a03974fb`. This checkpoint adds the
-completed runtime DATA, offline checks and Source-only comparison variants;
+The earlier entry/INIT checkpoint was pushed in `a03974fb`. The fixed comparison's
+verified B/D constructors, INIT results and prepared controller were pushed in
+`6ba984ae`; the completed comparison and its reviews are now recorded separately.
 [progress.md](../../progress.md) tracks current work and closed evidence.
 
 Historical baseline: the first fresh **Next 16.4.5 / React 19.3.1 App Router

@@ -1,8 +1,8 @@
 # Request state in the portable Next profile
 
 The portable profile cannot promise that successive HTTP requests share one
-JavaScript module instance. Keep the original generation-counter regression
-failed and visible. Use explicit request state or selected persistent storage
+JavaScript module instance. Keep every failed original generation-counter
+sample visible. Use explicit request state or selected persistent storage
 for application behavior that must cross requests. This is a compatibility
 boundary, not a runtime fix or a claim that the counter's exact failure cause
 has been proved.
@@ -24,6 +24,12 @@ The new Promise diagnostic separately retains generation1→1 while its persiste
 cache scenario passes52 checks and its strict browser tests pass in one sample.
 Its runtime result is2ae87cb0; coordinated DATA review4d47759f verifies that
 outcome while retaining failed overall acceptance.
+
+The later [fixed ten-trial comparison](nextjs-completion-comparison-2026-11-08.md)
+observes generation1→2 in both Node controls and native B/block1. Seven other
+native samples remain1→1, including B/block2. That positive guest sample is
+retained as a pass for its original gate; it does not establish request affinity,
+make module-global continuity a portable guarantee or waive the seven failures.
 
 | Execution context | Available continuity contract |
 | --- | --- |

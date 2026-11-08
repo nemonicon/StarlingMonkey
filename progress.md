@@ -4,14 +4,15 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
-Next.js executes in a real Wasm component. Current HTTP, persistent cache,
-streaming and functional UI checks pass. The new Promise diagnostic also passes
-strict Server Action response completion in one sample; earlier failures remain
-unresolved. The full suite still fails at the legacy generation counter. Work
-now focuses on request-state portability and completion stability before API
-expansion or production promotion.
+Next.js executes in a real Wasm component. The fixed ten-trial comparison passes
+both Node controls and one of eight guest full-suite samples. All ten pass HTTP,
+persistent cache, streaming and functional UI checks; seven guest generation
+gates and three strict Server Action completion gates remain failed. Independent
+DATA review verifies these outcomes. Portable evidence retention and offline
+checks pass, followed by full stock wasmCloud coverage and persistent-cache overlap/error
+checks. No fix, reliability result or production promotion is established.
 
-Latest result: native Fetch cleanup compiles and links, a fresh interoperability
+Current engine baseline: native Fetch cleanup compiles and links, a fresh interoperability
 component passes INIT construction review, and all16 deployed module cases pass
 in one GET with independent runtime review55a255e7 accepted for that subset.
 A separate public Fetch lifecycle component passes INIT construction review
@@ -56,8 +57,9 @@ it is not a demonstrated fix. No native or host change is selected.
 
 Current next steps and outstanding work:
 
-- **Next.js critical path:** finish the Root controller for the reviewed fixed
-  ten-run comparison, then execute its predeclared trials. Both new entry-only
+- **Next.js critical path:** the Root controller is complete and the reviewed fixed
+  ten-run comparison has completed under its original7,200-second owner. All ten
+  authorities were validated before the first trial. Both new entry-only
   await variants now compile and pass INIT review. Investigate
   completion stability against the retained failed samples without retry-based
   acceptance. The response-site trace cannot establish export or transport
@@ -70,9 +72,57 @@ Current next steps and outstanding work:
   distinguishes module-local state from persistent cache behavior; it makes no
   claim about a private Store or the exact observed failure cause. The separate
   [completion comparison proposal](docs/node-compat/nextjs-completion-stability-plan.md)
-  isolates await and response logging through fixed arms; it has not executed.
+  isolates await and response logging through fixed arms; all ten trials are
+  collected and independently reviewed; portable DATA retention and replay pass.
   Independent Source review passes both documents; the request-state note's
   preliminary review-status sentence is updated to the held4d47759f result.
+- **Current execution checkpoint:** commit `6ba984ae` is verified on `origin/main`
+  with a clean tree before launch. Root tool3e092c/session1711 starts the fixed
+  cohort under original owner92634/7,200 seconds. The current volume has47GiB
+  free. No additional trials, replacements or retries are authorized by this
+  schedule. Collection completion, each original gate and final acceptance
+  remain separate; no current run is adjudicated from partial output.
+- **Completed comparison, DATA review complete:** Root2e8b71 observes outer raw0;
+  Rootb21d29 verifies its clean terminal and all eight native stdout hashes,
+  lengths and finalized complete capture metadata before marker analysis.
+  Every fixed slot is collected-valid; `originalAllPassed` remains false.
+  Complete publications show both Node controls passing. Native B/block1
+  passes the original full suite with generation1→2; the seven other native
+  samples retain generation1→1. Strict browser completion passes A2/2, B2/2,
+  C0/2 and D1/2. These are exploratory observations, not a reliability estimate
+  or evidence that await/logging causes the difference. No replacement trial
+  or native fix follows from this result. Coordinated primary DATA review
+  `3929a4af` binds ownership/browser review`12922bb9` and marker review`cace7809`.
+  All ten trials pass 24 HTTP cases, 52 persistent-cache checks, 80 supplemental
+  checks, five stream chunks and functional browser checks. All three failed
+  POST terminals precede capture drain and context close in their own observer
+  clocks; all 20 pre-close drains complete. Each C/D sample has 54 positive
+  response-site markers, despite mixed browser outcomes. Root independently
+  rederives all 216 frame arrays/counts from authenticated stdout
+  (9c46b9). These sites prove no export/host/TCP completion. The finite portable
+  corpus contains 1,332 payload files/32,007,325 bytes. Source review catches and
+  corrects an offline-reader chunk-count type mismatch before execution, with
+  all retained data unchanged. C's corrected Source/copied-DATA review passes
+  (378361). Root's standalone check f3f3b7 exits0, saved in
+  [retained-data-check.json](tests/node-compat/frameworks/nextjs/next-completion-comparison-root-results-v1/retained-data-check.json);
+  R's separate Git-mode check also exits0. Both verify 21 selected namespaces,
+  637 raw client files, 240 HTTP body hashes, 20 PNGs, eight complete native
+  captures and 216 markers while preserving failed overall acceptance. Neither
+  opens original paths, runs a target or revalidates omitted binaries/app trees.
+  The
+  [complete result table](docs/node-compat/nextjs-completion-comparison-2026-11-08.md)
+  preserves every sample. Comprehensive stock wasmCloud coverage with an exact
+  self-origin allowance is the next execution priority; original failed gates,
+  broader lifecycle/cache overlap, costs and production promotion remain open.
+- **Next implementation in progress, Source only:** the different-host reuse
+  plan `8a268f33` has independent Source review. A new full-contract stock
+  wasmCloud actor and unbound Root preparation/wrapper are being prepared from
+  the existing cold host mechanism. They select the unchanged D990 component,
+  f805 app and full client/browser checks. One canonical literal loopback origin
+  must bind the exact port and normalized one-entry egress rule; no fallback
+  port, host modification or new component import is proposed. Runtime grants,
+  selected origin and actual results remain unissued. Evidence retention and
+  reader review are complete; the next-host drafting and Source review continue.
 - **Complete:** guarded native build, real-Next component construction, and one
   full deployed regression. HTTP/stream/browser checks pass in that sample;
   cache1→1 keeps the full suite failed. Prior browser failures remain unresolved.
