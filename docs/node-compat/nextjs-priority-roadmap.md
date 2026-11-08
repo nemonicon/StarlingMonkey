@@ -63,9 +63,11 @@ Next actions, in dependency order:
    Positive EOF/disposal/finish/cleanup/return sites do not establish export or
    transport completion, and colliding counters cannot identify physical requests.
    The [export/Promise audit](nextjs-export-promise-completion-audit.md) finds no
-   defect in the inspected settlement/event-loop path. Next is a separate entry
-   observation of the exact handler.handle Promise adoption, preserving values
-   and errors while explicitly changing await scheduling. No native patch is
+   defect in the inspected settlement/event-loop path. A separate entry now
+   constructs as componentcd60c673/37,260,823 bytes to observe the exact
+   handler.handle Promise adoption, preserving values and errors while explicitly
+   changing await scheduling. Its same13-interface INIT review and full deployed
+   regression are being completed. No native patch is
    justified yet. Declared React19.3.1
    and the captured Next-vendored browser canary are recorded separately.
 4. **Parallel compatibility priority:** distinguish module-local generation
@@ -88,10 +90,10 @@ Next actions, in dependency order:
    two-primary-tag mutation contract, all failures and unchanged legacy app code.
 
 The implementation/build checkpoint is committed and pushed through
-`7f8ec2b3`; [progress.md](../../progress.md) tracks current work and closed evidence.
+`3988e1e9`; [progress.md](../../progress.md) tracks current work and closed evidence.
 
-The retained first fresh **Next 16.4.5 / React 19.3.1 App Router application
-passes the selected experimental Wasmtime smoke contract**:
+Historical baseline: the first fresh **Next 16.4.5 / React 19.3.1 App Router
+application passed its selected experimental Wasmtime smoke contract**:
 24/24 HTTP checks, cache generation 1 → 2, five incremental Suspense chunks,
 and both browser interactions, with zero recorded browser or observer errors.
 A stock Node 22.14.0 control passes the same browser worker, readiness checks,
@@ -264,8 +266,9 @@ change host scheduling to simulate one Node process.
 
 ## Per-surface depth
 
-The full app pass demonstrates the paths it actually exercised. It does not
-replace each surface's broader differential, lifetime and failure suite.
+The historical app pass demonstrates the paths it exercised. Current results
+at the top of this document retain the two failed gates. Neither result replaces
+each surface's broader differential, lifetime and failure suite.
 
 | Surface | Current experimental evidence | Remaining boundary |
 | --- | --- | --- |
@@ -311,7 +314,8 @@ contract is therefore not accepted on that wasmCloud path. Report cold-request
 results separately; do not widen the world or modify the host to force reuse.
 See the [pinned lifetime analysis](../../tests/node-compat/host-capabilities/wasmcloud-warm-candidate-v1/README.md).
 
-The experimental full-application smoke milestone has passed on the selected
-Wasmtime configuration and its matched Node control. Reproducibility, deeper
-per-surface/lifecycle regressions, production promotion and performance work
-remain open.
+The historical smoke milestone passed on its selected Wasmtime configuration
+and matched Node control. The current broader application contract remains
+failed at legacy generation and strict Server Action response capture.
+Reproducibility, deeper lifecycle coverage, production promotion and performance
+work remain open.

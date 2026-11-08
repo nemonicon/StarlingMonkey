@@ -4,6 +4,11 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
+Next.js executes in a real Wasm component. Current HTTP, persistent cache,
+streaming and functional UI checks pass; the full suite remains failed at the
+legacy generation counter and strict Server Action response completion. Work
+now focuses on those failures before API expansion or production promotion.
+
 Latest result: native Fetch cleanup compiles and links, a fresh interoperability
 component passes INIT construction review, and all16 deployed module cases pass
 in one GET with independent runtime review55a255e7 accepted for that subset.
@@ -27,18 +32,25 @@ review0ed0e4c2. It cannot waive full-suite failures.
 The matched identity-encoding browser pair now also completes: explicit POST
 negotiation/absent response Content-Encoding pass on both arms, while native
 retains the same cache and strict browser failures and prepared Node passes.
-Coordinated DATA review8151dc47 passes that outcome review; the next discriminator is deployed guest
-response-completion markers rather than another compression workaround.
-A fresh marker component now passes INIT construction/data reviewee7511ac with
-the same13 standard imports and no INIT marker output. Bounded deployed capture
-is still being implemented; no completion trace has run.
+Coordinated DATA review8151dc47 passes that outcome review. The subsequent
+response-completion diagnostic constructs and runs: reviewd0085b5c verifies
+complete bounded stdout capture and preserves both failed application gates.
+Its54 records reach the adapter's EOF, disposal, finish, cleanup and normal-return
+sites, without proving export-Promise or host/TCP completion. The source audit
+finds no verified settlement defect. A separate child-handler Promise observer
+now constructs and validates as componentcd60c673 (37,260,823 bytes). Its
+coordinated INIT review0013502c observes131 imports on the same13 interfaces,
+with clean ownership and no INIT markers. Deployment remains pending. Its
+added await observes existing Promise adoption and can perturb scheduling;
+it is not a demonstrated fix. No native or host change is selected.
 
 Current next steps and outstanding work:
 
-- **Next.js critical path:** observe deployed guest completion at the existing
-  public response/adapter boundaries with bounded diagnostic markers. The
-  matched identity-encoding pair preserves the native failures, so simply
-  requesting identity is insufficient. Separately resolve
+- **Next.js critical path:** run the newly reviewed child-handler Promise
+  observer through the unchanged full suite
+  with bounded stdout capture. The response-site trace is complete but cannot
+  establish Promise or transport completion. The matched identity-encoding pair
+  also preserves the native failures. Separately resolve
   the legacy counter contract against per-request guest state; durable-cache
   success does not waive that failure. Expand the second-host action/browser
   contract only with an explicit self-origin egress policy. The
@@ -406,8 +418,31 @@ finds no Source defect: compiled embedding requires a fulfilled lowered Promise
 after the event loop, with later post_call/host-task boundaries unobserved.
 Next Source-only entry work observes the exact handler.handle Promise adoption
 with one explicit diagnostic await, preserving value/rejection while declaring
-scheduling perturbation. No such new component/runtime exists yet. Source and
-INIT results through7f8ec2b3 are pushed.
+scheduling perturbation. Its first two cores50a4736a/cce84ff2 pass Root/C Source
+review: nine exact replacements, an internal per-call holder and separate
+post-ownership rejection handling. The existing async return already adopts the
+child Promise; this is an observation/scheduling intervention, not a missing-await
+fix. Whole-family review now passes and entry indexd7fbc202 seals the unchanged
+seven payloads/91,333 bytes. The constructor is being bound to that genuine
+index; no new component/runtime exists for it yet. Its three generic executable
+files retain the preceding constructor's exact bytes. Runtime capture will reuse
+the reviewed helper and full application gates. All completed trace/audit/raw
+results through3988e1e9 are committed and pushed; this new work remains pending
+the next checkpoint.
+Ordered binding/closure review now passes for callerc0cf231a and plan8f56ab94.
+Root5e30ae independently reverses the three Root pins to exact reviewed source;
+preparationf9e2e4 exits0 and issues authority9ba322b2 with current31/39/18 roles.
+Root4ace77/session3014 starts original79742/2400 for fresh INIT construction and
+terminates0/clean (4ac9d2); all three inner commands return0, with unchanged
+world/input guards. Rootea87ed reads resultab13bb42 and new componentcd60c673,
+37,260,823 bytes; audit21e8ad86 emits the same13 standard interfaces. INIT
+stdout is906 bytes and stderr is empty. Coordinated whole-return/import/INIT
+review0013502c now passes, binding B owner/world reviewd65be4be (actual11 outer
+observations and2/1/1 inner observations, not inherited counts). All eight INIT
+streams contain no new marker. C freshly hashes the whole component, typed graph,
+current package and metadata; existing engine/Node payloads delegate to the
+accepted build and actual constructor guards. Deployed child-Promise markers
+remain unobserved. Source-only runtime binding is the next step.
 Commit4ffa8659 is pushed to origin/main; live
 build logs and the unfinished runtime controller were excluded from that cut.
 GeneratorV5 runs all ten checks successfully under original4023/900, result795dab0e;
