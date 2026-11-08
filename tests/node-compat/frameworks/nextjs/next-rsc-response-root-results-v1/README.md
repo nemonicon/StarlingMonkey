@@ -40,3 +40,9 @@ failure and exact partial preimages. The corrected binder verifies the semantic
 inverse and separately preserves/read-checks original bytes; it makes no JSON
 serializer byte-inverse claim. The controller literal replacement still has an
 exact byte inverse. Fresh binding history is `source-history/binding-v2`.
+
+Actual fixed pair: Wasm29465/600 and Node29725/300 both exit0 cleanly. Both
+complete HTTP200 gzip RSC and2,963 decoded bytes, with1,488/1,491 encoded bytes.
+[Primary review](actualreview.json), [independent gate](independent-runtime-gate-review.json)
+and [raw index](raw-records/index.json) retain the evidence. The original browser
+failure remains failed. See the [result report](../../../../../docs/node-compat/nextjs-rsc-http-response-results.md).

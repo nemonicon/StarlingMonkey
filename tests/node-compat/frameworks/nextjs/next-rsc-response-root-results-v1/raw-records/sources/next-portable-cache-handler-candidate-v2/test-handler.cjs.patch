@@ -1,0 +1,136 @@
+--- v1/test-handler.cjs
++++ v2/test-handler.cjs
+@@ -18,7 +18,7 @@
+   assert.ok(caught, 'expected ' + code);
+ }
+ function fixture() {
+-  const files = new Map([['/fixture/.next/cache', { dir: true }]]), calls = [];
++  const files = new Map([['/fixture/.next/cache', { dir: true }]]), calls = [], delegateContexts = [];
+   let nonce = 0, delegateRequires = 0, beforeRename = null, afterRename = null, afterWrite = null;
+   const fail = (code) => { const e = new Error(code); e.code = code; throw e; };
+   const fs = {
+@@ -36,7 +36,7 @@
+       if (!files.has(a)) fail('ENOENT'); files.set(b, files.get(a)); files.delete(a); if (afterRename) afterRename(a, b); },
+   };
+   class Delegate {
+-    constructor(ctx) { this.ctx = ctx; }
++    constructor(ctx) { this.ctx = ctx; delegateContexts.push(ctx); }
+     get(...args) { calls.push(['route.get', ...args]); return { delegated: true }; }
+     set(...args) { calls.push(['route.set', ...args]); }
+     revalidateTag(...args) { calls.push(['route.revalidateTag', ...args]); }
+@@ -54,8 +54,8 @@
+   new Function('require', 'module', 'exports', source)(requireFake, module, module.exports);
+   check(calls.length === 0 && delegateRequires === 0, 'no module-evaluation FS, entropy or Next import');
+   const make = () => new module.exports({ dev: false, flushToDisk: true, maxMemoryCacheSize: 0, serverDistDir: '/fixture/.next/server', fs: {} });
+-  const root = '/fixture/.next/cache/portable-fetch-v1';
+-  return { files, calls, make, root, Delegate, Handler: module.exports,
++  const root = '/fixture/.next/cache/portable-fetch-v2';
++  return { files, calls, make, root, Delegate, delegateContexts, Handler: module.exports,
+     beforeRename(fn) { beforeRename = fn; }, afterRename(fn) { afterRename = fn; }, afterWrite(fn) { afterWrite = fn; } };
+ }
+ async function main() {
+@@ -82,9 +82,9 @@
+   }
+   {
+     const f = fixture(), a = f.make(); await a.get(key(3), context()); await a.set(key(3), value('old'), writeContext());
+-    f.files.delete(f.root + '/epochs/0.json');
++    f.files.delete(f.root + '/epochs/1.json');
+     check(await f.make().get(key(3), context()) === null, 'missing epoch cannot revive an old initial token');
+-    f.files.set(f.root + '/epochs/0.json', { bytes: Buffer.from('{}') });
++    f.files.set(f.root + '/epochs/1.json', { bytes: Buffer.from('{}') });
+     await refuses(() => f.make().get(key(3), context()), 'ERR_SM_CACHE_CORRUPT');
+   }
+   {
+@@ -139,8 +139,91 @@
+     const f = fixture();
+     for (let i = 0; i < 128; i++) { const a = f.make(), k = (i % 64).toString(16).padStart(2, '0') + key(i).slice(2); await a.get(k, context()); await a.set(k, value(String(i)), writeContext()); }
+     const rows = [...f.files].filter(([p, v]) => p.startsWith(f.root + '/') && !v.dir);
+-    check(rows.length <= 140 && rows.reduce((n, [, v]) => n + v.bytes.length, 0) <= 8413184, 'fixed file and logical-byte bounds');
++    check(rows.length <= 148 && rows.reduce((n, [, v]) => n + v.bytes.length, 0) <= 8429568, 'fixed file and logical-byte bounds');
+     check(rows.every(([p]) => /\/(entries|epochs)\/(0|[1-9][0-9]*)\.(json|pending)$/.test(p)), 'no random temporary filename growth');
++  }
++  {
++    const f = fixture(), legacy = 'next-runtime-fixture-v1', portable = 'portable-fetch-v1';
++    const oldSoft = ['_N_T_/layout', '_N_T_/api/layout', '_N_T_/api/cache/layout',
++      '_N_T_/api/cache/route', '_N_T_/api/cache'];
++    const newSoft = ['_N_T_/layout', '_N_T_/api/layout', '_N_T_/api/portable-cache/layout',
++      '_N_T_/api/portable-cache/route', '_N_T_/api/portable-cache'];
++    const oldKey = key(9), newKey = '01' + key(10).slice(2);
++    const getOld = () => context(1, {tags: [legacy], softTags: oldSoft});
++    const getNew = () => context(1, {tags: [portable], softTags: newSoft});
++    const a = f.make(); await a.get(oldKey, getOld());
++    await a.set(oldKey, value('legacy'), writeContext(1, {tags: [legacy]}));
++    const b = f.make(); await b.get(newKey, getNew());
++    await b.set(newKey, value('portable'), writeContext(1, {tags: [portable]}));
++    check((await f.make().get(oldKey, getOld())).value.data.body === 'legacy', 'legacy explicit+five soft tags operational');
++    check((await f.make().get(newKey, getNew())).value.data.body === 'portable', 'portable explicit+five soft tags operational');
++    check([...f.files].filter(([p]) => /\/epochs\/\d+\.json$/.test(p)).length === 10, 'ten distinct read-epoch tags, including two shared soft tags');
++    await f.make().revalidateTag(portable, {expire: 0});
++    check(await f.make().get(newKey, getNew()) === null, 'portable primary invalidates portable value');
++    check((await f.make().get(oldKey, getOld())).value.data.body === 'legacy', 'portable primary does not invalidate legacy value');
++    await f.make().revalidateTag(legacy, {expire: 0});
++    check(await f.make().get(oldKey, getOld()) === null, 'legacy primary invalidates legacy value');
++  }
++  {
++    const f = fixture(), legacy = 'next-runtime-fixture-v1', soft = '_N_T_/api/cache';
++    const c = context(1, {tags: [legacy], softTags: [soft]});
++    const a = f.make(); await a.get(key(11), c);
++    await a.set(key(11), value('before-soft-epoch-change'), writeContext(1, {tags: [legacy]}));
++    // Inert persisted-record mutation exercises read staleness, not a supported
++    // public implicit-tag invalidation API. The latter must refuse below.
++    const [p, file] = [...f.files].find(([p, row]) => p.includes('/epochs/') && p.endsWith('.json') &&
++      JSON.parse(JSON.parse(row.bytes.toString()).payload).tag === soft);
++    const envelope = JSON.parse(file.bytes.toString()), payload = JSON.parse(envelope.payload);
++    payload.epoch = 'f'.repeat(64); envelope.payload = JSON.stringify(payload);
++    envelope.sha256 = createHash('sha256').update(envelope.payload).digest('hex');
++    f.files.set(p, {bytes: Buffer.from(JSON.stringify(envelope))});
++    check(await f.make().get(key(11), c) === null, 'fresh soft-tag epoch read rejects captured old epoch');
++  }
++  {
++    const f = fixture(), h = f.make();
++    for (const list of [['_N_T_/api/cache'], ['portable-fetch-v1', '_N_T_/layout'],
++      ['next-runtime-fixture-v1', '_N_T_/api/portable-cache']]) {
++      const before = f.calls.length, files = f.files.size;
++      await refuses(() => h.revalidateTag(list, {expire: 0}), 'ERR_SM_CACHE_UNSUPPORTED');
++      check(f.calls.length === before && f.files.size === files, 'whole unsupported mutation batch has no FS/RNG/delegate effect');
++    }
++    const before = f.calls.length;
++    await refuses(() => h.revalidateTag(['portable-fetch-v1', 'unknown']), 'ERR_SM_CACHE_UNSUPPORTED');
++    check(f.calls.length === before, 'unknown tag after valid primary refused before effects');
++    h.resetRequestCache();
++    await h.get(key(12), context()); await h.set(key(12), value('after-refusal'), writeContext());
++    check((await f.make().get(key(12), context())).value.data.body === 'after-refusal',
++      'unsupported mutation did not mark fresh handler started or disable writes through its initial reset');
++  }
++  {
++    const f = fixture(), h = f.make();
++    for (const tags of [['next-runtime-fixture-v1', 'portable-fetch-v1'],
++      ['portable-fetch-v1', 'portable-fetch-v1'], ['_N_T_/layout']]) {
++      const before = f.calls.length;
++      await refuses(() => h.get(key(13), context(1, {tags})), 'ERR_SM_CACHE_PROFILE');
++      check(f.calls.length === before, 'exactly one explicit primary required before FS/RNG');
++    }
++    const outer = {dev: false, flushToDisk: true, maxMemoryCacheSize: 0,
++      serverDistDir: '/fixture/.next/server', fs: {identity: 'real-context-placeholder'}};
++    new f.Handler(outer);
++    const delegated = f.delegateContexts.at(-1);
++    check(outer.flushToDisk === true && delegated.flushToDisk === false &&
++      delegated.maxMemoryCacheSize === 0 && delegated.fs === outer.fs,
++    'only real route delegate uses flush:false/max0, original FETCH options preserved');
++    assert.throws(() => new f.Handler({...outer, flushToDisk: false}), {code: 'ERR_SM_CACHE_PROFILE'}); checks++;
++  }
++  {
++    const f = fixture(), legacy = 'next-runtime-fixture-v1';
++    f.afterWrite((p) => {
++      if (!p.includes('/epochs/')) return;
++      const tag = JSON.parse(JSON.parse(f.files.get(p).bytes.toString()).payload).tag;
++      if (tag === 'portable-fetch-v1') { f.afterWrite(null); throw 0; }
++    });
++    const e = await refuses(() => f.make().revalidateTag([legacy, 'portable-fetch-v1'], {expire: 0}),
++      'ERR_SM_CACHE_INVALIDATION_PARTIAL');
++    check(JSON.stringify(e.committedTags) === JSON.stringify([legacy]) && e.cause?.cause === 0,
++      'valid multi-primary partial failure retains only completed publication and original falsy cause');
++    check([...f.files.keys()].some((p) => p.endsWith('.pending')), 'uncertain second tag pending remains bounded and unreclaimed');
+   }
+   console.log(JSON.stringify({ sourceTestsOnly: true, checks, actualCacheFilesystemUsed: false,
+     actualEntropyUsed: false, actualNextImported: false, actualHandlerLoadedInGuest: false }));

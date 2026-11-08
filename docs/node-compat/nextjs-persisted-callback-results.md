@@ -62,12 +62,13 @@ body and1,534-byte encoded body. These results
 describe the ported fixture; earlier failures and broader Node/Next compatibility
 limitations remain separate. No response-cancellation cause is established.
 
-The [next response-completion probe](../../tests/node-compat/frameworks/nextjs/next-fs-callback-root-results-v2/next-browser-steps.md)
-would reuse the retained391-byte request with captured-header restoration and
-an ordinary Node HTTP consumer, checking gzip completion and transport EOF.
-Preparation must refuse if the missing normalized headers cannot be restored
-unambiguously. This would separate producer completion from React/UI consumption
-for that workload; it would not explain or waive the original browser abort.
+The [captured-request response comparison](nextjs-rsc-http-response-results.md)
+now passes once on both Wasm and Node with complete gzip/HTTP EOF and2,963 decoded
+bytes. Exact request/header provenance is retained. This fresh-host ordinary
+HTTP workload has no preceding requests or React/Chrome consumer; it does not
+explain or waive the comprehensive browser abort. The next control should retain
+this raw consumer and reproduce the preceding HTTP/cache/supplemental/stream
+workload before investigating the browser boundary.
 
 Evidence: [clean app review](../../tests/node-compat/frameworks/nextjs/next-fs-callback-root-results-v2/actual-build-review.json),
 [Node helper review](../../tests/node-compat/frameworks/nextjs/next-node-fs-atomic-root-results-v1/actual-node-review.json),

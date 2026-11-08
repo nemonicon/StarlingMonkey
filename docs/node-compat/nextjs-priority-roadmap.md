@@ -11,11 +11,14 @@ this result demonstrates explicit persisted application data only. The actual
 Next filesystem-helper component separately passes3 cases/11 assertions.
 The critical path is now strict response completion and the related lifecycle
 investigation, with no weaker browser gate or earlier failure waiver.
-The [Source-backed next probe](../../tests/node-compat/frameworks/nextjs/next-fs-callback-root-results-v2/next-browser-steps.md)
-uses the actual retained multipart action body with captured-header restoration
-and a non-browser HTTP consumer to test gzip/EOF completion. It must stop during
-preparation if exact required header provenance is missing. No implementation
-fix, harmless-cancellation conclusion or full Next acceptance follows yet.
+The [captured-request ordinary HTTP comparison](nextjs-rsc-http-response-results.md)
+now passes once on both Wasm and Node: complete HTTP200 gzip responses decode to
+2,963 bytes, with matching CRC/ISIZE and known cleanup. It uses unchanged app,
+engine and component but a fresh host with no preceding HTTP workload. The
+strict comprehensive browser failure remains failed. Next preserve this raw
+consumer while controlling preceding workload, then inspect browser lifetime
+with the original strict gates. There is no justified compression/cancellation
+patch or full Next acceptance yet.
 
 Updated 2026-11-08. The latest comprehensive current-build comparison finishes
 with **Node passed and Wasm failed solely on legacy generation1→1**. Both pass

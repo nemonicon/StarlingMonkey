@@ -1,0 +1,231 @@
+--- before/embedding.cpp
++++ embedding.cpp
+@@ -7,6 +7,10 @@
+ #endif
+ #ifdef NODE_COMPAT_ENTROPY_POLICY
+ #include "node-compat-entropy.h"
++#endif
++#ifdef NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1
++#include "js/String.h"
++#include <cstdint>
+ #endif
+ 
+ namespace builtins::web::console {
+@@ -43,6 +47,168 @@
+ 
+ using componentize::embedding::Runtime;
+ 
++#ifdef NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1
++// Opt-in guest-only observation. No JS edge or borrowed character pointer is retained.
++enum class NativeExportObservationReason : uint8_t {
++  InvalidArguments, Missing, Invalid, Duplicate, NonlinearString, InvalidValue,
++  UnadmittedRoute
++};
++struct NativeExportObservation {
++  uint8_t method = 255;
++  uint8_t path = 255;
++  bool valid = false;
++  NativeExportObservationReason reason = NativeExportObservationReason::InvalidArguments;
++  char nonce[65] = {};
++};
++struct NativeExportWindow {
++  bool active = false;
++  uint8_t attempts = 0; // Saturated2; never an identity or request counter.
++  NativeExportObservation observation;
++};
++struct NativeExportDiagnostic {
++  NativeExportWindow window;
++  uint16_t ordinary_records = 0; // Only the component-local output bound.
++  bool stopped = false;
++};
++NativeExportDiagnostic native_export_diagnostic;
++
++bool native_export_enum(JS::HandleValue value, uint8_t maximum, uint8_t *out) {
++  if (!value.isNumber()) return false;
++  const double number = value.toNumber(); // Primitive read; no ToNumber/coercion.
++  if (!(number >= 0 && number <= maximum)) return false;
++  const uint8_t integer = static_cast<uint8_t>(number);
++  if (number != integer) return false;
++  *out = integer;
++  return true;
++}
++
++bool native_export_observe(JSContext *cx, unsigned argc, JS::Value *vp) {
++  JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
++  args.rval().setUndefined();
++  auto &diagnostic = native_export_diagnostic;
++  auto &window = diagnostic.window;
++  if (!window.active || diagnostic.stopped) return true;
++  if (window.attempts != 0) {
++    window.attempts = 2;
++    window.observation = {}; // Never keep first/last-wins public metadata.
++    return true;
++  }
++  window.attempts = 1;
++  auto &observation = window.observation;
++  uint8_t method, path, state, count;
++  if (argc != 5 || !native_export_enum(args[0], 1, &method) ||
++      !native_export_enum(args[1], 1, &path) ||
++      !native_export_enum(args[2], 3, &state) ||
++      !native_export_enum(args[3], 2, &count)) return true;
++  observation.method = method;
++  observation.path = path;
++  if (method == 1 && path == 1) {
++    observation.reason = NativeExportObservationReason::UnadmittedRoute;
++    return true;
++  }
++  if (state != 1) {
++    if (!args[4].isNull() || (state == 0 && count != 0) ||
++        (state == 2 && count > 1) || (state == 3 && count != 2)) return true;
++    observation.reason = state == 0 ? NativeExportObservationReason::Missing :
++        state == 2 ? NativeExportObservationReason::Invalid : NativeExportObservationReason::Duplicate;
++    return true;
++  }
++  if (count != 1 || !args[4].isString()) return true;
++  JS::RootedString input(cx, args[4].toString());
++  if (JS::GetStringLength(input) != 64) {
++    observation.reason = NativeExportObservationReason::InvalidValue;
++    return true;
++  }
++  if (!JS_StringIsLinear(input)) {
++    observation.reason = NativeExportObservationReason::NonlinearString;
++    return true;
++  }
++  char16_t units[64];
++  {
++    JS::AutoCheckCannotGC no_gc;
++    JS::CopyLinearStringChars(units, JS_ASSERT_STRING_IS_LINEAR(input), 64);
++  }
++  for (const char16_t unit : units) {
++    if (!((unit >= '0' && unit <= '9') || (unit >= 'a' && unit <= 'f'))) {
++      observation.reason = NativeExportObservationReason::InvalidValue;
++      return true;
++    }
++  }
++  for (size_t i = 0; i < 64; ++i) observation.nonce[i] = static_cast<char>(units[i]);
++  observation.nonce[64] = '\0';
++  observation.valid = true;
++  return true;
++}
++
++void native_export_begin() {
++  native_export_diagnostic.window = {};
++  native_export_diagnostic.window.active = true;
++}
++
++void native_export_retire() {
++  // Canonical post-return: memory only. No stdio, JS, allocation or import.
++  native_export_diagnostic.window = {};
++}
++
++const char *native_export_reason(NativeExportObservationReason reason) {
++  switch (reason) {
++  case NativeExportObservationReason::Missing: return "missing";
++  case NativeExportObservationReason::Invalid: return "invalid";
++  case NativeExportObservationReason::Duplicate: return "duplicate";
++  case NativeExportObservationReason::NonlinearString: return "nonlinear-string";
++  case NativeExportObservationReason::InvalidValue: return "invalid-value";
++  case NativeExportObservationReason::UnadmittedRoute: return "unadmitted-route";
++  default: return "invalid-arguments";
++  }
++}
++
++void native_export_write(const char *line, size_t length) {
++  // No retry/replay after any short write or failed flush. A host trap is not catchable here.
++  if (std::fwrite(line, 1, length, stdout) != length || std::fflush(stdout) != 0)
++    native_export_diagnostic.stopped = true;
++}
++
++void native_export_success_site() {
++  auto &diagnostic = native_export_diagnostic;
++  const auto &window = diagnostic.window;
++  if (diagnostic.stopped || !window.active || window.attempts == 0) return;
++  if (diagnostic.ordinary_records == 256) {
++    diagnostic.stopped = true;
++    static constexpr char truncated[] =
++        "{\"marker\":\"NEXT_NATIVE_EXPORT_PUBLIC_CORRELATION_V1\",\"version\":1,"
++        "\"event\":\"native-diagnostic-truncated\"}\n";
++    native_export_write(truncated, sizeof(truncated) - 1);
++    return;
++  }
++  const auto &observation = window.observation;
++  const bool ambiguous = window.attempts == 2;
++  const bool valid = !ambiguous && observation.valid;
++  const char *method = ambiguous ? "-" : observation.method == 0 ? "GET" : observation.method == 1 ? "POST" : "-";
++  const char *path = ambiguous ? "-" : observation.path == 0 ? "/actions" : observation.path == 1 ? "/action-result" : "-";
++  char correlation[67] = "null";
++  if (valid) {
++    correlation[0] = '"';
++    for (size_t i = 0; i < 64; ++i) correlation[i + 1] = observation.nonce[i];
++    correlation[65] = '"'; correlation[66] = '\0';
++  }
++  char line[512];
++  const int length = std::snprintf(line, sizeof(line),
++      "{\"marker\":\"NEXT_NATIVE_EXPORT_PUBLIC_CORRELATION_V1\",\"version\":1,"
++      "\"event\":\"native-success-return-site\",\"status\":\"%s\",\"observations\":%u,"
++      "\"method\":\"%s\",\"path\":\"%s\",\"reason\":\"%s\",\"corrCount\":%s,\"corr\":%s}\n",
++      ambiguous ? "ambiguous" : valid ? "single-valid" : "unavailable",
++      static_cast<unsigned>(window.attempts), method, path,
++      ambiguous ? "multiple-observations" : valid ? "-" : native_export_reason(observation.reason),
++      valid ? "1" : "null", correlation);
++  if (length <= 0 || static_cast<size_t>(length) >= sizeof(line)) {
++    diagnostic.stopped = true;
++    return;
++  }
++  ++diagnostic.ordinary_records;
++  native_export_write(line, static_cast<size_t>(length));
++}
++#endif
++
+ bool call_then_handler(JSContext *cx, JS::HandleObject receiver,
+                        JS::HandleValue extra, JS::CallArgs args) {
+   LOG("(call) call then handler");
+@@ -202,6 +368,9 @@
+     Runtime.engine->abort("entering an export with a nonempty internal tick FIFO");
+ #endif
+   Runtime.cur_fn_idx = fn_idx;
++#ifdef NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1
++  native_export_begin();
++#endif
+   if (argptr) {
+     Runtime.free_list.push_back(argptr);
+   }
+@@ -368,6 +537,9 @@
+     }
+   }
+ 
++#ifdef NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1
++  native_export_success_site();
++#endif
+   LOG("(call) end");
+ 
+   // we always return a retptr (even if null)
+@@ -383,6 +555,9 @@
+     abort();
+   }
+   Runtime.cur_fn_idx = -1;
++#ifdef NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1
++  native_export_retire();
++#endif
+   for (void *ptr : Runtime.free_list) {
+     cabi_free(ptr);
+   }
+@@ -676,6 +851,18 @@
+     return false;
+   }
+ 
++#ifdef NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1
++  {
++    JSAutoRealm diagnostic_realm(Runtime.cx, engine->global());
++    JS::RootedObject record(Runtime.cx, JS_NewPlainObject(Runtime.cx));
++    if (!record || !JS_DefineFunction(Runtime.cx, record, "observe", native_export_observe, 5,
++                                      JSPROP_ENUMERATE | JSPROP_READONLY | JSPROP_PERMANENT))
++      return false;
++    JS::RootedValue value(Runtime.cx, JS::ObjectValue(*record));
++    if (!engine->define_builtin_module("internal:starlingmonkey/native-export-diagnostic-v1", value))
++      return false;
++  }
++#endif
+   LOG("(wizer) complete");
+ 
+   return true;

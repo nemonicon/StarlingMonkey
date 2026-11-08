@@ -1,0 +1,20 @@
+String.h:309-315
+/**
+ * Concatenate two strings, possibly resulting in a rope.
+ * See above for thread safety comments.
+ */
+extern JS_PUBLIC_API JSString* JS_ConcatStrings(JSContext* cx,
+                                                JS::Handle<JSString*> left,
+                                                JS::Handle<JSString*> right);
+
+RootingAPI.h:637-646
+  /*
+   * Construct a handle from an explicitly rooted location. This is the
+   * normal way to create a handle, and normally happens implicitly.
+   */
+  template <typename S>
+  inline MOZ_IMPLICIT Handle(
+      const Rooted<S>& root,
+      std::enable_if_t<std::is_convertible_v<S, T>, int> dummy = 0);
+
+  template <typename S>

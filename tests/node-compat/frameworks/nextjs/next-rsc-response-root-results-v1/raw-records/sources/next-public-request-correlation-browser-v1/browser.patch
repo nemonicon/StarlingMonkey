@@ -1,0 +1,59 @@
+--- f19d/browser-check.mjs
++++ correlation/browser-check.mjs
+@@ -7,11 +7,12 @@
+ import {createRequire} from 'node:module';
+ import {join,resolve,relative,isAbsolute} from 'node:path';
+ import {pathToFileURL} from 'node:url';
++import {readPublicCorrelationManifest,publicCorrelationHeader} from './manifest.mjs';
+ 
+ assert.equal(process.version,'v22.14.0');
+ const args=process.argv.slice(2),options={};
+-assert.equal(args.length,6,'--origin URL --tools DIR --output FRESH');
+-for(let i=0;i<args.length;i+=2){assert(['--origin','--tools','--output'].includes(args[i])&&!Object.hasOwn(options,args[i]));options[args[i]]=args[i+1];}
++assert.equal(args.length,8,'--origin URL --tools DIR --output FRESH --correlation-manifest FILE');
++for(let i=0;i<args.length;i+=2){assert(['--origin','--tools','--output','--correlation-manifest'].includes(args[i])&&!Object.hasOwn(options,args[i]));options[args[i]]=args[i+1];}
+ const origin=new URL(options['--origin']);
+ assert(['http:','https:'].includes(origin.protocol)&&origin.pathname==='/'&&!origin.search&&!origin.hash&&!origin.username&&!origin.password,'Plain origin URL required');
+ const tools=resolve(options['--tools']),output=resolve(options['--output']);
+@@ -20,7 +21,7 @@
+ const netlogPath=join(output,'netlog.json'),netlogReadLimit=20*1024*1024;
+ async function descriptor(path){const h=createHash('sha256');let bytes=0;for await(const b of createReadStream(path)){h.update(b);bytes+=b.length;}return{path,sha256:h.digest('hex'),bytes};}
+ const result={schemaVersion:1,suite:'nextjs-hydration-browser-diagnostic-v2',origin:origin.origin,playwrightVersion:null,browserVersion:null,
+-  executable:null,tests:[],pageerrors:[],consoleerrors:[],failedrequests:[],actionPosts:[],errors:[],
++  publicRequestCorrelation:null,executable:null,tests:[],pageerrors:[],consoleerrors:[],failedrequests:[],actionPosts:[],errors:[],
+   browserClosed:false,ephemeralContexts:true,userProfileUsed:false,perTestTimeoutMs:limit,wasmBrowserRun:null,targetRuntimeProvenance:'Parent Root records actual host; the browser origin alone does not identify it',
+   cdpEvents:[],cdpCorrelations:[],cdpScope:{events:['Network.requestWillBeSent','Network.responseReceived','Network.dataReceived','Network.loadingFinished','Network.loadingFailed','Page.navigatedWithinDocument','Page.frameNavigated'],payloads:'Complete semantic protocol JSON; not original wire bytes',protocolClock:'CDP timestamps/monotonic seconds and wallTime retain original values; no conversion to Node hrtime',arrivalClock:'Node process.hrtime relative nanoseconds shared with Playwright trace',idCorrelation:'CDP IDs and per-test Playwright WeakMap IDs are distinct; URL/method matches are candidates only'},
+   assetBodies:[],bodyCaptures:[],responseHeaders:[],trace:[],traceClock:'Node process.hrtime.bigint relative nanoseconds',responseFinishedObservations:[],
+@@ -120,6 +121,14 @@
+ let browser;
+ await save();
+ try{
++  const correlation=await readPublicCorrelationManifest(resolve(options['--correlation-manifest']));
++  assert.equal(correlation.manifest.origin,origin.origin);
++  const manifestCopy=join(output,'public-request-correlation-manifest.json');
++  await writeFile(manifestCopy,correlation.bytes,{flag:'wx',mode:0o600});
++  result.publicRequestCorrelation={schemaVersion:1,manifest:correlation.manifest,manifestSource:correlation.source,
++    retainedManifest:await descriptor(manifestCopy),readEvidence:correlation.evidence,
++    scope:'Public per-test/run context header configuration; actual POST/NetLog/guest joins require independent DATA',actualGuestJoin:null};
++  await save(); // Manifest bytes/hash/evidence durably precede all contexts.
+   const fromTools=createRequire(join(tools,'package.json'));
+   const packagePath=fromTools.resolve('playwright-core/package.json'),entry=fromTools.resolve('playwright-core');
+   const physicalTools=await realpath(tools);
+@@ -132,7 +141,7 @@
+   assert(chromium,'Actual Playwright Chromium API');
+   browser=await chromium.launch({executablePath:chrome,headless:true,timeout:limit,args:['--log-net-log='+netlogPath,'--net-log-max-size-mb=16']});result.browserVersion=browser.version();assert.equal(result.browserVersion,'156.0.8078.81','Matched controls require the retained Chrome version');await save();
+   async function test(id,body){
+-    const record={id,passed:false,timedOut:false,screenshot:null,error:null};const started=Date.now();
++    const record={id,passed:false,timedOut:false,screenshot:null,error:null,publicCorrelationConfiguredNonce:correlation.manifest.nonceByTest[id]};const started=Date.now();
+     let context,page,timer,phase='context-setup';const finishes=new Set(),ids=new WeakMap();let nextRequest=0;
+     let rejectObserver;
+     const observerFailed=new Promise((_,reject)=>{rejectObserver=reject;});void observerFailed.catch(()=>{});
+@@ -148,7 +157,7 @@
+     const requestData=request=>({requestId:requestId(request),url:request.url(),method:request.method(),resourceType:request.resourceType(),isNavigationRequest:request.isNavigationRequest(),redirectedFrom:request.redirectedFrom()?requestId(request.redirectedFrom()):null});
+     mark('context-setup');
+     const pending=(async()=>{
+-      context=await browser.newContext({viewport:{width:1280,height:800},acceptDownloads:false});
++      context=await browser.newContext({viewport:{width:1280,height:800},acceptDownloads:false,extraHTTPHeaders:{[publicCorrelationHeader]:correlation.manifest.nonceByTest[id]}});
+       context.setDefaultTimeout(limit);context.setDefaultNavigationTimeout(limit);
+       page=await context.newPage();
+       page.on('request',request=>{const data=requestData(request);observer.noteRequest(request,data);trace(id,phase,'request',data);});

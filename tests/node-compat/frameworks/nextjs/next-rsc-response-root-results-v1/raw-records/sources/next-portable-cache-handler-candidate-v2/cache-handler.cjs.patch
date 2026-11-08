@@ -1,0 +1,98 @@
+--- v1/cache-handler.cjs
++++ v2/cache-handler.cjs
+@@ -9,12 +9,14 @@
+ const path = require('node:path').posix;
+ 
+ const PROFILE = Object.freeze({
+-  namespace: 'portable-fetch-v1', slots: 64, associations: 64,
++  namespace: 'portable-fetch-v2', slots: 64, associations: 64,
+   recordBytes: 65536, valueBytes: 32768, epochBytes: 2048,
+-  // Prospective /api/portable-cache/route scenario, not an existing app edit.
+-  tags: Object.freeze(['portable-fetch-v1', '_N_T_/layout', '_N_T_/api/layout',
+-    '_N_T_/api/portable-cache/layout', '_N_T_/api/portable-cache/route',
+-    '_N_T_/api/portable-cache']),
++  // Read epochs include exact legacy/new primary and ordinary API soft tags.
++  primaryTags: Object.freeze(['next-runtime-fixture-v1', 'portable-fetch-v1']),
++  tags: Object.freeze(['next-runtime-fixture-v1', 'portable-fetch-v1',
++    '_N_T_/layout', '_N_T_/api/layout', '_N_T_/api/cache/layout',
++    '_N_T_/api/cache/route', '_N_T_/api/cache', '_N_T_/api/portable-cache/layout',
++    '_N_T_/api/portable-cache/route', '_N_T_/api/portable-cache']),
+ });
+ const ROUTES = Object.freeze(['APP_PAGE', 'APP_ROUTE', 'PAGES']);
+ const own = Object.getOwnPropertyDescriptor;
+@@ -22,7 +24,7 @@
+ const same = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
+ function error(code, operation, message, cause) {
+   const e = new Error(message);
+-  e.code = code; e.operation = operation; e.module = 'next-portable-cache-handler-v1';
++  e.code = code; e.operation = operation; e.module = 'next-portable-cache-handler-v2';
+   if (arguments.length === 4) e.cause = cause;
+   return e;
+ }
+@@ -115,7 +117,7 @@
+     payload = JSON.parse(envelope.payload);
+     need(JSON.stringify(payload) === envelope.payload, 'ERR_SM_CACHE_CORRUPT', operation, 'Noncanonical JSON payload');
+   } catch (e) {
+-    if (e && e.module === 'next-portable-cache-handler-v1') throw e;
++    if (e && e.module === 'next-portable-cache-handler-v2') throw e;
+     throw error('ERR_SM_CACHE_CORRUPT', operation, 'Unreadable JSON record', e);
+   }
+   return payload;
+@@ -132,12 +134,13 @@
+       dist.startsWith('/') && !dist.includes('\0') && path.normalize(dist) === dist,
+     'ERR_SM_CACHE_PROFILE', 'constructor', 'Expected canonical absolute serverDistDir');
+     this.#root = path.join(path.dirname(dist), 'cache', PROFILE.namespace);
+-    // Genuine pinned Next class, not a replacement implementation. Loading this
+-    // nonbuiltin dependency requires the real runtime filesystem/module loader.
++    // Genuine pinned Next class. Route writes/ISR persistence are deferred in
++    // this read-only seed profile; FETCH retains the outer flushToDisk:true.
++    // Loading this dependency requires the runtime filesystem/module loader.
+     const Delegate = require('next/dist/server/lib/incremental-cache/file-system-cache.js').default;
+     need(typeof Delegate === 'function' && Delegate.memoryCache === undefined,
+       'ERR_SM_CACHE_DELEGATE', 'constructor', 'Existing Next static memory cache is outside this profile');
+-    this.#delegate = new Delegate({ ...ctx, maxMemoryCacheSize: 0 });
++    this.#delegate = new Delegate({ ...ctx, maxMemoryCacheSize: 0, flushToDisk: false });
+     this.#Delegate = Delegate;
+   }
+   #route(operation, ...args) {
+@@ -174,7 +177,7 @@
+         }
+       }
+     } catch (e) {
+-      if (e && e.module === 'next-portable-cache-handler-v1') throw e;
++      if (e && e.module === 'next-portable-cache-handler-v2') throw e;
+       throw error('ERR_SM_CACHE_IO', 'layout', 'Cache directory operation failed', e);
+     }
+   }
+@@ -217,9 +220,11 @@
+   }
+   #context(key, ctx) {
+     need(hex(key), 'ERR_SM_CACHE_PROFILE', 'context', 'Expected actual SHA256 cache key');
+-    const idx = field(ctx, 'fetchIdx', 'context'), explicit = tags(field(ctx, 'tags', 'context'), 'context');
+-    need(Number.isSafeInteger(idx) && idx >= 0 && explicit.includes('portable-fetch-v1'),
+-      'ERR_SM_CACHE_PROFILE', 'context', 'Requires actual finite fetchIdx and declared primary tag');
++    const idx = field(ctx, 'fetchIdx', 'context'), inputTags = field(ctx, 'tags', 'context');
++    const explicit = tags(inputTags, 'context');
++    need(Number.isSafeInteger(idx) && idx >= 0 && Array.isArray(inputTags) && inputTags.length === 1 &&
++      explicit.length === 1 && PROFILE.primaryTags.includes(explicit[0]),
++    'ERR_SM_CACHE_PROFILE', 'context', 'Requires actual finite fetchIdx and exactly one declared primary tag');
+     return { id: key + ':' + idx, explicit, combined: [...new Set([...explicit,
+       ...tags(field(ctx, 'softTags', 'context'), 'context')])].sort() };
+   }
+@@ -269,11 +274,15 @@
+       { schemaVersion: 1, key, tags: a.combined, epochs: a.epochs, lastModified: Date.now(), value: checked }, PROFILE.recordBytes);
+   }
+   async revalidateTag(input, durations) {
+-    this.#started = true;
+     const list = tags(typeof input === 'string' ? [input] : input, 'revalidateTag');
++    // Read-epoch tags do not grant route/path invalidation. Validate the whole
++    // batch before changing local state or performing FS, entropy or delegation.
++    need(list.every((tag) => PROFILE.primaryTags.includes(tag)),
++      'ERR_SM_CACHE_UNSUPPORTED', 'revalidateTag', 'Implicit/path tag invalidation is outside this FETCH profile');
+     need(durations === undefined || (durations !== null && typeof durations === 'object' &&
+       Reflect.ownKeys(durations).length === 1 && field(durations, 'expire', 'revalidateTag') === 0),
+     'ERR_SM_CACHE_UNSUPPORTED', 'revalidateTag', 'Only immediate expiration or expire:0 is supported');
++    this.#started = true;
+     this.#layout();
+     const committedTags = [];
+     try {

@@ -4,21 +4,20 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
-Current diagnostic: the retained391-byte Server Action request is admitted for a
-new ordinary-HTTP-consumer comparison. DATA capture`050c528f` and header evidence
-`382dbe59` uniquely join the original POST snapshot to one NetLog send-header
-record; all19 actual headers and the build's action-manifest binding are retained.
-The explicit replay policy preserves body/boundary/negotiation, rewrites only
-Host/Origin/Referer for each fresh listener, and removes the old public nonce.
-Client/actor Source reviews and three actual Node syntax checks pass. Binding
-preparation first fails before publication on an incorrect JSON formatting
-assumption; the failed binder and partial preimages are retained. A narrow
-correction verifies the semantic inverse and original preserved bytes separately.
-Corrected binding`bdd3e053` passes the actual original guards and seals the
-fresh input union. Fixed preparation`3a900d27` reserves Wasm600→Node300 slots;
-no replay request has been sent.
-This diagnoses raw gzip/EOF completion without React/Chrome and never replaces
-or weakens the failed strict browser gate.
+Latest diagnostic: the [captured Server Action HTTP replay](docs/node-compat/nextjs-rsc-http-response-results.md)
+passes once on Wasm29465/600 and Node29725/300, both raw0/clean. Both return
+HTTP200, complete gzip RSC and2,963 decoded bytes; encoded sizes are1,488/1,491.
+End/HTTP-complete and CRC/ISIZE pass with no abort or collection error. The exact
+391-byte request and all19 original headers are retained; replay rewrites only
+Host/Origin/Referer and removes the old public nonce. The app/engine/component
+and13 standard WASI0.2.10 imports are unchanged. This fresh-host/no-prework,
+non-browser workload does not explain or waive the original strict browser abort.
+Preparation's JSON-format assumption failure and exact preimages are preserved;
+corrected binding`bdd3e053` and fixed preparation`3a900d27` pass. Primary DATA
+review`0e74de45` and independent runtime/gzip review`e22f9f7a` pass;380 retained
+payloads total7,575,911 bytes (`b3a97510`). Root rehashes the entire raw corpus.
+The next non-browser prework control is Source-only preparation, with no slots
+or requests yet. Control preceding workload before changing native behavior.
 
 Latest ported-fixture comparison: explicit filesystem-backed callback state
 passes1→2 on both Wasm and Node. Both also pass24HTTP,52 portable-cache checks,

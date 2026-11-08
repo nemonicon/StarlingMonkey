@@ -1,0 +1,10 @@
+--- Builder8/prepare.py
++++ diagnostic/prepare.py
+@@ -53,6 +53,7 @@
+ 
+ def load():
+     plan = json.loads((HERE / 'plan.json').read_text())
++    need(plan['prospectiveSourceBindingsPending'] is False, 'Unbound diagnostic build Source')
+     need(plan['actionsAllowed'] is False and plan['state'] ==
+          'DORMANT_PORTABLE_SOURCE_AND_CARGO_NEXT_INTL_NATIVE_BUILD_PLAN_V3', 'Unissued Source plan')
+     need(descriptor(Path(sys.executable).resolve()) == plan['wrapperPython'], 'Pinned wrapperPython3.11 required')

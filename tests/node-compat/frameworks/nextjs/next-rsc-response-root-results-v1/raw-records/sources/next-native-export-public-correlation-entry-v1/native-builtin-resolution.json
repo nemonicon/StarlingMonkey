@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "state": "NATIVE_BUILTIN_COMPONENTIZE_RESOLUTION_SOURCE_AUDIT_V1",
+  "references": [
+    {
+      "source": {
+        "path": "/private/tmp/starling-node-compat/import-abi-clock-io-v1-package/src/componentize.js",
+        "sha256": "e58ef4f3b126f4a3fd07c61b368930bbf02dd0029f0f03e4c6928528e994e559",
+        "bytes": 18901
+      },
+      "witnesses": [
+        {
+          "firstLine": 128,
+          "lastLine": 161,
+          "excerpt": "    }\n  }\n\n  if (!jsSource && sourcePath) {\n    jsSource = await readFile(sourcePath, 'utf8');\n  }\n  const detectedExports = await detectKnownSourceExportNames(\n    sourceName,\n    jsSource,\n  );\n\n  // If there is an export of incomingHandler, there is likely to be a\n  // manual implementation of wasi:http/incoming-handler, so we should\n  // disable fetch-event\n  if (features.has('http') && detectedExports.has('incomingHandler')) {\n    if (debugBindings) {\n      console.error(\n        'Detected `incomingHandler` export, disabling fetch-event...',\n      );\n    }\n    features.delete('fetch-event');\n  }\n\n  // Splice the bindigns for the given WIT world into the engine WASM\n  let { wasm, jsBindings, exports, imports } = splicer.spliceBindings(\n    await readFile(engine),\n    [...features],\n    witWorld,\n    maybeWindowsPath(witPath),\n    worldName,\n    false,\n  );\n\n  const inputWasmPath = join(workDir, 'in.wasm');"
+        },
+        {
+          "firstLine": 257,
+          "lastLine": 285,
+          "excerpt": "      workspacePrefix = sourcesDir;\n      sourcePath = sourceName;\n    }\n    let currentDir = maybeWindowsPath(cwd());\n    if (workspacePrefix.startsWith(currentDir)) {\n      workspacePrefix = currentDir;\n      sourcePath = sourcePath.slice(workspacePrefix.length + 1);\n    }\n  }\n\n  // Ensure source path is relative to workspacePrefix for the args list,\n  // regardless of the directory\n  if (!opts.enableAot && resolve(sourcePath).startsWith(resolve(workspacePrefix))) {\n      sourcePath = relative(workspacePrefix, sourcePath);\n  }\n\n  let args = `--initializer-script-path ${initializerPath} --strip-path-prefix ${workspacePrefix}/ ${sourcePath}`;\n  runtimeArgs = runtimeArgs ? `${runtimeArgs} ${args}` : args;\n\n  let preopens = [`--dir=${sourcesDir}`];\n  if (opts.enableAot) {\n    preopens.push(`--dir=${workspacePrefix}`);\n  } else {\n    preopens.push(`--mapdir=/::${workspacePrefix}`);\n  }\n\n  let postProcess;\n  let postProcessName;\n  if (opts.enableAot) {"
+        },
+        {
+          "firstLine": 327,
+          "lastLine": 359,
+          "excerpt": "    const wizerBin = opts.wizerBin ?? wizer;\n    postProcessName = `wizer (${wizerBin})`;\n    postProcess = spawnSync(\n      wizerBin,\n      [\n        '--allow-wasi',\n        '--init-func',\n        'componentize.wizer',\n        ...preopens,\n        `--wasm-bulk-memory=true`,\n        '--inherit-env=true',\n        `-o=${outputWasmPath}`,\n        inputWasmPath,\n      ],\n      {\n        stdio: [null, stdout, 'pipe'],\n        env,\n        input: runtimeArgs,\n        encoding: 'utf-8',\n      },\n    );\n  }\n\n  // If the wizer (or weval) process failed, parse the output and display to the user\n  if (postProcess.status !== 0 || postProcess.signal) {\n    let procErr = parseWizerStderr(postProcess.stderr);\n    if (postProcess.signal) {\n      procErr += `\\nProcess was killed by signal: ${postProcess.signal}`;\n    }\n    if (postProcess.error) {\n      procErr += `\\nProcess error: ${postProcess.error.message}`;\n    }\n    let err = `Failed to initialize component (${postProcessName}):\\n${procErr}`;"
+        },
+        {
+          "firstLine": 415,
+          "lastLine": 425,
+          "excerpt": "    }),\n  );\n\n  // Convert CABI import conventions to ESM import conventions\n  imports = imports.map(([specifier, impt]) =>\n    specifier === '$root' ? [impt, 'default'] : [specifier, impt],\n  );\n\n  // Build debug object to return\n  let debugOutput;\n  if (debugBindings) {"
+        }
+      ],
+      "finding": "Raw-string source is written then initialized in the selected engine; spliceBindings uses the WIT world, not a scan mapping arbitrary JS imports into WIT. detectKnownSourceExportNames is an export check. Named native builtin resolution therefore belongs to engine INIT, not a new host/WIT import inferred from the specifier."
+    },
+    {
+      "source": {
+        "path": "/private/tmp/starling-node-compat/next-native-intl-build-fetch-cleanup825-first/native-source/runtime/script_loader.cpp",
+        "sha256": "40eeb699d87b30dd3c146421f189a99848715a19b2efc83b081f0d61d3832d67",
+        "bytes": 39041
+      },
+      "witnesses": [
+        {
+          "firstLine": 550,
+          "lastLine": 625,
+          "excerpt": "static JSObject *get_builtin_module(JSContext *cx, HandleValue id, HandleObject builtin) {\n  RootedValue module_val(cx);\n  MOZ_ASSERT(id.isString());\n  if (!JS::MapGet(cx, moduleRegistry, id, &module_val)) {\n    return nullptr;\n  }\n  if (!module_val.isUndefined()) {\n    return &module_val.toObject();\n  }\n\n  JS::CompileOptions opts(cx, *COMPILE_OPTS);\n  opts.setFile(\"<internal>\");\n  JS::SourceText<mozilla::Utf8Unit> source;\n\n  std::string code = \"const { \";\n  JS::RootedIdVector props(cx);\n  GetPropertyKeys(cx, builtin, JSITER_OWNONLY, &props);\n\n  size_t length = props.length();\n  bool firstValue = true;\n  for (size_t i = 0; i < length; ++i) {\n    if (firstValue) {\n      firstValue = false;\n    } else {\n      code += \", \";\n    }\n\n    code += \"'\";\n    const auto &prop = props[i];\n    JS::RootedValue key(cx, js::IdToValue(prop));\n    if (!key.isString()) {\n      return nullptr;\n    }\n    auto key_str = core::encode(cx, key);\n    code += std::string_view(key_str.ptr.get(), key_str.len);\n    code += \"': \";\n\n    code += \"e\";\n    code += std::to_string(i);\n  }\n\n  code += \" } = import.meta.builtin;\\nexport { \";\n\n  firstValue = true;\n  for (size_t i = 0; i < length; ++i) {\n    if (firstValue) {\n      firstValue = false;\n    } else {\n      code += \", \";\n    }\n\n    code += \"e\";\n    code += std::to_string(i);\n\n    code += \" as '\";\n    const auto &prop = props[i];\n    JS::RootedValue key(cx, js::IdToValue(prop));\n    if (!key.isString()) {\n      return nullptr;\n    }\n    auto key_str = core::encode(cx, key);\n    code += std::string_view(key_str.ptr.get(), key_str.len);\n    code += \"'\";\n  }\n  code += \" }\\n\";\n\n  if (!source.init(cx, code.c_str(), strlen(code.c_str()), JS::SourceOwnership::Borrowed)) {\n    return nullptr;\n  }\n\n  RootedObject module(cx, JS::CompileModule(cx, opts, source));\n  if (!module) {\n    return nullptr;\n  }\n  module_val.setObject(*module);\n"
+        },
+        {
+          "firstLine": 684,
+          "lastLine": 724,
+          "excerpt": "  if (!path) {\n    return false;\n  }\n\n  RootedValue builtin_val(cx);\n  if (!MapGet(cx, builtinModules, path_val, &builtin_val)) {\n    return false;\n  }\n  if (!builtin_val.isUndefined()) {\n    RootedValue specifier_val(cx, StringValue(specifier));\n    RootedObject builtin_obj(cx, &builtin_val.toObject());\n    // Share one module-record cache key only for explicitly registered aliases\n    // whose builtin values are the exact same object. Other builtin IDs retain\n    // their original module records and import.meta lookup keys.\n    if (!std::string_view(path.get()).starts_with(\"node:\")) {\n      RootedString node_prefix(cx, JS_NewStringCopyZ(cx, \"node:\"));\n      if (!node_prefix) {\n        return false;\n      }\n      // Concatenate JS strings so Unicode and embedded NULs are not truncated.\n      RootedString canonical_specifier(cx, JS_ConcatStrings(cx, node_prefix, specifier));\n      if (!canonical_specifier) {\n        return false;\n      }\n      RootedValue canonical_id(cx, StringValue(canonical_specifier));\n      RootedValue canonical_builtin(cx);\n      if (!JS::MapGet(cx, builtinModules, canonical_id, &canonical_builtin)) {\n        return false;\n      }\n      if (canonical_builtin.isObject() && &canonical_builtin.toObject() == builtin_obj.get()) {\n        // This outer root remains live across module compilation/allocation.\n        specifier_val.set(canonical_id);\n      }\n    }\n    RootedObject result(cx, get_builtin_module(cx, specifier_val, builtin_obj));\n    if (!result) {\n      return false;\n    }\n    return FinishLoadingImportedModule(cx, referrer, module_reques, payload, result, false);\n  }\n"
+        },
+        {
+          "firstLine": 790,
+          "lastLine": 806,
+          "excerpt": "  ENGINE = engine;\n  SCRIPT_LOADER = this;\n  COMPILE_OPTS = opts;\n  PATH_PREFIX = std::move(path_prefix);\n  JSContext *cx = engine->cx();\n  moduleRegistry.init(cx, JS::NewMapObject(cx));\n  builtinModules.init(cx, JS::NewMapObject(cx));\n#ifdef NODE_COMPAT_MODULE\n  fileurl_module_record.init(cx);\n  fileurl_url_record.init(cx);\n  fileurl_create_require.init(cx);\n  fileurl_to_path.init(cx);\n  fileurl_from_path.init(cx);\n  fileurl_url_string.init(cx);\n  fileurl_namespaces = 0;\n  fileurl_busy = false;\n#endif"
+        },
+        {
+          "firstLine": 822,
+          "lastLine": 845,
+          "excerpt": "bool ScriptLoader::define_builtin_module(const char *id, HandleValue builtin) {\n  JSContext *cx = ENGINE->cx();\n  RootedString id_str(cx, JS_NewStringCopyZ(cx, id));\n  if (!id_str) {\n    return false;\n  }\n  RootedValue module_val(cx);\n  RootedValue id_val(cx, StringValue(id_str));\n  bool already_exists = false;\n  if (!MapHas(cx, builtinModules, id_val, &already_exists)) {\n    return false;\n  }\n  if (already_exists) {\n    return api::throw_error(cx, ScriptLoaderErrors::BuiltinModuleExists, \"id\");\n  }\n  if (!MapSet(cx, builtinModules, id_val, builtin)) {\n    return false;\n  }\n#ifdef NODE_COMPAT_MODULE\n  if (!fileurl_capture_builtin(cx, id, builtin)) return false;\n#endif\n  return true;\n}\n"
+        }
+      ],
+      "finding": "The exact registered ID is looked up in builtinModules before file fallback. get_builtin_module enumerates OWNONLY keys and generates named ESM exports; no default export is automatically added. This supports only keys genuinely installed by the fresh selected native engine."
+    },
+    {
+      "source": {
+        "path": "/private/tmp/starling-node-compat/next-native-intl-build-fetch-cleanup825-first/native-source/runtime/engine.cpp",
+        "sha256": "8ea9ac4670ecacaa5da053e6e912520d599c1c6c8801245b508526b708c6acce",
+        "bytes": 28146
+      },
+      "witnesses": [
+        {
+          "firstLine": 469,
+          "lastLine": 501,
+          "excerpt": "extern bool install_builtins(Engine *engine);\n\n#ifdef DEBUG\nstatic bool trap(JSContext *cx, unsigned argc, JS::Value *vp) {\n  JS::CallArgs args = CallArgsFromVp(argc, vp);\n  ENGINE->dump_value(args.get(0));\n  MOZ_ASSERT(false, \"trap function called\");\n  return false;\n}\n#endif\n\nEngine::Engine(std::unique_ptr<EngineConfig> config) {\n  // total_compute = 0;\n  MOZ_ASSERT(!ENGINE);\n  ENGINE = this;\n  config_ = std::move(config);\n#ifdef NODE_COMPAT_ENTROPY_POLICY\n  builtins::node_compat::entropy::begin_engine(config_->pre_initialize);\n#endif\n\n  TRACE(\"StarlingMonkey engine initializing\");\n\n  if (!init_js(*config_)) {\n    abort(\"Initializing JS Engine\");\n  }\n\n  JS_SetContextPrivate(cx(), this);\n  JS::EnterRealm(cx(), global());\n  core::EventLoop::init(cx());\n\n  if (!install_builtins(this)) {\n    abort(\"installing builtins\");\n  }"
+        },
+        {
+          "firstLine": 599,
+          "lastLine": 615,
+          "excerpt": "bool Engine::define_builtin_module(const char* id, HandleValue builtin) {\n  TRACE(\"Defining builtin module '\", id, \"'\");\n  return scriptLoader->define_builtin_module(id, builtin);\n}\n\nstatic bool define_builtin_module(JSContext *cx, unsigned argc, Value *vp) {\n  CallArgs args = CallArgsFromVp(argc, vp);\n  auto name = core::encode(cx, args.get(0));\n  if (!name) {\n    return false;\n  }\n  if (!args.get(1).isObject()) {\n    JS_ReportErrorUTF8(cx, \"Second argument to defineBuiltinModule must be an object\");\n    return false;\n  }\n  if (!Engine::get(cx)->define_builtin_module(name.ptr.get(), args.get(1))) {\n    return false;"
+        },
+        {
+          "firstLine": 650,
+          "lastLine": 669,
+          "excerpt": "HandleObject Engine::init_script_global() { return INIT_SCRIPT_GLOBAL; }\n\nbool Engine::eval_toplevel(JS::SourceText<mozilla::Utf8Unit> &source, std::string_view path,\n                           MutableHandleValue result) {\n  MOZ_ASSERT(state() > EngineState::EngineInitializing, \"Engine must be done initializing\");\n  MOZ_ASSERT(state() != EngineState::Aborted, \"Engine state is aborted\");\n\n  RootedValue ns(cx());\n  RootedValue tla_promise(cx());\n  if (!scriptLoader->eval_top_level_script(path, source, &ns, &tla_promise)) {\n    return false;\n  }\n\n  SCRIPT_VALUE = ns;\n#ifdef NODE_COMPAT_INTERNAL_TICKS\n  // Classify using actual configuration; preserve Engine's public no-arg ABI.\n  if (!core::EventLoop::run_event_loop(this, 0, config_->module_mode\n          ? core::TickCheckpointOrigin::ModuleEvaluation\n          : core::TickCheckpointOrigin::ClassicEvaluation)) return false;\n#elif defined(NODE_COMPAT_STRICT_INITIALIZATION)"
+        }
+      ],
+      "finding": "Engine installs builtins before eval_top_level_script; Engine::define_builtin_module delegates to ScriptLoader. This is the existing resolution mechanism, not proof that the new diagnostic module is registered in the old engine."
+    },
+    {
+      "source": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-public-request-correlation-construction-v1/entry.mjs",
+        "sha256": "775e713a60482d1d7204736d4830b15c6412d6f087d3aa005d1e229d2cac679b",
+        "bytes": 8520
+      },
+      "witnesses": [
+        {
+          "firstLine": 55,
+          "lastLine": 86,
+          "excerpt": "  await recheck(); // Complete authentication BEFORE first custom/constructor import.\n  const {writeWhole,captureComponentReturn,typedOwnGraph}=await import('./capture.mjs');\n  const output=join(a.outputRoot,'api-return');await mkdir(output,{mode:0o700});\n  let captured=null,error,finalError,failed=false,finalFailed=false,toolFilesystem=null,mountConfigured=false;\n  try{\n    // Retain genuine current metadata verbatim; this is no old83 frame adapter.\n    await writeWhole(join(output,'native-metadata-input.json'),await checked(a.nativeMetadata));\n    const requested={engine:a.engine.path,preview2Adapter:p.pins.adapter.path,witPath:p.witDirectory,worldName:p.worldName,\n      disableFeatures:['fetch-event'],enableFeatures:[],enableAot:false,env:{},\n      debug:{bindings:false,binary:false,wizerLogging:false},debugBindings:false,debugBuild:false,enableWizerLogging:false};\n    await writeWhole(join(output,'requested-options.json'),JSON.stringify(requested,null,2)+'\\n');\n    // Official tool-side filesystem configuration, before importing the splicer.\n    // This fresh Node maps only the authenticated WIT directory, not / or /app.\n    toolFilesystem=await import(pathToFileURL(p.pins.toolFilesystemModule.path).href);\n    assert.equal(typeof toolFilesystem._getPreopens,'function');assert.equal(typeof toolFilesystem._setPreopens,'function');\n    const initialNames=toolFilesystem._getPreopens().map(([,name])=>name);\n    await writeWhole(join(output,'tool-preopens-initial.json'),JSON.stringify({count:initialNames.length,virtualNames:initialNames},null,2)+'\\n');\n    assert.deepEqual(initialNames,[],'Fresh tool parser preopens must be empty');\n    toolFilesystem._setPreopens({[p.witDirectory]:p.witDirectory});mountConfigured=true;\n    const configuredNames=toolFilesystem._getPreopens().map(([,name])=>name);\n    await writeWhole(join(output,'tool-preopens-configured.json'),JSON.stringify({count:configuredNames.length,virtualNames:configuredNames,\n      hostMappings:{[p.witDirectory]:p.witDirectory},module:p.pins.toolFilesystemModule,scope:'Construction tool parser only; no application or guest host mount'},null,2)+'\\n');\n    assert.deepEqual(configuredNames,[p.witDirectory]);\n    const {componentize}=await import(pathToFileURL(p.pins.packageEntry.path).href);\n    assert.equal(typeof componentize,'function');\n    const returned=await componentize((await checked(p.entries[a.entryMode])).toString('utf8'),requested);\n    captured=await captureComponentReturn(returned,output);\n    await writeWhole(join(output,'node-result.json'),JSON.stringify({schemaVersion:1,state:'NEXT_NATIVE_COMPONENT_API_RETURN_CAPTURED_UNREVIEWED_V1',\n      entryMode:a.entryMode,inputEntry:p.entries[a.entryMode],inputSourceIndex:p.inputSourceIndex,\n      artifacts:captured,engine:a.engine,nativeMetadata:a.nativeMetadata,ordinaryExportsInvoked:false},null,2)+'\\n');\n  }catch(caught){\n    failed=true;error=caught;"
+        }
+      ],
+      "finding": "The actual generic caller passes authenticated raw guest text and the selected engine into componentize with env{}, same world and fetch-event disabled. This is Source evidence only; no caller is invoked here."
+    }
+  ],
+  "sourceFinding": "A genuinely registered own observe native module can be resolved as a named ESM builtin by the existing loader during INIT. Current476b has no registration for the new literal.",
+  "inference": "With a fresh enabled engine that registers this literal before guest evaluation, existing synthetic builtin-module machinery should expose observe only. This remains uncompiled and requires actual new construction/typed import audit.",
+  "notProven": [
+    "new native module present in any actual engine",
+    "successful new Componentize/INIT",
+    "same actual13 external interfaces or returned import count",
+    "deployed callback/correlation/window/native/host completion"
+  ],
+  "actualNewNativeSourceIndex": null,
+  "actualConstructor": null
+}

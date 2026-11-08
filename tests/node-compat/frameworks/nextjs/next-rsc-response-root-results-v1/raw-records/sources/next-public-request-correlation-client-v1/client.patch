@@ -1,0 +1,51 @@
+--- d24e/run-contracts.mjs
++++ correlation/run-contracts.mjs
+@@ -7,6 +7,7 @@
+ import {mkdir,readFile,writeFile} from 'node:fs/promises';
+ import {dirname,join,resolve} from 'node:path';
+ import {fileURLToPath} from 'node:url';
++import {readPublicCorrelationManifest} from '../next-public-request-correlation-browser-v1/manifest.mjs';
+ import {collectSupplemental,validateSupplemental} from '../wasmtime-deployment-candidate-v8/supplemental.mjs';
+ import {collectPortableCache,validatePortableCache} from '../next-portable-cache-http-collector-v1/collector.mjs';
+ const here=dirname(fileURLToPath(import.meta.url)),origin=new URL(process.argv[2]),root=resolve(process.argv[3]),browserTools=process.argv[4];
+@@ -17,6 +18,12 @@
+ const errorData=e=>({name:e?.name??'Error',message:e?.message??String(e),stack:e?.stack??null});
+ const save=()=>writeFile(join(root,'result.json'),JSON.stringify(result,null,2)+'\n');await save();
+ try {
++  const manifestPath=join(dirname(root),'public-request-correlation.json');
++  const correlation=await readPublicCorrelationManifest(manifestPath);
++  assert.equal(correlation.manifest.runId,runId);assert.equal(correlation.manifest.origin,result.origin);
++  result.publicRequestCorrelation={schemaVersion:1,manifest:correlation.manifest,manifestSource:correlation.source,
++    readEvidence:correlation.evidence,sameBrowserManifestSourceObserved:null,actualGuestJoin:null};
++  await save(); // Host-only correlation admission precedes all target requests.
+   result.portableCache=await collectPortableCache({origin:result.origin,output:join(root,'portable-cache')});
+   await save(); // Whole five-request raw capture precedes semantic comparison.
+   result.portableCacheValidation=validatePortableCache(result.portableCache);
+@@ -76,13 +83,14 @@
+     complete: text.includes('NEXT_STREAM_SHELL') && text.includes('NEXT_STREAM_READY'),
+     incrementalDeliveryObserved: ready > shell && shell >= 0};
+   if (browserTools) {
+-    const args = [join(here, '../next-browser-netlog-candidate-v1/browser-check.mjs'), '--origin', result.origin,
+-      '--tools', browserTools, '--output', join(root, 'browser')];
++    const args = [join(here, '../next-public-request-correlation-browser-v1/browser-check.mjs'), '--origin', result.origin,
++      '--tools', browserTools, '--output', join(root, 'browser'), '--correlation-manifest', manifestPath];
+     result.browserArgv = [process.execPath, ...args];
+     const child = spawn(process.execPath, args, {stdio: ['ignore', 'inherit', 'inherit']});
+     const [code, signal] = await once(child, 'exit');
+     result.browserExit = {code, signal};
+     result.browser = JSON.parse(await readFile(join(root, 'browser/result.json')));
++    result.publicRequestCorrelation.sameBrowserManifestSourceObserved=JSON.stringify(result.browser.publicRequestCorrelation?.manifestSource??null)===JSON.stringify(correlation.source); // DATA only; original semantic conjunction unchanged.
+   }
+ } catch(error){result.errors.push(errorData(error));}
+ finally {
+--- old/test-gates.mjs
++++ new/test-gates.mjs
+@@ -3,7 +3,7 @@
+ import {readFile} from 'node:fs/promises';
+ import {fileURLToPath} from 'node:url';
+ const native=fileURLToPath(new URL('./run-contracts.mjs',import.meta.url));
+-const stock=fileURLToPath(new URL('../next-portable-cache-stock-candidate-v1/run-stock.mjs',import.meta.url));
++const stock=fileURLToPath(new URL('../next-public-request-correlation-stock-v1/run-stock.mjs',import.meta.url));
+ let checks=0;
+ for(const path of [native,stock]) {
+  const source=await readFile(path,'utf8');

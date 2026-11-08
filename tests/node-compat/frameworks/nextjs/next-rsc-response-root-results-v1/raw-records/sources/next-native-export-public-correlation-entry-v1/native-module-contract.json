@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "state": "PROSPECTIVE_INTERNAL_NATIVE_EXPORT_OBSERVE_ABI_V1",
+  "module": "internal:starlingmonkey/native-export-diagnostic-v1",
+  "imports": {
+    "named": [
+      "observe"
+    ],
+    "default": null,
+    "namespace": null
+  },
+  "arity": 5,
+  "arguments": [
+    {
+      "position": 0,
+      "name": "methodEnum",
+      "type": "number primitive",
+      "values": {
+        "GET": 0,
+        "POST": 1
+      }
+    },
+    {
+      "position": 1,
+      "name": "pathEnum",
+      "type": "number primitive",
+      "values": {
+        "/actions": 0,
+        "/action-result": 1
+      }
+    },
+    {
+      "position": 2,
+      "name": "corrStateEnum",
+      "type": "number primitive",
+      "values": {
+        "missing": 0,
+        "valid": 1,
+        "invalid": 2,
+        "duplicate": 3
+      }
+    },
+    {
+      "position": 3,
+      "name": "corrCount",
+      "type": "number primitive",
+      "values": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "position": 4,
+      "name": "corr",
+      "type": "string primitive or null",
+      "grammar": "valid exactly64lowercasehex string; otherwise null"
+    }
+  ],
+  "returnValue": "undefined; ignored by guest",
+  "callSite": "After actual Request construction and the existing guestCompletionBegin/guestCorrelationRequest snapshot; before unchanged V2 adapter-enter record.",
+  "callAdmission": "Existing completionTrace must be defined. Existing route/trace logger fault/stopped/truncation state can prevent a call; absence is unavailable, not a native or completion observation.",
+  "ordinaryObservationFailure": "Catch only the new ordinary synchronous observation error and call existing guestCompletionFault(); never modify app request/result/primary error/body/reader/disposal path. Uncatchable traps are outside this guarantee.",
+  "nativePromise": "R-selected proposed native callback validates without coercion, stores POD only, and retains no JS argument edges. It is inactive at INIT and returns undefined. Actual API/build proof is absent.",
+  "nativeWindow": "One existing native call window; all observe attempts saturate at2 and repeated/multiple observations are ambiguous even if equal. Native window and marker details require genuine separately reviewed native Source.",
+  "defaultBuildOption": {
+    "name": "NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1",
+    "default": "OFF",
+    "futureDiagnosticEngineRequiresEnabled": true,
+    "actualBuildProof": null
+  },
+  "nativeRecordSchema": {
+    "marker": "NEXT_NATIVE_EXPORT_PUBLIC_CORRELATION_V1",
+    "version": 1,
+    "event": "native-success-return-site",
+    "status": [
+      "single-valid",
+      "unavailable",
+      "ambiguous"
+    ],
+    "observations": "active observe attempts saturated at1/2; any second attempt clears saved value and is ambiguous",
+    "methodAndPath": "Only fixed enum-decoded GET/POST and /actions or /action-result, or -; never arbitrary argument text.",
+    "reason": "Fixed native-selected vocabulary; exact sealed native contract remains required.",
+    "corr": "exact64lowerhex only for single-valid, otherwise null",
+    "corrCount": "1 only for single-valid, otherwise null",
+    "emission": "At least one active observe attempt, only at native fulfilled+lowering success-return site. No record for zero attempts.",
+    "limits": "256 ordinary records and one short native-diagnostic-truncated record, then stop; no IDs or call counter.",
+    "actualNativeContract": null
+  },
+  "nativeSourceIndex": null,
+  "actualEngine": null,
+  "actualInitReview": null,
+  "actualRuntime": null,
+  "newWasiInterfaces": false,
+  "newGuestEnvironment": false,
+  "newPublicHeaders": false,
+  "newEntropyOrClock": false,
+  "builtinObject": "Proposed exact own observe function: arity5, enumerable/read-only/permanent; no default. R uses content-realm JSAutoRealm and rooted record/value through genuine Engine.define_builtin_module."
+}
