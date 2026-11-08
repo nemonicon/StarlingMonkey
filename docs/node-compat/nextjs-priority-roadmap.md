@@ -17,8 +17,9 @@ and select a standard-interface observation after the inner canonical call
 before changing the response path. The
 [composed observer](nextjs-standard-handler-return-observer.md) now passes actual
 tool validation and independent sibling/resource/import checks. Its first small
-deployed probe is next; public correlation and a new full Next.js run follow
-only after that mechanism proof. Do not expand compatibility to hide these gates.
+deployed probe also passes, with DATA review`0241d47c`. Bounded public metadata
+and its allocator/ownership probes are next, followed by a new full Next.js pair.
+Do not expand compatibility to hide these gates.
 
 The first [real-handler cache suite](../../tests/node-compat/frameworks/nextjs/next-persistent-cache-overlap-root-results-v1/README.md)
 now passes both Node and a real Wasmtime component: eleven groups/41 assertions

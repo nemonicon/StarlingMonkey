@@ -17,6 +17,23 @@ joins structural review`986a82ce`. The one-GET `/none` runtime actor/controller
 pass whole Source review. JSON-only preparation (`4e5987`/session85269,
 completion`a9e2b8`) issues authority`199d0c1c`/2,417 bytes; no actor invoked yet.
 See the [observer checkpoint](docs/node-compat/nextjs-standard-handler-return-observer.md).
+The subsequent actual mechanism runtime passes (`2fb81e`/session16148,
+completion`4227ba`), original79199/180/raw0/clean after checkpoint`431743d4` is
+pushed. Exactly one GET returns expected371-byte HTTP200 and the sole94-byte
+marker. Complete capture, normal Wasmtime79204 shutdown and current inputs/
+native/world guards pass. Runtime DATA review`0241d47c` verifies this bounded
+configured-inner-post-return witness, without observer-return/host/TCP/private/
+cause/Next claims. A separate v3 public-metadata observer now passes all7 actual tool steps
+(`b6f21e`/session43893, completion`f77332`). Envelope`a3196c70` retains
+exact inner`d04c4289` plus observer`e3cdb976`, with the same13 imports.
+Composition DATA review`c80d7319` verifies shared fields types and canonical
+getter options. Six fixed method/header probes are in Source review; runtime
+metadata behavior and use with the real Next app remain unverified.
+The fixed-six Source is sealed after correcting final I/O-vs-semantic error
+classification before execution. Root Node22 syntax check passes. JSON-only
+preparation (`8fe780`/session62354, completion`fac4d3`) issues authority
+`8f41cfcf`/2,427 bytes under genuine existing constructor/build/world guards.
+Actor/runtime execution remains pending at this checkpoint.
 
 Current completed helper milestone: the same real-filesystem cache suite passes
 **11 groups/41 assertions on Node, Wasmtime and stock wasmCloud**. Independent

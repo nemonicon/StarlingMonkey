@@ -1,8 +1,8 @@
 # Standard handler return observer
 
 The v2 observer is a real composed Component Model artifact. Parsing,
-validation, WIT extraction and composition pass; its first deployed request is
-pending. This is diagnostic work for the unresolved Next.js completion failure,
+validation, WIT extraction, composition and its first deployed request pass.
+This is diagnostic work for the unresolved Next.js completion failure,
 not a fix or production promotion.
 
 The actual Next component has a synchronous `handle` lift with an explicit
@@ -41,8 +41,27 @@ The original180-second owner and genuine inner build/world admission remain in
 use. The envelope has a separate composition review, not a fabricated constructor
 frame.
 
-A successful marker would witness ordinary observer execution after the inner
-synchronous canonical call and configured post-return complete. It would not
+The first deployed GET finishes raw0/clean under original owner79199/180 seconds.
+It returns the expected complete371-byte HTTP200 body and exactly one94-byte
+success marker, with complete finalized capture and normal child shutdown. The
+[runtime DATA review](../../tests/node-compat/frameworks/nextjs/next-standard-handler-observer-root-results-v1/actual-return-probe-runtime-review.json)
+joins the original owner, body, Source and composition proof. No target rerun
+occurs during review.
+
+That marker witnesses ordinary observer execution after the inner synchronous
+canonical call and configured post-return complete. It does not
 establish the observer's own return, host task completion, transport EOF,
 private request/Store identity, cause, unchanged scheduling or Next acceptance.
 Public metadata is absent from this first mechanism proof.
+
+The v3 implementation adds a bounded public-header snapshot before forwarding
+and emits it at the same later site. All seven actual parse/validate/WIT/compose/
+print steps pass. Its 5,519-byte observer produces a 37,173,284-byte probe envelope
+with the same standard external surface. The [v3 composition review](../../tests/node-compat/frameworks/nextjs/next-standard-handler-observer-root-results-v1/actual-v3-composition-review.json)
+verifies exact child bytes, shared fields types and canonical getter options.
+
+Metadata behavior still needs six fixed deployed cases: missing, valid, uppercase
+and duplicate header values, GET/POST, and both admitted paths. The probe fixture
+intentionally returns GET404 and POST405 on those paths. These tests check the
+observer while preserving the inner response. Allocator failure limits and
+trapped-instance cleanup remain explicit; these cases do not prove them.
