@@ -1,8 +1,9 @@
 # Native export diagnostic checkpoint
 
 The private diagnostic now compiles into a real guest engine and passes its
-fixed seventeen-case Wasmtime deployment. The full Next.js comparison is next;
-the earlier Server Action failures remain unresolved. Production acceptance
+fixed seventeen-case Wasmtime deployment. The full Next.js comparison has run:
+Node passes and native retains its failed legacy generation gate. The earlier
+Server Action failures remain unresolved. Production acceptance
 remains foundations-v13, and neither complete Node.js nor complete Buffer
 compatibility is claimed.
 
@@ -62,10 +63,33 @@ not prove C-function return, canonical post-return, receiver acknowledgement or
 host/TCP completion. The HTTP finish limitation is documented in the
 [completion audit](nextjs-export-promise-completion-audit.md).
 
-The real-Next constructor also finishes raw0 as component`6b2084d0`
+The real-Next constructor also finishes raw0 as component `6b2084d0`
 (37,282,148 bytes), with the same standard interface audit and
 [coordinated INIT review](../../tests/node-compat/frameworks/nextjs/next-native-export-diagnostic-next-root-results-v1/actual-construction-review.json).
-Next is one fixed native-to-Node comparison with every existing gate preserved.
+The fixed native-to-Node comparison now completes with every existing gate
+preserved. Native passes HTTP24, persistent-cache52, supplemental80, five stream
+chunks and both functional/strict browser tests in this sample. Its legacy
+generation check remains `1 → 1`, keeping the original full suite failed. Node
+observes `1 → 2` and passes the full suite. Earlier intermittent strict browser
+failures remain unresolved; this sample demonstrates no logging or native fix.
+
+Complete native stdout contains 19,019 bytes. The first bounded DATA analyzer
+matches the public POST value through browser/NetLog, both guest lanes and one
+native success-site record. The [coordinated pair DATA review](../../tests/node-compat/frameworks/nextjs/next-native-export-diagnostic-pair-root-results-v1/actual-runtime-review.json)
+and [independent correlation review](../../tests/node-compat/frameworks/nextjs/next-native-export-diagnostic-pair-root-results-v1/actual-native-correlation-review.json)
+verify these observations while retaining native false, Node true and full
+Next.js acceptance false.
+This extends the observed boundary without proving native C return, post-return
+or host completion.
+
+The [portable raw corpus](../../tests/node-compat/frameworks/nextjs/next-native-export-diagnostic-pair-root-results-v1/retained-raw-data-v1/check.py)
+contains 350 payload files (12,549,393 bytes). Both current-tree and staged Git-mode
+checks pass without reading the original temporary paths, running the analyzer
+or launching a target. They preserve the failed overall result. The separate
+seventeen-case corpus also passes both checks. A first Git-copy preflight used
+an incorrect control-file count and stopped before creating a copy or executing
+the reader; its receipt is retained alongside the corrected successful check.
+
 Output-quota exhaustion, failed stdout, forced-GC/OOM, broader lifecycle reuse,
 persistent-cache overlap and performance measurements remain outstanding.
 `progress.md` tracks execution and the portable evidence checks.

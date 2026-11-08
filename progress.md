@@ -21,8 +21,21 @@ semantic review confirms sixteen records and all seventeen response contracts;
 coordinated review`91e961ab` binds owner/capture review`77fbda3f`. The new real-Next
 component also constructs at raw0 as`6b2084d0` (37,282,148 bytes), with the same
 thirteen standard interfaces; coordinated INIT review`5c284564` binds
-owner/world review`8890980b`. The full deployed comparison remains pending.
-No Next.js fix is established. Source/build preparation
+owner/world review`8890980b`. The fixed native→Node comparison now completes
+raw0/clean as an experiment. Native passes HTTP/cache/stream/function and strict
+browser checks in this sample, but legacy generation1→1 keeps its original full
+suite false; Node passes every gate. Complete stdout is19,019 bytes. The first
+bounded dual-marker analysis observes one conservative public POST metadata
+join at the native success site (`af787ee6`). Coordinated pair DATA review
+`83ba87fe` and independent correlation review `0220cebc` verify these outcomes
+while retaining native false/Node true/full Next.js false. The portable pair
+corpus contains 350 payload files/12,549,393 bytes and passes current-tree and
+staged Git-mode checks (352 total files). The separate seventeen-case corpus
+also passes both checks. The first pair Git-copy preflight stopped on an
+incorrect control-file count before copy creation or reader execution; the
+failed preflight receipt and corrected successful receipt are retained.
+This positive sample establishes no fix for the earlier
+intermittent browser failures. Source/build preparation
 checkpoint `2cd7de93` is pushed to `origin/main`.
 
 Next.js executes in a real Wasm component. The fixed ten-trial comparison passes
@@ -35,9 +48,12 @@ passes HTTP/cache/supplemental/stream/function checks and retains generation1→
 and strict POST completion failures. Its DATA review, raw retention and
 current/Git-mode offline checks pass. Public request correlation now matches the
 actual POST across browser and guest observations while preserving its strict
-completion failure. The next step is a fresh native diagnostic engine and its
-direct-WASI probe, followed by the full Next.js regression. Persistent-cache
-overlap/error checks remain open. No fix, reliability result or production
+completion failure. The fresh native diagnostic engine, direct-WASI probe and
+full Next.js regression are now complete. Persistent-cache overlap/error/bound
+checks are the next implementation work. A source-only standard-interface
+composition proposal is being assessed for a later canonical-return observation;
+no observer component or new host capability has been activated. No fix,
+reliability result or production
 promotion is established.
 
 Current engine baseline: native Fetch cleanup compiles and links, a fresh interoperability
@@ -362,6 +378,23 @@ Current next steps and outstanding work:
   and Node run`native-export-stock-22-first` retain the original600/300-second
   owners under the1,200-second pair owner, every original gate and complete
   native stdout capture. The next action is the single declared comparison.
+- **Full comparison completed; native original suite remains failed:** Root
+  `8e99b1`/session39004 finishes`eed692` raw0 under original57938/1,200 seconds.
+  Native owner exits1 with valid complete evidence; Node owner exits0 and passes
+  the original full suite. Native passes HTTP24, persistent-cache52,
+  supplemental80, five stream chunks, both functional browser tests and both
+  strict browser tests. POST7 body/finished/sizes fulfill before context close,
+  with no browser errors or failed requests. Legacy generation remains1→1;
+  Node observes1→2. All earlier strict failures remain retained and unfixed.
+  Final native stdout is19,019 bytes with complete EOF/write/close/bound flags,
+  six native site records and54 V2 records. Root's first33-input DATA analysis
+  `357de5` exits0 as`af787ee6`: public POST metadata joins across browser,
+  same-local NetLog, guest adapter/classic entries and exactly one valid native
+  success-site observation. One strictly certified missing POST remains
+  separate; GET observations never substitute for POST. Seventeen pure native
+  join decisions also pass. This observes the named pre-return site, not C return,
+  canonical post-return, host/TCP completion, private identity or cause.
+  Independent pair/correlation reviews and portable raw-pair retention are next.
 - **Complete:** guarded native build, real-Next component construction, and one
   full deployed regression. HTTP/stream/browser checks pass in that sample;
   cache1→1 keeps the full suite failed. Prior browser failures remain unresolved.

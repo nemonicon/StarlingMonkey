@@ -1,0 +1,412 @@
+{
+  "schemaVersion": 1,
+  "state": "UNCOMPILED_NATIVE_EXPORT_DIAGNOSTIC_DIRECT_WASI_PROBE_CASE_CONTRACT_V1",
+  "nativeSourceIndex": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-export-public-correlation-candidate-v1/index.json",
+    "sha256": "6ed5a7ceabb308a163707dcb95d2b7f3ab521513cceea9837ebb70b741bfca9b",
+    "bytes": 3805
+  },
+  "nativeProtocol": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-export-public-correlation-candidate-v1/protocol.json",
+    "sha256": "d183ba3666e3d27739ad06d1593f446d14baca9fd1a49d2d445c278e0de12b6d",
+    "bytes": 4393
+  },
+  "module": "internal:starlingmonkey/native-export-diagnostic-v1",
+  "namedExport": "observe",
+  "probeMarker": "NEXT_NATIVE_EXPORT_DIAGNOSTIC_PROBE_V1",
+  "fixedFixtureValues": {
+    "valid": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "other": "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+    "scope": "Static public Source fixtures, not generated per-run/browser nonces or actual request metadata."
+  },
+  "initCase": {
+    "stage": "INIT",
+    "call": "observe(1,0,1,1,VALID)",
+    "expectedReturn": "undefined",
+    "expectedNativeRecord": false,
+    "scope": "Deliberate inactive-window fixture. No app/request/env/entropy/clock/WASI-I/O performed at INIT; require complete captured INIT streams before absence claim."
+  },
+  "firstHttpCaseMustBe": "/none",
+  "cases": [
+    {
+      "id": "none",
+      "request": {
+        "method": "GET",
+        "path": "/none"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 0,
+      "expectedNativeRecord": {
+        "required": false,
+        "absenceRequiresCompleteCapture": true
+      },
+      "extra": {}
+    },
+    {
+      "id": "valid",
+      "request": {
+        "method": "GET",
+        "path": "/valid"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 1,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "status": "single-valid",
+        "reason": "-",
+        "observations": 1,
+        "corr": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        "corrCount": 1
+      },
+      "extra": {}
+    },
+    {
+      "id": "missing",
+      "request": {
+        "method": "GET",
+        "path": "/missing"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 1,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "status": "unavailable",
+        "reason": "missing",
+        "observations": 1,
+        "corr": null,
+        "corrCount": null
+      },
+      "extra": {}
+    },
+    {
+      "id": "invalid",
+      "request": {
+        "method": "GET",
+        "path": "/invalid"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 1,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "status": "unavailable",
+        "reason": "invalid",
+        "observations": 1,
+        "corr": null,
+        "corrCount": null
+      },
+      "extra": {}
+    },
+    {
+      "id": "duplicate",
+      "request": {
+        "method": "GET",
+        "path": "/duplicate"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 1,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "status": "unavailable",
+        "reason": "duplicate",
+        "observations": 1,
+        "corr": null,
+        "corrCount": null
+      },
+      "extra": {}
+    },
+    {
+      "id": "wrong-enum-string",
+      "request": {
+        "method": "GET",
+        "path": "/wrong-enum-string"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 1,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "status": "unavailable",
+        "reason": "invalid-arguments",
+        "observations": 1,
+        "corr": null,
+        "corrCount": null
+      },
+      "extra": {
+        "accessorsAndConversionHooksMustRemainUntouched": true
+      }
+    },
+    {
+      "id": "wrong-enum-object",
+      "request": {
+        "method": "GET",
+        "path": "/wrong-enum-object"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 1,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "status": "unavailable",
+        "reason": "invalid-arguments",
+        "observations": 1,
+        "corr": null,
+        "corrCount": null
+      },
+      "extra": {
+        "accessorsAndConversionHooksMustRemainUntouched": true
+      }
+    },
+    {
+      "id": "wrong-value-object",
+      "request": {
+        "method": "GET",
+        "path": "/wrong-value-object"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 1,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "status": "unavailable",
+        "reason": "invalid-arguments",
+        "observations": 1,
+        "corr": null,
+        "corrCount": null
+      },
+      "extra": {
+        "accessorsAndConversionHooksMustRemainUntouched": true
+      }
+    },
+    {
+      "id": "wrong-arity",
+      "request": {
+        "method": "GET",
+        "path": "/wrong-arity"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 1,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "status": "unavailable",
+        "reason": "invalid-arguments",
+        "observations": 1,
+        "corr": null,
+        "corrCount": null
+      },
+      "extra": {
+        "accessorsAndConversionHooksMustRemainUntouched": true
+      }
+    },
+    {
+      "id": "short",
+      "request": {
+        "method": "GET",
+        "path": "/short"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 1,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "status": "unavailable",
+        "reason": "invalid-value",
+        "observations": 1,
+        "corr": null,
+        "corrCount": null
+      },
+      "extra": {}
+    },
+    {
+      "id": "uppercase",
+      "request": {
+        "method": "GET",
+        "path": "/uppercase"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 1,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "status": "unavailable",
+        "reason": "invalid-value",
+        "observations": 1,
+        "corr": null,
+        "corrCount": null
+      },
+      "extra": {}
+    },
+    {
+      "id": "newline",
+      "request": {
+        "method": "GET",
+        "path": "/newline"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 1,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "status": "unavailable",
+        "reason": "invalid-value",
+        "observations": 1,
+        "corr": null,
+        "corrCount": null
+      },
+      "extra": {}
+    },
+    {
+      "id": "nonhex",
+      "request": {
+        "method": "GET",
+        "path": "/nonhex"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 1,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "status": "unavailable",
+        "reason": "invalid-value",
+        "observations": 1,
+        "corr": null,
+        "corrCount": null
+      },
+      "extra": {}
+    },
+    {
+      "id": "repeated-same",
+      "request": {
+        "method": "GET",
+        "path": "/repeated-same"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 2,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "status": "ambiguous",
+        "reason": "multiple-observations",
+        "observations": 2,
+        "corr": null,
+        "corrCount": null
+      },
+      "extra": {}
+    },
+    {
+      "id": "repeated-different",
+      "request": {
+        "method": "GET",
+        "path": "/repeated-different"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 2,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "status": "ambiguous",
+        "reason": "multiple-observations",
+        "observations": 2,
+        "corr": null,
+        "corrCount": null
+      },
+      "extra": {}
+    },
+    {
+      "id": "rope",
+      "request": {
+        "method": "GET",
+        "path": "/rope"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 1,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "observations": 1,
+        "allowedRecords": [
+          {
+            "status": "single-valid",
+            "reason": "-",
+            "corr": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+            "corrCount": 1
+          },
+          {
+            "status": "unavailable",
+            "reason": "nonlinear-string",
+            "corr": null,
+            "corrCount": null
+          }
+        ]
+      },
+      "extra": {
+        "constructedStringExpression": true,
+        "representationObserved": false
+      }
+    },
+    {
+      "id": "after-observe-allocation",
+      "request": {
+        "method": "GET",
+        "path": "/after-observe-allocation"
+      },
+      "expectedHttpStatus": 200,
+      "expectedObserveAttempts": 1,
+      "expectedNativeRecord": {
+        "required": true,
+        "event": "native-success-return-site",
+        "status": "single-valid",
+        "reason": "-",
+        "observations": 1,
+        "corr": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        "corrCount": 1
+      },
+      "extra": {
+        "allocatedBytes": 524288,
+        "noGcForcedOrObserved": true
+      }
+    }
+  ],
+  "responseCommon": {
+    "marker": "NEXT_NATIVE_EXPORT_DIAGNOSTIC_PROBE_V1",
+    "caseRecognized": true,
+    "initObserveReturnedUndefined": true,
+    "allObserveReturnsUndefined": true,
+    "accessorTouched": false,
+    "valueOfCalled": false,
+    "toStringCalled": false,
+    "toPrimitiveCalled": false,
+    "fixtureArgumentsAreNotRequestMetadata": true,
+    "noGcForced": true
+  },
+  "limits": {
+    "caseCount": 17,
+    "responseAsciiBytes": 4096,
+    "ordinaryAllocationAfterObserveBytes": 524288,
+    "rootPerRequestDeadlineSeconds": 20,
+    "rootNativeRawCaptureBytes": 8388608
+  },
+  "futureRootProtocol": {
+    "actualAuthority": null,
+    "actualRun": null,
+    "caseSeparation": "Declare case isolation or an otherwise unambiguous retained normal-input protocol before execution. Fixed fixture values are reused; records/timestamps/count/order alone cannot identify a physical request/Store or safely partition an interleaved log.",
+    "completeCaptureBeforeAnyNativeRecordSemantics": true,
+    "negativeObservation": "Zero attempts(/none/unknown/method-refusal) means no native record expected, only qualified by complete bounded final capture. Missing record for an attempted case is unobserved/failed validation, not proof it succeeded.",
+    "noRetryOrFaultInjection": true
+  },
+  "notProved": [
+    "GC occurred or a string was actually a rope",
+    "memory/Store/resource identity",
+    "request metadata reflects actual incoming path/header",
+    "native C function returned or host/TCP completion",
+    "universal harmlessness or full Next acceptance"
+  ],
+  "actualEngine": null,
+  "actualConstructor": null,
+  "actualComponent": null,
+  "actualRuntime": null
+}

@@ -1,7 +1,24 @@
 # Next.js execution priority
 
 Updated 2026-11-08. The current critical path is the remaining request-state
-and Server Action response-completion gaps. Bounded Fetch cleanup compiles and
+and Server Action response-completion gaps. The latest native diagnostic build,
+seventeen-case direct probe and full native-to-Node Next.js comparison have all
+completed. The new native sample passes HTTP24, persistent-cache52,
+supplemental80, five streamed chunks and both functional/strict browser checks,
+but generation `1 → 1` keeps its original suite failed. Node passes the full
+suite with `1 → 2`. Coordinated DATA review `83ba87fe` and correlation review
+`0220cebc` are held. Current-tree and staged Git-mode raw-corpus checks pass.
+The single positive browser sample does not resolve the retained intermittent
+failures. See the [native diagnostic checkpoint](nextjs-native-export-diagnostic-2026-11-08.md).
+
+Next work is to implement persistent-cache overlap, error and bound checks;
+preserve the legacy counter failure as an explicit process-state limitation;
+and select a standard-interface observation after the inner canonical call
+before changing the response path. A composed guest observer is only a source
+proposal until resource ownership, sibling-instance wiring and final imports
+are validated. Do not expand native compatibility merely to hide these gates.
+
+Earlier baseline: bounded Fetch cleanup compiles and
 passes its public tests; the D990 baseline below retains both failed gates.
 Engine476b1c1d/metadata22f1d456, componentd990ecc1 and runtime result2fb8d5fd
 pass all five persistent-cache requests/52 checks,24 HTTP cases,80 supplemental
@@ -47,10 +64,9 @@ The fresh 825-file source set and its genuine portable selection are verified.
 All ten installed-generator checks and the full native build finish raw0. The
 new engine `237c4e5a` is 31,350,211 bytes; actual metadata records one private
 embedding definition and none in the 80 native compile rows. Native Source/link
-DATA review `b473d4c9` and coordinated build review `7e5311ad` pass. Next are the
-17-case direct WASI probe, emitted-import audit and full Next.js regression.
-Build success does not establish runtime correctness or resolve the browser
-failure.
+DATA review `b473d4c9` and coordinated build review `7e5311ad` pass. The 17-case
+direct WASI probe, emitted-import audit and full Next.js regression are now
+complete as recorded above. Production promotion remains open.
 See the [current correlation checkpoint](nextjs-public-request-correlation-2026-11-08.md).
 The first prefix-mismatched harness attempt remains a separate pre-HTTP failure.
 The following earlier2251/4e results remain as a separate baseline.
