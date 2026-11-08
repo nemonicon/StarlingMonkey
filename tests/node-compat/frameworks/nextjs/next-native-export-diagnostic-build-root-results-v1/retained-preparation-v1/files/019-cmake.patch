@@ -1,0 +1,16 @@
+--- before/CMakeLists.txt
++++ after/CMakeLists.txt
+@@ -14,7 +14,13 @@
+ 
+ include("${STARLINGMONKEY_SRC}/cmake/add_as_subproject.cmake")
+ 
++option(NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1
++    "Enable the internal native-export diagnostic v1 (experimental)" OFF)
+ add_builtin(componentize::embedding SRC embedding/embedding.cpp)
++if(NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1)
++    target_compile_definitions(builtin_componentize_embedding
++        PRIVATE NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1=1)
++endif()
+ include_directories("${STARLINGMONKEY_SRC}")
+ 
+ project(ComponentizeJS)

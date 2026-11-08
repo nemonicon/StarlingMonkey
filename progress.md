@@ -11,9 +11,14 @@ with its 7,200-second ceiling (`37f8d3`/session59432, completion`572b44`). Engin
 `237c4e5a` is 31,350,211 bytes; metadata`500e76ac` records the diagnostic ON
 definition only in the separate embedding compile, with none in the 80 native
 compile rows. Coordinated build DATA review`7e5311ad` and Source/link
-review`b473d4c9` pass for this build-only scope. Probe and Next.js
-construction recipes are prepared; neither a new engine runtime result nor a
-Next.js fix is established. Source/build preparation
+review`b473d4c9` pass for this build-only scope. Probe component`d04c4289`
+(37,156,919 bytes) now constructs/validates at raw0, with coordinated INIT
+review`163eb782`: 131 observed imports across the same thirteen standard
+WASI0.2.10 interfaces, incoming-handler-only export, full returned graph and
+complete marker-free INIT capture. Its seventeen deployed cases are next;
+the fixture's return-value flag and active observation behavior remain
+unobserved. The new Next.js constructor authority is prepared, with no new
+Next.js result or fix established. Source/build preparation
 checkpoint `2cd7de93` is pushed to `origin/main`.
 
 Next.js executes in a real Wasm component. The fixed ten-trial comparison passes
@@ -300,6 +305,20 @@ Current next steps and outstanding work:
   frontend codes `[1,1,0,0]`, separate driver0 and unaccepted runtime status.
   A separate replay from actual staged Git blobs and permissions also exits0.
   Both read copied DATA only; full SDK and engine payload replay is excluded.
+- **Diagnostic component construction complete; deployed cases pending:** Root
+  `39caa5`/session91297 completes `7a089a` raw0 under original50481/2,400 seconds.
+  Component`d04c4289`, actual audit`3a7a2d1d` and coordinated review`163eb782`
+  bind owner/world review`29ede10c`, the full 52-field metadata object and
+  genuine build`7e5311ad`. All four owners and eight complete INIT streams pass;
+  native/guest/probe markers are absent. Native module resolution and the
+  static INIT call do not establish the return flag or active-window behavior;
+  the first `/none` response and the fixed seventeen-case deployment will check
+  those next. Runtime Source`72eb6fe4` and controller`e4648223` have Source and
+  binding review; Root's genuine runtime authority preparation exits0 as
+  `9cab7f05`, with no target invoked yet. The preparation-only portable corpus
+  contains 115 copies/6,123,766 bytes; Root's first offline check`fc2462` exits0,
+  preserving ten generator outcomes and recorded 825-file evidence while
+  excluding current Source/tool payload replay and runtime/build acceptance.
 - **Complete:** guarded native build, real-Next component construction, and one
   full deployed regression. HTTP/stream/browser checks pass in that sample;
   cache1→1 keeps the full suite failed. Prior browser failures remain unresolved.

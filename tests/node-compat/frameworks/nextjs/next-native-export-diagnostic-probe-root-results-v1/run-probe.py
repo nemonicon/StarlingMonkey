@@ -12,10 +12,10 @@ import traceback
 HERE = Path(__file__).resolve().parent
 BASE = HERE.parent
 REPO = HERE.parents[4]
-ACTOR_INDEX = None
-ACTOR_PLAN = None
-CONSTRUCTION_PREPARER = None
-CONSTRUCTION_REVIEW = None
+ACTOR_INDEX = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-export-diagnostic-probe-runtime-v1/index.json', 'sha256': '72eb6fe422a64f42f083b9c2841c00e22702c03f85f75b6c724bdcadce756b89', 'bytes': 8138}
+ACTOR_PLAN = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-export-diagnostic-probe-runtime-v1/plan.json', 'sha256': '8b8f6b53511a0885f6b5b3b7274d7f340e36b990ade1dfcf8fe32218cc1e3b28', 'bytes': 8414}
+CONSTRUCTION_PREPARER = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-export-diagnostic-probe-root-results-v1/prepare-construction.py', 'sha256': '62142edc1a76bd7c47bc482737c16faa2364cde898ffb790aebf8a8ebf0859ef', 'bytes': 17890}
+CONSTRUCTION_REVIEW = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-native-export-diagnostic-probe-root-results-v1/actual-construction-review.json', 'sha256': '163eb782152b11c62be41165a5ea6a2130a70795b6d7490b477b0004b4646bca', 'bytes': 21317}
 PYTHON = dict(path='/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/bin/python3.11',
     sha256='b76df9b72b06c2592c34e234c10fb51a587fa4aaf3d57fd98325ea2774f4f758', bytes=52640)
 AUTHORITY = HERE / 'diagnostic-probe-runtime-authority.json'

@@ -1,0 +1,38 @@
+--- initial-unbound/materialize.py
++++ manifest-joined-unbound/materialize.py
+@@ -146,11 +146,34 @@
+         member(spec[key], parent_root, parent_members)
+     native_index, native_root, native_members = family(spec['nativeDiagnosticSourceIndex'])
+     require(native_index['state'] == spec['nativeDiagnosticIndexState'], 'Pinned native Source state')
+-    member(spec['nativeDiagnosticManifest'], native_root, native_members)
++    native_manifest = json.loads(member(spec['nativeDiagnosticManifest'], native_root, native_members))
++    require(native_manifest['state'] == 'UNCOMPILED_NATIVE_EXPORT_PUBLIC_CORRELATION_CANDIDATE_V1' and
++            native_manifest['plannedSealedIndexState'] == spec['nativeDiagnosticIndexState'] and
++            native_manifest['macro'] == spec['requiredCMakeOption'] and
++            native_manifest['existingEngineModified'] is False and
++            native_manifest['newCoreAbiOrWitOrHostService'] is False and
++            all(native_manifest[k] is None for k in ('sourceIndex', 'actualBuild', 'actualComponent',
++                'actualTypedImportCount', 'actualRuntime')), 'Genuine uncompiled native Source policy')
+     edits = spec['embeddingOverlays']
+     require(len(edits) == 2 and [(e['role'], e['path']) for e in edits] ==
+             [('componentize-embedding', 'CMakeLists.txt'),
+              ('componentize-embedding', 'embedding/embedding.cpp')], 'Exact embedding-only boundary')
++    native_overlay = native_manifest['embeddingOverlay']
++    require(native_overlay['target'] == edits[1]['path'] == 'embedding/embedding.cpp' and
++            native_overlay['selectionPath'] == 'componentize-embedding/' + edits[1]['path'] and
++            native_overlay['afterRepositoryPath'] == edits[1]['donor']['repositoryPath'],
++            'Native manifest role/target/member join')
++    for label, ref in [('before', edits[1]['beforeMember']), ('after', edits[1]['donor'])]:
++        require(type(ref) is dict, 'Bound native manifest member required')
++        declared = native_overlay[label]
++        suffix = relative(ref['repositoryPath']).parts
++        historical = PurePosixPath(declared['path'])
++        require(historical.is_absolute() and '..' not in historical.parts and
++                historical.parts[-len(suffix):] == suffix and
++                all(declared[k] == ref[k] for k in ('sha256', 'bytes')),
++                'Native manifest before/after descriptor join')
++    require(all(native_overlay['before'][k] == edits[1]['before'][k] for k in ('sha256', 'bytes')),
++            'Native manifest selected beforeimage join')
+     for i, edit in enumerate(edits):
+         require(edit['mode'] == 0o600, 'Embedding copy mode')
+         scope, members = (own_root, own_members) if i == 0 else (native_root, native_members)
