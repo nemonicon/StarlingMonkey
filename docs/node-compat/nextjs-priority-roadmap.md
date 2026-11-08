@@ -17,10 +17,15 @@ observer/deadline/error predicates and DATA review`484af70a`. Its first fixture
 version remains failed on an invalid HTML pattern; a separately built version
 corrects only that attribute. This does not fix the original redirect sample.
 
-Next work is to reuse the existing pristine standalone Node controller against
-the current app, current public-header/NetLog worker and genuine new script pins.
-The prior pristine pass used an older app/worker; it does not answer this current
-comparison. Keep every original redirect failure and assertion. The standard
+The current pristine standalone Node control now passes both strict browser
+tests, including redirect POST completion (owner891/600, raw0/clean). It uses
+the corrected current app, current public-header/NetLog worker and genuine
+script pins. [Primary DATA/raw retention](nextjs-current-redirect-control.md)
+verifies123 payloads/5,245,828 bytes. Next run the bridge Node
+and Wasm profiles with that exact app and browser-only workload: the earlier
+failed full pair used a different build and preceding HTTP/cache workload, so
+the pristine pass alone cannot isolate the bridge. Keep every original redirect
+failure and assertion. The standard
 return observer witnesses a later site, with seven unknown POST competitors
 still blocking the conservative outer public join. No private identity,
 scheduling or response-path cause has been established.

@@ -4,6 +4,20 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
+Latest redirect control: **pristine standalone Node passes both current strict
+browser tests**, including the redirecting Server Action. Original owner891/600
+finishes raw0/clean with protected inputs; the requested standalone server
+shutdown exits130. The browser records a complete2,963-byte POST7 response with
+fulfilled body/sizes/finished. Primary DATA review`374f66d2` verifies the bounded
+pass and123 retained payloads/5,245,828 bytes in
+[the current control report](docs/node-compat/nextjs-current-redirect-control.md).
+This uses the corrected2,196-file app and browser-only workload; the earlier
+failed bridge/full pair used a different app and preceding workload. It therefore
+does not isolate a bridge cause. Next: run both bridge Node and Wasm with this
+exact app and browser-only worker before selecting a runtime fix. The volume
+now has approximately42GiB free; launch/build capacity is no longer the current
+blocker. Original full failures and production acceptance remain unchanged.
+
 Latest completed control: the corrected **non-redirecting real Server Action
 passes on both Wasm and matched Node22**, raw0/clean, under unchanged strict
 observer/deadline/error predicates. Both render the returned value, capture all
@@ -88,8 +102,8 @@ positive evidence.
 
 
 
-Current critical-path work: the pristine standalone redirect control is being
-prepared with the current v2 app and original800f two-test observer. Current
+Current critical-path work: the pristine standalone redirect control is complete
+with the current v2 app and original800f two-test observer. Current
 client/actions HTML selects5/4 scripts; physical hashes and inventories are
 independently verified. The new browser preserves the original functional,
 network-observer, deadline/drain and final strict predicates; only its genuine
@@ -98,14 +112,22 @@ rebuild is needed. Both launcher and browser Source pass whole review. The
 first dependency intake refused a documentary asset URL before authority;
 explicit executable/app/browser dependencies replace that recursive intake and
 the refusal is retained. Genuine original source/world admission passes before/
-final; all four Node syntax checks pass. JSON-only preparation`51e87986` now
-issues one pristine600-second control authority, with no actor launched yet.
+final; all four Node syntax checks pass. JSON-only preparation`51e87986`
+issued one pristine600-second control authority. Its actual original owner891
+finishes raw0/clean; both strict browser tests pass. Primary DATA/raw retention
+is complete. The exact-app browser-only bridge/Wasm comparison is prepared.
+Whole Source review and both Node syntax checks pass. Root bindings`8a9f31be`
+preserve exact plan/controller inverses and freshly verify2,016 protected inputs,
+genuine35 build/1,678 source references and the whole constructor/world guards.
+Preparation`3664207d` fixes both authorities and fresh slots before any actor:
+Wasm original600-second owner, then bridge Node original300-second owner.
+No new engine/component/observer build or application warmup runs.
 
 
 Outstanding critical work:
 
-- Run the existing pristine standalone Node control on the current app and
-  current strict redirect observer, with real new asset pins. The [Source-backed
+- Compare the bridge Node and Wasm profiles against the completed pristine Node
+  control using the exact current app and strict browser-only workload. The [Source-backed
   next-step audit](tests/node-compat/frameworks/nextjs/next-nonredirect-action-root-results-v2/next-steps.md)
   locates the existing bare-Node launcher and its earlier strict pass, while
   preserving the current app/worker/asset gap. The bounded
