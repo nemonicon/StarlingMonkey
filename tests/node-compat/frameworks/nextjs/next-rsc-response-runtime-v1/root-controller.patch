@@ -1,0 +1,261 @@
+--- donor/run-controls.unbound.py
++++ newRoot/run-controls.py
+@@ -1,4 +1,4 @@
+-"""Prepare the fixed current-app full-contract profiles; run one original owner at a time."""
++"""Prepare the fixed direct RSC response probes; run one original owner at a time."""
+ import argparse
+ import hashlib
+ import importlib.util
+@@ -24,10 +24,8 @@
+ 
+ 
+ # Required existing reviewed DATA/Source, not issued runtime bindings.
+-REQUIRED_APP_REVIEW = None
+-REQUIRED_BROWSER_INDEX = None
+-REQUIRED_WORKER = dict(path=str(BASE / 'next-fs-callback-browser-v1/browser-check.mjs'),
+-    sha256='01caabc8dae9f684d7e7c9f70b413223811fd06fba3be546ce733c153d37072b', bytes=32170)
++REQUIRED_APP_REVIEW = dict(path=str(BASE / 'next-fs-callback-root-results-v2/actual-build-review.json'),
++    sha256='4a6f03cefbed841af163f62f2ef4cc226a025d84379c7cb7f2a33a541e0b147c', bytes=18599)
+ 
+ 
+ def context():
+@@ -36,22 +34,31 @@
+     raw = path.read_bytes()
+     assert path.resolve() == path and not path.is_symlink() and path.stat().st_nlink == 1
+     assert (hashlib.sha256(raw).hexdigest(), len(raw)) == (PREPARER['sha256'], PREPARER['bytes'])
+-    spec = importlib.util.spec_from_file_location('genuine_fs_callback_full_control_admission', path)
++    spec = importlib.util.spec_from_file_location('genuine_rsc_response_control_admission', path)
+     prep = importlib.util.module_from_spec(spec)
+     spec.loader.exec_module(prep)
+     binding = prep.document(BINDINGS)
+-    assert binding['state'] == 'ROOT_FS_CALLBACK_ACTUAL_RUNTIME_BINDINGS_V1'
++    assert binding['state'] == 'ROOT_RSC_RESPONSE_ACTUAL_RUNTIME_BINDINGS_V1'
+     assert binding['compositionReview'] == COMPOSITION_REVIEW and binding['innerConstructionReview'] == INNER_REVIEW
+-    assert binding['applicationBuildReview'] == REQUIRED_APP_REVIEW and binding['browserIndex'] == REQUIRED_BROWSER_INDEX
++    assert binding['applicationBuildReview'] == REQUIRED_APP_REVIEW
+     actor_index = prep.family(binding['actorIndex'])
+-    browser_index = prep.family(binding['browserIndex'])
+     client_index = prep.family(binding['clientIndex'])
+     client_root = Path(binding['clientIndex']['path']).parent
+-    assert client_root == BASE / 'next-fs-callback-full-client-v1'
++    assert client_root == BASE / 'next-rsc-response-client-v1'
++    client_plan_ref = next(dict(r, path=str(client_root / r['path'])) for r in client_index['files'] if r['path'] == 'plan.json')
++    client_plan = prep.document(client_plan_ref)
++    assert client_plan['encodedBodyLimit'] == 4 * 1024 * 1024 and client_plan['decodedBodyLimit'] == 16 * 1024 * 1024
++    assert client_plan['httpTimeoutMs'] == 20000 and client_plan['cleanupTimeoutMs'] == 2000
++    requirements = client_plan['sourceRequirements']
++    assert set(requirements) == {'requestCapture', 'requestBody', 'headerEvidence'}
++    assert client_plan['requestCapture'] == requirements['requestCapture']
++    protected = {ref['path']: ref for ref in binding['protectedInputs']}
++    assert len(protected) == len(binding['protectedInputs'])
++    for ref in requirements.values():
++        prep.checked(ref)
++        assert protected[ref['path']] == ref, 'Every external client consumer is protected before/final'
+     actor_root = Path(binding['actorIndex']['path']).parent
+-    browser_root = Path(binding['browserIndex']['path']).parent
+-    assert actor_root == BASE / 'next-fs-callback-runtime-v1'
+-    assert browser_root == BASE / 'next-fs-callback-browser-v1'
++    assert actor_root == BASE / 'next-rsc-response-runtime-v1'
+     for role, name in [('nativePlan', 'plan.json'), ('stockPlan', 'stock-plan.json')]:
+         assert binding[role]['path'] == str(actor_root / name)
+         assert any(dict(r, path=str(actor_root / r['path'])) == binding[role] for r in actor_index['files'])
+@@ -66,23 +73,20 @@
+     assert composition['selectedExports'] == ['wasi:http/incoming-handler@0.2.10']
+     plans = {arm: prep.document(binding[arm + 'Plan']) for arm in ('native', 'stock')}
+     for arm, plan in plans.items():
+-        assert plan['controlOnly'] is False and plan['prospectiveFsCallbackAppBindingsPending'] is False
+-        assert plan['fsCallbackFullControl']['fullClientSourcePending'] is False
+-        assert plan['fsCallbackFullControl']['requiredFullClientIndex'] == binding['clientIndex']
+-        assert plan['fsCallbackFullControl']['requiredFullClient'] == plan['clientSource']
++        assert plan['controlOnly'] is True and plan['prospectiveRscResponseBindingsPending'] is False
++        assert plan['rscResponseControl']['clientSourcePending'] is False
++        assert plan['rscResponseControl']['requiredClientIndex'] == binding['clientIndex']
++        assert plan['rscResponseControl']['requiredClient'] == plan['clientSource']
+         assert plan['applicationBuildReview'] == binding['applicationBuildReview']
+         assert plan['applicationBuildResult'] == app['actualResult'] and plan['applicationInputs'] == app['applicationInputs']
+         assert plan['applicationRootIdentityEvidence'] == app['applicationRootIdentityEvidence']
+-        assert plan['clientSourceIndex'] == binding['clientIndex'] and plan['browserSourceIndex'] == binding['browserIndex']
+-        assert plan['browserSource'] == REQUIRED_WORKER
+-        assert plan['clientSource']['path'] == str(client_root / 'run-contracts.mjs')
++        assert plan['clientSourceIndex'] == binding['clientIndex']
++        assert plan['clientSource']['path'] == str(client_root / 'run-client.mjs')
+         assert any(dict(r, path=str(client_root / r['path'])) == plan['clientSource'] for r in client_index['files'])
+-        assert plan['browserSource']['path'] == str(browser_root / 'browser-check.mjs')
+-        assert any(dict(r, path=str(browser_root / r['path'])) == plan['browserSource'] for r in browser_index['files'])
+         assert plan['node'] == plans['native']['node'] and plan['monitor'] == plans['native']['monitor']
+         prefix = Path(plan['outputPrefix'])
+         assert prefix.parent == Path('/private/tmp/starling-node-compat') and prefix.resolve() == prefix
+-        assert plan['runId'] == ('fs-callback-native-first' if arm == 'native' else 'fs-callback-stock-first')
++        assert plan['runId'] == ('rsc-response-native-first' if arm == 'native' else 'rsc-response-stock-first')
+     assert plans['native']['applicationSource'] == app['applicationRoot']
+     assert plans['stock']['standaloneSource'] == app['applicationRoot']
+     self_ref = prep.row(Path(__file__).resolve())
+@@ -91,7 +95,6 @@
+         for ref in [PREPARER, INNER_AUTHORITY, INNER_REVIEW, COMPOSITION_REVIEW, BINDINGS, self_ref]:
+             prep.checked(ref)
+         prep.family(binding['actorIndex'])
+-        prep.family(binding['browserIndex'])
+         prep.family(binding['clientIndex'])
+         for ref in binding['protectedInputs']:
+             prep.checked(ref)
+@@ -109,21 +112,21 @@
+ 
+ def make_authority(arm, binding, plans, inner, composition):
+     common = dict(schemaVersion=1, arm=arm, runId=plans[arm]['runId'], sourceIndex=binding['actorIndex'],
+-        controlOnly=False, fsCallbackFullSuiteAllowed=True, publicRequestCorrelationAllowed=True,
++        controlOnly=True, rscResponseControlAllowed=True, publicRequestCorrelationAllowed=True,
+         publicRequestCorrelation=PUBLIC, compilerAllowed=False, nativeBuildAllowed=False,
+         automaticRetry=False, replacementTrials=False, fullNextAccepted=False)
+     if arm == 'native':
+-        return dict(common, state='ROOT_NEXT_FS_CALLBACK_NATIVE_FULL_AUTHORIZED_V1',
++        return dict(common, state='ROOT_NEXT_RSC_RESPONSE_NATIVE_AUTHORIZED_V1',
+             plan=binding['nativePlan'], component=inner['component'], componentAudit=inner['componentAudit'],
+             constructionResult=inner['actualResult'], constructionCallerIndex=inner['callerSourceIndex'],
+             inputSourceIndex=inner['inputSourceIndex'], inputEntry=inner['inputEntry'],
+             envelope=composition['envelope'], compositionReview=COMPOSITION_REVIEW,
+-            localhostServeAllowed=True, actualNextGuestAllowed=True, browserAllowed=True,
++            localhostServeAllowed=True, actualNextGuestAllowed=True, browserAllowed=False,
+             standardHandlerObserverAllowed=True, componentConstructionAllowed=False,
+             externalDeploymentAllowed=False, adoptionAllowed=False)
+-    return dict(common, state='ROOT_NEXT_FS_CALLBACK_HOST_FULL_AUTHORIZED_V1',
++    return dict(common, state='ROOT_NEXT_RSC_RESPONSE_HOST_AUTHORIZED_V1',
+         plans=binding['stockPlan'], rootAuthorityPath=str(HERE / 'stock-authority.json'),
+-        localhostServerAllowed=True, browserAllowed=True, guestAllowed=False, engineAllowed=False,
++        localhostServerAllowed=True, browserAllowed=False, guestAllowed=False, engineAllowed=False,
+         externalApplicationDeploymentAllowed=False)
+ 
+ 
+@@ -150,7 +153,7 @@
+                 outputRoot=str(output), ownerOutputRoot=str(output) + '-external-root', ownerSeconds=600 if arm == 'native' else 300))
+         prep.admit(original)
+         protect()
+-        prep.save(prepared_path, dict(schemaVersion=1, state='ROOT_FIXED_FS_CALLBACK_PAIR_PREPARED_NOT_RUN_V1',
++        prep.save(prepared_path, dict(schemaVersion=1, state='ROOT_FIXED_RSC_RESPONSE_PAIR_PREPARED_NOT_RUN_V1',
+             controller=self_ref, bindings=BINDINGS, trials=rows, order=['native', 'stock'], publicRequestCorrelation=PUBLIC,
+             constructorGuardBefore=before, actorsInvoked=False, automaticRetry=False, replacementTrials=False,
+             oldRedirectFailuresWaived=False, fullOriginalContractExecuted=False, fullNextAccepted=False))
+@@ -160,7 +163,7 @@
+     prepared_ref = prep.row(prepared_path)
+     prepared = prep.document(prepared_ref)
+     assert prepared['controller'] == self_ref and prepared['bindings'] == BINDINGS
+-    assert prepared['state'] == 'ROOT_FIXED_FS_CALLBACK_PAIR_PREPARED_NOT_RUN_V1'
++    assert prepared['state'] == 'ROOT_FIXED_RSC_RESPONSE_PAIR_PREPARED_NOT_RUN_V1'
+     assert prepared['order'] == ['native', 'stock'] and [x['arm'] for x in prepared['trials']] == ['native', 'stock']
+     for item in prepared['trials']:
+         expected_output = plans[item['arm']]['outputPrefix'] + '-' + plans[item['arm']]['runId']
+@@ -207,30 +210,72 @@
+             client_ref = observed['client']['result']
+             assert client_ref['path'] == str(native_output / 'client/result.json')
+             client = prep.document(client_ref)
+-            assert client['suite'] == 'NEXT_FS_CALLBACK_FULL_CONTRACT_CLIENT_V1'
+-            assert client['controlOnly'] is False and client['fullOriginalContractExecuted'] is True
+-            assert observed['fullOriginalContractExecuted'] is True and client['fullNextAccepted'] is False
++            assert client['suite'] == 'NEXT_RSC_HTTP_RESPONSE_CLIENT_V1'
++            assert client['controlOnly'] is True and client['fullOriginalContractExecuted'] is False
++            assert observed['fullOriginalContractExecuted'] is False and client['fullNextAccepted'] is False
++            assert client['responseProbeExecuted'] is True and observed['responseProbeExecuted'] is True
+             assert type(client['passed']) is bool
+-            assert type(client['browserExit']['code']) is int and client['browserExit']['code'] in (0, 1)
+-            assert client['browserExit']['signal'] is None
+-            browser_ref = prep.row(native_output / 'client/browser/result.json')
+-            browser = prep.document(browser_ref)
+-            assert client['browser'] == browser and browser['browserClosed'] is True
+-            assert type(browser['passed']) is bool
+-            assert [x['id'] for x in browser['tests']] == ['client-counter', 'server-action']
+-            netlog = browser['netlog']
+-            assert netlog['completeJson'] is True and netlog['fsynced'] is True and netlog['errors'] == []
+-            netlog_ref = netlog['file']
+-            assert netlog_ref['path'] == str(native_output / 'client/browser/netlog.json')
+-            assert type(netlog_ref['bytes']) is int and 0 < netlog_ref['bytes'] <= 20 * 1024 * 1024
+-            netlog_data = prep.document(netlog_ref)
+-            assert type(netlog_data) is dict and type(netlog_data['constants']) is dict and type(netlog_data['events']) is list
+-            assert type(netlog['eventCount']) is int and netlog['eventCount'] == len(netlog_data['events'])
++            # Collection gates only. An HTTP abort/semantic false may still be a fully retained diagnostic slot.
++            assert type(client['responseCollectionComplete']) is bool
++            assert client['collectionErrors'] == []
++            request, response, connection = client['request'], client['response'], client['connection']
++            assert request['attempted'] is True and request['method'] == 'POST' and request['path'] == '/actions'
++            assert type(request['finishObserved']) is bool and type(request['closeObserved']) is bool
++            assert connection['cleanupCompleted'] is True and type(connection['socketAssigned']) is bool
++            if connection['socketAssigned']:
++                assert connection['socketCloseObserved'] is True
++            for key in ('received', 'endObserved', 'complete', 'abortedObserved', 'closeObserved'):
++                assert type(response[key]) is bool
++            raw_capture, raw_publication, raw_ref = response['rawCapture'], response['encodedBodyPublication'], response['encodedBody']
++            assert raw_ref['path'] == str(native_output / 'client/body.raw.gz')
++            assert type(raw_ref['bytes']) is int and 0 <= raw_ref['bytes'] <= 4 * 1024 * 1024
++            assert raw_capture['overflow'] is False and raw_capture['unretainedBytesUnknown'] is False
++            assert raw_capture['allObservedBytesCaptured'] is True
++            assert type(raw_capture['observedBytes']) is int and type(raw_capture['retainedBytes']) is int
++            assert raw_capture['observedBytes'] == raw_capture['retainedBytes'] == raw_ref['bytes']
++            assert all(raw_publication[key] is True for key in ('complete', 'fsynced', 'closed'))
++            assert raw_publication['fileBytes'] == raw_ref['bytes'] and raw_publication['sha256'] == raw_ref['sha256']
++            assert raw_publication['errors'] == []
++            prep.checked(raw_ref)
++            assert client['publicationFile'] == str(native_output / 'client/publication.json')
++            publication_ref = prep.row(Path(client['publicationFile']))
++            assert 0 < publication_ref['bytes'] <= 65536
++            publication = prep.document(publication_ref)
++            assert publication['schemaVersion'] == 1 and publication['state'] == 'RSC_HTTP_RESPONSE_CLIENT_PUBLICATION_COMPLETE_V1'
++            assert publication['complete'] is True and publication['errors'] == []
++            result_publication = publication['resultPublication']
++            assert all(result_publication[key] is True for key in ('complete', 'fsynced', 'closed'))
++            assert type(result_publication['fileBytes']) is int and result_publication['fileBytes'] == client_ref['bytes']
++            assert result_publication['sha256'] == client_ref['sha256'] and result_publication['errors'] == []
++            assert publication['result'] == client_ref and publication['encodedBody'] == raw_ref
++            assert publication['decodedBody'] == response['decodedBody']
++            if response['decodedBody'] is not None:
++                decoded_ref = response['decodedBody']
++                assert decoded_ref['path'] == str(native_output / 'client/body.decoded.bin')
++                assert type(decoded_ref['bytes']) is int and 0 <= decoded_ref['bytes'] <= 16 * 1024 * 1024
++                prep.checked(decoded_ref)
++            assert publication['encodedBodyPublication'] == raw_publication
++            assert publication['responseProbeExecuted'] is True and publication['responseCollectionComplete'] is client['responseCollectionComplete']
++            # The summary is emitted only after the receipt fsync/close; it is an external ordered publication witness.
++            summary_ref = observed['client']['stdout']
++            assert summary_ref['path'] == str(native_output / 'client.stdout.log')
++            assert 0 < summary_ref['bytes'] <= 65536
++            summary_bytes = prep.checked(summary_ref).read_bytes()
++            prep.checked(summary_ref)
++            lines = summary_bytes.decode('utf8').splitlines()
++            assert len(lines) == 1
++            summary = json.loads(lines[0])
++            assert summary['state'] == 'RSC_HTTP_RESPONSE_CLIENT_TERMINAL_PUBLISHED_V1'
++            assert summary['suite'] == client['suite'] and summary['result'] == client_ref and summary['publication'] == publication_ref
++            assert summary['passed'] is client['passed'] and summary['responseProbeExecuted'] is True
++            assert summary['responseCollectionComplete'] is client['responseCollectionComplete']
++            assert type(summary['collectionErrors']) is int and summary['collectionErrors'] == 0
++
+ 
+         except BaseException as error:
+             try:
+                 prep.save(HERE / 'stock-unattempted.json', dict(schemaVersion=1,
+-                    state='FS_CALLBACK_FULL_STOCK_SLOT_UNATTEMPTED_NATIVE_COLLECTION_UNCERTAIN_V1',
++                    state='RSC_RESPONSE_STOCK_SLOT_UNATTEMPTED_NATIVE_COLLECTION_UNCERTAIN_V1',
+                     error=dict(name=type(error).__name__, message=str(error)[:2048]), bindings=BINDINGS,
+                     automaticRetry=False, replacementTrials=False, fullNextAccepted=False))
+             except BaseException:
+@@ -244,7 +289,7 @@
+     actor = Path(binding['actorIndex']['path']).parent
+     argv = ([node['path'], str(actor / 'deploy.mjs'), ar['path']] if arm == 'native' else
+         [node['path'], str(actor / 'run-stock.mjs'), trial['outputRoot'], plan['standaloneSource'], plan['browserTools'], plan['runId'], ar['path']])
+-    monitor = prep.original(plan['monitor'], 'genuine_fs_callback_full_original_owner')
++    monitor = prep.original(plan['monitor'], 'genuine_rsc_response_original_owner')
+     env = {k: os.environ[k] for k in ('HOME', 'USER', 'LOGNAME') if k in os.environ}
+     env.update(PATH=str(Path(node['path']).parent) + ':/usr/bin:/bin', NODE_ENV='production', NEXT_TELEMETRY_DISABLED='1', CI='1')
+     logs.mkdir(mode=0o700)
+@@ -268,12 +313,12 @@
+                 secondary.append(dict(name=type(error).__name__, message=str(error)[:2048]))
+         clean = terminal is not None and not terminal['timeout'] and not terminal['forcedCleanup'] and terminal['parentOwnedGroupGone'] and terminal['allObservedOwnedGroupsGone'] and all(not terminal[k] for k in ('errors', 'signals', 'interruptedSignals', 'remainingObservedPids'))
+         try:
+-            row = dict(schemaVersion=1, state='ROOT_FS_CALLBACK_FULL_ORIGINAL_OWNER_COMPLETED_UNREVIEWED_V1', arm=arm,
++            row = dict(schemaVersion=1, state='ROOT_RSC_RESPONSE_ORIGINAL_OWNER_COMPLETED_UNREVIEWED_V1', arm=arm,
+                 rawExitCode=None if terminal is None else terminal['rawExitCode'], originalOwner=None if terminal is None else terminal['pid'],
+                 cleanOwner=clean, finalInputsPreserved=preserved, error=None if primary is None else dict(name=type(primary).__name__, message=str(primary)[:2048]),
+                 secondaryErrors=secondary, authority=ar, controller=self_ref, bindings=BINDINGS,
+                 terminal=prep.row(logs / 'terminal.json') if (logs / 'terminal.json').is_file() else None,
+-                constructorGuardBefore=before, constructorGuardAfter=after, fullOriginalContractExecutionClaimedByOwnerReceipt=False, fullNextAccepted=False)
++                constructorGuardBefore=before, constructorGuardAfter=after, responseProbeExecutionClaimedByOwnerReceipt=False, fullOriginalContractExecutionClaimedByOwnerReceipt=False, fullNextAccepted=False)
+             rr = prep.save(receipt, row)
+             print(json.dumps(dict(receipt=rr, rawExitCode=row['rawExitCode'], cleanOwner=clean)))
+         except BaseException:

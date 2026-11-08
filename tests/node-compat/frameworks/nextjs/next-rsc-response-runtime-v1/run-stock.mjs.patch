@@ -1,0 +1,85 @@
+--- donor/run-stock.mjs
++++ new/run-stock.mjs
+@@ -1,4 +1,5 @@
+-// Current full-contract profile through the unchanged matched Node message bridge.
++// Direct RSC response probe through the unchanged matched Node message bridge.
++// The legacy resource argv slot does not select a browser or add a public request nonce.
+ // This is host Node evidence, never a claim of guest execution.
+ import assert from 'node:assert/strict';
+ import {createHash} from 'node:crypto';
+@@ -19,20 +20,20 @@
+ const source = resolve(process.argv[3]);
+ const browserTools = process.argv[4],runId=process.argv[5];
+ const plan = JSON.parse(await readFile(join(here, 'stock-plan.json')));
+-assert.equal(plan.bindingState,'READY_FS_CALLBACK_FULL_CONTRACT','Unbound Source: no authority, output, app or browser');
+-assert.equal(plan.controlOnly,false);assert.equal(plan.prospectiveFsCallbackAppBindingsPending,false);
+-assert.equal(plan.fsCallbackFullControl.fullClientSourcePending,false,'New full client Source pending');
+-assert(plan.fsCallbackFullControl.requiredFullClientIndex&&plan.fsCallbackFullControl.requiredFullClient);
+-assert.deepEqual(plan.clientSourceIndex,plan.fsCallbackFullControl.requiredFullClientIndex);
+-assert.deepEqual(plan.clientSource,plan.fsCallbackFullControl.requiredFullClient);
++assert.equal(plan.bindingState,'READY_RSC_RESPONSE_CONTROL','Unbound Source: no authority, output, app or browser');
++assert.equal(plan.controlOnly,true);assert.equal(plan.prospectiveRscResponseBindingsPending,false);
++assert.equal(plan.rscResponseControl.clientSourcePending,false,'New RSC response client Source pending');
++assert(plan.rscResponseControl.requiredClientIndex&&plan.rscResponseControl.requiredClient);
++assert.deepEqual(plan.clientSourceIndex,plan.rscResponseControl.requiredClientIndex);
++assert.deepEqual(plan.clientSource,plan.rscResponseControl.requiredClient);
+ for(const key of ['applicationInputs','applicationBuildResult','applicationBuildReview','applicationRootIdentity','applicationRootIdentityEvidence','expectedApplication','standaloneSource','clientSource','clientSourceIndex'])assert(plan[key]!==null,'Missing new control binding:'+key);
+ assert(Array.isArray(plan.protectedInputs)&&plan.protectedInputs.length>0,'Fresh Node Source graph required');
+ assert.equal(process.argv.length,7,'Versioned host-only authority argument; six original positions preserved');
+ const authorityPath=resolve(process.argv[6]);
+ const authority=JSON.parse(await readFile(authorityPath,'utf8'));
+-assert.equal(authority.state,'ROOT_NEXT_FS_CALLBACK_HOST_FULL_AUTHORIZED_V1');
+-assert.equal(authority.controlOnly,false);assert.equal(authority.fsCallbackFullSuiteAllowed,true);
+-assert.equal(authority.localhostServerAllowed,true);assert.equal(authority.browserAllowed,true);
++assert.equal(authority.state,'ROOT_NEXT_RSC_RESPONSE_HOST_AUTHORIZED_V1');
++assert.equal(authority.controlOnly,true);assert.equal(authority.rscResponseControlAllowed,true);
++assert.equal(authority.localhostServerAllowed,true);assert.equal(authority.browserAllowed,false);
+ for(const key of ['compilerAllowed','nativeBuildAllowed','guestAllowed','engineAllowed','externalApplicationDeploymentAllowed'])assert.equal(authority[key],false);
+ assert.equal(authority.publicRequestCorrelationAllowed,true);assert.equal(authority.runId,runId);validatePublicCorrelation(authority.publicRequestCorrelation);
+ function deriveOutput(prefix,id){
+@@ -41,7 +42,7 @@
+   return prefix+'-'+id;
+ }
+ assert.equal(process.version, 'v22.14.0');
+-assert.equal(process.argv.length,7);assert(browserTools,'Control browser tools mandatory');
++assert.equal(process.argv.length,7);assert(browserTools,'Reserved client resources argument mandatory');
+ assert.equal(process.argv[2],root,'Output argument must be canonical');assert.equal(root,deriveOutput(plan.outputPrefix,runId));
+ assert(source.endsWith('/application/.next/standalone'));
+ await mkdir(root, {mode: 0o700});
+@@ -93,7 +94,7 @@
+   for(const r of input.files){const path=join(application,r.path),s=await lstat(path);assert.deepEqual(await descriptor(path),{path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}
+   for(const r of input.directories)assert.equal((await lstat(join(application,r.path))).mode&0o777,r.mode);
+ }
+-const result = {schemaVersion: 1, suite: 'NEXT_FS_CALLBACK_FULL_MATCHED_NODE_PROFILE_V1', controlOnly:false, fullOriginalContractExecuted:false, fullNextAccepted:false,
++const result = {schemaVersion: 1, suite: 'NEXT_RSC_RESPONSE_MATCHED_NODE_PROFILE_V1', controlOnly:true, responseProbeExecuted:false, fullOriginalContractExecuted:false, fullNextAccepted:false,
+   node: process.version, guestExecuted: false, applicationModified: false,
+   standaloneSource: source, sourceServer: await descriptor(join(source, 'server.js')),
+   bridge: await descriptor(join(here, '../http-bridge-candidate-v1/bridge.mjs')), harness: await descriptor(fileURLToPath(import.meta.url)),
+@@ -196,9 +197,9 @@
+   const [code,signal]=await once(child,'exit');result.controlClientExit={code,signal};
+   result.controlClientResult=await descriptor(join(clientOutput,'result.json'));
+   result.control=JSON.parse(await readFile(result.controlClientResult.path));
+-  assert.equal(typeof result.control.fullOriginalContractExecuted,'boolean');result.fullOriginalContractExecuted=result.control.fullOriginalContractExecuted;
+-  assert.equal(result.control.suite,'NEXT_FS_CALLBACK_FULL_CONTRACT_CLIENT_V1');
+-  assert.equal(result.control.controlOnly,false);assert.equal(result.control.fullOriginalContractExecuted,true);assert.equal(result.control.fullNextAccepted,false);
++  assert.equal(typeof result.control.responseProbeExecuted,'boolean');result.responseProbeExecuted=result.control.responseProbeExecuted;
++  assert.equal(result.control.suite,'NEXT_RSC_HTTP_RESPONSE_CLIENT_V1');
++  assert.equal(result.control.controlOnly,true);assert.equal(result.control.responseProbeExecuted,true);assert.equal(result.control.fullOriginalContractExecuted,false);assert.equal(result.control.fullNextAccepted,false);
+ } catch (error) {
+   result.errors.push({type:error===null?'null':typeof error,name:error?.name??null,message:error?.message??String(error),stack:error?.stack??null});
+ } finally {
+@@ -208,11 +209,11 @@
+   try{await dependencyBookend();result.originalDependencyInputsPreserved=true;}catch(error){result.originalDependencyInputsPreserved=false;result.errors.push({stage:'dependency-final-protection',name:error?.name??null,message:error?.message??String(error)});}
+   try{await sourceBookend();result.originalApplicationInputsPreserved=true;}catch(error){result.originalApplicationInputsPreserved=false;result.errors.push({stage:'original-app-final-protection',name:error.name,message:error.message,stack:error.stack});}
+   result.passed=result.prepared===true&&result.controlClientExit?.code===0&&result.controlClientExit?.signal===null
+-    &&result.control?.passed===true&&result.control?.controlOnly===false&&result.control?.fullOriginalContractExecuted===true
++    &&result.control?.passed===true&&result.control?.controlOnly===true&&result.control?.responseProbeExecuted===true&&result.control?.fullOriginalContractExecuted===false
+     &&result.originalApplicationInputsPreserved===true&&result.originalDependencyInputsPreserved===true
+     &&result.errors.length===0&&result.transportErrors.length===0;
+   await save();
+ }
+-console.log(JSON.stringify({state:result.passed?'NEXT_FS_CALLBACK_FULL_MATCHED_NODE_PROFILE_PASSED':'NEXT_FS_CALLBACK_FULL_MATCHED_NODE_PROFILE_FAILED',
+-  controlOnly:false,fullOriginalContractExecuted:result.fullOriginalContractExecuted,passed:result.passed,errors:result.errors,transportErrors:result.transportErrors,guestExecuted:false,fullNextAccepted:false}));
++console.log(JSON.stringify({state:result.passed?'NEXT_RSC_RESPONSE_MATCHED_NODE_PROFILE_PASSED':'NEXT_RSC_RESPONSE_MATCHED_NODE_PROFILE_FAILED',
++  controlOnly:true,responseProbeExecuted:result.responseProbeExecuted,fullOriginalContractExecuted:false,passed:result.passed,errors:result.errors,transportErrors:result.transportErrors,guestExecuted:false,fullNextAccepted:false}));
+ process.exitCode=result.passed?0:1;
