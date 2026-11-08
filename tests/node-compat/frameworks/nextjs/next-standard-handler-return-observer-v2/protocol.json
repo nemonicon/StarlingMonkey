@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "state": "UNVALIDATED_STANDARD_HANDLER_RETURN_OBSERVER_PROTOCOL_V1",
+  "marker": "NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V1",
+  "successEvent": "inner-handler-import-returned",
+  "successLine": "{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V1\",\"event\":\"inner-handler-import-returned\"}\n",
+  "successLineAsciiBytes": 94,
+  "limitEvent": "record-limit",
+  "limitLine": "{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V1\",\"event\":\"record-limit\"}\n",
+  "limitLineAsciiBytes": 77,
+  "successRecordsPerObserverInstance": 256,
+  "limitRecordsPerObserverInstance": 1,
+  "scope": "Fixed ordinary code after the exact synchronous imported standard handler returns; never a response-head/body readiness event. No public metadata selected in this first mechanism prototype.",
+  "ownership": {
+    "incomingRequest": "Received as own incoming-request; forwarded once through canon lower; no use/drop/retry thereafter including traps.",
+    "responseOutparam": "Received as own response-outparam; forwarded once through canon lower; never set/rebuilt/dropped by observer.",
+    "stdout": "New own output-stream acquired only after inner handler returns; borrowed by blocking-write-and-flush then dropped. A returned own io/error is dropped before trapping on stream failure.",
+    "sameNominalTypesRequired": true
+  },
+  "ioFailure": "No exception catch, retry or universal harmlessness claim. Host import/drop may trap; returned stream errors are cleaned then trap. A failed/partial write may have exposed prefix bytes. Complete finalized capture and exact lines are required for DATA.",
+  "retptrLayout": {
+    "memoryBytes": 65536,
+    "resultTagU8": 512,
+    "streamErrorTagU8": 516,
+    "lastOperationFailedOwnErrorU32": 520,
+    "reason": "Canonical wasm32 result<_,variant{last-operation-failed:own<error>,closed}> layout; trailing return pointer because flattened result exceeds one slot."
+  },
+  "init": "Memory data/global initialization only. No core start, imported function invocation, stdout, environment, filesystem, entropy or clock at instantiation.",
+  "limits": "Private fixed memory and record budget are per observer component instance, not globally unique identity or Store counters. Equal lines/counts cannot join physical invocations.",
+  "positiveWitnessProvesOnly": "Ordinary observer site after its imported synchronous handler call returned. Conditional configured inner canonical post-return completion requires independent encoded adapter/options validation; source label alone does not prove it.",
+  "doesNotProve": [
+    "observer own core return",
+    "observer canonical post-return",
+    "host task completion",
+    "transport EOF",
+    "process quiescence",
+    "physical request/Store identity",
+    "cause",
+    "unchanged scheduling",
+    "Next compatibility"
+  ],
+  "actualParse": null,
+  "actualComposition": null,
+  "actualRuntime": null
+}

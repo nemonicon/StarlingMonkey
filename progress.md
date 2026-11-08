@@ -4,6 +4,20 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
+Current critical-path work: a standard-interface return observer is built and
+independently type/structure reviewed. WAC CLI0.12.0 builds offline under
+original74822/900, raw0 (`8563f9`/session84552, completion`e121a4`), with Source/lock
+unchanged. Actual inspection confirms synchronous inner lift plus configured
+post-return. V1 validates but WIT decoding panics; both failures remain retained.
+A separate v2 uses the existing Starling type-only export shim and passes all7
+parse/compose/validate/WIT/print steps (`19ddeb`/session80788, completion`d30c12`).
+Envelope`e08b368b` retains exact inner`d04c4289` bytes and the same13 standard
+WASI0.2.10 imports/single handler export. Composition DATA review`1c1f8bae`
+joins structural review`986a82ce`. The one-GET `/none` runtime actor/controller
+pass whole Source review. JSON-only preparation (`4e5987`/session85269,
+completion`a9e2b8`) issues authority`199d0c1c`/2,417 bytes; no actor invoked yet.
+See the [observer checkpoint](docs/node-compat/nextjs-standard-handler-return-observer.md).
+
 Current completed helper milestone: the same real-filesystem cache suite passes
 **11 groups/41 assertions on Node, Wasmtime and stock wasmCloud**. Independent
 differential reviews verify identical assertion details and23 cache files per
