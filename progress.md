@@ -12,8 +12,12 @@ DATA review verifies these outcomes. Portable evidence retention and offline
 checks pass for that comparison. The new full stock wasmCloud profile also
 passes HTTP/cache/supplemental/stream/function checks and retains generation1→1
 and strict POST completion failures. Its DATA review, raw retention and
-current/Git-mode offline checks pass. Public request correlation and persistent-cache overlap/error
-checks are next. No fix, reliability result or production promotion is established.
+current/Git-mode offline checks pass. Public request correlation now matches the
+actual POST across browser and guest observations while preserving its strict
+completion failure. The next step is a fresh native diagnostic engine and its
+direct-WASI probe, followed by the full Next.js regression. Persistent-cache
+overlap/error checks remain open. No fix, reliability result or production
+promotion is established.
 
 Current engine baseline: native Fetch cleanup compiles and links, a fresh interoperability
 component passes INIT construction review, and all16 deployed module cases pass
@@ -255,6 +259,22 @@ Current next steps and outstanding work:
   original compiler vector. This proves frontend compilation only. Full engine
   build, native callback/INIT cases, emitted-import inspection and the next full
   Next.js regression remain outstanding; the strict browser failure is unfixed.
+- **Fresh diagnostic source materialization complete:** pushed Source checkpoint
+  `97090420` retains the native/guest/probe recipes and both frontend outcomes.
+  The real materializer now exits0 and produces 825 files (435 native, 387 build
+  support, three embedding), 7,562,493 bytes, with role-content hash `46e78a51`.
+  Only the embedding C++ and its CMake file differ from the preceding source set.
+  Independent DATA review `19fd3f9f` verifies the actual copies and descriptors;
+  Root prepares a genuine new portable selection `f5d37ea0` through the existing
+  admission mechanism. The generator recipe `fa8be735` binds these actual
+  materialization results and passes independent Source review; its ten unchanged
+  checks now finish raw0 (`08479bfe`), with all ten commands passing and the
+  runner reporting preserved source/tool inputs; independent DATA review is
+  pending. The full native build is next. The frontend retained corpus contains
+  52 files/4,009,463 bytes; Root's first offline reader exits0, preserving raw
+  frontend codes `[1,1,0,0]`, separate driver0 and unaccepted runtime status.
+  A separate replay from actual staged Git blobs and permissions also exits0.
+  Both read copied DATA only; full SDK and engine payload replay is excluded.
 - **Complete:** guarded native build, real-Next component construction, and one
   full deployed regression. HTTP/stream/browser checks pass in that sample;
   cache1→1 keeps the full suite failed. Prior browser failures remain unresolved.

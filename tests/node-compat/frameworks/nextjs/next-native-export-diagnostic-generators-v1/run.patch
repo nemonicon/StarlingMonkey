@@ -1,0 +1,19 @@
+--- Gen6/run.py
++++ diagnostic/run.py
+@@ -104,6 +104,7 @@
+ 
+ 
+ def layout(a, plan):
++    assert plan['prospectiveMaterializationBindingsPending'] is False, 'Actual materialization Source bindings pending'
+     assert type(a['schemaVersion']) is int and a['schemaVersion'] == 1
+     assert a['state'] == 'ROOT_PORTABLE_NEXT_GENERATORS_AUTHORIZED_V1' and a['unissued'] is False
+     assert a['generatorChecksAllowed'] is a['nodeHostSourceOnly'] is True
+@@ -112,7 +113,7 @@
+         assert a[key] is False
+     assert isinstance(a['runId'], str) and re.fullmatch('[a-z0-9][a-z0-9-]{0,47}', a['runId'])
+     assert not any(k in a for k in ['argv', 'environment', 'outputRoot', 'monitorOutputRoot'])
+-    assert plan['outputPrefix'] == '/private/tmp/starling-node-compat/next-native-portable-generators'
++    assert plan['outputPrefix'] == '/private/tmp/starling-node-compat/next-native-export-diagnostic-generators-v1'
+     assert plan['perCommandSeconds'] == 30 and plan['outerSeconds'] == 900
+     assert plan['minimumFreeBytes'] == 67108864
+     assert plan['maxAcceptedRawStreamBytes'] == 1048576 and plan['maxAcceptedOutputBytes'] == 8388608

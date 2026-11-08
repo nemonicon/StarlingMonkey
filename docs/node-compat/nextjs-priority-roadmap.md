@@ -38,9 +38,15 @@ completion. Primary review `ad0944cb` verifies the full pair and preserves nativ
 false/Node true/full Next false. The 318-file raw corpus passes current and
 Git-permission offline checks. The next [native-boundary proposal](../../tests/node-compat/frameworks/nextjs/next-native-export-public-correlation-plan-v1/README.md)
 identifies an internal guest registration path and ordinary `call` success site;
-direct stdout in `post_call` is rejected by the canonical ABI. No native patch
-is implemented. Primitive snapshot validation, ambiguity/clearing and legal
-ordinary-call I/O behavior are the next bounded engineering decisions.
+direct stdout in `post_call` is rejected by the canonical ABI. A separate
+opt-in [native candidate](../../tests/node-compat/frameworks/nextjs/next-native-export-public-correlation-candidate-v1/README.md)
+now implements primitive snapshot validation, ambiguity/clearing and bounded
+ordinary-call I/O. Macro-OFF/ON C++ frontend checks pass after restoring two
+authenticated empty SDK directories; the original failed checks are retained.
+The fresh 825-file source set and its genuine portable selection are verified.
+Next are the ten installed-generator checks, full native build, 17-case direct
+WASI probe, emitted-import audit and full Next.js regression. Frontend success
+does not establish runtime correctness or resolve the browser failure.
 See the [current correlation checkpoint](nextjs-public-request-correlation-2026-11-08.md).
 The first prefix-mismatched harness attempt remains a separate pre-HTTP failure.
 The following earlier2251/4e results remain as a separate baseline.
