@@ -1,0 +1,76 @@
+--- next-rsc-response-client-v1/run-client.mjs
++++ next-rsc-prework-client-v1/run-client.mjs
+@@ -1,5 +1,6 @@
+ // One captured semantic HTTP request; Root separately proves the actual host.
+ import assert from 'node:assert/strict';
++import {runPrework} from './prework.mjs';
+ import http from 'node:http';
+ import {createHash} from 'node:crypto';
+ import {gunzipSync} from 'node:zlib';
+@@ -52,10 +53,10 @@
+  const policy=JSON.parse(await readFile(join(here,'plan.json'),'utf8'));
+  assert(policy.requestCapture!==null,'Source request DATA is unbound; no output or HTTP');
+  assert.equal(policy.requestCaptureBindingPending,false);
+- assert.equal(policy.suite,'NEXT_RSC_HTTP_RESPONSE_CLIENT_V1');
++ assert.equal(policy.suite,'NEXT_RSC_PREWORK_HTTP_RESPONSE_CLIENT_V1');
+  assert.equal(policy.encodedBodyLimit,4194304);assert.equal(policy.decodedBodyLimit,16777216);
+  assert.equal(policy.httpTimeoutMs,20000);assert.equal(policy.cleanupTimeoutMs,2000);
+- const expectedRoot=runId==='rsc-response-native-first'?'/private/tmp/starling-node-compat/next-rsc-response-native-v1-'+runId+'/client':runId==='rsc-response-stock-first'?'/private/tmp/starling-node-compat/next-rsc-response-stock-v1-'+runId+'/client':null;
++ const expectedRoot=runId==='rsc-prework-native-first'?'/private/tmp/starling-node-compat/next-rsc-prework-native-v1-'+runId+'/client':runId==='rsc-prework-stock-first'?'/private/tmp/starling-node-compat/next-rsc-prework-stock-v1-'+runId+'/client':null;
+  assert.equal(output,expectedRoot);assert.equal(output,process.argv[3]);
+  assert.equal(await realpath(dirname(output)),dirname(output));
+  assert.deepEqual(Object.keys(policy.sourceRequirements).sort(),['headerEvidence','requestBody','requestCapture']);
+@@ -97,9 +98,17 @@
+  assert(boundary&&boundary[0]===names.get('content-type'));
+  assert(body.subarray(0,boundary[1].length+4).equals(Buffer.from('--'+boundary[1]+'\r\n')));
+  assert(body.subarray(-boundary[1].length-6).equals(Buffer.from('--'+boundary[1]+'--\r\n')));
++ const preworkPaths={donorFullClient:join(here,'../next-fs-callback-full-client-v1/run-contracts.mjs'),
++  portableCacheCollector:join(here,'../next-portable-cache-http-collector-v1/collector.mjs'),
++  supplemental:join(here,'../wasmtime-deployment-candidate-v8/supplemental.mjs'),fixtureContract:join(here,'../fixture-contract.json')};
++ assert.deepEqual(Object.keys(policy.preworkSourceRequirements).sort(),Object.keys(preworkPaths).sort());
++ for(const[key,path]of Object.entries(preworkPaths)){assert.equal(policy.preworkSourceRequirements[key].path,resolve(path));await refRead(policy.preworkSourceRequirements[key],1048576);}
++ assert.equal(policy.preworkModule.path,join(here,'prework.mjs'));await refRead(policy.preworkModule,1048576);
+  await mkdir(output,{mode:0o700});
+  const result={schemaVersion:1,suite:policy.suite,controlOnly:true,fullOriginalContractExecuted:false,fullNextAccepted:false,
+   origin:origin.origin,runId,requestCapture:policy.requestCapture,sourceRequirements:policy.sourceRequirements,
++  preworkSourceRequirements:policy.preworkSourceRequirements,preworkModule:policy.preworkModule,
++  precedingWorkload:{executed:false,collectionComplete:false,passed:false,result:null,publication:null},
+   publicHeaderPolicy:'captured public header removed; no replacement, manifest consumption or join',
+   semanticRequestNotWireIdentity:true,responseProbeExecuted:false,responseCollectionComplete:false,
+   limits:{encodedBodyBytes:policy.encodedBodyLimit,decodedBodyBytes:policy.decodedBodyLimit,httpMilliseconds:policy.httpTimeoutMs,cleanupMilliseconds:policy.cleanupTimeoutMs},
+@@ -114,6 +123,10 @@
+  partialResult=result;
+  const chunks=[];
+  const collection=(stage,error)=>result.collectionErrors.push({stage,...errorData(error)});
++ try{result.precedingWorkload=await runPrework({origin:origin.origin,output});}
++ catch(error){result.precedingWorkload.executed=true;collection('prework-publication',error);}
++ if(!result.precedingWorkload.collectionComplete)collection('prework-collection',new Error('Fixed preceding workload collection did not complete'));
++ if(result.precedingWorkload.collectionComplete){
+  await new Promise(resolveAttempt=>{
+   let request,response,socket,httpTimer,cleanupTimer,closing=false,settled=false;
+   function completeSnapshot(){if(response){result.response.complete=response.complete===true;result.response.trailers=response.trailers;result.response.rawTrailers=response.rawTrailers??[];}}
+@@ -167,6 +180,7 @@
+    request.end(body);
+   }catch(error){result.request.errors.push(errorData(error));if(!result.request.created)collection('request-construction',error);cleanup('request-synchronous-error');}
+  });
++ }else{result.terminalReason='prework-collection-incomplete';result.connection.cleanupCompleted=true;}
+  await new Promise(resolveTick=>setImmediate(resolveTick));
+  const raw=result.response.rawCapture,encoded=Buffer.concat(chunks,raw.retainedBytes);
+  raw.allObservedBytesCaptured=!raw.overflow&&!raw.unretainedBytesUnknown&&encoded.length===raw.observedBytes;
+@@ -182,6 +196,7 @@
+   &&result.response.errors.length===0&&result.request.errors.length===0&&result.connection.errors.length===0&&result.collectionErrors.length===0
+   &&raw.allObservedBytesCaptured&&result.connection.cleanupCompleted;
+  const check=(name,passed,detail=null)=>{if(!passed)result.validationErrors.push({name,detail});return passed;};
++ check('preceding-workload-passed',result.precedingWorkload.passed);
+  check('HTTP200',result.response.statusCode===200);check('HTTP-response-complete',result.responseCollectionComplete);
+  check('Content-Encoding-gzip',result.response.headers?.['content-encoding']==='gzip');
+  check('RSC-content-type',typeof result.response.headers?.['content-type']==='string'&&result.response.headers['content-type'].startsWith('text/x-component'));
+@@ -207,6 +222,8 @@
+  // Input read bookends are collection evidence, never inferred from HTTP200.
+  for(const [key,limit] of [['requestCapture',65536],['requestBody',65536],['headerEvidence',1048576]])
+   try{await refRead(policy.sourceRequirements[key],limit);}catch(error){collection('input-final:'+key,error);}
++ for(const ref of Object.values(policy.preworkSourceRequirements))try{await refRead(ref,1048576);}catch(error){collection('prework-input-final',error);}
++ try{await refRead(policy.preworkModule,1048576);if(result.precedingWorkload.result)await refRead(result.precedingWorkload.result,1048576);}catch(error){collection('prework-output-or-module-final',error);}
+  result.responseProbeExecuted=result.request.attempted&&typeof result.terminalReason==='string'&&result.connection.cleanupCompleted
+   &&result.response.encodedBody!==null;
+  result.errors=[...result.collectionErrors,...result.validationErrors];

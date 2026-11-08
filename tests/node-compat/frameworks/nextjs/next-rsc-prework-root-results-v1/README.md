@@ -1,8 +1,8 @@
 # Raw RSC response after non-browser prework
 
 Source and API reviews, four actual Node syntax checks and Root binding pass.
-Fixed preparation`2bdd462d` reserves one Wasm600-second slot followed by one
-Node300-second slot; no request has been sent yet. Binding`b27b9b19` protects
+Fixed preparation`2bdd462d` executes Wasm34292/600 then Node34423/300 once each;
+both original owners exit0 cleanly. Binding`b27b9b19` protects
 2,028 freshly derived inputs. Original NULL plans and literal preimages are
 retained in source-history/.
 
@@ -24,3 +24,12 @@ inversion and separately preserves exact original plan bytes. The source
 predecessor and its formatting-assumption failure remain in the previous
 [rsc-response packet](../next-rsc-response-root-results-v1/README.md).
 No old protected-input array is copied or retargeted.
+
+Both actual clients pass24HTTP/52cache/80supplemental/generation1→2 and five
+incremental chunks, then complete the raw gzip RSC response with2,963 decoded
+bytes (1,486/1,492 encoded). See the [result report](../../../../../docs/node-compat/nextjs-rsc-prework-response-results.md).
+The original strict browser failure remains failed; Chrome is absent here.
+
+[Primary DATA review](actualreview.json) and [independent runtime/gzip gate](independent-runtime-gate-review.json)
+pass within their stated scopes. The [raw index](raw-records/index.json) retains
+202 payloads/6,368,082 bytes, including both physical generation2 callback records.

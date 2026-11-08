@@ -19,13 +19,20 @@ payloads total7,575,911 bytes (`b3a97510`). Root rehashes the entire raw corpus.
 The next non-browser prework control is Source-only preparation, with no slots
 or requests yet. Control preceding workload before changing native behavior.
 
-The [non-browser prework control](tests/node-compat/frameworks/nextjs/next-rsc-prework-root-results-v1/README.md)
-is now prepared (`2bdd462d`) with fixed Wasm600→Node300 slots. Four actual
-Node syntax checks and whole Source/API reviews pass. Binding`b27b9b19` derives
-2,028 fresh inputs, including the three capture inputs, four external prework
-consumers and indexed local helper. It preserves the exact original4,382-byte
-pre-browser request span; the original full/browser clients remain unchanged.
-No request has been sent in this new profile yet.
+The [non-browser prework control](docs/node-compat/nextjs-rsc-prework-response-results.md)
+now passes once on Wasm34292/600 and Node34423/300, both raw0/clean. Both pass
+24HTTP,52 portable cache checks,80 supplemental checks, persisted generation1→2
+and stream5(0,2), then complete the raw RSC POST with normal gzip/CRC/ISIZE and
+HTTP EOF. Encoded sizes1,486/1,492 both decode to2,963 bytes. Four actual Node
+syntax checks and whole Source/API reviews pass. Binding`b27b9b19` derives2,028
+fresh inputs; fixed preparation`2bdd462d` executes each slot once. The unchanged
+4,382-byte pre-browser request span runs on the same listener before replay;
+Chrome/React and same-Store identity are not established. Independent binding review`fa90206c` and runtime/gzip review`79d0bfa0` pass,
+including all50 raw prework files per arm. Primary review`026c026a` verifies
+both physical canonical generation2 records with no pending file and retains
+202 payloads/6,368,082 bytes (`61ce2c24`); Root rehashes the complete corpus. The next Source-only diagnostic
+adds only Next's compress:false option to a new application version, preserving
+the full strict browser client and every earlier failure.
 
 Latest ported-fixture comparison: explicit filesystem-backed callback state
 passes1→2 on both Wasm and Node. Both also pass24HTTP,52 portable-cache checks,

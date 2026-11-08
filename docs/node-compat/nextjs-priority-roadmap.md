@@ -11,14 +11,17 @@ this result demonstrates explicit persisted application data only. The actual
 Next filesystem-helper component separately passes3 cases/11 assertions.
 The critical path is now strict response completion and the related lifecycle
 investigation, with no weaker browser gate or earlier failure waiver.
-The [captured-request ordinary HTTP comparison](nextjs-rsc-http-response-results.md)
-now passes once on both Wasm and Node: complete HTTP200 gzip responses decode to
-2,963 bytes, with matching CRC/ISIZE and known cleanup. It uses unchanged app,
-engine and component but a fresh host with no preceding HTTP workload. The
-strict comprehensive browser failure remains failed. Next preserve this raw
-consumer while controlling preceding workload, then inspect browser lifetime
-with the original strict gates. There is no justified compression/cancellation
-patch or full Next acceptance yet.
+The [fresh raw replay](nextjs-rsc-http-response-results.md) and the subsequent
+[raw replay after non-browser prework](nextjs-rsc-prework-response-results.md)
+both pass once on Wasm and matched Node. The latter passes24HTTP/52cache/80supplemental,
+generation1→2 and stream5(0,2) before complete gzip/HTTP EOF with2,963 decoded
+bytes. The same app, engine, component and13 standard interfaces are retained.
+Chrome/React and Store identity are absent from these controls; the strict full
+browser failure remains failed. Next prepare a separately versioned app adding
+only compress:false, then run the unchanged full client and strict browser with
+fresh build/asset bindings on Wasm and Node. This standard configuration
+counterfactual diagnoses a profile dimension; it is not an established fix or
+compression/cancellation cause.
 
 Updated 2026-11-08. The latest comprehensive current-build comparison finishes
 with **Node passed and Wasm failed solely on legacy generation1→1**. Both pass
