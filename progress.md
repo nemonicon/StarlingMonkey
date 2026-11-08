@@ -66,6 +66,20 @@ permission while denying external egress/new services/host mutation. Only
 genuine0599 INIT roles are Source-bound. JSON-only preparation
 (`21ab5b`/session40978, completion`22ed9b`) issues authority`a98fb01b`/4,550 bytes
 with no actor invocation. This is still a pending second-host execution gate.
+The first stock actor then stops before dev/HTTP/guest work: original71142/180
+finishes raw1/operationally clean (`75a987`/session70965, completion`b8a3e8`).
+Config-show succeeds with complete2,812-byte capture, but its effective
+`environment:{}` omits the empty `config` map, violating the harness's old
+unconditional assertion. Failure DATA review`4c060524` preserves that failed
+experiment and unobserved guest result;11 finite records/16,792 bytes retain
+the raw preflight. Pinned Rust serde Source confirms empty-map omission.
+A separate v2 changes exactly one executable predicate, accepting only the
+entire environment `{}` or `{config:{}}` while refusing other shapes/values.
+Whole/narrow Source reviews pass; v1 Sources/results remain intact. Fresh v2
+index`95ca9c27`/plan`6e290fc0` and controller`33fda2ee` retain all16 flags,
+three mounts, empty environment/egress and original180-second owner. JSON-only
+preparation (`b4b644`/session32019, completion`cb73e9`) issues new authority
+`e2529f90`/4,553 bytes without launching another actor.
 
 Active experiment: the opt-in native export diagnostic has passed Source review,
 both C++ frontend modes, fresh 825-file materialization and all ten generator

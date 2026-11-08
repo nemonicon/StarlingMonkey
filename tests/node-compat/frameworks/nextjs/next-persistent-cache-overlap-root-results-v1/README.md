@@ -66,3 +66,10 @@ The stock wasmCloud actor now passes whole Source review. Its three mounts use
 the existing stock configuration mechanism, with empty guest environment and
 egress policy. JSON-only preparation issues a fresh4,550-byte authority, without
 starting the host. Its one-request runtime and differential result remain pending.
+
+The first stock attempt is retained as a pre-dev harness failure:
+[failure review](actual-wasmcloud-v1-review.json). Config-show omits an empty
+environment config map; no host dev command, HTTP request or cache suite runs.
+The separate v2 validator accepts exactly `{}` or `{config:{}}`, matching the
+pinned Rust serialization rule and preserving the same empty policy. Source
+review and fresh JSON preparation pass; v2 runtime remains pending.
