@@ -4,6 +4,23 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
+Latest second-host result: the [compression-off stock wasmCloud trial](docs/node-compat/nextjs-compression-off-wasmcloud-results.md)
+finishes original47197/600 raw1/clean. It passes24HTTP/52portable/80supplemental,
+generation1→2, stream3(0,1), functionalUI2 and assets, but overall strict browser
+fails POST7 ERR_ABORTED (three capture errors/one failed request). Status200 and
+no Content-Encoding are recorded; body/sizes are unavailable and finished fails
+before drain/close. Config inspection, exact2mounts/3guestenv/self-egress,
+registration+TCP readiness, normal host shutdown and both complete stdout
+captures pass. Primary DATA review`81a9c56b` and independent gate`185cecef` verify
+the failed outcome. Raw index`09e9a040` retains155 payloads/5,368,231 bytes.
+The observed abort also occurs with compression disabled; no cause is established.
+Root rehashes the155-file raw corpus. The boundary audit`b5e4f87a` observes
+SPA historyApi update/same loader before canceled:true, not a recorded MPA/new
+document; cancellation initiator and HTTP EOF remain unproved. Fresh captured
+request`a45dea80` retains this build's391-byte action and all19 ordered headers
+with exact manifest provenance. Next is an identity-response raw-after-prework
+comparison on cloud and Node, preserving the original strict failure and gates.
+
 Latest result: the [compression-off full Next profile](docs/node-compat/nextjs-compression-off-full-results.md)
 passes once on Wasm40483/600 and Node40694/300, both raw0/clean. Both pass24HTTP,
 52 portable-cache checks,80 supplemental checks, persisted generation1→2,
@@ -28,14 +45,12 @@ Both emitted configs contain compress:false. Only19 fixture bytes change;
 34 files and the tracing exclusion remain exact. Source5c280e4b, build review
 9106545f, independent gate d4194323 and fresh5/4asset selection05c965a6 with
 independent join a9fe908f pass. The92-payload build corpus totals2,795,484 bytes.
-Next: the [stock wasmCloud full profile](tests/node-compat/frameworks/nextjs/next-fs-callback-no-compress-wasmcloud-root-results-v1/README.md)
-is prepared but not run. Actual wash2.11.0 version/hash preflight, all Source/API
-reviews and three Node syntax checks pass. Binding`a069e157` derives2,049 fresh
-inputs; preparation`c4c1e09c` issues one literal self-origin and one original600
-owner, with no reservation/handoff guarantee or fallback. The new cloud profile
-preserves original gates, current52-field admission, two mounts/three guest
-environment values and complete lifetime stdout. No host instance has launched. Lifecycle, resource/reuse, clean-machine,
-empirical cost and release/promotion gates remain outstanding.
+The stock host profile uses actual wash2.11.0 version/hash preflight and current
+52-field admission. Binding`a069e157` protects2,049 inputs; preparation`c4c1e09c`
+issues one literal origin and one original600 owner with no handoff guarantee,
+fallback or replacement trial. The failed trial above completes that declared
+slot. Lifecycle, resource/reuse, clean-machine, empirical cost and promotion
+work remain outstanding.
 
 The [raw response after non-browser prework](docs/node-compat/nextjs-rsc-prework-response-results.md)
 passes once on Wasm34292/600 and Node34423/300, both raw0/clean. Both pass24HTTP,

@@ -79,3 +79,8 @@ stdout, normal shutdown and preserved inputs. The [raw corpus](../../tests/node-
 browser bodies/screenshots/NetLog, owner records, Source and selected provenance;
 app/cache bulk and binaries are explicitly omitted. Whole app/native proofs
 remain delegated to their current guarded build evidence.
+
+The subsequent [stock wasmCloud trial](nextjs-compression-off-wasmcloud-results.md)
+retains a strict POST7 abort with no Content-Encoding header, while all other
+gates pass. This counterexample prevents interpreting these two positive samples
+as a cross-host completion guarantee or a compression fix.

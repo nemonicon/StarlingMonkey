@@ -1,14 +1,23 @@
 # Next.js execution priority
 
-Current result: the [compression-off full profile](nextjs-compression-off-full-results.md)
+Current second-host result: the [stock wasmCloud compression-off full trial](nextjs-compression-off-wasmcloud-results.md)
+passes24HTTP/52cache/80supplemental/generation/stream/function/asset checks but
+fails strict POST7 completion with ERR_ABORTED, despite absent Content-Encoding.
+Its clean owner and complete captures retain this failed outcome. Compression
+is not required for this observed failure; its cause remains unresolved. Next
+use the actual current action request in an identity-response raw-after-prework
+cloud/Node control, then follow the observed response-lifetime boundary without
+weakening01ca. Lifecycle/resource/reuse, reproduction, cost and promotion remain.
+
+Earlier passing sample: the [compression-off full profile](nextjs-compression-off-full-results.md)
 passes once on Wasm and matched Node, including24HTTP/52cache/80supplemental,
 generation1→2, incremental streaming and both unchanged strict browser tests.
 Actual POST7 body/finished/sizes fulfill; the Content-Encoding header is absent.
 The original compressed failure remains failed. This is one bounded application
 profile, not reliability, broad Node support or production acceptance.
-Next run the same full profile on stock wasmCloud2.11 with fresh actual bindings
-and complete lifetime logs; then finish the separate lifecycle/resource/reuse,
-clean-machine, cost and release gates. See the [next-step source audit](../../tests/node-compat/frameworks/nextjs/next-fs-callback-no-compress-root-results-v1/next-steps.md).
+The subsequent stock wasmCloud trial is retained above; its strict failure
+prevents a portable full-profile acceptance. Separate lifecycle/resource/reuse,
+clean-machine, cost and release gates remain. See the [next-step source audit](../../tests/node-compat/frameworks/nextjs/next-fs-callback-no-compress-root-results-v1/next-steps.md).
 
 Earlier result: the separately versioned
 [persisted-callback fixture](nextjs-persisted-callback-results.md) passes1→2 on

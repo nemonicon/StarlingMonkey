@@ -2,7 +2,8 @@
 
 Source/API reviews and actual syntax checks pass. Binding`a069e157` protects
 2,049 fresh inputs; preparation`c4c1e09c` reserves one original600-second trial.
-The runtime authority is issued; no host instance has launched yet.
+The declared trial finishes original47197/600 raw1/clean. All non-browser and
+functional checks pass; strict POST7 completion aborts without Content-Encoding.
 The actual pinned wash binary reports2.11.0 and matches365d896e/101,947,952 bytes.
 The version preflight establishes tool identity only, not deployed capabilities.
 
@@ -34,3 +35,15 @@ compiler, component constructor or production promotion is selected.
 Original Source/index/plan/controller preimages and exact metadata inverses are
 retained under source-history/. No previous protected array is reused. The
 previous Wasmtime/Node review is prerequisite DATA only; it proves no cloud run.
+
+[Primary runtime review](actual-runtime-review.json) and [independent recomputation](independent-runtime-gate-review.json)
+verify the failed full contract, normal host/owner cleanup and complete stdout.
+The [raw corpus](runtime-records/index.json) retains155 payloads/5,368,231 bytes.
+See the [result report](../../../../../docs/node-compat/nextjs-compression-off-wasmcloud-results.md).
+No replacement trial is performed and no earlier failure is waived.
+
+[Boundary audit](response-boundary-data-review.json) and [next steps](next-browser-steps.md)
+record the same-document/cancellation facts without identifying an initiator or
+HTTP EOF. [Current request DATA](identity-request-capture.json) retains the exact
+391-byte body and all19 original headers for a future identity-response replay.
+No new replay or authority is issued by that capture.
