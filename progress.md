@@ -22,6 +22,15 @@ capture. One valid POST/actions record matches the public test tuple, while7
 unknown-route POST competitors keep the conservative outer join failed. The
 witness does not identify a private request/Store, observer return or cause.
 
+Current implementation work: the separate non-redirect app Source is sealed
+at index`ae30b268`. It preserves all31 parent files and adds three real
+`useActionState`/Server Action files. Root independently verifies the selector-only
+builder change and Source copies. Its four original monitored host-build phases
+and pinned dependency versions are retained. The new strict-browser Source
+preserves the original observer/lifecycle bytes; generated script pins and app
+bindings remain pending the actual build. No new engine/component build is
+required or claimed. The old full-pair failures remain unchanged.
+
 Outstanding critical work:
 
 - Build a separate non-redirecting real Server Action control with the same

@@ -1,0 +1,19 @@
+This unsealed Source candidate adds `/action-value` as a non-redirect Server Action control. Its client form uses real React `useActionState`; the server action returns exactly one 1–64 character lowercase ASCII/digit/hyphen string. It does not call redirect, revalidate, router navigation, manual fetch, abort or a response drain. The existing `/actions` redirect fixture and all other 31 parent files are copied byte-identically into `fixture/`.
+
+The new page has `NEXT_ACTION_VALUE`, form `data-testid="action-value-form"`, input `name="value"`, submit `data-testid="action-value-submit"` and result `data-testid="action-value-result"`. Initial result is empty. Submitting `fixture-nonredirect-value` must render that exact returned text on the same route. C owns the separate browser control: the shared observer test label remains `server-action`, but there is no navigation waiter for this control. Strict body/finished/sizes/request-failure gates remain required. The control does not reclassify either earlier redirect failure. Existing guest/native/outer correlation schemas admit only their declared routes; `/action-value` is outside them and must not acquire a public-join claim.
+
+`build.py` is the genuine `next-portable-cache-app-build-v1/build.py` with only its fixture-catalogue path literal changed. `builder.patch` retains that exact diff. The new catalogue derives a complete 34-file fixture; no historical generated inventory or action ID is projected into it. Original Node/npm probes, locked `npm ci --ignore-scripts --no-audit --no-fund`, private empty npm configuration/cache/temp, real webpack build, traced standalone packaging, dynamic BUILD_ID/action manifest/inventory and source/tool bookends are unchanged. Phase caps are 120/120/600/900 seconds under the original monitor. The unchanged npm phase is not offline; Root explicitly selected that existing mechanism rather than adding cache/toolchain work.
+
+Root alone may run this after Source review, using its real tool authentication, accepted `030f` interop prerequisite and current full-engine guards before/final. The generic builder does not enforce the added Root prerequisite metadata or pin the entire tool tree from this prose. It requires explicit tool paths and probes their real versions; Root must authenticate the exact selected Node/npm inputs and fresh output. Proposed argv (not executed by R):
+
+```sh
+/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/bin/python3.11 -I -B \
+  tests/node-compat/frameworks/nextjs/next-nonredirect-action-app-build-v1/build.py \
+  --output /private/tmp/starling-node-compat/next-nonredirect-action-app-build-v1-first \
+  --node /private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node \
+  --npm-cli /private/tmp/starling-node-compat/next-app-tools-bootstrap-v1/lib/node_modules/npm/bin/npm-cli.js
+```
+
+Root must read the new completed application inventory, configuration, traced handler/delegate, actual action manifest and generated browser script list. New browser asset pins remain NULL until that build exists and is reviewed. The lazy `/app` loader in existing experimental inner component `6b20` / composed envelope `e4c7` is app-independent with the same pinned Next/React dependency versions; no native-engine or component rebuild is added by this candidate. A future runtime still requires genuine new app/client/protection bindings and Root admission.
+
+Only Source copies, byte/hash/JSON checks and a Python AST parse of the selector-only builder were performed. No retained Source function, plan CLI, JSX/JS parser, npm/Node/Next, guard, compiler, host, guest or browser ran. All actual build, Source-index, app identity, compiled asset and runtime fields remain NULL. The Vercel React skill informed the bounded primitive and direct import; Root excluded cross-request LRU advice for this portable profile. Stop here for Source peers; no index is sealed.
