@@ -11,19 +11,19 @@ is retained; full-pair review`75d04310` and public-observer review`8ea7854b`
 verify those outcomes.
 The earlier native-only positive strict-browser sample remains separate.
 
-Next work is a separate non-redirecting real Server Action under the same
-strict observer. The [Source audit](../../tests/node-compat/frameworks/nextjs/next-standard-handler-observer-root-results-v1/next-steps.md)
-proves no deliberate POST cancellation: this Node sample fails before fixture
-closure after same-document navigation, and one failed terminal feeds three
-observer errors. The matched Node bridge profile remains distinct from a pristine
-standalone server. The standard-interface
-observation after the inner canonical call is now exercised in the full app. The [composed observer](nextjs-standard-handler-return-observer.md)
-passes its first mechanism probe and all six bounded public-metadata cases,
-with runtime DATA reviews`0241d47c` and`c56ec847`. The unchanged real Next component
-now composes, validates and runs with this observer, retaining the failures above.
-Preserve the legacy counter failure as an explicit process-state limitation,
-and retain every strict browser assertion. No scheduling or response-path fix
-has been established.
+The separate [non-redirecting real Server Action control](nextjs-nonredirect-action-control.md)
+now passes strict completion on both Wasm and matched Node, with unchanged
+observer/deadline/error predicates and DATA review`484af70a`. Its first fixture
+version remains failed on an invalid HTML pattern; a separately built version
+corrects only that attribute. This does not fix the original redirect sample.
+
+Next work is to reuse the existing pristine standalone Node controller against
+the current app, current public-header/NetLog worker and genuine new script pins.
+The prior pristine pass used an older app/worker; it does not answer this current
+comparison. Keep every original redirect failure and assertion. The standard
+return observer witnesses a later site, with seven unknown POST competitors
+still blocking the conservative outer public join. No private identity,
+scheduling or response-path cause has been established.
 
 The first [real-handler cache suite](../../tests/node-compat/frameworks/nextjs/next-persistent-cache-overlap-root-results-v1/README.md)
 now passes both Node and a real Wasmtime component: eleven groups/41 assertions

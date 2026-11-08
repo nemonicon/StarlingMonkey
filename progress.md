@@ -4,6 +4,14 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
+Latest completed control: the corrected **non-redirecting real Server Action
+passes on both Wasm and matched Node22**, raw0/clean, under unchanged strict
+observer/deadline/error predicates. Both render the returned value, capture all
+five pinned scripts and identical complete89-byte POST200 bodies with fulfilled
+sizes/response.finished and no browser errors. Runtime DATA review`484af70a`
+verifies this bounded result. The original full redirect/counter gates below
+remain failed. See [control results](docs/node-compat/nextjs-nonredirect-action-control.md).
+
 Latest application result: the fixed **observer-v3 Wasm → Node22 comparison
 completes with both full suites failed**, without retries. Both pass24HTTP,
 52 portable-cache checks,80 supplemental checks, five incremental chunks and
@@ -62,7 +70,19 @@ Five script hashes are derived from its real HTML. Build DATA review`80c59d47`
 verifies the complete new payload and corrected pattern. The byte-identical
 browser/runtime code is separately sealed with fresh v2 app and asset bindings;
 Root verifies whole controller-preimage/namespace and binding inverses. V2
-runtime preparation is in progress; no v1 outcome is overwritten or waived.
+runtime preparation`ef1b28b0` completes without launching actors. The subsequent
+fixed v2 pair passes: native96345/600 (`376109`/session59202→`db4127`) and
+Node96562/300 (`7dd3c8`/session63062→`e7377e`), both raw0/clean with current
+inputs preserved. Both have real same-page action value, exact five script
+captures, one POST200 with complete body/sizes/finished, and no browser errors.
+The sole fixture correction is not an observer/gate change. No v1 or original
+redirect outcome is overwritten or waived. V2 runtime DATA review`484af70a`/28,221 bytes verifies both strict passes,
+all owner/capture/source/app joins and the unchanged v1 failure. The corrected
+control does not identify a redirect cancellation cause or accept full Next.js. The staged-Git
+raw-corpus check verifies all184 v1/v2 build/runtime payloads/10,526,524 bytes
+against their original SHA-256 descriptors, preserving both negative and
+positive evidence.
+
 
 
 
@@ -70,8 +90,12 @@ runtime preparation is in progress; no v1 outcome is overwritten or waived.
 
 Outstanding critical work:
 
-- Build a separate non-redirecting real Server Action control with the same
-  strict response observer. The [Source audit](tests/node-compat/frameworks/nextjs/next-standard-handler-observer-root-results-v1/next-steps.md)
+- Run the existing pristine standalone Node control on the current app and
+  current strict redirect observer, with real new asset pins. The [Source-backed
+  next-step audit](tests/node-compat/frameworks/nextjs/next-nonredirect-action-root-results-v2/next-steps.md)
+  locates the existing bare-Node launcher and its earlier strict pass, while
+  preserving the current app/worker/asset gap. The bounded
+  non-redirect control is complete. The [Source audit](tests/node-compat/frameworks/nextjs/next-standard-handler-observer-root-results-v1/next-steps.md)
   finds no proved deliberate POST cancellation. The Node sample navigates within
   the same document and fails before fixture closure; one failed request feeds
   three observer errors. This Node arm uses the shared bridge profile, not a
