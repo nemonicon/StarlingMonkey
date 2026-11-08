@@ -60,8 +60,16 @@ print steps pass. Its 5,519-byte observer produces a 37,173,284-byte probe envel
 with the same standard external surface. The [v3 composition review](../../tests/node-compat/frameworks/nextjs/next-standard-handler-observer-root-results-v1/actual-v3-composition-review.json)
 verifies exact child bytes, shared fields types and canonical getter options.
 
-Metadata behavior still needs six fixed deployed cases: missing, valid, uppercase
-and duplicate header values, GET/POST, and both admitted paths. The probe fixture
-intentionally returns GET404 and POST405 on those paths. These tests check the
-observer while preserving the inner response. Allocator failure limits and
-trapped-instance cleanup remain explicit; these cases do not prove them.
+All six fixed deployed metadata cases pass: missing, valid, uppercase and
+duplicate header values, GET/POST, and both admitted paths. The probe fixture
+intentionally returns GET404 and POST405 on those paths; every response remains
+correct. The [runtime DATA review](../../tests/node-compat/frameworks/nextjs/next-standard-handler-observer-root-results-v1/actual-metadata-probes-runtime-review.json)
+verifies one original900-second owner, six fresh normal-shutdown host processes,
+complete captures and exact canonical records. There are no retries or warmups.
+Allocator failure limits and trapped-instance cleanup remain unproved.
+
+The unchanged real Next component now also composes with v3. Four actual
+composition/validation/WIT/print steps pass; the envelope is37,298,513 bytes,
+with the same thirteen standard WASI imports. The new full-app runtime Source
+keeps the inner constructor evidence separate from the served envelope and its
+composition proof. Its actual application regression remains pending.

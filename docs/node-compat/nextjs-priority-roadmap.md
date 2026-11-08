@@ -11,15 +11,14 @@ suite with `1 → 2`. Coordinated DATA review `83ba87fe` and correlation review
 The single positive browser sample does not resolve the retained intermittent
 failures. See the [native diagnostic checkpoint](nextjs-native-export-diagnostic-2026-11-08.md).
 
-Next work is to implement persistent-cache overlap, error and bound checks;
-preserve the legacy counter failure as an explicit process-state limitation;
-and select a standard-interface observation after the inner canonical call
-before changing the response path. The
-[composed observer](nextjs-standard-handler-return-observer.md) now passes actual
-tool validation and independent sibling/resource/import checks. Its first small
-deployed probe also passes, with DATA review`0241d47c`. Bounded public metadata
-and its allocator/ownership probes are next, followed by a new full Next.js pair.
-Do not expand compatibility to hide these gates.
+Next work is the full Next.js run with a standard-interface observation after
+its inner canonical call. The [composed observer](nextjs-standard-handler-return-observer.md)
+passes its first mechanism probe and all six bounded public-metadata cases,
+with runtime DATA reviews`0241d47c` and`c56ec847`. The unchanged real Next component
+now composes and validates with this observer; its deployed regression is next.
+Preserve the legacy counter failure as an explicit process-state limitation,
+and retain every strict browser assertion. No scheduling or response-path fix
+has been established.
 
 The first [real-handler cache suite](../../tests/node-compat/frameworks/nextjs/next-persistent-cache-overlap-root-results-v1/README.md)
 now passes both Node and a real Wasmtime component: eleven groups/41 assertions

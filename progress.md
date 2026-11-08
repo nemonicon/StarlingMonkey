@@ -34,6 +34,34 @@ classification before execution. Root Node22 syntax check passes. JSON-only
 preparation (`8fe780`/session62354, completion`fac4d3`) issues authority
 `8f41cfcf`/2,427 bytes under genuine existing constructor/build/world guards.
 Actor/runtime execution remains pending at this checkpoint.
+The subsequent fixed6 run (`2533d4`/session19082, completion`bb895b`)
+passes raw0/clean under original83433/900. All6 are attempted exactly once,
+with complete collection and normal per-case shutdown. Result`349d3ce2`/44,951
+bytes records expected GET404/POST405 fixture responses and exact V3 metadata:
+missing/count0, valid/count1, uppercase-invalid/count1, duplicate/count2,
+GET/POST and both paths. Current native/world/input guards pass. Raw records
+are copied for future checks; runtime DATA review`c56ec847`/58,173 bytes
+independently verifies the bounded result. It delegates large binary hashes to
+the actual Root guards and composition proofs rather than claiming a fresh
+full binary hash sweep.
+No Next completion fix or broader allocator/resource-lifetime acceptance is claimed.
+The unchanged actual Next component`6b2084d0` is now composed with v3
+(`30dc5c`/session73446, completion`3d9bf7`). All4 new composition/validation/
+WIT/print steps pass; envelope`e4c79871` is37,298,513 bytes, same13 imports.
+Genuine Next constructor/build/world admission passes before/final. New
+composition DATA review and a separate full-app runtime Source are in progress;
+the new Next envelope has not yet served a request.
+New composition DATA review`b333fbc7`/33,472 bytes verifies its exact raw
+children and same synchronous/nominal-resource structure. The full Next actor
+and Root controller pass Source review, keeping original client/browser gates
+and inner constructor roles. Root derives1,859 current protection descriptors
+from genuine fresh constructor context (35 build/1,678 source refs, including
+825 pairs), actual component/review graphs and host dependencies; the previous
+1,771-item protection array is not copied or retargeted. Node syntax checking
+passes. JSON-only preparations issue native authority`e03ce8e5`/3,502 bytes
+and Node control`92cf7606`/1,718 bytes; neither full actor has started. The fixed
+native→Node comparison is declared before execution, with shared physical
+browser/app inputs, matching public values and no retries/replacements.
 
 Current completed helper milestone: the same real-filesystem cache suite passes
 **11 groups/41 assertions on Node, Wasmtime and stock wasmCloud**. Independent
