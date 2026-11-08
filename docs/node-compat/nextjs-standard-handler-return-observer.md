@@ -72,4 +72,49 @@ The unchanged real Next component now also composes with v3. Four actual
 composition/validation/WIT/print steps pass; the envelope is37,298,513 bytes,
 with the same thirteen standard WASI imports. The new full-app runtime Source
 keeps the inner constructor evidence separate from the served envelope and its
-composition proof. Its actual application regression remains pending.
+composition proof. The declared application comparison now completes once in each arm:
+
+| Gate | Wasm with observer | Matched Node22 |
+| --- | --- | --- |
+| HTTP cases |24/24 pass|24/24 pass|
+| Explicit portable cache |52 checks pass|52 checks pass|
+| Supplemental checks |80 pass|80 pass|
+| Incremental stream |5 chunks, pass|5 chunks, pass|
+| Functional browser interactions |2 pass|2 pass|
+| Legacy process-global counter |1→1, failed|1→2, pass|
+| Strict POST capture |failed|failed|
+| Original full suite |failed|failed|
+
+Both strict browser samples preserve POST7 `net::ERR_ABORTED` and body/finished/
+sizes capture errors. Both original owners finish cleanly with protected inputs;
+no retry or replacement occurs. The Node failure prevents attributing this
+sample's strict failure specifically to the guest runtime.
+
+The finite [raw comparison packet](../../tests/node-compat/frameworks/nextjs/next-standard-handler-observer-root-results-v1/next-pair-records-v1/manifest.json)
+retains185 selected files/5,066,749 bytes, including browser/NetLog/capture/body
+records and both original-owner trees. App copies, packages and large binaries
+remain outside this packet. The [fixed declaration](../../tests/node-compat/frameworks/nextjs/next-standard-handler-observer-root-results-v1/fixed-next-pair-declaration.json)
+records order, shared app/browser/public inputs and no-retry policy before launch.
+The [native public DATA review](../../tests/node-compat/frameworks/nextjs/next-standard-handler-observer-root-results-v1/actual-next-observer-public-review.json)
+verifies51 typed outer records,54 guest records and6 native records. Exactly one
+valid POST `/actions` record contains the declared public action value at the
+later import-return site. Seven unknown-route POST competitors keep the
+protocol's conservative outer join failed. Browser/NetLog/public guest tuples
+agree, without establishing physical identity or causality. The [combined runtime
+DATA review](../../tests/node-compat/frameworks/nextjs/next-standard-handler-observer-root-results-v1/actual-next-pair-runtime-review.json)
+verifies both failed suites, original owners and all retained raw copies.
+
+The [Source audit and next control](../../tests/node-compat/frameworks/nextjs/next-standard-handler-observer-root-results-v1/next-steps.md)
+find no proved deliberate POST cancellation. In this Node sample, same-document
+navigation precedes the request failure, which occurs before fixture closure;
+one failed request supplies three capture errors. This is the matched bridge
+profile, rather than a pristine standalone server. A separate non-redirecting
+real Server Action with the same strict observer is the next discriminating
+control. Its implementation and execution remain pending.
+
+Future runtime checks must use a fresh declared namespace and authority, the
+same complete strict gates and current genuine construction/composition guards.
+These first-run controllers deliberately refuse to overwrite their evidence.
+Keep the original failed fixtures as regression evidence. No complete Next.js,
+Node or Buffer compatibility, production promotion or measured performance
+advantage follows from this diagnostic.

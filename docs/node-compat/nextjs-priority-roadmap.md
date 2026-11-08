@@ -1,21 +1,26 @@
 # Next.js execution priority
 
-Updated 2026-11-08. The current critical path is the remaining request-state
-and Server Action response-completion gaps. The latest native diagnostic build,
-seventeen-case direct probe and full native-to-Node Next.js comparison have all
-completed. The new native sample passes HTTP24, persistent-cache52,
-supplemental80, five streamed chunks and both functional/strict browser checks,
-but generation `1 → 1` keeps its original suite failed. Node passes the full
-suite with `1 → 2`. Coordinated DATA review `83ba87fe` and correlation review
-`0220cebc` are held. Current-tree and staged Git-mode raw-corpus checks pass.
-The single positive browser sample does not resolve the retained intermittent
-failures. See the [native diagnostic checkpoint](nextjs-native-export-diagnostic-2026-11-08.md).
+Updated 2026-11-08. The latest fixed observer-v3 application comparison
+finishes once per arm with **both full suites failed**. Wasm and Node22 pass
+24HTTP,52 portable-cache checks,80 supplemental checks, five streaming chunks
+and two functional browser interactions. Both fail strict POST7 capture with
+`net::ERR_ABORTED`; Wasm additionally retains legacy generation1→1, while Node
+advances1→2. Both owners are clean with protected inputs. This new Node failure
+prevents a guest-specific cause claim from this sample. The raw185-file packet
+is retained; full-pair review`75d04310` and public-observer review`8ea7854b`
+verify those outcomes.
+The earlier native-only positive strict-browser sample remains separate.
 
-Next work is the full Next.js run with a standard-interface observation after
-its inner canonical call. The [composed observer](nextjs-standard-handler-return-observer.md)
+Next work is a separate non-redirecting real Server Action under the same
+strict observer. The [Source audit](../../tests/node-compat/frameworks/nextjs/next-standard-handler-observer-root-results-v1/next-steps.md)
+proves no deliberate POST cancellation: this Node sample fails before fixture
+closure after same-document navigation, and one failed terminal feeds three
+observer errors. The matched Node bridge profile remains distinct from a pristine
+standalone server. The standard-interface
+observation after the inner canonical call is now exercised in the full app. The [composed observer](nextjs-standard-handler-return-observer.md)
 passes its first mechanism probe and all six bounded public-metadata cases,
 with runtime DATA reviews`0241d47c` and`c56ec847`. The unchanged real Next component
-now composes and validates with this observer; its deployed regression is next.
+now composes, validates and runs with this observer, retaining the failures above.
 Preserve the legacy counter failure as an explicit process-state limitation,
 and retain every strict browser assertion. No scheduling or response-path fix
 has been established.

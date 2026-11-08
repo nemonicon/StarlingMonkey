@@ -4,6 +4,39 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-08. Overall roadmap: **in progress**.
 
+Latest application result: the fixed **observer-v3 Wasm → Node22 comparison
+completes with both full suites failed**, without retries. Both pass24HTTP,
+52 portable-cache checks,80 supplemental checks, five incremental chunks and
+two functional browser interactions. Both fail strict POST7 capture with
+`net::ERR_ABORTED`; native also retains legacy generation1→1, while Node1→2
+passes. Native owner86135/600 and Node86371/300 are clean and inputs preserved.
+This sample does not identify a guest-specific browser failure cause. All185
+selected raw records/5,066,749 bytes are copied for future checks; independent
+full-pair DATA review`75d04310`/84,472 bytes verifies the two failed results
+and all185 raw copies. The staged-Git blob check also verifies all185
+payloads/5,066,749 bytes against their original SHA-256 descriptors. Source/
+document whitespace checks pass separately; captured bundle whitespace is
+retained byte-for-byte. Native public DATA review`8ea7854b`
+verifies51 typed V3 records,54 guest records and6 native records in complete
+capture. One valid POST/actions record matches the public test tuple, while7
+unknown-route POST competitors keep the conservative outer join failed. The
+witness does not identify a private request/Store, observer return or cause.
+
+Outstanding critical work:
+
+- Build a separate non-redirecting real Server Action control with the same
+  strict response observer. The [Source audit](tests/node-compat/frameworks/nextjs/next-standard-handler-observer-root-results-v1/next-steps.md)
+  finds no proved deliberate POST cancellation. The Node sample navigates within
+  the same document and fails before fixture closure; one failed request feeds
+  three observer errors. This Node arm uses the shared bridge profile, not a
+  pristine standalone server. Keep both original redirect failures intact.
+- Keep arbitrary cross-request JS-global continuity unavailable in the portable
+  profile. The explicit filesystem cache subset passes; it does not restore a
+  single Node process or waive the legacy counter gate.
+- Complete lifecycle/reuse/concurrency, second-host application limits,
+  clean-machine reproduction and empirical size/startup/memory/throughput gates.
+  Broader Node compatibility and production promotion remain open.
+
 Current critical-path work: a standard-interface return observer is built and
 independently type/structure reviewed. WAC CLI0.12.0 builds offline under
 original74822/900, raw0 (`8563f9`/session84552, completion`e121a4`), with Source/lock
