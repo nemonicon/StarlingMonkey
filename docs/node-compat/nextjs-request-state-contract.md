@@ -31,6 +31,12 @@ native samples remain1→1, including B/block2. That positive guest sample is
 retained as a pass for its original gate; it does not establish request affinity,
 make module-global continuity a portable guarantee or waive the seven failures.
 
+The subsequent [full stock wasmCloud profile](nextjs-wasmcloud-full-contract-2026-11-08.md)
+passes the persistent-cache52 checks and retains legacy1→1. Coordinated DATA
+review `c528ca22` verifies that independent host result. Neither that success nor
+the host's source policy identifies the private instance of an observed request
+or supplies an exact failure cause.
+
 | Execution context | Available continuity contract |
 | --- | --- |
 | Pinned Node control | The selected host runs the fixture in one Node process; that control advances1→2. This does not generalize to a multiprocess Node deployment. |

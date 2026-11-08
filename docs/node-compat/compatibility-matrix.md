@@ -41,6 +41,14 @@ Coordinated DATA review `3929a4af` verifies collection and outcomes; two explora
 samples per arm establish no fix or reliability. Production API statuses and
 the selected 13 standard WASI imports are unchanged.
 
+The [full stock wasmCloud profile](nextjs-wasmcloud-full-contract-2026-11-08.md)
+also passes HTTP24/cache52/supplemental80/stream/function checks on the existing
+D990/f805 artifact. Its generation1→1 and strict POST abort remain failed under
+independent DATA review `c528ca22`. Exact self-origin configuration and standard
+imports are verified; no host change, arbitrary module-state continuity or
+general filesystem-rights guarantee follows. This adds target-host evidence,
+without changing production API dispositions.
+
 The following earlier smoke results retain their original artifact/cohort scope.
 The [Next priority roadmap](nextjs-priority-roadmap.md) now records a passing
 experimental full-application smoke milestone. The unmodified **Next 16.4.5 /

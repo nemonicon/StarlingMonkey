@@ -9,8 +9,11 @@ both Node controls and one of eight guest full-suite samples. All ten pass HTTP,
 persistent cache, streaming and functional UI checks; seven guest generation
 gates and three strict Server Action completion gates remain failed. Independent
 DATA review verifies these outcomes. Portable evidence retention and offline
-checks pass, followed by full stock wasmCloud coverage and persistent-cache overlap/error
-checks. No fix, reliability result or production promotion is established.
+checks pass for that comparison. The new full stock wasmCloud profile also
+passes HTTP/cache/supplemental/stream/function checks and retains generation1→1
+and strict POST completion failures. Its DATA review, raw retention and
+current/Git-mode offline checks pass. Public request correlation and persistent-cache overlap/error
+checks are next. No fix, reliability result or production promotion is established.
 
 Current engine baseline: native Fetch cleanup compiles and links, a fresh interoperability
 component passes INIT construction review, and all16 deployed module cases pass
@@ -111,25 +114,56 @@ Current next steps and outstanding work:
   opens original paths, runs a target or revalidates omitted binaries/app trees.
   The
   [complete result table](docs/node-compat/nextjs-completion-comparison-2026-11-08.md)
-  preserves every sample. Comprehensive stock wasmCloud coverage with an exact
-  self-origin allowance is the next execution priority; original failed gates,
+  preserves every sample. The subsequent comprehensive stock wasmCloud profile
+  with exact self-origin allowance is recorded below; original failed gates,
   broader lifecycle/cache overlap, costs and production promotion remain open.
-- **Next implementation ready for preparation, Source only:** the different-host reuse
+- **Completed different-host implementation and failed full-suite result:** the different-host reuse
   plan `8a268f33` has independent Source review. A new full-contract stock
   wasmCloud actor and Root preparation/wrapper are prepared from
   the existing cold host mechanism. They select the unchanged D990 component,
   f805 app and full client/browser checks. One canonical literal loopback origin
   must bind the exact port and normalized one-entry egress rule; no fallback
-  port, host modification or new component import is proposed. Runtime grants,
-  selected origin and actual results remain unissued. Actor `f22d805c` seals
+  port, host modification or new component import is added. Actor `f22d805c` seals
   18 payload files/127,795 bytes after independent Source/closure review. Root
   syntax checks for all three JS files pass0/empty output, with the external
   grammar receipt preserving actual argv/cwd. Root/B/R review the genuine
   preparer/wrapper and caller coupling; the sole actor-SHA binding produces
   wrapper `95f360f1`, with exact reversal to its reviewed unbound bytes. Natural
   client exits0/1 may publish log digests; interrupted/error/other exits retain
-  paths and delegate descendant finalization to the original monitor. No new
-  host profile has executed. Evidence retention and reader review are complete.
+  paths and delegate descendant finalization to the original monitor.
+  This Source checkpoint is pushed as `424ba3f2`. Root selects the single origin
+  `http://127.0.0.1:61785` (5589a4), then preparation218aaf/bd3fdc exits0 with
+  authority`906c12e3`/534,525 bytes, 1,784 fresh protected descriptors, all
+  825 source/target pairs and actual31/39/18 roles. The one full target run
+  f3e83a/328181 finishes1 under original owner194/600: clean, no timeout/force,
+  inputs/world preserved. Config-show/dev/full-client exit0/0/1. Independent
+  primary review`c528ca22` binds owner/config/browser review`519e3dd7`: all
+  24 HTTP/52 persistent-cache/80 supplemental/five-chunk/function checks pass;
+  legacy1→1 and three strict POST7 errors with one ERR_ABORTED remain failed.
+  Effective configuration contains exactly one normalized self-origin rule,
+  three guest environment values and the two mounts. Actual cache children are
+  files0600/directories0700; c101 does not explicitly request those modes.
+  Direct-fd log hashes after owner cleanup do not establish pipeEOF, a lifetime
+  log bound or transport completion. The
+  [full second-host report](docs/node-compat/nextjs-wasmcloud-full-contract-2026-11-08.md)
+  records these limits. Its finite raw corpus contains 148 payloads/3,666,674
+  bytes. Whole reader Source/copied-DATA review473cd7 passes; Root's actual
+  offline check61465e and R's separate Git-mode check both exit0. They verify
+  both selected namespaces, 63 client files, 24 HTTP body hashes, two PNGs and
+  six direct logs without original paths or target execution. Failed original
+  gates stay failed; omitted payloads and full52/80 semantics are not replayed.
+  The earlier ten-trial evidence is complete and pushed in`cea5d5d5`.
+- **Next Source proposal, unimplemented:** public request-correlation plan
+  `fbc52612` has independent Source review. It proposes a versioned 64-hex public
+  per-test header, actual Playwright/NetLog sent-header evidence and independently
+  observed adapter/classic fields, preserving every original assertion. Existing
+  context headers and genuine header-conversion paths supply the integration
+  points; a plan field alone cannot retarget the hardcoded browser worker.
+  Future worker/client/guest/constructor/runtime bindings and results remain
+  NULL. Spoofing, duplicates, coalescing, inner forwarding, missing records and
+  scheduling effects remain explicit. No new trial, native patch, private
+  identity or cause is claimed. Persistent-cache overlap/error/bounds, lifecycle,
+  clean-machine bootstrap, measurements and production promotion remain open.
 - **Complete:** guarded native build, real-Next component construction, and one
   full deployed regression. HTTP/stream/browser checks pass in that sample;
   cache1→1 keeps the full suite failed. Prior browser failures remain unresolved.

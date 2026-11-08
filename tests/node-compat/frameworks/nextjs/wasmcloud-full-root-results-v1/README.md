@@ -26,6 +26,14 @@ and every cache/HTTP/stream/browser assertion are unchanged. Client failure
 remains failure. Physical app modes do not prove read-only WASI descriptor rights;
 the host's readiness log-size check is not a lifetime stdout bound.
 
-Current actual origin, runtime authority and result are unissued. Source/grammar
-success does not accept execution, request affinity, reliability or full Next
-compatibility. Actual progress is recorded in [progress.md](../../../../../progress.md).
+The declared run is now consumed. [Preparation](runtime-preparation.json) binds
+origin `http://127.0.0.1:61785` and [authority](full-contract-runtime-authority.json)
+`906c12e3`; the original owner completes raw1/clean/protected. Config-show/dev/client
+exit0/0/1. The [DATA review](actual-runtime-review.json) verifies HTTP24/cache52/
+supplemental80/stream/function passes and preserves generation1→1/strict browser
+failures. Request affinity, reliability and full Next acceptance remain false.
+The [portable corpus](retained-raw-data-v1/README.md) is complete; current and
+Git-mode offline checks pass. Run `python3 -I -B retained-raw-data-v1/check.py`
+from this directory to verify the copied evidence without original paths or
+target execution. Actual progress is recorded in
+[progress.md](../../../../../progress.md).

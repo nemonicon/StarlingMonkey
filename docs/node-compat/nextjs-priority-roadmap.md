@@ -16,10 +16,16 @@ now completes with independent DATA review `3929a4af`: both Node controls and
 one of eight guest samples pass the original suite. Seven guest generation
 gates and three strict browser gates remain failed; all ten pass HTTP, persistent
 cache, supplemental, incremental stream and functional browser checks. The
-comparison establishes no await/logging fix. The next execution priority is the
-full stock wasmCloud contract with exact self-origin egress, followed by explicit
-persistent-cache overlap/error coverage. Portable DATA retention, current replay
-and a separate Git-mode replay now pass.
+comparison establishes no await/logging fix. The
+[full stock wasmCloud contract](nextjs-wasmcloud-full-contract-2026-11-08.md)
+now also executes: HTTP24/cache52/supplemental80/stream/function checks pass,
+while generation1→1 and strict browser completion fail. Independent DATA review
+`c528ca22` preserves that result. Next, investigate a public request-correlation
+field to bind the actual browser POST to guest trace sites, alongside explicit
+persistent-cache overlap/error coverage. The ten-trial portable DATA checks pass;
+the new host's raw retention and current/Git-mode checks also pass. The
+[public-correlation plan](../../tests/node-compat/frameworks/nextjs/nextjs-public-request-correlation-plan-v1/plan.json)
+has Source review only; its future implementation and runtime bindings remain null.
 The first prefix-mismatched harness attempt remains a separate pre-HTTP failure.
 The following earlier2251/4e results remain as a separate baseline.
 The optional persistent cache profile works on that corrected native loader.
@@ -104,13 +110,13 @@ Next actions, in dependency order:
    The [request-state contract](nextjs-request-state-contract.md) makes module-global
    continuity an unavailable portable guarantee while preserving the original
    failed gate. Explicit persistence does not preserve arbitrary lexical state.
-5. **Next execution priority:** extend current D990/f805
-   on stock wasmCloud to the unchanged full HTTP/cache/stream/browser contract.
-   Use a fresh literal Root-selected loopback origin, exact effective
-   `allowedHosts` rule for only that origin, explicit browser permission and the
-   original assertions. Reuse the existing cold host launcher and full client;
-   do not add a host service or widen the component world. Source review and
-   fresh authority remain required before that separately bounded action.
+5. **Full second-host contract executed; acceptance failed:** current D990/f805
+   runs the unchanged full HTTP/cache/stream/browser contract on stock wasmCloud.
+   Its exact self-origin configuration passes, as do HTTP24/cache52/supplemental80/
+   stream/function checks. Legacy1→1 and strict browser completion fail; original
+   owner raw1 is clean/protected. Review `c528ca22` verifies these outcomes.
+   Its raw evidence and current/Git-mode offline checks now pass. No host service,
+   native build, broader egress rule or new component import was needed.
    The existing **bounded portability run** on current D990/f805 stock wasmCloud
    exits0/clean/protected with all eight coldV5 requests passing; coordinated DATA
    review0ed0e4c2 passes that scope. This tests current target-host instantiation independently
@@ -118,8 +124,10 @@ Next actions, in dependency order:
    [mount/egress and request-state limits](nextjs-wasmcloud-mount-egress-source-note.md)
    remain explicit: physical app modes are not readonly descriptor rights;
    the old empty allowedHosts denies outgoing HTTP; P2 request Stores do not
-   promise process-global continuity. Full browser/self-HTTP execution is not
-   yet verified there. Persistent-cache overlap/error bounds and measured
+   promise process-global continuity. The full profile now verifies functional
+   action/UI behavior with its exact effective self-origin rule; it does not
+   authenticate a physical internal self-fetch dispatch. Persistent-cache
+   overlap/error bounds and measured
    lifecycle/resource costs remain later gates. Preserve the read-only route delegate, bounded
    two-primary-tag mutation contract, all failures and unchanged legacy app code.
 
