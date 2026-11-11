@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 1,
+  "suite": "NODE_RESPONSE_CLONE_CANCEL_FOLLOWUP_OBSERVATION_V1",
+  "executionKind": "bare-node-host",
+  "nodeVersion": "v22.14.0",
+  "nodeExecutable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+  "selectedNode": {
+    "path": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+    "sha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+    "bytes": 108619024
+  },
+  "toolBinaryHashVerifiedByThisCLI": false,
+  "sharedCase": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/response-clone-cancel-followup-candidate-v1/cases.mjs",
+    "sha256": "7e039c3ec4a5e49004e7bf4c9a4a664ff9e759b1f50095e89bbbe07f381bf5bd",
+    "bytes": 7001
+  },
+  "plan": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/response-clone-cancel-followup-candidate-v1/plan.json",
+    "sha256": "a5f95459b048722603de4714a366b0956e64c35a1c5d3bab7def975f3577f6a6",
+    "bytes": 1348
+  },
+  "captureCompleted": true,
+  "semanticAccepted": null,
+  "expectedForGuest": null,
+  "observation": {
+    "schemaVersion": 1,
+    "case": "RESPONSE_CLONE_CANCEL_FOLLOWUP_OBSERVATIONS_V1",
+    "collectionComplete": true,
+    "semanticAccepted": null,
+    "expectedFromNode": null,
+    "cases": [
+      {
+        "id": "both-reject-false",
+        "collectionComplete": true,
+        "observationOverflow": false,
+        "sourceCancelCalls": 1,
+        "sourceReasons": [
+          {
+            "description": {
+              "type": "object"
+            },
+            "isArray": true,
+            "length": 2,
+            "firstElementIsFirstReason": true,
+            "secondElementIsSecondReason": true
+          }
+        ],
+        "snapshots": [
+          {
+            "phase": "before-second-cancel",
+            "first": {
+              "state": "pending"
+            },
+            "second": {
+              "state": "not-requested"
+            },
+            "sourceCancelCalls": 0,
+            "sourceGateRejected": false
+          },
+          {
+            "phase": "after-second-before-source-rejection",
+            "first": {
+              "state": "pending"
+            },
+            "second": {
+              "state": "pending"
+            },
+            "sourceCancelCalls": 1,
+            "sourceGateRejected": false
+          },
+          {
+            "phase": "after-both-settled",
+            "first": {
+              "state": "rejected",
+              "reason": {
+                "type": "boolean",
+                "value": false
+              },
+              "sameReason": true
+            },
+            "second": {
+              "state": "rejected",
+              "reason": {
+                "type": "boolean",
+                "value": false
+              },
+              "sameReason": true
+            },
+            "sourceCancelCalls": 1,
+            "sourceGateRejected": true
+          }
+        ],
+        "outcomes": {
+          "first": {
+            "state": "rejected",
+            "reason": {
+              "type": "boolean",
+              "value": false
+            },
+            "sameReason": true
+          },
+          "second": {
+            "state": "rejected",
+            "reason": {
+              "type": "boolean",
+              "value": false
+            },
+            "sameReason": true
+          }
+        },
+        "rejection": {
+          "type": "boolean",
+          "value": false
+        }
+      },
+      {
+        "id": "both-reject-object",
+        "collectionComplete": true,
+        "observationOverflow": false,
+        "sourceCancelCalls": 1,
+        "sourceReasons": [
+          {
+            "description": {
+              "type": "object"
+            },
+            "isArray": true,
+            "length": 2,
+            "firstElementIsFirstReason": true,
+            "secondElementIsSecondReason": true
+          }
+        ],
+        "snapshots": [
+          {
+            "phase": "before-second-cancel",
+            "first": {
+              "state": "pending"
+            },
+            "second": {
+              "state": "not-requested"
+            },
+            "sourceCancelCalls": 0,
+            "sourceGateRejected": false
+          },
+          {
+            "phase": "after-second-before-source-rejection",
+            "first": {
+              "state": "pending"
+            },
+            "second": {
+              "state": "pending"
+            },
+            "sourceCancelCalls": 1,
+            "sourceGateRejected": false
+          },
+          {
+            "phase": "after-both-settled",
+            "first": {
+              "state": "rejected",
+              "reason": {
+                "type": "object",
+                "marker": "exact-source-cancel-rejection"
+              },
+              "sameReason": true
+            },
+            "second": {
+              "state": "rejected",
+              "reason": {
+                "type": "object",
+                "marker": "exact-source-cancel-rejection"
+              },
+              "sameReason": true
+            },
+            "sourceCancelCalls": 1,
+            "sourceGateRejected": true
+          }
+        ],
+        "outcomes": {
+          "first": {
+            "state": "rejected",
+            "reason": {
+              "type": "object",
+              "marker": "exact-source-cancel-rejection"
+            },
+            "sameReason": true
+          },
+          "second": {
+            "state": "rejected",
+            "reason": {
+              "type": "object",
+              "marker": "exact-source-cancel-rejection"
+            },
+            "sameReason": true
+          }
+        },
+        "rejection": {
+          "type": "object",
+          "marker": "exact-source-cancel-rejection"
+        }
+      },
+      {
+        "id": "first-cancel-survivor-eof",
+        "collectionComplete": true,
+        "observationOverflow": false,
+        "sourceCancelCalls": 0,
+        "sourceReasons": [],
+        "snapshots": [
+          {
+            "phase": "first-canceled-survivor-live",
+            "first": {
+              "state": "pending"
+            },
+            "readerClosed": {
+              "state": "pending"
+            },
+            "sourceCancelCalls": 0,
+            "sourceTerminalRequested": false
+          },
+          {
+            "phase": "after-survivor-terminal-and-cancel-settlement",
+            "first": {
+              "state": "fulfilled",
+              "value": {
+                "type": "undefined"
+              }
+            },
+            "readerClosed": {
+              "state": "fulfilled",
+              "value": {
+                "type": "undefined"
+              }
+            },
+            "sourceCancelCalls": 0,
+            "sourceTerminalRequested": true
+          }
+        ],
+        "firstRead": {
+          "done": false,
+          "bytes": 1,
+          "values": [
+            69
+          ]
+        },
+        "outcomes": {
+          "first": {
+            "state": "fulfilled",
+            "value": {
+              "type": "undefined"
+            }
+          },
+          "readerClosed": {
+            "state": "fulfilled",
+            "value": {
+              "type": "undefined"
+            }
+          },
+          "terminalRead": {
+            "state": "fulfilled",
+            "value": {
+              "done": true,
+              "value": {
+                "type": "undefined"
+              },
+              "bytes": null,
+              "valuesPrefix": null
+            }
+          }
+        },
+        "sourceError": {
+          "type": "object",
+          "marker": "survivor-source-error"
+        },
+        "readerReleased": true
+      },
+      {
+        "id": "first-cancel-survivor-source-error",
+        "collectionComplete": true,
+        "observationOverflow": false,
+        "sourceCancelCalls": 0,
+        "sourceReasons": [],
+        "snapshots": [
+          {
+            "phase": "first-canceled-survivor-live",
+            "first": {
+              "state": "pending"
+            },
+            "readerClosed": {
+              "state": "pending"
+            },
+            "sourceCancelCalls": 0,
+            "sourceTerminalRequested": false
+          },
+          {
+            "phase": "after-survivor-terminal-and-cancel-settlement",
+            "first": {
+              "state": "fulfilled",
+              "value": {
+                "type": "undefined"
+              }
+            },
+            "readerClosed": {
+              "state": "rejected",
+              "reason": {
+                "type": "object",
+                "marker": "survivor-source-error"
+              },
+              "sameReason": true
+            },
+            "sourceCancelCalls": 0,
+            "sourceTerminalRequested": true
+          }
+        ],
+        "firstRead": {
+          "done": false,
+          "bytes": 1,
+          "values": [
+            69
+          ]
+        },
+        "outcomes": {
+          "first": {
+            "state": "fulfilled",
+            "value": {
+              "type": "undefined"
+            }
+          },
+          "readerClosed": {
+            "state": "rejected",
+            "reason": {
+              "type": "object",
+              "marker": "survivor-source-error"
+            },
+            "sameReason": true
+          },
+          "terminalRead": {
+            "state": "rejected",
+            "reason": {
+              "type": "object",
+              "marker": "survivor-source-error"
+            },
+            "sameReason": true
+          }
+        },
+        "sourceError": {
+          "type": "object",
+          "marker": "survivor-source-error"
+        },
+        "readerReleased": true
+      }
+    ],
+    "nativeResourceCountsProved": false
+  },
+  "outerDeadlineMs": 5000,
+  "timedOut": false,
+  "error": null,
+  "secondaryErrors": [],
+  "fullNextAccepted": false
+}

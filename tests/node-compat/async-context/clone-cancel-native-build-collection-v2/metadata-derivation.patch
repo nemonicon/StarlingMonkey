@@ -1,0 +1,34 @@
+--- original-actual_metadata.py
++++ collected-actual_metadata.py
+@@ -24,7 +24,7 @@
+             with artifact.open('rb') as f:
+                 assert f.read(8) == b'\x00asm\x01\x00\x00\x00'
+             assert len(compile_rows) == len({r['file'] for r in compile_rows}) == 80
+-            assert all(r['file'] in {x['target']['path'] for x in rows} for r in compile_rows)
++            generated_unit = generated_translation_unit(compile_rows, rows)
+             assert all(observed.get(k, {}).get('value') == v for k, v in s['cmakeFlags'].items())
+             assert len(embedding_rows) == 1
+             macro = 'NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1'
+@@ -35,11 +35,11 @@
+             assert observed.get('Rust_TOOLCHAIN_IS_RUSTUP_MANAGED', {}).get('value') not in ('TRUE', 'ON', '1')
+             assert after == [r['target'] for r in native]
+             result['configuredRust'] = configured(m)
+-            result['nativeExportDiagnosticCompileEvidence'] = dict(option=macro, requested='ON', observed=observed[macro], embeddingDefinition=definition, embeddingDefinitionOccurrences=1, separateEmbeddingCommands=1, nativeCompileRows=80, nativeRowsWithDiagnosticDefinition=0, compiledSourceAfterimagesAuthenticated=True)
++            result['nativeExportDiagnosticCompileEvidence'] = dict(option=macro, requested='ON', observed=observed[macro], embeddingDefinition=definition, embeddingDefinitionOccurrences=1, separateEmbeddingCommands=1, nativeCompileRows=80, nativeRowsWithDiagnosticDefinition=0, compiledSourceAfterimagesAuthenticated=True, totalCompileRows=80, nativeRecipeCompileRows=79, generatedCompileRows=1, generatedTranslationUnits=[generated_unit])
+         except BaseException as error:
+             result['postCollectionErrors'].append(dict(type=type(error).__name__, message=str(error), stack=traceback.format_exc()))
+     sdk = Path(s['reusedTrees']['spidermonkey']['root'])
+-    metadata = dict(schemaVersion=1, metadataKind='CLONE_CANCEL_NATIVE_BUILD_ACTUAL_V1',
++    metadata = dict(schemaVersion=1, metadataKind='CLONE_CANCEL_NATIVE_BUILD_CLOSED_OUTPUT_COLLECTION_V2',
+         sourceComposition=result.get('sourceComposition'), sourceRoot=str(WORK / 'native-source'),
+         compiledSourceRoot=str(WORK / 'native-source'), compiledAfterInputs=after,
+         compilerTools=s['hostTools'], actualRustTools=dict(cargo=s['cargo'], rustc=s['rustc']),
+@@ -60,7 +60,7 @@
+         validatedCargoProofCapsule=None, validatedCargoProofIndex=None,
+         toolTreeInputs=trees, initialTreeProtection=result.get('treeProtectionBefore'),
+         originalExtractionWholeTreeAttestationClaimed=False, linkAndRustInputs=result['linkInputs'],
+-        engine=result.get('engineCandidate'), phases=result['phases'], recipe=descriptor(__file__),
++        engine=result.get('engineCandidate'), phases=result['phases'], recipe=DRIVER,
+         rootAuthority=None, old83MetadataProjected=False, engineExecuted=False, guestExecuted=False, adoption=False,
+         nativeExportDiagnosticCompileEvidence=result.get('nativeExportDiagnosticCompileEvidence'))
+     assert len(metadata) == 52

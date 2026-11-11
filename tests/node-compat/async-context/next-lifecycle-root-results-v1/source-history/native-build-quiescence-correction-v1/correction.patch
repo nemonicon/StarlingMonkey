@@ -1,0 +1,11 @@
+--- before-run-build.py
++++ run-build.py
+@@ -559,6 +559,8 @@
+             except BaseException as error:
+                 result['postCollectionErrors'].append(dict(type=type(error).__name__, message=str(error), stack=traceback.format_exc()))
+         try:
++            if result['ownerQuiescenceKnown'] is not True:
++                raise RuntimeError('raw build artifact collection skipped: owner quiescence unknown')
+             metadata = actual_metadata(s, d, m, old, rows, manifests, trees, result)
+             d.save(WORK / 'metadata.json', metadata)
+             result['metadata'] = descriptor(WORK / 'metadata.json')

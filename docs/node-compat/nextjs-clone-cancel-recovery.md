@@ -1,6 +1,7 @@
 # Native clone-cancellation repair: build readiness
 
-The native cancellation fix is **not compiled or guest-validated yet**.
+The native cancellation fix **compiles and passes its first real-component
+comparison on Wasmtime**. See the [new runtime results](nextjs-clone-cancel-results.md).
 The earlier real component still fails the cancellation comparison recorded in
 [the lifecycle results](nextjs-lifecycle-results.md). Production remains
 foundations-v13, and experimental engine 237c is unchanged.
@@ -9,7 +10,7 @@ The [candidate patch](../../tests/node-compat/async-context/response-clone-cance
 uses the existing SpiderMonkey stream and Promise APIs. Its shared cancellation
 promise waits for the original source cancellation, preserves the two ordered
 reason objects and adopts rejection, including falsy values. Source review
-passes; observable behavior still requires real component execution.
+passes; the first Wasmtime sample now matches Node for the bounded cases below.
 
 Four additional Node 22.14.0 references are captured:
 
@@ -23,7 +24,7 @@ Four additional Node 22.14.0 references are captured:
 The new component guest contains these unchanged shared cases, the original
 cancellation case and the 95-check request-context suite. Its Node syntax check
 passes. The four-call collector will request context, cancellation, followups,
-then context again. This is prepared Source, not a new runtime result. The
+then context again. That first Wasmtime run now passes all four responses. The
 collector retains the V2 Content-Length fix, which passed real TCP tests for
 truncated, complete and chunked responses. Those TCP checks do not prove guest
 semantics or resource retirement.
@@ -60,9 +61,17 @@ generated header, and the first tool materialization failure. It reads only
 retained repository files. Tool binaries are not included; a passing reader
 does not recreate the SDK or execute a component.
 
-Next: perform fresh offline Cargo verification and native compilation, review
-the complete new engine metadata, construct and validate a real component with
-only the selected standard WASI 0.2.10 imports, then compare all lifecycle cases
-against Node. Rerun the bounded full Next workload on the target hosts after
-the native fix passes. Same-Store identity, resource retirement, repetition,
+Fresh offline Cargo verification and all six native phases now pass. Engine
+`e3075c14` is 31,353,161 bytes. The original build runner's post-collection check
+fails on an existing empty CMake-generated unit; that failure remains intact.
+A separate collector verifies exactly 79 recipe units plus that generated unit,
+the separate embedding command and all remaining checks. Its complete corrected
+52-field metadata is `c7e225af`. The [build evidence and saved regression check](../../tests/node-compat/async-context/next-clone-cancel-native-root-results-v1/README.md)
+record both outcomes.
+
+Independent engine admission, complete component-input preparation, construction,
+component validation and the first lifecycle differential now pass. The emitted
+imports are exactly the selected standard WASI 0.2.10 interfaces.
+Next: run the same lifecycle regression on stock wasmCloud and rerun the bounded
+full Next workload on both target hosts. Same-Store identity, resource retirement, repetition,
 cost measurements and production promotion remain separate gates.

@@ -1,0 +1,96 @@
+--- prepare.before.py
++++ prepare.py
+@@ -12,13 +12,13 @@
+ 
+ HERE = Path(__file__).resolve().parent
+ REPO = HERE.parents[3]
+-RESULTS = HERE.parent / 'next-clone-cancel-component-root-results-v1'
+-OUTPUT = Path('/private/tmp/starling-node-compat/next-clone-cancel-component-v1-first')
++RESULTS = HERE.parent / 'next-clone-cancel-next-root-results-v1'
++OUTPUT = Path('/private/tmp/starling-node-compat/next-clone-cancel-next-component-v1-first')
+ ENGINE_ADMISSION = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/clone-cancel-native-build-v1/actual-engine-admission.json', 'sha256': 'e4004c28d4b5edff59ddb08e261ec3083748e59af8670532103913a6a116536a', 'bytes': 6965041}  # Actual closed independent admission.
+ COMPILER = {'path': str(HERE.parent / 'next-lifecycle-root-results-v1/compiler-selection.json'), 'sha256': '36277ca5d6a71773f75842c7a290aea3acbd5d713e569d84888ea61926b2329b', 'bytes': 2001991}
+-FIXTURE = {'path': str(HERE.parent / 'web-stream-context-component-v2/index.json'), 'sha256': 'efc000da0331090f1ea0127806b076223bdcb68368907f217aea69d736edf5df', 'bytes': 1718}
++FIXTURE = {'path': str(REPO / 'tests/node-compat/frameworks/nextjs/next-native-export-public-correlation-entry-v1/index.json'), 'sha256': '5d20e455b39a082c8b9a6cfbe7884fe0ec21f12acb35209e739e3de7c9482cd7', 'bytes': 4267}
+ WORLD = {'path': str(REPO / 'tests/node-compat/frameworks/nextjs/regexp-unicode-probe-candidate-v1/index.json'), 'sha256': '802595f5a32dd93fc95c63eb95c901352ecb8da180152735982c344d6b827f58', 'bytes': 4565}
+-CALLER = {'path': str(HERE / 'componentize.mjs'), 'sha256': '143a29f71408680f55adbf85914f2dcdb2e9b515c4d25e7bcc127b8b50468d43', 'bytes': 6730}
++CALLER = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/clone-cancel-next-construction-v1/componentize.mjs', 'sha256': '6aeb472fda457c643094dfd63f70fa09d3dad47b95a3c254882e0d4c709eb0ee', 'bytes': 6894}
+ CAPTURE = {'path': str(REPO / 'tests/node-compat/frameworks/nextjs/next-node-fs-atomic-construction-v2/capture.mjs'), 'sha256': '5393f6beb74bec2b5f80f8a781ddb0290554830f987c1857c2632630956070ee', 'bytes': 4872}
+ ADAPTER = {'path': '/private/tmp/starling-node-compat/next-preview1-adapter-v1/next-preview1-adapter.wasm', 'sha256': 'd30ade5b0a146ab1f6cbb878322fa937ec19c4a2b09f7497e9f08e49fb13cfd7', 'bytes': 49672}
+ INPUTS = {}
+@@ -210,13 +210,46 @@
+         assert ref in protected, 'actual result/engine ancestry missing from admission closure'
+     compiler = document(COMPILER)
+     compiler_package(compiler)
+-    fixture = family(FIXTURE, 6)
++    fixture = family(FIXTURE, 11)
++    own_index = descriptor(HERE / 'index.json')
++    family(own_index, 7)
++    policy_ref = descriptor(HERE / 'selection-policy.json')
++    policy = document(policy_ref)
++    assert policy['state'] == 'CLONE_CANCEL_NEXT_REAL_ENTRY_SELECTION_SOURCE_V1'
++    assert policy['engineAdmission'] == ENGINE_ADMISSION and policy['entrySourceIndex'] == FIXTURE
++    assert policy['historicalFixturePlanReinterpretedAsNewEngineProof'] is False
++    historical_plan_ref = next(r for r in fixture if r['path'] == str(Path(FIXTURE['path']).parent / 'plan.json'))
++    historical = document(historical_plan_ref)
++    native_contract = document(policy['nativeModuleContract'])
++    assert policy['nativeModuleContract'] in fixture
++    assert native_contract['module'] == 'internal:starlingmonkey/native-export-diagnostic-v1'
++    assert native_contract['imports'] == dict(named=['observe'], default=None, namespace=None) and native_contract['arity'] == 5
++    assert historical['entry'] == policy['entry'] and historical['worldSourceIndex'] == WORLD
++    assert historical['witDirectory'] == str(Path(WORLD['path']).parent) and historical['worldName'] == 'next-http'
++    assert sorted(historical['selectedInterfaces']) == sorted(policy['selectedInterfaces'])
++    assert historical['componentExports'] == policy['componentExports'] == ['wasi:http/incoming-handler@0.2.10']
++    assert len(policy['selectedInterfaces']) == len(set(policy['selectedInterfaces'])) == 13
++    assert historical['requiredCompiledRequestResponse']['sha256'] == policy['historicalRequestResponseSHA256']
++    assert policy['historicalRequestResponseSHA256'] == '1fe296b8472f14e50556910227b184552e0a0ac424f97a0f170c4b91cfd35fa6'
++    for name, wanted in policy['actualSelectedNativeSources'].items():
++        rows = [r for r in metadata['nativePolicyInputManifest'] if r['path'] == name]
++        assert len(rows) == 1 and all(rows[0][k] == wanted[k] for k in ('sha256', 'bytes'))
++        assert wanted['path'] == str(Path(metadata['compiledSourceRoot']) / name)
++        checked(wanted)
++    assert policy['actualSelectedNativeSources']['builtins/web/fetch/request-response.cpp']['sha256'] == '0431184d4562972c98538494caf46d2b11cdf0280f51d0e7143cd8534526442e'
++    assert metadata['requestedCMake']['NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1'] == 'ON'
++    assert metadata['observedCMake']['NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1'] == dict(type='BOOL', value='ON')
++    diagnostic = metadata['nativeExportDiagnosticCompileEvidence']
++    assert diagnostic['embeddingDefinitionOccurrences'] == diagnostic['separateEmbeddingCommands'] == 1
++    assert diagnostic['totalCompileRows'] == 80 and diagnostic['nativeRecipeCompileRows'] == 79 and diagnostic['generatedCompileRows'] == 1
++    assert diagnostic['nativeRowsWithDiagnosticDefinition'] == 0
++    assert diagnostic['compiledSourceAfterimagesAuthenticated'] is True
+     world = family(WORLD, 28)
+     wit_directory = Path(WORLD['path']).parent
+     assert len([r for r in world if Path(r['path']).suffix == '.wit']) == 8
+     entry_path = Path(FIXTURE['path']).parent / 'guest-entry.mjs'
+     entry = next(r for r in fixture if r['path'] == str(entry_path))
+-    assert entry['sha256'] == '8952f5ffde7ea6eea7f2499a70a0b10153417c115fbd5b6f457a28c531cdf584'
++    assert entry == policy['entry'] and entry['sha256'] == '022fccdfb1d9f603f7cbed6136edb99d1e7767fad4a3fd5e6c808acdcb3c236e'
+     checked(ADAPTER)
+     checked(CAPTURE)
+     checked(CALLER)
+@@ -227,13 +260,15 @@
+     protect()
+     compiler_package(compiler)
+     assert not os.path.lexists(OUTPUT)
+-    request = dict(schemaVersion=1, state='ROOT_CLONE_CANCEL_ENGINE_CONSTRUCTION_V1',
++    request = dict(schemaVersion=1, state='ROOT_CLONE_CANCEL_NEXT_ENGINE_CONSTRUCTION_V1',
+         engineAdmission=ENGINE_ADMISSION, engine=admission['engine'], nativeMetadata=admission['nativeMetadata'],
+         metadataKeys=keys, compilerSelection=COMPILER, entry=entry, capture=CAPTURE,
+         correctedBuildCollection=admission['actualBuildResult'],
+         originalFailedBuildResult=admission['originalFailedBuildResult'],
+         originalFailedBuildMetadata=admission['originalFailedBuildMetadata'],
+-        adapter=ADAPTER, worldSourceIndex=WORLD, fixtureSourceIndex=FIXTURE,
++        adapter=ADAPTER, worldSourceIndex=WORLD, fixtureSourceIndex=FIXTURE, constructorSourceIndex=own_index,
++        selectionPolicy=policy_ref, nativeModuleContract=policy['nativeModuleContract'],
++        expectedInterfaces=policy['selectedInterfaces'], expectedExports=policy['componentExports'],
+         witDirectory=str(wit_directory), output=str(OUTPUT),
+         inputs=sorted((ref for ref, _ in INPUTS.values()), key=lambda r: r['path']),
+         ordinaryExportsAllowed=False, hostServicesAdded=False, oldFixedGuardInvoked=False,
+@@ -244,7 +279,7 @@
+     assert RESULTS.resolve() == RESULTS
+     ref = write_request(RESULTS / 'construction-request.json', request)
+     print(json.dumps(dict(request=ref, engineMetadataKeys=len(keys), protectedInputs=len(request['inputs']),
+-                         closedWorldFiles=28, witFiles=8, fixturePayloadFiles=6,
++                         closedWorldFiles=28, witFiles=8, fixturePayloadFiles=11,
+                          componentizer=CALLER, outputCreated=False)), flush=True)
+ 
+ 

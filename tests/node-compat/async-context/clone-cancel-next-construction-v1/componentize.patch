@@ -1,0 +1,31 @@
+--- componentize.before.mjs
++++ componentize.mjs
+@@ -1,4 +1,4 @@
+-// Host tool caller. The selected guest only installs inert definitions during INIT.
++// Host tool caller. The selected unchanged real Next entry installs its profile only during INIT.
+ import assert from 'node:assert/strict';
+ import { createHash } from 'node:crypto';
+ import { readFile, readdir, lstat, readlink, realpath, mkdir } from 'node:fs/promises';
+@@ -38,7 +38,7 @@
+   const [requestPath, requestSHA] = process.argv.slice(2);
+   const requestBytes = await readFile(requestPath); assert.equal(hash(requestBytes), requestSHA);
+   const request = JSON.parse(requestBytes);
+-  assert.equal(request.state, 'ROOT_CLONE_CANCEL_ENGINE_CONSTRUCTION_V1');
++  assert.equal(request.state, 'ROOT_CLONE_CANCEL_NEXT_ENGINE_CONSTRUCTION_V1');
+   assert.equal(request.ordinaryExportsAllowed, false);
+   const selection = JSON.parse(await checked(request.compilerSelection));
+   assert.equal(selection.state, 'FRESH_COMPILER_PACKAGE_SELECTED_V1');
+@@ -95,10 +95,11 @@
+     const returned = await componentize((await checked(request.entry)).toString('utf8'), options);
+     const artifacts = await captureComponentReturn(returned, request.output);
+     await writeWhole(join(request.output, 'result.json'), JSON.stringify({ schemaVersion: 1,
+-      state: 'CLONE_CANCEL_LIFECYCLE_COMPONENT_CAPTURED_UNREVIEWED_V1', artifacts,
++      state: 'CLONE_CANCEL_NEXT_COMPONENT_CAPTURED_UNREVIEWED_V1', artifacts,
+       engine: request.engine, nativeMetadata: request.nativeMetadata, engineAdmission: request.engineAdmission,
+       compilerSelection: request.compilerSelection, inputEntry: request.entry,
+-      ordinaryExportInvoked: false }, null, 2) + '\n');
++      inputSourceIndex: request.fixtureSourceIndex, constructorSourceIndex: request.constructorSourceIndex,
++      selectionPolicy: request.selectionPolicy, ordinaryExportInvoked: false }, null, 2) + '\n');
+     console.log(JSON.stringify({ artifacts }));
+   } catch (error) {
+     primarySet = true; primary = error;

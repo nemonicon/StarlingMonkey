@@ -1,0 +1,333 @@
+--- review-construction.before.py
++++ review-construction.py
+@@ -1,4 +1,4 @@
+-"""Review the new constructor's closed outputs and prepare a four-call test.
++"""Review the closed real Next constructor only; no runtime request is emitted.
+ 
+ Reads the actual new-engine admission. No predecessor fixed-engine guard, tools,
+ or guest exports are invoked. Constructor/tool commands must have closed first.
+@@ -9,12 +9,12 @@
+ from pathlib import Path
+ import re
+ import sys
++import stat
+ 
+ HERE = Path(__file__).resolve().parent
+ BASE = HERE.parent
+-WORK = Path('/private/tmp/starling-node-compat/next-clone-cancel-component-v1-first')
++WORK = Path('/private/tmp/starling-node-compat/next-clone-cancel-next-component-v1-first')
+ COMMANDS = Path('/private/tmp/starling-node-compat/next-clone-cancel-native-recovery-v1-first/commands')
+-RUNTIME = Path('/private/tmp/starling-node-compat/next-lifecycle-runtime-v3-clone-cancel-first')
+ TOOLS = Path('/private/tmp/starling-node-compat/next-clone-cancel-native-recovery-v1-first/tools-v2')
+ SELECTED = {'wasi:cli/environment@0.2.10', 'wasi:cli/stdout@0.2.10', 'wasi:cli/stderr@0.2.10',
+     'wasi:clocks/monotonic-clock@0.2.10', 'wasi:clocks/wall-clock@0.2.10', 'wasi:random/random@0.2.10',
+@@ -28,6 +28,7 @@
+     p = Path(path)
+     assert p.is_absolute() and p.resolve(strict=True) == p and p.is_file()
+     before = p.stat()
++    assert stat.S_ISREG(before.st_mode) and 0 <= before.st_size <= 2 * 1024**3
+     h = hashlib.sha256()
+     with p.open('rb') as handle:
+         for block in iter(lambda: handle.read(1024**2), b''):
+@@ -60,54 +61,188 @@
+     return row(path)
+ 
+ 
+-def command(name, argv):
++def command(name, argv, seconds):
+     folder = COMMANDS / name
+     started_ref, terminal_ref = row(folder / 'started.json'), row(folder / 'terminal.json')
+     started, terminal = doc(started_ref), doc(terminal_ref)
+     assert started['argv'] == argv and started['pid'] == terminal['pid']
++    assert started['timeoutSeconds'] == seconds and started['authority'] == terminal['authority']
++    authority = doc(terminal['authority'])
++    assert authority['argv'] == argv and authority['seconds'] == seconds
++    for ref in authority['inputs']:
++        checked(ref)
+     assert terminal['rawExitCode'] == 0 and terminal['parentOwnedGroupGone'] is True
+     assert terminal['allObservedOwnedGroupsGone'] is True and terminal['timeout'] is False
+     assert terminal['forcedCleanup'] is False
+     assert all(terminal[k] == [] for k in ('errors', 'signals', 'interruptedSignals', 'remainingObservedPids'))
++    assert terminal['finalGroups'] and all(r['alive'] is False for r in terminal['finalGroups'])
+     checked(terminal['stdout']); checked(terminal['stderr'])
+     return started_ref, terminal_ref, terminal
+ 
+ 
++def members(index_ref, count, request_inputs):
++    index = doc(index_ref)
++    root = Path(index_ref['path']).parent
++    assert len(index['files']) == count
++    names, directories = set(), set()
++    assert index_ref in request_inputs
++    for item in index['files']:
++        rel = Path(item['path'])
++        assert not rel.is_absolute() and rel.parts and '..' not in rel.parts and rel.as_posix() == item['path']
++        assert item['path'] not in names
++        names.add(item['path'])
++        directories.update(p.as_posix() for p in rel.parents if p != Path('.'))
++        ref = dict(path=str(root / rel), sha256=item['sha256'], bytes=item['bytes'])
++        assert ref in request_inputs
++        checked(ref)
++    nodes = list(root.rglob('*'))
++    assert not any(p.is_symlink() for p in nodes)
++    assert {p.relative_to(root).as_posix() for p in nodes if p.is_file()} == names | {'index.json'}
++    assert {p.relative_to(root).as_posix() for p in nodes if p.is_dir()} == directories
++
++
++def package(selection, request_inputs):
++    assert selection['state'] == 'FRESH_COMPILER_PACKAGE_SELECTED_V1'
++    pkg = selection['package']
++    root = Path(pkg['root'])
++    assert root.resolve(strict=True) == root and root.is_dir()
++    names, links = set(), set()
++    for item in pkg['files']:
++        rel = Path(item['relativePath'])
++        assert not rel.is_absolute() and '..' not in rel.parts and rel.as_posix() == item['relativePath']
++        assert item['relativePath'] not in names
++        names.add(item['relativePath'])
++        ref = {k: item[k] for k in ('path', 'sha256', 'bytes')}
++        assert ref['path'] == str(root / rel) and ref in request_inputs
++        checked(ref)
++        assert stat.S_IMODE((root / rel).stat().st_mode) == item['mode']
++    for item in pkg['links']:
++        rel = Path(item['path'])
++        assert not rel.is_absolute() and '..' not in rel.parts and rel.as_posix() == item['path']
++        assert item['path'] not in links
++        links.add(item['path'])
++        p = root / rel
++        assert p.is_symlink() and os.readlink(p) == item['target']
++        assert str(p.resolve(strict=True)) == item['resolvedPath'] and root in p.resolve(strict=True).parents
++    actual_files, actual_links = set(), set()
++    pending = [root]
++    while pending:
++        for p in pending.pop().iterdir():
++            rel = p.relative_to(root).as_posix()
++            if p.is_symlink():
++                actual_links.add(rel)
++            elif p.is_dir():
++                pending.append(p)
++            else:
++                assert p.is_file()
++                actual_files.add(rel)
++    assert (actual_files, actual_links) == (names, links)
++
++
++def import_graph(graph, returned, component):
++    # Check every captured own field, deriving the Array length from actual
++    # returned tuples; no predecessor import function count is used.
++    serial = 2
++    def data_property(name, value, length=False):
++        return dict(key=dict(string=name), enumerable=not length, configurable=not length,
++                    kind='data', writable=True, value=value)
++    pairs = []
++    for index, pair in enumerate(returned):
++        serial += 1
++        properties = [data_property(str(i), dict(type='string', value=v)) for i, v in enumerate(pair)]
++        properties.append(data_property('length', dict(type='number', value='2'), True))
++        pairs.append(data_property(str(index), dict(type='Array', id=serial, properties=properties)))
++    pairs.append(data_property('length', dict(type='number', value=str(len(returned))), True))
++    expected = dict(type='object', id=0, properties=[
++        data_property('component', dict(type='Uint8Array', id=1, byteLength=component['bytes'],
++                      sha256=component['sha256'], file=component)),
++        data_property('imports', dict(type='Array', id=2, properties=pairs)),
++        data_property('debug', dict(type='undefined'))])
++    assert graph == expected, 'complete actual returned own graph differs from selected API shape'
++    return serial + 1
++
++
+ def main():
+     if not __debug__ or not sys.flags.isolated or not sys.dont_write_bytecode:
+-        raise RuntimeError('Use Python -I -B without optimization')
+-    assert len(sys.argv) == 2, 'Supply the exact actual construction request SHA256'
++        raise RuntimeError('Use Python -I -B without optimization before input IO')
++    assert len(sys.argv) == 2 and re.fullmatch('[0-9a-f]{64}', sys.argv[1]), 'Supply exact closed construction request SHA256'
++    output = HERE / 'construction-review.json'
++    assert not os.path.lexists(output)
+     request_ref = row(HERE / 'construction-request.json')
+     assert request_ref['sha256'] == sys.argv[1]
+     request = doc(request_ref)
+-    assert request['state'] == 'ROOT_CLONE_CANCEL_ENGINE_CONSTRUCTION_V1'
++    assert request['state'] == 'ROOT_CLONE_CANCEL_NEXT_ENGINE_CONSTRUCTION_V1'
+     assert request['output'] == str(WORK) and request['ordinaryExportsAllowed'] is False
+-    for ref in request['inputs']:
+-        checked(ref)
++    for field in ('hostServicesAdded', 'oldFixedGuardInvoked', 'oldMetadataProjected',
++                  'oldCompilerPackageIdentityClaimed', 'componentValidated', 'guestExecuted', 'productionPromotionAllowed'):
++        assert request[field] is False
++    inputs = request['inputs']
++    assert inputs and [r['path'] for r in inputs] == sorted({r['path'] for r in inputs})
++    for ref in inputs:
++        checked(ref)
++    for field in ('engineAdmission', 'engine', 'nativeMetadata', 'compilerSelection', 'entry', 'capture', 'adapter',
++                  'worldSourceIndex', 'fixtureSourceIndex', 'constructorSourceIndex', 'selectionPolicy', 'nativeModuleContract',
++                  'correctedBuildCollection', 'originalFailedBuildResult', 'originalFailedBuildMetadata'):
++        assert request[field] in inputs
+     admission = doc(request['engineAdmission'])
+     assert admission['state'] == 'CLONE_CANCEL_ACTUAL_ENGINE_ADMISSION_PASSED_V1'
+     assert admission['passed'] is admission['completeActualMetadataReviewed'] is admission['nativeBuildPassed'] is True
+     assert admission['oldMetadataProjected'] is admission['guestExecuted'] is False
+-    assert admission['engine'] == request['engine']
+-    assert admission['nativeMetadata'] == request['nativeMetadata']
++    assert admission['engine'] == request['engine'] and admission['nativeMetadata'] == request['nativeMetadata']
++    assert admission['originalDriverPassed'] is False and admission['originalOuterRawExitCode'] == 1
++    assert admission['actualBuildResult'] == request['correctedBuildCollection']
++    assert admission['originalFailedBuildResult'] == request['originalFailedBuildResult']
++    assert admission['originalFailedBuildMetadata'] == request['originalFailedBuildMetadata']
++    for role in ('protectedBuildInputs', 'protectedSourceInputs'):
++        assert all(ref in inputs for ref in admission[role])
+     metadata = doc(request['nativeMetadata'])
+-    assert sorted(metadata) == admission['metadataKeys'] == request['metadataKeys']
+-    assert metadata['engine'] == request['engine']
++    assert sorted(metadata) == admission['metadataKeys'] == admission['metadataFieldsVerified'] == request['metadataKeys']
++    assert metadata['engine'] == request['engine'] and metadata['guestExecuted'] is False
++    policy = doc(request['selectionPolicy'])
++    assert policy['state'] == 'CLONE_CANCEL_NEXT_REAL_ENTRY_SELECTION_SOURCE_V1'
++    assert policy['engineAdmission'] == request['engineAdmission'] and policy['entry'] == request['entry']
++    assert policy['entrySourceIndex'] == request['fixtureSourceIndex']
++    assert request['entry']['sha256'] == '022fccdfb1d9f603f7cbed6136edb99d1e7767fad4a3fd5e6c808acdcb3c236e'
++    assert request['entry']['bytes'] == 48063
++    assert policy['nativeModuleContract'] == request['nativeModuleContract']
++    assert policy['historicalFixturePlanReinterpretedAsNewEngineProof'] is False
++    for name, ref in policy['actualSelectedNativeSources'].items():
++        assert ref in inputs
++        selected = [r for r in metadata['nativePolicyInputManifest'] if r['path'] == name]
++        assert len(selected) == 1 and all(selected[0][k] == ref[k] for k in ('sha256', 'bytes'))
++    assert policy['actualSelectedNativeSources']['builtins/web/fetch/request-response.cpp']['sha256'] == '0431184d4562972c98538494caf46d2b11cdf0280f51d0e7143cd8534526442e'
++    assert metadata['requestedCMake']['NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1'] == 'ON'
++    assert metadata['observedCMake']['NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1'] == dict(type='BOOL', value='ON')
++    assert set(policy['selectedInterfaces']) == set(request['expectedInterfaces']) == SELECTED
++    assert policy['componentExports'] == request['expectedExports'] == ['wasi:http/incoming-handler@0.2.10']
++    members(request['fixtureSourceIndex'], 11, inputs)
++    members(request['worldSourceIndex'], 28, inputs)
++    members(request['constructorSourceIndex'], 7, inputs)
++    compiler = doc(request['compilerSelection'])
++    package(compiler, inputs)
+     node = '/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node'
+-    caller = BASE / 'clone-cancel-component-construction-v1/componentize.mjs'
+-    _, constructor_terminal, _ = command('clone-componentize', [node, str(caller), request_ref['path'], request_ref['sha256']])
++    caller = BASE / 'clone-cancel-next-construction-v1/componentize.mjs'
++    constructor_started, constructor_terminal, constructor_run = command('clone-next-componentize',
++        [node, str(caller), request_ref['path'], request_ref['sha256']], 900)
+     result_ref = row(WORK / 'result.json'); result = doc(result_ref)
+-    assert result['state'] == 'CLONE_CANCEL_LIFECYCLE_COMPONENT_CAPTURED_UNREVIEWED_V1'
+-    for key in ('engine', 'nativeMetadata', 'engineAdmission', 'compilerSelection'):
++    assert result['state'] == 'CLONE_CANCEL_NEXT_COMPONENT_CAPTURED_UNREVIEWED_V1'
++    for key in ('engine', 'nativeMetadata', 'engineAdmission', 'compilerSelection', 'selectionPolicy', 'constructorSourceIndex'):
+         assert result[key] == request[key]
+-    assert result['inputEntry'] == request['entry'] and result['ordinaryExportInvoked'] is False
++    assert result['inputEntry'] == request['entry'] and result['inputSourceIndex'] == request['fixtureSourceIndex']
++    assert result['ordinaryExportInvoked'] is False
++    assert set(result['artifacts']) == {'component', 'returnedImports', 'returnedOwnShape'}
+     for ref in result['artifacts'].values():
+         checked(ref)
+     component = result['artifacts']['component']
++    assert component['path'] == str(WORK / 'returned-component.wasm')
++    with checked(component).open('rb') as f:
++        assert f.read(8) == b'\x00asm\x0d\x00\x01\x00'
+     wasm_tools = row(TOOLS / 'wasm-tools/wasm-tools')
+     assert wasm_tools['sha256'] == 'b332dd79057dafdcc8a36ca933d0d499acea506b56b1ea28e28fbb036c9e713d'
+-    validation_started, validation_terminal, _ = command('clone-validate-component', [wasm_tools['path'], 'validate', component['path']])
+-    wit_started, wit_terminal, wit_run = command('clone-component-wit', [wasm_tools['path'], 'component', 'wit', component['path']])
++    validation_started, validation_terminal, validation_run = command('clone-next-validate-component',
++        [wasm_tools['path'], 'validate', component['path']], 120)
++    wit_started, wit_terminal, wit_run = command('clone-next-component-wit',
++        [wasm_tools['path'], 'component', 'wit', component['path']], 120)
+     wit = checked(wit_run['stdout']).read_text()
+     match = re.match(r'package root:component;\n\nworld root \{\n([^{}]*)\}\n', wit)
+     assert match is not None
+@@ -121,42 +256,62 @@
+     assert len(imports) == len(set(imports)) == 13 and set(imports) == SELECTED
+     assert exports == ['wasi:http/incoming-handler@0.2.10']
+     returned = doc(result['artifacts']['returnedImports'])
+-    assert all(type(pair) is list and len(pair) == 2 and all(type(v) is str for v in pair) for pair in returned)
+-    assert len({tuple(pair) for pair in returned}) == len(returned)
+-    assert {pair[0] for pair in returned} == set(imports)
+-    assert doc(row(WORK / 'final-preopens.json')) == [request['witDirectory']]
+-    collector = row(BASE / 'lifecycle-wasmtime-collector-v3/run-wasmtime.py')
+-    assert collector['sha256'] == '42c4939251a9f10bc33464493ed47c405f82d790dd7f742acf67997633c6d1cd'
+-    wasmtime = row(TOOLS / 'wasmtime/wasmtime')
+-    assert wasmtime['sha256'] == 'a85dec9fcbbad23d0e038e5a99604114dbe9aa77bc784e4bce0f33013eb33c1c'
+-    references = [row(Path('/private/tmp/starling-node-compat') / name / 'result.json') for name in (
+-        'web-stream-context-candidate-v2-node-first', 'response-clone-cancel-candidate-v1-node-first',
+-        'response-clone-cancel-followup-candidate-v1-node-first')]
+-    protected = [request_ref, result_ref, request['engineAdmission'], request['engine'], request['nativeMetadata'],
+-        request['compilerSelection'], request['entry'], row(Path(__file__).resolve()), row(HERE / 'compare-results.mjs'),
+-        row(BASE / 'web-stream-context-component-v1/compare.mjs'), *references]
+-    for ref in protected:
+-        checked(ref)
++    assert type(returned) is list and 0 < len(returned) <= 10000
++    assert all(type(pair) is list and len(pair) == 2 and all(type(v) is str and v for v in pair) for pair in returned)
++    assert len({tuple(pair) for pair in returned}) == len(returned) and {pair[0] for pair in returned} == set(imports)
++    graph = doc(result['artifacts']['returnedOwnShape'])
++    graph_objects = import_graph(graph, returned, component)
++    final_preopens, final_preopens_ref = doc(row(WORK / 'final-preopens.json')), row(WORK / 'final-preopens.json')
++    assert final_preopens == [request['witDirectory']]
++    options_ref = row(WORK / 'options.json'); options = doc(options_ref)
++    assert options == dict(engine=request['engine']['path'], preview2Adapter=request['adapter']['path'],
++        witPath=request['witDirectory'], worldName='next-http', disableFeatures=['fetch-event'], enableFeatures=[],
++        enableAot=False, env={}, debug=dict(bindings=False, binary=False, wizerLogging=False),
++        debugBindings=False, debugBuild=False, enableWizerLogging=False)
++    markers = ['NEXT_GUEST_RESPONSE_COMPLETION_V2', 'NEXT_NATIVE_EXPORT_PUBLIC_CORRELATION_V1',
++               'NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4']
++    actual_streams = []
++    for run in (constructor_run, validation_run, wit_run):
++        for key in ('stdout', 'stderr'):
++            ref = run[key]
++            assert ref['bytes'] <= 32 * 1024**2
++            data = checked(ref).read_bytes()
++            assert not any(marker.encode() in data for marker in markers)
++            actual_streams.append(ref)
++    # Full current request closure, Source/package identities and actual outputs
++    # are authenticated again; no old full-engine guard or helper is invoked.
++    package(compiler, inputs)
++    self_ref = row(Path(__file__).resolve()); checked(self_ref)
+     for ref in list(INPUTS.values()):
+         checked(ref)
+-    assert not RUNTIME.exists()
+-    review = dict(schemaVersion=1, state='CLONE_CANCEL_COMPONENT_CONSTRUCTION_REVIEW_PASSED_V1',
+-        passed=True, actualResult=result_ref, artifacts=result['artifacts'], engine=request['engine'],
+-        nativeMetadata=request['nativeMetadata'], engineAdmission=request['engineAdmission'],
+-        compilerSelection=request['compilerSelection'], guestSource=request['entry'], constructorRequest=request_ref,
+-        constructorTerminal=constructor_terminal, validationTerminal=validation_terminal, witTerminal=wit_terminal,
+-        emittedWit=wit_run['stdout'], emittedImports=imports, emittedExports=exports,
+-        returnedImportFunctions=len(returned), metadataKeys=sorted(metadata), protectedInputsChecked=len(INPUTS),
+-        ordinaryGuestExecuted=False, oldMetadataProjected=False, productionProfilePromoted=False)
+-    review_ref = save(HERE / 'construction-review.json', review)
+-    runtime_request = dict(schemaVersion=1, state='ROOT_LIFECYCLE_COMPONENT_RUNTIME_REQUEST_V3',
+-        component=component, wasmtime=wasmtime, wasmTools=wasm_tools, runtimeSource=collector,
+-        protectedInputs=[review_ref, *protected], outputRoot=str(RUNTIME),
++    counts = {interface: sum(pair[0] == interface for pair in returned) for interface in imports}
++    review = dict(schemaVersion=1, state='CLONE_CANCEL_NEXT_COMPONENT_CONSTRUCTION_REVIEW_PASSED_V1',
++        passed=True, verifiedPassed=True, actualResult=result_ref, artifacts=result['artifacts'], component=component,
++        engine=request['engine'], nativeMetadata=request['nativeMetadata'], engineAdmission=request['engineAdmission'],
++        compilerSelection=request['compilerSelection'], inputEntry=request['entry'], inputSourceIndex=request['fixtureSourceIndex'],
++        constructorSourceIndex=request['constructorSourceIndex'], selectionPolicy=request['selectionPolicy'],
++        constructorRequest=request_ref, constructorStarted=constructor_started, constructorTerminal=constructor_terminal,
+         validationStarted=validation_started, validationTerminal=validation_terminal,
+-        witStarted=wit_started, witTerminal=wit_terminal)
+-    runtime_ref = save(HERE / 'runtime-request.json', runtime_request)
+-    print(json.dumps(dict(review=review_ref, runtimeRequest=runtime_ref, component=component,
+-                         imports=len(imports), returnedImportFunctions=len(returned))))
++        witStarted=wit_started, witTerminal=wit_terminal, emittedWit=wit_run['stdout'], emittedImports=imports,
++        emittedExports=exports, selectedStandardVersion='0.2.10', returnedImports=result['artifacts']['returnedImports'],
++        returnedOwnShape=result['artifacts']['returnedOwnShape'], returnedImportFunctions=len(returned),
++        returnedImportInterfaceCounts=counts, completeReturnedImportAuditVerified=True, typedGraphObjectIds=graph_objects,
++        allImportTuplesUniqueAndTyped=True, componentTypedArrayBytesMatch=True, debugOwnPropertyType='undefined',
++        metadataKeys=sorted(metadata), completeActualMetadataReviewed=True, oldMetadataProjected=False,
++        originalFailedBuildResult=request['originalFailedBuildResult'], originalFailedBuildMetadata=request['originalFailedBuildMetadata'],
++        correctedBuildCollection=request['correctedBuildCollection'], originalDriverPassed=False, originalOuterRawExitCode=1,
++        requestedOptions=options_ref, finalPreopens=final_preopens_ref, actualInitStreams=actual_streams,
++        selectedMarkersAbsentInSixActualToolStreams=True, inactiveMarkerAbsenceIsNoRuntimeProof=True,
++        allThreeCommandsRawZeroClean=True, allCurrentInputsPreserved=True,
++        protectedInputs=sorted(INPUTS.values(), key=lambda r: r['path']), protectedInputsChecked=len(INPUTS),
++        reviewerSource=self_ref, ordinaryGuestExecuted=False, appMountedAtInit=False,
++        applicationBuildChanged=False, observerComposed=False, runtimeAccepted=False, fullNextAccepted=False,
++        productionProfilePromoted=False,
++        scope='Actual real Next INIT/component/return-graph/standard-world DATA review only. Immutable entry022f uses admitted engine0431 without oldfixed237c guards. No app mount, ordinary export, host runtime, response completion, physical identity or fullNext proof. No runtime request is emitted.',
++        authorship='B authored this reader and thin Next constructor/preparer; C authored original generic preparer, R native afterimage. No candidate/helper/engine/component function is imported or replayed by this reader.')
++    review_ref = save(output, review)
++    print(json.dumps(dict(review=review_ref, component=component, imports=len(imports),
++                         returnedImportFunctions=len(returned), runtimeRequestIssued=False)))
+ 
+ 
+ if __name__ == '__main__':

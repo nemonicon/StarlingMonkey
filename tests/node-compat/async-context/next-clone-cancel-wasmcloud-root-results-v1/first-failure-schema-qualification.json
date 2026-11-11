@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "state": "STOCK_LIFECYCLE_FIRST_ATTEMPT_SCHEMA_SOURCE_QUALIFICATION_V1",
+  "qualifiesSourcePeer": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/next-clone-cancel-wasmcloud-root-results-v1/source-api-peer.json",
+    "sha256": "36d82cb4531c045af78d8911946a242cacd0dd10624c963155d488c352324710",
+    "bytes": 2665
+  },
+  "qualification": "R Source/API peer missed that the pinned config-show JSON can omit empty dev.volumes and workload.environment.config. The direct-key ecaf predicate raised KeyError before dev/HTTP. Prior Source verdict did not establish runtime schema compatibility; preserve it with this measured qualification.",
+  "actualResult": {
+    "path": "/private/tmp/starling-node-compat/next-lifecycle-wasmcloud-v1-clone-cancel-first/result.json",
+    "sha256": "243f899bda012aad8756b265eceeaa69948adad439fbbfc4bc08a2eddea92584",
+    "bytes": 6384
+  },
+  "actualOwnerTerminal": {
+    "path": "/private/tmp/starling-node-compat/next-clone-cancel-native-recovery-v1-first/commands/clone-wasmcloud-runtime/terminal.json",
+    "sha256": "b3d4660a95a84d034f14f229e9caadd0fd0d15f1dd5e3334593c26f4e646b13b",
+    "bytes": 1565
+  },
+  "actualConfigShowStdout": {
+    "path": "/private/tmp/starling-node-compat/next-lifecycle-wasmcloud-v1-clone-cancel-first/config-show.stdout.log",
+    "sha256": "0a2d09655528fb3dd9496f916374d2d40193d4d5361d087b6760f30cfa20463a",
+    "bytes": 1595
+  },
+  "actualOwner": {
+    "pid": 78885,
+    "seconds": 300,
+    "rawExitCode": 1,
+    "ownershipClean": true
+  },
+  "actualConfigCommand": {
+    "pid": 78888,
+    "rawExitCode": 0,
+    "stdoutBytes": 1595,
+    "stderrBytes": 0,
+    "capturesCompleteEOFSyncClosedNoOverflow": true
+  },
+  "observedEffectiveConfig": {
+    "build": {
+      "command": "test -f \"$WASH_COMPONENT_PATH\"",
+      "component_path": "/private/tmp/starling-node-compat/next-clone-cancel-component-v1-first/returned-component.wasm"
+    },
+    "dev": {
+      "address": "127.0.0.1:53160",
+      "allow_insecure_registries": false,
+      "command": "test -f \"$WASH_COMPONENT_PATH\"",
+      "component_path": "/private/tmp/starling-node-compat/next-clone-cancel-component-v1-first/returned-component.wasm",
+      "service": false,
+      "wasi_otel": false,
+      "wasi_webgpu": false,
+      "wasm_proposals": []
+    },
+    "version": "2.11.0",
+    "wit": {
+      "registries": [],
+      "skip_fetch": true,
+      "sources": {},
+      "wit_dir": null
+    },
+    "workload": {
+      "allowedHostLoopbackPorts": [],
+      "allowedHosts": [],
+      "allowedIpNameLookups": [],
+      "environment": {}
+    }
+  },
+  "observedPrimaryError": [
+    {
+      "name": "KeyError",
+      "message": "'volumes'"
+    }
+  ],
+  "observedSecondaryErrors": [
+    {
+      "stage": "final-capture-or-protection",
+      "name": "ValueError",
+      "message": "exactly one closed config-show and one dev required"
+    }
+  ],
+  "devLaunched": false,
+  "httpRequestsAttempted": 0,
+  "allFourUnattempted": [
+    "/context",
+    "/clone-cancel",
+    "/clone-cancel-followups",
+    "/context"
+  ],
+  "collectorInputsPreservedClaimed": null,
+  "schemaInterpretationBoundary": "Actual omission is DATA; Rust serde/default Source review and a separately versioned stricter empty-only predicate are C/Root follow-up. No capability widening, retry acceptance or successful guest run is inferred.",
+  "oldSourceOrOutputsRewritten": false,
+  "reviewerInvokedFunctionsToolsOrHosts": false,
+  "stockGuestSemanticsAccepted": false,
+  "sameStoreIdentityProved": false,
+  "nativeResourceRetirementProved": false,
+  "fullNextAccepted": false
+}

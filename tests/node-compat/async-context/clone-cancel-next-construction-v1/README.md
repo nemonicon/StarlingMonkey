@@ -1,0 +1,9 @@
+# New-engine real Next INIT Source
+
+This separately versioned constructor selects admitted engine `e3075c14` and the unchanged real Next entry `022fccdf`. It retains the genuine fresh compiler selection `36277ca5`, adapter `d30ade5b`, whole28-member world and all11 immutable Next fixture members. Root alone prepares and invokes it.
+
+`prepare.py` protects the complete engine admission/build/source closure, original failed native driver ancestry, compiler package files/links, world, fixture and this seven-file Source family. It requires the Root-created Source index before publication. The new selection policy binds actual request-response afterimage `0431184d`, unchanged loader `40eeb699` and real diagnostic-ON compile evidence. The historical fixture plan's old `1fe296` requirement remains historical; it is not asserted as the new engine's source.
+
+`componentize.mjs` preserves the actual143a API/capture/protection/options/primary-error mechanism. Only truthful Next request/result labels and explicit captured Source roles differ. INIT receives empty environment, the selected WIT preopen only, no app mount and no ordinary export call. The entry installs its existing profile; its neutral readiness handler loads `/app` only when later deployed. No host adapters, guest facade implementations, app source or strict test predicates are changed.
+
+The three existing returned artifacts are captured without assuming an import function count. Root must independently validate the real component and audit the complete return graph, actual13 standard imports and sole incoming handler export. This packet provides no component/INIT success, runtime, response-completion, private identity or fullNext acceptance. V4 observer composition and host execution are separate future steps. All old failed/accepted artifacts retain their scopes.

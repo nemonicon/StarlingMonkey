@@ -6,14 +6,14 @@ now both pass the unchanged comprehensive workload with Chrome157.0.8103.39.
 The earlier Chrome156 failures remain recorded; this sample establishes no
 engine fix or cancellation cause.
 
-1. Fix the [measured cloned-response cancellation failure](nextjs-lifecycle-results.md):
-   forward both branch reasons to the source once and preserve cancellation
-   promise settlement. Add source rejection and one-cancel/survivor EOF/error
-   gates, then validate the fix on both target hosts. The [native build
-   prerequisites](nextjs-clone-cancel-recovery.md) are now restored; the four
-   additional Node references and ten fresh generator checks pass. Native
-   compilation and fixed-component validation remain pending. The bounded public AsyncLocalStorage/stream/
-   exception checks already match Node in two real-component runs (190 checks).
+1. Validate the [native cancellation repair](nextjs-clone-cancel-results.md) on
+   both hosts, then rebuild and regress the unchanged comprehensive Next app.
+   The fresh engine compiles, passes complete metadata admission and constructs
+   a component with exactly 13 standard WASI 0.2.10 imports. Its first Wasmtime
+   run now matches Node for the original cancellation case, all four added
+   rejection/EOF/error cases and both 95-check context runs. Stock wasmCloud
+   and full Next regressions with the changed engine remain pending. Keep the
+   earlier failed component and the build check's generated-unit failure intact.
    Broader request isolation and snapshot-state policy remain separate gates.
 2. Check resource retirement and reuse: repeated requests, aborted bodies,
    error recovery, filesystem/HTTP handles and retained memory on both hosts.

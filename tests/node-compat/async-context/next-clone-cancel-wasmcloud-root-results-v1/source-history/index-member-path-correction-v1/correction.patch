@@ -1,0 +1,21 @@
+--- prepare.before.py
++++ prepare.py
+@@ -44,11 +44,13 @@
+     source_refs = [index_ref]
+     names = set()
+     for item in index['files']:
+-        relative = Path(item['path'])
+-        assert not relative.is_absolute() and '..' not in relative.parts and relative.as_posix() == item['path']
+-        assert item['path'] not in names
+-        names.add(item['path'])
+-        ref = row(SOURCE / relative)
++        member = Path(item['path'])
++        assert '..' not in member.parts and member.as_posix() == item['path']
++        member = member if member.is_absolute() else SOURCE / member
++        relative = member.relative_to(SOURCE).as_posix()
++        assert relative not in names
++        names.add(relative)
++        ref = row(member)
+         assert (ref['sha256'], ref['bytes']) == (item['sha256'], item['bytes'])
+         source_refs.append(ref)
+     assert {p.relative_to(SOURCE).as_posix() for p in SOURCE.rglob('*') if p.is_file()} == names | {'index.json'}

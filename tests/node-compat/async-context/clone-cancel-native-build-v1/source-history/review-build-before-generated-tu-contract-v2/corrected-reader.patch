@@ -1,0 +1,337 @@
+--- review-build.before.py
++++ review-build.py
+@@ -18,7 +18,7 @@
+ ACTUAL_METADATA = None
+ ACTUAL_OUTER_TERMINAL = None
+ if any(value is None for value in (ACTUAL_RESULT, ACTUAL_METADATA, ACTUAL_OUTER_TERMINAL)):
+-    raise RuntimeError('Root must bind the three actual closed-build descriptors before input IO')
++    raise RuntimeError('Root must bind the corrected collection result/metadata and original raw1 owner descriptors before input IO')
+ 
+ HERE = Path(__file__).resolve().parent
+ WORK = Path('/private/tmp/starling-node-compat/next-clone-cancel-native-build-v1-first')
+@@ -26,6 +26,16 @@
+ OUTPUT = HERE / 'actual-engine-admission.json'
+ BUILDER = dict(path=str(HERE / 'run-build.py'), sha256='1cad0ccb6ffd3a5fe55f243b0c3728957e282970503f88287c8d8b59e870f3de', bytes=40260)
+ SELECTION = dict(path=str(HERE / 'build-selection.json'), sha256='cc807f6ea77a7ac951114d11ec03c952ad6cdffcdfc9d79192a48a23c41c8bcc', bytes=21843)
++COLLECTOR = dict(path=str(HERE.parent / 'clone-cancel-native-build-collection-v2/collect.py'), sha256='21e1bbe4669e67f0fb554a4d47e693904275581e1b0b997af3f91b762ac94d79', bytes=25193)
++ORIGINAL_RESULT = dict(path=str(WORK / 'result.json'), sha256='54291d8dd9b7b8ed954ef996e7dbdf2e75cf46c81c70adb6516e523e42bfed7c', bytes=2092519)
++ORIGINAL_METADATA = dict(path=str(WORK / 'metadata.json'), sha256='779bd077b36a94f62091a30ec4018c008dd91b80437f1445a36632867d24f34f', bytes=1158971)
++ORIGINAL_OUTER = dict(path=str(OUTER / 'terminal.json'), sha256='59f4407118302c3f57c229ab872579dc01798b635883b08af0a74aa8333974e0', bytes=269166)
++COLLECTION_TERMINAL = dict(path='/private/tmp/starling-node-compat/next-clone-cancel-native-recovery-v1-first/commands/collect-native-v2/terminal.json', sha256='18fd16d01558d4302599db4374ff115a17bf49f339dd3180fcc4c6d07a67d725', bytes=1549)
++GENERATED_REVIEW = dict(path=str(HERE.parent / 'next-clone-cancel-native-root-results-v1/generated-tu-source-data-review.json'), sha256='4f91d134d91a3d2cabe109ef9817bdd052e04f9c79646388677310aad41d9043', bytes=9065)
++CORE_VALIDATION = dict(path='/private/tmp/starling-node-compat/next-clone-cancel-native-recovery-v1-first/commands/validate-built-core/terminal.json', sha256='d2bcc02b0a0b712f9ef5b11ef3b6dbedd4296a93f00141b97fd0f694e95d89e6', bytes=1527)
++NULL_CPP = dict(path=str(WORK / 'build/starling-raw.wasm/null.cpp'), sha256='e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', bytes=0)
++NULL_WRITER = dict(path=str(WORK / 'native-source/cmake/spidermonkey.cmake'), sha256='af02f2af5ac9d5ceeb6e6e1b63ff433f33377b52d1ec1719732f008c12ad2da7', bytes=8409)
++NULL_CONSUMER = dict(path=str(WORK / 'native-source/cmake/build-crates.cmake'), sha256='3cbf3f9f080345694c40bc329bbc56b553b137d6291eaf745213c285e5a50dab', bytes=5761)
+ REL = 'builtins/web/fetch/request-response.cpp'
+ AFTER_SHA = '0431184d4562972c98538494caf46d2b11cdf0280f51d0e7143cd8534526442e'
+ DOC_LIMIT = 32 * 1024**2
+@@ -134,12 +144,12 @@
+     return p
+ 
+ 
+-def terminal(ref, argv=None, seconds=None, authority=None):
++def terminal(ref, argv=None, seconds=None, authority=None, raw_exit=0):
+     t = read(ref)
+-    need(t['rawExitCode'] == 0 and t['timeout'] is False and t['forcedCleanup'] is False and
++    need(type(t['rawExitCode']) is int and t['rawExitCode'] == raw_exit and t['timeout'] is False and t['forcedCleanup'] is False and
+          t['parentOwnedGroupGone'] is True and t['allObservedOwnedGroupsGone'] is True and
+          t['interruptedSignals'] == t['remainingObservedPids'] == t['signals'] == t['errors'] == [],
+-         'original owner did not finish raw0/clean')
++         'original owner did not finish with required raw code and clean ownership')
+     need(type(t['pid']) is int and t['pid'] > 1 and t['finalGroups'] and
+          all(row['alive'] is False for row in t['finalGroups']), 'owner final group facts')
+     check(t['stdout']); check(t['stderr'])
+@@ -214,6 +224,15 @@
+     emitted = [k.arg for k in calls[0].keywords]
+     need(len(declared) == len(set(declared)) and len(emitted) == len(set(emitted)) and
+          set(declared) == set(emitted), 'builder whole keyset agreement')
++    collector = ast.parse(payload(COLLECTOR).decode())
++    metadata_functions = [n for n in collector.body if isinstance(n, ast.FunctionDef) and n.name == 'actual_metadata']
++    need(len(metadata_functions) == 1, 'selected collector metadata source')
++    constructed = [n.value for n in ast.walk(metadata_functions[0]) if isinstance(n, ast.Assign) and
++                   any(isinstance(t, ast.Name) and t.id == 'metadata' for t in n.targets) and
++                   isinstance(n.value, ast.Call) and isinstance(n.value.func, ast.Name) and n.value.func.id == 'dict']
++    need(len(constructed) == 1 and all(k.arg is not None for k in constructed[0].keywords) and
++         len(constructed[0].keywords) == len(emitted) and
++         {k.arg for k in constructed[0].keywords} == set(emitted), 'whole collector/builder keyset agreement')
+     return sorted(emitted)
+ 
+ 
+@@ -391,39 +410,77 @@
+ 
+ 
+ def main():
+-    need(len(sys.argv) == 1 and not OUTPUT.exists() and not OUTPUT.is_symlink(), 'fixed reviewer/new admission only')
+-    need(ACTUAL_RESULT['path'] == str(WORK / 'result.json') and ACTUAL_METADATA['path'] == str(WORK / 'metadata.json') and
+-         ACTUAL_OUTER_TERMINAL['path'] == str(OUTER / 'terminal.json'), 'fixed actual output paths')
+-    # Establish quiescence before reading the build result/metadata/artifacts.
+-    outer = terminal(ACTUAL_OUTER_TERMINAL, [read(SELECTION)['wrapperPython']['path'], '-I', '-B', BUILDER['path']], 7200)
++    need(len(sys.argv) == 1 and not os.path.lexists(OUTPUT), 'fixed reviewer/new admission only')
++    need(ACTUAL_RESULT['path'] == str(WORK / 'closed-collection-v2/result.json') and
++         ACTUAL_METADATA['path'] == str(WORK / 'closed-collection-v2/metadata.json') and
++         ACTUAL_OUTER_TERMINAL == ORIGINAL_OUTER, 'corrected outputs and immutable original owner paths')
++    s = read(SELECTION)
++    # Establish original ownership quiescence, preserving its actual raw1.
++    outer = terminal(ACTUAL_OUTER_TERMINAL, [s['wrapperPython']['path'], '-I', '-B', BUILDER['path']], 7200, raw_exit=1)
+     request = read(outer['authority'])
+     need(request['state'] == 'ROOT_FIXED_NATIVE_BUILD_OWNER_REQUEST_V1' and request['seconds'] == 7200 and
+          request['configureCapSeconds'] == 2400 and request['buildCapSeconds'] == 7200 and
+          request['nativeBuildAllowed'] is True and request['guestExecutionAllowed'] is False, 'actual outer owner request')
+     for ref in request['protectedInputs']:
+         check(ref, 'source')
+-    collection, collection_ref = local(OUTER / 'collection.json')
+-    need(collection['terminal'] == ACTUAL_OUTER_TERMINAL and collection['request'] == outer['authority'] and
+-         collection['rawExitCode'] == 0 and collection['clean'] is True and collection['inputsUnchanged'] is True and
+-         collection['primaryError'] is None and collection['verificationError'] is None and collection['collectionErrors'] == [], 'actual outer final collection')
++    outer_collection, collection_ref = local(OUTER / 'collection.json')
++    need(outer_collection['terminal'] == ACTUAL_OUTER_TERMINAL and outer_collection['request'] == outer['authority'] and
++         outer_collection['rawExitCode'] == 1 and outer_collection['clean'] is False and outer_collection['inputsUnchanged'] is True and
++         outer_collection['primaryError'] is None and outer_collection['verificationError'] is None and
++         outer_collection['collectionErrors'] == [], 'original raw1 collection retained with clean ownership')
++    # The new read-only collector must itself have a genuine successful owner.
++    ct = terminal(COLLECTION_TERMINAL, [s['wrapperPython']['path'], '-I', '-B', COLLECTOR['path']], 600)
++    collector_request = read(ct['authority'])
++    collector_index = observe(HERE.parent / 'clone-cancel-native-build-collection-v2/index.json')
++    need(collector_request['argv'] == [s['wrapperPython']['path'], '-I', '-B', COLLECTOR['path']] and
++         collector_request['seconds'] == 600 and COLLECTOR in collector_request['inputs'] and
++         collector_index in collector_request['inputs'] and s['monitor'] in collector_request['inputs'] and
++         s['wrapperPython'] in collector_request['inputs'], 'generic collector authority and closed Source family')
++    for ref in collector_request['inputs']:
++        check(ref)
+     keys = builder_keys()
+-    s = read(SELECTION)
+     old = read(s['predecessorMetadata'], 'source')
+-    result = read(ACTUAL_RESULT)
+-    need(result['state'] == 'CLONE_CANCEL_NATIVE_BUILD_COMPLETED_RUNTIME_PENDING_V1' and result['passed'] is True and
++    result = read(ORIGINAL_RESULT)
++    original_metadata = read(ORIGINAL_METADATA)
++    need(result['state'] == 'CLONE_CANCEL_NATIVE_BUILD_FAILED_UNACCEPTED_V1' and result['passed'] is False and
+          result['selection'] == SELECTION and result['sourceMaterialization'] == s['sourceMaterialization'] and
+-         result['ownerQuiescenceKnown'] is True and result['primaryError'] is None and result['postCollectionErrors'] == [] and
++         result['ownerQuiescenceKnown'] is True and result['primaryError'] is None and
+          result['buildCommandSucceeded'] is True and result['engineOrGuestExecuted'] is False and result['adoption'] is False and
+          result['inputProtection']['unchanged'] is True and result['inputProtection']['errors'] == [] and
+-         result['inputProtection']['currentBeforeFinalOnly'] is True and result['metadata'] == ACTUAL_METADATA, 'actual complete build result')
++         result['inputProtection']['currentBeforeFinalOnly'] is True and result['metadata'] == ORIGINAL_METADATA,
++         'original failed build facts may not be rewritten')
++    errors = result['postCollectionErrors']
++    failed_expression = "assert all(r['file'] in {x['target']['path'] for x in rows} for r in compile_rows)"
++    need(len(errors) == 1 and errors[0]['type'] == 'AssertionError' and errors[0]['message'] == '' and
++         failed_expression in errors[0]['stack'] and 'line 431, in actual_metadata' in errors[0]['stack'] and
++         original_metadata['nativeExportDiagnosticCompileEvidence'] is None, 'exclusive original post-collection failure')
++    reviewed = read(ACTUAL_RESULT)
++    need(reviewed['state'] == 'CLOSED_NATIVE_BUILD_COLLECTION_REVIEW_COMPLETED_V2' and
++         reviewed['passed'] is reviewed['collectionReviewPassed'] is reviewed['nativeCommandsPassed'] is True and
++         reviewed['originalDriverPassed'] is False and type(reviewed['originalOuterRawExitCode']) is int and
++         reviewed['originalOuterRawExitCode'] == 1 and reviewed['originalFailedResult'] == ORIGINAL_RESULT and
++         reviewed['originalMetadata'] == ORIGINAL_METADATA and reviewed['actualOuterTerminal'] == ACTUAL_OUTER_TERMINAL and
++         reviewed['actualOuterCollection'] == collection_ref and reviewed['actualOuterRequest'] == outer['authority'] and
++         reviewed['actualOuterStarted'] == observe(OUTER / 'started.json') and
++         reviewed['builderSource'] == BUILDER and reviewed['collectorSource'] == COLLECTOR and reviewed['buildSelection'] == SELECTION and
++         reviewed['nativeMetadata'] == ACTUAL_METADATA and reviewed['metadataKeys'] == keys and
++         reviewed['originalFailureBitsPreserved'] is reviewed['originalPhaseProvenancePreserved'] is True and
++         reviewed['oldMetadataProjected'] is reviewed['toolsInvoked'] is reviewed['nativeRecompiled'] is
++         reviewed['guestExecuted'] is reviewed['fullNextAccepted'] is False, 'actual corrected collection roles and scope')
++    need(reviewed['coreEngineExecuted'] is reviewed['componentValidated'] is False and
++         reviewed['actualStaticCoreValidation'] == CORE_VALIDATION and
++         reviewed['originalFailureClassification'] == 'exclusive prebuild recipe-membership predicate rejected selected CMake generated empty TU',
++         'collection classification and core-validation scope')
+     metadata = read(ACTUAL_METADATA)
+-    need(sorted(metadata) == keys, 'actual whole metadata keyset differs from selected builder source')
++    need(sorted(metadata) == sorted(original_metadata) == keys and
++         {k for k in metadata if metadata[k] != original_metadata[k]} == {'metadataKind', 'nativeExportDiagnosticCompileEvidence'},
++         'whole new metadata and immutable original difference set')
+     materialized, roles = source_evidence(s, old)
+     operations(s, result)
+     cargo_review, configured = cargo(s, materialized, result)
+     protection = read(result['treeProtectionBefore'])
+     need(set(protection) == set(s['reusedTrees']) == set(metadata['toolTreeInputs']) and
+-         result['inputProtection']['wholeTrees'] == len(protection), 'complete selected tree roles')
++         result['inputProtection']['wholeTrees'] == len(protection) == 11, 'complete selected tree roles')
+     for role, selected in s['reusedTrees'].items():
+         spec = metadata['toolTreeInputs'][role]
+         need(spec['root'] == selected['root'] and spec['provenance'] == selected['provenance'], 'new tree role source')
+@@ -434,7 +491,6 @@
+             need(spec['archive'] == selected['archive'], 'tree actual archive join')
+             check(spec['archive'])
+         tree(snap)
+-    # Source composition is the freshly published one-afterimage object.
+     composition = read(result['sourceComposition'], 'source')
+     native = [dict(path=r['relativePath'], sha256=r['target']['sha256'], bytes=r['target']['bytes']) for r in roles['native']]
+     need(composition == dict(schemaVersion=1, state='ACTUAL_ONE_AFTERIMAGE_NATIVE_COMPOSITION_V1', sourceRoot=str(WORK / 'native-source'),
+@@ -443,15 +499,43 @@
+     db = read(metadata['compileDatabase'])
+     need(metadata['compileDatabase']['path'] == str(WORK / 'build/compile_commands.json') and db == metadata['actualCompileRows'] and
+          len(db) == len({r['file'] for r in db}) == 80, 'whole actual compile database')
++    source_targets = {r['target']['path'] for r in roles['native']}
++    recipe_rows = [r for r in db if r['file'] in source_targets]
++    generated_rows = [r for r in db if r['file'] not in source_targets]
++    need(len(recipe_rows) == 79 and len(generated_rows) == 1 and generated_rows[0]['file'] == NULL_CPP['path'],
++         'exact 79 recipe plus one selected CMake-generated empty translation unit')
++    check(NULL_CPP, 'source'); check(NULL_WRITER, 'source'); check(NULL_CONSUMER, 'source')
++    writer_lines = payload(NULL_WRITER, 'source').decode().splitlines()
++    consumer_lines = payload(NULL_CONSUMER, 'source').decode().splitlines()
++    need(writer_lines[46].strip() == 'file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/null.cpp "")' and
++         consumer_lines[85].strip() == 'add_library(rust-crates STATIC ${CMAKE_CURRENT_BINARY_DIR}/null.cpp)',
++         'actual selected CMake producer and consumer Source')
++    grow = generated_rows[0]
++    need(grow['directory'] == str(WORK / 'build') and
++         grow['output'] == str(WORK / 'build/starling-raw.wasm/CMakeFiles/rust-crates.dir/null.cpp.obj'), 'generated TU paths')
+     oldroot = Path(old['compiledSourceRoot'])
+-    old_files = {Path(r['file']).relative_to(oldroot).as_posix() for r in old['actualCompileRows']}
+-    actual_files = {Path(r['file']).relative_to(WORK / 'native-source').as_posix() for r in db}
+-    need(actual_files == old_files and REL in actual_files, 'same native compilation units, including afterimage')
+-    source_targets = {r['target']['path'] for r in materialized['copies']}
++    old_recipe_files = {Path(r['file']).relative_to(oldroot).as_posix() for r in old['actualCompileRows'] if Path(r['file']).is_relative_to(oldroot)}
++    actual_files = {Path(r['file']).relative_to(WORK / 'native-source').as_posix() for r in recipe_rows}
++    need(actual_files == old_recipe_files and len(actual_files) == 79 and REL in actual_files, 'unchanged 79 native recipe unit set')
++    generated_proof = read(GENERATED_REVIEW)
++    need(generated_proof['closedBuildResult'] == ORIGINAL_RESULT and generated_proof['originalMetadata'] == ORIGINAL_METADATA and
++         generated_proof['sourceMaterialization'] == s['sourceMaterialization'] and
++         generated_proof['compilePartition']['total'] == 80 and generated_proof['compilePartition']['authenticatedRecipeMembers'] == 79 and
++         generated_proof['compilePartition']['generatedMembers'] == 1 and generated_proof['compilePartition']['otherMembers'] == 0 and
++         generated_proof['compilePartition']['generatedRow'] == grow, 'independent generated-TU Source/DATA proof joins')
++    for ref in generated_proof['selectedFiles'].values():
++        check(ref, 'source')
++    generated = dict(source=NULL_CPP, compileRow=grow, writer=NULL_WRITER, writerLine=47, consumer=NULL_CONSUMER,
++                     consumerLine=86, emptyContentVerified=True, noOtherUnmappedTranslationUnitAllowed=True,
++                     independentSourceDataReview=GENERATED_REVIEW)
++    need(reviewed['generatedSourceDataReview'] == GENERATED_REVIEW and reviewed['generatedTranslationUnit'] == generated and
++         (reviewed['totalCompileRows'], reviewed['nativeRecipeCompileRows'], reviewed['generatedCompileRows'],
++          reviewed['separateEmbeddingCompileRows']) == (80, 79, 1, 1), 'corrected diagnostic partition evidence')
+     outputs = set()
+     for row in db:
+         argv = row.get('arguments') or shlex.split(row['command'])
+-        need(row['file'] in source_targets and '-c' in argv and argv[argv.index('-c') + 1] == row['file'] and '-o' in argv, 'native compile input/output argv')
++        need(row['file'] in source_targets | {NULL_CPP['path']} and argv.count('-c') == argv.count('-o') == 1 and
++             argv[argv.index('-c') + 1] == row['file'], 'compile input/output argv')
+         output = Path(argv[argv.index('-o') + 1])
+         if not output.is_absolute():
+             output = Path(row['directory']) / output
+@@ -464,12 +548,16 @@
+     macro = 'NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1'
+     definition = '-D' + macro + '=1'
+     need([token for token in shlex.split(embedding[0]) if macro in token] == [definition], 'sole embedding diagnostic token')
+-    observed_ref = observe(WORK / 'build/CMakeCache.txt')
+-    observed = cache_values(observed_ref)
+-    need(observed == metadata['observedCMake'] and metadata['requestedCMake'] == s['cmakeFlags'] and
+-         all(observed.get(k, {}).get('value') == v for k, v in s['cmakeFlags'].items()) and
++    observed = cache_values(observe(WORK / 'build/CMakeCache.txt'))
++    allowed_paths = dict(Rust_COMPILER=s['rustc']['path'], Rust_CARGO=s['cargo']['path'],
++        NODE_COMPAT_INTL_LOCKFILE=materialized['cargo']['lock']['path'], NODE_COMPAT_INTL_FIREFOX_SOURCE=s['reusedTrees']['intl-firefox']['root'],
++        CPM_OpenSSL_SOURCE=str(WORK / 'private-openssl/openssl-3.0.17'))
++    allowed_paths.update({'CPM_' + role + '_SOURCE': s['reusedTrees'][role]['root'] for role in
++                          ('wasi-sdk', 'binaryen', 'wasm-tools', 'wasmtime', 'weval', 'corrosion')})
++    need(s['cmakeFlags'] == {**old['requestedCMake'], **allowed_paths} and observed == metadata['observedCMake'] and
++         metadata['requestedCMake'] == s['cmakeFlags'] and all(observed.get(k, {}).get('value') == v for k, v in s['cmakeFlags'].items()) and
+          observed[macro] == dict(type='BOOL', value='ON') and
+-         observed.get('Rust_TOOLCHAIN_IS_RUSTUP_MANAGED', {}).get('value') not in ('TRUE', 'ON', '1'), 'whole configured CMake values')
++         observed.get('Rust_TOOLCHAIN_IS_RUSTUP_MANAGED', {}).get('value') not in ('TRUE', 'ON', '1'), 'whole selected/configured CMake values')
+     link_names = sorted(str(p) for p in (WORK / 'build').rglob('*') if p.is_file() and
+                         (p.suffix in ('.a', '.o', '.obj', '.rsp') or p.name in ('Cargo.toml', 'Cargo.lock', 'rust-staticlib.rs')))
+     need(metadata['linkAndRustInputs'] == result['linkInputs'] and
+@@ -477,21 +565,28 @@
+     for ref in result['linkInputs']:
+         check(ref)
+     engine = metadata['engine']
+-    need(engine == result['engineCandidate'] and engine['path'] == str(WORK / 'componentize-source/lib/starlingmonkey_embedding.wasm'), 'actual engine role')
++    need(engine == result['engineCandidate'] == reviewed['engine'] and
++         engine['path'] == str(WORK / 'componentize-source/lib/starlingmonkey_embedding.wasm'), 'actual engine role')
+     ep = check(engine)
+     with ep.open('rb') as f:
+         need(f.read(8) == b'\x00asm\x01\x00\x00\x00', 'actual native core header')
++    expected_source_names = {r['target']['path'] for r in materialized['copies']} | {engine['path']}
++    need({str(p) for name in ('native-source', 'componentize-source') for p in (WORK / name).rglob('*') if p.is_file()} == expected_source_names and
++         not any(p.is_symlink() for name in ('native-source', 'componentize-source') for p in (WORK / name).rglob('*')),
++         'complete copied Source and engine-only added artifact membership')
++    terminal(CORE_VALIDATION, [str(Path(s['reusedTrees']['wasm-tools']['root']) / 'wasm-tools'), 'validate', engine['path']], 120)
+     expected_diagnostic = dict(option=macro, requested='ON', observed=observed[macro], embeddingDefinition=definition,
+         embeddingDefinitionOccurrences=1, separateEmbeddingCommands=1, nativeCompileRows=80,
+-        nativeRowsWithDiagnosticDefinition=0, compiledSourceAfterimagesAuthenticated=True)
++        nativeRowsWithDiagnosticDefinition=0, compiledSourceAfterimagesAuthenticated=True,
++        totalCompileRows=80, nativeRecipeCompileRows=79, generatedCompileRows=1, generatedTranslationUnits=[generated])
+     manifests = expected_manifests(old)
+     sdkroot = Path(s['reusedTrees']['spidermonkey']['root'])
+     sdk_refs = {key: observe(sdkroot / name) for key, name in [('actualLibrary', 'libspidermonkey.a'),
+         ('actualSavedFrameHeader', 'include/js/SavedFrameAPI.h'), ('actualConfigHeader', 'include/js-config.h'), ('actualConfdefs', 'include/js-confdefs.h')]}
+     for key, ref in sdk_refs.items():
+         need(all(ref[k] == old[key][k] for k in ('sha256', 'bytes')), 'selected coherent SDK content changed')
+-    # Each actual metadata field has an explicit independently checked meaning.
+-    expected = dict(schemaVersion=1, metadataKind='CLONE_CANCEL_NATIVE_BUILD_ACTUAL_V1', sourceComposition=result['sourceComposition'],
++    # Every actual field is checked; old absent capsule/authority values stay absent.
++    expected = dict(schemaVersion=1, metadataKind='CLONE_CANCEL_NATIVE_BUILD_CLOSED_OUTPUT_COLLECTION_V2', sourceComposition=result['sourceComposition'],
+         sourceRoot=str(WORK / 'native-source'), compiledSourceRoot=str(WORK / 'native-source'), compiledAfterInputs=[r['target'] for r in roles['native']],
+         compilerTools=s['hostTools'], actualRustTools=dict(cargo=s['cargo'], rustc=s['rustc']), nativePolicyInputCount=len(roles['native']),
+         nativePolicyInputManifest=native, buildSupportInputCount=len(roles['support']),
+@@ -509,7 +604,18 @@
+         phases=result['phases'], recipe=BUILDER, rootAuthority=None, old83MetadataProjected=False, engineExecuted=False,
+         guestExecuted=False, adoption=False, nativeExportDiagnosticCompileEvidence=expected_diagnostic)
+     need(sorted(expected) == keys and metadata == expected, 'full actual metadata role/value validation')
+-    need(result['nativeExportDiagnosticCompileEvidence'] == expected_diagnostic, 'actual diagnostic result evidence')
++    expected_sources = sorted([r['target'] for r in materialized['copies']] + [NULL_CPP], key=lambda r: r['path'])
++    need(reviewed['protectedSourceInputs'] == expected_sources, 'collector complete 825 Source plus empty generated TU')
++    protected = reviewed['protectedBuildInputs']
++    need(protected == sorted(protected, key=lambda r: r['path']) and len({r['path'] for r in protected}) == len(protected) and
++         reviewed['currentInputProtection'] == dict(unchanged=True, files=len(protected), trees=11), 'collector current protection wire')
++    required = [BUILDER, COLLECTOR, SELECTION, ORIGINAL_RESULT, ORIGINAL_METADATA, ACTUAL_OUTER_TERMINAL,
++                collection_ref, outer['authority'], GENERATED_REVIEW, CORE_VALIDATION]
++    need(all(core(r) in protected for r in required), 'collector protected ancestry/prerequisite omissions')
++    for ref in protected:
++        check(ref)
++    for ref in expected_sources:
++        check(ref, 'source')
+     for key in ('actualAggregateLock', 'offlineCargoConfig', 'patchedSpiderMonkeyEvidence', 'savedFramePatchIndex'):
+         check(metadata[key], 'source')
+     for item in s['hostTools']:
+@@ -518,7 +624,6 @@
+         check(s[key])
+     for key in ('toolRecoveryResult', 'rustRecoveryResult', 'corrosionRecoveryResult', 'sdkRecoveryResult'):
+         check(s[key])
+-    # Source-selected generated compiler wrappers and environment are also retained.
+     environment, environment_ref = local(WORK / 'environment-policy.json')
+     need(environment['privateCargoHome'] is True and environment['offline'] is True and environment['rustupInvoked'] is False and
+          environment['environment']['SPIDERMONKEY_BINARIES'] == str(sdkroot) and
+@@ -526,27 +631,31 @@
+          environment['environment']['RUSTC'] == s['rustc']['path'], 'actual build environment')
+     for field in ('CMAKE_C_COMPILER', 'CMAKE_CXX_COMPILER'):
+         if field in observed:
+-            compiler = Path(observed[field]['value']).resolve(strict=True)
+-            observe(compiler)
++            observe(Path(observed[field]['value']).resolve(strict=True))
+     self_ref = observe(Path(__file__).resolve())
+     for path, (_, expected_stamp) in seen.items():
+         need(stamp(Path(path).lstat()) == expected_stamp, 'review final input bookend: ' + path)
+     report = dict(schemaVersion=1, state='CLONE_CANCEL_ACTUAL_ENGINE_ADMISSION_PASSED_V1', passed=True,
+         engine=engine, nativeMetadata=ACTUAL_METADATA, metadataKeys=keys, metadataFieldsVerified=keys,
+         completeActualMetadataReviewed=True, oldMetadataProjected=False, nativeBuildPassed=True, guestExecuted=False,
+-        actualBuildResult=ACTUAL_RESULT, buildSelection=SELECTION, actualOuterTerminal=ACTUAL_OUTER_TERMINAL,
+-        actualOuterCollection=collection_ref, builderSource=BUILDER, reviewerSource=self_ref,
+-        actualSourceMaterialization=s['sourceMaterialization'], actualGeneratorResult=s['generatorResult'],
+-        actualSourceComposition=result['sourceComposition'], actualCargoMetadataReview=result['cargoMetadataReview'],
+-        toolTreeSnapshots=metadata['toolTreeInputs'],
++        actualBuildResult=ACTUAL_RESULT, correctedBuildCollection=ACTUAL_RESULT,
++        originalFailedBuildResult=ORIGINAL_RESULT, originalFailedBuildMetadata=ORIGINAL_METADATA,
++        originalDriverPassed=False, originalOuterRawExitCode=1, originalFailureBitsPreserved=True,
++        buildSelection=SELECTION, actualOuterTerminal=ACTUAL_OUTER_TERMINAL, actualOuterCollection=collection_ref,
++        actualCollectionTerminal=COLLECTION_TERMINAL, collectorSource=COLLECTOR,
++        builderSource=BUILDER, reviewerSource=self_ref, actualSourceMaterialization=s['sourceMaterialization'],
++        actualGeneratorResult=s['generatorResult'], actualSourceComposition=result['sourceComposition'],
++        actualCargoMetadataReview=result['cargoMetadataReview'], actualStaticCoreValidation=CORE_VALIDATION,
++        generatedSourceDataReview=GENERATED_REVIEW, toolTreeSnapshots=metadata['toolTreeInputs'],
+         protectedBuildInputs=[seen[p][0] for p in sorted(groups['build'])],
+         protectedSourceInputs=[seen[p][0] for p in sorted(groups['source'])],
+         filesVerified=len(seen), fileBytesVerified=charged, sourceRecipe=dict(native=435, support=387, embedding=3, changedNativePaths=[REL]),
++        totalCompileRows=len(db), nativeRecipeCompileRows=len(recipe_rows), generatedCompileRows=len(generated_rows),
+         nativeCompileRows=len(db), separateEmbeddingRows=len(embedding), ordinaryExportsInvoked=False,
+-        coreWasmHeaderVerified=True, componentStandard13Verified=False, componentConstructed=False,
+-        runtimeAccepted=False, fullNextAccepted=False,
+-        scope='Actual native-build DATA admission only. Full source/build regular-file closure is explicit; tree snapshots also carry confined aliases. Constructor must add adapter, all closed WIT/fixture/compiler/capture inputs and obtain its own actual standard13/import validation.',
+-        sourceAuthorRelationship='B authored SDK recovery/shared context cases and this independent reader; C authored native builder; R authored native afterimage and Rust/Corrosion recovery. No builder/helper function is imported or replayed by this reader.')
++        coreWasmHeaderVerified=True, staticCoreValidationVerified=True, componentStandard13Verified=False,
++        componentConstructed=False, runtimeAccepted=False, fullNextAccepted=False,
++        scope='Full actual native-build DATA admission after genuine readonly collection. Original driver remains failed/raw1; native commands and all independently rederived collection gates passed. Constructor adds its own complete WIT/fixture/adapter/compiler/capture closure and actual component validation.',
++        sourceAuthorRelationship='B authored SDK recovery/shared context cases and this reader; C authored builder/closed collector; R authored native afterimage/Rust recovery/generated-TU proof. This reader imports or replays no builder, collector or helper function.')
+     data = (json.dumps(report, indent=2) + '\n').encode()
+     need(len(data) <= 16 * 1024**2, 'admission publication bound')
+     with OUTPUT.open('xb') as f:

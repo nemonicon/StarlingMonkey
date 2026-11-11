@@ -1,0 +1,35 @@
+[package]
+name = "rust-staticlib"
+edition = "2021"
+resolver = "2"
+
+[lib]
+crate-type = ["staticlib"]
+path = "rust-staticlib.rs"
+
+# Prevent inclusion in top-level workspace of the CMake src directory.
+[workspace]
+
+[profile.release]
+lto = true
+panic = 'abort'
+
+[profile.dev]
+lto = true
+panic = 'abort'
+
+# Only this aggregate root supplies these patches; dependency workspace patches
+# are not inherited. Match the exact fork's source/data identities.
+[patch.crates-io]
+icu_capi = { path = "/private/tmp/starling-node-compat/native-cargo-restore-v1-first-archives/sources/firefox/intl/icu_capi" }
+icu_segmenter_data = { path = "/private/tmp/starling-node-compat/native-cargo-restore-v1-first-archives/sources/firefox/intl/icu_segmenter_data" }
+unicode-bidi = { git = "https://github.com/servo/unicode-bidi", rev = "ca612daf1c08c53abe07327cb3e6ef6e0a760f0c" }
+
+[dependencies]
+# Dependencies appended by the CMake build system below here:
+rust-encoding = { path = "/private/tmp/starling-node-compat/next-clone-cancel-native-build-v1-first/native-source/crates/rust-encoding", features = [] }
+rust-hooks = { path = "/private/tmp/starling-node-compat/next-clone-cancel-native-build-v1-first/native-source/crates/rust-hooks", features = [] }
+rust-url = { path = "/private/tmp/starling-node-compat/next-clone-cancel-native-build-v1-first/native-source/crates/rust-url", features = [] }
+multipart = { path = "/private/tmp/starling-node-compat/next-clone-cancel-native-build-v1-first/native-source/crates/rust-multipart", features = ["capi", "simd"] }
+icu_capi = { path = "/private/tmp/starling-node-compat/native-cargo-restore-v1-first-archives/sources/firefox/intl/icu_capi", default-features = false, features = ["any_provider", "compiled_data", "segmenter", "calendar"] }
+unicode-bidi-ffi = { path = "/private/tmp/starling-node-compat/native-cargo-restore-v1-first-archives/sources/firefox/intl/bidi/rust/unicode-bidi-ffi", features = [] }

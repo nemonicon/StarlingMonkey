@@ -1,0 +1,38 @@
+--- before-run-build.py
++++ run-build.py
+@@ -75,11 +75,15 @@
+     return s
+ 
+ 
+-def clean_terminal(t):
+-    return (t['rawExitCode'] == 0 and t['parentOwnedGroupGone'] is True and
++def terminal_quiescent(t):
++    return (t['parentOwnedGroupGone'] is True and
+             t['allObservedOwnedGroupsGone'] is True and t['timeout'] is False and
+             t['forcedCleanup'] is False and t['errors'] == [] and t['signals'] == [] and
+             t['interruptedSignals'] == [] and t['remainingObservedPids'] == [])
++
++
++def clean_terminal(t):
++    return t['rawExitCode'] == 0 and terminal_quiescent(t)
+ 
+ 
+ def phase_quiescent(record):
+@@ -248,7 +252,7 @@
+     owned = out / 'owned-monitor'
+     owned.mkdir(mode=0o700)
+     t = owner.monitor([s['wrapperPython']['path'], '-I', '-B', str(Path(__file__).resolve()), '--worker-packet', str(out / 'packet.json')], str(WORK), env, owned, seconds, SELECTION)
+-    worker = read(descriptor(out / 'worker-result.json')) if (out / 'worker-result.json').exists() else None
++    worker = read(descriptor(out / 'worker-result.json')) if terminal_quiescent(t) and (out / 'worker-result.json').exists() else None
+     inner = worker.get('ownedGroupCleanup') or {} if worker else {}
+     inner_clean = bool(worker and inner.get('complete') is True and not inner.get('events') and not inner.get('errors') and not worker.get('launcherErrors') and not worker.get('sigtermReceived') and worker.get('stopReason') is None)
+     record = dict(label=label, argv=argv, innerOwnedClean=inner_clean, rawExitCode=None if worker is None else worker['rawChildExitCode'], outerTerminal=descriptor(owned / 'terminal.json'), workerResult=descriptor(out / 'worker-result.json') if worker else None, outerRawExitCode=t['rawExitCode'], ownedGone=t['parentOwnedGroupGone'] and t['allObservedOwnedGroupsGone'], timeout=t['timeout'], forcedCleanup=t['forcedCleanup'], errors=t['errors'], signals=t['signals'], interruptedSignals=t['interruptedSignals'], remainingObservedPids=t['remainingObservedPids'])
+@@ -553,7 +557,7 @@
+                 result['phases'].append(record)
+                 result['ownerQuiescenceKnown'] = phase_quiescent(record)
+                 log = WORK / 'results' / label / 'command.combined.log'
+-                if log.exists():
++                if result['ownerQuiescenceKnown'] is True and log.exists():
+                     result['wholeNinjaCommands'] = descriptor(log)
+                 assert d.phase_succeeded(record), 'ninja commands harvest failed'
+             except BaseException as error:

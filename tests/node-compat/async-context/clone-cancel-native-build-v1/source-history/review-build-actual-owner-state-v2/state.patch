@@ -1,0 +1,11 @@
+--- review-build.before.py
++++ review-build.py
+@@ -418,7 +418,7 @@
+     # Establish original ownership quiescence, preserving its actual raw1.
+     outer = terminal(ACTUAL_OUTER_TERMINAL, [s['wrapperPython']['path'], '-I', '-B', BUILDER['path']], 7200, raw_exit=1)
+     request = read(outer['authority'])
+-    need(request['state'] == 'ROOT_FIXED_NATIVE_BUILD_OWNER_REQUEST_V1' and request['seconds'] == 7200 and
++    need(request['state'] == 'ROOT_FIXED_NATIVE_BUILD_OWNER_REQUEST_V2' and request['seconds'] == 7200 and
+          request['configureCapSeconds'] == 2400 and request['buildCapSeconds'] == 7200 and
+          request['nativeBuildAllowed'] is True and request['guestExecutionAllowed'] is False, 'actual outer owner request')
+     for ref in request['protectedInputs']:

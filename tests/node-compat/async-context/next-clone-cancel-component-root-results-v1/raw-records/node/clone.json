@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 1,
+  "suite": "NODE_RESPONSE_CLONE_CANCEL_OBSERVATION_V1",
+  "executionKind": "bare-node-host",
+  "nodeVersion": "v22.14.0",
+  "nodeExecutable": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+  "selectedNode": {
+    "path": "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+    "sha256": "e2d4915d03eda6a2f00a09920e7eeb7a04ad123f9aaad61b1481179fe1bf50e0",
+    "bytes": 108619024
+  },
+  "toolBinaryHashVerifiedByThisCLI": false,
+  "sharedCase": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/response-clone-cancel-candidate-v1/case.mjs",
+    "sha256": "e7d4d51bd3afd6ff6aa6d0dad7813e9247de200268b3ced92e3fa00612ba95a0",
+    "bytes": 5702
+  },
+  "plan": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/response-clone-cancel-candidate-v1/plan.json",
+    "sha256": "f4d504bb32a44dfe749892dee3c87b0c6622634abdfaa22912e9cc0acc06d1fe",
+    "bytes": 1903
+  },
+  "captureCompleted": true,
+  "semanticAccepted": null,
+  "expectedForGuest": null,
+  "observation": {
+    "schemaVersion": 1,
+    "case": "RESPONSE_CLONE_BOTH_CANCEL_OBSERVATION_V1",
+    "collectionComplete": true,
+    "semanticAccepted": null,
+    "expectedFromNode": null,
+    "sourceCancelCalls": 1,
+    "sourceCancelReasons": [
+      {
+        "type": "object",
+        "isArray": true,
+        "isFirstObject": false,
+        "isSecondObject": false,
+        "arrayLength": 2,
+        "firstElementIsFirstObject": true,
+        "secondElementIsSecondObject": true
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "kind": "source-start"
+      },
+      {
+        "sequence": 2,
+        "kind": "cancel-invocation",
+        "branch": "first"
+      },
+      {
+        "sequence": 3,
+        "kind": "cancel-invocation",
+        "branch": "second"
+      },
+      {
+        "sequence": 4,
+        "kind": "source-cancel-enter"
+      },
+      {
+        "sequence": 5,
+        "kind": "source-gate-release"
+      },
+      {
+        "sequence": 6,
+        "kind": "source-cancel-return-gate-settled"
+      },
+      {
+        "sequence": 7,
+        "kind": "cancel-settled",
+        "branch": "first",
+        "outcome": "fulfilled"
+      },
+      {
+        "sequence": 8,
+        "kind": "cancel-settled",
+        "branch": "second",
+        "outcome": "fulfilled"
+      }
+    ],
+    "snapshots": [
+      {
+        "phase": "after-clone",
+        "first": {
+          "state": "not-requested"
+        },
+        "second": {
+          "state": "not-requested"
+        },
+        "sourceCancelCalls": 0,
+        "sourceGateReleased": false,
+        "originalBodyUsed": false,
+        "cloneBodyUsed": false
+      },
+      {
+        "phase": "after-first-cancel-sync",
+        "first": {
+          "state": "pending",
+          "returnedSameRealmPromise": true
+        },
+        "second": {
+          "state": "not-requested"
+        },
+        "sourceCancelCalls": 0,
+        "sourceGateReleased": false,
+        "originalBodyUsed": true,
+        "cloneBodyUsed": false
+      },
+      {
+        "phase": "before-second-cancel-after-checkpoint",
+        "first": {
+          "state": "pending",
+          "returnedSameRealmPromise": true
+        },
+        "second": {
+          "state": "not-requested"
+        },
+        "sourceCancelCalls": 0,
+        "sourceGateReleased": false,
+        "originalBodyUsed": true,
+        "cloneBodyUsed": false
+      },
+      {
+        "phase": "after-second-cancel-sync",
+        "first": {
+          "state": "pending",
+          "returnedSameRealmPromise": true
+        },
+        "second": {
+          "state": "pending",
+          "returnedSameRealmPromise": true
+        },
+        "sourceCancelCalls": 1,
+        "sourceGateReleased": false,
+        "originalBodyUsed": true,
+        "cloneBodyUsed": true
+      },
+      {
+        "phase": "after-second-checkpoint-before-source-release",
+        "first": {
+          "state": "pending",
+          "returnedSameRealmPromise": true
+        },
+        "second": {
+          "state": "pending",
+          "returnedSameRealmPromise": true
+        },
+        "sourceCancelCalls": 1,
+        "sourceGateReleased": false,
+        "originalBodyUsed": true,
+        "cloneBodyUsed": true
+      },
+      {
+        "phase": "after-source-release-and-both-settlements",
+        "first": {
+          "state": "fulfilled",
+          "returnedSameRealmPromise": true,
+          "value": {
+            "type": "undefined"
+          }
+        },
+        "second": {
+          "state": "fulfilled",
+          "returnedSameRealmPromise": true,
+          "value": {
+            "type": "undefined"
+          }
+        },
+        "sourceCancelCalls": 1,
+        "sourceGateReleased": true,
+        "originalBodyUsed": true,
+        "cloneBodyUsed": true
+      }
+    ],
+    "observationOverflow": false,
+    "microtaskCheckpointRounds": 2,
+    "sourceGateReleased": true,
+    "nativeResourceCountsProved": false,
+    "cancelOutcomes": {
+      "first": {
+        "state": "fulfilled",
+        "returnedSameRealmPromise": true,
+        "value": {
+          "type": "undefined"
+        }
+      },
+      "second": {
+        "state": "fulfilled",
+        "returnedSameRealmPromise": true,
+        "value": {
+          "type": "undefined"
+        }
+      }
+    },
+    "responseMetadata": {
+      "originalStatus": 200,
+      "cloneStatus": 200,
+      "originalHeader": "bounded",
+      "cloneHeader": "bounded"
+    }
+  },
+  "outerDeadlineMs": 5000,
+  "timedOut": false,
+  "error": null,
+  "secondaryErrors": [],
+  "fullNextAccepted": false
+}

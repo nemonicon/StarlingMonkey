@@ -4,38 +4,87 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-11. Overall roadmap: **in progress**.
 
-Current native repair work: the cloned-response cancellation candidate is
-source-reviewed but **not compiled or tested in a component yet**. Four additional
-Node22.14.0 references pass: deferred cancellation rejection preserves false or
-object identity, and a canceled branch settles correctly when its sibling reaches
-EOF or errors. The corrected HTTP collector passes real TCP tests for complete,
-truncated Content-Length, and chunked bodies; no guest claim follows from those
-collector tests.
+Current native repair result: the [repaired-engine real-component regression](docs/node-compat/nextjs-clone-cancel-results.md)
+**passes on Wasmtime 42.0.1 against Node 22.14.0**. Both request-context runs
+match (95 assertions each), the original cloned-response cancellation now calls
+the source once with both reasons and waits, and all four rejection/EOF/error
+follow-ups match Node. All four HTTP 200 bodies are complete; runtime owner
+76401 and comparison owner 76491 exit 0 with clean cleanup. Component `7c227997`
+validates with exactly 13 selected standard WASI 0.2.10 imports and the sole
+incoming-handler export. The 99-payload saved packet retains the complete
+observations. Its repository-only checker passes both the current tree and an
+isolated 101-file copy of staged Git blobs, recomputing typed comparisons and
+requiring complete captures. Optimized Python is refused before reads. The
+unchanged real Next entry also constructs as `bfb106fe` and passes component
+validation and complete INIT/return-graph review; it has not served the app yet.
+Stock wasmCloud, full Next regressions with this engine, resource
+retirement, repeatability and cost remain outstanding. Production is unchanged.
 
-Native build prerequisites are now recovered with about98GiB initially free.
+The first stock wasmCloud lifecycle attempt is preserved as a harness failure:
+owner 78885 exits 1 with clean cleanup after `config show` exits 0. The host
+omits empty `dev.volumes` and environment-config keys; the new validator requires
+one of those absent keys. No `dev` process or HTTP request ran. The 27-payload
+failure packet is retained, and a separately versioned validator correction is
+in progress. The passing Wasmtime result is unchanged.
+
+The current checkpoint includes the closed native build, corrected admission,
+passing Wasmtime regression and portable saved checks, real Next INIT result,
+and first stock-host harness failure. Active observer-composition drafts and
+the next stock validator version remain outstanding work.
+
+Native build prerequisites are now recovered with about 98 GiB initially free.
 All six tool archives and the public SpiderMonkey header-donor archive match
-their saved hashes. All243 missing Intl headers now match:242 were fetched from
+their saved hashes. All 243 missing Intl headers now match: 242 were fetched from
 the pinned source, and the generated bidi header was reproduced exactly with
-cbindgen0.29.1. The complete selected SDK596 files/13 directories matches the
-historical content and modes, preserving the patched library. Native Rust1.88
-and Corrosion0.5.1 also match their selected payloads. The first tool
+cbindgen 0.29.1. The complete selected SDK (596 files, 13 directories) matches the
+historical content and modes, preserving the patched library. Native Rust 1.88
+and Corrosion 0.5.1 also match their selected payloads. The first tool
 materialization's macOS symlink-mode failure and partial tree remain preserved;
-the corrected V2 succeeds with all31 symlinks at their declared mode.
+the corrected V2 succeeds with all 31 symlinks at their declared mode.
 
-The fresh435-native/387-support/3-embedding recipe is assembled with exactly one
+The fresh 435-native/387-support/3-embedding recipe is assembled with exactly one
 C++ change. All ten installed generator checks pass. The [saved recovery
 checker](tests/node-compat/async-context/clone-cancel-recovery-root-results-v1/check-recovery-saved.py)
-passes885 retained payloads/5,698,413B, preserving all three original recovery
+passes 885 retained payloads/5,698,413 bytes, preserving all three original recovery
 failures and the four Node references. It reads no original absolute paths.
-Fresh offline Cargo verification, native compilation and metadata, real-component
-cancellation tests, and subsequent full Next regressions remain outstanding.
-The existing237c engine and prior failing lifecycle component remain unchanged.
+Fresh offline Cargo verification, Rust version/sysroot checks and CMake
+configuration now pass. Native compilation and linking also finish successfully:
+all six owned native phases exit 0 cleanly. Candidate engine
+`e3075c14ec903831fb43dd305fb9c21eeaeb99a0d0a71c052fbda3a914faa965`
+is 31,353,161 bytes. Original outer owner 54904 exits 1 cleanly because the
+post-build checker incorrectly requires all 80 compilation rows to be copied
+inputs; one is the existing CMake-generated empty `null.cpp`. Both the old and
+new build contain that generated unit. The core engine passes `wasm-tools validate`. The failed result and original metadata
+are preserved; the candidate subsequently passes separate independent engine admission;
+no guest behavior follows from that admission. Separate corrected collection now passes (owner 74259, exit 0, clean cleanup).
+It validates 79 recipe units, exactly one generated empty unit, the separate
+embedding command and all remaining gates, re-deriving the full 52 fields.
+Corrected metadata is `c7e225af`; the original failed metadata remains unchanged.
+The first outer wrapper was refused
+before child launch because its requested 10,800 seconds exceeded the original
+monitor's 7,200-second maximum; that failure and the source-review qualification
+are preserved. The repository-only original-build checker verifies all 2,315 retained payloads
+while requiring the original failed result and outer exit 1. It also passes from
+an isolated 2,317-file copy of actual staged Git blobs. It makes no corrected
+acceptance or binary-verification claim. Independent admission now passes
+(owner 75744, exit 0, clean cleanup), including the actual engine binary and
+complete corrected metadata. Component preparation also passes (owner 75867),
+protecting 27,506 inputs and the complete selected WIT world. Actual component construction, validation and the first Wasmtime cancellation
+comparison now pass as recorded above. Stock wasmCloud and full Next regressions
+remain outstanding.
+The existing 237c engine and prior failing lifecycle component remain unchanged.
 The previous lifecycle failure checkpoint is
 `b71aa50478c705803d9a62dbe6a44a89dcd642bb`. This recovery checkpoint does not
-promote the cancellation fix. The native build runner and its final input
-selection remain work in progress.
+promote the cancellation fix. The native build runner, selection and corrected collection are now closed
+evidence. Component and host validation remain in progress.
 
-Latest lifecycle result: the [real-component comparison](docs/node-compat/nextjs-lifecycle-results.md)
+Recovery and regression checkpoint `fe957d5260d9c64d0b1ad7a4d999db34f4304dfc`
+is committed, pushed and verified on remote `main`. The checker also passes from
+an isolated 887-file copy of actual staged Git blobs. Optimized Python is refused
+before payload reads. The active native builder and final selection are separate
+work in progress and were excluded from that checkpoint.
+
+Previous lifecycle result (old engine, failure retained): the [real-component comparison](docs/node-compat/nextjs-lifecycle-results.md)
 passes both public request-context runs against Node (eight groups/95 checks
 each), including four explicit public AsyncResource construction refusals.
 Cloned-response cancellation **fails**: Node calls the source once with both

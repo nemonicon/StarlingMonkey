@@ -1,0 +1,15 @@
+--- review-build.unbound.py
++++ review-build.py
+@@ -14,9 +14,9 @@
+ if not __debug__ or not sys.flags.isolated or not sys.dont_write_bytecode:
+     raise RuntimeError('requires unoptimized Python -I -B before input IO')
+ 
+-ACTUAL_RESULT = None
+-ACTUAL_METADATA = None
+-ACTUAL_OUTER_TERMINAL = None
++ACTUAL_RESULT = {'path': '/private/tmp/starling-node-compat/next-clone-cancel-native-build-v1-first/closed-collection-v2/result.json', 'sha256': 'd1c29a586c1a1d6f4e176e4f9ae1de166a42745dca0effff60f5197beaeb846a', 'bytes': 735488}
++ACTUAL_METADATA = {'path': '/private/tmp/starling-node-compat/next-clone-cancel-native-build-v1-first/closed-collection-v2/metadata.json', 'sha256': 'c7e225af3046b87939ec057ecf6c4ecbea3a3102a77c1fc05e4bf6f39b74f026', 'bytes': 1161902}
++ACTUAL_OUTER_TERMINAL = {'path': '/private/tmp/starling-node-compat/next-clone-cancel-native-recovery-v1-first/commands/native-build-v2/terminal.json', 'sha256': '59f4407118302c3f57c229ab872579dc01798b635883b08af0a74aa8333974e0', 'bytes': 269166}
+ if any(value is None for value in (ACTUAL_RESULT, ACTUAL_METADATA, ACTUAL_OUTER_TERMINAL)):
+     raise RuntimeError('Root must bind the corrected collection result/metadata and original raw1 owner descriptors before input IO')
+ 
