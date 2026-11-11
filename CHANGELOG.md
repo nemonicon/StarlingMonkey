@@ -1,5 +1,44 @@
 # Changelog
 
+## [0.5.0](https://github.com/nemonicon/StarlingMonkey/compare/starlingmonkey-v0.4.0...starlingmonkey-v0.5.0) (2026-11-11)
+
+
+### Features
+
+* Allow resetting of engine at runtime ([#337](https://github.com/nemonicon/StarlingMonkey/issues/337)) ([e0d58d0](https://github.com/nemonicon/StarlingMonkey/commit/e0d58d0c82f49d22fbe82e35fb6222d24d552d8a))
+* **crypto:** Add support for Ed25519 ([#330](https://github.com/nemonicon/StarlingMonkey/issues/330)) ([0539a47](https://github.com/nemonicon/StarlingMonkey/commit/0539a47c961eebd4d623a17250d40b2546f47e3e))
+* implement Response.clone() ([#312](https://github.com/nemonicon/StarlingMonkey/issues/312)) ([5c671dd](https://github.com/nemonicon/StarlingMonkey/commit/5c671dd86db596ac2ea88a60bebf8d4505b4b8fa))
+* reenable weval patches ([#303](https://github.com/nemonicon/StarlingMonkey/issues/303)) ([643aa45](https://github.com/nemonicon/StarlingMonkey/commit/643aa451947694ba8cbf2e51cb2b63d7bc972d92))
+* update wasi to 0.2.10 ([#300](https://github.com/nemonicon/StarlingMonkey/issues/300)) ([c0873b7](https://github.com/nemonicon/StarlingMonkey/commit/c0873b74b728898dc91311fc75ea2f27c154f5ae))
+* **url:** implement `URLSearchParams.size` property ([#296](https://github.com/nemonicon/StarlingMonkey/issues/296)) ([27d1d5d](https://github.com/nemonicon/StarlingMonkey/commit/27d1d5d5126c475d948aaadffed6c543758e3b73))
+
+
+### Bug Fixes
+
+* aarch64-&gt;arm64 in wasi-sdk download url ([#302](https://github.com/nemonicon/StarlingMonkey/issues/302)) ([6ff0d0d](https://github.com/nemonicon/StarlingMonkey/commit/6ff0d0d0bdf08192ecb7826a9f27cf3098980a80))
+* **ci:** add weval artifacts to the release ([#304](https://github.com/nemonicon/StarlingMonkey/issues/304)) ([1614930](https://github.com/nemonicon/StarlingMonkey/commit/161493015f735195d4795cf07f025e44d26a5396))
+* **ci:** Fix release-please setup ([#282](https://github.com/nemonicon/StarlingMonkey/issues/282)) ([9d9a34b](https://github.com/nemonicon/StarlingMonkey/commit/9d9a34b9a1de6c5fedb65d0a44b77677bf02b9bc))
+* **ci:** Unify release-please CI workflows ([#284](https://github.com/nemonicon/StarlingMonkey/issues/284)) ([c5f80bd](https://github.com/nemonicon/StarlingMonkey/commit/c5f80bd82209913141723f14016ef4157daaf964))
+* **console:** console.assert() logs on failure, not on success ([#318](https://github.com/nemonicon/StarlingMonkey/issues/318)) ([f5a7adc](https://github.com/nemonicon/StarlingMonkey/commit/f5a7adcae0f2864e53b1642d23eff8c401160922))
+* Correct URL finalizer for when the URL is undefined ([#336](https://github.com/nemonicon/StarlingMonkey/issues/336)) ([fe2c92e](https://github.com/nemonicon/StarlingMonkey/commit/fe2c92e4a14e7a4ad64bd0d58df8ce1dffb8827f))
+* **crypto:** Copy HMAC bytes into a new std::vector, to avoid a use-after-free ([#342](https://github.com/nemonicon/StarlingMonkey/issues/342)) ([d3d8125](https://github.com/nemonicon/StarlingMonkey/commit/d3d8125b3eed1651c1f20a51bc901577bd145f90))
+* **crypto:** Fix bug in canOnlySignOrVerify logic. Current version checks for sign|verify, but not exclusively those flags ([#332](https://github.com/nemonicon/StarlingMonkey/issues/332)) ([d7ba2ea](https://github.com/nemonicon/StarlingMonkey/commit/d7ba2ea306a0df1baf875f5e1000e85153adbf00))
+* **crypto:** throw DataError, not TypeError, for JWK missing kty ([f7d56e1](https://github.com/nemonicon/StarlingMonkey/commit/f7d56e146e577039e9788f5da30d2c2d54e5a837))
+* **crypto:** Throw DataError, not TypeError, for JWK missing kty ([#328](https://github.com/nemonicon/StarlingMonkey/issues/328)) ([f7d56e1](https://github.com/nemonicon/StarlingMonkey/commit/f7d56e146e577039e9788f5da30d2c2d54e5a837))
+* **crypto:** Treat undefined JWK members as absent, not "undefined" ([#333](https://github.com/nemonicon/StarlingMonkey/issues/333)) ([7dc6aa9](https://github.com/nemonicon/StarlingMonkey/commit/7dc6aa9016bf3e3e6747038c32dcf86f821e3f3a))
+* **debugger:** Fix path normalization in debugger sourcemaps handling ([#279](https://github.com/nemonicon/StarlingMonkey/issues/279)) ([afcf222](https://github.com/nemonicon/StarlingMonkey/commit/afcf222f512eb211d1b29d7a427fc8db6dd27f84))
+* **fetch:** body.blob() sets Blob.type from Content-Type header ([#313](https://github.com/nemonicon/StarlingMonkey/issues/313)) ([04721e3](https://github.com/nemonicon/StarlingMonkey/commit/04721e3ab946bd77e9ad9de055efa1ef809b545d))
+* Fix CryptoKeyUsages::isSuperSetOf ([#347](https://github.com/nemonicon/StarlingMonkey/issues/347)) ([ab43f2c](https://github.com/nemonicon/StarlingMonkey/commit/ab43f2c4f274f9b43acf41de19a38c52746c29dc))
+* **form-data:** preserve leading BOM in multipart text parts ([#317](https://github.com/nemonicon/StarlingMonkey/issues/317)) ([17c0e12](https://github.com/nemonicon/StarlingMonkey/commit/17c0e12bcdb324b1b55445f10900c8326eee1aa8))
+* handle any sequence in AbortSignal ([#310](https://github.com/nemonicon/StarlingMonkey/issues/310)) ([f74fb25](https://github.com/nemonicon/StarlingMonkey/commit/f74fb2547e3bc6a275366ecbb4dc80e2f4121b4f))
+* Make boundary parameter of multi-part form data requests safe for use in Content-Type headers ([#335](https://github.com/nemonicon/StarlingMonkey/issues/335)) ([a46051a](https://github.com/nemonicon/StarlingMonkey/commit/a46051ab379559cb2fa85760a387eaf3f75c4681))
+* Prevent `URLSearchParams.toString()` from returning unencoded params when not modified ([#292](https://github.com/nemonicon/StarlingMonkey/issues/292)) ([a2ddae3](https://github.com/nemonicon/StarlingMonkey/commit/a2ddae3d463c61437fafc490308016fbc2a53cdd))
+* Replace malformed UTF-8 and strip BOM in Response and Request `text()` and `json()` ([#348](https://github.com/nemonicon/StarlingMonkey/issues/348)) ([54b3329](https://github.com/nemonicon/StarlingMonkey/commit/54b3329b3ce818fd1f244e871e9c259b63667cda))
+* **url:** allow `SpecSlice` to hold empty strings ([#293](https://github.com/nemonicon/StarlingMonkey/issues/293)) ([faa9114](https://github.com/nemonicon/StarlingMonkey/commit/faa9114ac16b3ba665d7863915f7edb866b91248))
+* **url:** fix leaky `Drop`s for `SpecString` and `CVec` ([#294](https://github.com/nemonicon/StarlingMonkey/issues/294)) ([51d5388](https://github.com/nemonicon/StarlingMonkey/commit/51d5388c48811688329bb5fd2a13384574ac6cfd))
+* **url:** make URLSearchParams record constructor spec compliant ([#295](https://github.com/nemonicon/StarlingMonkey/issues/295)) ([d591115](https://github.com/nemonicon/StarlingMonkey/commit/d59111599472cf2cd921cde323847824bea4a8a8))
+* **url:** validate name in URLSearchParams.append() ([#320](https://github.com/nemonicon/StarlingMonkey/issues/320)) ([fb47e0e](https://github.com/nemonicon/StarlingMonkey/commit/fb47e0e771fb8538b8cf2a41c24e534cca518e44))
+
 ## [0.4.0](https://github.com/bytecodealliance/StarlingMonkey/compare/starlingmonkey-v0.3.0...starlingmonkey-v0.4.0) (2026-10-26)
 
 
