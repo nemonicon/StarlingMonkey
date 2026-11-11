@@ -1,6 +1,6 @@
 # Next.js execution
 
-## Current checkpoint: 2026-11-08
+## Current checkpoint: 2026-11-11
 
 Next.js runs inside the experimental SpiderMonkey/Wasm server, but full portable
 Next.js acceptance remains **failed**. The current compression-off application
@@ -22,6 +22,12 @@ The [resource-stream derivative](../../../../docs/node-compat/nextjs-resource-st
 now reproduces that failure while retaining2,963 browser-resource bytes. Node
 passes with a successful terminal; cloud's canceled terminal remains incomplete.
 The original module-global generation fixture remains a separate failed contract.
+
+The [V4 observer checkpoint](../../../../docs/node-compat/nextjs-observer-v4-results.md)
+passes seven real-component metadata probes and validates the new Next envelope.
+Its full browser run remains pending. The saved raw packet and bounded
+`next-standard-handler-observer-v4-root-results-v1/check-retained-v2.py` checker
+also pass from actual staged Git copies without the original temporary trees.
 
 The [current result and limitations](../../../../docs/node-compat/nextjs-native-export-diagnostic-2026-11-08.md),
 [priority roadmap](../../../../docs/node-compat/nextjs-priority-roadmap.md) and

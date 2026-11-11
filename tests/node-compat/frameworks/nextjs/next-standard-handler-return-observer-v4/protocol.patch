@@ -1,0 +1,123 @@
+--- ../next-standard-handler-return-observer-v3/protocol.json
++++ protocol.json
+@@ -1,8 +1,8 @@
+ {
+-  "schemaVersion": 3,
+-  "state": "UNVALIDATED_STANDARD_HANDLER_RETURN_PUBLIC_METADATA_PROTOCOL_V3",
+-  "marker": "NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V3",
+-  "version": 3,
++  "schemaVersion": 4,
++  "state": "UNVALIDATED_STANDARD_HANDLER_RETURN_PUBLIC_METADATA_PROTOCOL_V4",
++  "marker": "NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4",
++  "version": 4,
+   "event": "inner-handler-import-returned",
+   "headerName": "x-next-public-request-correlation",
+   "headerNameAsciiBytes": 33,
+@@ -12,6 +12,8 @@
+     "event",
+     "method",
+     "path",
++    "pathStatus",
++    "snapshotStatus",
+     "corrState",
+     "corrCount",
+     "corr"
+@@ -24,21 +26,20 @@
+   "path": [
+     "/actions",
+     "/action-result",
+-    "unknown"
++    null
+   ],
+-  "routePolicy": "Only standard method.get(tag0)/post(tag2) and exact full path-with-query bytes /actions(8) or /action-result(14) admitted. Query, other, absent, malformed or arbitrarily long route stays unknown. No URL normalization, percent-decoding, query replay or raw text output. Route classification is not assertion that every method/path pair is an intended application endpoint.",
++  "routePolicy": "Classify the actual path-with-query option: None is absent/null; Some exact full bytes /actions(8) or /action-result(14) is present-target with that literal; every other Some including empty/query/encoded/trailing-slash is present-other/null. No normalization or arbitrary path text emitted. Method GET0/POST2/unknown is independent. Route classification is not endpoint response/status acceptance.",
+   "corrState": {
+-    "missing": "Admitted method/path; fields.get of fixed syntactically valid literal returns0 values: corrCount0,corrnull.",
+-    "valid": "Admitted method/path; exactly1 field-value, exactly64 bytes, each ASCII0-9/a-f; copy64 to fixed snapshot then publish corrCount1 and that value.",
+-    "invalid": "Admitted method/path; exactly1 value with any other length/byte shape, including empty/comma-coalesced/uppercase/newline: corrCount1,corrnull.",
+-    "duplicate": "Admitted method/path; at least2 returned values, even identical: corrCount2 saturated,corrnull. No wire-duplicate inference.",
+-    "unknown": "Method or path unadmitted; regardless of observed headers clear correlation/count to null. Preserve separately known method/path enum; unknown is never interpreted as missing."
++    "missing": "Independent of method/path: fixed valid literal fields.get returns0 values; corrCount0,corrnull.",
++    "valid": "Independent of method/path: exactly1 field-value of64 ASCII0-9/a-f bytes; copied to snapshot; corrCount1 and that value.",
++    "invalid": "Independent of method/path: exactly1 other length/shape including empty/uppercase/comma/newline; corrCount1,corrnull.",
++    "duplicate": "Independent of method/path: at least2 returned values even identical; corrCount2 saturated,corrnull; no wire-duplicate inference."
+   },
+   "ownership": "Borrow original incoming-request for metadata; acquire one owned fields child, fields.get returns copied list values, drop fields child immediately on successful getter return, classify/copy only returned slices, then forward original owned request/outparam once. No body resource, request reconstruction, header mutation or uncertain-transfer retry.",
+   "memory": {
+     "fixedBytes": 65536,
+     "memoryGrowSelected": false,
+-    "constantsEndExclusive": 440,
++    "constantsEndExclusive": 527,
+     "stdoutReturnArea": [
+       1024,
+       1036
+@@ -80,19 +81,23 @@
+   },
+   "limits": {
+     "recordBufferBytes": 512,
+-    "pythonModelMaximumAdmittedRecordBytes": 254,
++    "pythonModelMaximumAdmittedRecordBytes": 314,
+     "ordinaryRecordsPerInstance": 256,
+     "limitRecordsPerInstance": 1,
+-    "limitLine": "{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V3\",\"version\":3,\"event\":\"record-limit\"}\n",
+-    "limitLineAsciiBytes": 89
++    "limitLine": "{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"record-limit\"}\n",
++    "limitLineAsciiBytes": 89,
++    "maximumVariant": "unknown method + /action-result +present-target +snapshot success +valid64hex; newline included",
++    "byteModelScope": "48 finite JSON wire variants in wire-byte-fixtures.json; not WAT/type/host execution."
+   },
+   "joinPolicy": [
+-    "Require complete finalized raw capture and exact typed schema; missing/malformed/limited output stays unobserved.",
+-    "One unique valid POST/actions candidate must match the declared public value alongside browser/NetLog and other public-lane evidence; value is public metadata, never a private ID.",
+-    "Any competing invalid/duplicate/unknown POST or unknown-method candidate, including route-cleared records, conservatively blocks the corresponding join.",
+-    "Missing/count0 may be a separate uninstrumented candidate only when method/path were admitted. Unknown must never be defaulted to missing.",
+-    "Known GET observations are distinct, including forwarding/navigation; equal public values do not make them POSTs or establish outer-to-inner causal identity.",
+-    "Do not concatenate records by local count, order, time or equal value into physical instances/Stores."
++    "Require complete finalized capture and exact V4 typed schema/consistent pathStatus; malformed, lost, limited, unknown-getter or unobserved outcomes remain blocking.",
++    "Unknown method blocks the join even if other metadata is available; never infer POST/GET.",
++    "Absent path blocks route joining; independently known correlation does not reconstruct its path.",
++    "Only proved present-other can be excluded from an exact present-target tuple under this separately reviewed V4 policy. No path/query normalization, guessed routes or retrospective V3 upgrades.",
++    "For admitted target POST/actions, require one unique valid/count1 public value equal to the independently Root-declared public correlation value, with actual request/browser/NetLog/public-lane cardinality. Public value is not authentication/private identity.",
++    "Otherwise competing invalid/duplicate/unknown or ambiguous target POST candidates conservatively block. Missing/count0 is distinct only after a successful fixed-name getter snapshot; never default unknown to missing.",
++    "Known GET observations are distinct; equal values do not establish POST-to-internal-GET causality, physical instance/Store identity, cross-lane order or completion.",
++    "All existing V3 unknown records and refused joins remain unchanged; V4 cannot reclassify their discarded path/header facts."
+   ],
+   "init": "Only constants/globals/memory declarations; no core start or imported calls at instantiation. No manifest/environment/clock/entropy/filesystem access.",
+   "positiveWitness": "Metadata snapshot before transfer plus ordinary code after the exact synchronous imported handler returned, conditional on independently validated new envelope/post-return structure. Not observer own return/post-return, host/TCP/task completion, identity, cause or fullNext.",
+@@ -100,5 +105,35 @@
+   "actualTests": null,
+   "actualParse": null,
+   "actualComposition": null,
+-  "actualRuntime": null
++  "actualRuntime": null,
++  "pathStatus": [
++    "present-target",
++    "present-other",
++    "absent"
++  ],
++  "snapshotStatus": [
++    "success"
++  ],
++  "snapshotPolicy": "Ordinary snapshotStatus success means the existing method/path/header/fields.get calls and fields child drop returned normally before the same owned forwarding call, and this record is emitted after that synchronous inner import returned. Getter/canonical allocation/drop/inner traps do not fabricate a normal row. Missing capture cannot identify a specific getter failure.",
++  "unknownMethod": "Unsupported successfully returned standard method variants remain method unknown. They never become GET/POST and conservatively block joining even when other metadata is available.",
++  "unknownGetter": "An admission/collection failed-or-unobserved outcome only; no invented recoverable WIT getter error enum, success row, fallback delegation or extra pre-forward I/O.",
++  "pathStatusConsistency": {
++    "present-target": "path is one of the two exact literals",
++    "present-other": "getter returned Some with a different full byte string; path is null",
++    "absent": "getter returned None; path is null; not present-other"
++  },
++  "models": {
++    "source": {
++      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-standard-handler-return-observer-v4/model-fixtures.mjs",
++      "sha256": "f87303be82cf82dd93432f768300dd0ce084c87eeacfbf894bd3e495417fc3d2",
++      "bytes": 6620
++    },
++    "wireBytes": {
++      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-standard-handler-return-observer-v4/wire-byte-fixtures.json",
++      "sha256": "f63faefb6916a6b951748f0b23771c0271c20944c08990988955f057ebabf317",
++      "bytes": 17406
++    },
++    "executionResult": null,
++    "scope": "Inert classifier/byte/allocator/record-cap models, including synthetic None/trap; never fabricated real-host incoming resources."
++  }
+ }

@@ -1,0 +1,105 @@
+--- ../next-standard-handler-return-observer-v3/observer.wat
++++ observer.wat
+@@ -1,4 +1,4 @@
+-;; Source-only public-metadata observer v3. No core start or manual post-return.
++;; Source-only public-metadata observer v4. No core start or manual post-return.
+ ;; The observer and unchanged inner component must be sibling instances.
+ (component
+   (type $http-types (instance
+@@ -113,7 +113,7 @@
+           (select (local.get $old-len) (local.get $new-len)
+             (i32.lt_u (local.get $old-len) (local.get $new-len))))))
+       (local.get $pointer))
+-    (data (i32.const 0) "{\22marker\22:\22NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V3\22,\22version\22:3,\22event\22:\22inner-handler-import-returned\22,\22method\22:")
++    (data (i32.const 0) "{\22marker\22:\22NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\22,\22version\22:4,\22event\22:\22inner-handler-import-returned\22,\22method\22:")
+     (data (i32.const 116) ",\22path\22:")
+     (data (i32.const 124) ",\22corrState\22:")
+     (data (i32.const 140) ",\22corrCount\22:")
+@@ -136,7 +136,12 @@
+     (data (i32.const 336) "2")
+     (data (i32.const 340) "null")
+     (data (i32.const 344) "\22")
+-    (data (i32.const 348) "{\22marker\22:\22NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V3\22,\22version\22:3,\22event\22:\22record-limit\22}\0a"))
++    (data (i32.const 348) "{\22marker\22:\22NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\22,\22version\22:4,\22event\22:\22record-limit\22}\0a")
++    (data (i32.const 440) ",\22pathStatus\22:")
++    (data (i32.const 456) "\22present-target\22")
++    (data (i32.const 472) "\22present-other\22")
++    (data (i32.const 488) "\22absent\22")
++    (data (i32.const 500) ",\22snapshotStatus\22:\22success\22"))
+   (core instance $storage-instance (instantiate $storage))
+   (alias core export $storage-instance "memory" (core memory $memory))
+   (alias core export $storage-instance "realloc" (core func $realloc))
+@@ -193,7 +198,11 @@
+     (func $append-path (param $dest i32) (param $tag i32) (result i32)
+       (if (i32.eq (local.get $tag) (i32.const 1)) (then (return (call $append (local.get $dest) (i32.const 256) (i32.const 10)))))
+       (if (i32.eq (local.get $tag) (i32.const 2)) (then (return (call $append (local.get $dest) (i32.const 268) (i32.const 16)))))
+-      (call $append (local.get $dest) (i32.const 244) (i32.const 9)))
++      (call $append (local.get $dest) (i32.const 340) (i32.const 4)))
++    (func $append-path-status (param $dest i32) (param $tag i32) (result i32)
++      (if (i32.eq (local.get $tag) (i32.const 2)) (then (return (call $append (local.get $dest) (i32.const 456) (i32.const 16)))))
++      (if (i32.eq (local.get $tag) (i32.const 1)) (then (return (call $append (local.get $dest) (i32.const 472) (i32.const 15)))))
++      (call $append (local.get $dest) (i32.const 488) (i32.const 8)))
+     (func $append-state (param $dest i32) (param $tag i32) (result i32)
+       (if (i32.eq (local.get $tag) (i32.const 1)) (then (return (call $append (local.get $dest) (i32.const 284) (i32.const 9)))))
+       (if (i32.eq (local.get $tag) (i32.const 2)) (then (return (call $append (local.get $dest) (i32.const 296) (i32.const 7)))))
+@@ -212,13 +221,16 @@
+       (if (i32.load8_u (i32.const 1024)) (then
+         (if (i32.eqz (i32.load8_u (i32.const 1028))) (then (call $drop-error (i32.load (i32.const 1032)))))
+         unreachable)))
+-    (func $emit-metadata (param $method i32) (param $path i32) (param $state i32) (param $count i32)
++    (func $emit-metadata (param $method i32) (param $path i32) (param $path-status i32) (param $state i32) (param $count i32)
+       (local $cursor i32)
+       (local.set $cursor (i32.const 1536))
+       (local.set $cursor (call $append (local.get $cursor) (i32.const 0) (i32.const 114)))
+       (local.set $cursor (call $append-method (local.get $cursor) (local.get $method)))
+       (local.set $cursor (call $append (local.get $cursor) (i32.const 116) (i32.const 8)))
+       (local.set $cursor (call $append-path (local.get $cursor) (local.get $path)))
++      (local.set $cursor (call $append (local.get $cursor) (i32.const 440) (i32.const 14)))
++      (local.set $cursor (call $append-path-status (local.get $cursor) (local.get $path-status)))
++      (local.set $cursor (call $append (local.get $cursor) (i32.const 500) (i32.const 27)))
+       (local.set $cursor (call $append (local.get $cursor) (i32.const 124) (i32.const 13)))
+       (local.set $cursor (call $append-state (local.get $cursor) (local.get $state)))
+       (local.set $cursor (call $append (local.get $cursor) (i32.const 140) (i32.const 13)))
+@@ -236,7 +248,7 @@
+       (local.set $cursor (call $append (local.get $cursor) (i32.const 164) (i32.const 2)))
+       (call $emit (i32.const 1536) (i32.sub (local.get $cursor) (i32.const 1536))))
+     (func (export "handle") (param $request i32) (param $out i32)
+-      (local $method i32) (local $path i32) (local $state i32) (local $count i32)
++      (local $method i32) (local $path i32) (local $path-status i32) (local $state i32) (local $count i32)
+       (local $tag i32) (local $pointer i32) (local $length i32) (local $fields i32) (local $values i32)
+       ;; Reset only between legal synchronous invocations; no retained slices.
+       (call $reset)
+@@ -246,12 +258,13 @@
+       (if (i32.eq (local.get $tag) (i32.const 2)) (then (local.set $method (i32.const 2))))
+       (call $get-path (local.get $request) (i32.const 1056))
+       (if (i32.eq (i32.load8_u (i32.const 1056)) (i32.const 1)) (then
++        (local.set $path-status (i32.const 1)) ;; Some path, including empty/query/non-target.
+         (local.set $pointer (i32.load (i32.const 1060)))
+         (local.set $length (i32.load (i32.const 1064)))
+         (if (i32.eq (local.get $length) (i32.const 8)) (then
+-          (if (call $equal (local.get $pointer) (i32.const 204) (i32.const 8)) (then (local.set $path (i32.const 1))))))
++          (if (call $equal (local.get $pointer) (i32.const 204) (i32.const 8)) (then (local.set $path (i32.const 1)) (local.set $path-status (i32.const 2))))))
+         (if (i32.eq (local.get $length) (i32.const 14)) (then
+-          (if (call $equal (local.get $pointer) (i32.const 212) (i32.const 14)) (then (local.set $path (i32.const 2))))))
++          (if (call $equal (local.get $pointer) (i32.const 212) (i32.const 14)) (then (local.set $path (i32.const 2)) (local.set $path-status (i32.const 2))))))
+       ))
+       (local.set $fields (call $get-headers (local.get $request)))
+       ;; Fields child is dropped immediately after the copied-list result returns.
+@@ -271,15 +284,13 @@
+           (if (call $hex64 (local.get $pointer)) (then
+             (memory.copy (i32.const 1088) (local.get $pointer) (i32.const 64))
+             (local.set $state (i32.const 2))))))))
+-      ;; Unadmitted route/method clears retained correlation conservatively.
+-      (if (i32.or (i32.eqz (local.get $method)) (i32.eqz (local.get $path))) (then
+-        (local.set $state (i32.const 0)) (local.set $count (i32.const 3))))
++      ;; Header classification is independent of method/path; absent path stays distinct.
+       ;; Same one owned transfer as v2, only after child drop and snapshot copy.
+       (call $inner-handler (local.get $request) (local.get $out))
+       (if (i32.lt_u (global.get $records) (i32.const 256))
+         (then
+           (global.set $records (i32.add (global.get $records) (i32.const 1)))
+-          (call $emit-metadata (local.get $method) (local.get $path) (local.get $state) (local.get $count)))
++          (call $emit-metadata (local.get $method) (local.get $path) (local.get $path-status) (local.get $state) (local.get $count)))
+         (else (if (i32.eq (global.get $records) (i32.const 256)) (then
+           (global.set $records (i32.const 257))
+           (call $emit (i32.const 348) (i32.const 89)))))))

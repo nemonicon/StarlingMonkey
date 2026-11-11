@@ -18,6 +18,11 @@ The [strict-workload resource observer](nextjs-resource-stream-results.md) now
 retains2,963 browser bytes even in the reproduced wasmCloud cancellation.
 That failed terminal remains incomplete; matched Node completes and passes.
 
+The [V4 metadata observer](nextjs-observer-v4-results.md) now passes seven real
+component probes and composes with the unchanged Next inner. Its fresh full
+browser workload is pending; earlier failures remain recorded. A portable
+saved-evidence checker and raw logs support future regression checks.
+
 The [priority roadmap](nextjs-priority-roadmap.md) leads with that response
 lifetime boundary, then lifecycle/resource/reuse, clean-machine reproduction,
 measured cost and production promotion. Server JavaScript executes in

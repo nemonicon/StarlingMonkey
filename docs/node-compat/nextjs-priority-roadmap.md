@@ -26,11 +26,13 @@ loadingFinished kept separate. The public guest POST stage chain is witnessed,
 but seven unknown outer POSTs still block the broader join. This is evidence
 about a failure, not a fix or complete cloud response.
 
-Next audit and correct the outer observer's bounded metadata classification in
-a separately versioned observer, preserving the old V3 join=false result.
-Resolve that measurement limit before selecting an engine change or intrusive
-React reader/root hooks. Keep strict worker01ca and all original assertions
-unchanged. The separately found native finish-error propagation defect needs
+The [V4 observer](nextjs-observer-v4-results.md) now builds and passes seven
+real-component metadata probes, preserving the old V3 join=false result.
+The tested observer is now composed with the unchanged Next inner; the resulting
+envelope passes validation and structural review. Next prepare a fresh runtime
+binding and repeat the strict workload with V4 classification. Resolve the fresh sample's public metadata
+join before selecting an engine change or React reader/root hooks. Keep strict
+worker01ca and all original assertions unchanged. The separately found native finish-error propagation defect needs
 its own standard-WASI regression; it is not established as this abort's cause.
 After the response boundary, prioritize lifecycle and
 resource retirement/reuse, clean-machine reproduction, empirical cost and

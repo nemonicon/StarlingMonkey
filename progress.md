@@ -2,7 +2,24 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
-Last updated: 2026-11-08. Overall roadmap: **in progress**.
+Last updated: 2026-11-11. Overall roadmap: **in progress**.
+
+Latest completed gate: [observer V4](docs/node-compat/nextjs-observer-v4-results.md)
+builds and passes all seven real-component metadata probes on Wasmtime42.0.1.
+Original owner22795/900 exits0 clean; all seven hosts shut down normally, captures
+complete and original inputs remain preserved. The 5,771B observer keeps the
+selected13 standard WASI0.2.10 external imports and unchanged diagnostic inner
+bytes. Primary composition214c1d9b and metadata61bb6690 reviews pass. The saved
+70-file/2,233,749B packet and repository-only checker retain the exact cases.
+Independent Source/binding b151d23c, composition299f5760 and runtime2ee2df27
+reviews pass. The hardened reader7a59c5b1 passes current and isolated72-file
+staged-Git copies; old reader/61bb proof remain preserved. Next envelope9da63790
+now composes the unchanged6b20 inner and tested3534 observer: all four tool steps
+and Root structural review730c2698 plus independent peeraba36a69 pass, with
+nine tool records retained.
+Next prepare a fresh V4 full-runtime binding and repeat the unchanged strict
+workload. This metadata/composition result does not resolve or waive the browser
+abort. No Next request has run through the new envelope yet.
 
 Latest full-workload diagnostic: the [CDP resource-stream comparison](docs/node-compat/nextjs-resource-stream-results.md)
 finishes cloud67923/600 raw1/clean and Node68512/300 raw0/clean. Both pass24HTTP,
@@ -34,11 +51,17 @@ release/finish return/cleanup, but seven unknown outer POSTs block the broader
 join. Token1 and sequences repeat and do not establish physical identity.
 The [outer metadata audit](tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-root-results-v1/outer-observer-metadata-source-audit.md)
 (`8e2ecc32`) finds deliberate V3 correlation clearing for unadmitted paths, not
-proof of a getter failure. A bounded V4 wire is proposed to distinguish target/
-other/absent path and independent header state with the same standard calls;
-its Source peer`ebdd744b` passes, but it is not implemented or run, and old V3
-globaljoin:false is unchanged. This is
-the next gate before further intrusive instrumentation or an engine change.
+proof of a getter failure. The separate [V4 Source](tests/node-compat/frameworks/nextjs/next-standard-handler-return-observer-v4/README.md)
+now implements target/other/absent path classification and independent header
+state with the same standard calls. Root's finite byte check passes48 variants,
+maximum314B within512B. Two model syntax checks, five inert model groups and two
+probe-runner syntax checks pass. A premature model preflight safely refuses a
+changed, not-yet-frozen source before Node or output creation; its refusal and
+exact preimage remain recorded. The final Source is frozen and actual WAT
+build/composition and all seven deployed metadata cases now pass. A separate
+binding preflight refuses Root's mistyped digest before edits/build; its correction
+uses the saved typed descriptor. None/allocator behavior remains model-only.
+Old V3 globaljoin:false is unchanged. The build volume now has about100GiB free.
 
 Current work: the [full-workload CDP observer](tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-root-results-v1/README.md)
 now has independent Source/API reviews`7f6e9841`/`f26f5512`, six actual Node

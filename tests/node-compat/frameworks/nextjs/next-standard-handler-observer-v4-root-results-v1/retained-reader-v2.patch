@@ -1,0 +1,65 @@
+--- check-retained.py
++++ check-retained-v2.py
+@@ -3,6 +3,7 @@
+ import json
+ from pathlib import Path
+ import sys
++import stat
+ 
+ INDEX_SHA = '28b1c1e17053afa9ee63519a5ef2c19d6bb9aafae0e77d77618b7c1d88a9a66a'
+ 
+@@ -12,23 +13,42 @@
+         raise ValueError(message)
+ 
+ 
++def stamp(path):
++    s = path.lstat()
++    return (s.st_dev, s.st_ino, s.st_mode, s.st_nlink, s.st_size, s.st_mtime_ns, s.st_ctime_ns)
++
++
++def bounded_read(path, maximum, exact=None):
++    require(path.resolve() == path and not any(p.is_symlink() for p in (path, *path.parents)), 'Canonical ancestry')
++    before = stamp(path)
++    require(stat.S_ISREG(before[2]) and before[3] == 1 and 0 <= before[4] <= maximum, 'Bounded independent regular file')
++    require(exact is None or before[4] == exact, 'Declared file size before read')
++    with path.open('rb') as handle:
++        raw = handle.read(maximum + 1)
++    require(len(raw) == before[4] and stamp(path) == before, 'Stable bounded read')
++    return raw
++
++
+ def check():
+     if not (__debug__ and sys.flags.isolated and sys.dont_write_bytecode):
+         raise RuntimeError('Use Python -I -B without -O')
+     require(len(sys.argv) == 1, 'No arguments')
+     root = Path(__file__).resolve().parent / 'raw-records'
+-    raw_index = (root / 'index.json').read_bytes()
++    raw_index = bounded_read(root / 'index.json', 65536)
+     require(hashlib.sha256(raw_index).hexdigest() == INDEX_SHA, 'Pinned saved packet')
+     index = json.loads(raw_index)
+     require(len(index['files']) == index['payloadFiles'] == 70, 'Exact packet count')
+-    rows, originals = {}, {}
++    require(all(type(r['bytes']) is int and 0 <= r['bytes'] <= 4 * 1024**2 for r in index['files']), 'Declared per-file bounds')
++    require(sum(r['bytes'] for r in index['files']) == index['totalBytes'] <= 16 * 1024**2, 'Declared aggregate bound')
++    rows, originals, stamps = {}, {}, {}
+     for row in index['files']:
+         name = row['path']
+         part = Path(name)
+         require(not part.is_absolute() and '..' not in part.parts and name not in rows, 'Safe unique path')
+         path = root / part
+         require(not path.is_symlink() and path.is_file() and path.stat().st_nlink == 1, 'Regular copied file')
+-        raw = path.read_bytes()
++        raw = bounded_read(path, 4 * 1024**2, row['bytes'])
++        stamps[name] = stamp(path)
+         require(len(raw) == row['bytes'] <= 4 * 1024**2 and hashlib.sha256(raw).hexdigest() == row['sha256'], 'Saved bytes: ' + name)
+         require(all(row[k] == row['original'][k] for k in ('sha256', 'bytes')), 'Copied/original descriptor equality')
+         rows[name] = raw
+@@ -104,6 +124,8 @@
+         summaries.append(dict(caseId=case['caseId'], metadata=metadata, status=405, bodyBytes=len(body), passed=True))
+     require(all(result[k] is True for k in ('driverCompletedAllDeclaredCases', 'allCollectionsCompletedCleanly', 'allDeclaredMetadataAndResponsesAccepted', 'originalInputsPreserved', 'passed')), 'Aggregate result')
+     require(result['fullNextAccepted'] is False and receipt['fullNextAccepted'] is False, 'No Next acceptance upgrade')
++    require(all(stamp(root / name) == value for name, value in stamps.items()), 'Final payload bookends')
++    require(bounded_read(root / 'index.json', 65536) == raw_index, 'Final index bookend')
+     return dict(schemaVersion=1, state='V4_RETAINED_METADATA_PROBES_CHECK_PASSED_V1', payloadFiles=70,
+         totalBytes=2233749, originalOwner=22795, metadataCasesPassed=7, cases=summaries,
+         replayedHosts=False, openedOriginalPaths=False, allocatorOrAbsentPathExecuted=False,
