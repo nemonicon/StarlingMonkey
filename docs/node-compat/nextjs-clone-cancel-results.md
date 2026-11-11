@@ -1,9 +1,10 @@
 # Native clone-cancellation regression
 
-The first repaired-engine sample passes on Wasmtime 42.0.1 against Node 22.14.0.
+The repaired-engine sample passes on Wasmtime 42.0.1 and stock wasmCloud 2.11.0
+against Node 22.14.0.
 This fixes the bounded cancellation failure observed with engine `237c4e5a`.
-It does not yet establish the result on wasmCloud or pass the full Next.js
-workload with the changed engine. Production remains foundations-v13.
+The full Next.js workload has not yet run with the changed engine. Production
+remains foundations-v13. Each row below passes on both hosts.
 
 | Check | Actual result |
 |---|---|
@@ -23,6 +24,15 @@ exactly four GETs: `/context`, `/clone-cancel`, `/clone-cancel-followups`,
 `/context`. All return HTTP 200 with complete bodies of 17,379 / 3,041 / 4,691 /
 17,379 bytes. The host exits normally after SIGINT. Original runtime owner
 76401/120 and comparison owner 76491/30 both exit 0 with complete cleanup.
+
+The stock wasmCloud run uses the identical component and returns byte-identical
+bodies for all four requests. Runtime owner 80219/300 and comparison owner
+80391/30 exit 0 with complete cleanup; both `config show` and `wash dev` exit 0,
+and the host stops normally after SIGINT. Its effective configuration has no
+mounts, guest environment entries or outgoing allowlists. The first harness
+attempt is retained: it failed on an omitted empty configuration field before
+launching `dev` or making any HTTP request. V2 accepts only the empty-field
+omissions defined by the pinned host's serde code.
 
 The changed native source is `request-response.cpp` afterimage `0431184d`.
 Engine `e3075c14` is 31,353,161 bytes; component `7c227997` is 37,268,017 bytes.
@@ -65,8 +75,20 @@ the working tree and an isolated copy of 101 actual staged Git blobs. Optimized
 Python is refused before payload reads. It validates retained evidence; it does
 not rerun or verify the omitted binaries.
 
-Next gates are the same lifecycle sample on stock wasmCloud 2.11.0, the unchanged
-comprehensive Next.js app on both target hosts, resource-lifetime/reuse checks,
+The stock success is separately retained as 59 payloads / 288,118 bytes. Its
+repository-only checker also passes from an isolated copy of 61 staged Git files:
+
+```sh
+python3 -I -B tests/node-compat/async-context/next-clone-cancel-wasmcloud-root-results-v2/check-saved.py
+```
+
+The first failed attempt remains a separate 27-payload packet. No original
+record is rewritten. The unchanged real Next entry now constructs as `bfb106fe`;
+its observer envelope `f1c32f45` validates and passes structural review, including
+exact embedded child bytes, shared resource types and the same 13 external
+interfaces. That review establishes composition, not deployed application behavior.
+
+Next gates are the unchanged comprehensive Next.js app on both target hosts, resource-lifetime/reuse checks,
 repeatability, clean-checkout reproduction and cost measurements. A healthy
 second context response does not prove same-Store identity or native resource
 retirement. No broad Node/Buffer compatibility or production promotion follows

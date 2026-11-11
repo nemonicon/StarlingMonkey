@@ -5,7 +5,7 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 Last updated: 2026-11-11. Overall roadmap: **in progress**.
 
 Current native repair result: the [repaired-engine real-component regression](docs/node-compat/nextjs-clone-cancel-results.md)
-**passes on Wasmtime 42.0.1 against Node 22.14.0**. Both request-context runs
+**passes on Wasmtime 42.0.1 and stock wasmCloud 2.11.0 against Node 22.14.0**. Both request-context runs
 match (95 assertions each), the original cloned-response cancellation now calls
 the source once with both reasons and waits, and all four rejection/EOF/error
 follow-ups match Node. All four HTTP 200 bodies are complete; runtime owner
@@ -17,20 +17,36 @@ isolated 101-file copy of staged Git blobs, recomputing typed comparisons and
 requiring complete captures. Optimized Python is refused before reads. The
 unchanged real Next entry also constructs as `bfb106fe` and passes component
 validation and complete INIT/return-graph review; it has not served the app yet.
-Stock wasmCloud, full Next regressions with this engine, resource
-retirement, repeatability and cost remain outstanding. Production is unchanged.
+The stock run returns byte-identical bodies, with runtime owner 80219 and
+comparison owner 80391 both exiting 0 cleanly. Its effective configuration has
+no mounts, guest environment entries or outgoing allowlists. The separate
+59-payload/288,118-byte stock packet is retained. Its repository-only checker
+passes both the current tree and an isolated 61-file staged-Git copy; optimized
+Python is refused before payload reads. Full Next regressions with
+this engine, resource retirement, repeatability and cost remain outstanding. Production is unchanged.
 
 The first stock wasmCloud lifecycle attempt is preserved as a harness failure:
 owner 78885 exits 1 with clean cleanup after `config show` exits 0. The host
 omits empty `dev.volumes` and environment-config keys; the new validator requires
 one of those absent keys. No `dev` process or HTTP request ran. The 27-payload
-failure packet is retained, and a separately versioned validator correction is
-in progress. The passing Wasmtime result is unchanged.
+failure packet is retained. The separately versioned V2 validator handles only
+the empty-field omissions declared by pinned Rust serde code; the fresh stock
+run now passes as recorded above. The original failed attempt stays failed.
 
-The current checkpoint includes the closed native build, corrected admission,
+Checkpoint `9313eb8d41705f65d37f962e6e625c9cbb42f20f` is committed, pushed
+and verified on remote `main`. Its 2,598 staged source/evidence files were
+byte-compared with the worktree before the final proof file was added.
+The checkpoint includes the closed native build, corrected admission,
 passing Wasmtime regression and portable saved checks, real Next INIT result,
-and first stock-host harness failure. Active observer-composition drafts and
-the next stock validator version remain outstanding work.
+and first stock-host harness failure. The stock V2 success is newer than that
+checkpoint. Observer composition now passes: owner 81368 and structural review
+owner 82292 exit 0 cleanly; envelope `f1c32f45` embeds the exact new Next component
+and tested observer, preserving shared resource types and the 13 standard imports.
+The closed composition/tool records are retained as 59 payloads / 3,213,306
+stored bytes, with every retained and expanded hash independently checked.
+Current Node, Chrome, Playwright, Wasmtime and wash identities and versions also
+pass revalidation. The comprehensive three-arm Next runtime harness remains in
+progress, with fixed Wasmtime → wasmCloud → Node execution order.
 
 Native build prerequisites are now recovered with about 98 GiB initially free.
 All six tool archives and the public SpiderMonkey header-donor archive match
@@ -70,8 +86,8 @@ acceptance or binary-verification claim. Independent admission now passes
 (owner 75744, exit 0, clean cleanup), including the actual engine binary and
 complete corrected metadata. Component preparation also passes (owner 75867),
 protecting 27,506 inputs and the complete selected WIT world. Actual component construction, validation and the first Wasmtime cancellation
-comparison now pass as recorded above. Stock wasmCloud and full Next regressions
-remain outstanding.
+comparison now pass as recorded above. Stock wasmCloud lifecycle now also passes; full Next regressions remain
+outstanding.
 The existing 237c engine and prior failing lifecycle component remain unchanged.
 The previous lifecycle failure checkpoint is
 `b71aa50478c705803d9a62dbe6a44a89dcd642bb`. This recovery checkpoint does not

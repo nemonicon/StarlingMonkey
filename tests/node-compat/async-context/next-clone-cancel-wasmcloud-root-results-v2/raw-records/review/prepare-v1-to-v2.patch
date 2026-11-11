@@ -1,0 +1,43 @@
+--- v1/prepare.py
++++ v2/prepare.py
+@@ -8,8 +8,8 @@
+ 
+ HERE = Path(__file__).resolve().parent
+ BASE = HERE.parent
+-SOURCE = BASE / 'lifecycle-wasmcloud-collector-v1'
+-OUTPUT = Path('/private/tmp/starling-node-compat/next-lifecycle-wasmcloud-v1-clone-cancel-first')
++SOURCE = BASE / 'lifecycle-wasmcloud-collector-v2'
++OUTPUT = Path('/private/tmp/starling-node-compat/next-lifecycle-wasmcloud-v2-clone-cancel-first')
+ WASH = Path('/private/tmp/starling-node-compat/wasmcloud/bin/wash-2.11.0-aarch64-apple-darwin')
+ 
+ 
+@@ -38,9 +38,9 @@
+     assert original['state'] == 'ROOT_LIFECYCLE_COMPONENT_RUNTIME_REQUEST_V3'
+     assert original['component']['sha256'] == '7c22799781975b7e9c09d9df294fb1c5e3f243bb1c596d733425f98cf805f779'
+     index_ref = row(SOURCE / 'index.json')
+-    assert index_ref['sha256'] == '232538e55fe9d1a9756a51e944a1cafcf067facc82a856bd2ab4193597afb50d'
++    assert index_ref['sha256'] == 'd67bc92a34f8167c8e26d5840ad6f58eeb1a9e59c1e6f28eb433698d345640bd'
+     index = json.loads((SOURCE / 'index.json').read_bytes())
+-    assert len(index['files']) == 4
++    assert len(index['files']) == 5
+     source_refs = [index_ref]
+     names = set()
+     for item in index['files']:
+@@ -56,7 +56,7 @@
+     assert {p.relative_to(SOURCE).as_posix() for p in SOURCE.rglob('*') if p.is_file()} == names | {'index.json'}
+     assert not any(p.is_symlink() for p in SOURCE.rglob('*'))
+     collector = row(SOURCE / 'run-wasmcloud.py')
+-    assert collector['sha256'] == 'ecaf191aa8d059383a9cf9fb511a8789c0a29603b65f5a950f293ab5ca244a8b'
++    assert collector['sha256'] == '229903cbb09f8299341f9588ec4044154627c3dd238619b7fb1bc02aa1ef041a'
+     wash = row(WASH)
+     assert wash['sha256'] == '365d896eaed3894f1c551a1ed7351c2aae9dfa5548ce82041ead92e6253d1954' and wash['bytes'] == 101947952
+     protected = [base_ref, row(Path(__file__).resolve()), *source_refs, *original['protectedInputs']]
+@@ -69,7 +69,7 @@
+         lease.bind(('127.0.0.1', 0))
+         origin = 'http://127.0.0.1:' + str(lease.getsockname()[1])
+     request = {k: original[k] for k in ('component', 'wasmTools', 'validationStarted', 'validationTerminal', 'witStarted', 'witTerminal')}
+-    request.update(schemaVersion=1, state='ROOT_LIFECYCLE_WASMCLOUD_RUNTIME_REQUEST_V1',
++    request.update(schemaVersion=1, state='ROOT_LIFECYCLE_WASMCLOUD_RUNTIME_REQUEST_V2',
+         wash=wash, runtimeSource=collector, outputRoot=str(OUTPUT), selfOrigin=origin,
+         protectedInputs=protected, derivedFromValidatedWasmtimeRequest=base_ref,
+         guestEnvironmentConfigured=False, applicationMounted=False, outgoingHostsAllowed=False,

@@ -1,0 +1,55 @@
+--- lifecycle-wasmcloud-collector-v1/run-wasmcloud.py
++++ lifecycle-wasmcloud-collector-v2/run-wasmcloud.py
+@@ -163,15 +163,18 @@
+ 
+ def effective_configuration(actual, wanted):
+     need(actual['version'] == wanted['version'] and actual['build'] == wanted['build'], 'effective build configuration')
+-    for key in ('address', 'command', 'component_path', 'service', 'volumes'):
++    for key in ('address', 'command', 'component_path', 'service'):
+         need(actual['dev'][key] == wanted['dev'][key], 'effective dev field: ' + key)
++    need(actual['dev'].get('volumes', []) == [], 'no dev volumes; empty serde omission permitted')
+     for key in ('components', 'plugins', 'host_plugins'):
+         need(actual['dev'].get(key, []) == [], 'no extra dev workloads/plugins')
+     for key in ('allowedHosts', 'allowedIpNameLookups', 'allowedHostLoopbackPorts'):
+         need(actual['workload'][key] == [], 'zero outgoing allowlist')
+-    need(actual['workload'].get('config', {}) == {} and
+-         actual['workload']['environment']['config'] == {} and actual['wit']['skip_fetch'] is True,
+-         'zero guest config/environment; no WIT network fetch')
++    environment = actual['workload']['environment']
++    need(type(environment) is dict and set(environment) <= {'config'} and
++         environment.get('config', {}) == {}, 'zero guest environment; no configFrom/secretFrom or extra fields')
++    need(actual['workload'].get('config', {}) == {} and actual['wit']['skip_fetch'] is True,
++         'zero guest config; no WIT network fetch')
+ 
+ 
+ def registration(captures, origin):
+@@ -227,9 +230,9 @@
+         raise RuntimeError('Use nonoptimized Python -I -B')
+     need(len(sys.argv) == 2, 'usage: run-wasmcloud.py ABSOLUTE_REQUEST.json')
+     request_ref = row(Path(sys.argv[1])); request = document(request_ref)
+-    need(request['state'] == 'ROOT_LIFECYCLE_WASMCLOUD_RUNTIME_REQUEST_V1', 'fresh Root cloud runtime request')
++    need(request['state'] == 'ROOT_LIFECYCLE_WASMCLOUD_RUNTIME_REQUEST_V2', 'fresh Root cloud runtime request')
+     need(type(request['outputRoot']) is str and re.fullmatch(
+-        r'/private/tmp/starling-node-compat/next-lifecycle-wasmcloud-v1-[a-z0-9][a-z0-9-]{0,47}',
++        r'/private/tmp/starling-node-compat/next-lifecycle-wasmcloud-v2-[a-z0-9][a-z0-9-]{0,47}',
+         request['outputRoot']) is not None, 'fresh cloud output namespace')
+     OUTPUT = Path(request['outputRoot'])
+     need(OUTPUT.resolve() == OUTPUT and OUTPUT.parent.is_dir() and not os.path.lexists(OUTPUT), 'exclusive canonical output')
+@@ -261,7 +264,7 @@
+     protect()
+     os.umask(0o077)
+     OUTPUT.mkdir(mode=0o700)
+-    result = dict(schemaVersion=1, state='LIFECYCLE_WASMCLOUD_COLLECTION_IN_PROGRESS_V1', request=request_ref,
++    result = dict(schemaVersion=1, state='LIFECYCLE_WASMCLOUD_COLLECTION_IN_PROGRESS_V2', request=request_ref,
+         component=request['component'], wash=request['wash'], selectedInterfaces=sorted(SELECTED),
+         emittedImports=imports, exports=exports, actualHost='stock-wasmCloud-2.11.0',
+         configured=wanted, bodyLimitBytes=BODY_LIMIT, eachLogLimitBytes=LOG_LIMIT,
+@@ -397,7 +400,7 @@
+                 result['secondaryErrors'].append(dict(stage='final-capture-or-protection', **error(value)))
+         result['unattemptedRequests'] = result['fixedRequests'][len(result['responses']):]
+         result['collectionClean'] = primary is None and not result['secondaryErrors'] and result.get('allFourBodiesCollected') is True and result.get('inputsPreserved') is True
+-        result['state'] = 'LIFECYCLE_WASMCLOUD_COLLECTION_CLEAN_UNREVIEWED_V1' if result['collectionClean'] else 'LIFECYCLE_WASMCLOUD_COLLECTION_FAILED_RAW_PRESERVED_V1'
++        result['state'] = 'LIFECYCLE_WASMCLOUD_COLLECTION_CLEAN_UNREVIEWED_V2' if result['collectionClean'] else 'LIFECYCLE_WASMCLOUD_COLLECTION_FAILED_RAW_PRESERVED_V2'
+         try:
+             descriptor = save(OUTPUT / 'result.json', result)
+             print(json.dumps(dict(result=descriptor, collectionClean=result['collectionClean'], semanticComparisonPerformed=False)), flush=True)

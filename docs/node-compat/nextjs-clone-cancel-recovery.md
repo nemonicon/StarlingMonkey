@@ -1,7 +1,7 @@
 # Native clone-cancellation repair: build readiness
 
-The native cancellation fix **compiles and passes its first real-component
-comparison on Wasmtime**. See the [new runtime results](nextjs-clone-cancel-results.md).
+The native cancellation fix **compiles and passes real-component comparisons on
+Wasmtime and stock wasmCloud**. See the [new runtime results](nextjs-clone-cancel-results.md).
 The earlier real component still fails the cancellation comparison recorded in
 [the lifecycle results](nextjs-lifecycle-results.md). Production remains
 foundations-v13, and experimental engine 237c is unchanged.
@@ -72,6 +72,7 @@ record both outcomes.
 Independent engine admission, complete component-input preparation, construction,
 component validation and the first lifecycle differential now pass. The emitted
 imports are exactly the selected standard WASI 0.2.10 interfaces.
-Next: run the same lifecycle regression on stock wasmCloud and rerun the bounded
-full Next workload on both target hosts. Same-Store identity, resource retirement, repetition,
+The same lifecycle regression now passes on stock wasmCloud with byte-identical
+response bodies. Next: rerun the bounded full Next workload on both target hosts.
+Same-Store identity, resource retirement, repetition,
 cost measurements and production promotion remain separate gates.

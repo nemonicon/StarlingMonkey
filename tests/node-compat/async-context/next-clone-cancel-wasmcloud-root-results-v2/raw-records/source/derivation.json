@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "state": "MEASURED_EMPTY_SERDE_OMISSION_SOURCE_CORRECTION_V2",
+  "before": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/lifecycle-wasmcloud-collector-v1/run-wasmcloud.py",
+    "sha256": "ecaf191aa8d059383a9cf9fb511a8789c0a29603b65f5a950f293ab5ca244a8b",
+    "bytes": 22460
+  },
+  "after": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/lifecycle-wasmcloud-collector-v2/run-wasmcloud.py",
+    "sha256": "229903cbb09f8299341f9588ec4044154627c3dd238619b7fb1bc02aa1ef041a",
+    "bytes": 22713
+  },
+  "patch": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/lifecycle-wasmcloud-collector-v2/v1-to-v2.patch",
+    "sha256": "d98f50d284e2288528c0fb3d72ee9534272a4c51bb81f2af6d9812fd662db996",
+    "bytes": 4102
+  },
+  "actualV1Failure": {
+    "path": "/private/tmp/starling-node-compat/next-lifecycle-wasmcloud-v1-clone-cancel-first/result.json",
+    "sha256": "243f899bda012aad8756b265eceeaa69948adad439fbbfc4bc08a2eddea92584",
+    "bytes": 6384
+  },
+  "actualV1ConfigShow": {
+    "path": "/private/tmp/starling-node-compat/next-lifecycle-wasmcloud-v1-clone-cancel-first/config-show.stdout.log",
+    "sha256": "0a2d09655528fb3dd9496f916374d2d40193d4d5361d087b6760f30cfa20463a",
+    "bytes": 1595
+  },
+  "actualHostStarted": false,
+  "actualHttpRequests": 0,
+  "sourceEvidence": [
+    {
+      "reference": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-persistent-cache-overlap-root-results-v1/source-history/wasmcloud-2.11.0-config.rs",
+        "sha256": "42fd99e466eaf4f8d496253a99068423428a738379069414c3790146dc7b51d8",
+        "bytes": 125293
+      },
+      "lines": [
+        1243,
+        1245
+      ],
+      "fact": "dev.volumes default Vec with skip_serializing_if Vec::is_empty"
+    },
+    {
+      "reference": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-persistent-cache-overlap-root-results-v1/source-history/wasmcloud-2.11.0-config-source.rs",
+        "sha256": "cc39cd326a4579b78153039933d96d0eeaeab9d3113fa86c3493198eeddb1d7f",
+        "bytes": 39467
+      },
+      "lines": [
+        49,
+        61
+      ],
+      "fact": "EnvironmentLayer.config default HashMap skips empty; configFrom and secretFrom are distinct fields and remain rejected"
+    }
+  ],
+  "priorSourcePeerQualified": "V1 Source review assumed empty dev.volumes and environment.config would remain present in config-show JSON. Actual stock serialization omitted them, so the actor failed before dev/HTTP. V2 permits only those empty representations; no mount, environment value or extra environment source is admitted.",
+  "unchanged": "same pinned2.11 binary, component/WIT validation, zero-cap configuredmodel, all allowlists, singledev/config/readiness, fourcalls/bodychecks, captures/shutdown/owner obligations",
+  "authorExecutedFunctions": false,
+  "authorInvokedToolsOrHosts": false,
+  "actualV2": null
+}

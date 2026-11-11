@@ -1,0 +1,362 @@
+--- compose-next.before.py
++++ compose-observer.py
+@@ -1,95 +1,208 @@
+-"""Compose the unchanged reviewed Next inner with the V4 observer after genuine seven-case metadata acceptance."""
++"""Root-only composition of actual new Next inner and unchanged tested V4 observer."""
+ import hashlib
+-import importlib.util
+ import json
++import os
+ from pathlib import Path
++import re
++import stat
+ import subprocess
+ import sys
+ 
+ HERE = Path(__file__).resolve().parent
+-BASE = HERE.parent
+-WORK = Path('/private/tmp/starling-node-compat/next-standard-handler-observer-next-v4-first')
+-PREPARER = dict(path=str(BASE / 'next-native-export-diagnostic-next-root-results-v1/prepare-construction.py'),
+-    sha256='4bafbb2fd675bcee84746aea3988ae6eb597d64570d19cd3c8819aa158d2c5e4', bytes=19784)
+-INNER_REVIEW = dict(path=str(BASE / 'next-native-export-diagnostic-next-root-results-v1/actual-construction-review.json'),
+-    sha256='5c284564e0ddefba507c5429acd98c42393d5c0f2764105a4046f0665f51e16a', bytes=22550)
+-INNER_AUTHORITY = dict(path=str(BASE / 'next-native-export-diagnostic-next-root-results-v1/diagnostic-next-construction-authority.json'),
+-    sha256='23313b9b1858e22df729b379c10750cd92ba00ce4aa9bee179fc21142fdfea66', bytes=5597386)
+-OBSERVER_REVIEW = dict(path=str(HERE / 'actual-v4-composition-review.json'),
+-    sha256='214c1d9bcfd1858666d460afe72811b858fc8018e9f5e4bfb9519d8ddbe04224', bytes=11140)
++WORK = Path('/private/tmp/starling-node-compat/next-clone-cancel-next-observer-v1-first')
++CONSTRUCTION_REVIEW = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/next-clone-cancel-next-root-results-v1/construction-review.json', 'sha256': '30ae9607b5d2b115e7dfd742c14c1071ab646dc5e14ef4510763a2926f773c49', 'bytes': 7868016}
++OBSERVER_REVIEW = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-standard-handler-observer-v4-root-results-v1/actual-v4-composition-review.json', 'sha256': '214c1d9bcfd1858666d460afe72811b858fc8018e9f5e4bfb9519d8ddbe04224', 'bytes': 11140}
+ METADATA_REVIEW = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-standard-handler-observer-v4-root-results-v1/actual-metadata-runtime-review.json', 'sha256': '61bb6690df9cf8fef3c455314352a95816a20bc01920909b75632bf5333c47c8', 'bytes': 7272}
+-WAC = dict(path='/private/tmp/starling-node-compat/next-standard-handler-wac-build-v1-first/target/debug/wac',
+-    sha256='6577e5eedeb0644025a8454c3d600ecad14a3788432c48e8d40b7ba56d271f5f', bytes=30168152)
+-WASM_TOOLS = dict(path='/private/tmp/starling-node-compat/node-crypto-hash-hmac-v3-build/cache/wasm-tools/1448/wasm-tools',
+-    sha256='b332dd79057dafdcc8a36ca933d0d499acea506b56b1ea28e28fbb036c9e713d', bytes=17556208)
+-
++WAC = dict(path='/private/tmp/starling-node-compat/next-standard-handler-wac-build-v1-first/target/debug/wac', sha256='6577e5eedeb0644025a8454c3d600ecad14a3788432c48e8d40b7ba56d271f5f', bytes=30168152)
++WASM_TOOLS = dict(path='/private/tmp/starling-node-compat/next-clone-cancel-native-recovery-v1-first/tools-v2/wasm-tools/wasm-tools', sha256='b332dd79057dafdcc8a36ca933d0d499acea506b56b1ea28e28fbb036c9e713d', bytes=17556208)
++OBSERVER = dict(path='/private/tmp/starling-node-compat/next-standard-handler-observer-build-v4-first/observer.wasm', sha256='3534089e3a28ef109cffef9bc2c6b9bebf1e7ab7c90d1781c91272d01ac3092f', bytes=5771)
++INPUTS = {}
++STAMPS = {}
++CHARGED = 0
++
++def need(value, message):
++    if not value:
++        raise RuntimeError(message)
++
++
++def stamp(value):
++    return tuple(getattr(value, name) for name in ('st_dev', 'st_ino', 'st_mode', 'st_nlink', 'st_size', 'st_mtime_ns', 'st_ctime_ns'))
++
++
++def row(path):
++    p = Path(path)
++    need(p.is_absolute() and p.resolve(strict=True) == p, 'canonical regular input')
++    before = p.lstat()
++    need(stat.S_ISREG(before.st_mode) and 0 <= before.st_size <= 2 * 1024**3, 'file kind/declared bound')
++    h = hashlib.sha256()
++    with p.open('rb') as f:
++        need(stamp(os.fstat(f.fileno())) == stamp(before), 'changed before open')
++        remaining = before.st_size
++        while remaining:
++            block = f.read(min(1024**2, remaining))
++            need(bool(block), 'short input read')
++            h.update(block)
++            remaining -= len(block)
++        need(f.read(1) == b'' and stamp(os.fstat(f.fileno())) == stamp(before), 'changed during read')
++    need(stamp(p.lstat()) == stamp(before), 'file read bookend')
++    return dict(path=str(p), sha256=h.hexdigest(), bytes=before.st_size)
++
++
++def checked(ref):
++    global CHARGED
++    need(type(ref) is dict and set(ref) == {'path', 'sha256', 'bytes'} and
++         type(ref['bytes']) is int and 0 <= ref['bytes'] <= 2 * 1024**3 and
++         type(ref['sha256']) is str and re.fullmatch('[0-9a-f]{64}', ref['sha256']) is not None, 'typed descriptor')
++    old = INPUTS.get(ref['path'])
++    need(old is None or old == ref, 'conflicting input descriptor')
++    p = Path(ref['path'])
++    if old is None:
++        CHARGED += ref['bytes']
++        need(len(INPUTS) < 100000 and CHARGED <= 96 * 1024**3, 'input count/aggregate declaration bound')
++        need(row(p) == ref, 'input payload mismatch')
++        INPUTS[ref['path']] = ref
++        STAMPS[ref['path']] = stamp(p.lstat())
++    else:
++        need(stamp(p.lstat()) == STAMPS[ref['path']], 'input physical bookend')
++    return p
++
++
++def raw(ref, limit=32 * 1024**2):
++    need(ref['bytes'] <= limit, 'bounded raw input')
++    p = checked(ref)
++    with p.open('rb') as f:
++        data = f.read(limit + 1)
++    need(len(data) == ref['bytes'] and len(data) <= limit and hashlib.sha256(data).hexdigest() == ref['sha256'], 'raw readback')
++    need(stamp(p.lstat()) == STAMPS[ref['path']], 'raw input bookend')
++    return data
++
++
++def unique(pairs):
++    result = {}
++    for key, value in pairs:
++        need(key not in result, 'duplicate JSON key')
++        result[key] = value
++    return result
++
++
++def doc(ref):
++    return json.loads(raw(ref), object_pairs_hook=unique,
++                      parse_constant=lambda _: (_ for _ in ()).throw(RuntimeError('nonfinite JSON')))
++
++
++def protect(full=False):
++    for path, ref in list(INPUTS.items()):
++        need(stamp(Path(path).lstat()) == STAMPS[path], 'protected input changed')
++        if full:
++            need(row(path) == ref, 'protected final payload changed')
++
++
++def save(path, value):
++    data = (json.dumps(value, indent=2) + '\n').encode()
++    need(len(data) <= 32 * 1024**2, 'publication bound')
++    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
++    primary = None
++    try:
++        view = memoryview(data)
++        while view:
++            n = os.write(fd, view)
++            need(n > 0, 'short publication')
++            view = view[n:]
++        os.fsync(fd)
++    except BaseException as error:
++        primary = error
++    try:
++        os.close(fd)
++    except BaseException:
++        if primary is not None:
++            raise primary
++        raise
++    if primary is not None:
++        raise primary
++    need(Path(path).read_bytes() == data, 'publication readback')
++    return row(path)
++
++
++def prerequisites():
++    construction = doc(CONSTRUCTION_REVIEW)
++    need(construction['state'] == 'CLONE_CANCEL_NEXT_COMPONENT_CONSTRUCTION_REVIEW_PASSED_V1', 'actual new Next construction review')
++    for key in ('passed', 'verifiedPassed', 'completeReturnedImportAuditVerified', 'allImportTuplesUniqueAndTyped',
++                'componentTypedArrayBytesMatch', 'completeActualMetadataReviewed', 'allThreeCommandsRawZeroClean', 'allCurrentInputsPreserved'):
++        need(construction[key] is True, 'new construction proof: ' + key)
++    for key in ('oldMetadataProjected', 'ordinaryGuestExecuted', 'appMountedAtInit', 'observerComposed', 'runtimeAccepted', 'fullNextAccepted'):
++        need(construction[key] is False, 'new construction scope: ' + key)
++    need(construction['component']['sha256'] == 'bfb106fe77874a8e4d2d24ec446c83a301af82346f782cee95dd219b336a943b' and
++         construction['component']['bytes'] == 37274386, 'actual selected new inner')
++    need(construction['originalDriverPassed'] is False and construction['originalOuterRawExitCode'] == 1, 'old native failure preserved')
++    request = doc(construction['constructorRequest'])
++    need(request['state'] == 'ROOT_CLONE_CANCEL_NEXT_ENGINE_CONSTRUCTION_V1' and
++         request['engineAdmission'] == construction['engineAdmission'] and request['engine'] == construction['engine'] and
++         request['nativeMetadata'] == construction['nativeMetadata'] and request['entry'] == construction['inputEntry'], 'actual new request roles')
++    need(request['ordinaryExportsAllowed'] is False and request['oldFixedGuardInvoked'] is False, 'new request scope')
++    admission = doc(construction['engineAdmission'])
++    need(admission['state'] == 'CLONE_CANCEL_ACTUAL_ENGINE_ADMISSION_PASSED_V1' and
++         admission['passed'] is admission['completeActualMetadataReviewed'] is admission['nativeBuildPassed'] is True and
++         admission['engine'] == construction['engine'] and admission['nativeMetadata'] == construction['nativeMetadata'] and
++         admission['oldMetadataProjected'] is admission['guestExecuted'] is False, 'actual new engine admission')
++    metadata = doc(construction['nativeMetadata'])
++    need(sorted(metadata) == admission['metadataKeys'] == admission['metadataFieldsVerified'] == construction['metadataKeys'] and
++         metadata['engine'] == construction['engine'], 'whole actual native metadata')
++    for ref in construction['protectedInputs'] + request['inputs'] + admission['protectedBuildInputs'] + admission['protectedSourceInputs']:
++        checked(ref)
++    for ref in construction['artifacts'].values():
++        checked(ref)
++    for key in ('component', 'constructorRequest', 'engine', 'nativeMetadata', 'engineAdmission', 'inputEntry',
++                'inputSourceIndex', 'constructorSourceIndex', 'selectionPolicy', 'constructorTerminal', 'validationTerminal', 'witTerminal'):
++        checked(construction[key])
++    observer = doc(OBSERVER_REVIEW)
++    need(observer['state'] == 'COORDINATED_STANDARD_HANDLER_OBSERVER_V4_COMPOSITION_DATA_REVIEW_PASSED_V1', 'actual observer construction ancestry')
++    for key in ('verifiedPassed', 'verifiedDataReviewPassed', 'rawChildBytesVerified', 'siblingDefiningInstancesVerified',
++                'sharedNominalResourceAliasesVerified', 'fieldsNominalResourceAliasesVerified', 'metadataGetterCanonicalOptionsVerified',
++                'synchronousLiftLowerWithInnerPostReturnVerified', 'innerExplicitPostReturnPreserved', 'observerManualPostReturnAbsent',
++                'observerNoMarkerBeforeInnerCallSourceVerified', 'normalFieldsChildDropBeforeOwnForwardSourceVerified',
++                'correlationSnapshotIndependentOfMethodAndPathSourceVerified', 'allSevenRequestedToolStepsRawZero', 'allSevenToolStderrEmpty'):
++        need(observer[key] is True, 'observer ancestry proof: ' + key)
++    need(observer['observerBinary'] == OBSERVER and observer['runtimeAccepted'] is observer['actualMetadataBehaviorProved'] is False,
++         'observer Source/binary scope')
++    metadata_review = doc(METADATA_REVIEW)
++    need(metadata_review['state'] == 'COORDINATED_STANDARD_HANDLER_OBSERVER_V4_METADATA_DATA_REVIEW_PASSED_V1', 'actual seven-case metadata ancestry')
++    for key in ('verifiedPassed', 'verifiedDataReviewPassed', 'allCollectionsCompletedCleanly', 'actualMetadataBehaviorProved',
++                'runtimeAccepted', 'cleanOwner', 'finalInputsPreserved'):
++        need(metadata_review[key] is True, 'metadata ancestry proof: ' + key)
++    need(metadata_review['metadataCasesPassed'] == len(metadata_review['caseResults']) == 7 and
++         all(r['passed'] is True for r in metadata_review['caseResults']) and metadata_review['rawExitCode'] == 0 and
++         metadata_review['originalOwnerSeconds'] == 900 and metadata_review['compositionReview'] == OBSERVER_REVIEW and
++         metadata_review['observerBinary'] == OBSERVER and metadata_review['nextWorkloadExecuted'] is metadata_review['fullNextAccepted'] is False,
++         'metadata accepted roles and scope')
++    for key in ('observerSource', 'observerManifest', 'observerProtocol'):
++        checked(observer[key])
++    checked(OBSERVER); checked(WAC); checked(WASM_TOOLS)
++    return construction, request, observer
+ 
+ def main():
+-    if not (__debug__ and sys.flags.isolated and sys.dont_write_bytecode and len(sys.argv) == 1 and type(METADATA_REVIEW) is dict):
+-        raise RuntimeError('Use non-optimized Python -I -B and a genuine bound V4 metadata review; no helper read or action')
+-    source = Path(PREPARER['path'])
+-    raw = source.read_bytes()
+-    assert source.resolve() == source and not source.is_symlink() and source.stat().st_nlink == 1
+-    assert (hashlib.sha256(raw).hexdigest(), len(raw)) == (PREPARER['sha256'], PREPARER['bytes'])
+-    spec = importlib.util.spec_from_file_location('genuine_next_v4_observer_composition_admission', source)
+-    prep = importlib.util.module_from_spec(spec)
+-    spec.loader.exec_module(prep)
+-    review = prep.document(INNER_REVIEW)
+-    assert review['state'] == 'COORDINATED_NATIVE_EXPORT_DIAGNOSTIC_NEXT_COMPONENT_INIT_DATA_REVIEW_PASSED_V1'
+-    assert review['verifiedPassed'] is True and review['rootAuthority'] == INNER_AUTHORITY
+-    observer = prep.document(OBSERVER_REVIEW)
+-    assert observer['state'] == 'COORDINATED_STANDARD_HANDLER_OBSERVER_V4_COMPOSITION_DATA_REVIEW_PASSED_V1'
+-    assert observer['verifiedPassed'] is True and observer['verifiedDataReviewPassed'] is True
+-    assert review['completeReturnedImportAuditVerified'] is True
+-    assert observer['rawChildBytesVerified'] is observer['siblingDefiningInstancesVerified'] is True
+-    assert observer['sharedNominalResourceAliasesVerified'] is observer['fieldsNominalResourceAliasesVerified'] is True
+-    assert observer['metadataGetterCanonicalOptionsVerified'] is observer['correlationSnapshotIndependentOfMethodAndPathSourceVerified'] is True
+-    assert observer['allSevenRequestedToolStepsRawZero'] is observer['allSevenToolStderrEmpty'] is True
+-    assert observer['runtimeAccepted'] is observer['actualMetadataBehaviorProved'] is False
+-    metadata = prep.document(METADATA_REVIEW)
+-    assert metadata['state'] == 'COORDINATED_STANDARD_HANDLER_OBSERVER_V4_METADATA_DATA_REVIEW_PASSED_V1'
+-    for key in ('verifiedPassed', 'verifiedDataReviewPassed', 'allCollectionsCompletedCleanly', 'actualMetadataBehaviorProved', 'runtimeAccepted', 'cleanOwner', 'finalInputsPreserved'):
+-        assert metadata[key] is True
+-    assert type(metadata['metadataCasesPassed']) is int and metadata['metadataCasesPassed'] == 7
+-    assert metadata['originalOwnerSeconds'] == 900 and metadata['rawExitCode'] == 0
+-    assert metadata['compositionReview'] == OBSERVER_REVIEW
+-    assert metadata['envelope'] == observer['envelope'] and metadata['observerBinary'] == observer['observerBinary']
+-    assert metadata['innerComponent'] == observer['innerComponent']
+-    assert metadata['nextWorkloadExecuted'] is metadata['fullNextAccepted'] is False
+-    assert metadata['allocatorOrAbsentPathExecuted'] is metadata['recordLimitExecuted'] is False
+-    assert len(metadata['caseResults']) == 7 and all(item['passed'] is True for item in metadata['caseResults'])
+-    inner, binary = review['component'], observer['observerBinary']
+-    assert inner == dict(path='/private/tmp/starling-node-compat/next-native-export-diagnostic-next-component-v2-real-next-diagnostic-next-native-export-first/api-return/returned-component.wasm', sha256='6b2084d0a7abe06862825f70cb87016811654ed1fb0e5db9377ccf3a303df3ce', bytes=37282148)
+-    assert binary == dict(path='/private/tmp/starling-node-compat/next-standard-handler-observer-build-v4-first/observer.wasm', sha256='3534089e3a28ef109cffef9bc2c6b9bebf1e7ab7c90d1781c91272d01ac3092f', bytes=5771)
+-    refs = [PREPARER, INNER_REVIEW, INNER_AUTHORITY, OBSERVER_REVIEW, METADATA_REVIEW, WAC, WASM_TOOLS, inner, binary]
+-    refs += [observer[k] for k in ('observerSource', 'observerManifest', 'observerProtocol')]
+-    self_ref = prep.row(Path(__file__).resolve())
+-
+-    def protect():
+-        for ref in refs + [self_ref]:
+-            prep.checked(ref)
+-
+-    protect()
+-    authority = prep.document(INNER_AUTHORITY)
+-    before = prep.admit(authority)
+-    assert not WORK.exists() and not WORK.is_symlink() and WORK.resolve() == WORK
+-    output = HERE / 'next-v4-composition-result.json'
+-    assert not output.exists() and not output.is_symlink()
++    if not __debug__ or not sys.flags.isolated or not sys.dont_write_bytecode or len(sys.argv) != 1:
++        raise RuntimeError('Root uses unoptimized Python -I -B; no helper imports')
++    output = HERE / 'composition-result.json'
++    need(not os.path.lexists(WORK) and not os.path.lexists(output) and WORK.parent.resolve() == WORK.parent, 'fresh fixed composition paths')
++    construction, request, observer = prerequisites()
++    self_ref = row(Path(__file__).resolve()); checked(self_ref)
++    inner = construction['component']
++    protect(full=True)
+     WORK.mkdir(mode=0o700)
+-    envelope = WORK / 'next-with-observer.wasm'
+-    skeleton = WORK / 'envelope.skeleton.wat'
++    envelope, skeleton = WORK / 'next-with-observer.wasm', WORK / 'envelope.skeleton.wat'
+     steps = [
+-        ('compose', [WAC['path'], 'plug', '--plug', inner['path'], binary['path'], '-o', str(envelope)]),
++        ('compose', [WAC['path'], 'plug', '--plug', inner['path'], OBSERVER['path'], '-o', str(envelope)]),
+         ('validate', [WASM_TOOLS['path'], 'validate', str(envelope)]),
+         ('wit', [WASM_TOOLS['path'], 'component', 'wit', str(envelope)]),
+         ('skeleton', [WASM_TOOLS['path'], 'print', '--skeleton', '--print-offsets', str(envelope), '-o', str(skeleton)]),
+     ]
+-    result = dict(schemaVersion=1, state='ROOT_NEXT_STANDARD_HANDLER_OBSERVER_V4_COMPOSITION_COLLECTING_V1',
+-        controller=self_ref, innerComponent=inner, innerConstructionReview=INNER_REVIEW,
+-        innerConstructionAuthority=INNER_AUTHORITY, observerBinary=binary,
+-        observerSourceReview=OBSERVER_REVIEW, observerMetadataReview=METADATA_REVIEW, commands=[], error=None, finalizationErrors=[],
+-        constructorGuardBefore=before, constructorGuardAfter=None, finalInputsPreserved=False,
+-        runtimeInvoked=False, fullNextAccepted=False)
++    result = dict(schemaVersion=1, state='CLONE_CANCEL_NEXT_V4_COMPOSITION_COLLECTING_V1', controller=self_ref,
++        innerConstructionReview=CONSTRUCTION_REVIEW, innerConstructionRequest=construction['constructorRequest'],
++        engineAdmission=construction['engineAdmission'], engine=construction['engine'], nativeMetadata=construction['nativeMetadata'],
++        innerComponent=inner, observerBinary=OBSERVER, observerCompositionReview=OBSERVER_REVIEW, metadataRuntimeReview=METADATA_REVIEW,
++        observerSource=observer['observerSource'], observerManifest=observer['observerManifest'], observerProtocol=observer['observerProtocol'],
++        commands=[], error=None, finalizationErrors=[], finalInputsPreserved=False,
++        originalDriverPassed=False, originalOuterRawExitCode=1, runtimeInvoked=False, fullNextAccepted=False)
+     primary = None
+     try:
+         for label, argv in steps:
+@@ -97,52 +210,56 @@
+             out, err = WORK / (label + '.stdout.log'), WORK / (label + '.stderr.log')
+             attempt = dict(label=label, argv=argv, rawExitCode=None, timeout=False, error=None, stdout=None, stderr=None)
+             result['commands'].append(attempt)
++            operation_error = None
+             try:
+                 with out.open('xb') as stdout, err.open('xb') as stderr:
+                     completed = subprocess.run(argv, cwd=WORK, env=dict(PATH='/usr/bin:/bin', LANG='C', LC_ALL='C'),
+                         stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr, timeout=120, check=False)
+                 attempt['rawExitCode'] = completed.returncode
+             except BaseException as error:
++                operation_error = error
+                 attempt['timeout'] = isinstance(error, subprocess.TimeoutExpired)
+                 attempt['error'] = dict(name=type(error).__name__, message=str(error)[:2048])
+-                raise
+             finally:
+-                for key, path in [('stdout', out), ('stderr', err)]:
++                for key, path in (('stdout', out), ('stderr', err)):
+                     if path.exists():
+                         try:
+-                            attempt[key] = prep.row(path)
++                            attempt[key] = row(path)
+                         except BaseException as error:
+-                            if attempt['error'] is None:
+-                                raise
+-                            result['finalizationErrors'].append(dict(stage=label + '-' + key, name=type(error).__name__, message=str(error)[:2048]))
+-            assert completed.returncode == 0, 'Composition tool failed: ' + label
+-        result.update(envelope=prep.row(envelope), actualSkeleton=prep.row(skeleton),
+-            externalWit=prep.row(WORK / 'wit.stdout.log'), allRequestedToolStepsPassed=True)
++                            if operation_error is None:
++                                operation_error = error
++                                attempt['error'] = dict(name=type(error).__name__, message=str(error)[:2048])
++                            else:
++                                result['finalizationErrors'].append(dict(stage=label + '-' + key, name=type(error).__name__, message=str(error)[:2048]))
++            if operation_error is not None:
++                raise operation_error
++            need(attempt['rawExitCode'] == 0, 'composition tool raw failure: ' + label)
++        result.update(envelope=row(envelope), actualSkeleton=row(skeleton), externalWit=row(WORK / 'wit.stdout.log'),
++                      allFourRequestedToolStepsRawZero=True)
+     except BaseException as error:
+         primary = error
+         result['error'] = dict(name=type(error).__name__, message=str(error)[:2048])
+     finally:
+         try:
+-            result['constructorGuardAfter'] = prep.admit(authority)
+-            protect()
++            protect(full=True)
+             result['finalInputsPreserved'] = True
+         except BaseException as error:
+             if primary is None:
+                 primary = error
+-            result['finalizationErrors'].append(dict(stage='final-admission', name=type(error).__name__, message=str(error)[:2048]))
+-        result['state'] = ('ROOT_NEXT_STANDARD_HANDLER_OBSERVER_V4_COMPOSITION_COMPLETED_UNREVIEWED_V1'
+-            if primary is None else 'ROOT_NEXT_STANDARD_HANDLER_OBSERVER_V4_COMPOSITION_FAILED_PRESERVED_V1')
++            result['finalizationErrors'].append(dict(stage='final-input-protection', name=type(error).__name__, message=str(error)[:2048]))
++        result['protectedInputs'] = sorted(INPUTS.values(), key=lambda r: r['path'])
++        result['state'] = ('CLONE_CANCEL_NEXT_V4_COMPOSITION_COMPLETED_UNREVIEWED_V1' if primary is None
++                           else 'CLONE_CANCEL_NEXT_V4_COMPOSITION_FAILED_PRESERVED_V1')
+         try:
+-            receipt = prep.save(output, result)
+-            print(json.dumps(dict(result=receipt, state=result['state'], runtimeInvoked=False)))
++            receipt = save(output, result)
++            print(json.dumps(dict(result=receipt, state=result['state'], runtimeInvoked=False)), flush=True)
+         except BaseException:
+             if primary is not None:
+                 raise primary
+             raise
+     if primary is not None:
+         raise primary
+-    return 0
+ 
+ 
+ if __name__ == '__main__':
+-    raise SystemExit(main())
++    main()
