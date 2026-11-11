@@ -4,6 +4,37 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-11. Overall roadmap: **in progress**.
 
+Current native repair work: the cloned-response cancellation candidate is
+source-reviewed but **not compiled or tested in a component yet**. Four additional
+Node22.14.0 references pass: deferred cancellation rejection preserves false or
+object identity, and a canceled branch settles correctly when its sibling reaches
+EOF or errors. The corrected HTTP collector passes real TCP tests for complete,
+truncated Content-Length, and chunked bodies; no guest claim follows from those
+collector tests.
+
+Native build prerequisites are now recovered with about98GiB initially free.
+All six tool archives and the public SpiderMonkey header-donor archive match
+their saved hashes. All243 missing Intl headers now match:242 were fetched from
+the pinned source, and the generated bidi header was reproduced exactly with
+cbindgen0.29.1. The complete selected SDK596 files/13 directories matches the
+historical content and modes, preserving the patched library. Native Rust1.88
+and Corrosion0.5.1 also match their selected payloads. The first tool
+materialization's macOS symlink-mode failure and partial tree remain preserved;
+the corrected V2 succeeds with all31 symlinks at their declared mode.
+
+The fresh435-native/387-support/3-embedding recipe is assembled with exactly one
+C++ change. All ten installed generator checks pass. The [saved recovery
+checker](tests/node-compat/async-context/clone-cancel-recovery-root-results-v1/check-recovery-saved.py)
+passes885 retained payloads/5,698,413B, preserving all three original recovery
+failures and the four Node references. It reads no original absolute paths.
+Fresh offline Cargo verification, native compilation and metadata, real-component
+cancellation tests, and subsequent full Next regressions remain outstanding.
+The existing237c engine and prior failing lifecycle component remain unchanged.
+The previous lifecycle failure checkpoint is
+`b71aa50478c705803d9a62dbe6a44a89dcd642bb`. This recovery checkpoint does not
+promote the cancellation fix. The native build runner and its final input
+selection remain work in progress.
+
 Latest lifecycle result: the [real-component comparison](docs/node-compat/nextjs-lifecycle-results.md)
 passes both public request-context runs against Node (eight groups/95 checks
 each), including four explicit public AsyncResource construction refusals.

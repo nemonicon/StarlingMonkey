@@ -1,0 +1,36 @@
+--- donor/run-node.mjs
++++ followup/run-node.mjs
+@@ -10,19 +10,19 @@
+ assert.deepEqual(process.execArgv,[],'Bare pinned Node required');
+ for(const key of ['NODE_OPTIONS','NODE_PATH'])assert(!Object.hasOwn(process.env,key),key+' forbidden');
+ const planBytes=await readFile(join(here,'plan.json')),plan=JSON.parse(planBytes);
+-assert.equal(plan.state,'SOURCE_ONLY_RESPONSE_CLONE_CANCEL_OBSERVATION_V1');
++assert.equal(plan.state,'SOURCE_ONLY_RESPONSE_CLONE_CANCEL_FOLLOWUP_OBSERVATION_V1');
+ assert.equal(plan.outerDeadlineMs,5000);assert.equal(process.execPath,plan.node.path);
+ assert.equal(await realpath(process.execPath),process.execPath);
+-const source=join(here,'case.mjs'),sourceBytes=await readFile(source);
++const source=join(here,'cases.mjs'),sourceBytes=await readFile(source);
+ assert.deepEqual({path:source,sha256:sha(sourceBytes),bytes:sourceBytes.length},plan.sharedCase);
+ const output=resolve(process.argv[2]);assert.equal(output,process.argv[2]);
+-const outputPrefix='/private/tmp/starling-node-compat/response-clone-cancel-candidate-v1-node-';
++const outputPrefix='/private/tmp/starling-node-compat/response-clone-cancel-followup-candidate-v1-node-';
+ assert(output.startsWith(outputPrefix));
+ assert(/^[a-z0-9][a-z0-9-]{0,47}$/.test(output.slice(outputPrefix.length)));
+ assert.equal(await realpath(dirname(output)),dirname(output));
+ await mkdir(output,{mode:0o700});assert.equal((await lstat(output)).mode&0o777,0o700);
+-const {runResponseCloneCancelCase,describeThrown}=await import(pathToFileURL(source).href);
+-const report={};const result={schemaVersion:1,suite:'NODE_RESPONSE_CLONE_CANCEL_OBSERVATION_V1',
++const {runResponseCloneCancelFollowups,describeThrown}=await import(pathToFileURL(source).href);
++const report={};const result={schemaVersion:1,suite:'NODE_RESPONSE_CLONE_CANCEL_FOLLOWUP_OBSERVATION_V1',
+   executionKind:'bare-node-host',nodeVersion:process.version,nodeExecutable:process.execPath,
+   selectedNode:plan.node,toolBinaryHashVerifiedByThisCLI:false,
+   sharedCase:plan.sharedCase,plan:{path:join(here,'plan.json'),sha256:sha(planBytes),bytes:planBytes.length},
+@@ -30,7 +30,7 @@
+   outerDeadlineMs:5000,timedOut:false,error:null,secondaryErrors:[],fullNextAccepted:false};
+ let failed=false,primary,timer;
+ // Observe the collector immediately, even if the outer deadline wins.
+-const pending=runResponseCloneCancelCase({report}).then(value=>({kind:'fulfilled',value}),error=>({kind:'rejected',error}));
++const pending=runResponseCloneCancelFollowups({report}).then(value=>({kind:'fulfilled',value}),error=>({kind:'rejected',error}));
+ try{
+   const observed=await Promise.race([pending,new Promise(resolve=>{timer=setTimeout(()=>resolve({kind:'deadline'}),5000);})]);
+   if(observed.kind==='deadline'){result.timedOut=true;throw new Error('Shared case exceeded outer5000ms deadline');}

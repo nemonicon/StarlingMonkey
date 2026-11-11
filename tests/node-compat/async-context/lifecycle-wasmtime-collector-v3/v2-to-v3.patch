@@ -1,0 +1,55 @@
+--- lifecycle-wasmtime-collector-v2/run-wasmtime.py
++++ lifecycle-wasmtime-collector-v3/run-wasmtime.py
+@@ -1,4 +1,4 @@
+-"""V2 reusable collection of three ordinary lifecycle calls; comparison is separate.
++"""V3 reusable collection of four ordinary lifecycle calls; comparison is separate.
+ 
+ Root wraps this fixed collector in the original120s owner. No host reentry,
+ application mount, guest environment forwarding, retries or same-Store claim.
+@@ -156,10 +156,10 @@
+         raise RuntimeError('Use nonoptimized Python -I -B')
+     need(len(sys.argv) == 2, 'usage: run-wasmtime.py ABSOLUTE_REQUEST.json')
+     request_ref = row(Path(sys.argv[1])); request = document(request_ref)
+-    need(request['state'] == 'ROOT_LIFECYCLE_COMPONENT_RUNTIME_REQUEST_V1', 'new Root runtime request')
++    need(request['state'] == 'ROOT_LIFECYCLE_COMPONENT_RUNTIME_REQUEST_V3', 'new Root runtime request')
+     need(type(request['outputRoot']) is str and re.fullmatch(
+-        r'/private/tmp/starling-node-compat/next-lifecycle-runtime-v2-[a-z0-9][a-z0-9-]{0,47}',
+-        request['outputRoot']) is not None, 'safe fresh V2 output namespace')
++        r'/private/tmp/starling-node-compat/next-lifecycle-runtime-v3-[a-z0-9][a-z0-9-]{0,47}',
++        request['outputRoot']) is not None, 'safe fresh V3 output namespace')
+     OUTPUT = Path(request['outputRoot'])
+     need(OUTPUT.resolve() == OUTPUT and OUTPUT.parent.is_dir(), 'canonical existing output parent')
+     need(request['runtimeSource'] == row(Path(__file__).resolve()), 'selected exact collector Source')
+@@ -186,10 +186,10 @@
+     protect()
+     need(OUTPUT.parent.resolve() == OUTPUT.parent and not OUTPUT.exists() and not OUTPUT.is_symlink(), 'exclusive canonical output')
+     OUTPUT.mkdir(mode=0o700)
+-    result = dict(schemaVersion=1, state='LIFECYCLE_HTTP_COLLECTION_IN_PROGRESS_V1', request=request_ref,
++    result = dict(schemaVersion=1, state='LIFECYCLE_HTTP_COLLECTION_IN_PROGRESS_V3', request=request_ref,
+         component=request['component'], wasmtime=request['wasmtime'], selectedInterfaces=sorted(SELECTED),
+         emittedImports=imports, exports=exports, bodyLimitBytes=BODY_LIMIT, eachLogLimitBytes=LOG_LIMIT,
+-        fixedRequests=['/context', '/clone-cancel', '/context'], responses=[], errors=[], secondaryErrors=[],
++        fixedRequests=['/context', '/clone-cancel', '/clone-cancel-followups', '/context'], responses=[], errors=[], secondaryErrors=[],
+         collectionClean=False, semanticComparisonPerformed=False, sameStoreIdentityProved=False,
+         applicationMounted=False, extraHttpRequests=0, fullNextAccepted=False)
+     child = None; captures = []; stop = threading.Event(); primary = None
+@@ -259,7 +259,7 @@
+                     raise transport_primary
+                 raise RuntimeError('HTTP collection uncertain; fixed remaining suffix unattempted')
+             # Status/report semantics are retained without being accepted here.
+-        result['allThreeBodiesCollected'] = len(result['responses']) == 3
++        result['allFourBodiesCollected'] = len(result['responses']) == 4
+     except BaseException as value:
+         primary = value; result['errors'].append(error(value))
+     finally:
+@@ -294,8 +294,8 @@
+             else:
+                 result['secondaryErrors'].append(dict(stage='final-capture-or-protection', **error(value)))
+         result['unattemptedRequests'] = result['fixedRequests'][len(result['responses']):]
+-        result['collectionClean'] = primary is None and not result['secondaryErrors'] and result.get('allThreeBodiesCollected') is True and result.get('inputsPreserved') is True
+-        result['state'] = 'LIFECYCLE_HTTP_COLLECTION_CLEAN_UNREVIEWED_V1' if result['collectionClean'] else 'LIFECYCLE_HTTP_COLLECTION_FAILED_RAW_PRESERVED_V1'
++        result['collectionClean'] = primary is None and not result['secondaryErrors'] and result.get('allFourBodiesCollected') is True and result.get('inputsPreserved') is True
++        result['state'] = 'LIFECYCLE_HTTP_COLLECTION_CLEAN_UNREVIEWED_V3' if result['collectionClean'] else 'LIFECYCLE_HTTP_COLLECTION_FAILED_RAW_PRESERVED_V3'
+         try:
+             descriptor = save(OUTPUT / 'result.json', result)
+             print(json.dumps(dict(result=descriptor, collectionClean=result['collectionClean'], semanticComparisonPerformed=False)), flush=True)

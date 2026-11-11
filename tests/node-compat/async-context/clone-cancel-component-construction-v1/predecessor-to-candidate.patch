@@ -1,0 +1,45 @@
+--- next-lifecycle-construction-v1/componentize.mjs
++++ clone-cancel-component-construction-v1/componentize.mjs
+@@ -38,7 +38,7 @@
+   const [requestPath, requestSHA] = process.argv.slice(2);
+   const requestBytes = await readFile(requestPath); assert.equal(hash(requestBytes), requestSHA);
+   const request = JSON.parse(requestBytes);
+-  assert.equal(request.state, 'ROOT_CURRENT_ENGINE_FRESH_COMPILER_CONSTRUCTION_V1');
++  assert.equal(request.state, 'ROOT_CLONE_CANCEL_ENGINE_CONSTRUCTION_V1');
+   assert.equal(request.ordinaryExportsAllowed, false);
+   const selection = JSON.parse(await checked(request.compilerSelection));
+   assert.equal(selection.state, 'FRESH_COMPILER_PACKAGE_SELECTED_V1');
+@@ -46,10 +46,21 @@
+   const metadataBytes = await checked(request.nativeMetadata);
+   const metadata = JSON.parse(metadataBytes);
+   assert.deepEqual(Object.keys(metadata).sort(), request.metadataKeys);
+-  assert.equal(request.metadataKeys.length, 52);
++  const admission = JSON.parse(await checked(request.engineAdmission));
++  assert.equal(admission.state, 'CLONE_CANCEL_ACTUAL_ENGINE_ADMISSION_PASSED_V1');
++  assert.equal(admission.passed, true);
++  assert.deepEqual(admission.engine, request.engine);
++  assert.deepEqual(admission.nativeMetadata, request.nativeMetadata);
++  assert.deepEqual(admission.metadataKeys, request.metadataKeys);
++  assert.deepEqual(metadata.engine, request.engine);
++  assert.equal(admission.completeActualMetadataReviewed, true);
++  assert.equal(admission.oldMetadataProjected, false);
++  assert.equal(admission.nativeBuildPassed, true);
++  assert.equal(admission.guestExecuted, false);
+   async function protect() {
+     assert.equal(hash(await readFile(requestPath)), requestSHA);
+     await checked(request.compilerSelection);
++    await checked(request.engineAdmission);
+     for (const ref of request.inputs) await checked(ref);
+     const found = await inventory(pkg.root);
+     assert.deepEqual(found.files, pkg.files.map(row => row.relativePath).sort());
+@@ -84,8 +95,8 @@
+     const returned = await componentize((await checked(request.entry)).toString('utf8'), options);
+     const artifacts = await captureComponentReturn(returned, request.output);
+     await writeWhole(join(request.output, 'result.json'), JSON.stringify({ schemaVersion: 1,
+-      state: 'FRESH_LIFECYCLE_COMPONENT_CAPTURED_UNREVIEWED_V1', artifacts,
+-      engine: request.engine, nativeMetadata: request.nativeMetadata,
++      state: 'CLONE_CANCEL_LIFECYCLE_COMPONENT_CAPTURED_UNREVIEWED_V1', artifacts,
++      engine: request.engine, nativeMetadata: request.nativeMetadata, engineAdmission: request.engineAdmission,
+       compilerSelection: request.compilerSelection, inputEntry: request.entry,
+       ordinaryExportInvoked: false }, null, 2) + '\n');
+     console.log(JSON.stringify({ artifacts }));

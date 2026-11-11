@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "state": "MEASURED_SYMLINK_MODE_CORRECTION_SOURCE_ONLY_V2",
+  "v1Source": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/clone-cancel-native-tool-recovery-v1/materialize.py",
+    "sha256": "f7dec11c96be5ef7979c64a931c44428d96f3dfd1d0cb81e126f43d60e61105f",
+    "bytes": 14554
+  },
+  "v2Source": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/clone-cancel-native-tool-recovery-v2/materialize.py",
+    "sha256": "09ad8b2d09a19ca9bd1b1a99bed4180715462e5174ca37604271f93bd61bee35",
+    "bytes": 15150
+  },
+  "exactCorrectionPatch": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/clone-cancel-native-tool-recovery-v2/v1-to-v2.patch",
+    "sha256": "85f3a61c7d267ab1727b044cc99bf7d5b9ca3ab457a055824e1698f14fdd5d58",
+    "bytes": 3830
+  },
+  "priorFailure": {
+    "path": "/private/tmp/starling-node-compat/next-clone-cancel-native-recovery-v1-first/tool-recovery-result.json",
+    "sha256": "43668e1b60a3d30980b5aaf3f7f4262fb905140ec8fcc5086db676ac3b137c33",
+    "bytes": 954
+  },
+  "observedData": {
+    "resultInputsPreserved": true,
+    "resultToolsInventory": [],
+    "platform": "darwin",
+    "lchmodExported": true,
+    "readOnlyLstatSamples": [
+      {
+        "suffix": "tools/wasi-sdk/bin/clang",
+        "mode": "0755",
+        "link": "clang-21"
+      },
+      {
+        "suffix": "tools/wasi-sdk/bin/clang++",
+        "mode": "0755",
+        "link": "clang"
+      },
+      {
+        "suffix": "tools/wasi-sdk/lib/libLLVM-21-wasi-sdk.dylib",
+        "mode": "0755",
+        "link": "libLLVM.dylib"
+      }
+    ],
+    "actualArchiveSymlinkMode": "0777",
+    "causeOfCreationModeNotProved": true
+  },
+  "priorSourcePassQualified": "V1 Source/API peer missed the platform-specific difference between archive symlink mode and newly created symlink mode. The v1 strict mode predicate correctly failed; no positive inventory or recovered-tool acceptance was published.",
+  "changes": [
+    "fresh exclusive tools-v2 and result-v2 namespaces",
+    "authenticate preserved v1 failed result",
+    "Darwin+lchmod platform requirement before output writes",
+    "explicit no-follow symlink mode application",
+    "truthful V2 result state"
+  ],
+  "unchanged": [
+    "all six exact archive versions/hashes",
+    "all namespace/link safety validation",
+    "file/hardlink/directory copying and mode policy",
+    "full final inventory and input preservation",
+    "no executable/compiler/host invocation"
+  ],
+  "authorExecutedCandidateFunctions": false,
+  "authorExtractedPayloads": false,
+  "actualResult": null,
+  "actualToolSelection": null
+}

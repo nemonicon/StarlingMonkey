@@ -1,0 +1,19 @@
+# Exact selected SpiderMonkey SDK recovery Source
+
+Root executes `PINNED_PYTHON -I -B prepare-sdk.py` with no arguments, after Source peer and after all additional headers are present. This author has not executed the materializer, extracted an SDK, fetched a header or invoked a compiler. The entry explicitly refuses optimized/nonisolated/bytecode-writing Python before input I/O.
+
+donor-map.json accounts for every selected a5d6 inventory entry: 596 regular files/646,760,937 bytes and 13 directories. The fixed fresh output is `/private/tmp/starling-node-compat/next-clone-cancel-native-recovery-v1-first/spidermonkey-selected-sdk`. It refuses existing output, inventory or receipt. Preflight authenticates the complete map, original inventory, base archive and every resolved file before creating that directory. An unresolved or wrong header fails with the full unresolved list before any output operation. It performs no network requests and never writes the original SDK.
+
+The resolution is 55 surviving selected files (including the actual ca04 Intl/SavedFrame library), 295 exact matching vanilla147 tar headers, three exact selected special recoveries, and 243 additional pinned Intl headers. The author independently hashed the archive and all 55 surviving selected files, including the637 MB library. The vanilla library is neither selected nor copied. One legitimate vanilla tar hardlink resolves to its same-archive regular header target; the output is a new regular file with its own inode, never a hardlink. Symbolic/special tar entries and escaping names are refused.
+
+The special recoveries retain the original selected bytes:
+
+- SavedFrameAPI.h comes from the pinned repository patch afterimage, exact fc3b/7304.
+- js-confdefs.h comes from the retained CI text archive's generated member, exact288f/2341.
+- js-config.h uses the vanilla header template with its sole Intl undef replaced by define1. The retained actual CI config.status explicitly records that definition, and the resulting full bytes match the original selected c9c3/2321 hash. This recovers the original configuration, rather than accepting the vanilla no-Intl configuration or inventing a new one.
+
+remote-header-candidates.json supplies Source-path candidates, expected size/SHA and a fresh target for the243 additional files. A URL is not an availability claim. Root owns actual fetch/generation receipts and every failed attempt. The generated bidi header may require the recorded cbindgen route, but its final bytes still must equal51565f/3287. The Source manifest's downloaded:false values describe this author's actions; Root's later acquisition evidence is separate and does not rewrite this Source.
+
+After complete preflight, the materializer exclusively creates directories/files, copies source files with bounded streams and hashes, writes verified tar-derived header bytes, fsyncs files, and reads back the entire new tree. It requires exact historical relative names, kinds, modes, sizes and hashes, 596 unique file inodes/nlink1, and final input bookends. It writes the actual new physical inventory in the existing root/rootIdentity/entries schema, plus a separate materialization receipt. A late copy/I/O failure leaves a partial fresh directory unaccepted; it is not deleted or reused automatically. The normal receipt claims exact recovered SDK content, not a new CI/compiler attestation.
+
+The initial own tar DATA audit refused its unexpected hardlink before producing a map or SDK output; audit-history.json records the corrected confined byte-reference interpretation. No old file removal is inferred from missing paths. Actual library/config/source/tool identity and all original52 metadata fields remain subject to Root's genuine fresh native-build admission. This Source does not issue an authority, build an engine/component, execute a guest, accept the clone fix or promote full Next support.

@@ -1,0 +1,80 @@
+--- v1/run-wasmtime.py
++++ v2/run-wasmtime.py
+@@ -1,4 +1,4 @@
+-"""Collect three ordinary lifecycle HTTP calls; semantic comparison is separate.
++"""V2 reusable collection of three ordinary lifecycle calls; comparison is separate.
+ 
+ Root wraps this fixed collector in the original120s owner. No host reentry,
+ application mount, guest environment forwarding, retries or same-Store claim.
+@@ -17,7 +17,6 @@
+ import threading
+ import time
+ 
+-OUTPUT = Path('/private/tmp/starling-node-compat/next-lifecycle-runtime-v1-first')
+ BODY_LIMIT = 128 * 1024
+ LOG_LIMIT = 512 * 1024
+ SELECTED = {'wasi:cli/environment@0.2.10', 'wasi:clocks/monotonic-clock@0.2.10',
+@@ -129,13 +128,40 @@
+             complete=complete, file=descriptor)
+ 
+ 
++def read_response_body(response, raw, record):
++    while True:
++        try:
++            block = response.read(min(4096, BODY_LIMIT + 1 - len(raw)))
++        except http.client.IncompleteRead as value:
++            record['overflow'] = len(raw) + len(value.partial) > BODY_LIMIT
++            raw.extend(value.partial[:max(0, BODY_LIMIT - len(raw))])
++            raise
++        if not block:
++            # Sized http.client reads can reach socket EOF without consuming declared Content-Length.
++            # Only None (no length / chunked) or zero remaining permits complete collection.
++            remaining = response.length
++            if remaining is not None and remaining != 0:
++                record['unfulfilledContentLength'] = remaining
++                raise ValueError('HTTP EOF before declared Content-Length was fulfilled')
++            record['complete'] = True; break
++        if len(raw) + len(block) > BODY_LIMIT:
++            record['overflow'] = True
++            raw.extend(block[:max(0, BODY_LIMIT - len(raw))])
++            raise ValueError('HTTP body limit exceeded; bounded prefix retained')
++        raw.extend(block)
++
++
+ def main():
+     if not __debug__ or not sys.flags.isolated or not sys.dont_write_bytecode:
+         raise RuntimeError('Use nonoptimized Python -I -B')
+     need(len(sys.argv) == 2, 'usage: run-wasmtime.py ABSOLUTE_REQUEST.json')
+     request_ref = row(Path(sys.argv[1])); request = document(request_ref)
+     need(request['state'] == 'ROOT_LIFECYCLE_COMPONENT_RUNTIME_REQUEST_V1', 'new Root runtime request')
+-    need(request['outputRoot'] == str(OUTPUT), 'fixed fresh output')
++    need(type(request['outputRoot']) is str and re.fullmatch(
++        r'/private/tmp/starling-node-compat/next-lifecycle-runtime-v2-[a-z0-9][a-z0-9-]{0,47}',
++        request['outputRoot']) is not None, 'safe fresh V2 output namespace')
++    OUTPUT = Path(request['outputRoot'])
++    need(OUTPUT.resolve() == OUTPUT and OUTPUT.parent.is_dir(), 'canonical existing output parent')
+     need(request['runtimeSource'] == row(Path(__file__).resolve()), 'selected exact collector Source')
+     need(type(request['protectedInputs']) is list and 0 < len(request['protectedInputs']) <= 4096, 'finite protected input list')
+     protected = [request_ref, request['runtimeSource'], request['component'], request['wasmtime'], request['wasmTools'],
+@@ -210,20 +236,7 @@
+                 record.update(status=response.status, reason=response.reason, httpVersion=response.version,
+                     headers=response.getheaders())
+                 need(sum(len(k) + len(v) + 4 for k, v in record['headers']) <= 65536, 'header metadata bound')
+-                while True:
+-                    try:
+-                        block = response.read(min(4096, BODY_LIMIT + 1 - len(raw)))
+-                    except http.client.IncompleteRead as value:
+-                        record['overflow'] = len(raw) + len(value.partial) > BODY_LIMIT
+-                        raw.extend(value.partial[:max(0, BODY_LIMIT - len(raw))])
+-                        raise
+-                    if not block:
+-                        record['complete'] = True; break
+-                    if len(raw) + len(block) > BODY_LIMIT:
+-                        record['overflow'] = True
+-                        raw.extend(block[:max(0, BODY_LIMIT - len(raw))])
+-                        raise ValueError('HTTP body limit exceeded; bounded prefix retained')
+-                    raw.extend(block)
++                read_response_body(response, raw, record)
+             except BaseException as value:
+                 transport_primary = value; record['transportError'] = error(value)
+             finally:

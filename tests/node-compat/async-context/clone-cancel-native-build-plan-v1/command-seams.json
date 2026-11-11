@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "state": "PROPOSED_COMMAND_SEAMS_NOT_EXECUTED_V1",
+  "rootMustResolveAllAngleBracketRolesBeforeIssuance": true,
+  "sourceAuthorityNotIssued": true,
+  "freshPrivateRustupEnvironment": {
+    "RUSTUP_HOME": "<RECOVERY>/rustup-home",
+    "CARGO_HOME": "<RECOVERY>/cargo-home",
+    "RUSTUP_TOOLCHAIN": "1.88.0"
+  },
+  "rustRecoveryCommands": [
+    {
+      "argv": [
+        "<PINNED_RUSTUP>",
+        "set",
+        "auto-self-update",
+        "disable"
+      ],
+      "seconds": 300
+    },
+    {
+      "argv": [
+        "<PINNED_RUSTUP>",
+        "toolchain",
+        "install",
+        "1.88.0",
+        "--profile",
+        "minimal"
+      ],
+      "seconds": 1800
+    },
+    {
+      "argv": [
+        "<PINNED_RUSTUP>",
+        "target",
+        "add",
+        "--toolchain",
+        "1.88.0",
+        "wasm32-wasip1"
+      ],
+      "seconds": 900
+    }
+  ],
+  "actualNativeBuildEnvironmentMustComeFromOriginalRunner": "environment(plan,authority,work), private offline Cargo/cache/tmp and single job; no inherited compiler/startup overrides",
+  "cmakeFlags": {
+    "ENABLE_BUILTIN_NODE_COMPAT": "ON",
+    "ENABLE_BUILTIN_WEB_TIMERS": "ON",
+    "ENABLE_BUILTIN_WEB_CRYPTO": "ON",
+    "ENABLE_BUILTIN_WEB_TEXT_CODEC": "ON",
+    "NODE_COMPAT_PATH": "ON",
+    "NODE_COMPAT_EVENTS": "ON",
+    "NODE_COMPAT_STRING_DECODER": "ON",
+    "NODE_COMPAT_ASSERT": "ON",
+    "NODE_COMPAT_QUERYSTRING": "ON",
+    "NODE_COMPAT_UTIL": "ON",
+    "NODE_COMPAT_STREAM_WEB": "ON",
+    "NODE_COMPAT_INTERNAL_TICKS": "ON",
+    "NODE_COMPAT_CLASSIC_STREAMS": "ON",
+    "NODE_COMPAT_ZLIB": "ON",
+    "NODE_COMPAT_STREAM_CONSUMERS": "ON",
+    "NODE_COMPAT_CRYPTO_HASH_HMAC": "ON",
+    "NODE_COMPAT_MODULE": "ON",
+    "NODE_COMPAT_FS": "ON",
+    "NODE_COMPAT_ASYNC_LOCAL_STORAGE": "ON",
+    "NODE_COMPAT_VM_DATA": "ON",
+    "NODE_COMPAT_TIMERS": "ON",
+    "NODE_COMPAT_NEXT_IMPORTS": "ON",
+    "NODE_COMPAT_NEXT_HTTP": "ON",
+    "NODE_COMPAT_ZLIB_STREAMING": "ON",
+    "NODE_COMPAT_NEXT_STARTUP": "ON",
+    "NODE_COMPAT_CRYPTO_RANDOM": "ON",
+    "NODE_COMPAT_NEXT_PERFORMANCE": "ON",
+    "NODE_COMPAT_LOCKED_RUST": "ON",
+    "USE_WASM_OPT": "ON",
+    "NODE_COMPAT_GC_STRESS": "OFF",
+    "NODE_COMPAT_OOM_TESTING": "OFF",
+    "NODE_CRYPTO_AUDITED_BORROW": "OFF",
+    "ENABLE_JS_DEBUGGER": "OFF",
+    "ENABLE_BUILTIN_WPT_SUPPORT": "OFF",
+    "WEVAL": "OFF",
+    "CMAKE_BUILD_TYPE": "Release",
+    "CMAKE_POLICY_VERSION_MINIMUM": "3.5",
+    "NODE_COMPAT_ENTROPY_MODE": "RUNTIME_ONLY",
+    "CMAKE_C_COMPILER_LAUNCHER": "",
+    "CMAKE_CXX_COMPILER_LAUNCHER": "",
+    "NODE_COMPAT_CLASSIC_STREAMS_TOWEB": "ON",
+    "SPIDERMONKEY_INTL": "ON",
+    "NODE_COMPAT_PREINSTALLED_RUST": "ON",
+    "Rust_RESOLVE_RUSTUP_TOOLCHAINS": "OFF",
+    "CPM_LOCAL_PACKAGES_ONLY": "ON",
+    "NODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1": "ON",
+    "Rust_COMPILER": "<SELECTED_RUSTC>",
+    "Rust_CARGO": "<SELECTED_CARGO>",
+    "NODE_COMPAT_INTL_LOCKFILE": "<SELECTED_INTL_LOCK>",
+    "NODE_COMPAT_INTL_FIREFOX_SOURCE": "<SELECTED_FIREFOX_SOURCE>",
+    "CPM_wasi-sdk_SOURCE": "<SELECTED_WASI_SDK>",
+    "CPM_binaryen_SOURCE": "<SELECTED_BINARYEN>",
+    "CPM_wasm-tools_SOURCE": "<SELECTED_WASM_TOOLS>",
+    "CPM_wasmtime_SOURCE": "<SELECTED_WASMTIME>",
+    "CPM_weval_SOURCE": "<SELECTED_WEVAL>",
+    "CPM_corrosion_SOURCE": "<SELECTED_CORROSION>",
+    "CPM_OpenSSL_SOURCE": "<WORK/private-openssl/openssl-3.0.17>"
+  },
+  "nativeCommands": [
+    {
+      "role": "rust-version",
+      "argv": [
+        "<SELECTED_RUSTC>",
+        "--version",
+        "--verbose"
+      ],
+      "seconds": 120
+    },
+    {
+      "role": "cargo-version",
+      "argv": [
+        "<SELECTED_CARGO>",
+        "--version",
+        "--verbose"
+      ],
+      "seconds": 120
+    },
+    {
+      "role": "rust-sysroot",
+      "argv": [
+        "<SELECTED_RUSTC>",
+        "--print",
+        "sysroot"
+      ],
+      "seconds": 120
+    },
+    {
+      "role": "configure",
+      "argv": [
+        "<PINNED_CMAKE>",
+        "-S",
+        "<WORK>/componentize-source",
+        "-B",
+        "<WORK>/build",
+        "-G",
+        "Ninja",
+        "<EXPLICIT_-D_ROWS_FROM_cmakeFlags>"
+      ],
+      "seconds": 2400
+    },
+    {
+      "role": "build",
+      "argv": [
+        "<PINNED_CMAKE>",
+        "--build",
+        "<WORK>/build",
+        "--target",
+        "starlingmonkey_embedding",
+        "--parallel",
+        "1",
+        "--",
+        "-d",
+        "keeprsp"
+      ],
+      "seconds": 7200
+    },
+    {
+      "role": "ninja-commands",
+      "argv": [
+        "<PINNED_NINJA>",
+        "-C",
+        "<WORK>/build",
+        "-t",
+        "commands"
+      ],
+      "seconds": 120
+    }
+  ],
+  "noIncrementalObjectReuseSelected": true,
+  "diagnosticEvidenceRequired": {
+    "requested": "ON",
+    "actualCMakeBool": "ON",
+    "nativeRows": 80,
+    "separateEmbeddingRows": 1,
+    "embeddingExactDefinition": "-DNODE_COMPAT_NATIVE_EXPORT_DIAGNOSTIC_V1=1",
+    "nativeRowsWithDiagnosticMacro": 0
+  },
+  "oldPlanDiskStartBytes": 3221225472,
+  "oldPlanDiskStopBytes": 1073741824,
+  "capacity100GbIsParentReportedNotMeasuredHere": true,
+  "networkOrBuildCommandsExecutedByAuthor": false
+}

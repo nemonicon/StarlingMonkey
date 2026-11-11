@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "state": "SOURCE_ONLY_RESPONSE_CLONE_CANCEL_NATIVE_CANDIDATE_V1",
+  "actionsAllowed": false,
+  "replacementRelativePath": "builtins/web/fetch/request-response.cpp",
+  "before": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/response-clone-cancel-native-candidate-v1/before/builtins/web/fetch/request-response.cpp",
+    "sha256": "1fe296b8472f14e50556910227b184552e0a0ac424f97a0f170c4b91cfd35fa6",
+    "bytes": 126132
+  },
+  "after": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/response-clone-cancel-native-candidate-v1/after/builtins/web/fetch/request-response.cpp",
+    "sha256": "0431184d4562972c98538494caf46d2b11cdf0280f51d0e7143cd8534526442e",
+    "bytes": 130742
+  },
+  "patch": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/response-clone-cancel-native-candidate-v1/clone-cancel.patch",
+    "sha256": "d037dafc63afb78ff3a59527f06dbb10883b04581f64b433d86c6e7b0a3a2f0e",
+    "bytes": 9103
+  },
+  "baseEngineSHA256": "237c4e5ace16d6ad20f00e2da08501e6948e29056a5d2aad2a25e55bc894453a",
+  "baseMetadataSHA256": "500e76acf6d76c1552ad3208a6b2498f3b1439bbb14a5ac043f8c35d0405a48e",
+  "actualCompiledBaseSourceSHA256": "1fe296b8472f14e50556910227b184552e0a0ac424f97a0f170c4b91cfd35fa6",
+  "scope": [
+    "traced tee state retains original stream/shared cancellation Promise/raw reason values",
+    "first branch cancellation does not cancel live sibling source",
+    "second branch invokes original source cancel once with ordered reason array and adopts returned Promise",
+    "natural source EOF/error settles lone cancellation; active source cancellation owns its Promise result",
+    "stop new source reads after terminal or both canceled; preserve clone byte-copy policy"
+  ],
+  "apiWitnesses": [
+    {
+      "path": "/private/tmp/starling-node-compat/next-intl-ci-run42281671898-v1/distribution/spidermonkey-dist-release-intl-savedframe-eval/include/js/Stream.h",
+      "sha256": "7f2c9db89d6283c745b687fdf2c02fe7aa56cc8a281f7a5b9a13a50fcee71595",
+      "bytes": 29446
+    },
+    {
+      "path": "/private/tmp/starling-node-compat/next-intl-ci-run42281671898-v1/distribution/spidermonkey-dist-release-intl-savedframe-eval/include/js/Promise.h",
+      "sha256": "b92f7baf6e1fbe4eb8b728a91f9d9bbb3ab77160d5a78c07c15071d6731b56d2",
+      "bytes": 30890
+    }
+  ],
+  "NodeFirstSharedFollowups": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/response-clone-cancel-followup-candidate-v1/plan.json",
+  "preconditions": [
+    "Root restores/authenticates complete genuine SDK (old selected Array.h missing at Source audit)",
+    "fresh genuine native frontend/full build metadata derived from actual materialization; no old metadata projection",
+    "new real component/standard13 import audit and actual runtime on new engine",
+    "Node-first followup outcomes pinned before differential acceptance"
+  ],
+  "deferred": [
+    "native append cancellation",
+    "unreified postheader abort",
+    "all structured-clone failure paths",
+    "OOM/GC/reset/finalizers",
+    "native resource/Store-death counts",
+    "same-Store identity and browser-cause/fullNext claims"
+  ],
+  "CPlusPlusParsedOrCompiled": false,
+  "actualFrontend": null,
+  "actualFullBuild": null,
+  "actualEngine": null,
+  "actualMetadata": null,
+  "actualComponent": null,
+  "actualNodeFollowup": null,
+  "actualGuestComparison": null,
+  "productionSourceModified": false,
+  "fullNextAccepted": false
+}

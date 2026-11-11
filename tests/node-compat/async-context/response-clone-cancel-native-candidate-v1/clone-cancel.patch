@@ -1,0 +1,213 @@
+--- before/builtins/web/fetch/request-response.cpp
++++ after/builtins/web/fetch/request-response.cpp
+@@ -2514,6 +2514,12 @@
+   ReadAgain = 4, // bool: a branch pulled while a read was in flight.
+   Canceled1 = 5, // bool: branch1's consumer canceled.
+   Canceled2 = 6, // bool: branch2's consumer canceled.
++  SourceStream = 7, // Retained original stream, before replacing Response body slots.
++  CancelPromise = 8, // Shared promise returned by both branch cancel algorithms.
++  Reason1 = 9, // Raw cancellation values; the state object's edges are traced.
++  Reason2 = 10,
++  CancelStarted = 11, // Set before invoking user cancellation; source cancel is once-only.
++  SourceTerminal = 12, // Source read EOF/error; no later pull should start a new read.
+ };
+ 
+ // Element index on each branch source: which branch it backs (1 or 2). Element 0
+@@ -2542,6 +2548,23 @@
+   }
+   out.set(&v.toObject());
+   return true;
++}
++
++// A lone branch cancellation waits for the source EOF/error of its survivor.
++// Once source cancellation starts, its returned promise alone owns settlement.
++static bool clone_tee_settle_terminal_cancel(JSContext *cx, JS::HandleObject state) {
++  bool cancel_started = false;
++  if (!clone_tee_get_bool(cx, state, CloneTeeSlot::CancelStarted, &cancel_started)) {
++    return false;
++  }
++  if (cancel_started) {
++    return true;
++  }
++  JS::RootedObject promise(cx);
++  if (!clone_tee_get_branch(cx, state, CloneTeeSlot::CancelPromise, &promise)) {
++    return false;
++  }
++  return JS::ResolvePromise(cx, promise, JS::UndefinedHandleValue);
+ }
+ 
+ static bool clone_tee_pump(JSContext *cx, JS::HandleObject state);
+@@ -2555,7 +2578,8 @@
+       !clone_tee_get_bool(cx, state, CloneTeeSlot::Canceled2, &canceled2)) {
+     return false;
+   }
+-  if (!clone_tee_set_bool(cx, state, CloneTeeSlot::Reading, false)) {
++  if (!clone_tee_set_bool(cx, state, CloneTeeSlot::Reading, false) ||
++      !clone_tee_set_bool(cx, state, CloneTeeSlot::SourceTerminal, true)) {
+     return false;
+   }
+ 
+@@ -2574,7 +2598,10 @@
+     }
+     ok = JS::ReadableStreamError(cx, branch2, error) && ok;
+   }
+-  return ok;
++  if (!ok) {
++    return false;
++  }
++  return clone_tee_settle_terminal_cancel(cx, state);
+ }
+ 
+ static bool clone_tee_read_then_handler(JSContext *cx, JS::HandleObject state,
+@@ -2606,7 +2633,8 @@
+   }
+ 
+   if (done_val.toBoolean()) {
+-    if (!clone_tee_set_bool(cx, state, CloneTeeSlot::Reading, false)) {
++    if (!clone_tee_set_bool(cx, state, CloneTeeSlot::Reading, false) ||
++        !clone_tee_set_bool(cx, state, CloneTeeSlot::SourceTerminal, true)) {
+       return false;
+     }
+     bool ok = true;
+@@ -2616,7 +2644,10 @@
+     if (!canceled2) {
+       ok = JS::ReadableStreamClose(cx, branch2) && ok;
+     }
+-    return ok;
++    if (!ok) {
++      return false;
++    }
++    return clone_tee_settle_terminal_cancel(cx, state);
+   }
+ 
+   // Re-entrant pulls during the enqueues below may set ReadAgain again.
+@@ -2672,6 +2703,15 @@
+ // Guarded by the Reading flag so concurrent pulls from the two branches never
+ // issue overlapping reads on the single source reader.
+ static bool clone_tee_pump(JSContext *cx, JS::HandleObject state) {
++  bool terminal = false, canceled1 = false, canceled2 = false;
++  if (!clone_tee_get_bool(cx, state, CloneTeeSlot::SourceTerminal, &terminal) ||
++      !clone_tee_get_bool(cx, state, CloneTeeSlot::Canceled1, &canceled1) ||
++      !clone_tee_get_bool(cx, state, CloneTeeSlot::Canceled2, &canceled2)) {
++    return false;
++  }
++  if (terminal || (canceled1 && canceled2)) {
++    return true;
++  }
+   bool reading = false;
+   if (!clone_tee_get_bool(cx, state, CloneTeeSlot::Reading, &reading)) {
+     return false;
+@@ -2708,30 +2748,64 @@
+   return JS::AddPromiseReactions(cx, read_promise, then_handler, catch_handler);
+ }
+ 
+-// Records that this branch's consumer canceled so the read loop stops feeding
+-// it (enqueueing into a canceled — and therefore non-readable — branch would
+-// assert). The other branch keeps receiving data; when both are canceled no
+-// consumer pulls, so the source read loop naturally quiesces.
++// Both branch cancel promises adopt the same source-cancel outcome. The first
++// cancellation alone leaves the source readable for its surviving branch.
+ static bool clone_tee_cancel_algorithm(JSContext *cx, JS::CallArgs args,
+                                        JS::HandleObject source, JS::HandleObject /*owner*/,
+-                                       JS::HandleValue /*reason*/) {
++                                       JS::HandleValue reason) {
+   JS::RootedValue state_val(cx);
+   if (!JS_GetElement(cx, source, 0, &state_val)) {
+     return false;
+   }
+   JS::RootedObject state(cx, &state_val.toObject());
++  JS::RootedObject promise(cx);
++  if (!clone_tee_get_branch(cx, state, CloneTeeSlot::CancelPromise, &promise)) {
++    return false;
++  }
++  args.rval().setObject(*promise);
+ 
+   JS::RootedValue branch_val(cx);
+   if (!JS_GetElement(cx, source, CLONE_TEE_SOURCE_BRANCH_SLOT, &branch_val)) {
+-    return false;
+-  }
+-  CloneTeeSlot slot =
+-      branch_val.toInt32() == 1 ? CloneTeeSlot::Canceled1 : CloneTeeSlot::Canceled2;
+-  if (!clone_tee_set_bool(cx, state, slot, true)) {
+-    return false;
+-  }
+-
+-  args.rval().setUndefined();
++    return RejectPromiseWithPendingError(cx, promise);
++  }
++  const bool first_branch = branch_val.toInt32() == 1;
++  const auto canceled_slot = first_branch ? CloneTeeSlot::Canceled1 : CloneTeeSlot::Canceled2;
++  const auto reason_slot = first_branch ? CloneTeeSlot::Reason1 : CloneTeeSlot::Reason2;
++  if (!JS_SetElement(cx, state, std::to_underlying(reason_slot), reason) ||
++      !clone_tee_set_bool(cx, state, canceled_slot, true)) {
++    return RejectPromiseWithPendingError(cx, promise);
++  }
++  bool canceled1 = false, canceled2 = false, started = false, terminal = false;
++  if (!clone_tee_get_bool(cx, state, CloneTeeSlot::Canceled1, &canceled1) ||
++      !clone_tee_get_bool(cx, state, CloneTeeSlot::Canceled2, &canceled2) ||
++      !clone_tee_get_bool(cx, state, CloneTeeSlot::CancelStarted, &started) ||
++      !clone_tee_get_bool(cx, state, CloneTeeSlot::SourceTerminal, &terminal)) {
++    return RejectPromiseWithPendingError(cx, promise);
++  }
++  if (canceled1 && canceled2 && !started && !terminal) {
++    // The underlying cancel callback may reenter JS; set this before the call.
++    if (!clone_tee_set_bool(cx, state, CloneTeeSlot::CancelStarted, true)) {
++      return RejectPromiseWithPendingError(cx, promise);
++    }
++    JS::RootedValue reason1(cx), reason2(cx);
++    JS::RootedObject reasons(cx, JS::NewArrayObject(cx, 2));
++    JS::RootedObject original_stream(cx);
++    if (!reasons ||
++        !JS_GetElement(cx, state, std::to_underlying(CloneTeeSlot::Reason1), &reason1) ||
++        !JS_GetElement(cx, state, std::to_underlying(CloneTeeSlot::Reason2), &reason2) ||
++        !JS_SetElement(cx, reasons, 0, reason1) || !JS_SetElement(cx, reasons, 1, reason2) ||
++        !clone_tee_get_branch(cx, state, CloneTeeSlot::SourceStream, &original_stream)) {
++      return RejectPromiseWithPendingError(cx, promise);
++    }
++    JS::RootedValue composite_reason(cx, JS::ObjectValue(*reasons));
++    JS::RootedObject canceled(cx, JS::ReadableStreamCancel(cx, original_stream, composite_reason));
++    if (!canceled) {
++      return RejectPromiseWithPendingError(cx, promise);
++    }
++    JS::RootedValue cancellation(cx, JS::ObjectValue(*canceled));
++    // Resolve with the promise, not undefined: preserve delayed rejection too.
++    return JS::ResolvePromise(cx, promise, cancellation);
++  }
+   return true;
+ }
+ 
+@@ -2824,6 +2898,10 @@
+   if (!reader) {
+     return false;
+   }
++  JS::RootedObject cancel_promise(cx, JS::NewPromiseObject(cx, nullptr));
++  if (!cancel_promise) {
++    return false;
++  }
+ 
+   JS::RootedValue undefined_val(cx, JS::UndefinedValue());
+   JS::RootedObject source1(cx, streams::NativeStreamSource::create(
+@@ -2858,10 +2936,22 @@
+   if (!JS_SetElement(cx, state, std::to_underlying(CloneTeeSlot::Branch2), slot_val)) {
+     return false;
+   }
++  slot_val.setObject(*body_stream);
++  if (!JS_SetElement(cx, state, std::to_underlying(CloneTeeSlot::SourceStream), slot_val)) {
++    return false;
++  }
++  slot_val.setObject(*cancel_promise);
++  if (!JS_SetElement(cx, state, std::to_underlying(CloneTeeSlot::CancelPromise), slot_val) ||
++      !JS_SetElement(cx, state, std::to_underlying(CloneTeeSlot::Reason1), undefined_val) ||
++      !JS_SetElement(cx, state, std::to_underlying(CloneTeeSlot::Reason2), undefined_val)) {
++    return false;
++  }
+   if (!clone_tee_set_bool(cx, state, CloneTeeSlot::Reading, false) ||
+       !clone_tee_set_bool(cx, state, CloneTeeSlot::ReadAgain, false) ||
+       !clone_tee_set_bool(cx, state, CloneTeeSlot::Canceled1, false) ||
+-      !clone_tee_set_bool(cx, state, CloneTeeSlot::Canceled2, false)) {
++      !clone_tee_set_bool(cx, state, CloneTeeSlot::Canceled2, false) ||
++      !clone_tee_set_bool(cx, state, CloneTeeSlot::CancelStarted, false) ||
++      !clone_tee_set_bool(cx, state, CloneTeeSlot::SourceTerminal, false)) {
+     return false;
+   }
+ 
