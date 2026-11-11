@@ -1,30 +1,28 @@
 # Next.js execution priority
 
-Current priority: turn the [passing V4 full sample](nextjs-v4-full-results.md)
-into a dependable bounded profile. Stock wasmCloud2.11.0 and matched Node22.14.0
-now both pass the unchanged comprehensive workload with Chrome157.0.8103.39.
-The earlier Chrome156 failures remain recorded; this sample establishes no
-engine fix or cancellation cause.
+Current priority: turn the [passing three-arm Next sample](nextjs-clone-cancel-full-results.md)
+into a dependable bounded profile. Wasmtime 42.0.1, stock wasmCloud 2.11.0 and
+matched Node 22.14.0 now pass the unchanged comprehensive workload with the
+repaired native engine and Chrome 157.0.8103.39. Independent review verifies
+24 HTTP, 52 cache and 80 supplemental checks, generation 1→2, streaming, assets,
+UI and strict browser completion on every arm. The component still uses exactly
+13 standard WASI 0.2.10 interfaces. The earlier Chrome 156 failures remain
+recorded; this sample does not establish their cause.
 
-1. Regress the unchanged comprehensive Next app with the [native cancellation
-   repair](nextjs-clone-cancel-results.md) on both hosts.
-   The fresh engine compiles, passes complete metadata admission and constructs
-   a component with exactly 13 standard WASI 0.2.10 imports. Its first Wasmtime
-   run matches Node for the original cancellation case, all four added
-   rejection/EOF/error cases and both 95-check context runs. Stock wasmCloud
-   now passes the same checks with byte-identical bodies. Real Next INIT and
-   component validation pass; full Next serving tests remain pending. Keep the
-   earlier failed component and the build check's generated-unit failure intact.
-   Broader request isolation and snapshot-state policy remain separate gates.
-2. Check resource retirement and reuse: repeated requests, aborted bodies,
+Completed prerequisite: the [native cancellation repair](nextjs-clone-cancel-results.md)
+also matches Node in real components on both hosts, including rejection/EOF/error
+followups and request-context checks before and after cancellation. Preserve
+the earlier failures and original build-check failure as separate evidence.
+
+1. Check resource retirement and reuse: repeated requests, aborted bodies,
    error recovery, filesystem/HTTP handles and retained memory on both hosts.
-   Do not equate local counters with host instance identity.
-3. Run a declared repeatability matrix with frozen browser/tool versions and
-   unchanged assertions; preserve every failed sample. Extend the current full
-   profile to a matched Wasmtime run with the same current tool selection.
-4. Reproduce from a clean checkout with complete artifact prerequisites and
+   Include broader request isolation and snapshot-state policy. Do not equate
+   local counters with host instance identity.
+2. Run a declared repeatability matrix with frozen browser/tool versions and
+   unchanged assertions on both hosts; preserve every failed sample.
+3. Reproduce from a clean checkout with complete artifact prerequisites and
    emitted-import checks, then measure size, startup, memory and throughput.
-5. Promote only the reviewed bounded changes after these gates. The accepted
+4. Promote only the reviewed bounded changes after these gates. The accepted
    production checkpoint remains foundations-v13.
 
 Historical response-boundary evidence follows. It remains useful if an abort

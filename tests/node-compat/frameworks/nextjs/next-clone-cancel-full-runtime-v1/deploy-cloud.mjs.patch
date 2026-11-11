@@ -1,0 +1,134 @@
+--- deploy-cloud.mjs.before
++++ deploy-cloud.mjs
+@@ -1,6 +1,7 @@
+ // Dormant stock wasmCloud full-contract actor; late Root authority is mandatory.
+ // Builtins only; neither generated guest modules nor packaging APIs are imported.
+ import assert from 'node:assert/strict';
++import {admitNextRuntime} from './admit-next.mjs';
+ import {captureRawStdout} from './capture-stdout.mjs';
+ import {configuration,validateEffective,registrationFromLogs} from './models.mjs';
+ import {validatePublicCorrelation,writePublicCorrelationManifest} from './public-correlation.mjs';
+@@ -57,12 +58,10 @@
+  assert(root.ino>0&&root.nlink>0&&root.mode<=0o777);return true;
+ }
+ const plan=await read(join(here,'plan.json'));
+-assert.equal(plan.bindingState,'READY_FULL_CLIENT_FULL_CONTRACT','Unbound Source: no authority input, output or actor');
+-for(const key of ['clientSource','browserSource','clientSourceIndex','browserSourceIndex','acceptedConstructionReview','expectedComponent'])assert(plan[key]!==null,'Missing reviewed binding:'+key);
+-assert.equal(plan.prospectiveEnvelopeBindingsPending,false,'Unbound composed-envelope Source');
+-assert(plan.expectedEnvelopeBindings.envelope&&plan.expectedEnvelopeBindings.compositionReview);
+-assert.equal(typeof plan.expectedCompositionReviewState,'string');
+-assert(plan.compositionReviewFixedValues&&Object.keys(plan.compositionReviewFixedValues).length>0);
++assert.equal(plan.bindingState,'READY_CLONE_CANCEL_NEXT_FULL','Unbound Source: no authority input, output or actor');
++for(const key of ['clientSource','browserSource','clientSourceIndex','browserSourceIndex','expectedComponent'])assert(plan[key]!==null,'Missing reviewed binding:'+key);
++assert.equal(plan.newComponentBindingsPending,false,'Actual new construction/composition bindings pending');
++assert.equal(plan.hostToolRevalidationPending,false,'Current browser/runtime tool revalidation pending');
+ assert(Array.isArray(plan.protectedInputs)&&plan.protectedInputs.length>0,'Fresh Root protection graph required');
+ assert.equal(plan.controlOnly,false);assert.equal(plan.prospectiveFullClientBindingsPending,false,'New app/client DATA pending');
+ assert.equal(plan.fullClientFullContract.clientSourcePending,false,'New full client Source pending');
+@@ -71,7 +70,7 @@
+ assert.deepEqual(plan.clientSource,plan.fullClientFullContract.requiredClient);
+ for(const key of ['outputPrefix','applicationSource','applicationInputs','applicationBuildResult','applicationBuildReview','applicationRootIdentity','applicationRootIdentityEvidence','applicationSchema','clientSource','clientSourceIndex','browserSource','browserSourceIndex'])assert(plan[key]!==null,'New control binding:'+key);
+ const authorityPath=resolve(process.argv[2]),authority=await read(authorityPath),authorityRef=await row(authorityPath);
+-assert.equal(authority.state,'ROOT_NEXT_RSC_STREAM_OBSERVER_V4_CLOUD_AUTHORIZED_V2');
++assert.equal(authority.state,'ROOT_CLONE_CANCEL_NEXT_FULL_CLOUD_AUTHORIZED_V1');
+ assert.equal(authority.publicRequestCorrelationAllowed,true);
+ assert.equal(authority.standardHandlerObserverAllowed,true);
+ assert.equal(authority.fullClientFullContractAllowed,true);assert.equal(authority.rscStreamObserverAllowed,true);assert.equal(authority.controlOnly,false);
+@@ -89,76 +88,10 @@
+ for(const key of ['constructionCallerIndex','inputSourceIndex','inputEntry']){const ref=authority[key];assert(ref&&typeof ref.path==='string'&&/^[a-f0-9]{64}$/.test(ref.sha256)&&Number.isSafeInteger(ref.bytes)&&ref.bytes>=0,'Exact late Root descriptor required:'+key);assert.equal(resolve(ref.path),ref.path);assert.equal(await realpath(ref.path),ref.path);if(key!=='inputEntry')assert.equal(ref.path.split('/').at(-1),'index.json');}
+ async function entrySelection(){await family(authority.inputSourceIndex);await verify(authority.inputEntry);const base=dirname(authority.inputSourceIndex.path),rel=relative(base,authority.inputEntry.path);assert(rel&&!rel.startsWith('../')&&!rel.startsWith('/'));const members=(await read(authority.inputSourceIndex.path)).files,member=members.find(r=>r.path===rel);assert(member,'Selected real-next entry must be indexed in selected Source family');assert.deepEqual({...member,path:join(base,member.path)},authority.inputEntry);}
+ async function protect(){await verify(authorityRef);for(const key of ['node','monitor','wash'])await verify(plan[key]);await family(authority.sourceIndex);await family(authority.constructionCallerIndex);await entrySelection();for(const ref of plan.sourceFamilies)await family(ref);await family(plan.clientSourceIndex);await family(plan.browserSourceIndex);for(const r of [...plan.protectedInputs,plan.clientSource,plan.browserSource])await verify(r);}
+-await protect();await verify(authority.constructionResult);await verify(authority.component);await verify(authority.componentAudit);
+-assert.deepEqual({sha256:authority.component.sha256,bytes:authority.component.bytes},plan.expectedComponent);
+-const construction=await read(authority.constructionResult.path),audit=await read(authority.componentAudit.path);
+-assert.equal(construction.state,'NEXT_NATIVE_COMPONENT_CONSTRUCTION_PASSED_UNREVIEWED_V2');assert.equal(construction.passed,true);assert.equal(construction.entryMode,'real-next');
+-assert.deepEqual(construction.artifacts.component,authority.component);assert.deepEqual(construction.artifacts.componentAudit,authority.componentAudit);
+-assert.deepEqual(construction.callerIndex,authority.constructionCallerIndex);assert.equal(construction.finalProtection.unchanged,true);assert.equal(construction.error,null);
+-for(const key of ['ordinaryExportsInvoked','httpServed','appMountedAtInit','productionProfilePromoted'])assert.equal(construction[key],false);
+-assert(Array.isArray(construction.artifacts.engineBuildEvidence)&&construction.artifacts.engineBuildEvidence.length>0);
+-const artifactRefs=[authority.constructionResult,authority.component,authority.componentAudit,construction.rootAuthority,construction.callerIndex,construction.plan,...construction.artifacts.engineBuildEvidence];
+-for(const key of ['engine','nativeMetadata','inputSourceIndex','inputEntry','adapter','returnedImports','returnedOwnShape'])artifactRefs.push(construction.artifacts[key]);
+-async function artifactBookend(){for(const ref of artifactRefs)await verify(ref);}
+-await artifactBookend();
+-assert.deepEqual(construction.artifacts.inputEntry,authority.inputEntry);assert.deepEqual(construction.artifacts.inputSourceIndex,authority.inputSourceIndex);
+-const constructorPlan=await read(construction.plan.path);assert.equal(constructorPlan.worldName,plan.fixedWit.worldName);assert.deepEqual([...constructorPlan.selectedInterfaces].sort(),[...plan.selectedInterfaces].sort());
+-async function witBookend(){const tree=await walk(constructorPlan.witDirectory);assert.equal(tree.links.length,0);assert.deepEqual(tree.files.filter(x=>x.endsWith('.wit')).sort(),plan.fixedWit.files.map(x=>x.path).sort());for(const ref of plan.fixedWit.files)await verify({...ref,path:join(constructorPlan.witDirectory,ref.path)});}
+-await witBookend();
+-assert.equal(audit.schemaVersion,1);assert.equal(audit.state,'NEXT_NATIVE_COMPONENT_DATA_AUDIT_PASSED_V1');assert.equal(audit.passed,true);assert.deepEqual(audit.component,authority.component);
+-assert.deepEqual([...audit.selectedInterfaces].sort(),[...plan.selectedInterfaces].sort());assert.equal(new Set(audit.selectedInterfaces).size,13);
+-assert.equal(new Set(audit.emittedImports).size,audit.emittedImports.length);assert(audit.emittedImports.every(x=>plan.selectedInterfaces.includes(x)&&x.endsWith('@0.2.10')));
+-assert(Array.isArray(audit.unusedSelectedInterfaces));assert.deepEqual([...audit.unusedSelectedInterfaces].sort(),plan.selectedInterfaces.filter(x=>!audit.emittedImports.includes(x)).sort());
+-assert.deepEqual(audit.exports,['wasi:http/incoming-handler@0.2.10']);assert.equal(audit.allEmittedVersion,'0.2.10');assert.equal(audit.noExternalPreview1OrCustomImports,true);
+-for(const key of ['validateTerminal','witTerminal']){await verify(audit[key]);const t=await read(audit[key].path);assert.equal(t.rawExitCode,0);assert.equal(t.timeout,false);assert.equal(t.forcedCleanup,false);assert.equal(t.parentOwnedGroupGone,true);assert.equal(t.allObservedOwnedGroupsGone,true);for(const k of ['signals','errors','interruptedSignals','remainingObservedPids'])assert.deepEqual(t[k],[]);artifactRefs.push(audit[key],t.stdout,t.stderr);}
+-// The constructor/audit/component above remain the genuine unchanged INNER.
+-// The separately reviewed envelope is selected only as the served artifact.
+-for(const key of ['envelope','compositionReview']){
+- assert.deepEqual(authority[key],plan.expectedEnvelopeBindings[key]);await verify(authority[key]);
+- const path=authority[key].path;assert.equal(resolve(path),path);assert.equal(await realpath(path),path);
+-}
+-const composition=await read(authority.compositionReview.path);
+-assert.equal(composition.state,plan.expectedCompositionReviewState);
+-assert.equal(composition.verifiedPassed,true);assert.equal(composition.verifiedDataReviewPassed,true);
+-for(const[key,value]of Object.entries(plan.compositionReviewFixedValues))assert.deepEqual(composition[key],value);
+-assert.deepEqual(composition.envelope,authority.envelope);assert.deepEqual(composition.innerComponent,authority.component);
+-assert.deepEqual(composition.innerComponentAudit,authority.componentAudit);
+-assert.deepEqual(composition.innerConstructionReview,plan.acceptedConstructionReview);
+-assert.deepEqual(composition.innerConstructionAuthority,construction.rootAuthority);
+-for(const key of ['rawChildBytesVerified','siblingDefiningInstancesVerified','sharedNominalResourceAliasesVerified',
+- 'fieldsNominalResourceAliasesVerified','metadataGetterCanonicalOptionsVerified','synchronousLiftLowerWithInnerPostReturnVerified',
+- 'innerExplicitPostReturnPreserved','observerManualPostReturnAbsent','internalIncomingHandlerImportComposedAway',
+- 'allFourRequestedToolStepsRawZero','allFourToolStderrEmpty','finalInputsPreserved'])assert.equal(composition[key],true,key);
+-assert.equal(composition.selectedStandardVersion,'0.2.10');assert.equal(composition.selectedImports.length,13);
+-assert.deepEqual([...composition.selectedImports].sort(),[...plan.selectedInterfaces].sort());
+-assert.deepEqual(composition.selectedExports,['wasi:http/incoming-handler@0.2.10']);
+-for(const key of ['runtimeInvoked','runtimeAccepted','fullNextAccepted','oldV3JoinUpgraded'])assert.equal(composition[key],false);
+-for(const key of ['observerSource','observerManifest','observerProtocol','observerCompositionReview','metadataRuntimeReview'])
+- assert.deepEqual(composition[key],plan.standardHandlerObserver[key]);
+-const observerComposition=await read(composition.observerCompositionReview.path);
+-assert.equal(observerComposition.state,plan.standardHandlerObserver.observerCompositionReviewState);
+-for(const key of ['verifiedPassed','verifiedDataReviewPassed','rawChildBytesVerified','siblingDefiningInstancesVerified',
+- 'sharedNominalResourceAliasesVerified','fieldsNominalResourceAliasesVerified','metadataGetterCanonicalOptionsVerified',
+- 'synchronousLiftLowerWithInnerPostReturnVerified','innerExplicitPostReturnPreserved','observerManualPostReturnAbsent',
+- 'internalIncomingHandlerImportComposedAway','allSevenRequestedToolStepsRawZero','allSevenToolStderrEmpty',
+- 'observerNoMarkerBeforeInnerCallSourceVerified','normalFieldsChildDropBeforeOwnForwardSourceVerified',
+- 'correlationSnapshotIndependentOfMethodAndPathSourceVerified'])assert.equal(observerComposition[key],true,key);
+-for(const key of ['observerBinary','observerSource','observerManifest','observerProtocol'])assert.deepEqual(observerComposition[key],composition[key]);
+-const metadataProbe=await read(composition.metadataRuntimeReview.path);
+-assert.equal(metadataProbe.state,plan.standardHandlerObserver.metadataRuntimeReviewState);
+-for(const key of ['verifiedPassed','verifiedDataReviewPassed','allCollectionsCompletedCleanly','actualMetadataBehaviorProved',
+- 'runtimeAccepted','cleanOwner','finalInputsPreserved'])assert.equal(metadataProbe[key],true,key);
+-assert.equal(metadataProbe.metadataCasesPassed,7);assert.equal(metadataProbe.caseResults.length,7);
+-assert.equal(metadataProbe.rawExitCode,0);assert.equal(metadataProbe.originalOwnerSeconds,900);
+-assert.deepEqual(metadataProbe.compositionReview,composition.observerCompositionReview);
+-assert.deepEqual(metadataProbe.observerBinary,composition.observerBinary);assert.deepEqual(metadataProbe.envelope,observerComposition.envelope);
+-for(const key of ['nextWorkloadExecuted','fullNextAccepted','oldV3JoinUpgraded','allocatorOrAbsentPathExecuted','recordLimitExecuted'])assert.equal(metadataProbe[key],false);
+-artifactRefs.push(authority.envelope,authority.compositionReview);
+-for(const key of ['actualCompositionResult','observerBinary','innerComponent','innerConstructionReview','innerConstructionAuthority',
+- 'innerComponentAudit','observerSource','observerManifest','observerProtocol','observerCompositionReview','metadataRuntimeReview','actualSkeleton'])artifactRefs.push(composition[key]);
+-for(const key of ['actualBuildResult','envelope','observerBinary','innerComponent','innerConstructionReview','innerConstructionAuthority',
+- 'observerSource','observerManifest','observerProtocol','actualSkeleton','innerComponentAudit'])artifactRefs.push(observerComposition[key]);
+-artifactRefs.push(composition.externalWorld.wit,observerComposition.externalWorld.wit,observerComposition.observerWorld.wit,metadataProbe.rootReceipt);await artifactBookend();
++await protect();
++const runtimeAdmission=await admitNextRuntime({plan,authority,kind:'cloud'});
++const {constructionReview,artifactRefs,artifactBookend,witBookend}=runtimeAdmission;
++await artifactBookend();await witBookend();
+ 
+ await verify(plan.applicationInputs);await verify(plan.applicationBuildResult);
+ const input=await read(plan.applicationInputs.path),appBuild=await read(plan.applicationBuildResult.path);
+@@ -179,7 +112,7 @@
+ }
+ await sourceBookend();
+ const output=resolve(plan.outputPrefix+'-'+authority.runId);assert.equal(output,plan.outputPrefix+'-'+authority.runId);const app=join(output,'app'),cache=join(output,'cache'),project=join(output,'project');await mkdir(output,{mode:0o700});
+-const result={schemaVersion:1,state:'RSC_STREAM_OBSERVER_V4_FULL_CLOUD_PROFILE_IN_PROGRESS_V1',controlOnly:false,fullOriginalContractExecuted:false,fullNextAccepted:false,runId:authority.runId,outputRoot:output,inputEntry:authority.inputEntry,inputSourceIndex:authority.inputSourceIndex,component:authority.component,componentAudit:authority.componentAudit,constructionResult:authority.constructionResult,servedEnvelope:authority.envelope,servedEnvelopeCompositionReview:authority.compositionReview,standardHandlerObserverMarkersInterpreted:false,rootAuthority:authorityRef,sourceIndex:authority.sourceIndex,selectedInterfaces:plan.selectedInterfaces,emittedImports:audit.emittedImports,errors:[],server:null,client:null,originalInputsPreserved:false,readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationInputs:plan.applicationInputs,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],adoption:false,actualHost:'stock-wasmCloud-2.11.0',wash:plan.wash,commands:[],configVerifiedBeforeDev:false,readiness:null};
++const result={schemaVersion:1,state:'CLONE_CANCEL_NEXT_FULL_CLOUD_PROFILE_IN_PROGRESS_V1',controlOnly:false,fullOriginalContractExecuted:false,fullNextAccepted:false,runId:authority.runId,outputRoot:output,inputEntry:authority.inputEntry,inputSourceIndex:authority.inputSourceIndex,component:authority.component,constructionReview:authority.constructionReview,engineAdmission:authority.engineAdmission,constructionRequest:authority.constructionRequest,constructionResult:authority.constructionResult,servedEnvelope:authority.envelope,servedEnvelopeCompositionReview:authority.compositionReview,standardHandlerObserverMarkersInterpreted:false,rootAuthority:authorityRef,sourceIndex:authority.sourceIndex,selectedInterfaces:plan.selectedInterfaces,emittedImports:constructionReview.emittedImports,errors:[],server:null,client:null,originalInputsPreserved:false,readonlyAppPreserved:false,applicationBuildResult:plan.applicationBuildResult,applicationInputs:plan.applicationInputs,applicationSchema:plan.applicationSchema,sourceRootIdentity:plan.applicationRootIdentity,ownedAdditionalDirectories:[],adoption:false,actualHost:'stock-wasmCloud-2.11.0',wash:plan.wash,commands:[],configVerifiedBeforeDev:false,readiness:null};
+ const save=()=>writeFile(join(output,'result.json'),JSON.stringify(result,null,2)+'\n',{mode:0o600});await save();
+ const pause=ms=>new Promise(yes=>setTimeout(yes,ms));const children=[];let host=null,status=null,clientProcess=null,lease=null,stopping=false;
+ async function prepareReadonlyCopy(){
+@@ -284,6 +217,6 @@
+  result.cacheInventory=[];try{assert.equal((await lstat(cache)).mode&0o777,0o700);const tree=await walk(cache);assert.equal(tree.links.length,0);for(const name of tree.files){const path=join(cache,name);result.cacheInventory.push({...await row(path),relativePath:name,mode:(await lstat(path)).mode&0o777});}}catch(error){result.errors.push({stage:'cache-final-inventory',...errorData(error)});}
+  result.allDirectCliExitsZero=JSON.stringify(result.commands.map(x=>x.label))===JSON.stringify(['config-show','wash-dev','full-contract-client'])&&result.commands.every(x=>x.timeout===false&&x.forcedCleanup===false&&x.exit?.code===0&&x.exit?.signal===null&&x.exit?.error===null);
+  result.passed=result.controlPassed===true&&result.configVerifiedBeforeDev===true&&result.errors.length===0&&result.originalInputsPreserved&&result.readonlyAppPreserved&&result.allDirectCliExitsZero&&children.length===2&&children.every(x=>x.record.stdoutCapture?.complete===true)&&result.server?.shutdownReason==='full-contracts-collected'&&result.server?.shutdownRequested===true&&result.server?.sigintSent===true&&host?.status?.code===0&&host?.status?.signal===null&&host?.status?.error===null;
+- result.state=result.passed?'RSC_STREAM_OBSERVER_V4_FULL_CLOUD_PROFILE_PASSED_UNREVIEWED_V1':'RSC_STREAM_OBSERVER_V4_FULL_CLOUD_PROFILE_FAILED_RAW_PRESERVED_V1';await save();
++ result.state=result.passed?'CLONE_CANCEL_NEXT_FULL_CLOUD_PROFILE_PASSED_UNREVIEWED_V1':'CLONE_CANCEL_NEXT_FULL_CLOUD_PROFILE_FAILED_RAW_PRESERVED_V1';await save();
+ }
+ console.log(JSON.stringify({state:result.state,passed:result.passed,fullOriginalContractExecuted:result.fullOriginalContractExecuted,fullNextAccepted:false,errors:result.errors}));process.exitCode=result.passed?0:1;

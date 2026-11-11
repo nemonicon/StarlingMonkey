@@ -1,0 +1,11 @@
+# New-engine full Next runtime Source
+
+Root owns the fixed sequence Wasmtime600 → stock wasmCloud600 → matched Node300. Every arm is a fresh logical invocation, with no replacement trials or retries. New plans are unbound: actual composition, client, app inventory/root, host-tool receipt, Source indexes and fresh protection graph must be admitted before authority/output/host activity.
+
+The shared admit-next.mjs is a pure DATA reader. It joins the real30ae Next construction review/request and admitted e307 engine/full actual metadata, preserves original native raw1/resultfalse ancestry, and requires the genuine eventual V4 composition proof. It never manufactures the old componentAudit/engineBuildEvidence/rootAuthority frame or imports a fixed237c guard. All declared actual constructor/build/source inputs, tools, whole WIT/entry families and current observer ancestry are checked before/final.
+
+The Wasmtime and cloud actors retain their original independent readonly app-copy/writable-cache policies and transport/capture/shutdown code. Cloud retains two independent volumes, three guest environment values, exact self-origin egress, config-show before one dev invocation, registration plus TCP readiness, and lifetime stdout captures. Wasmtime retains ordinary serve and its independent cache mount. Node retains the existing message bridge/module-provider profile and owned copy/cache layout; component fields are prerequisite DATA only, never Node guest execution.
+
+All full request/client/strict browser predicates remain unchanged. Known semantic failure may be retained and followed by the next arm only after complete known publication/capture, normal host/browser termination, original clean owner and current protection. Incomplete or uncertain collection stops the suffix. Host tool identity requires a new Root receipt with actual four --version commands plus six host refs and the complete selected Playwright package. Chrome launcher hashes do not attest its whole app bundle; versions do not prove host behavior. Browser4a57 remains unchanged and independently checks Chrome157/PW1.64.1.
+
+This Source packet executes no helper/Node/host during authoring and issues no authority. Runtime results, public tuples, private identity, causality, React/host completion, production adoption and fullNext remain unproved.

@@ -73,6 +73,7 @@ Independent engine admission, complete component-input preparation, construction
 component validation and the first lifecycle differential now pass. The emitted
 imports are exactly the selected standard WASI 0.2.10 interfaces.
 The same lifecycle regression now passes on stock wasmCloud with byte-identical
-response bodies. Next: rerun the bounded full Next workload on both target hosts.
-Same-Store identity, resource retirement, repetition,
-cost measurements and production promotion remain separate gates.
+response bodies. The [bounded full Next comparison](nextjs-clone-cancel-full-results.md)
+now also passes once on both target hosts and matched Node. Same-Store identity,
+resource retirement, repeatability, clean-checkout reproduction, cost measurements
+and production promotion remain separate gates.

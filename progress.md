@@ -4,6 +4,35 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-11. Overall roadmap: **in progress**.
 
+Baseline checkpoint before the full-app test: `0b7e8412d57b6936e416e932f29f8a10a047927c`,
+verified on remote `main`. It includes the passing stock wasmCloud lifecycle
+comparison, portable checker, Next observer composition and current host-tool
+revalidation. All 153 staged files preceding the final checkpoint proof matched
+the worktree byte for byte. The comprehensive runtime harness, bindings and
+completed results now form the next checkpoint below.
+
+The [new full-app comparison](docs/node-compat/nextjs-clone-cancel-full-results.md)
+now passes all three fixed arms: Wasmtime 85601/600, stock wasmCloud 86646/600
+and matched Node 88034/300 each exit 0 with clean shutdown. Independent review
+`003ba83c` verifies 210 input artifacts and recomputes all 24 HTTP, 52 cache and
+80 supplemental checks, persisted generation 1→2, incremental streaming,
+both UI interactions, assets and strict browser completion. All three resource
+observers capture complete 2,963-byte responses. Review owner 88588 exits 0
+cleanly. There were no retries or weakened assertions. The portable packet
+retains 350 payloads / 16,214,908 stored bytes, including all 210 review inputs.
+Its checkout-only checker recomputes all three results and passes both here and
+from an isolated copy of 352 actual staged Git files (16,460,847 bytes), with
+identical output. Optimized Python is refused before packet reads. Original
+command records and unchanged failure history are retained. This is one
+bounded sample; resource retirement, repeatability, reproduction, cost and
+production promotion remain outstanding.
+
+Next implementation gate: a [bounded disconnect-and-recovery probe](tests/node-compat/frameworks/nextjs/next-clone-cancel-full-root-results-v1/next-lifecycle-gate.md)
+against the unchanged Next app on both hosts and Node, followed by a declared
+repeatability matrix. The proposal uses existing routes and standard interfaces.
+It does not infer native handle retirement or Store identity from later healthy
+responses; the new probe has not been implemented or executed.
+
 Current native repair result: the [repaired-engine real-component regression](docs/node-compat/nextjs-clone-cancel-results.md)
 **passes on Wasmtime 42.0.1 and stock wasmCloud 2.11.0 against Node 22.14.0**. Both request-context runs
 match (95 assertions each), the original cloned-response cancellation now calls
@@ -16,14 +45,15 @@ observations. Its repository-only checker passes both the current tree and an
 isolated 101-file copy of staged Git blobs, recomputing typed comparisons and
 requiring complete captures. Optimized Python is refused before reads. The
 unchanged real Next entry also constructs as `bfb106fe` and passes component
-validation and complete INIT/return-graph review; it has not served the app yet.
+validation and complete INIT/return-graph review. Its full application comparison
+now passes on both hosts and matched Node as recorded above.
 The stock run returns byte-identical bodies, with runtime owner 80219 and
 comparison owner 80391 both exiting 0 cleanly. Its effective configuration has
 no mounts, guest environment entries or outgoing allowlists. The separate
 59-payload/288,118-byte stock packet is retained. Its repository-only checker
 passes both the current tree and an isolated 61-file staged-Git copy; optimized
-Python is refused before payload reads. Full Next regressions with
-this engine, resource retirement, repeatability and cost remain outstanding. Production is unchanged.
+Python is refused before payload reads. Resource retirement, repeatability and
+cost remain outstanding. Production is unchanged.
 
 The first stock wasmCloud lifecycle attempt is preserved as a harness failure:
 owner 78885 exits 1 with clean cleanup after `config show` exits 0. The host
@@ -45,8 +75,8 @@ and tested observer, preserving shared resource types and the 13 standard import
 The closed composition/tool records are retained as 59 payloads / 3,213,306
 stored bytes, with every retained and expanded hash independently checked.
 Current Node, Chrome, Playwright, Wasmtime and wash identities and versions also
-pass revalidation. The comprehensive three-arm Next runtime harness remains in
-progress, with fixed Wasmtime → wasmCloud → Node execution order.
+pass revalidation. The comprehensive three-arm Next runtime harness completes
+in fixed Wasmtime → wasmCloud → Node order, with all three arms passing.
 
 Native build prerequisites are now recovered with about 98 GiB initially free.
 All six tool archives and the public SpiderMonkey header-donor archive match

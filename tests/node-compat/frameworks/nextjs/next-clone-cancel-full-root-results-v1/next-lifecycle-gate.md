@@ -1,0 +1,26 @@
+# Next bounded lifecycle gate
+
+Recommend one separately versioned **repeated disconnect-and-recovery probe against the unchanged real Next app**, followed by a small repeatability matrix. Keep e307/bfb/f1c, the2196-file compression-off app, current browser/tool pins, all13 standard WASI interfaces and the current full-suite result unchanged. The roadmap puts retirement/reuse before repeatability and cost; the current three-arm pass is one bounded sample ([priority roadmap](../../../../../docs/node-compat/nextjs-priority-roadmap.md#L17), [full result](../../../../../docs/node-compat/nextjs-clone-cancel-full-results.md#L27)). No implementation or test is added by this note.
+
+Use one original owned invocation per Wasmtime and stock wasmCloud host, plus matched Node. Declare three warm-up cycles and16 measured sequential cycles before running. Each cycle uses only existing routes:
+
+1. Consume `/stream` completely with the existing shell-before-ready/body-completeness checks.
+2. Request `/stream` again, retain actual first body bytes, then close the client socket. Bound bytes, requests, waits and the whole cycle; synchronize on received bytes rather than sleep. Do not send an artificial guest stream error or grow output until an error occurs.
+3. Send the existing invalid JSON case to `/api/json`; require its real400 marker and complete body.
+4. Read `/api/context` with the existing cookie/header values, then without them; require the declared distinct/empty results.
+5. Read `/api/fs-crypto`; require its existing exact text/SHA and complete response. This adds repeated real FS use without exposing an unsupported descriptor API or changing the cache allowlist.
+
+Reuse the actual route/response predicates from [fixture-contract.json](../fixture-contract.json#L1), `/stream`'s finite Suspense producer and the FS route in [the current fixture](../next-fs-callback-no-compress-app-build-v1/fixture/app/api/fs-crypto/route.js#L1). The existing [disconnect plan](../../../../../docs/node-compat/nextjs-context-lifecycle-plan.md#L241) already distinguishes under-length upload, first-body-byte peer close and later healthy inspection. Its existing real I/O-abort controls are stronger cancellation witnesses than a new fake resource model. Keep the passing four-call clone/context suites as separate controls rather than duplicate their190 context checks ([clone regression](../../../../../docs/node-compat/nextjs-clone-cancel-results.md#L10)).
+
+Acceptance for this first stress probe is finite collection, exact complete normal/error responses, recovery after every intentional disconnect, preserved inputs, complete logs and normal host/owner shutdown. A client close does **not** require an observed guest write failure: if buffering accepts the bounded response first, report disconnect propagation inconclusive. Any naturally observed cancel/finally/finish/drop attempt must remain distinct from completed cleanup. Do not waive a transport or strict-browser failure. This probe does not rerun the fresh-cache fullclient in-place: its fixed clean-cache assumptions need a separately declared repeated-run policy.
+
+The evidence boundaries are important:
+
+- EOF and repeated correct FS results show completed application operations/recovery, not a live native descriptor count. Selected0431 `BodyFutureTask::retire_subscription` retires a read subscription separately from `terminal_body`'s finish/close ([source](../../../async-context/response-clone-cancel-native-candidate-v1/after/builtins/web/fetch/request-response.cpp#L69)).
+- Selected `WASIHandle<T>` has a DEBUG-only `used_handles` set; it is not a public release counter. Its tracked [88218bdb source](../next-native-fetch-resource-cleanup-candidate-v1/after/host-apis/wasi-0.2.0/handles.h#L66) byte-matches the admitted compiled header. Public `process.memoryUsage`, `_getActiveHandles` and `getActiveResourcesInfo` are deferred unsupported functions in the selected [f997b77c startup source](../stacktrace-native-v1/after/startup-core.mjs#L137), also byte-matched here. Do not report invented zero counts.
+- Optional bounded host RSS samples before/after warm-up and fixed batches are whole-host trend evidence only. Record actual worker population, all samples and noise; establish no leak threshold from one sample. Flat RSS does not prove retirement, and growth can include allocator/pool caching.
+- Stock wasmCloud P2 uses fresh Stores/instances; Wasmtime reuse configuration provides no request-affinity proof. A healthy later request may use another instance. Module labels, request counts and context successes do not establish same-Store identity ([documented limits](../../../../../docs/node-compat/nextjs-context-lifecycle-plan.md#L143)).
+
+No new native instrumentation, custom imports or host changes are needed for this functional recovery gate. If a specific retirement failure is observed—or an actual native-count claim becomes necessary—first identify which existing public observation cannot resolve it, then review narrowly scoped native observability separately. Keep that later question distinct from this reliability gate and foundations-v13 production acceptance.
+
+Source-only advisory by B, author of shared context cases and new full-runtime admission/retainer; no helper, test, compiler, browser or host executed for this note.

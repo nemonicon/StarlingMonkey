@@ -1,0 +1,78 @@
+--- run-stock.mjs.before
++++ run-stock.mjs
+@@ -1,6 +1,7 @@
+ // Current full-contract profile through the unchanged matched Node message bridge.
+ // This is host Node evidence, never a claim of guest execution.
+ import assert from 'node:assert/strict';
++import {admitNextRuntime} from './admit-next.mjs';
+ import {createHash} from 'node:crypto';
+ import {createServer} from 'node:http';
+ import {once} from 'node:events';
+@@ -19,7 +20,7 @@
+ const source = resolve(process.argv[3]);
+ const browserTools = process.argv[4],runId=process.argv[5];
+ const plan = JSON.parse(await readFile(join(here, 'stock-plan.json')));
+-assert.equal(plan.bindingState,'READY_FULL_CLIENT_FULL_CONTRACT','Unbound Source: no authority, output, app or browser');
++assert.equal(plan.bindingState,'READY_CLONE_CANCEL_NEXT_FULL','Unbound Source: no authority, output, app or browser');
+ assert.equal(plan.controlOnly,false);assert.equal(plan.prospectiveFullClientBindingsPending,false);
+ assert.equal(plan.fullClientFullContract.clientSourcePending,false,'New full client Source pending');
+ assert(plan.fullClientFullContract.requiredClientIndex&&plan.fullClientFullContract.requiredClient);
+@@ -30,7 +31,7 @@
+ assert.equal(process.argv.length,7,'Versioned host-only authority argument; six original positions preserved');
+ const authorityPath=resolve(process.argv[6]);
+ const authority=JSON.parse(await readFile(authorityPath,'utf8'));
+-assert.equal(authority.state,'ROOT_NEXT_RSC_STREAM_OBSERVER_V4_HOST_AUTHORIZED_V2');
++assert.equal(authority.state,'ROOT_CLONE_CANCEL_NEXT_FULL_HOST_AUTHORIZED_V1');
+ assert.equal(authority.controlOnly,false);assert.equal(authority.fullClientFullContractAllowed,true);assert.equal(authority.rscStreamObserverAllowed,true);
+ assert.equal(authority.localhostServerAllowed,true);assert.equal(authority.browserAllowed,true);
+ for(const key of ['compilerAllowed','nativeBuildAllowed','guestAllowed','engineAllowed','externalApplicationDeploymentAllowed'])assert.equal(authority[key],false);
+@@ -44,6 +45,9 @@
+ assert.equal(process.argv.length,7);assert(browserTools,'Control browser tools mandatory');
+ assert.equal(process.argv[2],root,'Output argument must be canonical');assert.equal(root,deriveOutput(plan.outputPrefix,runId));
+ assert(source.endsWith('/application/.next/standalone'));
++assert.equal(plan.newComponentBindingsPending,false,'Actual new component prerequisite pending');
++assert.equal(plan.hostToolRevalidationPending,false,'Current browser/runtime tool revalidation pending');
++const runtimeAdmission=await admitNextRuntime({plan,authority,kind:'stock'});
+ await mkdir(root, {mode: 0o700});
+ await mkdir(join(root, 'responses'));
+ const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+@@ -93,8 +97,9 @@
+   for(const r of input.files){const path=join(application,r.path),s=await lstat(path);assert.deepEqual(await descriptor(path),{path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}
+   for(const r of input.directories)assert.equal((await lstat(join(application,r.path))).mode&0o777,r.mode);
+ }
+-const result = {schemaVersion: 1, suite: 'NEXT_RSC_STREAM_OBSERVER_V4_FULL_MATCHED_NODE_PROFILE_V1', controlOnly:false, fullOriginalContractExecuted:false, fullNextAccepted:false,
++const result = {schemaVersion: 1, suite: 'CLONE_CANCEL_NEXT_FULL_MATCHED_NODE_PROFILE_V1', controlOnly:false, fullOriginalContractExecuted:false, fullNextAccepted:false,
+   node: process.version, guestExecuted: false, applicationModified: false,
++  newComponentPrerequisite:{constructionReview:authority.constructionReview,engineAdmission:authority.engineAdmission,compositionReview:authority.compositionReview,componentExecuted:false},
+   standaloneSource: source, sourceServer: await descriptor(join(source, 'server.js')),
+   bridge: await descriptor(join(here, '../http-bridge-candidate-v1/bridge.mjs')), harness: await descriptor(fileURLToPath(import.meta.url)),
+   http: [], errors: [], transportErrors: [], prepared: false};
+@@ -102,16 +107,17 @@
+ result.rootAuthority=rootAuthorityDescriptor;result.publicRequestCorrelation=null;
+ async function verifyRef(ref){
+  assert(ref&&typeof ref.path==='string'&&resolve(ref.path)===ref.path);assert.equal(await realpath(ref.path),ref.path);
+- const before=await lstat(ref.path);assert(before.isFile()&&!before.isSymbolicLink()&&before.nlink===1);
++ const before=await lstat(ref.path);assert(before.isFile()&&!before.isSymbolicLink());assert(before.nlink===1||['/usr/bin/make','/usr/bin/git'].includes(ref.path),'Only pinned OS executable aliases');
+  assert.deepEqual(await descriptor(ref.path),ref);const after=await lstat(ref.path);
+  for(const key of ['dev','ino','mode','nlink','size','mtimeMs','ctimeMs'])assert.equal(before[key],after[key]);
+ }
+ async function sourceFamily(ref){
+- await verifyRef(ref);const index=JSON.parse(await readFile(ref.path,'utf8')),directory=dirname(ref.path);
++ await verifyRef(ref);assert.equal((await lstat(ref.path)).nlink,1);const index=JSON.parse(await readFile(ref.path,'utf8')),directory=dirname(ref.path);
+  const tree=await walk(directory);assert.equal(tree.links.length,0);assert.deepEqual(tree.files.sort(),[...index.files.map(x=>x.path),'index.json'].sort());
+- for(const row of index.files){assert(typeof row.path==='string'&&!row.path.startsWith('/')&&!row.path.split('/').some(x=>!x||x==='.'||x==='..'));await verifyRef({...row,path:join(directory,row.path)});}
++ for(const row of index.files){assert(typeof row.path==='string'&&!row.path.startsWith('/')&&!row.path.split('/').some(x=>!x||x==='.'||x==='..'));await verifyRef({...row,path:join(directory,row.path)});assert.equal((await lstat(join(directory,row.path))).nlink,1);}
+ }
+ async function dependencyBookend(){
++ await runtimeAdmission.artifactBookend();await runtimeAdmission.witBookend();
+  assert.deepEqual(authority.sourceIndex,await descriptor(join(here,'index.json')));
+  await verifyRef(rootAuthorityDescriptor);await sourceFamily(authority.sourceIndex);
+  for(const family of plan.sourceFamilies)await sourceFamily(family);
+@@ -213,6 +219,6 @@
+     &&result.errors.length===0&&result.transportErrors.length===0;
+   await save();
+ }
+-console.log(JSON.stringify({state:result.passed?'NEXT_RSC_STREAM_OBSERVER_V4_FULL_MATCHED_NODE_PROFILE_PASSED':'NEXT_RSC_STREAM_OBSERVER_V4_FULL_MATCHED_NODE_PROFILE_FAILED',
++console.log(JSON.stringify({state:result.passed?'CLONE_CANCEL_NEXT_FULL_MATCHED_NODE_PROFILE_PASSED':'CLONE_CANCEL_NEXT_FULL_MATCHED_NODE_PROFILE_FAILED',
+   controlOnly:false,fullOriginalContractExecuted:result.fullOriginalContractExecuted,passed:result.passed,errors:result.errors,transportErrors:result.transportErrors,guestExecuted:false,fullNextAccepted:false}));
+ process.exitCode=result.passed?0:1;

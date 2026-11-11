@@ -1,0 +1,72 @@
+--- review-results.before.py
++++ review-results.py
+@@ -161,6 +161,14 @@
+ 
+ def supplemental(capture):
+     c = Checks(); items = capture['observations']
++    # Collection certainty is independent of the genuine semantic validator's
++    # early outer-catch return. Authenticate every collected outcome first.
++    need(type(items) is list and len(items) == 6 and len({r['id'] for r in items}) == 6, 'Six supplemental collection records required')
++    for r in items:
++        need(all(r[k] is None for k in ('error', 'readerReleaseError', 'publicationError')) and r['bodyEofObserved'] is True and r['signalAborted'] is False, 'Supplemental collection EOF/error/cleanup')
++        body = checked(r['body']); need(body == decoded(r['bodyBase64'], 1048576), 'Supplemental collection published body')
++        pieces = [decoded(p['base64'], 1048576) for p in r['responseChunks']]
++        need(b''.join(pieces) == body and all(len(b) == p['bytes'] and digest(b) == p['sha256'] for b, p in zip(pieces, r['responseChunks'])), 'Supplemental collection all chunk bytes')
+     unicode_value, recovery_value = 'concurrent-€-😀-café', 'recovered-界-✅'
+     specs = [
+         ('context-alpha', 'concurrent', 'GET', '/api/context', {'cookie': 'fixture_token=parallel-alpha', 'x-fixture-probe': 'probe-alpha'}, 200, {'marker': 'NEXT_CONTEXT', 'cookie': 'parallel-alpha', 'header': 'probe-alpha'}),
+@@ -402,6 +410,13 @@
+             checked(server['stderr'])
+     need(type(exit_record['code']) is int and exit_record['code'] in (0, 1) and exit_record['signal'] is None and exit_record.get('error') is None, 'Client actual terminal incomplete')
+     need(exit_record['code'] == (0 if client['passed'] else 1), 'Client status/passed mismatch')
++    if arm == 'stock' or client['passed']:
++        need(actual['errors'] == [], 'Actor collection/cleanup/publication errors')
++    else:
++        expected_stage = 'deployment-or-control' if arm == 'wasmtime' else 'wasmcloud-full-deployment-or-control'
++        need(len(actual['errors']) == 1 and actual['errors'][0].get('stage') == expected_stage and
++             actual['errors'][0].get('name') == 'AssertionError' and exit_record['code'] == 1,
++             'Semantic negative requires only the known client-status assertion; all other actor errors are uncertainty')
+ 
+ 
+ def callback_state(arm, work, expected):
+@@ -419,6 +434,23 @@
+     return dict(namespace=str(root), members=names, pendingAbsent=True, state=row(path), generation=int(match[1]),
+                 namespacePhysical=dict(dev=before[0], ino=before[1], mode=stat.S_IMODE(before[2]), nlink=before[3]),
+                 observationScope='Closed owned namespace snapshot only; no crash durability, CAS or private resource identity claim')
++
++
++def public_manifest(authority, actual, client, browser, work, run_id):
++    path = work / 'public-request-correlation.json'
++    value = json.loads(raw(path, 4096)); ref = row(path)
++    need(set(value) == {'schemaVersion', 'runId', 'origin', 'headerName', 'nonceByTest'} and value['schemaVersion'] == 1, 'Actual public manifest schema')
++    block = authority['publicRequestCorrelation']
++    need(value['runId'] == run_id and value['origin'] == client['origin'] == browser['origin'], 'Actual public manifest run/origin')
++    need(value['headerName'] == block['headerName'] == 'x-next-public-request-correlation' and value['nonceByTest'] == block['nonceByTest'], 'Root-declared public nonce equality')
++    need(set(value['nonceByTest']) == {'client-counter', 'server-action'} and len(set(value['nonceByTest'].values())) == 2, 'Independent per-test public nonce inventory')
++    need(all(type(v) is str and re.fullmatch('[0-9a-f]{64}', v) is not None for v in value['nonceByTest'].values()), 'Configured public nonce types')
++    need(actual['publicRequestCorrelation']['manifest'] == ref and actual['publicRequestCorrelation']['value'] == value, 'Actor actual manifest publication')
++    for observed in (client['publicRequestCorrelation'], browser['publicRequestCorrelation']):
++        need(observed['manifestSource'] == ref and observed['manifest'] == value, 'Client/browser actual manifest bytes')
++    for record in browser['resourceStreamObservation']['observations']:
++        need(record['target']['headerName'] == value['headerName'] and record['target']['nonce'] == value['nonceByTest']['server-action'], 'Selected observer Root public context')
++    return dict(manifest=ref, runId=run_id, origin=value['origin'], headerName=value['headerName'], nonceByTest=value['nonceByTest'], publicTupleOnly=True, physicalIdentityClaimed=False)
+ 
+ 
+ def review_arm(trial, binding):
+@@ -437,6 +469,7 @@
+     need(client['suite'] == SUITE and client['controlOnly'] is False and client['fullNextAccepted'] is False and client['browser'] == browser, 'Current full-client/browser wire')
+     need(client['errors'] == [] and client['transportErrors'] == [], 'Incomplete original client collection')
+     need(client['fullOriginalContractExecuted'] is True, 'Actual original workload not fully collected')
++    public_context = public_manifest(authority, actual, client, browser, work, trial['runId'])
+     client_plan = document(Path(plan['clientSource']['path']).parent / 'plan.json')
+     need(client_plan['sourceRequirements']['browserSourceIndex'] == binding['browserIndex'], 'Client selected actual browser index')
+     for ref in client_plan['sourceRequirements'].values(): checked(ref)
+@@ -456,7 +489,7 @@
+     result = dict(collectionVerified=ui['resource']['collectionComplete'], semanticPassed=full, originalContractPassed=original,
+                   actualResult=row(work / 'result.json'), clientResult=row(client_root / 'result.json'), browserResult=row(client_root / 'browser/result.json'), owner=owner,
+                   http=http, httpPassed=sum(r['passed'] for r in http), httpTotal=len(http), portable=portable_result, supplemental=supplemental_result,
+-                  generation=generation, streaming=stream, browser=ui, callbackState=callback_state(arm, work, generation['after']), actorErrors=actual['errors'], fullOriginalContractExecuted=True, fullNextAccepted=False)
++                  generation=generation, streaming=stream, browser=ui, publicRequestCorrelation=public_context, callbackState=callback_state(arm, work, generation['after']), actorErrors=actual['errors'], fullOriginalContractExecuted=True, fullNextAccepted=False)
+     if not result['collectionVerified']: result['collectionErrors'] = ['Resource observer collection uncertain/incomplete']
+     else: result['collectionErrors'] = []
+     return result

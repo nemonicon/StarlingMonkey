@@ -3,8 +3,9 @@
 The repaired-engine sample passes on Wasmtime 42.0.1 and stock wasmCloud 2.11.0
 against Node 22.14.0.
 This fixes the bounded cancellation failure observed with engine `237c4e5a`.
-The full Next.js workload has not yet run with the changed engine. Production
-remains foundations-v13. Each row below passes on both hosts.
+The [full Next.js comparison](nextjs-clone-cancel-full-results.md) now also passes
+once on Wasmtime, stock wasmCloud and matched Node, with independent semantic
+review. Production remains foundations-v13. Each row below passes on both hosts.
 
 | Check | Actual result |
 |---|---|
@@ -88,8 +89,8 @@ its observer envelope `f1c32f45` validates and passes structural review, includi
 exact embedded child bytes, shared resource types and the same 13 external
 interfaces. That review establishes composition, not deployed application behavior.
 
-Next gates are the unchanged comprehensive Next.js app on both target hosts, resource-lifetime/reuse checks,
-repeatability, clean-checkout reproduction and cost measurements. A healthy
+Next gates are resource-lifetime/reuse checks, repeatability, clean-checkout
+reproduction and cost measurements. A healthy
 second context response does not prove same-Store identity or native resource
 retirement. No broad Node/Buffer compatibility or production promotion follows
 from this sample.
