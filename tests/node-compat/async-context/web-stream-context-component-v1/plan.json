@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "state": "PUBLIC_ALS_WEB_STREAM_COMPONENT_SOURCE_ONLY_V1",
+  "guestEntry": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/web-stream-context-component-v1/guest-entry.mjs",
+    "sha256": "67cdc3549b22cbe9a6fa3702df4076a14ce51e689648b3259dce466928498174",
+    "bytes": 37296
+  },
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/context",
+      "caseSource": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/web-stream-context-candidate-v2/cases.mjs",
+        "sha256": "371ffc0a2b2916056651b16785da26efacdac78076b4a56c7da0c629c0fbb9f3",
+        "bytes": 17018
+      },
+      "boundaryMode": "native-boundaries",
+      "publicAsyncResourceRefusalSeparate": true,
+      "expectedPositiveAssertionsFromNode": 95,
+      "webStreamExpectationsRequireActualNodeComparison": true
+    },
+    {
+      "method": "GET",
+      "path": "/clone-cancel",
+      "caseSource": {
+        "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/response-clone-cancel-candidate-v1/case.mjs",
+        "sha256": "e7d4d51bd3afd6ff6aa6d0dad7813e9247de200268b3ced92e3fa00612ba95a0",
+        "bytes": 5702
+      },
+      "collectionDeadlineMilliseconds": 5000,
+      "partialReportOnDeadline": true,
+      "semanticExpectation": null
+    }
+  ],
+  "adapterSource": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/context-interleaving-candidate-v1/guest-entry.mjs",
+    "sha256": "63afd3bd32b12820e609aa4693a2bc56379712175c6f6b819224bd8f972195ec",
+    "bytes": 31479
+  },
+  "adapterSelection": {
+    "startExact": "// Standard WASI HTTP resource ownership",
+    "endBeforeExact": "// Shared ordinary workload.",
+    "bytes": 8967,
+    "sha256": "f6f2ec870ed1699b968bdd68dc9db91914a471d482ae9aff7f9b9d60fc7d60ce",
+    "contentsUnchanged": true
+  },
+  "caseExportRemoval": {
+    "context": [
+      "export const CASE_IDS",
+      "export function describeThrown",
+      "export async function runWebStreamContextCases"
+    ],
+    "clone": [
+      "export function describeThrown",
+      "export async function runResponseCloneCancelCase"
+    ],
+    "eachExactOnce": true,
+    "isolatedClosures": true
+  },
+  "imports": [
+    "starling:node-startup",
+    "starling:node-http",
+    "node:async_hooks",
+    "wasi:http/types@0.2.10"
+  ],
+  "capabilities": {
+    "sameSelectedStandardWasiOnly": true,
+    "customHostImports": false,
+    "applicationMountsRequired": false,
+    "networkClientRequired": false,
+    "same13WorldRequiresGenuineConstructionAudit": true
+  },
+  "bounds": {
+    "jsonResponseBytes": 131072,
+    "contextCaseMilliseconds": 1000,
+    "contextEachCleanupMilliseconds": 250,
+    "cloneObservationMilliseconds": 5000,
+    "externalOriginalOwnerStillRequired": true
+  },
+  "initialization": {
+    "bootstrapAtDeployedPreparationOnly": true,
+    "testInstancesOrTimersAtInit": false,
+    "candidateAsyncResourceFacadeInstalled": false,
+    "readyPromiseAllocatedNeutrally": true,
+    "incomingResourcesEnterNativeFreshBeforeWebRequest": true
+  },
+  "actualNodeV2Oracle": null,
+  "actualCloneNodeOracle": null,
+  "actualComponent": null,
+  "actualConstructionReview": null,
+  "actualRuntimeResult": null,
+  "runtimeAccepted": false,
+  "fullNextAccepted": false,
+  "comparisonSource": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/web-stream-context-component-v1/compare.mjs",
+    "sha256": "d03cc217faf6aed85f2c29699d1c32fd07e56c91300429d8d44d3799d2194e2a",
+    "bytes": 4535
+  },
+  "publicAsyncResourceRefusal": {
+    "namedAndDefaultIdentityRequired": true,
+    "typedErrorRequired": "ERR_SM_NODE_UNSUPPORTED",
+    "comparedToNodePositiveApi": false
+  }
+}

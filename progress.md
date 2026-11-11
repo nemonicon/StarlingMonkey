@@ -4,6 +4,45 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-11. Overall roadmap: **in progress**.
 
+Latest lifecycle result: the [real-component comparison](docs/node-compat/nextjs-lifecycle-results.md)
+passes both public request-context runs against Node (eight groups/95 checks
+each), including four explicit public AsyncResource construction refusals.
+Cloned-response cancellation **fails**: Node calls the source once with both
+reason objects and waits; the native engine never calls it and fulfills early.
+Original runtime owner41704/120 exits0 clean with three complete HTTP200 bodies;
+semantic comparison41834/30 exits1 as required. Exact Content-Length/body sizes
+are independently verified. No same-Store or native retirement claim follows.
+Componentea18d156/37,225,626B validates with exactly13 standard WASI0.2.10 imports
+and the sole incoming-handler export. Its engine237c remains unchanged.
+The305-payload/968,759B saved packet and repository-only checker pass while
+preserving the cancellation failure. The checker also passes from an isolated
+307-file copy of actual staged Git blobs; optimized Python is refused before
+payload reads. Native cancellation repair and its
+negative cases are the next priority; a generic HTTP collector under-length
+gap is documented and must be corrected before future reuse.
+
+Compiler recovery: the volume has about100GiB free. The deleted compiler
+package is being replaced by a separately selected, freshly rebuilt package;
+the old package identity is not claimed. Its271 compiler Source files match the
+saved cut, all4859 dependency payloads match the original tool cut, and the
+locked Rust build plus Jco wrapping/transpilation finish cleanly. The new
+splicer is716737f5/5,589,391B. The existing237c engine remains unchanged, and
+its genuine52-field metadata/35 build/1,678 Source-reference admission passes.
+
+Pinned Node22.14.0 now collects eight new public AsyncLocalStorage/WebStream
+groups with95 passing assertions, including bind/snapshot exception and
+rejection restoration and queueMicrotask. A review found a negative-path
+cleanup weakness in the first test version; that version and its positive
+result remain preserved. The corrected v2 also passes95 assertions with
+identical normal observations. A separate Response.clone cancellation oracle
+observes one source cancellation with both original reason objects; both branch
+promises remain pending until the source cancellation completes. These are
+Node observations, now compared with the real component as recorded above.
+The native cancellation fix, restored native build prerequisites and broader
+host lifecycle validation are still in progress. Public AsyncResource remains
+unsupported. The recovered compiler package has constructed and validated this
+component successfully.
+
 Latest full Next result: the [V4 full comparison](docs/node-compat/nextjs-v4-full-results.md)
 passes once on stock wasmCloud2.11.0 and matched Node22.14.0 with Chrome157.0.8103.39
 and Playwright1.64.1. Original owners32470/600 and33103/300 exit0 clean. Both pass

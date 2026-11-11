@@ -1,0 +1,1468 @@
+{
+  "executionKind": "node-reference",
+  "nodeVersion": "v22.14.0",
+  "execArgv": [],
+  "nodeOptionsPresent": false,
+  "guestExecuted": false,
+  "schemaVersion": 1,
+  "suite": "PUBLIC_ALS_WEB_STREAM_CONTEXT_OBSERVATIONS_V1",
+  "expectationsFrozen": false,
+  "webStreamContextComparisonPerformed": false,
+  "nativeAsyncResourceTested": false,
+  "fullNextAccepted": false,
+  "boundaryMode": "public-only",
+  "nativeBoundaryClaimRequiresExternalProof": false,
+  "records": [
+    {
+      "id": "readable-pull",
+      "events": [
+        {
+          "sequence": 1,
+          "event": "source.start",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 2,
+          "event": "creator.returned",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 3,
+          "event": "consumer.before-read",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 4,
+          "event": "source.pull.before-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 5,
+          "event": "source.pull.after-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 6,
+          "event": "consumer.after-first-read",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 7,
+          "event": "consumer.after-end",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 8,
+          "event": "case.outer-after-completion",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        }
+      ],
+      "checks": [
+        {
+          "name": "one-pull",
+          "passed": true
+        },
+        {
+          "name": "read-value",
+          "passed": true
+        },
+        {
+          "name": "read-end",
+          "passed": true
+        },
+        {
+          "name": "outer-restored",
+          "passed": true
+        }
+      ],
+      "fulfilled": true,
+      "primarySet": false,
+      "passed": true,
+      "cleanup": {
+        "errors": [],
+        "pendingTasks": 0,
+        "heldLocks": 0,
+        "liveDeadlineTimers": 0,
+        "knownComplete": true
+      }
+    },
+    {
+      "id": "readable-cancel",
+      "events": [
+        {
+          "sequence": 1,
+          "event": "source.start",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 2,
+          "event": "creator.returned",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 3,
+          "event": "consumer.before-cancel",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 4,
+          "event": "source.cancel.before-await",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 5,
+          "event": "source.cancel.after-await",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 6,
+          "event": "consumer.after-cancel",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 7,
+          "event": "case.outer-after-completion",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        }
+      ],
+      "checks": [
+        {
+          "name": "cancel-once",
+          "passed": true
+        },
+        {
+          "name": "cancel-reason-identity",
+          "passed": true
+        },
+        {
+          "name": "outer-restored",
+          "passed": true
+        }
+      ],
+      "fulfilled": true,
+      "primarySet": false,
+      "passed": true,
+      "cleanup": {
+        "errors": [],
+        "pendingTasks": 0,
+        "heldLocks": 0,
+        "liveDeadlineTimers": 0,
+        "knownComplete": true
+      }
+    },
+    {
+      "id": "writable-write-close",
+      "events": [
+        {
+          "sequence": 1,
+          "event": "sink.start",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 2,
+          "event": "creator.returned",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 3,
+          "event": "consumer.before-write",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 4,
+          "event": "sink.write.before-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "value": "write-value"
+          }
+        },
+        {
+          "sequence": 5,
+          "event": "sink.write.after-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 6,
+          "event": "consumer.after-write",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 7,
+          "event": "sink.close.before-await",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 8,
+          "event": "sink.close.after-await",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 9,
+          "event": "consumer.after-close",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 10,
+          "event": "case.outer-after-completion",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        }
+      ],
+      "checks": [
+        {
+          "name": "write-once",
+          "passed": true
+        },
+        {
+          "name": "close-once",
+          "passed": true
+        },
+        {
+          "name": "outer-restored",
+          "passed": true
+        }
+      ],
+      "fulfilled": true,
+      "primarySet": false,
+      "passed": true,
+      "cleanup": {
+        "errors": [],
+        "pendingTasks": 0,
+        "heldLocks": 0,
+        "liveDeadlineTimers": 0,
+        "knownComplete": true
+      }
+    },
+    {
+      "id": "writable-abort",
+      "events": [
+        {
+          "sequence": 1,
+          "event": "sink.start",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 2,
+          "event": "creator.returned",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 3,
+          "event": "consumer.before-abort",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 4,
+          "event": "sink.abort.before-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 5,
+          "event": "sink.abort.after-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 6,
+          "event": "consumer.after-abort",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 7,
+          "event": "case.outer-after-completion",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        }
+      ],
+      "checks": [
+        {
+          "name": "abort-once",
+          "passed": true
+        },
+        {
+          "name": "abort-reason-identity",
+          "passed": true
+        },
+        {
+          "name": "outer-restored",
+          "passed": true
+        }
+      ],
+      "fulfilled": true,
+      "primarySet": false,
+      "passed": true,
+      "cleanup": {
+        "errors": [],
+        "pendingTasks": 0,
+        "heldLocks": 0,
+        "liveDeadlineTimers": 0,
+        "knownComplete": true
+      }
+    },
+    {
+      "id": "transform-write-flush",
+      "events": [
+        {
+          "sequence": 1,
+          "event": "transformer.start",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 2,
+          "event": "creator.returned",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 3,
+          "event": "consumer.before-paired-read-write",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 4,
+          "event": "transformer.transform.before-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 5,
+          "event": "transformer.transform.after-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 6,
+          "event": "consumer.after-paired-read-write",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 7,
+          "event": "transformer.flush.before-await",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 8,
+          "event": "transformer.flush.after-await",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 9,
+          "event": "consumer.after-close",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 10,
+          "event": "case.outer-after-completion",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        }
+      ],
+      "checks": [
+        {
+          "name": "transform-once",
+          "passed": true
+        },
+        {
+          "name": "flush-once",
+          "passed": true
+        },
+        {
+          "name": "transformed-value",
+          "passed": true
+        },
+        {
+          "name": "transform-end",
+          "passed": true
+        },
+        {
+          "name": "outer-restored",
+          "passed": true
+        }
+      ],
+      "fulfilled": true,
+      "primarySet": false,
+      "passed": true,
+      "cleanup": {
+        "errors": [],
+        "pendingTasks": 0,
+        "heldLocks": 0,
+        "liveDeadlineTimers": 0,
+        "knownComplete": true
+      }
+    },
+    {
+      "id": "bind-throw-reject",
+      "events": [
+        {
+          "sequence": 1,
+          "event": "capture.returned",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 2,
+          "event": "captured.sync",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 0,
+            "argumentIdentity": true,
+            "receiverIdentity": true
+          }
+        },
+        {
+          "sequence": 3,
+          "event": "caller.after-sync-throw",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 0,
+            "caught": true,
+            "identity": true
+          }
+        },
+        {
+          "sequence": 4,
+          "event": "captured.sync",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 1,
+            "argumentIdentity": true,
+            "receiverIdentity": true
+          }
+        },
+        {
+          "sequence": 5,
+          "event": "caller.after-sync-throw",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 1,
+            "caught": true,
+            "identity": true
+          }
+        },
+        {
+          "sequence": 6,
+          "event": "captured.sync",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 2,
+            "argumentIdentity": true,
+            "receiverIdentity": true
+          }
+        },
+        {
+          "sequence": 7,
+          "event": "caller.after-sync-throw",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 2,
+            "caught": true,
+            "identity": true
+          }
+        },
+        {
+          "sequence": 8,
+          "event": "captured.sync",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 3,
+            "argumentIdentity": true,
+            "receiverIdentity": true
+          }
+        },
+        {
+          "sequence": 9,
+          "event": "caller.after-sync-throw",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 3,
+            "caught": true,
+            "identity": true
+          }
+        },
+        {
+          "sequence": 10,
+          "event": "captured.sync",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 4,
+            "argumentIdentity": true,
+            "receiverIdentity": true
+          }
+        },
+        {
+          "sequence": 11,
+          "event": "caller.after-sync-throw",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 4,
+            "caught": true,
+            "identity": true
+          }
+        },
+        {
+          "sequence": 12,
+          "event": "captured.async.before-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 0
+          }
+        },
+        {
+          "sequence": 13,
+          "event": "caller.after-async-call",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 0
+          }
+        },
+        {
+          "sequence": 14,
+          "event": "captured.async.after-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 0
+          }
+        },
+        {
+          "sequence": 15,
+          "event": "caller.after-rejection",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 0,
+            "caught": true,
+            "identity": true
+          }
+        },
+        {
+          "sequence": 16,
+          "event": "captured.async.before-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 1
+          }
+        },
+        {
+          "sequence": 17,
+          "event": "caller.after-async-call",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 1
+          }
+        },
+        {
+          "sequence": 18,
+          "event": "captured.async.after-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 1
+          }
+        },
+        {
+          "sequence": 19,
+          "event": "caller.after-rejection",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 1,
+            "caught": true,
+            "identity": true
+          }
+        },
+        {
+          "sequence": 20,
+          "event": "case.outer-after-completion",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        }
+      ],
+      "checks": [
+        {
+          "name": "sync-0-capture-A",
+          "passed": true
+        },
+        {
+          "name": "sync-0-argument",
+          "passed": true
+        },
+        {
+          "name": "sync-0-receiver",
+          "passed": true
+        },
+        {
+          "name": "sync-0-throw-identity",
+          "passed": true
+        },
+        {
+          "name": "sync-0-caller-B",
+          "passed": true
+        },
+        {
+          "name": "sync-1-capture-A",
+          "passed": true
+        },
+        {
+          "name": "sync-1-argument",
+          "passed": true
+        },
+        {
+          "name": "sync-1-receiver",
+          "passed": true
+        },
+        {
+          "name": "sync-1-throw-identity",
+          "passed": true
+        },
+        {
+          "name": "sync-1-caller-B",
+          "passed": true
+        },
+        {
+          "name": "sync-2-capture-A",
+          "passed": true
+        },
+        {
+          "name": "sync-2-argument",
+          "passed": true
+        },
+        {
+          "name": "sync-2-receiver",
+          "passed": true
+        },
+        {
+          "name": "sync-2-throw-identity",
+          "passed": true
+        },
+        {
+          "name": "sync-2-caller-B",
+          "passed": true
+        },
+        {
+          "name": "sync-3-capture-A",
+          "passed": true
+        },
+        {
+          "name": "sync-3-argument",
+          "passed": true
+        },
+        {
+          "name": "sync-3-receiver",
+          "passed": true
+        },
+        {
+          "name": "sync-3-throw-identity",
+          "passed": true
+        },
+        {
+          "name": "sync-3-caller-B",
+          "passed": true
+        },
+        {
+          "name": "sync-4-capture-A",
+          "passed": true
+        },
+        {
+          "name": "sync-4-argument",
+          "passed": true
+        },
+        {
+          "name": "sync-4-receiver",
+          "passed": true
+        },
+        {
+          "name": "sync-4-throw-identity",
+          "passed": true
+        },
+        {
+          "name": "sync-4-caller-B",
+          "passed": true
+        },
+        {
+          "name": "async-0-capture-before-A",
+          "passed": true
+        },
+        {
+          "name": "async-0-argument",
+          "passed": true
+        },
+        {
+          "name": "async-0-immediate-caller-B",
+          "passed": true
+        },
+        {
+          "name": "async-0-capture-after-A",
+          "passed": true
+        },
+        {
+          "name": "async-0-rejection-identity",
+          "passed": true
+        },
+        {
+          "name": "async-0-resumed-caller-B",
+          "passed": true
+        },
+        {
+          "name": "async-1-capture-before-A",
+          "passed": true
+        },
+        {
+          "name": "async-1-argument",
+          "passed": true
+        },
+        {
+          "name": "async-1-immediate-caller-B",
+          "passed": true
+        },
+        {
+          "name": "async-1-capture-after-A",
+          "passed": true
+        },
+        {
+          "name": "async-1-rejection-identity",
+          "passed": true
+        },
+        {
+          "name": "async-1-resumed-caller-B",
+          "passed": true
+        },
+        {
+          "name": "outer-restored",
+          "passed": true
+        }
+      ],
+      "fulfilled": true,
+      "primarySet": false,
+      "passed": true,
+      "cleanup": {
+        "errors": [],
+        "pendingTasks": 0,
+        "heldLocks": 0,
+        "liveDeadlineTimers": 0,
+        "knownComplete": true
+      }
+    },
+    {
+      "id": "snapshot-throw-reject",
+      "events": [
+        {
+          "sequence": 1,
+          "event": "capture.returned",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 2,
+          "event": "captured.sync",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 0,
+            "argumentIdentity": true,
+            "receiverIdentity": null
+          }
+        },
+        {
+          "sequence": 3,
+          "event": "caller.after-sync-throw",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 0,
+            "caught": true,
+            "identity": true
+          }
+        },
+        {
+          "sequence": 4,
+          "event": "captured.sync",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 1,
+            "argumentIdentity": true,
+            "receiverIdentity": null
+          }
+        },
+        {
+          "sequence": 5,
+          "event": "caller.after-sync-throw",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 1,
+            "caught": true,
+            "identity": true
+          }
+        },
+        {
+          "sequence": 6,
+          "event": "captured.sync",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 2,
+            "argumentIdentity": true,
+            "receiverIdentity": null
+          }
+        },
+        {
+          "sequence": 7,
+          "event": "caller.after-sync-throw",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 2,
+            "caught": true,
+            "identity": true
+          }
+        },
+        {
+          "sequence": 8,
+          "event": "captured.sync",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 3,
+            "argumentIdentity": true,
+            "receiverIdentity": null
+          }
+        },
+        {
+          "sequence": 9,
+          "event": "caller.after-sync-throw",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 3,
+            "caught": true,
+            "identity": true
+          }
+        },
+        {
+          "sequence": 10,
+          "event": "captured.sync",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 4,
+            "argumentIdentity": true,
+            "receiverIdentity": null
+          }
+        },
+        {
+          "sequence": 11,
+          "event": "caller.after-sync-throw",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 4,
+            "caught": true,
+            "identity": true
+          }
+        },
+        {
+          "sequence": 12,
+          "event": "captured.async.before-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 0
+          }
+        },
+        {
+          "sequence": 13,
+          "event": "caller.after-async-call",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 0
+          }
+        },
+        {
+          "sequence": 14,
+          "event": "captured.async.after-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 0
+          }
+        },
+        {
+          "sequence": 15,
+          "event": "caller.after-rejection",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 0,
+            "caught": true,
+            "identity": true
+          }
+        },
+        {
+          "sequence": 16,
+          "event": "captured.async.before-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 1
+          }
+        },
+        {
+          "sequence": 17,
+          "event": "caller.after-async-call",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 1
+          }
+        },
+        {
+          "sequence": 18,
+          "event": "captured.async.after-await",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": {
+            "index": 1
+          }
+        },
+        {
+          "sequence": 19,
+          "event": "caller.after-rejection",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": {
+            "index": 1,
+            "caught": true,
+            "identity": true
+          }
+        },
+        {
+          "sequence": 20,
+          "event": "case.outer-after-completion",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        }
+      ],
+      "checks": [
+        {
+          "name": "sync-0-capture-A",
+          "passed": true
+        },
+        {
+          "name": "sync-0-argument",
+          "passed": true
+        },
+        {
+          "name": "sync-0-throw-identity",
+          "passed": true
+        },
+        {
+          "name": "sync-0-caller-B",
+          "passed": true
+        },
+        {
+          "name": "sync-1-capture-A",
+          "passed": true
+        },
+        {
+          "name": "sync-1-argument",
+          "passed": true
+        },
+        {
+          "name": "sync-1-throw-identity",
+          "passed": true
+        },
+        {
+          "name": "sync-1-caller-B",
+          "passed": true
+        },
+        {
+          "name": "sync-2-capture-A",
+          "passed": true
+        },
+        {
+          "name": "sync-2-argument",
+          "passed": true
+        },
+        {
+          "name": "sync-2-throw-identity",
+          "passed": true
+        },
+        {
+          "name": "sync-2-caller-B",
+          "passed": true
+        },
+        {
+          "name": "sync-3-capture-A",
+          "passed": true
+        },
+        {
+          "name": "sync-3-argument",
+          "passed": true
+        },
+        {
+          "name": "sync-3-throw-identity",
+          "passed": true
+        },
+        {
+          "name": "sync-3-caller-B",
+          "passed": true
+        },
+        {
+          "name": "sync-4-capture-A",
+          "passed": true
+        },
+        {
+          "name": "sync-4-argument",
+          "passed": true
+        },
+        {
+          "name": "sync-4-throw-identity",
+          "passed": true
+        },
+        {
+          "name": "sync-4-caller-B",
+          "passed": true
+        },
+        {
+          "name": "async-0-capture-before-A",
+          "passed": true
+        },
+        {
+          "name": "async-0-argument",
+          "passed": true
+        },
+        {
+          "name": "async-0-immediate-caller-B",
+          "passed": true
+        },
+        {
+          "name": "async-0-capture-after-A",
+          "passed": true
+        },
+        {
+          "name": "async-0-rejection-identity",
+          "passed": true
+        },
+        {
+          "name": "async-0-resumed-caller-B",
+          "passed": true
+        },
+        {
+          "name": "async-1-capture-before-A",
+          "passed": true
+        },
+        {
+          "name": "async-1-argument",
+          "passed": true
+        },
+        {
+          "name": "async-1-immediate-caller-B",
+          "passed": true
+        },
+        {
+          "name": "async-1-capture-after-A",
+          "passed": true
+        },
+        {
+          "name": "async-1-rejection-identity",
+          "passed": true
+        },
+        {
+          "name": "async-1-resumed-caller-B",
+          "passed": true
+        },
+        {
+          "name": "outer-restored",
+          "passed": true
+        }
+      ],
+      "fulfilled": true,
+      "primarySet": false,
+      "passed": true,
+      "cleanup": {
+        "errors": [],
+        "pendingTasks": 0,
+        "heldLocks": 0,
+        "liveDeadlineTimers": 0,
+        "knownComplete": true
+      }
+    },
+    {
+      "id": "queue-microtask",
+      "events": [
+        {
+          "sequence": 1,
+          "event": "scheduler.returned",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 2,
+          "event": "caller.before-microtask-await",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 3,
+          "event": "microtask.A",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 4,
+          "event": "microtask.B",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 5,
+          "event": "microtask.A.then",
+          "context": {
+            "first": "A",
+            "second": "A"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 6,
+          "event": "caller.after-microtask-await",
+          "context": {
+            "first": "B",
+            "second": "B"
+          },
+          "detail": null
+        },
+        {
+          "sequence": 7,
+          "event": "case.outer-after-completion",
+          "context": {
+            "first": "undefined",
+            "second": "undefined"
+          },
+          "detail": null
+        }
+      ],
+      "checks": [
+        {
+          "name": "microtask-A-context",
+          "passed": true
+        },
+        {
+          "name": "microtask-B-context",
+          "passed": true
+        },
+        {
+          "name": "microtask-A-then-context",
+          "passed": true
+        },
+        {
+          "name": "microtasks-once",
+          "passed": true
+        },
+        {
+          "name": "microtasks-caller-B",
+          "passed": true
+        },
+        {
+          "name": "outer-restored",
+          "passed": true
+        }
+      ],
+      "fulfilled": true,
+      "primarySet": false,
+      "passed": true,
+      "cleanup": {
+        "errors": [],
+        "pendingTasks": 0,
+        "heldLocks": 0,
+        "liveDeadlineTimers": 0,
+        "knownComplete": true
+      }
+    }
+  ],
+  "passed": true,
+  "surface": {
+    "AsyncLocalStorage": "function",
+    "ReadableStream": "function",
+    "WritableStream": "function",
+    "TransformStream": "function",
+    "queueMicrotask": "function",
+    "setTimeout": "function",
+    "clearTimeout": "function"
+  },
+  "completedAllCases": true,
+  "contextOracleStatus": "OBSERVATIONS_ONLY_WEB_STREAM_BASELINE_NOT_FROZEN"
+}

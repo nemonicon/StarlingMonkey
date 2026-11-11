@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "state": "COMPILER_RECOVERY_EXACT_SOURCE_FRESH_PACKAGE_PLAN_V1",
+  "sourceMaterializer": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/compiler-recovery-v1/prepare-source.py",
+    "sha256": "72ca536db28083c29dcbf64bfe7f3c66f107f5dc107c0e2d760296e90b20f8c3",
+    "bytes": 8712
+  },
+  "sourceManifest": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/compiler-recovery-v1/source-manifest.json",
+    "sha256": "e900aa10e0be6cd90cd0371406763bf974def75cb95141d96538b10d28448b2d",
+    "bytes": 51418
+  },
+  "originalToolCut": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-pruning-candidate-v1/tool-cut-references.json",
+    "sha256": "39067fcec4116f871af613ade49a617b5c93884d6c97e6df11e997e6ad4ab769",
+    "bytes": 2104465
+  },
+  "originalBuildPlan": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-pruning-candidate-v1/future-build-plan.json",
+    "sha256": "0bfa412638f016a31beff2f1da9a4de3a19a2bdb95ab0ef57fba451b97bfd7ab",
+    "bytes": 4844
+  },
+  "originalRustCargoLock": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/foundation-scheduler/clock-io-pruning-candidate-v1/after/Cargo.lock",
+    "sha256": "317832af49b2369c5c60fd240ae7f3e7cf79ed28b395ca71f31a4702664810ab",
+    "bytes": 30000
+  },
+  "originalRustToolchain": "1.96.1-aarch64-apple-darwin",
+  "currentSourceFiles": 271,
+  "currentSourceBytes": 656619,
+  "workRoot": "/private/tmp/starling-node-compat/next-lifecycle-compiler-recovery-v1-first",
+  "sourceRoot": "/private/tmp/starling-node-compat/next-lifecycle-compiler-recovery-v1-first/source",
+  "packageRoot": "/private/tmp/starling-node-compat/next-lifecycle-compiler-recovery-v1-first/package",
+  "npmToolchainRoot": "/private/tmp/starling-node-compat/next-lifecycle-compiler-recovery-v1-first/toolchain",
+  "originalNpmPackage": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/milestones/foundations-v12/docs/node-compat/component-tests/toolchain/package.json",
+    "sha256": "4db920d079c9fd1f2f0946972c09183060cf949054c465b581119865f6ce23db",
+    "bytes": 117
+  },
+  "originalNpmLock": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/milestones/foundations-v12/docs/node-compat/component-tests/toolchain/package-lock.json",
+    "sha256": "bd852f41ddaa956d9135640690dffb4b05c47c326210ccd277cd632449aca952",
+    "bytes": 105484
+  },
+  "npmRelocationReceipt": {
+    "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/next-lifecycle-root-results-v1/npm-lock-relocation.json",
+    "sha256": "d67a923af9b63e9778857d40c4a0d4cb0b70e9ce3235916586e9caf57daa6e08",
+    "bytes": 653
+  },
+  "commands": [
+    {
+      "role": "WASM_SPLICER_COMPONENT_BUILD",
+      "argv": [
+        "/Users/dan/.rustup/toolchains/1.96.1-aarch64-apple-darwin/bin/cargo",
+        "build",
+        "--locked",
+        "--release",
+        "-p",
+        "splicer-component",
+        "--lib",
+        "--target",
+        "wasm32-wasip1",
+        "--target-dir",
+        "/private/tmp/starling-node-compat/next-lifecycle-compiler-recovery-v1-first/target"
+      ],
+      "cwd": "/private/tmp/starling-node-compat/next-lifecycle-compiler-recovery-v1-first/source",
+      "scope": "Splicer-only SDK tool; no native engine build."
+    },
+    {
+      "role": "WASI_COMPONENT_WRAPPER",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/private/tmp/starling-node-compat/next-lifecycle-compiler-recovery-v1-first/toolchain/node_modules/@bytecodealliance/jco/dist/jco.js",
+        "new",
+        "/private/tmp/starling-node-compat/next-lifecycle-compiler-recovery-v1-first/target/wasm32-wasip1/release/splicer_component.wasm",
+        "--wasi-reactor",
+        "-o",
+        "/private/tmp/starling-node-compat/next-lifecycle-compiler-recovery-v1-first/splicer.wasm"
+      ],
+      "cwd": "/private/tmp/starling-node-compat/next-lifecycle-compiler-recovery-v1-first/source"
+    },
+    {
+      "role": "SPLICER_JS_BINDINGS",
+      "argv": [
+        "/private/tmp/starling-node-compat/node-v22.14.0-darwin-arm64/bin/node",
+        "/private/tmp/starling-node-compat/next-lifecycle-compiler-recovery-v1-first/toolchain/node_modules/@bytecodealliance/jco/dist/jco.js",
+        "transpile",
+        "-q",
+        "--name",
+        "spidermonkey-embedding-splicer",
+        "/private/tmp/starling-node-compat/next-lifecycle-compiler-recovery-v1-first/splicer.wasm",
+        "-o",
+        "/private/tmp/starling-node-compat/next-lifecycle-compiler-recovery-v1-first/package/lib",
+        "--",
+        "-O1"
+      ],
+      "cwd": "/private/tmp/starling-node-compat/next-lifecycle-compiler-recovery-v1-first/source"
+    }
+  ],
+  "packageAssembly": {
+    "sourceFiles": [
+      "package.json",
+      "types.d.ts",
+      "src/componentize.js",
+      "src/platform.js",
+      "src/cli.js"
+    ],
+    "dependencies": "Independently copied complete fresh normalized-npm node_modules, preserving declared internal aliases/modes; include original root metadata only as documentary .toolchain-metadata, not new resolution roots.",
+    "generatedBindings": "Exact fresh package/lib outputs of actual Jco new/transpile; retain all files/hashes, then fresh whole package inventory.",
+    "oldPrivateInventoryRestored": false,
+    "originalHistoricalCoreExpected": {
+      "sha256": "61685a01168e4f3ed12cf701bcde1a568992ea16d4a33266cbd2784fc1532abb",
+      "bytes": 5583293
+    },
+    "requireActualNewCoreAndWrapperHashes": true,
+    "shimExpected": {
+      "sha256": "79ebf1d3569f7468ddb11ea053f9db00ec23a7e9a91dd64f6f3ab474132fb3ff",
+      "bytes": 33517
+    }
+  },
+  "compilerControls": [
+    "Pin actual Cargo/Rust/Rustdoc1.96.1 and wasm32-wasip1 target libraries; new private CARGO_HOME/target/tmp; do not mutate original source/cache/evidence.",
+    "Use --locked with after/Cargo.lock317832. Original offline-vendor recipe has118 cached+3 exact locked crates; fresh Root network/locked build is a distinct recorded tool action, not an offline claim.",
+    "Keep native-engine CMake/Make/npm-prepack paths uninvoked. Optional original host-cli/unit-test commands remain separate; the constructor needs generated JS/core package, not a new guest engine.",
+    "Capture argv/cwd, selected safe compiler environment/overrides, input Source/lock/tool descriptors, complete stdout/stderr/started/terminal; stop on nonzero/timeout/unknown cleanup.",
+    "Rehash all271 staged Source/modes and fresh package; verify actual exported splicer APIs plus constructor options/std13 through separately reviewed real construction/validate/WIT.",
+    "Actual new package inventory has fresh paths/modes and possibly changed generated bytes; never issue missing old6cc0 inventory or rewrite old61685 evidence. Bind a fresh genuine package selector after actual review."
+  ],
+  "nativeEngineAnd52Context": {
+    "engineSha256": "237c4e5ace16d6ad20f00e2da08501e6948e29056a5d2aad2a25e55bc894453a",
+    "metadataSha256": "500e76acf6d76c1552ad3208a6b2498f3b1439bbb14a5ac043f8c35d0405a48e",
+    "admission": "Original genuine4baf/23313 context/authority/admit before/final, all52 actual metadata values +35build/1678Source/825 source-target proof; tool selector changes only package roles. No metadata projection or engine rebuild."
+  },
+  "actionsExecutedByAuthor": false,
+  "componentConstructedByAuthor": false,
+  "fullNextAccepted": false
+}

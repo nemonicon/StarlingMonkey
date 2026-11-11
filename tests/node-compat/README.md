@@ -1,5 +1,11 @@
 # Native Node compatibility integration tests
 
+The latest [real-component lifecycle results](../../docs/node-compat/nextjs-lifecycle-results.md)
+retain two passing95-check context comparisons and a failing cloned-response
+cancellation regression. Run the repository-only evidence check with
+`python3 -I -B tests/node-compat/async-context/next-lifecycle-root-results-v1/check-saved.py`.
+That command verifies the saved failure; it does not execute or accept a new engine.
+
 These tests require a ComponentizeJS embedding engine rebuilt from this checkout
 with `ENABLE_BUILTIN_NODE_COMPAT=ON`. The runner refuses the released engine,
 checks its build metadata/hash, and leaves the native `node:buffer` and

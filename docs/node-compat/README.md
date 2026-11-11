@@ -2,6 +2,11 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
+The latest [lifecycle comparison](nextjs-lifecycle-results.md) passes190 native
+request-context checks against Node and identifies a concrete cloned-response
+cancellation failure. Its failing regression is retained. Native cancellation
+repair now leads the Next.js roadmap; no production promotion has occurred.
+
 **The bounded Next.js full workload now passes once on wasmCloud and matched
 Node with Chrome157.** The [V4 full results](nextjs-v4-full-results.md) retain
 24HTTP,52 cache and80 supplemental checks, generation1→2, incremental streaming,
@@ -29,8 +34,8 @@ The [V4 metadata observer](nextjs-observer-v4-results.md) passes seven real
 component probes and composes with the unchanged Next inner. The subsequent full
 browser comparison is recorded above. Saved evidence supports regression checks.
 
-The [priority roadmap](nextjs-priority-roadmap.md) leads with request isolation,
-lifecycle/resource/reuse and repeatability, then clean-machine reproduction,
+The [priority roadmap](nextjs-priority-roadmap.md) leads with the measured
+cancellation defect, lifecycle/resource/reuse and repeatability, then clean-machine reproduction,
 measured cost and production promotion. Server JavaScript executes in
 SpiderMonkey/Wasm with thirteen selected standard WASI0.2.10 interfaces;
 the browser runs ordinary Next client JavaScript. Full Node/Buffer compatibility

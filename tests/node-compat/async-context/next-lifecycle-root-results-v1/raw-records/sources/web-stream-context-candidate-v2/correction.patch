@@ -1,0 +1,46 @@
+--- web-stream-context-candidate-v1/cases.mjs
++++ web-stream-context-candidate-v2/cases.mjs
+@@ -184,11 +184,20 @@
+     async flush() { flushes++; c.observe('transformer.flush.before-await'); await Promise.resolve(); c.observe('transformer.flush.after-await'); },
+   }));
+   c.addCleanup(async () => {
+-    const jobs = [];
+-    if (reader) jobs.push(c.track(reader.cancel('fixture-cleanup')));
+-    if (writer) jobs.push(c.track(writer.abort('fixture-cleanup')));
+-    try { await Promise.allSettled(jobs); }
+-    finally { if (reader) c.release(reader); if (writer) c.release(writer); }
++    const jobs = []; let primarySet = false, primary;
++    const remember = error => { if (!primarySet) { primarySet = true; primary = error; } };
++    // Request both operations even if one throws synchronously; observe both promises.
++    if (reader) try { jobs.push(c.track(reader.cancel('fixture-cleanup'))); } catch (error) { remember(error); }
++    if (writer) try { jobs.push(c.track(writer.abort('fixture-cleanup'))); } catch (error) { remember(error); }
++    try {
++      for (const row of await Promise.allSettled(jobs)) if (row.status === 'rejected') remember(row.reason);
++    } catch (error) { remember(error); }
++    finally {
++      // Attempt both lock releases, retaining an earlier rejection including falsy values.
++      if (reader) try { c.release(reader); } catch (error) { remember(error); }
++      if (writer) try { c.release(writer); } catch (error) { remember(error); }
++    }
++    if (primarySet) throw primary;
+   });
+   c.observe('creator.returned');
+   await c.run('B', async () => {
+--- web-stream-context-candidate-v1/run-node.mjs
++++ web-stream-context-candidate-v2/run-node.mjs
+@@ -26,8 +26,14 @@
+   if (bytes.length > 128 * 1024) throw new Error('result exceeds 128 KiB');
+   const file = path.join(output, 'result.json');
+   const descriptor = fs.openSync(file, 'wx', 0o600);
++  let writePrimarySet = false, writePrimary;
+   try { fs.writeFileSync(descriptor, bytes); fs.fsyncSync(descriptor); }
+-  finally { fs.closeSync(descriptor); }
++  catch (error) { writePrimarySet = true; writePrimary = error; }
++  finally {
++    try { fs.closeSync(descriptor); }
++    catch (error) { if (!writePrimarySet) { writePrimarySet = true; writePrimary = error; } }
++  }
++  if (writePrimarySet) throw writePrimary;
+   const saved = fs.readFileSync(file);
+   if (!saved.equals(bytes)) throw new Error('result readback mismatch');
+   publication = { path: file, bytes: bytes.length, sha256: crypto.createHash('sha256').update(bytes).digest('hex') };

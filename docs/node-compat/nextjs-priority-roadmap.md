@@ -6,9 +6,13 @@ now both pass the unchanged comprehensive workload with Chrome157.0.8103.39.
 The earlier Chrome156 failures remain recorded; this sample establishes no
 engine fix or cancellation cause.
 
-1. Exercise request-state isolation and AsyncLocalStorage propagation across
-   concurrent promises, stream callbacks, cancellation and exceptions. Keep
-   per-request state out of snapshot/global storage.
+1. Fix the [measured cloned-response cancellation failure](nextjs-lifecycle-results.md):
+   forward both branch reasons to the source once and preserve cancellation
+   promise settlement. Add source rejection and one-cancel/survivor EOF/error
+   gates, restore the missing native build prerequisites, then validate the
+   fix on both target hosts. The new bounded public AsyncLocalStorage/stream/
+   exception checks already match Node in two real-component runs (190 checks).
+   Broader request isolation and snapshot-state policy remain separate gates.
 2. Check resource retirement and reuse: repeated requests, aborted bodies,
    error recovery, filesystem/HTTP handles and retained memory on both hosts.
    Do not equate local counters with host instance identity.
