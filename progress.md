@@ -4,6 +4,55 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-11. Overall roadmap: **in progress**.
 
+Previously pushed checkpoint: `6f388aa825ef368aa16db47e0d0927a4908f68c0`,
+the passing comprehensive Next application comparison. This follow-up completes
+[a separate disconnect/recovery regression](docs/node-compat/nextjs-disconnect-recovery-results.md)
+and preserves a **negative lifecycle result**.
+
+Completed in this checkpoint:
+
+- Implemented the fixed 3 warm-up +16 recorded cycles, six calls per cycle:
+  complete streaming, first-body disconnect, malformed JSON, distinct populated
+  then empty request context, and filesystem/SHA-256 recovery. No app, engine,
+  component, selected WASI imports or host services changed.
+- Both the initial and corrected six-case real-HTTP collector controls pass.
+  Review corrected a late-event mutation race after unknown cleanup timeout;
+  the unforced timeout-abandonment branch remains source-reviewed only.
+- Wasmtime owner 95660/600 and wasmCloud owner 96690/600 exit 0 with clean process
+  shutdown. All 114 client observations pass on each host, but each host emits
+  19 request-abort and `mozalloc_abort` diagnostics. Wasmtime also emits 19
+  worker-error backtraces. These are preserved failures, not successful native
+  cleanup or resource-retirement evidence.
+- Node bridge owner 98526/300 exits 1: its 114 client observations pass, but the
+  actor records 19 `/stream` transport errors with `Request aborted`. All owned
+  processes close without timeout or forced cleanup. No run was retried.
+- Independent review `344c3c36` verifies 734 artifacts and recomputes the complete
+  three-arm result. All 342 client observations pass; overall functional recovery
+  and native lifecycle acceptance remain false.
+- The portable packet retains 793 payloads /14,877,142 stored bytes, including
+  all reviewer inputs. The Python-only saved checker passes here and from an
+  isolated copy of 795 staged Git files with identical output. It preserves the
+  failures and does not open original app/compiler/host/build payloads.
+  Optimized Python is refused before packet reads. Original commands, source
+  corrections and prior failures remain recorded.
+
+Next work, in priority order:
+
+1. Reproduce the [suspected abort ordering path](tests/node-compat/frameworks/nextjs/next-disconnect-recovery-root-results-v1/source-triage.md)
+   with the public bridge and exact error identity. Test a narrow guest-entry
+   repair in real components; preserve unrelated/falsy errors and cleanup
+   failures, then rerun the disconnect and comprehensive application suites.
+2. Extend resource-retirement/reuse and concurrent request-isolation coverage.
+   Healthy later requests do not prove same-Store reuse or native cleanup.
+3. Run the declared full-browser repeatability matrix and clean-checkout
+   reproduction, followed by component size, startup, memory and throughput
+   measurements. Review bounded production promotion only after those gates.
+
+The accepted production checkpoint remains foundations-v13. No complete Node
+or Buffer compatibility, native resource-retirement proof, performance advantage
+or Next production acceptance is claimed. Available disk space is now about
+94 GiB, so the earlier storage blocker is resolved.
+
 Baseline checkpoint before the full-app test: `0b7e8412d57b6936e416e932f29f8a10a047927c`,
 verified on remote `main`. It includes the passing stock wasmCloud lifecycle
 comparison, portable checker, Next observer composition and current host-tool
@@ -27,11 +76,10 @@ command records and unchanged failure history are retained. This is one
 bounded sample; resource retirement, repeatability, reproduction, cost and
 production promotion remain outstanding.
 
-Next implementation gate: a [bounded disconnect-and-recovery probe](tests/node-compat/frameworks/nextjs/next-clone-cancel-full-root-results-v1/next-lifecycle-gate.md)
-against the unchanged Next app on both hosts and Node, followed by a declared
-repeatability matrix. The proposal uses existing routes and standard interfaces.
-It does not infer native handle retirement or Store identity from later healthy
-responses; the new probe has not been implemented or executed.
+The previously proposed [disconnect-and-recovery gate](tests/node-compat/frameworks/nextjs/next-clone-cancel-full-root-results-v1/next-lifecycle-gate.md)
+is now executed and fails lifecycle acceptance as recorded above. The abort
+ordering regression and repair take priority over the later repeatability,
+resource and performance gates.
 
 Current native repair result: the [repaired-engine real-component regression](docs/node-compat/nextjs-clone-cancel-results.md)
 **passes on Wasmtime 42.0.1 and stock wasmCloud 2.11.0 against Node 22.14.0**. Both request-context runs

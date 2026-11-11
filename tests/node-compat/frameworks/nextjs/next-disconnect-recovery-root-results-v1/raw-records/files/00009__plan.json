@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "state": "NEXT_DISCONNECT_RECOVERY_CLIENT_SOURCE_ONLY_V1",
+  "suite": "NEXT_DISCONNECT_RECOVERY_CLIENT_V1",
+  "controlOnly": true,
+  "fullOriginalContractExecuted": false,
+  "fullNextAccepted": false,
+  "cli": "node run-client.mjs ORIGIN FRESH_CLIENT_OUTPUT UNUSED_BROWSER_TOOLS RUN_ID",
+  "nodeArgc": 6,
+  "nodeVersion": "v22.14.0",
+  "warmupCycles": 3,
+  "measuredCycles": 16,
+  "plannedCalls": 114,
+  "limits": {
+    "httpTimeoutMs": 20000,
+    "cleanupTimeoutMs": 2000,
+    "bodyLimitBytes": 4194304,
+    "chunkLimit": 65536,
+    "metadataLimitBytes": 262144,
+    "resultBytes": 16777216,
+    "clientTimeoutMs": 180000
+  },
+  "allowedOutputPolicies": [
+    {
+      "runId": "disconnect-recovery-wasmtime-first",
+      "output": "/private/tmp/starling-node-compat/next-disconnect-recovery-wasmtime-v1-disconnect-recovery-wasmtime-first/client"
+    },
+    {
+      "runId": "disconnect-recovery-cloud-first",
+      "output": "/private/tmp/starling-node-compat/next-disconnect-recovery-cloud-v1-disconnect-recovery-cloud-first/client"
+    },
+    {
+      "runId": "disconnect-recovery-stock-first",
+      "output": "/private/tmp/starling-node-compat/next-disconnect-recovery-stock-v1-disconnect-recovery-stock-first/client"
+    }
+  ],
+  "cycles": [
+    {
+      "index": 0,
+      "phase": "warmup",
+      "label": "warmup-000",
+      "cookie": "alpha-000",
+      "probe": "probe-value-000"
+    },
+    {
+      "index": 1,
+      "phase": "warmup",
+      "label": "warmup-001",
+      "cookie": "alpha-001",
+      "probe": "probe-value-001"
+    },
+    {
+      "index": 2,
+      "phase": "warmup",
+      "label": "warmup-002",
+      "cookie": "alpha-002",
+      "probe": "probe-value-002"
+    },
+    {
+      "index": 3,
+      "phase": "measured",
+      "label": "measured-003",
+      "cookie": "alpha-003",
+      "probe": "probe-value-003"
+    },
+    {
+      "index": 4,
+      "phase": "measured",
+      "label": "measured-004",
+      "cookie": "alpha-004",
+      "probe": "probe-value-004"
+    },
+    {
+      "index": 5,
+      "phase": "measured",
+      "label": "measured-005",
+      "cookie": "alpha-005",
+      "probe": "probe-value-005"
+    },
+    {
+      "index": 6,
+      "phase": "measured",
+      "label": "measured-006",
+      "cookie": "alpha-006",
+      "probe": "probe-value-006"
+    },
+    {
+      "index": 7,
+      "phase": "measured",
+      "label": "measured-007",
+      "cookie": "alpha-007",
+      "probe": "probe-value-007"
+    },
+    {
+      "index": 8,
+      "phase": "measured",
+      "label": "measured-008",
+      "cookie": "alpha-008",
+      "probe": "probe-value-008"
+    },
+    {
+      "index": 9,
+      "phase": "measured",
+      "label": "measured-009",
+      "cookie": "alpha-009",
+      "probe": "probe-value-009"
+    },
+    {
+      "index": 10,
+      "phase": "measured",
+      "label": "measured-010",
+      "cookie": "alpha-010",
+      "probe": "probe-value-010"
+    },
+    {
+      "index": 11,
+      "phase": "measured",
+      "label": "measured-011",
+      "cookie": "alpha-011",
+      "probe": "probe-value-011"
+    },
+    {
+      "index": 12,
+      "phase": "measured",
+      "label": "measured-012",
+      "cookie": "alpha-012",
+      "probe": "probe-value-012"
+    },
+    {
+      "index": 13,
+      "phase": "measured",
+      "label": "measured-013",
+      "cookie": "alpha-013",
+      "probe": "probe-value-013"
+    },
+    {
+      "index": 14,
+      "phase": "measured",
+      "label": "measured-014",
+      "cookie": "alpha-014",
+      "probe": "probe-value-014"
+    },
+    {
+      "index": 15,
+      "phase": "measured",
+      "label": "measured-015",
+      "cookie": "alpha-015",
+      "probe": "probe-value-015"
+    },
+    {
+      "index": 16,
+      "phase": "measured",
+      "label": "measured-016",
+      "cookie": "alpha-016",
+      "probe": "probe-value-016"
+    },
+    {
+      "index": 17,
+      "phase": "measured",
+      "label": "measured-017",
+      "cookie": "alpha-017",
+      "probe": "probe-value-017"
+    },
+    {
+      "index": 18,
+      "phase": "measured",
+      "label": "measured-018",
+      "cookie": "alpha-018",
+      "probe": "probe-value-018"
+    }
+  ],
+  "callOrder": [
+    "stream-complete",
+    "stream-disconnect",
+    "json-malformed",
+    "context-set",
+    "context-empty",
+    "fs-crypto"
+  ],
+  "sourceRequirements": {
+    "fixtureContract": {
+      "path": "/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/fixture-contract.json",
+      "sha256": "d6399e901a0612f672ee176e9ded84fcc19e3f4016059e5d5f728596b0b807f2",
+      "bytes": 8158
+    }
+  },
+  "localCollector": "http-call.mjs",
+  "protocolControls": {
+    "entry": "test-real-http.mjs",
+    "cases": [
+      "complete-content-length",
+      "complete-chunked",
+      "underlength-content-length",
+      "body-overflow",
+      "never-body-deadline",
+      "first-actual-body-close"
+    ],
+    "actualExecution": null
+  },
+  "classification": {
+    "knownClosedFailure": "A fully retained, durably published, known request/response/socket termination remains collected even when HTTP is incomplete or semantics fail. No retry; fixed following cases continue.",
+    "stopSuffix": "Unknown cleanup/publication, overflow/unretained data, or declared client budget expiration. Unattempted count remains explicit.",
+    "httpComplete": "Only normal calls require end + readableEnded + IncomingMessage.complete + matching actual Content-Length if present + no transport errors/deadline; entity bytes are after transfer framing, without content decoding.",
+    "intentionalClose": "After first actual nonempty body Buffer, record complete/readableEnded/end at intent and final separately; invoke request.destroy and associated socket cleanup. Expected post-intent resets are retained, never required, and earlier/unrelated errors fail semantics.",
+    "alreadyCompleteAtIntent": "Known local boundary, inconclusive peer truncation/guest propagation; never relabel as a proved partial response.",
+    "warmup": "Three full fixed six-call cycles before sixteen measured cycles; no sleeps, adaptive growth, throughput/memory threshold or same-Store assertion."
+  },
+  "nodeHttpPrimarySources": [
+    "https://nodejs.org/download/release/v22.14.0/docs/api/http.html#messagecomplete",
+    "https://nodejs.org/download/release/v22.14.0/docs/api/http.html#requestdestroyerror"
+  ],
+  "applicationSourceUnchanged": true,
+  "browserExecuted": false,
+  "actualSourceIndex": null,
+  "actualAuthority": null,
+  "actualRuntime": null,
+  "actualResult": null,
+  "functionsOrTargetsExecutedByAuthor": false
+}

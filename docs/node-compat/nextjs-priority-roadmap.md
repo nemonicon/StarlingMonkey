@@ -1,7 +1,14 @@
 # Next.js execution priority
 
-Current priority: turn the [passing three-arm Next sample](nextjs-clone-cancel-full-results.md)
-into a dependable bounded profile. Wasmtime 42.0.1, stock wasmCloud 2.11.0 and
+Current priority: fix the [disconnect failure exposed by repeated recovery checks](nextjs-disconnect-recovery-results.md).
+All 342 client observations pass, but both Wasm hosts emit 19 guest-abort
+diagnostics each, and the matched Node bridge records 19 transport errors and
+exits 1. Healthy follow-up requests do not waive this failure. Preserve this
+sample, reproduce the abort-to-errored-stream cancellation path, and repair its
+guest-side ownership/error handling before repeatability or performance work.
+
+The [passing three-arm full Next sample](nextjs-clone-cancel-full-results.md)
+remains a completed prerequisite. Wasmtime 42.0.1, stock wasmCloud 2.11.0 and
 matched Node 22.14.0 now pass the unchanged comprehensive workload with the
 repaired native engine and Chrome 157.0.8103.39. Independent review verifies
 24 HTTP, 52 cache and 80 supplemental checks, generation 1→2, streaming, assets,
@@ -14,8 +21,12 @@ also matches Node in real components on both hosts, including rejection/EOF/erro
 followups and request-context checks before and after cancellation. Preserve
 the earlier failures and original build-check failure as separate evidence.
 
-1. Check resource retirement and reuse: repeated requests, aborted bodies,
-   error recovery, filesystem/HTTP handles and retained memory on both hosts.
+1. Reproduce and repair disconnect handling with a focused bridge and
+   real-component regression. Preserve unknown/falsy failures and actual
+   cleanup errors; a broad catch or ignored abort log is not acceptance.
+   Then rerun the fixed disconnect and full-application suites on both hosts
+   and Node. Continue resource retirement and reuse checks for
+   filesystem/HTTP handles and retained memory on both hosts.
    Include broader request isolation and snapshot-state policy. Do not equate
    local counters with host instance identity.
 2. Run a declared repeatability matrix with frozen browser/tool versions and

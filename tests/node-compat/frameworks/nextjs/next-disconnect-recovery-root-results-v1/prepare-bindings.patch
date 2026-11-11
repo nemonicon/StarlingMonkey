@@ -1,0 +1,160 @@
+--- prepare-bindings.before.py
++++ prepare-bindings.py
+@@ -12,20 +12,25 @@
+ 
+ HERE = Path(__file__).resolve().parent
+ BASE = HERE.parent
+-RUNTIME = BASE / 'next-clone-cancel-full-runtime-v1'
+-CLIENT = BASE / 'next-clone-cancel-full-client-v1'
+-RECOVERY = Path('/private/tmp/starling-node-compat/next-clone-cancel-native-recovery-v1-first')
++RUNTIME = BASE / 'next-disconnect-recovery-runtime-v1'
++CLIENT = BASE / 'next-disconnect-recovery-client-v1'
++RECOVERY = Path('/private/tmp/starling-node-compat/next-disconnect-recovery-root-v1')
+ HISTORY = HERE / 'source-history/binding-v1'
+ INPUTS, STAMPS = {}, {}
+ CHARGED = 0
+-RUNTIME_UNBOUND = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-clone-cancel-full-runtime-v1/index.json', 'sha256': '28a0f6c3e4c558d3c1d7331fc30ae4dee869c4b2f46d7af17082ad58f6a8a1b8', 'bytes': 2803}
+-CLIENT_INDEX = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-clone-cancel-full-client-v1/index.json', 'sha256': '424b84b4026e6d3481c4b30f9f54697939cc51a68e9a449643fafe3c03d3eec9', 'bytes': 1117}
++RUNTIME_UNBOUND = None
++CLIENT_INDEX = None
+ BROWSER_INDEX = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-v4-browser-v1/index.json', 'sha256': '4a5735967658f9679960b747ec21a42dd7809752a3da5df8c38b627b7a0fef8c', 'bytes': 1796}
+ CONSTRUCTION_REVIEW = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/next-clone-cancel-next-root-results-v1/construction-review.json', 'sha256': '30ae9607b5d2b115e7dfd742c14c1071ab646dc5e14ef4510763a2926f773c49', 'bytes': 7868016}
+ COMPOSITION_REVIEW = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/async-context/next-clone-cancel-next-root-results-v1/composition-review.json', 'sha256': 'b92cfa088a8198cb15bd729eab470309acc61629176b2f750da773b34b1dee03', 'bytes': 7874285}
+ HOST_REVIEW = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-clone-cancel-full-root-results-v1/host-tool-revalidation.json', 'sha256': '9edc453c11c6886f179d87c350148d60b6663c892274f9c8a9f584068fbe4b85', 'bytes': 47628}
+ APP_REVIEW = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-fs-callback-no-compress-root-results-v1/actual-build-review.json', 'sha256': '9106545f606ee30b2a3a05940d97233ce3b2e867e6abcdc5c5ec84efa09ad679', 'bytes': 22847}
+ ASSETS = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-fs-callback-no-compress-root-results-v1/asset-selection.json', 'sha256': '05c965a6b536af21c5947ccace5d9c1cc12b129c86a5b2df42e1bb95dd2c5b4c', 'bytes': 7350}
++BASELINE_BINDINGS = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-clone-cancel-full-root-results-v1/runtime-bindings.json', 'sha256': '49f3b6c36ab2271f9685a74f6f6d116ed174f89ac62c01fa9a92a438f035ec4f', 'bytes': 8604402}
++if RUNTIME_UNBOUND is None or CLIENT_INDEX is None:
++    raise RuntimeError('Root must bind the two actual sealed new Source indexes before input IO')
++
++
+ def need(value, message):
+     if not value:
+         raise RuntimeError(message)
+@@ -148,6 +153,8 @@
+ 
+ def fresh_context(runtime_ref):
+     runtime=family(runtime_ref);family(CLIENT_INDEX);family(BROWSER_INDEX)
++    baseline=doc(BASELINE_BINDINGS)
++    need(baseline['state']=='ROOT_CLONE_CANCEL_NEXT_FULL_ACTUAL_BINDINGS_V1','genuine baseline binding DATA only')
+     construction=doc(CONSTRUCTION_REVIEW);composition=doc(COMPOSITION_REVIEW);host=doc(HOST_REVIEW)
+     need(construction['state']=='CLONE_CANCEL_NEXT_COMPONENT_CONSTRUCTION_REVIEW_PASSED_V1' and
+          construction['passed'] is construction['completeReturnedImportAuditVerified'] is True,'actual new construction')
+@@ -165,6 +172,9 @@
+          admission['originalDriverPassed'] is False and admission['originalOuterRawExitCode']==1,'genuine new engine and original failed ancestry')
+     need(construction['engineAdmission']==composition['engineAdmission'] and request['engineAdmission']==construction['engineAdmission'] and
+          request['engine']==admission['engine']==construction['engine'] and request['nativeMetadata']==admission['nativeMetadata'],'new actual role joins')
++    need(baseline['constructionReview']==CONSTRUCTION_REVIEW and baseline['compositionReview']==COMPOSITION_REVIEW and
++         baseline['component']==construction['component'] and baseline['envelope']==composition['envelope'] and
++         baseline['hostToolRevalidation']==HOST_REVIEW and baseline['appReview']==APP_REVIEW,'unchanged actual baseline roles; no protected-array transfer')
+     for refs_ in [construction['protectedInputs'],composition['protectedInputs'],request['inputs'],
+                   admission['protectedBuildInputs'],admission['protectedSourceInputs'],host['protectedInputs']]:
+         for ref_ in refs_:checked(ref_)
+@@ -212,7 +222,8 @@
+         sources.append(row(BASE/relative_))
+     for ref_ in sources:family(ref_)
+     client_plan=doc(row(CLIENT/'plan.json'))
+-    need(len(client_plan['sourceRequirements'])==6 and client_plan['sourceRequirements']['browserSourceIndex']==BROWSER_INDEX,'six actual fullclient consumers')
++    need(client_plan['suite']=='NEXT_DISCONNECT_RECOVERY_CLIENT_V1' and type(client_plan['sourceRequirements']) is dict and
++         len(client_plan['sourceRequirements'])==1,'actual probe client and declared external consumer')
+     for ref_ in client_plan['sourceRequirements'].values():checked(ref_)
+     for relative_ in ['http-bridge-candidate-v1/bridge.mjs','next-browser-netlog-stock-candidate-v1/module-host-provider.mjs',
+                       '../../foundation-module/node-module-candidate-v1/module-core.mjs']:
+@@ -238,7 +249,7 @@
+     originals={arm:raw(row(RUNTIME/name)) for arm,name in filenames.items()}
+     old_plans={arm:json.loads(data) for arm,data in originals.items()}
+     for arm,p in old_plans.items():
+-        need(p['bindingState']=='UNBOUND_CLONE_CANCEL_NEXT_FULL_DATA' and p['hostKind']==arm and
++        need(p['bindingState']=='UNBOUND_DISCONNECT_RECOVERY_DATA' and p['hostKind']==arm and
+              p['sourceFamilies']==p['protectedInputs']==[] and p['newComponentBindingsPending'] is p['hostToolRevalidationPending'] is True,'unbound fresh plan only')
+     protected=dict(INPUTS)
+     mutable={str(RUNTIME/'index.json')}|{str(RUNTIME/name) for name in filenames.values()}
+@@ -247,17 +258,17 @@
+     construction,composition,request,host=context['construction'],context['composition'],context['request'],context['host']
+     bindings=dict(constructionReview=CONSTRUCTION_REVIEW,constructionResult=construction['actualResult'],constructionRequest=construction['constructorRequest'],
+                   engineAdmission=construction['engineAdmission'],component=construction['component'],envelope=composition['envelope'],compositionReview=COMPOSITION_REVIEW)
+-    client=row(CLIENT/'run-contracts.mjs');browser=context['clientPlan']['sourceRequirements']['browserWorker']
++    client=row(CLIENT/'run-client.mjs');browser=row(BASE/'next-rsc-stream-observer-v4-browser-v1/browser-check.mjs')
+     plans={};changes={};new_values={}
+     for arm,old in old_plans.items():
+-        p=copy.deepcopy(old);p.update(bindingState='READY_CLONE_CANCEL_NEXT_FULL',sourceFamilies=context['sources'],protectedInputs=union,
++        p=copy.deepcopy(old);p.update(bindingState='READY_DISCONNECT_RECOVERY_PROBE',sourceFamilies=context['sources'],protectedInputs=union,
+             applicationInputs=context['app']['applicationInputs'],applicationBuildResult=context['app']['actualResult'],applicationBuildReview=APP_REVIEW,
+             applicationRootIdentityEvidence=context['app']['applicationRootIdentityEvidence'],clientSource=client,clientSourceIndex=CLIENT_INDEX,
+             browserSource=browser,browserSourceIndex=BROWSER_INDEX,browserTools=host['browserTools'],newComponentBindingsPending=False,
+             newComponentBindings=bindings,expectedComponent={k:construction['component'][k] for k in ['sha256','bytes']},
+             hostToolRevalidationPending=False,hostToolRevalidation=HOST_REVIEW,selectedHostTools=host['selectedHostTools'],
+-            prospectiveFullClientBindingsPending=False,assetSelection=ASSETS,
+-            fullClientFullContract=dict(clientSourcePending=False,requiredClientIndex=CLIENT_INDEX,requiredClient=client),
++            prospectiveProbeBindingsPending=False,assetSelection=ASSETS,
++            disconnectRecoveryClient=dict(clientSourcePending=False,requiredClientIndex=CLIENT_INDEX,requiredClient=client),
+             outputPrefix=old['namespacePolicy']['plannedOutputPrefix'],runId=old['namespacePolicy']['plannedRunId'])
+         p['namespacePolicy']['actualOutputPrefixAndRunIdPending']=False
+         if arm=='stock':
+@@ -298,15 +309,15 @@
+     for arm in ['wasmtime','cloud','stock']:
+         p=new_values[arm];actor=row(RUNTIME/({'wasmtime':'run-wasmtime.mjs','cloud':'deploy-cloud.mjs','stock':'run-stock.mjs'}[arm]))
+         arms.append(dict(arm=arm,plan=plans[arm],actor=actor,runId=p['runId'],outputPrefix=p['outputPrefix'],outputRoot=p['outputPrefix']+'-'+p['runId'],
+-            authorityPath=str(HERE/(arm+'-authority.json')),ownerOutputRoot=str(RECOVERY/'commands'/('clone-cancel-full-'+arm)),outerSeconds=p['outerSeconds']))
+-    output=dict(schemaVersion=1,state='ROOT_CLONE_CANCEL_NEXT_FULL_ACTUAL_BINDINGS_V1',runtimeIndex=runtime_index,clientIndex=CLIENT_INDEX,browserIndex=BROWSER_INDEX,
++            authorityPath=str(HERE/(arm+'-authority.json')),ownerOutputRoot=str(RECOVERY/'commands'/('disconnect-recovery-'+arm)),outerSeconds=p['outerSeconds']))
++    output=dict(schemaVersion=1,state='ROOT_DISCONNECT_RECOVERY_ACTUAL_BINDINGS_V1',runtimeIndex=runtime_index,clientIndex=CLIENT_INDEX,browserIndex=BROWSER_INDEX,
+         constructionReview=CONSTRUCTION_REVIEW,constructionResult=construction['actualResult'],constructionRequest=construction['constructorRequest'],engineAdmission=construction['engineAdmission'],
+         component=construction['component'],envelope=composition['envelope'],compositionReview=COMPOSITION_REVIEW,hostToolRevalidation=HOST_REVIEW,selectedHostTools=host['selectedHostTools'],
+         appReview=APP_REVIEW,appInputs=context['app']['applicationInputs'],appResult=context['app']['actualResult'],appRootIdentityEvidence=context['app']['applicationRootIdentityEvidence'],
+         assetSelection=ASSETS,sourceFamilies=context['sources'],protectedInputs=union,plans=plans,arms=arms,binderSource=row(Path(__file__).resolve()),
+-        authorityIssued=False,actorInvoked=False,fullNextAccepted=False)
++        authorityIssued=False,actorInvoked=False,probeExecuted=False,browserInvoked=False,fullOriginalContractExecuted=False,baselineFullRuntimeBindings=BASELINE_BINDINGS,fullNextAccepted=False)
+     bound_ref=save(HERE/'runtime-bindings.json',output)
+-    receipt=save(HERE/'source-bindings.json',dict(schemaVersion=1,state='CLONE_CANCEL_NEXT_FULL_BINDING_METADATA_WRITTEN_V1',runtimeBindings=bound_ref,
++    receipt=save(HERE/'source-bindings.json',dict(schemaVersion=1,state='DISCONNECT_RECOVERY_BINDING_METADATA_WRITTEN_V1',runtimeBindings=bound_ref,
+         binderSource=output['binderSource'],unboundRuntimeIndex=RUNTIME_UNBOUND,retainedUnboundRuntimeIndex=row(HISTORY/'runtime-index.unbound.json'),
+         boundRuntimeIndex=runtime_index,clientIndex=CLIENT_INDEX,browserIndex=BROWSER_INDEX,planPreimages=preimages,boundPlans=plans,changedPlanKeys=changes,
+         semanticPlanInversesVerified=True,allOriginalPlanBytesPreserved=True,onlyThreePlanRowsAndAggregateCountersResealed=True,
+@@ -316,12 +327,12 @@
+ 
+ def make_authority(arm):
+     binding_ref=row(HERE/'runtime-bindings.json');binding=doc(binding_ref)
+-    need(binding['state']=='ROOT_CLONE_CANCEL_NEXT_FULL_ACTUAL_BINDINGS_V1' and binding['binderSource']==row(Path(__file__).resolve()),'own actual bound packet')
++    need(binding['state']=='ROOT_DISCONNECT_RECOVERY_ACTUAL_BINDINGS_V1' and binding['binderSource']==row(Path(__file__).resolve()),'own actual bound packet')
+     context=fresh_context(binding['runtimeIndex'])
+     for ref_ in binding['protectedInputs']:checked(ref_)
+     need([r['arm'] for r in binding['arms']]==['wasmtime','cloud','stock'],'fixed three-arm order')
+     selected=next(r for r in binding['arms'] if r['arm']==arm);plan=doc(selected['plan'])
+-    need(plan['bindingState']=='READY_CLONE_CANCEL_NEXT_FULL' and plan['newComponentBindingsPending'] is plan['hostToolRevalidationPending'] is False,'actual bound plan')
++    need(plan['bindingState']=='READY_DISCONNECT_RECOVERY_PROBE' and plan['newComponentBindingsPending'] is plan['hostToolRevalidationPending'] is False,'actual bound plan')
+     need(not os.path.lexists(selected['authorityPath']) and not os.path.lexists(selected['outputRoot']) and not os.path.lexists(selected['ownerOutputRoot']),'one fresh slot, no retry')
+     # Prefix ownership is a necessary order guard. Root separately reviews full
+     # collection/shutdown before calling this mode; this is not an automatic
+@@ -332,17 +343,17 @@
+              terminal['parentOwnedGroupGone'] is terminal['allObservedOwnedGroupsGone'] is True and
+              all(terminal[k]==[] for k in ['errors','signals','interruptedSignals','remainingObservedPids']),'prior original owner must be closed/clean')
+         previous_result=doc(row(Path(previous['outputRoot'])/'result.json'))
+-        need(previous_result['originalInputsPreserved'] is True and previous_result['fullOriginalContractExecuted'] is True,'prior collection/input preservation minimum')
++        need(previous_result['originalInputsPreserved'] is True and previous_result['probeExecuted'] is True and previous_result['probeCollectionComplete'] is True and previous_result['probeCleanupComplete'] is True,'prior collection/input preservation minimum')
+     request=context['request'];authority=dict(schemaVersion=1,state=plan['expectedAuthorityState'],arm=arm,runId=selected['runId'],sourceIndex=binding['runtimeIndex'],
+-        controlOnly=False,fullClientFullContractAllowed=True,rscStreamObserverAllowed=True,publicRequestCorrelationAllowed=True,
++        controlOnly=True,disconnectRecoveryProbeAllowed=True,rscStreamObserverAllowed=False,publicRequestCorrelationAllowed=True,
+         publicRequestCorrelation=dict(headerName='x-next-public-request-correlation',nonceByTest={'client-counter':{'wasmtime':'a','cloud':'c','stock':'e'}[arm]*64,'server-action':{'wasmtime':'b','cloud':'d','stock':'f'}[arm]*64}),
+-        compilerAllowed=False,nativeBuildAllowed=False,automaticRetry=False,replacementTrials=False,fullNextAccepted=False,
++        compilerAllowed=False,nativeBuildAllowed=False,automaticRetry=False,replacementTrials=False,fullNextAccepted=False,fullOriginalContractExecuted=False,browserInvoked=False,probeExecuted=False,
+         constructionCallerIndex=request['constructorSourceIndex'],inputSourceIndex=request['fixtureSourceIndex'],inputEntry=request['entry'],runtimeBindings=binding_ref,
+         **plan['newComponentBindings'])
+-    if arm=='stock':authority.update(plans=selected['plan'],rootAuthorityPath=selected['authorityPath'],localhostServerAllowed=True,browserAllowed=True,
++    if arm=='stock':authority.update(plans=selected['plan'],rootAuthorityPath=selected['authorityPath'],localhostServerAllowed=True,browserAllowed=False,
+         guestAllowed=False,engineAllowed=False,externalApplicationDeploymentAllowed=False)
+     else:
+-        authority.update(plan=selected['plan'],localhostServeAllowed=True,actualNextGuestAllowed=True,browserAllowed=True,
++        authority.update(plan=selected['plan'],localhostServeAllowed=True,actualNextGuestAllowed=True,browserAllowed=False,
+             standardHandlerObserverAllowed=True,componentConstructionAllowed=False,externalDeploymentAllowed=False,adoptionAllowed=False)
+     if arm=='cloud':
+         with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as lease:
+@@ -351,7 +362,7 @@
+             outgoingHttpWorkloadSelected=True,hostMutationAllowed=False,automaticRetryAllowed=False,newServicesAllowed=False,
+             portSelection=dict(singleBindZeroThenClose=True,unreservedRaceExists=True,fallbackAllowed=False))
+     protect(full=True);authority_ref=save(Path(selected['authorityPath']),authority)
+-    receipt=save(HERE/(arm+'-authority-preparation.json'),dict(schemaVersion=1,state='CLONE_CANCEL_NEXT_FULL_RUNTIME_AUTHORITY_PREPARED_V1',
++    receipt=save(HERE/(arm+'-authority-preparation.json'),dict(schemaVersion=1,state='DISCONNECT_RECOVERY_RUNTIME_AUTHORITY_PREPARED_V1',
+         authority=authority_ref,runtimeBindings=binding_ref,arm=arm,ownerOutputRoot=selected['ownerOutputRoot'],outputRoot=selected['outputRoot'],outerSeconds=selected['outerSeconds'],
+         actor=selected['actor'],actorInvoked=False,rootMustReviewPreviousCollectionBeforeNextMode=True))
+     print(json.dumps(dict(authority=authority_ref,preparation=receipt,actorInvoked=False)),flush=True)

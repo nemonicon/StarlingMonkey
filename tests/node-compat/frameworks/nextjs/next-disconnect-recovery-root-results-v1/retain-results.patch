@@ -1,0 +1,189 @@
+--- retain-results.before.py
++++ retain-results.py
+@@ -1,4 +1,4 @@
+-"""Retain closed full-profile DATA only. No helpers, tools, guest or host calls.
++"""Retain closed disconnect/recovery probe DATA only. No helpers, tools, guest or host calls.
+ 
+ Original absolute paths become lookup keys. A future saved checker must perform
+ all I/O through the retained index rather than reopening those original paths.
+@@ -29,6 +29,7 @@
+ WANTED = {}
+ OMISSIONS = []
+ BODY_ROOTS = []
++ABSENT = []
+ 
+ 
+ def need(value, message):
+@@ -53,7 +54,7 @@
+ 
+ def descriptor(path):
+     p = canonical(path); before = stamp(p)
+-    need(stat.S_ISREG(before[2]) and 0 <= before[4] <= MAX_FILE, 'bounded regular input required: ' + str(p))
++    need(stat.S_ISREG(before[2]) and before[3] == 1 and 0 <= before[4] <= MAX_FILE, 'bounded regular input required: ' + str(p))
+     with p.open('rb') as f:
+         data = f.read(MAX_FILE + 1)
+     need(len(data) == before[4] and len(data) <= MAX_FILE and stamp(p) == before, 'input size/read bookend')
+@@ -164,17 +165,22 @@
+     authority_ref = descriptor(trial['authorityPath'])
+     need(authority_ref in request['inputs'], 'runtime authority absent from genuine generic request inputs')
+     plan = doc(trial['plan'])
+-    expected = [plan['node']['path'],trial['actor']['path']]
+-    if trial['arm'] == 'stock':
+-        expected += [trial['outputRoot'], plan['standaloneSource'], plan['browserTools'],trial['runId'],trial['authorityPath']]
+-    else:
+-        expected += [trial['authorityPath']]
+-    need(started['argv'] == request['argv'] == expected, 'exact original actor argv')
++    argv=request['argv']
++    need(type(argv) is list and len(argv) == (7 if trial['arm']=='stock' else 3) and argv[0] == plan['node']['path'], 'original actor CLI shape')
++    actor_arg=Path(argv[1])
++    need('..' not in actor_arg.parts, 'actor path traversal')
++    actor_path=actor_arg if actor_arg.is_absolute() else Path(request['cwd'])/actor_arg
++    need(str(actor_path) == trial['actor']['path'] and trial['actor'] in request['inputs'] and argv[-1] == trial['authorityPath'], 'actual original actor/authority roles')
++    if trial['arm']=='stock':
++        need(argv[2:6] == [trial['outputRoot'],plan['standaloneSource'],plan['browserTools'],trial['runId']], 'actual stock actor arguments')
++    need(started['argv'] == argv, 'exact original owner argv')
+     need(collection['terminal'] == terminal_ref and collection['inputsUnchanged'] is True and
+          collection['rawExitCode'] == terminal['rawExitCode'], 'actual generic collection receipt')
+     authority = doc(authority_ref)
+     need(authority['sourceIndex'] == bindings['runtimeIndex'] and authority['runId'] == trial['runId'] and
+-         authority['plans' if trial['arm']=='stock' else 'plan'] == trial['plan'], 'actual runtime authority roles')
++         authority['plans' if trial['arm']=='stock' else 'plan'] == trial['plan'] and
++         authority['disconnectRecoveryProbeAllowed'] is authority['controlOnly'] is True and
++         authority['browserAllowed'] is authority['rscStreamObserverAllowed'] is False, 'actual probe runtime authority roles')
+     return dict(terminal=terminal_ref,started=start_ref,request=request_ref,collection=collection_ref,authority=authority_ref,
+                 rawExitCode=terminal['rawExitCode'],ownershipClean=True)
+ 
+@@ -184,6 +190,8 @@
+         need(stamp(path) == before and descriptor(path) == ref and stamp(path) == before, 'final input bookend changed')
+     for path, before in DIRECTORIES.items():
+         need(stamp(path) == before, 'owned directory changed before/final retention')
++    for path in ABSENT:
++        need(not os.path.lexists(path), 'unattempted/absent namespace appeared during retention')
+ 
+ 
+ def write_whole(path, data):
+@@ -218,15 +226,34 @@
+     binding_ref, review_ref = descriptor(args.bindings), descriptor(args.review)
+     need(binding_ref['sha256'] == args.bindings_sha and review_ref['sha256'] == args.review_sha, 'actual binding/review pins')
+     bindings, review = doc(binding_ref), doc(review_ref)
+-    need(bindings['state'] == 'ROOT_CLONE_CANCEL_NEXT_FULL_ACTUAL_BINDINGS_V1' and
+-         review['state'] == 'ROOT_CLONE_CANCEL_NEXT_FULL_DATA_REVIEW_COMPLETED_V1' and
++    need(bindings['state'] == 'ROOT_DISCONNECT_RECOVERY_ACTUAL_BINDINGS_V1' and
++         review['state'] == 'ROOT_DISCONNECT_RECOVERY_DATA_REVIEW_COMPLETED_V1' and
+          review['runtimeBindings'] == binding_ref and type(review['verifiedDataReviewPassed']) is bool and
+-         review['fullNextAccepted'] is False, 'genuine closed actual review/binding wire')
+-    need([row['arm'] for row in bindings['arms']] == ['wasmtime','cloud','stock'] and
+-         [row['outerSeconds'] for row in bindings['arms']] == [600,600,300], 'fixed three original slots')
++         review['nativeLifecycleAccepted'] is review['fullOriginalContractExecuted'] is review['fullNextAccepted'] is False and
++         type(review['allFunctionalRecoveryPassed']) is type(review['guestAbortDiagnosticsPresent']) is bool,
++         'genuine closed probe DATA review/binding wire; negative lifecycle remains negative')
++    order=['wasmtime','cloud','stock']
++    need([row['arm'] for row in bindings['arms']] == order and
++         [row['outerSeconds'] for row in bindings['arms']] == [600,600,300] and
++         type(review['arms']) is dict and set(review['arms']) == set(order), 'fixed three original slots')
+     BODY_ROOTS.extend(Path(trial['outputRoot'])/'client' for trial in bindings['arms'])
+-    # Establish all three owners' closed status before traversing any output.
+-    owners = {trial['arm']:owner(trial,bindings) for trial in bindings['arms']}
++    # Establish every present original owner's closure before any output walk.
++    # Authority preparation alone is not an attempted actor. A missing terminal
++    # with an existing owner namespace is ambiguous and refuses retention.
++    owners={};unattempted=[];suffix=False
++    for trial in bindings['arms']:
++        arm=trial['arm'];folder=Path(trial['ownerOutputRoot']);output=Path(trial['outputRoot'])
++        if os.path.lexists(folder/'terminal.json'):
++            need(not suffix, 'attempted owner after an unattempted fixed suffix')
++            owners[arm]=owner(trial,bindings)
++        else:
++            need(not os.path.lexists(folder) and not os.path.lexists(output), 'missing terminal with potentially active/partial output')
++            observed=review['arms'][arm]
++            need(observed.get('verifiedDataReviewPassed') is False and observed.get('missingOrUnattempted') is True and
++                 observed.get('passed') is None, 'unattempted suffix must remain explicit failed/unknown review DATA')
++            ABSENT.extend((folder,output))
++            suffix=True;unattempted.append(dict(arm=arm,ownerOutputRoot=str(folder),outputRoot=str(output),
++                reason='no original owner/output namespace at retention; no target collection inferred',reviewObservation=observed))
+     add(binding_ref,'actual binding');add(review_ref,'actual DATA review')
+     add_path(Path(__file__).resolve(),'retainer Source');add(review['actualReviewer'],'actual reviewer Source')
+     reviewed = review['reviewedInputs']
+@@ -242,30 +269,41 @@
+     if source_binding.exists():
+         add_path(source_binding,'actual metadata binding receipt')
+     for trial in bindings['arms']:
+-        arm = trial['arm']
+-        walk_owned(Path(trial['ownerOutputRoot']),'closed original generic owner:'+arm)
+-        add(owners[arm]['authority'],'issued per-slot runtime authority:'+arm)
+-        add_path(Path(trial['authorityPath']).with_name(arm+'-authority-preparation.json'),'actual authority preparation:'+arm)
+-        output = directory(Path(trial['outputRoot']))
++        arm=trial['arm']
++        if arm in owners:
++            walk_owned(Path(trial['ownerOutputRoot']),'closed original generic owner:'+arm)
++            add(owners[arm]['authority'],'issued per-slot probe authority:'+arm)
++            add_path(Path(trial['authorityPath']).with_name(arm+'-authority-preparation.json'),'actual authority preparation:'+arm)
++        elif os.path.lexists(trial['authorityPath']):
++            # Retain issued-but-uninvoked authority DATA without inventing an owner.
++            add_path(Path(trial['authorityPath']),'issued unattempted authority:'+arm)
++            add_path(Path(trial['authorityPath']).with_name(arm+'-authority-preparation.json'),'unattempted authority preparation:'+arm)
++        if arm not in owners:
++            continue
++        if not os.path.lexists(trial['outputRoot']):
++            need(review['arms'][arm]['verifiedDataReviewPassed'] is False, 'verified result cannot omit owned output')
++            ABSENT.append(Path(trial['outputRoot']))
++            OMISSIONS.append(dict(path=trial['outputRoot'],reason='closed attempted actor produced no output namespace',contentsTraversed=False))
++            continue
++        output=directory(Path(trial['outputRoot']))
+         for path in sorted(output.iterdir(),key=lambda value:value.name):
+-            s = path.lstat(); need(not stat.S_ISLNK(s.st_mode),'owned output alias refused')
++            s=path.lstat();need(not stat.S_ISLNK(s.st_mode),'owned output alias refused')
+             if stat.S_ISDIR(s.st_mode):
+                 if path.name in COPY_ROOT_DIRS:
+-                    walk_owned(path,'owned runtime/client/browser DATA:'+arm)
++                    walk_owned(path,'owned runtime/probe call/body/publication DATA:'+arm)
+                 else:
+                     need(path.name in SKIP_ROOT_DIRS,'unknown root output directory refuses silent omission: '+path.name)
+                     OMISSIONS.append(dict(path=str(path),reason='full app/cache/project/XDG tree excluded; only explicit reviewed evidence or config copied',contentsTraversed=False))
+             else:
+                 need(stat.S_ISREG(s.st_mode),'owned output socket/device/FIFO refused')
+                 need(path.suffix.lower() not in BINARY_SUFFIXES,'unexpected root binary output')
+-                add_path(path,'owned root capture/result/manifest:'+arm)
+-        if arm=='cloud':
+-            config=output/'project/.wash/config.json'
+-            need(config.exists(),'actual cloud config Source retained')
+-            add_path(config,'actual selected cloud configuration')
+-        # Callback state is retained from reviewedInputs; its directory-membership
+-        # and pending-absence observations remain explicit review DATA, not a
+-        # claim that a saved checker re-opened the original cache namespace.
++                add_path(path,'owned root capture/result/manifest including negative diagnostics:'+arm)
++        if arm=='cloud' and os.path.lexists(output/'project/.wash/config.json'):
++            add_path(output/'project/.wash/config.json','actual selected cloud configuration')
++    # Every attempted call's JSON, body and publication are under the owned
++    # client namespace, including known partial/negative observations. Explicit
++    # reviewedInputs include any further finite diagnostic evidence. Nothing
++    # here infers peer EOF, guest cancellation, retirement or same-Store reuse.
+     total = sum(row['source']['bytes'] for row in WANTED.values())
+     need(len(WANTED) <= MAX_FILES and total <= MAX_EXPANDED,'upfront aggregate retention declarations')
+     protect()
+@@ -311,17 +349,19 @@
+     need({p.relative_to(OUTPUT).as_posix() for p in OUTPUT.rglob('*') if p.is_file()}=={row['retained']['path'] for row in entries},'closed retained payload membership')
+     retained_reviewed={tuple(row['source'][key] for key in ('path','sha256','bytes')) for row in entries if row['reviewedInput']}
+     need(retained_reviewed=={tuple(ref[key] for key in ('path','sha256','bytes')) for ref in reviewed},'every actual reviewer input copied')
+-    index=dict(schemaVersion=1,state='CLONE_CANCEL_NEXT_FULL_CLOSED_RESULTS_RETAINED_DATA_V1',runtimeBindings=binding_ref,actualReview=review_ref,
++    index=dict(schemaVersion=1,state='DISCONNECT_RECOVERY_CLOSED_RESULTS_RETAINED_DATA_V1',runtimeBindings=binding_ref,actualReview=review_ref,
+         sourcePathsAreLookupKeysOnly=True,originalPathReadsAllowedBySavedChecker=False,entries=entries,payloadFiles=len(entries),
+         retainedBytes=stored_total,expandedBytes=expanded_total,reviewedInputTuples=len(retained_reviewed),allReviewedInputsRetained=True,
+         limits=dict(files=MAX_FILES,perFile=MAX_FILE,expandedTotal=MAX_EXPANDED,storedTotal=MAX_STORED,ownedDepth=16),
+         gzipPolicy=dict(threshold=GZIP_AT,mtime=0,filename='',level=9,sourceTupleAlwaysExpanded=True),
+-        originalOwners=owners,omittedOwnedTrees=OMISSIONS,
++        originalOwners=owners,unattemptedArms=unattempted,omittedOwnedTrees=OMISSIONS,
+         omissions=['Full copied applications and cache/XDG/project trees are not recursively retained; only selected config and explicit reviewed cache evidence remain',
+-                   'Full native build/compiler/SDK/tool/engine/component binaries and the27k protected payload closure are deliberately omitted; proof JSON records state their delegated scope',
+-                   'No absolute original path is a saved-checker I/O target; each original tuple must resolve through this index'],
+-        verifiedDataReviewPassed=review['verifiedDataReviewPassed'],allFullContractsPassed=review['allFullContractsPassed'],
+-        originalFailuresPreserved=True,deepNativePayloadsRetained=False,runtimeOrHelperInvoked=False,fullNextAccepted=False)
++                   'Full native build/compiler/SDK/tool/engine/component binaries and the full protected payload closure are deliberately omitted; proof JSON records state their delegated scope',
++                   'No absolute original path is a saved-checker I/O target; each original tuple must resolve through this index; no guest cancellation/retirement or same-Store claim'],
++        verifiedDataReviewPassed=review['verifiedDataReviewPassed'],allFunctionalRecoveryPassed=review['allFunctionalRecoveryPassed'],
++        guestAbortDiagnosticsPresent=review['guestAbortDiagnosticsPresent'],nativeLifecycleAccepted=False,
++        originalFailuresPreserved=True,deepNativePayloadsRetained=False,runtimeOrHelperInvoked=False,
++        browserInvoked=False,fullOriginalContractExecuted=False,fullNextAccepted=False)
+     encoded=(json.dumps(index,indent=2)+'\n').encode();need(len(encoded)<=4*1024**2,'finite index bound')
+     write_whole(OUTPUT/'index.json',encoded)
+     need((OUTPUT/'index.json').read_bytes()==encoded,'index publication readback')

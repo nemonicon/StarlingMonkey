@@ -1,0 +1,319 @@
+{
+  "schemaVersion": 1,
+  "fixture": "Next16.4.5 App Router / React19.3.1",
+  "requests": [
+    {
+      "id": "health",
+      "path": "/api/health",
+      "method": "GET",
+      "status": 200,
+      "json": {
+        "marker": "NEXT_HEALTH_OK",
+        "ok": true
+      }
+    },
+    {
+      "id": "home",
+      "path": "/",
+      "method": "GET",
+      "status": 200,
+      "includes": [
+        "NEXT_HOME_STATIC",
+        "NEXT_ROOT_LAYOUT",
+        "Starling Next Runtime Fixture"
+      ]
+    },
+    {
+      "id": "nested-layout",
+      "path": "/nested/leaf",
+      "method": "GET",
+      "status": 200,
+      "includes": [
+        "NEXT_ROOT_LAYOUT",
+        "NEXT_NESTED_LAYOUT",
+        "NEXT_NESTED_LEAF",
+        "Nested Fixture"
+      ]
+    },
+    {
+      "id": "dynamic-ssr",
+      "path": "/ssr/fixture-slug",
+      "method": "GET",
+      "status": 200,
+      "includes": [
+        "NEXT_DYNAMIC_SSR",
+        "fixture-slug"
+      ]
+    },
+    {
+      "id": "query",
+      "path": "/query?term=hello%20world&tag=one&tag=two",
+      "method": "GET",
+      "status": 200,
+      "includes": [
+        "NEXT_QUERY",
+        "hello world",
+        "one|two"
+      ]
+    },
+    {
+      "id": "server-action-form-ssr",
+      "path": "/actions",
+      "method": "GET",
+      "status": 200,
+      "includes": [
+        "NEXT_SERVER_ACTION_FORM",
+        "server-action",
+        "fixture-action"
+      ]
+    },
+    {
+      "id": "server-action-result-page",
+      "path": "/action-result?value=fixture-action",
+      "method": "GET",
+      "status": 200,
+      "includes": [
+        "NEXT_ACTION_RESULT",
+        "fixture-action"
+      ]
+    },
+    {
+      "id": "client-counter-ssr",
+      "path": "/client",
+      "method": "GET",
+      "status": 200,
+      "includes": [
+        "NEXT_CLIENT_COUNTER",
+        "NEXT_CLIENT_COUNT:",
+        "counter-increment"
+      ]
+    },
+    {
+      "id": "suspense-complete",
+      "path": "/stream",
+      "method": "GET",
+      "status": 200,
+      "includes": [
+        "NEXT_STREAM_SHELL",
+        "NEXT_STREAM_READY"
+      ]
+    },
+    {
+      "id": "json-get",
+      "path": "/api/json?q=hello",
+      "method": "GET",
+      "status": 200,
+      "json": {
+        "marker": "NEXT_JSON_GET",
+        "query": "hello"
+      }
+    },
+    {
+      "id": "json-post",
+      "path": "/api/json",
+      "method": "POST",
+      "status": 200,
+      "body": "{\"value\":\"posted\"}",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "json": {
+        "marker": "NEXT_JSON_POST",
+        "value": "posted"
+      }
+    },
+    {
+      "id": "json-invalid",
+      "path": "/api/json",
+      "method": "POST",
+      "status": 400,
+      "body": "{bad",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "json": {
+        "marker": "NEXT_JSON_BAD_INPUT"
+      }
+    },
+    {
+      "id": "request-context",
+      "path": "/api/context",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "cookie": "fixture_token=alpha",
+        "x-fixture-probe": "probe-value"
+      },
+      "json": {
+        "marker": "NEXT_CONTEXT",
+        "cookie": "alpha",
+        "header": "probe-value"
+      },
+      "responseHeaders": {
+        "x-fixture-response": "context-ok"
+      },
+      "responseHeaderIncludes": {
+        "set-cookie": [
+          "fixture_reply=set",
+          "HttpOnly",
+          "SameSite=lax"
+        ]
+      }
+    },
+    {
+      "id": "redirect",
+      "path": "/go",
+      "method": "GET",
+      "status": 307,
+      "location": "/nested/leaf"
+    },
+    {
+      "id": "not-found",
+      "path": "/missing",
+      "method": "GET",
+      "status": 404,
+      "includes": [
+        "NEXT_NOT_FOUND"
+      ]
+    },
+    {
+      "id": "unknown-route",
+      "path": "/does-not-exist",
+      "method": "GET",
+      "status": 404,
+      "includes": [
+        "NEXT_NOT_FOUND"
+      ]
+    },
+    {
+      "id": "bounded-node-compat",
+      "path": "/api/compat",
+      "method": "GET",
+      "status": 200,
+      "json": {
+        "marker": "NEXT_COMPAT_OK",
+        "assertions": true
+      }
+    },
+    {
+      "id": "fs-crypto-probe",
+      "path": "/api/fs-crypto",
+      "method": "GET",
+      "status": 200,
+      "json": {
+        "marker": "NEXT_FS_CRYPTO",
+        "text": "nextjs-runtime-fixture\n",
+        "sha256": "6bb4bb9103d951dce4f9ff0ebaeee7e91d610226c5661630d59824f0d958b928"
+      },
+      "scope": "Node baseline expected success; Wasm unsupported bindings must be retained as breakage"
+    },
+    {
+      "id": "cache-first",
+      "path": "/api/cache",
+      "method": "GET",
+      "status": 200,
+      "json": {
+        "marker": "NEXT_CACHE_VALUE"
+      }
+    },
+    {
+      "id": "cache-repeat",
+      "path": "/api/cache",
+      "method": "GET",
+      "status": 200,
+      "json": {
+        "marker": "NEXT_CACHE_VALUE"
+      },
+      "equalJsonTo": "cache-first"
+    },
+    {
+      "id": "cache-revalidate",
+      "path": "/api/revalidate",
+      "method": "POST",
+      "status": 200,
+      "json": {
+        "marker": "NEXT_CACHE_REVALIDATED",
+        "tag": "next-runtime-fixture-v1"
+      }
+    },
+    {
+      "id": "cache-after-revalidate",
+      "path": "/api/cache",
+      "method": "GET",
+      "status": 200,
+      "json": {
+        "marker": "NEXT_CACHE_VALUE"
+      },
+      "scope": "Record generation relative to pre-invalidation; no global restart/reuse inference"
+    },
+    {
+      "id": "public-asset",
+      "path": "/fixture.txt",
+      "method": "GET",
+      "status": 200,
+      "includes": [
+        "NEXT_PUBLIC_ASSET"
+      ]
+    }
+  ],
+  "wasmCases": [
+    {
+      "id": "shared-bounded-compat",
+      "source": "app-fixture/lib/compat.mjs",
+      "export": "run",
+      "asyncResult": "JSONserializable",
+      "marker": "NEXT_COMPAT_OK",
+      "sameSourceAsHttp": "/api/compat"
+    }
+  ],
+  "interactionCases": [
+    {
+      "id": "server-action-submit",
+      "scope": "Not exercised by GET SSR assertion",
+      "procedure": "Derive actual $ACTION_ID_ hidden input from /actions form; POST actual form data with value=fixture-action and proper same-origin headers; verify303 redirect/action result. Do not hardcode build action IDs."
+    },
+    {
+      "id": "client-counter-click",
+      "scope": "Needs browser/hydration; HTTP GET proves SSR/assets only",
+      "procedure": "Load/client, click counter-increment, assert counter-value becomes NEXT_CLIENT_COUNT:1; retain browser errors."
+    },
+    {
+      "id": "suspense-stream-order",
+      "scope": "Complete-body HTTP does not prove streaming",
+      "procedure": "Retain actual chunk ordering/times; shell/fallback before ready under finite30ms delay. No timing-performance inference."
+    },
+    {
+      "id": "cache-invalidation",
+      "scope": "Same single owned Node server process and fixture-specific cache key",
+      "procedure": "Compare complete JSON first/repeat; POST invalidate; retain post-invalidate generation. Process lifetime/restarts can reset module counter, so do not claim general persistence."
+    }
+  ],
+  "packaging": {
+    "output": "standalone",
+    "buildArgv": [
+      "next",
+      "build",
+      "--webpack"
+    ],
+    "cpus": 1,
+    "exactVersions": {
+      "next": "16.4.5",
+      "react": "19.3.1",
+      "react-dom": "19.3.1"
+    },
+    "standaloneRequirements": [
+      "Retain genuine .next/standalone/server.js and traced node_modules",
+      "Copy .next/static to standalone/.next/static and public to standalone/public for real asset serving; Next standalone does not copy them by default",
+      "Retain fixtures/message.txt at traced standalone cwd fixtures path; config explicitly traces this route file"
+    ],
+    "noExternalNetworkFontsDatabase": true,
+    "noShimsStubsProxies": true
+  },
+  "sourceOnlyAuthor": true,
+  "buildOrNodeOrGuestExecutedByFixtureAuthor": false,
+  "limitations": [
+    "Framework compilation/server startup/HTTP versus Wasm/component execution are separate outcomes",
+    "HTTP SSR cannot establish client hydration, action invocation or chunk streaming",
+    "FS/crypto and unsupported APIs remain separate deliberate probes, never silently replaced"
+  ]
+}
