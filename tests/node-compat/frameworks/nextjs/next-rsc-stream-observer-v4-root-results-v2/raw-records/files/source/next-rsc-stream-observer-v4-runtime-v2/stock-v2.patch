@@ -1,0 +1,11 @@
+--- v1/run-stock.mjs
++++ v2/run-stock.mjs
+@@ -30,7 +30,7 @@
+ assert.equal(process.argv.length,7,'Versioned host-only authority argument; six original positions preserved');
+ const authorityPath=resolve(process.argv[6]);
+ const authority=JSON.parse(await readFile(authorityPath,'utf8'));
+-assert.equal(authority.state,'ROOT_NEXT_RSC_STREAM_OBSERVER_V4_HOST_AUTHORIZED_V1');
++assert.equal(authority.state,'ROOT_NEXT_RSC_STREAM_OBSERVER_V4_HOST_AUTHORIZED_V2');
+ assert.equal(authority.controlOnly,false);assert.equal(authority.fullClientFullContractAllowed,true);assert.equal(authority.rscStreamObserverAllowed,true);
+ assert.equal(authority.localhostServerAllowed,true);assert.equal(authority.browserAllowed,true);
+ for(const key of ['compilerAllowed','nativeBuildAllowed','guestAllowed','engineAllowed','externalApplicationDeploymentAllowed'])assert.equal(authority[key],false);

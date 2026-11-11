@@ -1,0 +1,28 @@
+--- parent/run-stock.mjs
++++ v4/run-stock.mjs
+@@ -30,7 +30,7 @@
+ assert.equal(process.argv.length,7,'Versioned host-only authority argument; six original positions preserved');
+ const authorityPath=resolve(process.argv[6]);
+ const authority=JSON.parse(await readFile(authorityPath,'utf8'));
+-assert.equal(authority.state,'ROOT_NEXT_RSC_STREAM_OBSERVER_HOST_AUTHORIZED_V1');
++assert.equal(authority.state,'ROOT_NEXT_RSC_STREAM_OBSERVER_V4_HOST_AUTHORIZED_V1');
+ assert.equal(authority.controlOnly,false);assert.equal(authority.fullClientFullContractAllowed,true);assert.equal(authority.rscStreamObserverAllowed,true);
+ assert.equal(authority.localhostServerAllowed,true);assert.equal(authority.browserAllowed,true);
+ for(const key of ['compilerAllowed','nativeBuildAllowed','guestAllowed','engineAllowed','externalApplicationDeploymentAllowed'])assert.equal(authority[key],false);
+@@ -93,7 +93,7 @@
+   for(const r of input.files){const path=join(application,r.path),s=await lstat(path);assert.deepEqual(await descriptor(path),{path,sha256:r.sha256,bytes:r.bytes});assert.equal(s.mode&0o777,r.mode);assert.equal(s.nlink,1);assert(s.dev!==r.dev||s.ino!==r.ino);}
+   for(const r of input.directories)assert.equal((await lstat(join(application,r.path))).mode&0o777,r.mode);
+ }
+-const result = {schemaVersion: 1, suite: 'NEXT_RSC_STREAM_OBSERVER_FULL_MATCHED_NODE_PROFILE_V1', controlOnly:false, fullOriginalContractExecuted:false, fullNextAccepted:false,
++const result = {schemaVersion: 1, suite: 'NEXT_RSC_STREAM_OBSERVER_V4_FULL_MATCHED_NODE_PROFILE_V1', controlOnly:false, fullOriginalContractExecuted:false, fullNextAccepted:false,
+   node: process.version, guestExecuted: false, applicationModified: false,
+   standaloneSource: source, sourceServer: await descriptor(join(source, 'server.js')),
+   bridge: await descriptor(join(here, '../http-bridge-candidate-v1/bridge.mjs')), harness: await descriptor(fileURLToPath(import.meta.url)),
+@@ -213,6 +213,6 @@
+     &&result.errors.length===0&&result.transportErrors.length===0;
+   await save();
+ }
+-console.log(JSON.stringify({state:result.passed?'NEXT_RSC_STREAM_OBSERVER_FULL_MATCHED_NODE_PROFILE_PASSED':'NEXT_RSC_STREAM_OBSERVER_FULL_MATCHED_NODE_PROFILE_FAILED',
++console.log(JSON.stringify({state:result.passed?'NEXT_RSC_STREAM_OBSERVER_V4_FULL_MATCHED_NODE_PROFILE_PASSED':'NEXT_RSC_STREAM_OBSERVER_V4_FULL_MATCHED_NODE_PROFILE_FAILED',
+   controlOnly:false,fullOriginalContractExecuted:result.fullOriginalContractExecuted,passed:result.passed,errors:result.errors,transportErrors:result.transportErrors,guestExecuted:false,fullNextAccepted:false}));
+ process.exitCode=result.passed?0:1;

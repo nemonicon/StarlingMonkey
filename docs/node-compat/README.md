@@ -2,7 +2,14 @@
 
 Current accepted checkpoint: [foundations-v13, bounded classic streams](../../tests/node-compat/foundation-classic-streams/production-acceptance-v13/README.md). The corrected342-source production layer, exact five-file promotion, runtime gates, separate cost evidence and declared preservation scope are accepted. Consumer355/zlib350 experiments and the broader roadmap remain outside that checkpoint; historical preparation statements below retain their original scopes.
 
-**Next.js executes in Wasm; full portable acceptance remains failed.** The
+**The bounded Next.js full workload now passes once on wasmCloud and matched
+Node with Chrome157.** The [V4 full results](nextjs-v4-full-results.md) retain
+24HTTP,52 cache and80 supplemental checks, generation1→2, incremental streaming,
+UI/assets and unchanged strict browser completion. Lifecycle, repeatability,
+clean-machine and production acceptance remain open. Earlier Chrome156 failures
+remain failed and unexplained; no engine fix is claimed.
+
+Earlier evidence: the
 [compression-off full profile](nextjs-compression-off-full-results.md) passes
 once on stock Wasmtime and matched Node, including persisted generation1→2 and
 strict browser completion. The subsequent
@@ -18,13 +25,12 @@ The [strict-workload resource observer](nextjs-resource-stream-results.md) now
 retains2,963 browser bytes even in the reproduced wasmCloud cancellation.
 That failed terminal remains incomplete; matched Node completes and passes.
 
-The [V4 metadata observer](nextjs-observer-v4-results.md) now passes seven real
-component probes and composes with the unchanged Next inner. Its fresh full
-browser workload is pending; earlier failures remain recorded. A portable
-saved-evidence checker and raw logs support future regression checks.
+The [V4 metadata observer](nextjs-observer-v4-results.md) passes seven real
+component probes and composes with the unchanged Next inner. The subsequent full
+browser comparison is recorded above. Saved evidence supports regression checks.
 
-The [priority roadmap](nextjs-priority-roadmap.md) leads with that response
-lifetime boundary, then lifecycle/resource/reuse, clean-machine reproduction,
+The [priority roadmap](nextjs-priority-roadmap.md) leads with request isolation,
+lifecycle/resource/reuse and repeatability, then clean-machine reproduction,
 measured cost and production promotion. Server JavaScript executes in
 SpiderMonkey/Wasm with thirteen selected standard WASI0.2.10 interfaces;
 the browser runs ordinary Next client JavaScript. Full Node/Buffer compatibility

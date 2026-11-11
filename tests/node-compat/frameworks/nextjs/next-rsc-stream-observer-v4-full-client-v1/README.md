@@ -1,0 +1,13 @@
+This Source-only fullclient successor changes the two fixed output/runId pairs and the physical selected browser worker path from immutable d544. All other request/collector/browser/correlation/lifecycle/publication code, argc6 API, suite/result labels and every original assertion/conjunction remain byte-identical. The suite remains NEXT_RSC_STREAM_OBSERVER_FULL_CONTRACT_CLIENT_V1.
+
+Fresh policies:
+- rsc-stream-observer-v4-cloud-first -> /private/tmp/starling-node-compat/next-rsc-stream-observer-v4-cloud-v1-rsc-stream-observer-v4-cloud-first/client
+- rsc-stream-observer-v4-stock-first -> /private/tmp/starling-node-compat/next-rsc-stream-observer-v4-stock-v1-rsc-stream-observer-v4-stock-first/client
+
+Root initially sought immutable d886 browser reuse. Source API permits it, but current actual Chrome changed to157.0.8103.39 and the old selected Playwright files are absent. Root explicitly authorized the separate next-rsc-stream-observer-v4-browser-v1 fork after its actual Chrome version command confirmed157. That browser changes only the exact version assertion literal; its helpers/17 fixtures/strict workload and same9106 app/assets/action plan are unchanged. The old browser/client are untouched.
+
+The new fullclient plan changes only allowedOutputPolicies, the two typed browser Source refs and the prospective browser directory. actualBrowserSourceBindingPending remains false because the new immutable browser Source/index and bound same-app policy are concrete. Four external consumer roles are unchanged; browserSourceIndex/browserWorker identify the new version-selected Source. Root must authenticate all six in its fresh Source union and resolve genuine Playwright1.64.1/current host rows independently. No old protected array, runtime/envelope/constructor frame or operational acceptance is copied.
+
+A new matched V4 pair uses Chrome157 on both arms. Comparison to the earlier V3 pair is confounded by Chrome156 ->157; no outer-observer effect, strict-browser cure or cause is established by this Source. Inherited historical UNBOUND/pending prose refers to original Source/runtime authority. The packet index is Source-only, with no authority or new runtime result.
+
+Raw d544/f4a6 originals and the pre-browser-selection e85 draft are preserved outside this family in the V4 observer Root/source-history/full-client-v4-successor-v1 and client-v4-browser-selection-v1. Exact code patch/inverses and typed browser selection are in derivation.json. B used own stdlib text/JSON/hash/stat only; no candidate/helper/JS parser/Node/CLI/browser/host/target execution. Root owns actual checks and actions.

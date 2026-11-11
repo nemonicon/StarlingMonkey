@@ -1,0 +1,54 @@
+--- before/v4-public-tuple-fixtures.json
++++ after/v4-public-tuple-fixtures.json
+@@ -1369,6 +1369,51 @@
+         "outerPublicTupleWitnessAdmitted": true,
+         "prospectivePublicTupleJoinAdmitted": true
+       }
++    },
++    {
++      "id": "record-leading-whitespace-is-not-canonical",
++      "set": [
++        {
++          "path": [
++            "stdout"
++          ],
++          "value": "unrelated ordinary stdout\n{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"inner-handler-import-returned\",\"method\":\"GET\",\"path\":\"/actions\",\"pathStatus\":\"present-target\",\"snapshotStatus\":\"success\",\"corrState\":\"valid\",\"corrCount\":1,\"corr\":\"8888888888888888888888888888888888888888888888888888888888888888\"}\n{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"inner-handler-import-returned\",\"method\":\"POST\",\"path\":\"/actions\",\"pathStatus\":\"present-target\",\"snapshotStatus\":\"success\",\"corrState\":\"missing\",\"corrCount\":0,\"corr\":null}\n{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"inner-handler-import-returned\",\"method\":\"POST\",\"path\":null,\"pathStatus\":\"present-other\",\"snapshotStatus\":\"success\",\"corrState\":\"duplicate\",\"corrCount\":2,\"corr\":null}\n{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"inner-handler-import-returned\",\"method\":\"POST\",\"path\":\"/actions\",\"pathStatus\":\"present-target\",\"snapshotStatus\":\"success\",\"corrState\":\"valid\",\"corrCount\":1,\"corr\":\"8888888888888888888888888888888888888888888888888888888888888888\"}\n {\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"inner-handler-import-returned\",\"method\":\"POST\",\"path\":\"/actions\",\"pathStatus\":\"present-target\",\"snapshotStatus\":\"success\",\"corrState\":\"valid\",\"corrCount\":1,\"corr\":\"8888888888888888888888888888888888888888888888888888888888888888\"}\n"
++        }
++      ],
++      "expect": {
++        "outerPublicTupleWitnessAdmitted": false,
++        "prospectivePublicTupleJoinAdmitted": false
++      }
++    },
++    {
++      "id": "record-crlf-is-not-canonical",
++      "set": [
++        {
++          "path": [
++            "stdout"
++          ],
++          "value": "unrelated ordinary stdout\n{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"inner-handler-import-returned\",\"method\":\"GET\",\"path\":\"/actions\",\"pathStatus\":\"present-target\",\"snapshotStatus\":\"success\",\"corrState\":\"valid\",\"corrCount\":1,\"corr\":\"8888888888888888888888888888888888888888888888888888888888888888\"}\n{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"inner-handler-import-returned\",\"method\":\"POST\",\"path\":\"/actions\",\"pathStatus\":\"present-target\",\"snapshotStatus\":\"success\",\"corrState\":\"missing\",\"corrCount\":0,\"corr\":null}\n{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"inner-handler-import-returned\",\"method\":\"POST\",\"path\":null,\"pathStatus\":\"present-other\",\"snapshotStatus\":\"success\",\"corrState\":\"duplicate\",\"corrCount\":2,\"corr\":null}\n{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"inner-handler-import-returned\",\"method\":\"POST\",\"path\":\"/actions\",\"pathStatus\":\"present-target\",\"snapshotStatus\":\"success\",\"corrState\":\"valid\",\"corrCount\":1,\"corr\":\"8888888888888888888888888888888888888888888888888888888888888888\"}\n{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"inner-handler-import-returned\",\"method\":\"POST\",\"path\":\"/actions\",\"pathStatus\":\"present-target\",\"snapshotStatus\":\"success\",\"corrState\":\"valid\",\"corrCount\":1,\"corr\":\"8888888888888888888888888888888888888888888888888888888888888888\"}\r\n"
++        }
++      ],
++      "expect": {
++        "outerPublicTupleWitnessAdmitted": false,
++        "prospectivePublicTupleJoinAdmitted": false
++      }
++    },
++    {
++      "id": "escaped-method-is-not-canonical",
++      "set": [
++        {
++          "path": [
++            "stdout"
++          ],
++          "value": "unrelated ordinary stdout\n{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"inner-handler-import-returned\",\"method\":\"GET\",\"path\":\"/actions\",\"pathStatus\":\"present-target\",\"snapshotStatus\":\"success\",\"corrState\":\"valid\",\"corrCount\":1,\"corr\":\"8888888888888888888888888888888888888888888888888888888888888888\"}\n{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"inner-handler-import-returned\",\"method\":\"POST\",\"path\":\"/actions\",\"pathStatus\":\"present-target\",\"snapshotStatus\":\"success\",\"corrState\":\"missing\",\"corrCount\":0,\"corr\":null}\n{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"inner-handler-import-returned\",\"method\":\"POST\",\"path\":null,\"pathStatus\":\"present-other\",\"snapshotStatus\":\"success\",\"corrState\":\"duplicate\",\"corrCount\":2,\"corr\":null}\n{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"inner-handler-import-returned\",\"method\":\"POST\",\"path\":\"/actions\",\"pathStatus\":\"present-target\",\"snapshotStatus\":\"success\",\"corrState\":\"valid\",\"corrCount\":1,\"corr\":\"8888888888888888888888888888888888888888888888888888888888888888\"}\n{\"marker\":\"NEXT_STANDARD_HANDLER_RETURN_OBSERVER_V4\",\"version\":4,\"event\":\"inner-handler-import-returned\",\"method\":\"\\u0050OST\",\"path\":\"/actions\",\"pathStatus\":\"present-target\",\"snapshotStatus\":\"success\",\"corrState\":\"valid\",\"corrCount\":1,\"corr\":\"8888888888888888888888888888888888888888888888888888888888888888\"}\n"
++        }
++      ],
++      "expect": {
++        "outerPublicTupleWitnessAdmitted": false,
++        "prospectivePublicTupleJoinAdmitted": false
++      }
+     }
+   ]
+ }

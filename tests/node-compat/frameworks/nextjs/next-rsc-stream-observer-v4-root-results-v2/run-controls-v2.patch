@@ -1,0 +1,72 @@
+--- v1-unbound/run-controls.py
++++ v2-unbound/run-controls.py
+@@ -85,14 +85,15 @@
+     prep = importlib.util.module_from_spec(spec)
+     spec.loader.exec_module(prep)
+     binding = prep.document(BINDINGS)
+-    assert binding['state'] == 'ROOT_RSC_STREAM_OBSERVER_V4_ACTUAL_BINDINGS_V1'
++    assert binding['state'] == 'ROOT_RSC_STREAM_OBSERVER_V4_ACTUAL_BINDINGS_V2'
+     assert binding['compositionReview'] == COMPOSITION_REVIEW and binding['innerConstructionReview'] == INNER_REVIEW
+     assert binding['applicationBuildReview'] == REQUIRED_APP_REVIEW and binding['assetSelection'] == ASSET_SELECTION
++    prep.checked(binding['constructionArtifactBookendPreflight'])
+     selected_host = prep.document(binding['selectedHostTools'])
+     assert selected_host['passed'] is True and selected_host['fullWorkloadInvoked'] is False
+     assert selected_host['chromeVersion'] == '157.0.8103.39' and selected_host['playwrightVersion'] == '1.64.1'
+     assert len(selected_host['hostRequirements']) == 6 and len(selected_host['playwrightPackageFiles']) == 115
+-    actor_root, client_root, browser_root = (BASE / name for name in ('next-rsc-stream-observer-v4-runtime-v1', 'next-rsc-stream-observer-v4-full-client-v1', 'next-rsc-stream-observer-v4-browser-v1'))
++    actor_root, client_root, browser_root = (BASE / name for name in ('next-rsc-stream-observer-v4-runtime-v2', 'next-rsc-stream-observer-v4-full-client-v2', 'next-rsc-stream-observer-v4-browser-v1'))
+     indices = {}
+     for role, folder in (('actorIndex', actor_root), ('clientIndex', client_root), ('browserIndex', browser_root)):
+         assert binding[role]['path'] == str(folder / 'index.json')
+@@ -153,12 +154,13 @@
+         assert plan['applicationBuildReview'] == REQUIRED_APP_REVIEW and plan['applicationBuildResult'] == app['actualResult']
+         assert plan['applicationInputs'] == app['applicationInputs'] and plan['applicationRootIdentityEvidence'] == app['applicationRootIdentityEvidence']
+         assert plan['node'] == plans['cloud']['node'] and plan['monitor'] == plans['cloud']['monitor']
+-        assert plan['outputPrefix'] == '/private/tmp/starling-node-compat/next-rsc-stream-observer-v4-' + arm + '-v1'
+-        assert plan['runId'] == 'rsc-stream-observer-v4-' + arm + '-first'
++        assert plan['outputPrefix'] == '/private/tmp/starling-node-compat/next-rsc-stream-observer-v4-' + arm + '-v2'
++        assert plan['runId'] == 'rsc-stream-observer-v4-' + arm + '-second'
+         assert plan['namespacePolicy']['plannedOutputPrefix'] == plan['outputPrefix'] and plan['namespacePolicy']['plannedRunId'] == plan['runId']
+         if arm == 'cloud':
+             assert plan['outerSeconds'] == 600
+         assert plan['browserTools'] == selected_host['browserTools'] and plan['selectedHostTools'] == binding['selectedHostTools']
++        assert plan['constructionArtifactBookendPreflight'] == binding['constructionArtifactBookendPreflight']
+     assert client_plan['allowedOutputPolicies'] == [dict(runId=plans[arm]['runId'], output=plans[arm]['outputPrefix'] + '-' + plans[arm]['runId'] + '/client') for arm in ('cloud', 'stock')]
+     assert plans['cloud']['applicationSchema']['additionalDirectories'] == []
+     assert plans['cloud']['applicationSchema']['ownedDirectoriesIncludingRoot'] == plans['cloud']['applicationSchema']['directoriesExcludingRoot'] + 1
+@@ -190,7 +192,7 @@
+         publicRequestCorrelation=PUBLIC, compilerAllowed=False, nativeBuildAllowed=False,
+         automaticRetry=False, replacementTrials=False, fullNextAccepted=False)
+     if arm == 'cloud':
+-        return dict(common, state='ROOT_NEXT_RSC_STREAM_OBSERVER_V4_CLOUD_AUTHORIZED_V1',
++        return dict(common, state='ROOT_NEXT_RSC_STREAM_OBSERVER_V4_CLOUD_AUTHORIZED_V2',
+             plan=binding['cloudPlan'], component=inner['component'], componentAudit=inner['componentAudit'],
+             constructionResult=inner['actualResult'], constructionCallerIndex=inner['callerSourceIndex'],
+             inputSourceIndex=inner['inputSourceIndex'], inputEntry=inner['inputEntry'],
+@@ -201,7 +203,7 @@
+             hostMutationAllowed=False, automaticRetryAllowed=False, newServicesAllowed=False,
+             standardHandlerObserverAllowed=True, componentConstructionAllowed=False,
+             externalDeploymentAllowed=False, adoptionAllowed=False)
+-    return dict(common, state='ROOT_NEXT_RSC_STREAM_OBSERVER_V4_HOST_AUTHORIZED_V1',
++    return dict(common, state='ROOT_NEXT_RSC_STREAM_OBSERVER_V4_HOST_AUTHORIZED_V2',
+         plans=binding['stockPlan'], rootAuthorityPath=str(HERE / 'stock-authority.json'),
+         localhostServerAllowed=True, browserAllowed=True, guestAllowed=False, engineAllowed=False,
+         externalApplicationDeploymentAllowed=False)
+@@ -236,7 +238,7 @@
+                 outputRoot=str(output), ownerOutputRoot=str(output) + '-external-root', ownerSeconds=600 if arm == 'cloud' else 300))
+         assert prep.admit(original) == before
+         protect()
+-        prep.save(prepared_path, dict(schemaVersion=1, state='ROOT_FIXED_RSC_STREAM_OBSERVER_V4_FULL_PAIR_PREPARED_NOT_RUN_V1',
++        prep.save(prepared_path, dict(schemaVersion=1, state='ROOT_FIXED_RSC_STREAM_OBSERVER_V4_FULL_PAIR_PREPARED_NOT_RUN_V2',
+             controller=self_ref, bindings=BINDINGS, trials=rows, order=['cloud', 'stock'], publicRequestCorrelation=PUBLIC,
+             cloudSelfOrigin=cloud_origin, portSelectionSocketClosedBeforeAuthorityPublication=True,
+             portReservationOrHandoffGuaranteed=False, actorMustLeaseExactOriginOnce=True, fallbackAllowed=False,
+@@ -248,7 +250,7 @@
+     prepared_ref = prep.row(prepared_path)
+     prepared = prep.document(prepared_ref)
+     assert prepared['controller'] == self_ref and prepared['bindings'] == BINDINGS
+-    assert prepared['state'] == 'ROOT_FIXED_RSC_STREAM_OBSERVER_V4_FULL_PAIR_PREPARED_NOT_RUN_V1'
++    assert prepared['state'] == 'ROOT_FIXED_RSC_STREAM_OBSERVER_V4_FULL_PAIR_PREPARED_NOT_RUN_V2'
+     assert prepared['portReservationOrHandoffGuaranteed'] is False and prepared['fallbackAllowed'] is False
+     assert prepared['order'] == ['cloud', 'stock'] and [x['arm'] for x in prepared['trials']] == ['cloud', 'stock']
+     for item in prepared['trials']:

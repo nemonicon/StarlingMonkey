@@ -1,0 +1,36 @@
+--- before/admit-v4-public-tuple.py
++++ after/admit-v4-public-tuple.py
+@@ -244,6 +244,8 @@
+                  or (state == "valid" and count == 1 and hex64(corr))
+                  or (state == "invalid" and count == 1 and corr is None)
+                  or (state == "duplicate" and count == 2 and corr is None)), "observer-correlation-schema")
++            need(json.dumps(row, separators=(",", ":"), ensure_ascii=True, allow_nan=False) + "\n" == line,
++                 "observer-noncanonical-wire")
+             rows.append({"line": number, "record": row})
+         except (Refusal, ValueError, TypeError) as error:
+             faults.append({"line": number, "code": str(error) if isinstance(error, Refusal) else "malformed-observer-json"})
+@@ -325,7 +327,9 @@
+     need(path.is_absolute() and path.resolve() == path, "noncanonical-input-path")
+     before = path.stat()
+     need(stat.S_ISREG(before.st_mode) and before.st_nlink == 1 and before.st_size <= cap, "input-physical-or-cap")
+-    raw = path.read_bytes()
++    with path.open("rb") as stream:
++        raw = stream.read(cap + 1)
++    need(len(raw) <= cap, "input-read-cap")
+     after = path.stat()
+     keys = ["st_dev", "st_ino", "st_mode", "st_nlink", "st_size", "st_mtime_ns", "st_ctime_ns"]
+     need(all(getattr(before, k) == getattr(after, k) for k in keys) and len(raw) == before.st_size, "input-changed")
+@@ -350,7 +354,12 @@
+         raw = read_ref(refs[name], cap)
+         material[name] = raw if name in ["stdout", "requestBody"] else decode_json(raw)
+     # These are explicit delegated DATA attestations, not inferred from an empty log.
+-    for ref in material["captureEvidence"].get("provenance", []):
++    provenance = material["captureEvidence"].get("provenance", [])
++    need(isinstance(provenance, list) and 0 < len(provenance) <= 64, "provenance-count-cap")
++    need(all(isinstance(ref, dict) and type(ref.get("bytes")) is int
++             and 0 <= ref["bytes"] <= 2 << 20 for ref in provenance)
++         and sum(ref["bytes"] for ref in provenance) <= 16 << 20, "provenance-aggregate-cap")
++    for ref in provenance:
+         read_ref(ref, 2 << 20)
+     return material
+ 

@@ -1,0 +1,11 @@
+--- v1/deploy.mjs
++++ v2/deploy.mjs
+@@ -71,7 +71,7 @@
+ assert.deepEqual(plan.clientSource,plan.fullClientFullContract.requiredClient);
+ for(const key of ['outputPrefix','applicationSource','applicationInputs','applicationBuildResult','applicationBuildReview','applicationRootIdentity','applicationRootIdentityEvidence','applicationSchema','clientSource','clientSourceIndex','browserSource','browserSourceIndex'])assert(plan[key]!==null,'New control binding:'+key);
+ const authorityPath=resolve(process.argv[2]),authority=await read(authorityPath),authorityRef=await row(authorityPath);
+-assert.equal(authority.state,'ROOT_NEXT_RSC_STREAM_OBSERVER_V4_CLOUD_AUTHORIZED_V1');
++assert.equal(authority.state,'ROOT_NEXT_RSC_STREAM_OBSERVER_V4_CLOUD_AUTHORIZED_V2');
+ assert.equal(authority.publicRequestCorrelationAllowed,true);
+ assert.equal(authority.standardHandlerObserverAllowed,true);
+ assert.equal(authority.fullClientFullContractAllowed,true);assert.equal(authority.rscStreamObserverAllowed,true);assert.equal(authority.controlOnly,false);

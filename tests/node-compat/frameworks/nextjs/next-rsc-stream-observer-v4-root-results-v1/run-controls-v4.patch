@@ -1,0 +1,174 @@
+--- corrected-v1-unbound/run-controls.py
++++ v4-unbound/run-controls.py
+@@ -18,8 +18,9 @@
+     sha256='23313b9b1858e22df729b379c10750cd92ba00ce4aa9bee179fc21142fdfea66', bytes=5597386)
+ INNER_REVIEW = dict(path=str(BASE / 'next-native-export-diagnostic-next-root-results-v1/actual-construction-review.json'),
+     sha256='5c284564e0ddefba507c5429acd98c42393d5c0f2764105a4046f0665f51e16a', bytes=22550)
+-COMPOSITION_REVIEW = dict(path=str(BASE / 'next-standard-handler-observer-root-results-v1/actual-next-v3-composition-review.json'),
+-    sha256='b333fbc736e653f0a56bbe7ee031b3b943faf3e4d2ea687112659465171e2387', bytes=33472)
++COMPOSITION_REVIEW = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-standard-handler-observer-v4-root-results-v1/actual-next-v4-composition-review.json', 'sha256': '730c2698578692e35789918930d6be1cf8fb837a4e5362bcef5b802919795c2f', 'bytes': 9900}
++OBSERVER_COMPOSITION_REVIEW = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-standard-handler-observer-v4-root-results-v1/actual-v4-composition-review.json', 'sha256': '214c1d9bcfd1858666d460afe72811b858fc8018e9f5e4bfb9519d8ddbe04224', 'bytes': 11140}
++METADATA_REVIEW = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-standard-handler-observer-v4-root-results-v1/actual-metadata-runtime-review.json', 'sha256': '61bb6690df9cf8fef3c455314352a95816a20bc01920909b75632bf5333c47c8', 'bytes': 7272}
+ PUBLIC = dict(headerName='x-next-public-request-correlation',
+     nonceByTest={'client-counter': '7' * 64, 'server-action': '8' * 64})
+ 
+@@ -41,8 +42,41 @@
+ ASSET_SELECTION = dict(path=str(BASE / 'next-fs-callback-no-compress-root-results-v1/asset-selection.json'), sha256='05c965a6b536af21c5947ccace5d9c1cc12b129c86a5b2df42e1bb95dd2c5b4c', bytes=7350)
+ 
+ 
++def composition_evidence(prep):
++    composition = prep.document(COMPOSITION_REVIEW)
++    assert composition['state'] == 'COORDINATED_NEXT_STANDARD_HANDLER_OBSERVER_V4_COMPOSITION_DATA_REVIEW_PASSED_V1'
++    for key in ('verifiedPassed', 'verifiedDataReviewPassed', 'rawChildBytesVerified', 'siblingDefiningInstancesVerified',
++            'sharedNominalResourceAliasesVerified', 'fieldsNominalResourceAliasesVerified', 'metadataGetterCanonicalOptionsVerified',
++            'synchronousLiftLowerWithInnerPostReturnVerified', 'innerExplicitPostReturnPreserved', 'observerManualPostReturnAbsent',
++            'internalIncomingHandlerImportComposedAway', 'allFourRequestedToolStepsRawZero', 'allFourToolStderrEmpty', 'finalInputsPreserved'):
++        assert composition[key] is True
++    for key in ('runtimeInvoked', 'runtimeAccepted', 'fullNextAccepted', 'oldV3JoinUpgraded'):
++        assert composition[key] is False
++    assert composition['observerCompositionReview'] == OBSERVER_COMPOSITION_REVIEW and composition['metadataRuntimeReview'] == METADATA_REVIEW
++    observer, metadata = prep.document(OBSERVER_COMPOSITION_REVIEW), prep.document(METADATA_REVIEW)
++    assert observer['state'] == 'COORDINATED_STANDARD_HANDLER_OBSERVER_V4_COMPOSITION_DATA_REVIEW_PASSED_V1'
++    for key in ('verifiedPassed', 'verifiedDataReviewPassed', 'allSevenRequestedToolStepsRawZero', 'allSevenToolStderrEmpty',
++            'observerNoMarkerBeforeInnerCallSourceVerified', 'normalFieldsChildDropBeforeOwnForwardSourceVerified',
++            'correlationSnapshotIndependentOfMethodAndPathSourceVerified'):
++        assert observer[key] is True
++    for key in ('observerBinary', 'observerSource', 'observerManifest', 'observerProtocol'):
++        assert observer[key] == composition[key]
++    assert metadata['state'] == 'COORDINATED_STANDARD_HANDLER_OBSERVER_V4_METADATA_DATA_REVIEW_PASSED_V1'
++    for key in ('verifiedPassed', 'verifiedDataReviewPassed', 'allCollectionsCompletedCleanly', 'actualMetadataBehaviorProved', 'runtimeAccepted', 'cleanOwner', 'finalInputsPreserved'):
++        assert metadata[key] is True
++    assert metadata['metadataCasesPassed'] == len(metadata['caseResults']) == 7
++    assert metadata['rawExitCode'] == 0 and metadata['originalOwnerSeconds'] == 900
++    assert metadata['compositionReview'] == OBSERVER_COMPOSITION_REVIEW and metadata['observerBinary'] == composition['observerBinary']
++    assert metadata['envelope'] == observer['envelope']
++    for key in ('nextWorkloadExecuted', 'fullNextAccepted', 'oldV3JoinUpgraded', 'allocatorOrAbsentPathExecuted', 'recordLimitExecuted'):
++        assert metadata[key] is False
++    return composition, observer, metadata
++
++
+ def context():
+-    assert __debug__ and sys.flags.isolated and sys.dont_write_bytecode and type(BINDINGS) is dict, 'Unbound Source refuses helper import/action'
++    if not __debug__ or not sys.flags.isolated or not sys.dont_write_bytecode:
++        raise RuntimeError('Requires nonoptimized isolated Python with bytecode disabled')
++    assert type(BINDINGS) is dict, 'Unbound Source refuses helper import/action'
+     path = Path(PREPARER['path'])
+     raw = path.read_bytes()
+     assert path.resolve() == path and not path.is_symlink() and path.stat().st_nlink == 1
+@@ -51,10 +85,14 @@
+     prep = importlib.util.module_from_spec(spec)
+     spec.loader.exec_module(prep)
+     binding = prep.document(BINDINGS)
+-    assert binding['state'] == 'ROOT_RSC_STREAM_OBSERVER_ACTUAL_BINDINGS_V1'
++    assert binding['state'] == 'ROOT_RSC_STREAM_OBSERVER_V4_ACTUAL_BINDINGS_V1'
+     assert binding['compositionReview'] == COMPOSITION_REVIEW and binding['innerConstructionReview'] == INNER_REVIEW
+     assert binding['applicationBuildReview'] == REQUIRED_APP_REVIEW and binding['assetSelection'] == ASSET_SELECTION
+-    actor_root, client_root, browser_root = (BASE / name for name in ('next-rsc-stream-observer-runtime-v1', 'next-rsc-stream-observer-full-client-v1', 'next-rsc-stream-observer-browser-v1'))
++    selected_host = prep.document(binding['selectedHostTools'])
++    assert selected_host['passed'] is True and selected_host['fullWorkloadInvoked'] is False
++    assert selected_host['chromeVersion'] == '157.0.8103.39' and selected_host['playwrightVersion'] == '1.64.1'
++    assert len(selected_host['hostRequirements']) == 6 and len(selected_host['playwrightPackageFiles']) == 115
++    actor_root, client_root, browser_root = (BASE / name for name in ('next-rsc-stream-observer-v4-runtime-v1', 'next-rsc-stream-observer-v4-full-client-v1', 'next-rsc-stream-observer-v4-browser-v1'))
+     indices = {}
+     for role, folder in (('actorIndex', actor_root), ('clientIndex', client_root), ('browserIndex', browser_root)):
+         assert binding[role]['path'] == str(folder / 'index.json')
+@@ -72,6 +110,9 @@
+     assert requirements['browserSourceIndex'] == binding['browserIndex'] and requirements['browserWorker'] == worker
+     protected = {row['path']: row for row in binding['protectedInputs']}
+     assert len(protected) == len(binding['protectedInputs']) and protected
++    for ref in [binding['selectedHostTools'], *selected_host['hostRequirements'], *selected_host['playwrightPackageFiles']]:
++        prep.checked(ref)
++        assert protected[ref['path']] == ref
+     for ref in requirements.values():
+         prep.checked(ref)
+         assert protected[ref['path']] == ref
+@@ -92,7 +133,9 @@
+     action = manifest['node'][binding['requiredActionId']]
+     assert action['exportedName'] == 'submitFixture' and action['filename'] == 'app/actions/actions.js'
+     assert set(action['workers']) == {'app/actions/page'}
+-    inner, composition = prep.document(INNER_REVIEW), prep.document(COMPOSITION_REVIEW)
++    inner = prep.document(INNER_REVIEW)
++    composition, observer_composition, metadata_review = composition_evidence(prep)
++    assert binding['observerCompositionReview'] == OBSERVER_COMPOSITION_REVIEW and binding['metadataRuntimeReview'] == METADATA_REVIEW
+     assert inner['verifiedPassed'] is True and inner['rootAuthority'] == INNER_AUTHORITY and inner['completeReturnedImportAuditVerified'] is True
+     assert composition['verifiedPassed'] is True and composition['verifiedDataReviewPassed'] is True
+     assert composition['innerComponent'] == inner['component'] and composition['innerConstructionAuthority'] == INNER_AUTHORITY
+@@ -110,12 +153,12 @@
+         assert plan['applicationBuildReview'] == REQUIRED_APP_REVIEW and plan['applicationBuildResult'] == app['actualResult']
+         assert plan['applicationInputs'] == app['applicationInputs'] and plan['applicationRootIdentityEvidence'] == app['applicationRootIdentityEvidence']
+         assert plan['node'] == plans['cloud']['node'] and plan['monitor'] == plans['cloud']['monitor']
+-        assert plan['outputPrefix'] == '/private/tmp/starling-node-compat/next-rsc-stream-observer-' + arm + '-v1'
+-        assert plan['runId'] == 'rsc-stream-observer-' + arm + '-first'
++        assert plan['outputPrefix'] == '/private/tmp/starling-node-compat/next-rsc-stream-observer-v4-' + arm + '-v1'
++        assert plan['runId'] == 'rsc-stream-observer-v4-' + arm + '-first'
+         assert plan['namespacePolicy']['plannedOutputPrefix'] == plan['outputPrefix'] and plan['namespacePolicy']['plannedRunId'] == plan['runId']
+         if arm == 'cloud':
+             assert plan['outerSeconds'] == 600
+-        assert plan['browserTools'] == '/private/tmp/starling-node-compat/nextjs-16.4.5-v13-post-77659217-replay/browser-tools'
++        assert plan['browserTools'] == selected_host['browserTools'] and plan['selectedHostTools'] == binding['selectedHostTools']
+     assert client_plan['allowedOutputPolicies'] == [dict(runId=plans[arm]['runId'], output=plans[arm]['outputPrefix'] + '-' + plans[arm]['runId'] + '/client') for arm in ('cloud', 'stock')]
+     assert plans['cloud']['applicationSchema']['additionalDirectories'] == []
+     assert plans['cloud']['applicationSchema']['ownedDirectoriesIncludingRoot'] == plans['cloud']['applicationSchema']['directoriesExcludingRoot'] + 1
+@@ -124,7 +167,7 @@
+     assert sorted(plans['cloud']['selectedInterfaces']) == sorted(composition['selectedImports'])
+     self_ref = prep.row(Path(__file__).resolve())
+     def protect():
+-        for ref in (PREPARER, INNER_AUTHORITY, INNER_REVIEW, COMPOSITION_REVIEW, REQUIRED_APP_REVIEW, ASSET_SELECTION, BINDINGS, self_ref):
++        for ref in (PREPARER, INNER_AUTHORITY, INNER_REVIEW, COMPOSITION_REVIEW, OBSERVER_COMPOSITION_REVIEW, METADATA_REVIEW, REQUIRED_APP_REVIEW, ASSET_SELECTION, BINDINGS, self_ref):
+             prep.checked(ref)
+         for role in ('actorIndex', 'clientIndex', 'browserIndex'):
+             prep.family(binding[role])
+@@ -147,7 +190,7 @@
+         publicRequestCorrelation=PUBLIC, compilerAllowed=False, nativeBuildAllowed=False,
+         automaticRetry=False, replacementTrials=False, fullNextAccepted=False)
+     if arm == 'cloud':
+-        return dict(common, state='ROOT_NEXT_RSC_STREAM_OBSERVER_CLOUD_AUTHORIZED_V1',
++        return dict(common, state='ROOT_NEXT_RSC_STREAM_OBSERVER_V4_CLOUD_AUTHORIZED_V1',
+             plan=binding['cloudPlan'], component=inner['component'], componentAudit=inner['componentAudit'],
+             constructionResult=inner['actualResult'], constructionCallerIndex=inner['callerSourceIndex'],
+             inputSourceIndex=inner['inputSourceIndex'], inputEntry=inner['inputEntry'],
+@@ -158,7 +201,7 @@
+             hostMutationAllowed=False, automaticRetryAllowed=False, newServicesAllowed=False,
+             standardHandlerObserverAllowed=True, componentConstructionAllowed=False,
+             externalDeploymentAllowed=False, adoptionAllowed=False)
+-    return dict(common, state='ROOT_NEXT_RSC_STREAM_OBSERVER_HOST_AUTHORIZED_V1',
++    return dict(common, state='ROOT_NEXT_RSC_STREAM_OBSERVER_V4_HOST_AUTHORIZED_V1',
+         plans=binding['stockPlan'], rootAuthorityPath=str(HERE / 'stock-authority.json'),
+         localhostServerAllowed=True, browserAllowed=True, guestAllowed=False, engineAllowed=False,
+         externalApplicationDeploymentAllowed=False)
+@@ -193,7 +236,7 @@
+                 outputRoot=str(output), ownerOutputRoot=str(output) + '-external-root', ownerSeconds=600 if arm == 'cloud' else 300))
+         assert prep.admit(original) == before
+         protect()
+-        prep.save(prepared_path, dict(schemaVersion=1, state='ROOT_FIXED_RSC_STREAM_OBSERVER_PREWORK_PAIR_PREPARED_NOT_RUN_V1',
++        prep.save(prepared_path, dict(schemaVersion=1, state='ROOT_FIXED_RSC_STREAM_OBSERVER_V4_FULL_PAIR_PREPARED_NOT_RUN_V1',
+             controller=self_ref, bindings=BINDINGS, trials=rows, order=['cloud', 'stock'], publicRequestCorrelation=PUBLIC,
+             cloudSelfOrigin=cloud_origin, portSelectionSocketClosedBeforeAuthorityPublication=True,
+             portReservationOrHandoffGuaranteed=False, actorMustLeaseExactOriginOnce=True, fallbackAllowed=False,
+@@ -205,7 +248,7 @@
+     prepared_ref = prep.row(prepared_path)
+     prepared = prep.document(prepared_ref)
+     assert prepared['controller'] == self_ref and prepared['bindings'] == BINDINGS
+-    assert prepared['state'] == 'ROOT_FIXED_RSC_STREAM_OBSERVER_PREWORK_PAIR_PREPARED_NOT_RUN_V1'
++    assert prepared['state'] == 'ROOT_FIXED_RSC_STREAM_OBSERVER_V4_FULL_PAIR_PREPARED_NOT_RUN_V1'
+     assert prepared['portReservationOrHandoffGuaranteed'] is False and prepared['fallbackAllowed'] is False
+     assert prepared['order'] == ['cloud', 'stock'] and [x['arm'] for x in prepared['trials']] == ['cloud', 'stock']
+     for item in prepared['trials']:
+@@ -372,7 +415,7 @@
+         except BaseException as error:
+             try:
+                 prep.save(HERE / 'stock-unattempted.json', dict(schemaVersion=1,
+-                    state='RSC_STREAM_OBSERVER_STOCK_SLOT_UNATTEMPTED_CLOUD_COLLECTION_UNCERTAIN_V1',
++                    state='RSC_STREAM_OBSERVER_V4_STOCK_SLOT_UNATTEMPTED_CLOUD_COLLECTION_UNCERTAIN_V1',
+                     error=dict(name=type(error).__name__, message=str(error)[:2048]), bindings=BINDINGS,
+                     automaticRetry=False, replacementTrials=False, fullNextAccepted=False))
+             except BaseException:
+@@ -411,7 +454,7 @@
+                 secondary.append(dict(name=type(error).__name__, message=str(error)[:2048]))
+         clean = terminal is not None and not terminal['timeout'] and not terminal['forcedCleanup'] and terminal['parentOwnedGroupGone'] and terminal['allObservedOwnedGroupsGone'] and all(not terminal[k] for k in ('errors', 'signals', 'interruptedSignals', 'remainingObservedPids'))
+         try:
+-            row = dict(schemaVersion=1, state='ROOT_RSC_STREAM_OBSERVER_PREWORK_ORIGINAL_OWNER_COMPLETED_UNREVIEWED_V1', arm=arm,
++            row = dict(schemaVersion=1, state='ROOT_RSC_STREAM_OBSERVER_V4_FULL_ORIGINAL_OWNER_COMPLETED_UNREVIEWED_V1', arm=arm,
+                 rawExitCode=None if terminal is None else terminal['rawExitCode'], originalOwner=None if terminal is None else terminal['pid'],
+                 cleanOwner=clean, finalInputsPreserved=preserved, error=None if primary is None else dict(name=type(primary).__name__, message=str(primary)[:2048]),
+                 secondaryErrors=secondary, authority=ar, controller=self_ref, bindings=BINDINGS,

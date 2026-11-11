@@ -1,0 +1,120 @@
+--- v1-unbound/prepare-bindings.py
++++ v2-unbound/prepare-bindings.py
+@@ -8,8 +8,8 @@
+ 
+ HERE = Path(__file__).resolve().parent
+ BASE = HERE.parent
+-ACTOR = BASE / 'next-rsc-stream-observer-v4-runtime-v1'
+-CLIENT = BASE / 'next-rsc-stream-observer-v4-full-client-v1'
++ACTOR = BASE / 'next-rsc-stream-observer-v4-runtime-v2'
++CLIENT = BASE / 'next-rsc-stream-observer-v4-full-client-v2'
+ BROWSER = BASE / 'next-rsc-stream-observer-v4-browser-v1'
+ ACTOR_INDEX = None
+ CLIENT_INDEX = None
+@@ -24,6 +24,7 @@
+ BODY_CONTROL = dict(path=str(BASE / 'next-rsc-browser-body-prework-root-results-v1/actualreview.json'),
+     sha256='bc79b8111d58127d501a9aa6e592e81f71742f632cba5b8f2aeacbf7459b1e49', bytes=154007)
+ SELECTED_HOST_TOOLS = None
++CONSTRUCTION_ARTIFACT_PREFLIGHT = None
+ COMPOSITION_REVIEW = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-standard-handler-observer-v4-root-results-v1/actual-next-v4-composition-review.json', 'sha256': '730c2698578692e35789918930d6be1cf8fb837a4e5362bcef5b802919795c2f', 'bytes': 9900}
+ OBSERVER_COMPOSITION_REVIEW = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-standard-handler-observer-v4-root-results-v1/actual-v4-composition-review.json', 'sha256': '214c1d9bcfd1858666d460afe72811b858fc8018e9f5e4bfb9519d8ddbe04224', 'bytes': 11140}
+ METADATA_REVIEW = {'path': '/Users/dan/dev/StarlingMonkey/tests/node-compat/frameworks/nextjs/next-standard-handler-observer-v4-root-results-v1/actual-metadata-runtime-review.json', 'sha256': '61bb6690df9cf8fef3c455314352a95816a20bc01920909b75632bf5333c47c8', 'bytes': 7272}
+@@ -65,7 +66,7 @@
+ def main():
+     if not __debug__ or not sys.flags.isolated or not sys.dont_write_bytecode:
+         raise RuntimeError('Requires nonoptimized isolated Python with bytecode disabled')
+-    assert all(type(r) is dict for r in (ACTOR_INDEX, CLIENT_INDEX, BROWSER_INDEX, CONTROLLER_UNBOUND, SELECTED_HOST_TOOLS)), 'Source review/seals pending; no helper read or mutation'
++    assert all(type(r) is dict for r in (ACTOR_INDEX, CLIENT_INDEX, BROWSER_INDEX, CONTROLLER_UNBOUND, SELECTED_HOST_TOOLS, CONSTRUCTION_ARTIFACT_PREFLIGHT)), 'Source review/seals pending; no helper read or mutation'
+     helper = BASE / 'next-native-export-diagnostic-next-root-results-v1/prepare-construction.py'
+     raw = helper.read_bytes()
+     assert (hashlib.sha256(raw).hexdigest(), len(raw)) == ('4bafbb2fd675bcee84746aea3988ae6eb597d64570d19cd3c8819aa158d2c5e4', 19784)
+@@ -82,6 +83,30 @@
+     assert CONTROLLER_UNBOUND['path'] == str(HERE / 'run-controls.py')
+     prep.checked(CONTROLLER_UNBOUND)
+     composition, observer_composition, metadata_review = composition_evidence(prep)
++    # Close the actor's actual historical constructor artifactBookend inputs before any owner can be issued.
++    # The Root preflight receipt is authenticated provenance; fresh checked(ref) below is the admission.
++    prep.checked(CONSTRUCTION_ARTIFACT_PREFLIGHT)
++    inner_review_ref = prep.row(BASE / 'next-native-export-diagnostic-next-root-results-v1/actual-construction-review.json')
++    assert (inner_review_ref['sha256'], inner_review_ref['bytes']) == ('5c284564e0ddefba507c5429acd98c42393d5c0f2764105a4046f0665f51e16a', 22550)
++    inner_review = prep.document(inner_review_ref)
++    construction = prep.document(inner_review['actualResult'])
++    audit = prep.document(inner_review['componentAudit'])
++    assert construction['state'] == 'NEXT_NATIVE_COMPONENT_CONSTRUCTION_PASSED_UNREVIEWED_V2' and construction['passed'] is True
++    assert construction['artifacts']['component'] == inner_review['component'] and construction['artifacts']['componentAudit'] == inner_review['componentAudit']
++    assert audit['component'] == inner_review['component'] and audit['passed'] is True
++    constructor_bookend_refs = [inner_review['actualResult'], inner_review['component'], inner_review['componentAudit'],
++        construction['rootAuthority'], construction['callerIndex'], construction['plan'], *construction['artifacts']['engineBuildEvidence']]
++    for key in ('engine', 'nativeMetadata', 'inputSourceIndex', 'inputEntry', 'adapter', 'returnedImports', 'returnedOwnShape'):
++        constructor_bookend_refs.append(construction['artifacts'][key])
++    for key in ('validateTerminal', 'witTerminal'):
++        terminal_ref = audit[key]
++        terminal = prep.document(terminal_ref)
++        assert terminal['rawExitCode'] == 0 and not terminal['timeout'] and not terminal['forcedCleanup']
++        assert terminal['parentOwnedGroupGone'] and terminal['allObservedOwnedGroupsGone']
++        assert all(not terminal[key] for key in ('signals', 'errors', 'interruptedSignals', 'remainingObservedPids'))
++        constructor_bookend_refs.extend((terminal_ref, terminal['stdout'], terminal['stderr']))
++    for ref in constructor_bookend_refs:
++        prep.checked(ref)
+     selected_host = prep.document(SELECTED_HOST_TOOLS)
+     assert selected_host['state'] == 'ROOT_V4_BROWSER_TOOL_SELECTION_PASSED_NOT_BROWSER_EXECUTED_V1' and selected_host['passed'] is True
+     assert selected_host['chromeVersion'] == '157.0.8103.39' and selected_host['playwrightVersion'] == '1.64.1'
+@@ -168,8 +193,8 @@
+     assert client_plan['suite'] == 'NEXT_RSC_STREAM_OBSERVER_FULL_CONTRACT_CLIENT_V1' and client_plan['actualBrowserSourceBindingPending'] is False
+     assert set(client_plan['sourceRequirements']) == {'manifestReader', 'supplemental', 'portableCacheCollector', 'fixtureContract', 'browserSourceIndex', 'browserWorker'}
+     assert client_plan['sourceRequirements']['browserWorker'] == worker and client_plan['sourceRequirements']['browserSourceIndex'] == browser_ref
+-    assert client_plan['allowedOutputPolicies'] == [dict(runId='rsc-stream-observer-v4-' + arm + '-first',
+-        output='/private/tmp/starling-node-compat/next-rsc-stream-observer-v4-' + arm + '-v1-rsc-stream-observer-v4-' + arm + '-first/client') for arm in ('cloud', 'stock')]
++    assert client_plan['allowedOutputPolicies'] == [dict(runId='rsc-stream-observer-v4-' + arm + '-second',
++        output='/private/tmp/starling-node-compat/next-rsc-stream-observer-v4-' + arm + '-v2-rsc-stream-observer-v4-' + arm + '-second/client') for arm in ('cloud', 'stock')]
+     plans, preimages = {}, {}
+     for arm, name in (('cloud', 'plan.json'), ('stock', 'stock-plan.json')):
+         p = json.loads((ACTOR / name).read_bytes())
+@@ -178,9 +203,9 @@
+         p.update(applicationInputs=app['applicationInputs'], applicationBuildResult=app['actualResult'], applicationBuildReview=APP_REVIEW,
+             applicationRootIdentityEvidence=app['applicationRootIdentityEvidence'], applicationBuildSource=app['sourceIndex'],
+             clientSource=prep.row(CLIENT / 'run-contracts.mjs'), clientSourceIndex=client_ref,
+-            browserSource=worker, browserSourceIndex=browser_ref, browserTools=selected_host['browserTools'], selectedHostTools=SELECTED_HOST_TOOLS, prospectiveFullClientBindingsPending=False,
+-            bindingState='READY_FULL_CLIENT_FULL_CONTRACT', outputPrefix='/private/tmp/starling-node-compat/next-rsc-stream-observer-v4-' + arm + '-v1',
+-            runId='rsc-stream-observer-v4-' + arm + '-first')
++            browserSource=worker, browserSourceIndex=browser_ref, browserTools=selected_host['browserTools'], selectedHostTools=SELECTED_HOST_TOOLS, constructionArtifactBookendPreflight=CONSTRUCTION_ARTIFACT_PREFLIGHT, prospectiveFullClientBindingsPending=False,
++            bindingState='READY_FULL_CLIENT_FULL_CONTRACT', outputPrefix='/private/tmp/starling-node-compat/next-rsc-stream-observer-v4-' + arm + '-v2',
++            runId='rsc-stream-observer-v4-' + arm + '-second')
+         p['fullClientFullContract'].update(clientSourcePending=False, requiredClientIndex=client_ref,
+             requiredClient=prep.row(CLIENT / 'run-contracts.mjs'), assetSelection=ASSET_SELECTION,
+             browserFamily=browser_ref, clientFamily=client_ref, requiredAssetSelection=ASSET_SELECTION,
+@@ -231,6 +256,8 @@
+             for member in value:
+                 descriptors(member)
+ 
++    for ref in constructor_bookend_refs + [CONSTRUCTION_ARTIFACT_PREFLIGHT]:
++        add(ref)
+     for ref in state['buildRefs'] + state['sourceRefs'] + [prep.ENGINE, prep.NATIVE_METADATA]:
+         add(ref)
+     donor = prep.document(prep.row(BASE / 'next-nonredirect-action-runtime-v2/plan.json'))
+@@ -281,12 +308,12 @@
+             p['sourceFamilies'], p['protectedInputs'] = families, protected
+         bind_plan(ACTOR, name, arm, publish)
+     actor_ref = reseal(ACTOR)
+-    binding = dict(schemaVersion=1, state='ROOT_RSC_STREAM_OBSERVER_V4_ACTUAL_BINDINGS_V1', actorIndex=actor_ref,
++    binding = dict(schemaVersion=1, state='ROOT_RSC_STREAM_OBSERVER_V4_ACTUAL_BINDINGS_V2', actorIndex=actor_ref,
+         clientIndex=client_ref, browserIndex=browser_ref, cloudPlan=prep.row(ACTOR / 'plan.json'), stockPlan=prep.row(ACTOR / 'stock-plan.json'),
+         applicationBuildReview=APP_REVIEW, assetSelection=ASSET_SELECTION, actualActionManifest=manifest_ref, requiredActionId=action_id,
+         originalFailedFullReview=FAILED_FULL, precedingBodyControlReview=BODY_CONTROL, protectedInputs=protected,
+         innerConstructionReview=prep.row(BASE / 'next-native-export-diagnostic-next-root-results-v1/actual-construction-review.json'),
+-        compositionReview=COMPOSITION_REVIEW, observerCompositionReview=OBSERVER_COMPOSITION_REVIEW, metadataRuntimeReview=METADATA_REVIEW, selectedHostTools=SELECTED_HOST_TOOLS)
++        compositionReview=COMPOSITION_REVIEW, observerCompositionReview=OBSERVER_COMPOSITION_REVIEW, metadataRuntimeReview=METADATA_REVIEW, selectedHostTools=SELECTED_HOST_TOOLS, constructionArtifactBookendPreflight=CONSTRUCTION_ARTIFACT_PREFLIGHT)
+     binding_ref = prep.save(HERE / 'runtime-bindings.json', binding)
+     controller = HERE / 'run-controls.py'
+     raw = prep.checked(CONTROLLER_UNBOUND).read_bytes()
+@@ -303,8 +330,9 @@
+         prep.family(ref)
+     assert prep.admit(original) == before
+     print(json.dumps(prep.save(HERE / 'source-bindings.json', dict(schemaVersion=1,
+-        state='ROOT_RSC_STREAM_OBSERVER_V4_METADATA_BOUND_NOT_RUN_V1', bindings=binding_ref, generator=prep.row(Path(__file__).resolve()),
++        state='ROOT_RSC_STREAM_OBSERVER_V4_METADATA_BOUND_NOT_RUN_V2', bindings=binding_ref, generator=prep.row(Path(__file__).resolve()),
+         controller=prep.row(controller), planInverses=changes, controllerOneLiteralInverseVerified=True,
++        constructorArtifactBookendReferenceCount=len({r['path'] for r in constructor_bookend_refs}), constructorArtifactBookendPreflight=CONSTRUCTION_ARTIFACT_PREFLIGHT,
+         protectedInputCount=len(protected), genuineBuildReferences=len(state['buildRefs']), genuineSourceReferences=len(state['sourceRefs']),
+         originalGuardBefore=before, oldProtectedArrayCopied=False, browserSelected=True, browserInvoked=False, immutableBrowserAndClientResealed=False, selectedHostPackageFiles=len(selected_host['playwrightPackageFiles']), actorsInvoked=False, fullNextAccepted=False))))
+ 

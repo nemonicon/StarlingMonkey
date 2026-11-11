@@ -1,0 +1,11 @@
+--- ../next-rsc-stream-observer-browser-v1/browser-check.mjs
++++ browser-check.mjs
+@@ -184,7 +184,7 @@
+   result.executableHashScope='Selected Chrome executable only; not an entire application-bundle hash';await save();
+   const module=await import(pathToFileURL(entry).href),chromium=module.chromium??module.default?.chromium;
+   assert(chromium,'Actual Playwright Chromium API');
+-  browser=await chromium.launch({executablePath:chrome,headless:true,timeout:limit,args:['--log-net-log='+netlogPath,'--net-log-max-size-mb=16']});result.browserVersion=browser.version();assert.equal(result.browserVersion,'156.0.8078.81','Matched controls require the retained Chrome version');await save();
++  browser=await chromium.launch({executablePath:chrome,headless:true,timeout:limit,args:['--log-net-log='+netlogPath,'--net-log-max-size-mb=16']});result.browserVersion=browser.version();assert.equal(result.browserVersion,'157.0.8103.39','Matched controls require the retained Chrome version');await save();
+   async function test(id,body){
+     const record={id,passed:false,timedOut:false,screenshot:null,error:null,publicCorrelationConfiguredNonce:correlation.manifest.nonceByTest[id]};const started=Date.now();
+     let context,page,timer,phase='context-setup';const finishes=new Set(),ids=new WeakMap();let nextRequest=0;

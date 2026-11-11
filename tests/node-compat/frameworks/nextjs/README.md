@@ -2,8 +2,14 @@
 
 ## Current checkpoint: 2026-11-11
 
-Next.js runs inside the experimental SpiderMonkey/Wasm server, but full portable
-Next.js acceptance remains **failed**. The current compression-off application
+The [V4 full comparison](../../../../docs/node-compat/nextjs-v4-full-results.md)
+now passes once on stock wasmCloud2.11.0 and matched Node22.14.0 with Chrome157:
+24HTTP,52 cache checks,80 supplemental checks, generation1→2, streaming,
+UI/assets and the original strict browser assertions. Both owners exit0 clean.
+This is a bounded profile result; repeatability, lifecycle and production
+acceptance remain open. Earlier Chrome156 failures remain failed and unexplained.
+
+Earlier evidence: the current compression-off application
 uses engine `237c4e5a` and component `6b2084d0`. Its full Wasmtime/Node comparison
 passes once, including persisted generation1→2 and the unchanged strict browser
 tests. The subsequent stock wasmCloud full trial passes24 HTTP cases,52 cache
@@ -25,7 +31,7 @@ The original module-global generation fixture remains a separate failed contract
 
 The [V4 observer checkpoint](../../../../docs/node-compat/nextjs-observer-v4-results.md)
 passes seven real-component metadata probes and validates the new Next envelope.
-Its full browser run remains pending. The saved raw packet and bounded
+Its subsequent full browser run is recorded above. The saved metadata packet and bounded
 `next-standard-handler-observer-v4-root-results-v1/check-retained-v2.py` checker
 also pass from actual staged Git copies without the original temporary trees.
 
@@ -37,15 +43,16 @@ Buffer or Next compatibility claim. The selected world still has thirteen
 standard WASI 0.2.10 interfaces and only the incoming-handler export; no custom
 host services, host modifications or socket/TLS implementation were introduced.
 
-Two portable regression evidence checks run from a checkout without the old
+Portable regression evidence checks run from a checkout without the old
 temporary build trees:
 
 ```sh
+python3 -I -B tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-v4-root-results-v2/review-runtime.py --retained
 python3 -I -B tests/node-compat/frameworks/nextjs/next-native-export-diagnostic-probe-root-results-v1/retained-runtime-v1/check.py
 python3 -I -B tests/node-compat/frameworks/nextjs/next-native-export-diagnostic-pair-root-results-v1/retained-raw-data-v1/check.py
 ```
 
-Both pass from the working tree and from Git-mode copies. The first verifies
+The two earlier checks pass from the working tree and from Git-mode copies. The first verifies
 the seventeen-case direct diagnostic deployment; the second verifies the full
 pair while preserving native failure and Node success. These check retained
 data, not a new target execution or a rebuild. Fresh target execution still

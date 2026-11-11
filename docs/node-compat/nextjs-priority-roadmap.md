@@ -1,6 +1,31 @@
 # Next.js execution priority
 
-Current second-host result: the [stock wasmCloud compression-off full trial](nextjs-compression-off-wasmcloud-results.md)
+Current priority: turn the [passing V4 full sample](nextjs-v4-full-results.md)
+into a dependable bounded profile. Stock wasmCloud2.11.0 and matched Node22.14.0
+now both pass the unchanged comprehensive workload with Chrome157.0.8103.39.
+The earlier Chrome156 failures remain recorded; this sample establishes no
+engine fix or cancellation cause.
+
+1. Exercise request-state isolation and AsyncLocalStorage propagation across
+   concurrent promises, stream callbacks, cancellation and exceptions. Keep
+   per-request state out of snapshot/global storage.
+2. Check resource retirement and reuse: repeated requests, aborted bodies,
+   error recovery, filesystem/HTTP handles and retained memory on both hosts.
+   Do not equate local counters with host instance identity.
+3. Run a declared repeatability matrix with frozen browser/tool versions and
+   unchanged assertions; preserve every failed sample. Extend the current full
+   profile to a matched Wasmtime run with the same current tool selection.
+4. Reproduce from a clean checkout with complete artifact prerequisites and
+   emitted-import checks, then measure size, startup, memory and throughput.
+5. Promote only the reviewed bounded changes after these gates. The accepted
+   production checkpoint remains foundations-v13.
+
+Historical response-boundary evidence follows. It remains useful if an abort
+recurs; new React instrumentation is not the immediate next step for the passing
+sample. The current V4 observer establishes one public-tuple witness, while its
+stronger join stays inconclusive under observed-only coverage.
+
+Previous second-host result: the [stock wasmCloud compression-off full trial](nextjs-compression-off-wasmcloud-results.md)
 passes24HTTP/52cache/80supplemental/generation/stream/function/asset checks but
 fails strict POST7 completion with ERR_ABORTED, despite absent Content-Encoding.
 Its clean owner and complete captures retain this failed outcome. Compression
@@ -29,9 +54,9 @@ about a failure, not a fix or complete cloud response.
 The [V4 observer](nextjs-observer-v4-results.md) now builds and passes seven
 real-component metadata probes, preserving the old V3 join=false result.
 The tested observer is now composed with the unchanged Next inner; the resulting
-envelope passes validation and structural review. Next prepare a fresh runtime
-binding and repeat the strict workload with V4 classification. Resolve the fresh sample's public metadata
-join before selecting an engine change or React reader/root hooks. Keep strict
+envelope passes validation and structural review. The fresh full-runtime
+comparison is now complete above. Preserve its observed-only public metadata
+scope before selecting an engine change or React reader/root hooks. Keep strict
 worker01ca and all original assertions unchanged. The separately found native finish-error propagation defect needs
 its own standard-WASI regression; it is not established as this abort's cause.
 After the response boundary, prioritize lifecycle and

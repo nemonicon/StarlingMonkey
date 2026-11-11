@@ -4,7 +4,43 @@ Current accepted checkpoint: [foundations-v13, bounded classic streams](tests/no
 
 Last updated: 2026-11-11. Overall roadmap: **in progress**.
 
-Latest completed gate: [observer V4](docs/node-compat/nextjs-observer-v4-results.md)
+Latest full Next result: the [V4 full comparison](docs/node-compat/nextjs-v4-full-results.md)
+passes once on stock wasmCloud2.11.0 and matched Node22.14.0 with Chrome157.0.8103.39
+and Playwright1.64.1. Original owners32470/600 and33103/300 exit0 clean. Both pass
+24HTTP,52 portable-cache checks,80 supplemental checks, generation1→2, incremental
+streaming, both UI interactions, asset checks and the original strict browser
+completion assertions. Both resource observers report complete bodies. Primary
+review791317fe recomputes these gates from the closed captures. This is one
+bounded profile sample; the older Chrome156 aborts remain failed and unexplained.
+No engine fix or production promotion is claimed.
+
+The fresh V4 capture contains51 normal metadata rows:47 known other paths,
+three distinct target requests and one matching public POST tuple. The analyzer
+admits that observed witness. Its stronger join remains inconclusive because the
+capture assessment deliberately claims observed-only coverage. It does not prove
+private identity, React reader EOF or a cause for the historical abort.
+
+Environment recovery is recorded: exact Playwright1.64.1 was restored after
+its old directory disappeared; Chrome had updated156→157. First owner30991/600
+failed cleanly before host/output creation because a pinned constructor adapter
+was absent. Its logs remain retained and its Node slot was not attempted. Root
+recovered the exact original adapter d30ade5b/49,672B from retained WAT and verified
+all54 constructor inputs plus all2,196 application files. The separately versioned
+V2 runner closes that prerequisite gap before issuing an owner. Its fresh2,199
+input binding and source review pass. No component bytes changed.
+
+The successful pair is retained as270 payloads/7,987,845B, indexd588c81e.
+The repository-only reader recomputes the original review and passes; optimized
+Python is refused before reads. Independent runtime8595fd75, tuplea82bfea9,
+bindingdd29bba3 and Sourcebe160074 reviews pass within their stated scopes.
+The same reader also passes from an isolated273-file copy made from actual
+staged Git blobs, with identical output and no original input-path reads.
+At that validation cut all505 staged files matched the worktree byte for byte.
+This completes the full-workload evidence checkpoint. Next prioritize request-state
+isolation, resource retirement and component reuse, followed by repeatability,
+clean-machine reproduction, cost measurements and production promotion.
+
+Completed prerequisite: [observer V4](docs/node-compat/nextjs-observer-v4-results.md)
 builds and passes all seven real-component metadata probes on Wasmtime42.0.1.
 Original owner22795/900 exits0 clean; all seven hosts shut down normally, captures
 complete and original inputs remain preserved. The 5,771B observer keeps the
@@ -17,11 +53,10 @@ staged-Git copies; old reader/61bb proof remain preserved. Next envelope9da63790
 now composes the unchanged6b20 inner and tested3534 observer: all four tool steps
 and Root structural review730c2698 plus independent peeraba36a69 pass, with
 nine tool records retained.
-Next prepare a fresh V4 full-runtime binding and repeat the unchanged strict
-workload. This metadata/composition result does not resolve or waive the browser
-abort. No Next request has run through the new envelope yet.
+The subsequent fresh V4 full-runtime comparison is recorded above. The
+metadata/composition result itself does not resolve or waive the earlier abort.
 
-Latest full-workload diagnostic: the [CDP resource-stream comparison](docs/node-compat/nextjs-resource-stream-results.md)
+Previous full-workload diagnostic: the [CDP resource-stream comparison](docs/node-compat/nextjs-resource-stream-results.md)
 finishes cloud67923/600 raw1/clean and Node68512/300 raw0/clean. Both pass24HTTP,
 52 portable checks,80 supplemental checks, generation1→2, stream3(0,1), UI2 and
 assets. The original strict browser gate remains cloudfalse/Nodetrue with3/0
@@ -63,7 +98,7 @@ binding preflight refuses Root's mistyped digest before edits/build; its correct
 uses the saved typed descriptor. None/allocator behavior remains model-only.
 Old V3 globaljoin:false is unchanged. The build volume now has about100GiB free.
 
-Current work: the [full-workload CDP observer](tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-root-results-v1/README.md)
+Earlier completed work: the [full-workload CDP observer](tests/node-compat/frameworks/nextjs/next-rsc-stream-observer-root-results-v1/README.md)
 now has independent Source/API reviews`7f6e9841`/`f26f5512`, six actual Node
 syntax checks and17 actual synthetic groups passing. Earlier12 positive groups
 missed post-terminal/empty-body/4MiB decoder counterexamples; those failures,

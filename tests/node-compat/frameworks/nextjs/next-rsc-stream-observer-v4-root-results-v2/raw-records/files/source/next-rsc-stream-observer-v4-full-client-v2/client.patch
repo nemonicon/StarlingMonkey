@@ -1,0 +1,11 @@
+--- v1/run-contracts.mjs
++++ v2/run-contracts.mjs
+@@ -11,7 +11,7 @@
+ import {collectSupplemental,validateSupplemental} from '../wasmtime-deployment-candidate-v8/supplemental.mjs';
+ import {collectPortableCache,validatePortableCache} from '../next-portable-cache-http-collector-v1/collector.mjs';
+ const here=dirname(fileURLToPath(import.meta.url)),origin=new URL(process.argv[2]),root=resolve(process.argv[3]),browserTools=process.argv[4];
+-assert.equal(process.version,'v22.14.0');assert.equal(process.argv.length,6);const runId=process.argv[5];assert(/^[a-z0-9][a-z0-9-]{0,47}$/.exec(runId)?.[0]===runId);assert.equal(origin.origin,process.argv[2]);assert.equal(origin.hostname,'127.0.0.1');assert.equal(origin.protocol,'http:');assert(browserTools);const expectedRoot=runId==='rsc-stream-observer-v4-cloud-first'?'/private/tmp/starling-node-compat/next-rsc-stream-observer-v4-cloud-v1-'+runId+'/client':runId==='rsc-stream-observer-v4-stock-first'?'/private/tmp/starling-node-compat/next-rsc-stream-observer-v4-stock-v1-'+runId+'/client':null;assert.equal(root,expectedRoot,'Exact fresh declared native/stock full-client output required');
++assert.equal(process.version,'v22.14.0');assert.equal(process.argv.length,6);const runId=process.argv[5];assert(/^[a-z0-9][a-z0-9-]{0,47}$/.exec(runId)?.[0]===runId);assert.equal(origin.origin,process.argv[2]);assert.equal(origin.hostname,'127.0.0.1');assert.equal(origin.protocol,'http:');assert(browserTools);const expectedRoot=runId==='rsc-stream-observer-v4-cloud-second'?'/private/tmp/starling-node-compat/next-rsc-stream-observer-v4-cloud-v2-'+runId+'/client':runId==='rsc-stream-observer-v4-stock-second'?'/private/tmp/starling-node-compat/next-rsc-stream-observer-v4-stock-v2-'+runId+'/client':null;assert.equal(root,expectedRoot,'Exact fresh declared native/stock full-client output required');
+ await mkdir(root,{mode:0o700});await mkdir(join(root,'responses'));
+ const hash=b=>createHash('sha256').update(b).digest('hex');
+ const result={schemaVersion:1,suite:'NEXT_RSC_STREAM_OBSERVER_FULL_CONTRACT_CLIENT_V1',controlOnly:false,fullOriginalContractExecuted:false,fullNextAccepted:false,origin:origin.origin,node:process.version,http:[],errors:[],transportErrors:[],actualRuntimeExecutionClaimRequiresParentProof:true};
